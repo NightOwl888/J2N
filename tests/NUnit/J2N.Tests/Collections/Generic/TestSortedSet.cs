@@ -2753,6 +2753,219 @@ namespace J2N.Collections.Generic
             Assert.AreEqual(0, lookupView.Count);
         }
 
+
+        // More cases
+
+        //------------------------------------------------------------
+        // 1. HEADSET (GetViewBefore) - Ascending vs Descending
+        // ------------------------------------------------------------
+
+        [Test]
+        public void Test_headSet_ascending_validRange()
+        {
+            SortedSet<int> set = new SortedSet<int>() { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+
+            SortedSet<int> view = set.GetViewBefore(5, false);
+
+            CollectionAssert.AreEqual(new[] { 0, 1, 2, 3, 4 }, view.ToArray());
+
+            SortedSet<int> descending = set.GetViewDescending().GetViewBefore(5, false);
+            SortedSet<int> inverse = set.GetViewAfter(5);
+
+            CollectionAssert.AreEqual(new[] { 9, 8, 7, 6 }, descending.ToArray());
+            CollectionAssert.AreEqual(new[] { 5, 6, 7, 8, 9 }, inverse.ToArray());
+        }
+
+        [Test]
+        public void Test_headSet_descending_validRange()
+        {
+            SortedSet<int> set = new SortedSet<int>() { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+            SortedSet<int> desc = set.GetViewDescending();
+
+            SortedSet<int> view = desc.GetViewBefore(5, false);
+
+            // In descending view, "head" means values BEFORE 5 in descending order
+            CollectionAssert.AreEqual(new[] { 9, 8, 7, 6 }, view.ToArray());
+        }
+
+        [Test]
+        public void Test_headSet_descending_inclusive()
+        {
+            SortedSet<int> set = new SortedSet<int>() { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+            SortedSet<int> desc = set.GetViewDescending();
+
+            SortedSet<int> view = desc.GetViewBefore(5, true);
+
+            CollectionAssert.AreEqual(new[] { 9, 8, 7, 6, 5 }, view.ToArray());
+        }
+
+        // ------------------------------------------------------------
+        // 2. TAILSET (GetViewAfter) - Ascending vs Descending
+        // ------------------------------------------------------------
+
+        [Test]
+        public void Test_tailSet_ascending_validRange()
+        {
+            SortedSet<int> set = new SortedSet<int>() { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+
+            SortedSet<int> view = set.GetViewAfter(5);
+
+            CollectionAssert.AreEqual(new[] { 5, 6, 7, 8, 9 }, view.ToArray());
+        }
+
+        [Test]
+        public void Test_tailSet_descending_validRange()
+        {
+            SortedSet<int> set = new SortedSet<int>() { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+            SortedSet<int> desc = set.GetViewDescending();
+
+            SortedSet<int> view = desc.GetViewAfter(5);
+
+            // In descending view, "tail" means <= 5 in descending order
+            CollectionAssert.AreEqual(new[] { 5, 4, 3, 2, 1, 0 }, view.ToArray());
+        }
+
+        [Test]
+        public void Test_tailSet_descending_inclusive()
+        {
+            SortedSet<int> set = new SortedSet<int>() { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+            SortedSet<int> desc = set.GetViewDescending();
+
+            SortedSet<int> view = desc.GetViewAfter(5, true);
+
+            CollectionAssert.AreEqual(new[] { 5, 4, 3, 2, 1, 0 }, view.ToArray());
+        }
+
+        // ------------------------------------------------------------
+        // 3. CRITICAL: Exception behavior (nested views)
+        // ------------------------------------------------------------
+
+        [Test]
+        public void Test_headSet_ascending_outOfRange_throws()
+        {
+            SortedSet<int> set = new SortedSet<int>() { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+
+            SortedSet<int> view = set.GetViewBefore(5, false);
+
+            Assert.Throws<ArgumentOutOfRangeException>(() => view.GetViewBefore(7, false));
+        }
+
+        [Test]
+        public void Test_headSet_descending_outOfRange_throws()
+        {
+            SortedSet<int> set = new SortedSet<int>() { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+            SortedSet<int> desc = set.GetViewDescending();
+
+            SortedSet<int> view = desc.GetViewBefore(5, false);
+
+            // KEY TEST: which side is "out of range"?
+            Assert.Throws<ArgumentOutOfRangeException>(() => view.GetViewBefore(3, false));
+        }
+
+        [Test]
+        public void Test_tailset_ascending_outOfRange_throws()
+        {
+            SortedSet<int> set = new SortedSet<int>() { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+            SortedSet<int> view = set.GetViewAfter(5, false);
+            Assert.Throws<ArgumentOutOfRangeException>(() => view.GetViewAfter(3, false));
+        }
+
+        [Test]
+        public void Test_tailSet_descending_outOfRange_throws()
+        {
+            SortedSet<int> set = new SortedSet<int>() { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+            SortedSet<int> desc = set.GetViewDescending();
+            SortedSet<int> view = desc.GetViewAfter(5, false);
+            // KEY TEST
+            Assert.Throws<ArgumentOutOfRangeException>(() => view.GetViewAfter(7, false)); // <-- critical for direction semantics
+        }
+
+        // ------------------------------------------------------------
+        // 4. CROSS-DIRECTION sanity checks
+        // ------------------------------------------------------------
+
+        [Test]
+        public void Test_descending_headSet_then_tailSet_behavior()
+        {
+            SortedSet<int> set = new SortedSet<int>() { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+            SortedSet<int> desc = set.GetViewDescending();
+
+            SortedSet<int> head = desc.GetViewBefore(5, false); // [9..6]
+            SortedSet<int> tail = head.GetViewAfter(7);
+
+            CollectionAssert.AreEqual(new[] { 7, 6 }, tail.ToArray());
+        }
+
+        [Test]
+        public void Test_descending_tailSet_then_headSet_behavior()
+        {
+            SortedSet<int> set = new SortedSet<int>() { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+            SortedSet<int> desc = set.GetViewDescending();
+
+            SortedSet<int> tail = desc.GetViewAfter(5); // [5..0]
+            SortedSet<int> head = tail.GetViewBefore(3, false);
+
+            CollectionAssert.AreEqual(new[] { 5, 4 }, head.ToArray());
+        }
+
+        [Test]
+        public void Test_subSet_chaining_three_levels()
+        {
+            SortedSet<int> set = new SortedSet<int>() { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+
+            SortedSet<int> a = set.GetView(2, true, 9, false);   // [2..8]
+            SortedSet<int> b = a.GetView(3, true, 7, false);     // [3..6]
+            SortedSet<int> c = b.GetView(4, true, 6, false);     // [4..5]
+
+            CollectionAssert.AreEqual(new[] { 4, 5 }, c.ToArray());
+        }
+
+        [Test]
+        public void Test_descending_multi_chain()
+        {
+            SortedSet<int> set = new SortedSet<int>() { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+            SortedSet<int> desc = set.GetViewDescending();
+
+            SortedSet<int> a = desc.GetViewBefore(7, false);    // [9..8]
+            SortedSet<int> b = a.GetViewAfter(8);               // [8]
+
+            CollectionAssert.AreEqual(new[] { 8 }, b.ToArray());
+        }
+
+        [Test]
+        public void Test_mixed_subset_head_tail()
+        {
+            SortedSet<int> set = new SortedSet<int>() { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+
+            SortedSet<int> sub = set.GetView(2, true, 8, false);   // [2..7]
+            SortedSet<int> head = sub.GetViewBefore(6, false);     // [2..5]
+            SortedSet<int> tail = head.GetViewAfter(4);            // [4..5]
+
+            CollectionAssert.AreEqual(new[] { 4, 5 }, tail.ToArray());
+        }
+
+        [Test]
+        public void Test_descending_subset_then_head()
+        {
+            SortedSet<int> set = new SortedSet<int>() { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+            SortedSet<int> desc = set.GetViewDescending();
+
+            SortedSet<int> sub = desc.GetView(8, true, 3, false);  // [8..4]
+            SortedSet<int> head = sub.GetViewBefore(6, false);    // [8..7]
+
+            CollectionAssert.AreEqual(new[] { 8, 7 }, head.ToArray());
+        }
+
+        [Test]
+        public void Test_chained_out_of_range_throws()
+        {
+            SortedSet<int> set = new SortedSet<int>() { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+
+            SortedSet<int> sub = set.GetView(2, true, 6, false);
+
+            Assert.Throws<ArgumentOutOfRangeException>(() => sub.GetViewBefore(7, false));
+        }
+
         /// <summary>
         /// Represents a sorted collection that may contain duplicates. Note this is just a mock and
         /// the data provided to the constructor must already be sorted according to the provided comparer.

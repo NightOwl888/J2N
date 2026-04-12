@@ -576,10 +576,10 @@ namespace J2N.Collections.Tests
                     SortedDictionary<string, int> view = dictionary.GetView(firstElement, middleElement);
                     var lookup = view.GetSpanAlternateLookup<char>();
                     Assert.Throws<ArgumentOutOfRangeException>(() => lookup.GetViewBefore(lastElement.AsSpan()));
-                    Assert.Throws<ArgumentOutOfRangeException>(() => lookup.GetViewBefore(lastElement.AsSpan(), upperKeyInclusive: true));
-                    Assert.Throws<ArgumentOutOfRangeException>(() => lookup.GetViewBefore(lastElement.AsSpan(), upperKeyInclusive: false));
-                    Assert.NotNull(lookup.GetViewBefore(middleElement.AsSpan(), upperKeyInclusive: true));
-                    Assert.NotNull(lookup.GetViewBefore(middleElement.AsSpan(), upperKeyInclusive: false));
+                    Assert.Throws<ArgumentOutOfRangeException>(() => lookup.GetViewBefore(lastElement.AsSpan(), inclusive: true));
+                    Assert.Throws<ArgumentOutOfRangeException>(() => lookup.GetViewBefore(lastElement.AsSpan(), inclusive: false));
+                    Assert.NotNull(lookup.GetViewBefore(middleElement.AsSpan(), inclusive: true));
+                    Assert.NotNull(lookup.GetViewBefore(middleElement.AsSpan(), inclusive: false));
                 }
             }
         }
@@ -642,10 +642,10 @@ namespace J2N.Collections.Tests
                     SortedDictionary<string, int> view = set.GetViewAfter(middleElement);
                     var lookup = view.GetSpanAlternateLookup<char>();
                     Assert.Throws<ArgumentOutOfRangeException>(() => lookup.GetViewAfter(firstElement.AsSpan()));
-                    Assert.Throws<ArgumentOutOfRangeException>(() => lookup.GetViewAfter(firstElement.AsSpan(), lowerKeyInclusive: true));
-                    Assert.Throws<ArgumentOutOfRangeException>(() => lookup.GetViewAfter(firstElement.AsSpan(), lowerKeyInclusive: false));
-                    Assert.NotNull(lookup.GetViewAfter(middleElement.AsSpan(), lowerKeyInclusive: true));
-                    Assert.NotNull(lookup.GetViewAfter(middleElement.AsSpan(), lowerKeyInclusive: false));
+                    Assert.Throws<ArgumentOutOfRangeException>(() => lookup.GetViewAfter(firstElement.AsSpan(), inclusive: true));
+                    Assert.Throws<ArgumentOutOfRangeException>(() => lookup.GetViewAfter(firstElement.AsSpan(), inclusive: false));
+                    Assert.NotNull(lookup.GetViewAfter(middleElement.AsSpan(), inclusive: true));
+                    Assert.NotNull(lookup.GetViewAfter(middleElement.AsSpan(), inclusive: false));
                 }
             }
         }
@@ -656,18 +656,18 @@ namespace J2N.Collections.Tests
         [InlineData(false, true)]
         [InlineData(false, false)]
         public void SortedDictionary_GetSpanAlternateLookup_WorksOnView(
-           bool lowerInclusive,
-           bool upperInclusive)
+           bool fromInclusive,
+           bool toInclusive)
         {
             var dictionary = new SortedDictionary<string, int>(StringComparer.Ordinal);
             for (int i = 0; i < 10; i++)
                 dictionary.Add(i.ToString("D2"), i);
 
             // View: [02,07]
-            var view = dictionary.GetView("02", lowerInclusive, "07", upperInclusive);
+            var view = dictionary.GetView("02", fromInclusive, "07", toInclusive);
 
-            int minInclusive = lowerInclusive ? 2 : 3;
-            int maxInclusive = upperInclusive ? 7 : 6;
+            int minInclusive = fromInclusive ? 2 : 3;
+            int maxInclusive = toInclusive ? 7 : 6;
 
             AssertSpanLookupMatchesView(view, minInclusive, maxInclusive);
 
@@ -677,15 +677,15 @@ namespace J2N.Collections.Tests
 
             AssertSpanLookupMatchesView(view.GetViewDescending(), minInclusive, maxInclusive);
 
-            int actualLower = lowerInclusive ? 1 : 2;
-            int actualUpper = upperInclusive ? 8 : 7;
+            int actualLower = fromInclusive ? 1 : 2;
+            int actualUpper = toInclusive ? 8 : 7;
 
             AssertSpanLookupRejectsOutOfRangeValues(
                 view,
                 actualLower,
                 actualUpper,
-                lowerInclusive,
-                upperInclusive);
+                fromInclusive,
+                toInclusive);
         }
 
         [Theory]
@@ -694,18 +694,18 @@ namespace J2N.Collections.Tests
         [InlineData(false, true)]
         [InlineData(false, false)]
         public void SortedDictionary_GetSpanAlternateLookup_WorksOnNestedView(
-            bool lowerInclusive,
-            bool upperInclusive)
+            bool fromInclusive,
+            bool toInclusive)
         {
             var dictionary = new SortedDictionary<string, int>(StringComparer.Ordinal);
             for (int i = 0; i < 10; i++)
                 dictionary.Add(i.ToString("D2"), i);
 
-            var view1 = dictionary.GetView("02", lowerInclusive, "08", upperInclusive);
-            var view2 = view1.GetView("03", lowerInclusive, "06", upperInclusive);
+            var view1 = dictionary.GetView("02", fromInclusive, "08", toInclusive);
+            var view2 = view1.GetView("03", fromInclusive, "06", toInclusive);
 
-            int minInclusive = lowerInclusive ? 3 : 4;
-            int maxInclusive = upperInclusive ? 6 : 5;
+            int minInclusive = fromInclusive ? 3 : 4;
+            int maxInclusive = toInclusive ? 6 : 5;
 
             AssertSpanLookupMatchesView(view2, minInclusive, maxInclusive);
 
@@ -715,15 +715,15 @@ namespace J2N.Collections.Tests
 
             AssertSpanLookupMatchesView(view2.GetViewDescending(), minInclusive, maxInclusive);
 
-            int lowerReject = lowerInclusive ? 2 : 3;
-            int upperReject = upperInclusive ? 7 : 6;
+            int lowerReject = fromInclusive ? 2 : 3;
+            int upperReject = toInclusive ? 7 : 6;
 
             AssertSpanLookupRejectsOutOfRangeValues(
                 view2,
                 lowerReject,
                 upperReject,
-                lowerInclusive,
-                upperInclusive);
+                fromInclusive,
+                toInclusive);
         }
 
         [Theory]
@@ -732,19 +732,19 @@ namespace J2N.Collections.Tests
         [InlineData(false, true)]
         [InlineData(false, false)]
         public void SortedDictionary_GetSpanAlternateLookup_WorksOnDeeplyNestedViews(
-            bool lowerInclusive,
-            bool upperInclusive)
+            bool fromInclusive,
+            bool toInclusive)
         {
             var dictionary = new SortedDictionary<string, int>(StringComparer.Ordinal);
             for (int i = 0; i < 20; i++)
                 dictionary.Add(i.ToString("D2"), i);
 
-            var v1 = dictionary.GetView("01", lowerInclusive, "18", upperInclusive);
-            var v2 = v1.GetView("03", lowerInclusive, "15", upperInclusive);
-            var v3 = v2.GetView("05", lowerInclusive, "10", upperInclusive);
+            var v1 = dictionary.GetView("01", fromInclusive, "18", toInclusive);
+            var v2 = v1.GetView("03", fromInclusive, "15", toInclusive);
+            var v3 = v2.GetView("05", fromInclusive, "10", toInclusive);
 
-            int minInclusive = lowerInclusive ? 5 : 6;
-            int maxInclusive = upperInclusive ? 10 : 9;
+            int minInclusive = fromInclusive ? 5 : 6;
+            int maxInclusive = toInclusive ? 10 : 9;
 
             AssertSpanLookupMatchesView(v3, minInclusive, maxInclusive);
 
@@ -754,15 +754,15 @@ namespace J2N.Collections.Tests
 
             AssertSpanLookupMatchesView(v3.GetViewDescending(), minInclusive, maxInclusive);
 
-            int lowerReject = lowerInclusive ? 4 : 5;
-            int upperReject = upperInclusive ? 11 : 10;
+            int lowerReject = fromInclusive ? 4 : 5;
+            int upperReject = toInclusive ? 11 : 10;
 
             AssertSpanLookupRejectsOutOfRangeValues(
                 v3,
                 lowerReject,
                 upperReject,
-                lowerInclusive,
-                upperInclusive);
+                fromInclusive,
+                toInclusive);
         }
 
         private static void AssertSpanLookupMatchesRootDictionary(SortedDictionary<string, int> dictionary)
@@ -969,7 +969,7 @@ namespace J2N.Collections.Tests
             Assert.Equal(0, dictionary.Count);
         }
 
-        private static void AssertSpanLookupRejectsOutOfRangeValues(SortedDictionary<string, int> dictionary, int below, int above, bool lowerInclusive, bool upperInclusive)
+        private static void AssertSpanLookupRejectsOutOfRangeValues(SortedDictionary<string, int> dictionary, int below, int above, bool fromInclusive, bool toInclusive)
         {
             var lookup = dictionary.GetSpanAlternateLookup<char>();
 
@@ -986,8 +986,8 @@ namespace J2N.Collections.Tests
 
             Assert.Throws<ArgumentOutOfRangeException>(() => dictionary.GetView(low, high));
             Assert.Throws<ArgumentOutOfRangeException>(() => lookup.GetView(low.AsSpan(), high.AsSpan()));
-            Assert.Throws<ArgumentOutOfRangeException>(() => dictionary.GetView(low, lowerInclusive, high, upperInclusive));
-            Assert.Throws<ArgumentOutOfRangeException>(() => lookup.GetView(low.AsSpan(), lowerInclusive, high.AsSpan(), upperInclusive));
+            Assert.Throws<ArgumentOutOfRangeException>(() => dictionary.GetView(low, fromInclusive, high, toInclusive));
+            Assert.Throws<ArgumentOutOfRangeException>(() => lookup.GetView(low.AsSpan(), fromInclusive, high.AsSpan(), toInclusive));
         }
 
         #endregion GetSpanAlternateLookup
@@ -1509,10 +1509,10 @@ namespace J2N.Collections.Tests
                     // J2N: this was confirmed to match JDK behavior
                     SortedDictionary<TKey, TValue> view = dictionary.GetViewBefore(middleElement.Key);
                     Assert.Throws<ArgumentOutOfRangeException>(() => view.GetViewBefore(lastElement.Key));
-                    Assert.Throws<ArgumentOutOfRangeException>(() => view.GetViewBefore(lastElement.Key, upperKeyInclusive: true));
-                    Assert.Throws<ArgumentOutOfRangeException>(() => view.GetViewBefore(lastElement.Key, upperKeyInclusive: false));
-                    Assert.NotNull(view.GetViewBefore(middleElement.Key, upperKeyInclusive: true));
-                    Assert.NotNull(view.GetViewBefore(middleElement.Key, upperKeyInclusive: false));
+                    Assert.Throws<ArgumentOutOfRangeException>(() => view.GetViewBefore(lastElement.Key, inclusive: true));
+                    Assert.Throws<ArgumentOutOfRangeException>(() => view.GetViewBefore(lastElement.Key, inclusive: false));
+                    Assert.NotNull(view.GetViewBefore(middleElement.Key, inclusive: true));
+                    Assert.NotNull(view.GetViewBefore(middleElement.Key, inclusive: false));
                 }
             }
         }
@@ -1694,10 +1694,10 @@ namespace J2N.Collections.Tests
                     // J2N: this was confirmed to match JDK behavior
                     SortedDictionary<TKey, TValue> view = dictionary.GetViewAfter(middleElement.Key);
                     Assert.Throws<ArgumentOutOfRangeException>(() => view.GetViewAfter(firstElement.Key));
-                    Assert.Throws<ArgumentOutOfRangeException>(() => view.GetViewAfter(firstElement.Key, lowerKeyInclusive: true));
-                    Assert.Throws<ArgumentOutOfRangeException>(() => view.GetViewAfter(firstElement.Key, lowerKeyInclusive: false));
-                    Assert.NotNull(view.GetViewAfter(middleElement.Key, lowerKeyInclusive: true));
-                    Assert.NotNull(view.GetViewAfter(middleElement.Key, lowerKeyInclusive: false));
+                    Assert.Throws<ArgumentOutOfRangeException>(() => view.GetViewAfter(firstElement.Key, inclusive: true));
+                    Assert.Throws<ArgumentOutOfRangeException>(() => view.GetViewAfter(firstElement.Key, inclusive: false));
+                    Assert.NotNull(view.GetViewAfter(middleElement.Key, inclusive: true));
+                    Assert.NotNull(view.GetViewAfter(middleElement.Key, inclusive: false));
                 }
             }
         }

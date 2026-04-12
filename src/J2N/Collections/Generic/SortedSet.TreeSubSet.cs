@@ -295,19 +295,34 @@ namespace J2N.Collections.Generic
                 return true;
             }
 
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            internal override bool IsTooHigh([AllowNull] T item)
+            private bool IsWithinRange([AllowNull] T item, bool inclusive)
+                => inclusive ? IsWithinRange(item) : IsWithinClosedRange(item);
+
+
+            private bool IsWithinClosedRange([AllowNull] T item)
             {
-                return IsTooHigh(item, _uBoundInclusive);
+                if (_lBoundActive)
+                {
+                    if (comparer.Compare(item!, _min!) < 0)
+                        return false;
+                }
+
+                if (_uBoundActive)
+                {
+                    if (comparer.Compare(item!, _max!) > 0)
+                        return false;
+                }
+
+                return true;
             }
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            private bool IsTooHigh([AllowNull] T item, bool upperBoundInclusive)
+            internal override bool IsTooHigh([AllowNull] T item)
             {
                 if (_uBoundActive)
                 {
                     int c = comparer.Compare(item!, _max!);
-                    if (c > 0 || (c == 0 && !upperBoundInclusive))
+                    if (c > 0 || (c == 0 && !_uBoundInclusive))
                         return true;
                 }
                 return false;
@@ -316,16 +331,10 @@ namespace J2N.Collections.Generic
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             internal override bool IsTooLow([AllowNull] T item)
             {
-                return IsTooLow(item, _lBoundInclusive);
-            }
-
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            private bool IsTooLow([AllowNull] T item, bool lowerBoundInclusive)
-            {
                 if (_lBoundActive)
                 {
                     int c = comparer.Compare(item!, _min!);
-                    if (c < 0 || (c == 0 && !lowerBoundInclusive))
+                    if (c < 0 || (c == 0 && !_lBoundInclusive))
                         return true;
                 }
                 return false;
@@ -554,66 +563,107 @@ namespace J2N.Collections.Generic
             // This passes functionality down to the underlying tree, clipping edges if necessary
             // There's nothing gained by having a nested subset. May as well draw it from the base
             // Cannot increase the bounds of the subset, can only decrease it
-            public override SortedSet<T> GetViewBefore([AllowNull] T upperValue)
+            internal override SortedSet<T> DoGetViewBefore([AllowNull] T toValue, bool inclusive, ExceptionArgument toArgumentName)
             {
-                if (IsTooHigh(upperValue))
+                if (!IsWithinRange(toValue, inclusive))
                 {
-                    ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.upperValue);
+                    ThrowHelper.ThrowArgumentOutOfRangeException(toArgumentName);
                 }
 
                 return !_reverse
-                    ? base.GetViewBefore(upperValue, upperValueInclusive: true)
-                    : base.GetViewAfter(upperValue, lowerValueInclusive: true);
+                    ? GetViewBeforeCore(toValue, inclusive)
+                    : GetViewAfterCore(toValue, inclusive);
             }
 
             // This passes functionality down to the underlying tree, clipping edges if necessary
             // There's nothing gained by having a nested subset. May as well draw it from the base
             // Cannot increase the bounds of the subset, can only decrease it
-            public override SortedSet<T> GetViewBefore([AllowNull] T upperValue, bool upperValueInclusive)
+            internal override SortedSet<T> DoGetViewAfter([AllowNull] T fromValue, bool inclusive, ExceptionArgument fromArgumentName)
             {
-                if (IsTooHigh(upperValue))
+                if (!IsWithinRange(fromValue, inclusive))
                 {
-                    ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.upperValue);
+                    ThrowHelper.ThrowArgumentOutOfRangeException(fromArgumentName);
                 }
 
                 return !_reverse
-                    ? base.GetViewBefore(upperValue, upperValueInclusive)
-                    : base.GetViewAfter(upperValue, upperValueInclusive);
+                    ? GetViewAfterCore(fromValue, inclusive)
+                    : GetViewBeforeCore(fromValue, inclusive);
             }
 
-            // This passes functionality down to the underlying tree, clipping edges if necessary
-            // There's nothing gained by having a nested subset. May as well draw it from the base
-            // Cannot increase the bounds of the subset, can only decrease it
-            public override SortedSet<T> GetViewAfter([AllowNull] T lowerValue)
+            private SortedSet<T> GetViewBeforeCore([AllowNull] T toValue, bool inclusive)
             {
-                if (IsTooLow(lowerValue))
+                T? upper;
+                bool upperInclusive;
+
+                // Fast path - no upper bound, no equality possible
+                if (!_uBoundActive)
                 {
-                    ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.lowerValue);
+                    upper = toValue;
+                    upperInclusive = inclusive;
+                }
+                else
+                {
+                    // Compute comparison ONCE
+                    int cmp = comparer.Compare(toValue!, _max!);
+                    if (cmp < 0)
+                    {
+                        // Override with new value
+                        upper = toValue;
+                        upperInclusive = inclusive;
+                    }
+                    else if (cmp > 0)
+                    {
+                        // Clipped by upper bound
+                        upper = _max;
+                        upperInclusive = _uBoundInclusive;
+                    }
+                    else // cmp == 0
+                    {
+                        // Rare equality case
+                        upper = _max;
+                        upperInclusive = _uBoundInclusive && inclusive;
+                    }
                 }
 
-                return !_reverse
-                    ? base.GetViewAfter(lowerValue, lowerValueInclusive: true)
-                    : base.GetViewBefore(lowerValue, upperValueInclusive: true);
+                return new TreeSubSet(_underlying, _min, _lBoundInclusive, upper, upperInclusive, _lBoundActive, true, _reverse);
             }
 
-            // This passes functionality down to the underlying tree, clipping edges if necessary
-            // There's nothing gained by having a nested subset. May as well draw it from the base
-            // Cannot increase the bounds of the subset, can only decrease it
-            public override SortedSet<T> GetViewAfter([AllowNull] T lowerValue, bool lowerValueInclusive)
+            private SortedSet<T> GetViewAfterCore([AllowNull] T fromValue, bool inclusive)
             {
-                if (IsTooLow(lowerValue))
+                T? lower;
+                bool lowerInclusive;
+
+                // Fast path - no lower bound, no equality possible
+                if (!_lBoundActive)
                 {
-                    ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.lowerValue);
+                    lower = fromValue;
+                    lowerInclusive = inclusive;
+                }
+                else
+                {
+                    // Compute comparison ONCE
+                    int cmp = comparer.Compare(fromValue!, _min!);
+                    if (cmp > 0)
+                    {
+                        // Override with new value
+                        lower = fromValue;
+                        lowerInclusive = inclusive;
+                    }
+                    else if (cmp < 0)
+                    {
+                        // Clipped by lower bound
+                        lower = _min;
+                        lowerInclusive = _lBoundInclusive;
+                    }
+                    else // cmp == 0
+                    {
+                        // Rare equality case
+                        lower = _min;
+                        lowerInclusive = _lBoundInclusive && inclusive;
+                    }
                 }
 
-                return !_reverse
-                    ? base.GetViewAfter(lowerValue, lowerValueInclusive)
-                    : base.GetViewBefore(lowerValue, lowerValueInclusive);
-            }
-
-            public override SortedSet<T> GetViewDescending()
-            {
-                return new TreeSubSet(_underlying, _min, _lBoundInclusive, _max, _uBoundInclusive, _lBoundActive, _uBoundActive, !_reverse);
+                return new TreeSubSet(_underlying, lower, lowerInclusive, _max, _uBoundInclusive, true, _uBoundActive, _reverse);
             }
 
 #if DEBUG

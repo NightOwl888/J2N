@@ -1605,44 +1605,48 @@ namespace J2N.Collections.Generic
 
             /// <summary>
             /// Returns the view of a subset in a <see cref="SortedDictionary{TKey, TValue}"/> with no lower bound.
+            /// <para/>
+            /// Usage Note: To match the default behavior of the JDK, call the <see cref="GetViewBefore(ReadOnlySpan{TAlternateKeySpan}, bool)"/>
+            /// overload with <c>inclusive</c> set to <see langword="false"/>.
             /// </summary>
-            /// <param name="upperKey">The highest desired key in the view.</param>
+            /// <param name="toKey">The last desired key in the view (highest in ascending order, lowest in descending order).</param>
             /// <returns>A subset view that contains only the values in the specified range.</returns>
             /// <remarks>
-            /// This method returns a view of the range of elements that fall before <paramref name="upperKey"/>
-            /// (inclusive), as defined by the comparer. This method does not copy elements from the
+            /// This method returns a view of the range of elements that fall before <paramref name="toKey"/>
+            /// (inclusive), as defined by the current view order and comparer. This method does not copy elements from the
             /// <see cref="SortedDictionary{TKey, TValue}"/>, but provides a window into the underlying <see cref="SortedDictionary{TKey, TValue}"/> itself.
             /// You can make changes in both the view and in the underlying <see cref="SortedDictionary{TKey, TValue}"/>.
             /// <para/>
             /// This corresponds to the <c>headMap()</c> method in the JDK.
             /// </remarks>
-            public SortedDictionary<TKey, TValue> GetViewBefore(ReadOnlySpan<TAlternateKeySpan> upperKey)
+            public SortedDictionary<TKey, TValue> GetViewBefore(ReadOnlySpan<TAlternateKeySpan> toKey)
             {
-                SortedSet<KeyValuePair<TKey, TValue>> viewSet = _setLookup.GetViewBefore(upperKey);
+                SortedSet<KeyValuePair<TKey, TValue>> viewSet = _setLookup.DoGetViewBefore(toKey, inclusive: true, ExceptionArgument.toKey);
                 return new SortedDictionary<TKey, TValue>(viewSet);
             }
 
             /// <summary>
             /// Returns the view of a subset in a <see cref="SortedDictionary{TKey, TValue}"/> with no lower bound.
             /// <para/>
-            /// Usage Note: To match the default behavior of the JDK, call this overload with <paramref name="upperKeyInclusive"/>
+            /// Usage Note: To match the default behavior of the JDK, call this overload with <paramref name="inclusive"/>
             /// set to <see langword="false"/>.
             /// </summary>
-            /// <param name="upperKey">The highest desired value in the view.</param>
-            /// <param name="upperKeyInclusive">If <see langword="true"/>, <paramref name="upperKey"/> will be included in the range;
+            /// <param name="toKey">The last desired key in the view (highest in ascending order, lowest in descending order).</param>
+            /// <param name="inclusive">If <see langword="true"/>, <paramref name="toKey"/> will be included in the range;
             /// otherwise, it is an exclusive upper bound.</param>
             /// <returns>
-            /// This method returns a view of the range of elements that fall before <paramref name="upperKey"/>, as defined by the comparer.
-            /// The upper bound may either be inclusive (<see langword="true"/>) or exclusive (<see langword="false"/>) depending on the
-            /// value of <paramref name="upperKeyInclusive"/>. This method does not copy elements from the
-            /// <see cref="SortedDictionary{TKey, TValue}"/>, but provides a window into the underlying <see cref="SortedDictionary{TKey, TValue}"/> itself.
+            /// This method returns a view of the range of elements that fall before <paramref name="toKey"/>, as defined
+            /// by the current view order and comparer. The upper bound may either be inclusive (<see langword="true"/>)
+            /// or exclusive (<see langword="false"/>) depending on the value of <paramref name="inclusive"/>. This method
+            /// does not copy elements from the <see cref="SortedDictionary{TKey, TValue}"/>, but provides a window into
+            /// the underlying <see cref="SortedDictionary{TKey, TValue}"/> itself.
             /// You can make changes in both the view and in the underlying <see cref="SortedDictionary{TKey, TValue}"/>.
             /// <para/>
             /// This corresponds to the <c>headMap()</c> method in the JDK.
             /// </returns>
-            public SortedDictionary<TKey, TValue> GetViewBefore(ReadOnlySpan<TAlternateKeySpan> upperKey, bool upperKeyInclusive)
+            public SortedDictionary<TKey, TValue> GetViewBefore(ReadOnlySpan<TAlternateKeySpan> toKey, bool inclusive)
             {
-                SortedSet<KeyValuePair<TKey, TValue>> viewSet = _setLookup.GetViewBefore(upperKey, upperKeyInclusive);
+                SortedSet<KeyValuePair<TKey, TValue>> viewSet = _setLookup.DoGetViewBefore(toKey, inclusive, ExceptionArgument.toKey);
                 return new SortedDictionary<TKey, TValue>(viewSet);
             }
 
@@ -1653,41 +1657,42 @@ namespace J2N.Collections.Generic
             /// <summary>
             /// Returns a view of a subset in a <see cref="SortedDictionary{TKey, TValue}"/> with no upper bound.
             /// </summary>
-            /// <param name="lowerKey">The lowest value in the range for the view.</param>
+            /// <param name="fromKey">The first key in the range for the view (lowest in ascending order, highest in descending order).</param>
             /// <returns>A subset view that contains only the values in the specified range.</returns>
             /// <remarks>
-            /// This method returns a view of the range of elements that fall after <paramref name="lowerKey"/>
-            /// (inclusive), as defined by the comparer. This method does not copy elements from the
+            /// This method returns a view of the range of elements that fall after <paramref name="fromKey"/>
+            /// (inclusive), as defined by the current view order and comparer. This method does not copy elements from the
             /// <see cref="SortedDictionary{TKey, TValue}"/>, but provides a window into the underlying <see cref="SortedDictionary{TKey, TValue}"/> itself.
             /// You can make changes in both the view and in the underlying <see cref="SortedDictionary{TKey, TValue}"/>.
             /// <para/>
             /// This corresponds to the <c>tailMap()</c> method in the JDK.
             /// </remarks>
-            public SortedDictionary<TKey, TValue> GetViewAfter(ReadOnlySpan<TAlternateKeySpan> lowerKey)
+            public SortedDictionary<TKey, TValue> GetViewAfter(ReadOnlySpan<TAlternateKeySpan> fromKey)
             {
-                SortedSet<KeyValuePair<TKey, TValue>> viewSet = _setLookup.GetViewAfter(lowerKey);
+                SortedSet<KeyValuePair<TKey, TValue>> viewSet = _setLookup.DoGetViewAfter(fromKey, inclusive: true, ExceptionArgument.fromKey);
                 return new SortedDictionary<TKey, TValue>(viewSet);
             }
 
             /// <summary>
             /// Returns a view of a subset in a <see cref="SortedDictionary{TKey, TValue}"/> with no upper bound.
             /// </summary>
-            /// <param name="lowerKey">The lowest value in the range for the view.</param>
-            /// <param name="lowerKeyInclusive">If <see langword="true"/>, <paramref name="lowerKey"/> will be included in the range;
+            /// <param name="fromKey">The first key in the range for the view (lowest in ascending order, highest in descending order).</param>
+            /// <param name="inclusive">If <see langword="true"/>, <paramref name="fromKey"/> will be included in the range;
             /// otherwise, it is an exclusive lower bound.</param>
             /// <returns>A subset view that contains only the values in the specified range.</returns>
             /// <remarks>
-            /// This method returns a view of the range of elements that fall after <paramref name="lowerKey"/>, as defined by the comparer.
-            /// The lower bound may either be inclusive (<see langword="true"/>) or exclusive (<see langword="false"/>) depending on the
-            /// value of <paramref name="lowerKeyInclusive"/>. This method does not copy elements from the
-            /// <see cref="SortedDictionary{TKey, TValue}"/>, but provides a window into the underlying <see cref="SortedDictionary{TKey, TValue}"/> itself.
+            /// This method returns a view of the range of elements that fall after <paramref name="fromKey"/>, as defined
+            /// by the current view order and comparer. The lower bound may either be inclusive (<see langword="true"/>)
+            /// or exclusive (<see langword="false"/>) depending on the value of <paramref name="inclusive"/>. This method
+            /// does not copy elements from the <see cref="SortedDictionary{TKey, TValue}"/>, but provides a window into
+            /// the underlying <see cref="SortedDictionary{TKey, TValue}"/> itself.
             /// You can make changes in both the view and in the underlying <see cref="SortedDictionary{TKey, TValue}"/>.
             /// <para/>
             /// This corresponds to the <c>tailMap()</c> method in the JDK.
             /// </remarks>
-            public SortedDictionary<TKey, TValue> GetViewAfter(ReadOnlySpan<TAlternateKeySpan> lowerKey, bool lowerKeyInclusive)
+            public SortedDictionary<TKey, TValue> GetViewAfter(ReadOnlySpan<TAlternateKeySpan> fromKey, bool inclusive)
             {
-                SortedSet<KeyValuePair<TKey, TValue>> viewSet = _setLookup.GetViewAfter(lowerKey, lowerKeyInclusive);
+                SortedSet<KeyValuePair<TKey, TValue>> viewSet = _setLookup.DoGetViewAfter(fromKey, inclusive, ExceptionArgument.fromKey);
                 return new SortedDictionary<TKey, TValue>(viewSet);
             }
 
@@ -1718,17 +1723,17 @@ namespace J2N.Collections.Generic
         INavigableCollection<KeyValuePair<TKey, TValue>> INavigableCollection<KeyValuePair<TKey, TValue>>.GetView(KeyValuePair<TKey, TValue> fromValue, bool fromInclusive, KeyValuePair<TKey, TValue> toValue, bool toInclusive)
             => _set.GetView(fromValue, fromInclusive, toValue, toInclusive);
 
-        INavigableCollection<KeyValuePair<TKey, TValue>> INavigableCollection<KeyValuePair<TKey, TValue>>.GetViewBefore(KeyValuePair<TKey, TValue> upperValue)
-            => _set.GetViewBefore(upperValue);
+        INavigableCollection<KeyValuePair<TKey, TValue>> INavigableCollection<KeyValuePair<TKey, TValue>>.GetViewBefore(KeyValuePair<TKey, TValue> toValue)
+            => _set.GetViewBefore(toValue);
 
-        INavigableCollection<KeyValuePair<TKey, TValue>> INavigableCollection<KeyValuePair<TKey, TValue>>.GetViewBefore(KeyValuePair<TKey, TValue> upperValue, bool upperValueInclusive)
-            => _set.GetViewBefore(upperValue, upperValueInclusive);
+        INavigableCollection<KeyValuePair<TKey, TValue>> INavigableCollection<KeyValuePair<TKey, TValue>>.GetViewBefore(KeyValuePair<TKey, TValue> toValue, bool inclusive)
+            => _set.GetViewBefore(toValue, inclusive);
 
-        INavigableCollection<KeyValuePair<TKey, TValue>> INavigableCollection<KeyValuePair<TKey, TValue>>.GetViewAfter(KeyValuePair<TKey, TValue> lowerValue)
-            => _set.GetViewAfter(lowerValue);
+        INavigableCollection<KeyValuePair<TKey, TValue>> INavigableCollection<KeyValuePair<TKey, TValue>>.GetViewAfter(KeyValuePair<TKey, TValue> fromValue)
+            => _set.GetViewAfter(fromValue);
 
-        INavigableCollection<KeyValuePair<TKey, TValue>> INavigableCollection<KeyValuePair<TKey, TValue>>.GetViewAfter(KeyValuePair<TKey, TValue> lowerValue, bool lowerValueInclusive)
-            => _set.GetViewAfter(lowerValue, lowerValueInclusive);
+        INavigableCollection<KeyValuePair<TKey, TValue>> INavigableCollection<KeyValuePair<TKey, TValue>>.GetViewAfter(KeyValuePair<TKey, TValue> fromValue, bool inclusive)
+            => _set.GetViewAfter(fromValue, inclusive);
 
         INavigableCollection<KeyValuePair<TKey, TValue>> INavigableCollection<KeyValuePair<TKey, TValue>>.GetViewDescending()
             => _set.GetViewDescending();
@@ -1778,7 +1783,7 @@ namespace J2N.Collections.Generic
         /// <para/>
         /// This corresponds to the <c>subMap()</c> method in the JDK.
         /// </remarks>
-        public SortedDictionary<TKey, TValue> GetView(TKey? fromKey, TKey? toKey)
+        public SortedDictionary<TKey, TValue> GetView([AllowNull] TKey fromKey, [AllowNull] TKey toKey)
         {
             SortedSet<KeyValuePair<TKey, TValue>> viewSet = _set.DoGetView(
                 new KeyValuePair<TKey, TValue>(fromKey!, default!),
@@ -1797,7 +1802,7 @@ namespace J2N.Collections.Generic
         /// Usage Note: To match the behavior of the JDK, call this overload with <paramref name="fromInclusive"/>
         /// set to <see langword="true"/> and <paramref name="toInclusive"/> set to <see langword="false"/>.
         /// </summary>
-        /// <param name="fromKey">The first key in the range for the view (lowest in ascending order, highest in descending order).</param>
+        /// <param name="fromKey">The first desired key in the range for the view (lowest in ascending order, highest in descending order).</param>
         /// <param name="fromInclusive">If <see langword="true"/>, <paramref name="fromKey"/> will be included in the range;
         /// otherwise, it is an exclusive lower bound.</param>
         /// <param name="toKey">The last desired key in the view (highest in ascending order, lowest in descending order).</param>
@@ -1818,7 +1823,7 @@ namespace J2N.Collections.Generic
         /// <para/>
         /// This corresponds to the <c>subMap()</c> method in the JDK.
         /// </remarks>
-        public SortedDictionary<TKey, TValue> GetView(TKey? fromKey, bool fromInclusive, TKey? toKey, bool toInclusive)
+        public SortedDictionary<TKey, TValue> GetView([AllowNull] TKey fromKey, bool fromInclusive, [AllowNull] TKey toKey, bool toInclusive)
         {
             SortedSet<KeyValuePair<TKey, TValue>> viewSet = _set.DoGetView(
                 new KeyValuePair<TKey, TValue>(fromKey!, default!),
@@ -1834,20 +1839,22 @@ namespace J2N.Collections.Generic
         /// <summary>
         /// Returns the view of a subset in a <see cref="SortedDictionary{TKey, TValue}"/> with no lower bound.
         /// </summary>
-        /// <param name="upperKey">The highest desired key in the view.</param>
+        /// <param name="toKey">The last desired key in the view (highest in ascending order, lowest in descending order).</param>
         /// <returns>A subset view that contains only the values in the specified range.</returns>
         /// <remarks>
-        /// This method returns a view of the range of elements that fall before <paramref name="upperKey"/>
-        /// (inclusive), as defined by the comparer. This method does not copy elements from the
+        /// This method returns a view of the range of elements that fall before <paramref name="toKey"/>
+        /// (inclusive), as defined by the current view order and comparer. This method does not copy elements from the
         /// <see cref="SortedDictionary{TKey, TValue}"/>, but provides a window into the underlying <see cref="SortedDictionary{TKey, TValue}"/> itself.
         /// You can make changes in both the view and in the underlying <see cref="SortedDictionary{TKey, TValue}"/>.
         /// <para/>
         /// This corresponds to the <c>headMap()</c> method in the JDK.
         /// </remarks>
-        public SortedDictionary<TKey, TValue> GetViewBefore(TKey? upperKey)
+        public SortedDictionary<TKey, TValue> GetViewBefore([AllowNull] TKey toKey)
         {
-            SortedSet<KeyValuePair<TKey, TValue>> viewSet = _set.GetViewBefore(
-                new KeyValuePair<TKey, TValue>(upperKey!, default!));
+            SortedSet<KeyValuePair<TKey, TValue>> viewSet = _set.DoGetViewBefore(
+                new KeyValuePair<TKey, TValue>(toKey!, default!),
+                inclusive: true,
+                ExceptionArgument.toKey);
 
             return new SortedDictionary<TKey, TValue>(viewSet);
         }
@@ -1855,26 +1862,28 @@ namespace J2N.Collections.Generic
         /// <summary>
         /// Returns the view of a subset in a <see cref="SortedDictionary{TKey, TValue}"/> with no lower bound.
         /// <para/>
-        /// Usage Note: To match the default behavior of the JDK, call this overload with <paramref name="upperKeyInclusive"/>
+        /// Usage Note: To match the default behavior of the JDK, call this overload with <paramref name="inclusive"/>
         /// set to <see langword="false"/>.
         /// </summary>
-        /// <param name="upperKey">The highest desired value in the view.</param>
-        /// <param name="upperKeyInclusive">If <see langword="true"/>, <paramref name="upperKey"/> will be included in the range;
+        /// <param name="toKey">The last desired key in the view (highest in ascending order, lowest in descending order).</param>
+        /// <param name="inclusive">If <see langword="true"/>, <paramref name="toKey"/> will be included in the range;
         /// otherwise, it is an exclusive upper bound.</param>
         /// <returns>
-        /// This method returns a view of the range of elements that fall before <paramref name="upperKey"/>, as defined by the comparer.
-        /// The upper bound may either be inclusive (<see langword="true"/>) or exclusive (<see langword="false"/>) depending on the
-        /// value of <paramref name="upperKeyInclusive"/>. This method does not copy elements from the
-        /// <see cref="SortedDictionary{TKey, TValue}"/>, but provides a window into the underlying <see cref="SortedDictionary{TKey, TValue}"/> itself.
+        /// This method returns a view of the range of elements that fall before <paramref name="toKey"/>, as defined
+        /// by the current view order and comparer. The upper bound may either be inclusive (<see langword="true"/>) or
+        /// exclusive (<see langword="false"/>) depending on the value of <paramref name="inclusive"/>. 
+        /// This method does not copy elements from the <see cref="SortedDictionary{TKey, TValue}"/>, but provides
+        /// a window into the underlying <see cref="SortedDictionary{TKey, TValue}"/> itself.
         /// You can make changes in both the view and in the underlying <see cref="SortedDictionary{TKey, TValue}"/>.
         /// <para/>
         /// This corresponds to the <c>headMap()</c> method in the JDK.
         /// </returns>
-        public SortedDictionary<TKey, TValue> GetViewBefore(TKey? upperKey, bool upperKeyInclusive)
+        public SortedDictionary<TKey, TValue> GetViewBefore([AllowNull] TKey toKey, bool inclusive)
         {
-            SortedSet<KeyValuePair<TKey, TValue>> viewSet = _set.GetViewBefore(
-                new KeyValuePair<TKey, TValue>(upperKey!, default!),
-                upperKeyInclusive);
+            SortedSet<KeyValuePair<TKey, TValue>> viewSet = _set.DoGetViewBefore(
+                new KeyValuePair<TKey, TValue>(toKey!, default!),
+                inclusive,
+                ExceptionArgument.toKey);
 
             return new SortedDictionary<TKey, TValue>(viewSet);
         }
@@ -1882,20 +1891,22 @@ namespace J2N.Collections.Generic
         /// <summary>
         /// Returns a view of a subset in a <see cref="SortedDictionary{TKey, TValue}"/> with no upper bound.
         /// </summary>
-        /// <param name="lowerKey">The lowest value in the range for the view.</param>
+        /// <param name="fromKey">The first desired key in the range for the view (lowest in ascending order, highest in descending order).</param>
         /// <returns>A subset view that contains only the values in the specified range.</returns>
         /// <remarks>
-        /// This method returns a view of the range of elements that fall after <paramref name="lowerKey"/>
-        /// (inclusive), as defined by the comparer. This method does not copy elements from the
+        /// This method returns a view of the range of elements that fall after <paramref name="fromKey"/>
+        /// (inclusive), as defined by the current view order and comparer. This method does not copy elements from the
         /// <see cref="SortedDictionary{TKey, TValue}"/>, but provides a window into the underlying <see cref="SortedDictionary{TKey, TValue}"/> itself.
         /// You can make changes in both the view and in the underlying <see cref="SortedDictionary{TKey, TValue}"/>.
         /// <para/>
         /// This corresponds to the <c>tailMap()</c> method in the JDK.
         /// </remarks>
-        public SortedDictionary<TKey, TValue> GetViewAfter(TKey? lowerKey)
+        public SortedDictionary<TKey, TValue> GetViewAfter([AllowNull] TKey fromKey)
         {
-            SortedSet<KeyValuePair<TKey, TValue>> viewSet = _set.GetViewAfter(
-                new KeyValuePair<TKey, TValue>(lowerKey!, default!));
+            SortedSet<KeyValuePair<TKey, TValue>> viewSet = _set.DoGetViewAfter(
+                new KeyValuePair<TKey, TValue>(fromKey!, default!),
+                inclusive: true,
+                ExceptionArgument.fromKey);
 
             return new SortedDictionary<TKey, TValue>(viewSet);
         }
@@ -1903,24 +1914,26 @@ namespace J2N.Collections.Generic
         /// <summary>
         /// Returns a view of a subset in a <see cref="SortedDictionary{TKey, TValue}"/> with no upper bound.
         /// </summary>
-        /// <param name="lowerKey">The lowest value in the range for the view.</param>
-        /// <param name="lowerKeyInclusive">If <see langword="true"/>, <paramref name="lowerKey"/> will be included in the range;
+        /// <param name="fromKey">The first desired key in the range for the view (lowest in ascending order, highest in descending order).</param>
+        /// <param name="inclusive">If <see langword="true"/>, <paramref name="fromKey"/> will be included in the range;
         /// otherwise, it is an exclusive lower bound.</param>
         /// <returns>A subset view that contains only the values in the specified range.</returns>
         /// <remarks>
-        /// This method returns a view of the range of elements that fall after <paramref name="lowerKey"/>, as defined by the comparer.
-        /// The lower bound may either be inclusive (<see langword="true"/>) or exclusive (<see langword="false"/>) depending on the
-        /// value of <paramref name="lowerKeyInclusive"/>. This method does not copy elements from the
-        /// <see cref="SortedDictionary{TKey, TValue}"/>, but provides a window into the underlying <see cref="SortedDictionary{TKey, TValue}"/> itself.
+        /// This method returns a view of the range of elements that fall after <paramref name="fromKey"/>, 
+        /// as defined by the current view order and comparer. The lower bound may either be inclusive (<see langword="true"/>)
+        /// or exclusive (<see langword="false"/>) depending on the value of <paramref name="inclusive"/>.
+        /// This method does not copy elements from the <see cref="SortedDictionary{TKey, TValue}"/>, but
+        /// provides a window into the underlying <see cref="SortedDictionary{TKey, TValue}"/> itself.
         /// You can make changes in both the view and in the underlying <see cref="SortedDictionary{TKey, TValue}"/>.
         /// <para/>
         /// This corresponds to the <c>tailMap()</c> method in the JDK.
         /// </remarks>
-        public SortedDictionary<TKey, TValue> GetViewAfter(TKey? lowerKey, bool lowerKeyInclusive)
+        public SortedDictionary<TKey, TValue> GetViewAfter([AllowNull] TKey fromKey, bool inclusive)
         {
-            SortedSet<KeyValuePair<TKey, TValue>> viewSet = _set.GetViewAfter(
-                new KeyValuePair<TKey, TValue>(lowerKey!, default!),
-                lowerKeyInclusive);
+            SortedSet<KeyValuePair<TKey, TValue>> viewSet = _set.DoGetViewAfter(
+                new KeyValuePair<TKey, TValue>(fromKey!, default!),
+                inclusive,
+                ExceptionArgument.fromKey);
 
             return new SortedDictionary<TKey, TValue>(viewSet);
         }
@@ -1930,7 +1943,10 @@ namespace J2N.Collections.Generic
         /// </summary>
         /// <returns>A view that contains the values of the current <see cref="SortedDictionary{TKey, TValue}"/> in reverse order.</returns>
         /// <remarks>
-        /// This method returns a reverse order view of the range of elements of this <see cref="SortedDictionary{TKey, TValue}"/>, as defined by the comparer.
+        /// This method returns a reverse order view of the range of elements of this <see cref="SortedDictionary{TKey, TValue}"/>,
+        /// as defined by the comparer. This method does not copy elements from the <see cref="SortedSet{T}"/>, but provides a
+        /// window into the underlying <see cref="SortedSet{T}"/> itself.
+        /// You can make changes in both the view and in the underlying <see cref="SortedSet{T}"/>.
         /// <para/>
         /// This corresponds to the <c>descendingMap()</c> method in the JDK.
         /// </remarks>
@@ -2518,51 +2534,51 @@ namespace J2N.Collections.Generic
                 return false;
             }
 
-            INavigableCollection<TKey> INavigableCollection<TKey>.GetView([AllowNull] TKey fromKey, [AllowNull] TKey toKey)
+            INavigableCollection<TKey> INavigableCollection<TKey>.GetView([AllowNull] TKey fromValue, [AllowNull] TKey toValue)
             {
                 // Note that if this is called on TreeSubSet, it overrides GetView() and properly
                 // cascades the call to the underlying set.
-                SortedDictionary<TKey, TValue> viewDictionary = _dictionary.GetView(fromKey, toKey);
+                SortedDictionary<TKey, TValue> viewDictionary = _dictionary.GetView(fromValue, toValue);
                 return new KeyCollection(viewDictionary);
             }
 
-            INavigableCollection<TKey> INavigableCollection<TKey>.GetView([AllowNull] TKey fromKey, bool fromInclusive, [AllowNull] TKey toKey, bool toInclusive)
+            INavigableCollection<TKey> INavigableCollection<TKey>.GetView([AllowNull] TKey fromValue, bool fromInclusive, [AllowNull] TKey toValue, bool toInclusive)
             {
                 // Note that if this is called on TreeSubSet, it overrides GetView() and properly
                 // cascades the call to the underlying set.
-                SortedDictionary<TKey, TValue> viewDictionary = _dictionary.GetView(fromKey, fromInclusive, toKey, toInclusive);
+                SortedDictionary<TKey, TValue> viewDictionary = _dictionary.GetView(fromValue, fromInclusive, toValue, toInclusive);
                 return new KeyCollection(viewDictionary);
             }
 
-            INavigableCollection<TKey> INavigableCollection<TKey>.GetViewBefore(TKey? upperValue)
+            INavigableCollection<TKey> INavigableCollection<TKey>.GetViewBefore([AllowNull] TKey toValue)
             {
                 // Note that if this is called on TreeSubSet, it overrides GetViewBefore() and properly
                 // cascades the call to the underlying set.
-                SortedDictionary<TKey, TValue> viewDictionary = _dictionary.GetViewBefore(upperValue);
+                SortedDictionary<TKey, TValue> viewDictionary = _dictionary.GetViewBefore(toValue);
                 return new KeyCollection(viewDictionary);
             }
 
-            INavigableCollection<TKey> INavigableCollection<TKey>.GetViewBefore(TKey? upperValue, bool upperValueInclusive)
+            INavigableCollection<TKey> INavigableCollection<TKey>.GetViewBefore([AllowNull] TKey toValue, bool inclusive)
             {
                 // Note that if this is called on TreeSubSet, it overrides GetViewBefore() and properly
                 // cascades the call to the underlying set.
-                SortedDictionary<TKey, TValue> viewDictionary = _dictionary.GetViewBefore(upperValue, upperValueInclusive);
+                SortedDictionary<TKey, TValue> viewDictionary = _dictionary.GetViewBefore(toValue, inclusive);
                 return new KeyCollection(viewDictionary);
             }
 
-            INavigableCollection<TKey> INavigableCollection<TKey>.GetViewAfter(TKey? lowerValue)
+            INavigableCollection<TKey> INavigableCollection<TKey>.GetViewAfter([AllowNull] TKey fromValue)
             {
                 // Note that if this is called on TreeSubSet, it overrides GetViewAfter() and properly
                 // cascades the call to the underlying set.
-                SortedDictionary<TKey, TValue> viewDictionary = _dictionary.GetViewAfter(lowerValue);
+                SortedDictionary<TKey, TValue> viewDictionary = _dictionary.GetViewAfter(fromValue);
                 return new KeyCollection(viewDictionary);
             }
 
-            INavigableCollection<TKey> INavigableCollection<TKey>.GetViewAfter(TKey? lowerValue, bool lowerValueInclusive)
+            INavigableCollection<TKey> INavigableCollection<TKey>.GetViewAfter([AllowNull] TKey fromValue, bool inclusive)
             {
                 // Note that if this is called on TreeSubSet, it overrides GetViewAfter() and properly
                 // cascades the call to the underlying set.
-                SortedDictionary<TKey, TValue> viewDictionary = _dictionary.GetViewAfter(lowerValue, lowerValueInclusive);
+                SortedDictionary<TKey, TValue> viewDictionary = _dictionary.GetViewAfter(fromValue, inclusive);
                 return new KeyCollection(viewDictionary);
             }
 

@@ -153,78 +153,86 @@ namespace J2N.Collections.Generic
 
         /// <summary>
         /// Returns the view of a subset in a <see cref="INavigableCollection{T}"/> with no lower bound.
+        /// <para/>
+        /// Usage Note: To match the default behavior of the JDK, call the <see cref="GetViewBefore(T, bool)"/>
+        /// overload with <c>inclusive</c> set to <see langword="false"/>.
         /// </summary>
-        /// <param name="upperValue">The highest desired value in the view.</param>
+        /// <param name="toValue">The last desired value in the view (highest in ascending order, lowest in descending order).</param>
         /// <returns>A subset view that contains only the values in the specified range.</returns>
         /// <remarks>
-        /// This method returns a view of the range of elements that fall before <paramref name="upperValue"/>
-        /// (inclusive), as defined by the comparer. This method does not copy elements from the
+        /// This method returns a view of the range of elements that fall before <paramref name="toValue"/>
+        /// (inclusive), as defined by the current view order and comparer. This method does not copy elements from the
         /// <see cref="INavigableCollection{T}"/>, but provides a window into the underlying <see cref="INavigableCollection{T}"/> itself.
         /// You can make changes in both the view and in the underlying <see cref="INavigableCollection{T}"/>.
         /// <para/>
         /// This corresponds to the <c>headSet()</c> method in the JDK.
         /// </remarks>
-        INavigableCollection<T> GetViewBefore(T? upperValue);
+        INavigableCollection<T> GetViewBefore([AllowNull] T toValue);
 
         /// <summary>
         /// Returns the view of a subset in a <see cref="INavigableCollection{T}"/> with no lower bound.
         /// <para/>
-        /// Usage Note: To match the default behavior of the JDK, call this overload with <paramref name="upperValueInclusive"/>
+        /// Usage Note: To match the default behavior of the JDK, call this overload with <paramref name="inclusive"/>
         /// set to <see langword="false"/>.
         /// </summary>
-        /// <param name="upperValue">The highest desired value in the view.</param>
-        /// <param name="upperValueInclusive">If <see langword="true"/>, <paramref name="upperValue"/> will be included in the range;
+        /// <param name="toValue">The last desired value in the view (highest in ascending order, lowest in descending order).</param>
+        /// <param name="inclusive">If <see langword="true"/>, <paramref name="toValue"/> will be included in the range;
         /// otherwise, it is an exclusive upper bound.</param>
         /// <returns>
-        /// This method returns a view of the range of elements that fall before <paramref name="upperValue"/>, as defined by the comparer.
-        /// The upper bound may either be inclusive (<see langword="true"/>) or exclusive (<see langword="false"/>) depending on the
-        /// value of <paramref name="upperValueInclusive"/>. This method does not copy elements from the
-        /// <see cref="INavigableCollection{T}"/>, but provides a window into the underlying <see cref="INavigableCollection{T}"/> itself.
+        /// This method returns a view of the range of elements that fall before <paramref name="toValue"/>, as defined by
+        /// the current view order and comparer. The upper bound may either be inclusive (<see langword="true"/>)
+        /// or exclusive (<see langword="false"/>) depending on the value of <paramref name="inclusive"/>.
+        /// This method does not copy elements from the <see cref="INavigableCollection{T}"/>, but provides a window
+        /// into the underlying <see cref="INavigableCollection{T}"/> itself.
         /// You can make changes in both the view and in the underlying <see cref="INavigableCollection{T}"/>.
         /// <para/>
         /// This corresponds to the <c>headSet()</c> method in the JDK.
         /// </returns>
-        INavigableCollection<T> GetViewBefore(T? upperValue, bool upperValueInclusive);
+        INavigableCollection<T> GetViewBefore([AllowNull] T toValue, bool inclusive);
 
         /// <summary>
         /// Returns a view of a subset in a <see cref="INavigableCollection{T}"/> with no upper bound.
         /// </summary>
-        /// <param name="lowerValue">The lowest value in the range for the view.</param>
+        /// <param name="fromValue">The first desired value in the view (lowest in ascending order, highest in descending order).</param>
         /// <returns>A subset view that contains only the values in the specified range.</returns>
         /// <remarks>
-        /// This method returns a view of the range of elements that fall after <paramref name="lowerValue"/>
-        /// (inclusive), as defined by the comparer. This method does not copy elements from the
+        /// This method returns a view of the range of elements that fall after <paramref name="fromValue"/>
+        /// (inclusive), as defined by the current view order and comparer. This method does not copy elements from the
         /// <see cref="INavigableCollection{T}"/>, but provides a window into the underlying <see cref="INavigableCollection{T}"/> itself.
         /// You can make changes in both the view and in the underlying <see cref="INavigableCollection{T}"/>.
         /// <para/>
         /// This corresponds to the <c>tailSet()</c> method in the JDK.
         /// </remarks>
-        INavigableCollection<T> GetViewAfter(T? lowerValue);
+        INavigableCollection<T> GetViewAfter([AllowNull] T fromValue);
 
         /// <summary>
         /// Returns a view of a subset in a <see cref="INavigableCollection{T}"/> with no upper bound.
         /// </summary>
-        /// <param name="lowerValue">The lowest value in the range for the view.</param>
-        /// <param name="lowerValueInclusive">If <see langword="true"/>, <paramref name="lowerValue"/> will be included in the range;
+        /// <param name="fromValue">The first desired value in the view (lowest in ascending order, highest in descending order).</param>
+        /// <param name="inclusive">If <see langword="true"/>, <paramref name="fromValue"/> will be included in the range;
         /// otherwise, it is an exclusive lower bound.</param>
         /// <returns>A subset view that contains only the values in the specified range.</returns>
         /// <remarks>
-        /// This method returns a view of the range of elements that fall after <paramref name="lowerValue"/>, as defined by the comparer.
-        /// The lower bound may either be inclusive (<see langword="true"/>) or exclusive (<see langword="false"/>) depending on the
-        /// value of <paramref name="lowerValueInclusive"/>. This method does not copy elements from the
-        /// <see cref="INavigableCollection{T}"/>, but provides a window into the underlying <see cref="INavigableCollection{T}"/> itself.
+        /// This method returns a view of the range of elements that fall after <paramref name="fromValue"/>, as defined
+        /// by the current view order and comparer. The lower bound may either be inclusive (<see langword="true"/>)
+        /// or exclusive (<see langword="false"/>) depending on the value of <paramref name="inclusive"/>. This method
+        /// does not copy elements from the <see cref="INavigableCollection{T}"/>, but provides a window into the
+        /// underlying <see cref="INavigableCollection{T}"/> itself.
         /// You can make changes in both the view and in the underlying <see cref="INavigableCollection{T}"/>.
         /// <para/>
         /// This corresponds to the <c>tailSet()</c> method in the JDK.
         /// </remarks>
-        INavigableCollection<T> GetViewAfter(T? lowerValue,  bool lowerValueInclusive);
+        INavigableCollection<T> GetViewAfter([AllowNull] T fromValue,  bool inclusive);
 
         /// <summary>
         /// Returns a reverse order view of the elements of the current <see cref="INavigableCollection{T}"/>.
         /// </summary>
         /// <returns>A view that contains the values of the current <see cref="INavigableCollection{T}"/> in reverse order.</returns>
         /// <remarks>
-        /// This method returns a reverse order view of the range of elements of this <see cref="INavigableCollection{T}"/>, as defined by the comparer.
+        /// This method returns a reverse order view of the range of elements of this <see cref="INavigableCollection{T}"/>, as
+        /// defined by the comparer. This method does not copy elements from the <see cref="SortedSet{T}"/>, but provides a
+        /// window into the underlying <see cref="SortedSet{T}"/> itself.
+        /// You can make changes in both the view and in the underlying <see cref="SortedSet{T}"/>.
         /// <para/>
         /// This corresponds to the <c>descendingSet()</c> method in the JDK.
         /// </remarks>
