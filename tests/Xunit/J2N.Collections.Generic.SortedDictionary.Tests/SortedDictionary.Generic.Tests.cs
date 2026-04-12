@@ -567,6 +567,12 @@ namespace J2N.Collections.Tests
                 for (int i = 0; i < count; i++)
                     dictionary.Add(i.ToString(), i);
 
+                Asssert_SubsquentCallOutOfRangeCall_ThrowsArgumentOutOfRangeException_MatchingDictionary(dictionary, comparer, count);
+                Asssert_SubsquentCallOutOfRangeCall_ThrowsArgumentOutOfRangeException_MatchingDictionary(dictionary.GetViewDescending(), ReverseComparer<string>.Create(comparer), count);
+            }
+
+            static void Asssert_SubsquentCallOutOfRangeCall_ThrowsArgumentOutOfRangeException_MatchingDictionary(SortedDictionary<string, int> dictionary, SCG.IComparer<string> comparer, int count)
+            {
                 string firstElement = dictionary.ElementAt(0).Key;
                 string middleElement = dictionary.ElementAt(count / 2).Key;
                 string lastElement = dictionary.ElementAt(count - 1).Key;
@@ -575,9 +581,19 @@ namespace J2N.Collections.Tests
                     // J2N: this was confirmed to match JDK behavior
                     SortedDictionary<string, int> view = dictionary.GetView(firstElement, middleElement);
                     var lookup = view.GetSpanAlternateLookup<char>();
-                    Assert.Throws<ArgumentOutOfRangeException>(() => lookup.GetViewBefore(lastElement.AsSpan()));
-                    Assert.Throws<ArgumentOutOfRangeException>(() => lookup.GetViewBefore(lastElement.AsSpan(), inclusive: true));
-                    Assert.Throws<ArgumentOutOfRangeException>(() => lookup.GetViewBefore(lastElement.AsSpan(), inclusive: false));
+
+                    AssertExtensions.ThrowsSameArgumentException<ArgumentOutOfRangeException>(
+                        () => view.GetViewBefore(lastElement),
+                        () => lookup.GetViewBefore(lastElement.AsSpan()));
+
+                    AssertExtensions.ThrowsSameArgumentException<ArgumentOutOfRangeException>(
+                        () => view.GetViewBefore(lastElement, inclusive: true),
+                        () => lookup.GetViewBefore(lastElement.AsSpan(), inclusive: true));
+
+                    AssertExtensions.ThrowsSameArgumentException<ArgumentOutOfRangeException>(
+                        () => view.GetViewBefore(lastElement, inclusive: false),
+                        () => lookup.GetViewBefore(lastElement.AsSpan(), inclusive: false));
+
                     Assert.NotNull(lookup.GetViewBefore(middleElement.AsSpan(), inclusive: true));
                     Assert.NotNull(lookup.GetViewBefore(middleElement.AsSpan(), inclusive: false));
                 }
@@ -629,21 +645,37 @@ namespace J2N.Collections.Tests
             if (count >= 3)
             {
                 SCG.IComparer<string> comparer = StringComparer.Ordinal;
-                var set = new SortedDictionary<string, int>(comparer);
+                var dictionary = new SortedDictionary<string, int>(comparer);
                 for (int i = 0; i < count; i++)
-                    set.Add(i.ToString(), i);
+                    dictionary.Add(i.ToString(), i);
 
-                string firstElement = set.ElementAt(0).Key;
-                string middleElement = set.ElementAt(count / 2).Key;
-                string lastElement = set.ElementAt(count - 1).Key;
+                Asssert_SubsquentCallOutOfRangeCall_ThrowsArgumentOutOfRangeException_MatchingDictionary(dictionary, comparer, count);
+                Asssert_SubsquentCallOutOfRangeCall_ThrowsArgumentOutOfRangeException_MatchingDictionary(dictionary.GetViewDescending(), ReverseComparer<string>.Create(comparer), count);
+            }
+
+            static void Asssert_SubsquentCallOutOfRangeCall_ThrowsArgumentOutOfRangeException_MatchingDictionary(SortedDictionary<string, int> dictionary, SCG.IComparer<string> comparer, int count)
+            {
+                string firstElement = dictionary.ElementAt(0).Key;
+                string middleElement = dictionary.ElementAt(count / 2).Key;
+                string lastElement = dictionary.ElementAt(count - 1).Key;
                 if ((comparer.Compare(firstElement, middleElement) < 0) && (comparer.Compare(middleElement, lastElement) < 0))
                 {
                     // J2N: this was confirmed to match JDK behavior
-                    SortedDictionary<string, int> view = set.GetViewAfter(middleElement);
+                    SortedDictionary<string, int> view = dictionary.GetViewAfter(middleElement);
                     var lookup = view.GetSpanAlternateLookup<char>();
-                    Assert.Throws<ArgumentOutOfRangeException>(() => lookup.GetViewAfter(firstElement.AsSpan()));
-                    Assert.Throws<ArgumentOutOfRangeException>(() => lookup.GetViewAfter(firstElement.AsSpan(), inclusive: true));
-                    Assert.Throws<ArgumentOutOfRangeException>(() => lookup.GetViewAfter(firstElement.AsSpan(), inclusive: false));
+
+                    AssertExtensions.ThrowsSameArgumentException<ArgumentOutOfRangeException>(
+                        () => view.GetViewAfter(firstElement),
+                        () => lookup.GetViewAfter(firstElement.AsSpan()));
+
+                    AssertExtensions.ThrowsSameArgumentException<ArgumentOutOfRangeException>(
+                        () => view.GetViewAfter(firstElement, inclusive: true),
+                        () => lookup.GetViewAfter(firstElement.AsSpan(), inclusive: true));
+
+                    AssertExtensions.ThrowsSameArgumentException<ArgumentOutOfRangeException>(
+                        () => view.GetViewAfter(firstElement, inclusive: false),
+                        () => lookup.GetViewAfter(firstElement.AsSpan(), inclusive: false));
+
                     Assert.NotNull(lookup.GetViewAfter(middleElement.AsSpan(), inclusive: true));
                     Assert.NotNull(lookup.GetViewAfter(middleElement.AsSpan(), inclusive: false));
                 }
