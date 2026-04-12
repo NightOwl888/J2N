@@ -548,11 +548,11 @@ namespace J2N.Collections.Generic
                 ExceptionArgument lowerArgumentName = _reverse ? toArgumentName : fromArgumentName;
                 ExceptionArgument upperArgumentName = _reverse ? fromArgumentName : toArgumentName;
 
-                if (IsTooLow(lower))
+                if (!IsWithinRange(lower, lowerInclusive))
                 {
                     ThrowHelper.ThrowArgumentOutOfRangeException(lowerArgumentName);
                 }
-                if (IsTooHigh(upper))
+                if (!IsWithinRange(upper, upperInclusive))
                 {
                     ThrowHelper.ThrowArgumentOutOfRangeException(upperArgumentName);
                 }

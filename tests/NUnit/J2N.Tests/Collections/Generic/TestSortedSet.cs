@@ -2966,6 +2966,81 @@ namespace J2N.Collections.Generic
             Assert.Throws<ArgumentOutOfRangeException>(() => sub.GetViewBefore(7, false));
         }
 
+        // subSet bounds errors
+        [Test]
+        public void Test_subSet_lowerViolatesUpperBound_throws()
+        {
+            SortedSet<int> set = new SortedSet<int>() { 1, 2, 3, 4, 5 };
+
+            SortedSet<int> view = set.GetView(2, true, 4, true);
+
+            // lower = 5: violates UPPER bound (4)
+            Assert.Throws<ArgumentOutOfRangeException>(() => view.GetView(5, true, 6, true));
+        }
+
+        [Test]
+        public void Test_subSet_upperViolatesLowerBound_throws()
+        {
+            SortedSet<int> set = new SortedSet<int>() { 1, 2, 3, 4, 5 };
+
+            SortedSet<int> view = set.GetView(2, true, 4, true);
+
+            // lower = 5: violates UPPER bound (4)
+            Assert.Throws<ArgumentOutOfRangeException>(() => view.GetView(0, true, 1, true));
+        }
+
+        [Test]
+        public void Test_subSet_bothEndpointsOutsideRange_throws()
+        {
+            SortedSet<int> set = new SortedSet<int>() { 1, 2, 3, 4, 5 };
+
+            SortedSet<int> view = set.GetView(2, true, 4, true);
+
+            // lower = 5: violates UPPER bound (4)
+            Assert.Throws<ArgumentOutOfRangeException>(() => view.GetView(0, true, 6, true));
+        }
+
+        [Test]
+        public void test_descendingSubSet_oppositeBoundViolation_throws()
+        {
+            SortedSet<int> set = new SortedSet<int>() { 1, 2, 3, 4, 5 };
+
+            SortedSet<int> view = set.GetView(2, true, 4, true).GetViewDescending();
+
+            // lower = 5: violates UPPER bound (4)
+            Assert.Throws<ArgumentOutOfRangeException>(() => view.GetView(5, true, 3, true));
+        }
+
+        [Test]
+        public void Test_tailSet_exceedsUpperBound_throws()
+        {
+            SortedSet<int> set = new SortedSet<int>() { 1, 2, 3, 4, 5 };
+
+            SortedSet<int> view = set.GetView(2, true, 4, true);
+
+            // lower = 5: violates UPPER bound (4)
+            Assert.Throws<ArgumentOutOfRangeException>(() => view.GetViewAfter(5, true));
+        }
+
+        [Test]
+        public void Test_GetView_Exclusive_Exclusive_OutOfRangeBy1_DoesNotThrow()
+        {
+            var set = new SortedSet<string>(StringComparer.Ordinal);
+            for (int i = 0; i < 20; i++)
+                set.Add(i.ToString("D2"));
+
+            SortedSet<string> v1 = set.GetView("01", false, "18", false);
+            SortedSet<string> v2 = v1.GetView("03", false, "15", false);
+            SortedSet<string> v3 = v2.GetView("05", false, "10", false);
+
+            SortedSet<string> end = v3.GetView("05", false, "10", false);
+
+            // Special case that does not throw because both bounds are exclusive
+            CollectionAssert.AreEqual(new[] { "06", "07", "08", "09" }, end.ToArray());
+
+            //Assert.Throws<ArgumentOutOfRangeException>(() => v3.GetView("05", false, "10", false));
+        }
+
         /// <summary>
         /// Represents a sorted collection that may contain duplicates. Note this is just a mock and
         /// the data provided to the constructor must already be sorted according to the provided comparer.

@@ -712,6 +712,13 @@ namespace J2N.Collections.Tests
             int actualLower = fromInclusive ? 1 : 2;
             int actualUpper = toInclusive ? 8 : 7;
 
+            // Special case - if both bounds are exclusive, the "closed range" rule takes effect.
+            // In this case, we adjust the upper up 1 because [02,07] would not throw.
+            if (!fromInclusive && !toInclusive)
+            {
+                actualUpper = 8;
+            }
+
             AssertSpanLookupRejectsOutOfRangeValues(
                 view,
                 actualLower,
@@ -749,6 +756,13 @@ namespace J2N.Collections.Tests
 
             int lowerReject = fromInclusive ? 2 : 3;
             int upperReject = toInclusive ? 7 : 6;
+
+            // Special case - if both bounds are exclusive, the "closed range" rule takes effect.
+            // In this case, we adjust the upper up 1 because [03,06] would not throw.
+            if (!fromInclusive && !toInclusive)
+            {
+                upperReject = 7;
+            }
 
             AssertSpanLookupRejectsOutOfRangeValues(
                 view2,
@@ -788,6 +802,13 @@ namespace J2N.Collections.Tests
 
             int lowerReject = fromInclusive ? 4 : 5;
             int upperReject = toInclusive ? 11 : 10;
+
+            // Special case - if both bounds are exclusive, the "closed range" rule takes effect.
+            // In this case, we adjust the upper up 1 because [05,10] would not throw.
+            if (!fromInclusive && !toInclusive)
+            {
+                upperReject = 11;
+            }
 
             AssertSpanLookupRejectsOutOfRangeValues(
                 v3,

@@ -2319,11 +2319,11 @@ namespace J2N.Collections.Generic
                 ExceptionArgument lowerArgumentName = reverse ? toArgumentName : fromArgumentName;
                 ExceptionArgument upperArgumentName = reverse ? fromArgumentName : toArgumentName;
 
-                if (IsTooLow(lower, comparer))
+                if (!IsWithinRange(lower, lowerInclusive, comparer))
                 {
                     ThrowHelper.ThrowArgumentOutOfRangeException(lowerArgumentName);
                 }
-                if (IsTooHigh(upper, comparer))
+                if (!IsWithinRange(upper, upperInclusive, comparer))
                 {
                     ThrowHelper.ThrowArgumentOutOfRangeException(upperArgumentName);
                 }
