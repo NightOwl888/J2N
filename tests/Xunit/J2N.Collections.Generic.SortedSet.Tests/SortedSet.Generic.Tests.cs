@@ -1285,10 +1285,9 @@ namespace J2N.Collections.Tests
             Assert.Equal(46, mySubSet.Count); //"not all elements were encountered"
 
             SCG.IEnumerable<int> en = mySubSet.Reverse();
-            Assert.True(mySubSet.SetEquals(en)); //"Expected to be the same set."
+            SortedSet<int> descending = mySubSet.GetViewDescending();
 
             // J2N: Added asserts for descending set comparison
-            SortedSet<int> descending = mySubSet.GetViewDescending();
             using var descendingEnumerator = descending.GetEnumerator();
             foreach (int element in en)
             {

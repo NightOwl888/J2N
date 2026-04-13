@@ -2738,7 +2738,7 @@ namespace J2N.Collections.Generic
         /// </remarks>
         public IEnumerator<T> GetEnumerator() => new Enumerator(this, IsReversed); // J2N: Pass through the IsReversed property to align the enumeration order with the view
 
-        internal Enumerator GetEnumeratorInternal() => new Enumerator(this, IsReversed);
+        internal Enumerator GetEnumeratorInternal(bool reverse) => new Enumerator(this, IsReversed ^ reverse);
 
         IEnumerator<T> IEnumerable<T>.GetEnumerator() => GetEnumerator();
 

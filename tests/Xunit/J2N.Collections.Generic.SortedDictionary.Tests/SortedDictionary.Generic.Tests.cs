@@ -172,6 +172,19 @@ namespace J2N.Collections.Tests
 
         [Theory]
         [MemberData(nameof(ValidCollectionSizes))]
+        public void SortedDictionary_Generic_ReverseDictionaryIsProperlySortedAccordingToComparer(int setLength)
+        {
+            SortedDictionary<TKey, TValue> dictionary = (SortedDictionary<TKey, TValue>)GenericIDictionaryFactory(setLength);
+            List<SCG.KeyValuePair<TKey, TValue>> expected = dictionary.ToList();
+            expected.Sort(GetIComparer());
+            expected.Reverse();
+            int expectedIndex = 0;
+            foreach (SCG.KeyValuePair<TKey, TValue> value in dictionary.Reverse())
+                Assert.Equal(expected[expectedIndex++], value);
+        }
+
+        [Theory]
+        [MemberData(nameof(ValidCollectionSizes))]
         public void SortedDictionary_Generic_GetViewDescending_IsProperlySortedAccordingToComparer(int setLength)
         {
             SortedDictionary<TKey, TValue> dictionary = (SortedDictionary<TKey, TValue>)GenericIDictionaryFactory(setLength);
@@ -239,6 +252,32 @@ namespace J2N.Collections.Tests
                     Assert.Equal(Math.Sign(original), -Math.Sign(forwardSwapped));
                 }
             }
+        }
+
+        [Fact]
+        public void SortedDictionary_Generic_TestSubSetEnumerator()
+        {
+            SortedDictionary<int, int> sortedSet = new SortedDictionary<int, int>();
+            for (int i = 0; i < 10000; i++)
+            {
+                if (!sortedSet.ContainsKey(i))
+                    sortedSet.Add(i, i);
+            }
+            SortedDictionary<int, int> mySubSet = sortedSet.GetView(45, 90);
+
+            Assert.Equal(46, mySubSet.Count); //"not all elements were encountered"
+
+            SCG.IEnumerable<SCG.KeyValuePair<int, int>> en = mySubSet.Reverse();
+            SortedDictionary<int, int> descending = mySubSet.GetViewDescending();
+
+            // J2N: Added asserts for descending set comparison
+            using var descendingEnumerator = descending.GetEnumerator();
+            foreach (SCG.KeyValuePair<int, int> element in en)
+            {
+                Assert.True(descendingEnumerator.MoveNext());
+                Assert.Equal(element, descendingEnumerator.Current);
+            }
+            Assert.False(descendingEnumerator.MoveNext());
         }
 
         #endregion

@@ -1758,6 +1758,20 @@ namespace J2N.Collections.Generic
 
         #endregion
 
+        /// <summary>
+        /// Returns an <see cref="IEnumerable{T}"/> of <see cref="KeyValuePair{TKey, TValue}"/> that iterates over the
+        /// <see cref="SortedDictionary{TKey, TValue}"/> in reverse order.
+        /// </summary>
+        /// <returns>An enumerator that iterates over the <see cref="SortedDictionary{TKey, TValue}"/> in reverse order.</returns>
+        public IEnumerable<KeyValuePair<TKey, TValue>> Reverse()
+        {
+            Enumerator e = new Enumerator(this, Enumerator.KeyValuePair, reverse: true);
+            while (e.MoveNext())
+            {
+                yield return e.Current;
+            }
+        }
+
         #region GetView Members
 
         /// <summary>
@@ -2118,8 +2132,13 @@ namespace J2N.Collections.Generic
             internal const int DictEntry = 2;
 
             internal Enumerator(SortedDictionary<TKey, TValue> dictionary, int getEnumeratorRetType)
+                : this(dictionary, getEnumeratorRetType, reverse: false)
             {
-                _treeEnum = dictionary._set.GetEnumeratorInternal();
+            }
+
+            internal Enumerator(SortedDictionary<TKey, TValue> dictionary, int getEnumeratorRetType, bool reverse)
+            {
+                _treeEnum = dictionary._set.GetEnumeratorInternal(reverse);
                 _getEnumeratorRetType = getEnumeratorRetType;
             }
 
