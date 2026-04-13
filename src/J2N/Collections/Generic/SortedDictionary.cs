@@ -1553,7 +1553,7 @@ namespace J2N.Collections.Generic
             return false;
         }
 
-        bool INavigableDictionary<TKey, TValue>.TryGetFirst(out TKey key, out TValue value)
+        bool INavigableDictionary<TKey, TValue>.TryGetFirst([MaybeNullWhen(false)] out TKey key, [MaybeNullWhen(false)] out TValue value)
             => TryGetFirst(out key, out value);
 
         /// <summary>
@@ -1579,7 +1579,7 @@ namespace J2N.Collections.Generic
             return false;
         }
 
-        bool INavigableDictionary<TKey, TValue>.TryGetLast(out TKey key, out TValue value)
+        bool INavigableDictionary<TKey, TValue>.TryGetLast([MaybeNullWhen(false)] out TKey key, [MaybeNullWhen(false)] out TValue value)
             => TryGetLast(out key, out value);
 
         /// <summary>
@@ -1604,7 +1604,7 @@ namespace J2N.Collections.Generic
             return false;
         }
 
-        bool INavigableDictionary<TKey, TValue>.RemoveFirst(out TKey key, out TValue value)
+        bool INavigableDictionary<TKey, TValue>.RemoveFirst([MaybeNullWhen(false)] out TKey key, [MaybeNullWhen(false)] out TValue value)
             => RemoveFirst(out key, out value);
 
         /// <summary>
@@ -1629,7 +1629,7 @@ namespace J2N.Collections.Generic
             return false;
         }
 
-        bool INavigableDictionary<TKey, TValue>.RemoveLast(out TKey key, out TValue value)
+        bool INavigableDictionary<TKey, TValue>.RemoveLast([MaybeNullWhen(false)] out TKey key, [MaybeNullWhen(false)] out TValue value)
             => RemoveLast(out key, out value);
 
         /// <summary>
@@ -1647,9 +1647,9 @@ namespace J2N.Collections.Generic
         /// <para/>
         /// Usage Note: This corresponds to the <c>lowerEntry()</c> method in the JDK.
         /// </remarks>
-        public bool TryGetPredecessor(TKey key, [MaybeNullWhen(false)] out TKey resultKey, [MaybeNullWhen(false)] out TValue resultValue)
+        public bool TryGetPredecessor([AllowNull] TKey key, [MaybeNullWhen(false)] out TKey resultKey, [MaybeNullWhen(false)] out TValue resultValue)
         {
-            if (_set.TryGetPredecessor(new KeyValuePair<TKey, TValue>(key, default!), out KeyValuePair<TKey, TValue> result))
+            if (_set.TryGetPredecessor(new KeyValuePair<TKey, TValue>(key!, default!), out KeyValuePair<TKey, TValue> result))
             {
                 resultKey = result.Key;
                 resultValue = result.Value;
@@ -1660,7 +1660,7 @@ namespace J2N.Collections.Generic
             return false;
         }
 
-        bool INavigableDictionary<TKey, TValue>.TryGetPredecessor(TKey key, out TKey resultKey, out TValue resultValue)
+        bool INavigableDictionary<TKey, TValue>.TryGetPredecessor([AllowNull] TKey key, [MaybeNullWhen(false)] out TKey resultKey, [MaybeNullWhen(false)] out TValue resultValue)
             => TryGetPredecessor(key, out resultKey, out resultValue);
 
         /// <summary>
@@ -1678,9 +1678,9 @@ namespace J2N.Collections.Generic
         /// <para/>
         /// Usage Note: This corresponds to the <c>higherEntry()</c> method in the JDK.
         /// </remarks>
-        public bool TryGetSuccessor(TKey key, [MaybeNullWhen(false)] out TKey resultKey, [MaybeNullWhen(false)] out TValue resultValue)
+        public bool TryGetSuccessor([AllowNull] TKey key, [MaybeNullWhen(false)] out TKey resultKey, [MaybeNullWhen(false)] out TValue resultValue)
         {
-            if (_set.TryGetSuccessor(new KeyValuePair<TKey, TValue>(key, default!), out KeyValuePair<TKey, TValue> result))
+            if (_set.TryGetSuccessor(new KeyValuePair<TKey, TValue>(key!, default!), out KeyValuePair<TKey, TValue> result))
             {
                 resultKey = result.Key;
                 resultValue = result.Value;
@@ -1691,7 +1691,7 @@ namespace J2N.Collections.Generic
             return false;
         }
 
-        bool INavigableDictionary<TKey, TValue>.TryGetSuccessor(TKey key, out TKey resultKey, out TValue resultValue)
+        bool INavigableDictionary<TKey, TValue>.TryGetSuccessor([AllowNull] TKey key, [MaybeNullWhen(false)] out TKey resultKey, [MaybeNullWhen(false)] out TValue resultValue)
             => TryGetSuccessor(key, out resultKey, out resultValue);
 
         /// <summary>
@@ -1709,9 +1709,9 @@ namespace J2N.Collections.Generic
         /// <para/>
         /// Usage Note: This corresponds to the <c>floorEntry()</c> method in the JDK.
         /// </remarks>
-        public bool TryGetFloor(TKey key, [MaybeNullWhen(false)] out TKey resultKey, [MaybeNullWhen(false)] out TValue resultValue)
+        public bool TryGetFloor([AllowNull] TKey key, [MaybeNullWhen(false)] out TKey resultKey, [MaybeNullWhen(false)] out TValue resultValue)
         {
-            if (_set.TryGetFloor(new KeyValuePair<TKey, TValue>(key, default!), out KeyValuePair<TKey, TValue> result))
+            if (_set.TryGetFloor(new KeyValuePair<TKey, TValue>(key!, default!), out KeyValuePair<TKey, TValue> result))
             {
                 resultKey = result.Key;
                 resultValue = result.Value;
@@ -1722,7 +1722,7 @@ namespace J2N.Collections.Generic
             return false;
         }
 
-        bool INavigableDictionary<TKey, TValue>.TryGetFloor(TKey key, out TKey resultKey, out TValue resultValue)
+        bool INavigableDictionary<TKey, TValue>.TryGetFloor([AllowNull] TKey key, [MaybeNullWhen(false)] out TKey resultKey, [MaybeNullWhen(false)] out TValue resultValue)
             => TryGetFloor(key, out resultKey, out resultValue);
 
         /// <summary>
@@ -1740,9 +1740,9 @@ namespace J2N.Collections.Generic
         /// <para/>
         /// Usage Note: This corresponds to the <c>ceilingEntry()</c> method in the JDK.
         /// </remarks>
-        public bool TryGetCeiling(TKey key, [MaybeNullWhen(false)] out TKey resultKey, [MaybeNullWhen(false)] out TValue resultValue)
+        public bool TryGetCeiling([AllowNull] TKey key, [MaybeNullWhen(false)] out TKey resultKey, [MaybeNullWhen(false)] out TValue resultValue)
         {
-            if (_set.TryGetCeiling(new KeyValuePair<TKey, TValue>(key, default!), out KeyValuePair<TKey, TValue> result))
+            if (_set.TryGetCeiling(new KeyValuePair<TKey, TValue>(key!, default!), out KeyValuePair<TKey, TValue> result))
             {
                 resultKey = result.Key;
                 resultValue = result.Value;
@@ -1753,7 +1753,7 @@ namespace J2N.Collections.Generic
             return false;
         }
 
-        bool INavigableDictionary<TKey, TValue>.TryGetCeiling(TKey key, out TKey resultKey, out TValue resultValue)
+        bool INavigableDictionary<TKey, TValue>.TryGetCeiling([AllowNull] TKey key, [MaybeNullWhen(false)] out TKey resultKey, [MaybeNullWhen(false)] out TValue resultValue)
             => TryGetCeiling(key, out resultKey, out resultValue);
 
         /// <summary>
@@ -1806,7 +1806,7 @@ namespace J2N.Collections.Generic
             return new SortedDictionary<TKey, TValue>(viewSet);
         }
 
-        INavigableDictionary<TKey, TValue> INavigableDictionary<TKey, TValue>.GetView(TKey fromKey, TKey toKey)
+        INavigableDictionary<TKey, TValue> INavigableDictionary<TKey, TValue>.GetView([AllowNull] TKey fromKey, [AllowNull] TKey toKey)
             => GetView(fromKey, toKey);
 
         /// <summary>
@@ -1849,7 +1849,7 @@ namespace J2N.Collections.Generic
             return new SortedDictionary<TKey, TValue>(viewSet);
         }
 
-        INavigableDictionary<TKey, TValue> INavigableDictionary<TKey, TValue>.GetView(TKey fromKey, bool fromInclusive, TKey toKey, bool toInclusive)
+        INavigableDictionary<TKey, TValue> INavigableDictionary<TKey, TValue>.GetView([AllowNull] TKey fromKey, bool fromInclusive, [AllowNull] TKey toKey, bool toInclusive)
             => GetView(fromKey, fromInclusive, toKey, toInclusive);
 
         /// <summary>
@@ -1875,7 +1875,7 @@ namespace J2N.Collections.Generic
             return new SortedDictionary<TKey, TValue>(viewSet);
         }
 
-        INavigableDictionary<TKey, TValue> INavigableDictionary<TKey, TValue>.GetViewBefore(TKey toKey)
+        INavigableDictionary<TKey, TValue> INavigableDictionary<TKey, TValue>.GetViewBefore([AllowNull] TKey toKey)
             => GetViewBefore(toKey);
 
         /// <summary>
@@ -1907,7 +1907,7 @@ namespace J2N.Collections.Generic
             return new SortedDictionary<TKey, TValue>(viewSet);
         }
 
-        INavigableDictionary<TKey, TValue> INavigableDictionary<TKey, TValue>.GetViewBefore(TKey toKey, bool inclusive)
+        INavigableDictionary<TKey, TValue> INavigableDictionary<TKey, TValue>.GetViewBefore([AllowNull] TKey toKey, bool inclusive)
             => GetViewBefore(toKey, inclusive);
 
         /// <summary>
@@ -1933,7 +1933,7 @@ namespace J2N.Collections.Generic
             return new SortedDictionary<TKey, TValue>(viewSet);
         }
 
-        INavigableDictionary<TKey, TValue> INavigableDictionary<TKey, TValue>.GetViewAfter(TKey fromKey)
+        INavigableDictionary<TKey, TValue> INavigableDictionary<TKey, TValue>.GetViewAfter([AllowNull] TKey fromKey)
             => GetViewAfter(fromKey);
 
         /// <summary>
@@ -1963,7 +1963,7 @@ namespace J2N.Collections.Generic
             return new SortedDictionary<TKey, TValue>(viewSet);
         }
 
-        INavigableDictionary<TKey, TValue> INavigableDictionary<TKey, TValue>.GetViewAfter(TKey fromKey, bool inclusive)
+        INavigableDictionary<TKey, TValue> INavigableDictionary<TKey, TValue>.GetViewAfter([AllowNull] TKey fromKey, bool inclusive)
             => GetViewAfter(fromKey, inclusive);
 
         /// <summary>
@@ -2569,16 +2569,16 @@ namespace J2N.Collections.Generic
                 return false;
             }
 
-            bool INavigableCollection<TKey>.TryGetPredecessor(TKey item, [MaybeNullWhen(false)] out TKey result)
+            bool INavigableCollection<TKey>.TryGetPredecessor([AllowNull] TKey item, [MaybeNullWhen(false)] out TKey result)
                 => _dictionary.TryGetPredecessor(item, out result, out _);
 
-            bool INavigableCollection<TKey>.TryGetSuccessor(TKey item, [MaybeNullWhen(false)] out TKey result)
+            bool INavigableCollection<TKey>.TryGetSuccessor([AllowNull] TKey item, [MaybeNullWhen(false)] out TKey result)
                 => _dictionary.TryGetSuccessor(item, out result, out _);
 
-            bool INavigableCollection<TKey>.TryGetFloor(TKey item, [MaybeNullWhen(false)] out TKey result)
+            bool INavigableCollection<TKey>.TryGetFloor([AllowNull] TKey item, [MaybeNullWhen(false)] out TKey result)
                 => _dictionary.TryGetFloor(item, out result, out _);
 
-            bool INavigableCollection<TKey>.TryGetCeiling(TKey item, [MaybeNullWhen(false)] out TKey result)
+            bool INavigableCollection<TKey>.TryGetCeiling([AllowNull] TKey item, [MaybeNullWhen(false)] out TKey result)
                 => _dictionary.TryGetCeiling(item, out result, out _);
 
             IEnumerable<TKey> INavigableCollection<TKey>.Reverse()

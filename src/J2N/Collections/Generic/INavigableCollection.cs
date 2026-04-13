@@ -81,7 +81,7 @@ namespace J2N.Collections.Generic
         /// <para/>
         /// Usage Note: This corresponds to the <c>lower()</c> method in the JDK.
         /// </remarks>
-        bool TryGetPredecessor(T item, [MaybeNullWhen(false)] out T result);
+        bool TryGetPredecessor([AllowNull] T item, [MaybeNullWhen(false)] out T result);
 
         /// <summary>
         /// Gets the entry in the <see cref="INavigableCollection{T}"/> whose value
@@ -95,7 +95,7 @@ namespace J2N.Collections.Generic
         /// <para/>
         /// Usage Note: This corresponds to the <c>higher()</c> method in the JDK.
         /// </remarks>
-        bool TryGetSuccessor(T item, [MaybeNullWhen(false)] out T result);
+        bool TryGetSuccessor([AllowNull] T item, [MaybeNullWhen(false)] out T result);
 
         /// <summary>
         /// Gets the value in the <see cref="INavigableCollection{T}"/> whose value
@@ -109,7 +109,7 @@ namespace J2N.Collections.Generic
         /// <para/>
         /// Usage Note: This corresponds to the <c>floor()</c> method in the JDK.
         /// </remarks>
-        bool TryGetFloor(T item, [MaybeNullWhen(false)] out T result);
+        bool TryGetFloor([AllowNull] T item, [MaybeNullWhen(false)] out T result);
 
         /// <summary>
         /// Gets the value in the <see cref="INavigableCollection{T}"/> whose value
@@ -123,7 +123,7 @@ namespace J2N.Collections.Generic
         /// <para/>
         /// Usage Note: This corresponds to the <c>ceiling()</c> method in the JDK.
         /// </remarks>
-        bool TryGetCeiling(T item, [MaybeNullWhen(false)] out T result);
+        bool TryGetCeiling([AllowNull] T item, [MaybeNullWhen(false)] out T result);
 
         /// <summary>
         /// Returns an <see cref="IEnumerable{T}"/> that iterates over the

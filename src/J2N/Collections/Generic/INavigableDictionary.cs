@@ -16,6 +16,7 @@
  */
 #endregion
 
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
@@ -43,12 +44,12 @@ namespace J2N.Collections.Generic
         /// </remarks>
         // J2N: Comparer is discoverable through both IDictionary<TKey, TValue> and ISortedCollection<TKey>, but we want to return
         // the implementation that matches the TKey comparer rather than the KeyValuePair<TKey, TValue> comparer for dictionary compatibility.
-        IComparer<TKey> Comparer { get; }
+        new IComparer<TKey> Comparer { get; }
 
         /// <summary>
         /// Gets a collection corresponding to the keys in the <see cref="INavigableDictionary{TKey, TValue}"/>.
         /// </summary>
-        /// <value>A <see cref="INavigableCollection{TKey}"/> over <see cref="TKey"/> containing the keys in
+        /// <value>A <see cref="INavigableCollection{TKey}"/> over <typeparamref name="TKey"/> containing the keys in
         /// the <see cref="INavigableDictionary{TKey, TValue}"/>.</value>
         /// <remarks>
         /// The keys in the returned <see cref="INavigableCollection{TKey}"/> are sorted according
@@ -64,7 +65,7 @@ namespace J2N.Collections.Generic
         /// as the <c>descendingKeySet()</c> method in the JDK, call <see cref="Reverse()"/> for a single pass of the values
         /// or <see cref="GetViewDescending()"/> on the returned <see cref="INavigableCollection{TKey}"/> for a persistent reverse view.
         /// </remarks>
-        INavigableCollection<TKey> Keys { get; }
+        new INavigableCollection<TKey> Keys { get; }
 
         /// <summary>
         /// Gets the entry in the <see cref="INavigableDictionary{TKey, TValue}"/> whose key
@@ -125,7 +126,7 @@ namespace J2N.Collections.Generic
         /// <para/>
         /// Usage Note: This corresponds to the <c>lowerEntry()</c> method in the JDK.
         /// </remarks>
-        bool TryGetPredecessor(TKey key, [MaybeNullWhen(false)] out TKey resultKey, [MaybeNullWhen(false)] out TValue resultValue);
+        bool TryGetPredecessor([AllowNull] TKey key, [MaybeNullWhen(false)] out TKey resultKey, [MaybeNullWhen(false)] out TValue resultValue);
 
         /// <summary>
         /// Gets the entry in the <see cref="INavigableDictionary{TKey, TValue}"/> whose key
@@ -140,7 +141,7 @@ namespace J2N.Collections.Generic
         /// <para/>
         /// Usage Note: This corresponds to the <c>higherEntry()</c> method in the JDK.
         /// </remarks>
-        bool TryGetSuccessor(TKey key, [MaybeNullWhen(false)] out TKey resultKey, [MaybeNullWhen(false)] out TValue resultValue);
+        bool TryGetSuccessor([AllowNull] TKey key, [MaybeNullWhen(false)] out TKey resultKey, [MaybeNullWhen(false)] out TValue resultValue);
 
         /// <summary>
         /// Gets the entry in the <see cref="INavigableDictionary{TKey, TValue}"/> whose key
@@ -155,7 +156,7 @@ namespace J2N.Collections.Generic
         /// <para/>
         /// Usage Note: This corresponds to the <c>floorEntry()</c> method in the JDK.
         /// </remarks>
-        bool TryGetFloor(TKey key, [MaybeNullWhen(false)] out TKey resultKey, [MaybeNullWhen(false)] out TValue resultValue);
+        bool TryGetFloor([AllowNull] TKey key, [MaybeNullWhen(false)] out TKey resultKey, [MaybeNullWhen(false)] out TValue resultValue);
 
         /// <summary>
         /// Gets the entry in the <see cref="INavigableDictionary{TKey, TValue}"/> whose key
@@ -170,7 +171,7 @@ namespace J2N.Collections.Generic
         /// <para/>
         /// Usage Note: This corresponds to the <c>ceilingEntry()</c> method in the JDK.
         /// </remarks>
-        bool TryGetCeiling(TKey key, [MaybeNullWhen(false)] out TKey resultKey, [MaybeNullWhen(false)] out TValue resultValue);
+        bool TryGetCeiling([AllowNull] TKey key, [MaybeNullWhen(false)] out TKey resultKey, [MaybeNullWhen(false)] out TValue resultValue);
 
         /// <summary>
         /// Returns an <see cref="IEnumerable{T}"/> of <see cref="KeyValuePair{TKey, TValue}"/> that iterates over the

@@ -718,10 +718,10 @@ namespace J2N.Collections.Generic
                 }
             }
 
-            internal override bool DoTryGetPredecessor(T item, [MaybeNullWhen(false)] out T result)
+            internal override bool DoTryGetPredecessor([AllowNull] T item, [MaybeNullWhen(false)] out T result)
                 => _reverse ? TryGetSuccessorCore(item, out result) : TryGetPredecessorCore(item, out result);
 
-            internal bool TryGetPredecessorCore(T item, [MaybeNullWhen(false)] out T result)
+            internal bool TryGetPredecessorCore([AllowNull] T item, [MaybeNullWhen(false)] out T result)
             {
                 VersionCheck();
 #if DEBUG
@@ -740,7 +740,7 @@ namespace J2N.Collections.Generic
 
                 while (current != null)
                 {
-                    int cmp = comparer.Compare(item, current.Item);
+                    int cmp = comparer.Compare(item!, current.Item);
 
                     if (cmp > 0)
                     {
@@ -764,10 +764,10 @@ namespace J2N.Collections.Generic
                 return true;
             }
 
-            internal override bool DoTryGetSuccessor(T item, [MaybeNullWhen(false)] out T result)
+            internal override bool DoTryGetSuccessor([AllowNull] T item, [MaybeNullWhen(false)] out T result)
                 => _reverse ? TryGetPredecessorCore(item, out result) : TryGetSuccessorCore(item, out result);
 
-            internal bool TryGetSuccessorCore(T item, [MaybeNullWhen(false)] out T result)
+            internal bool TryGetSuccessorCore([AllowNull] T item, [MaybeNullWhen(false)] out T result)
             {
                 VersionCheck();
 #if DEBUG
@@ -786,7 +786,7 @@ namespace J2N.Collections.Generic
 
                 while (current != null)
                 {
-                    int cmp = comparer.Compare(item, current.Item);
+                    int cmp = comparer.Compare(item!, current.Item);
 
                     if (cmp < 0)
                     {
@@ -810,10 +810,10 @@ namespace J2N.Collections.Generic
                 return true;
             }
 
-            internal override bool DoTryGetFloor(T item, [MaybeNullWhen(false)] out T result)
+            internal override bool DoTryGetFloor([AllowNull] T item, [MaybeNullWhen(false)] out T result)
                 => _reverse ? TryGetCeilingCore(item, out result) : TryGetFloorCore(item, out result);
 
-            internal bool TryGetFloorCore(T item, [MaybeNullWhen(false)] out T result)
+            internal bool TryGetFloorCore([AllowNull] T item, [MaybeNullWhen(false)] out T result)
             {
                 VersionCheck();
 #if DEBUG
@@ -825,7 +825,7 @@ namespace J2N.Collections.Generic
 
                 while (current != null)
                 {
-                    int cmp = comparer.Compare(item, current.Item);
+                    int cmp = comparer.Compare(item!, current.Item);
 
                     if (cmp < 0)
                     {
@@ -848,10 +848,10 @@ namespace J2N.Collections.Generic
                 return true;
             }
 
-            internal override bool DoTryGetCeiling(T item, [MaybeNullWhen(false)] out T result)
+            internal override bool DoTryGetCeiling([AllowNull] T item, [MaybeNullWhen(false)] out T result)
                 => _reverse ? TryGetFloorCore(item, out result) : TryGetCeilingCore(item, out result);
 
-            internal bool TryGetCeilingCore(T item, [MaybeNullWhen(false)] out T result)
+            internal bool TryGetCeilingCore([AllowNull] T item, [MaybeNullWhen(false)] out T result)
             {
                 VersionCheck();
 #if DEBUG
@@ -863,7 +863,7 @@ namespace J2N.Collections.Generic
 
                 while (current != null)
                 {
-                    int cmp = comparer.Compare(item, current.Item);
+                    int cmp = comparer.Compare(item!, current.Item);
 
                     if (cmp > 0)
                     {

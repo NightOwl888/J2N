@@ -644,15 +644,15 @@ namespace J2N.Collections.Generic
         /// <para/>
         /// Usage Note: This corresponds to the <c>lower()</c> method in the JDK.
         /// </remarks>
-        public bool TryGetPredecessor(T item, [MaybeNullWhen(false)] out T result) => DoTryGetPredecessor(item, out result);
+        public bool TryGetPredecessor([AllowNull] T item, [MaybeNullWhen(false)] out T result) => DoTryGetPredecessor(item, out result);
 
-        internal virtual bool DoTryGetPredecessor(T item, [MaybeNullWhen(false)] out T result)
+        internal virtual bool DoTryGetPredecessor([AllowNull] T item, [MaybeNullWhen(false)] out T result)
         {
             Node? current = root, match = null;
 
             while (current != null)
             {
-                int comp = comparer.Compare(item, current.Item);
+                int comp = comparer.Compare(item!, current.Item);
 
                 if (comp > 0)
                 {
@@ -698,15 +698,15 @@ namespace J2N.Collections.Generic
         /// <para/>
         /// Usage Note: This corresponds to the <c>higher()</c> method in the JDK.
         /// </remarks>
-        public bool TryGetSuccessor(T item, [MaybeNullWhen(false)] out T result) => DoTryGetSuccessor(item, out result);
+        public bool TryGetSuccessor([AllowNull] T item, [MaybeNullWhen(false)] out T result) => DoTryGetSuccessor(item, out result);
 
-        internal virtual bool DoTryGetSuccessor(T item, [MaybeNullWhen(false)] out T result)
+        internal virtual bool DoTryGetSuccessor([AllowNull] T item, [MaybeNullWhen(false)] out T result)
         {
             Node? current = root, match = null;
 
             while (current != null)
             {
-                int comp = comparer.Compare(item, current.Item);
+                int comp = comparer.Compare(item!, current.Item);
 
                 if (comp < 0)
                 {
@@ -752,16 +752,16 @@ namespace J2N.Collections.Generic
         /// <para/>
         /// Usage Note: This corresponds to the <c>floor()</c> method in the JDK.
         /// </remarks>
-        public bool TryGetFloor(T item, [MaybeNullWhen(false)] out T result) => DoTryGetFloor(item, out result);
+        public bool TryGetFloor([AllowNull] T item, [MaybeNullWhen(false)] out T result) => DoTryGetFloor(item, out result);
 
-        internal virtual bool DoTryGetFloor(T item, [MaybeNullWhen(false)] out T result)
+        internal virtual bool DoTryGetFloor([AllowNull] T item, [MaybeNullWhen(false)] out T result)
         {
             Node? current = root;
             Node? candidate = null;
 
             while (current != null)
             {
-                int cmp = comparer.Compare(item, current.Item);
+                int cmp = comparer.Compare(item!, current.Item);
 
                 if (cmp < 0)
                 {
@@ -799,16 +799,16 @@ namespace J2N.Collections.Generic
         /// <para/>
         /// Usage Note: This corresponds to the <c>ceiling()</c> method in the JDK.
         /// </remarks>
-        public bool TryGetCeiling(T item, [MaybeNullWhen(false)] out T result) => DoTryGetCeiling(item, out result);
+        public bool TryGetCeiling([AllowNull] T item, [MaybeNullWhen(false)] out T result) => DoTryGetCeiling(item, out result);
 
-        internal virtual bool DoTryGetCeiling(T item, [MaybeNullWhen(false)] out T result)
+        internal virtual bool DoTryGetCeiling([AllowNull] T item, [MaybeNullWhen(false)] out T result)
         {
             Node? current = root;
             Node? candidate = null;
 
             while (current != null)
             {
-                int cmp = comparer.Compare(item, current.Item);
+                int cmp = comparer.Compare(item!, current.Item);
 
                 if (cmp > 0)
                 {
@@ -4803,16 +4803,16 @@ namespace J2N.Collections.Generic
 
         IComparer<T> ISortedCollection<T>.Comparer => Comparer;
 
-        bool INavigableCollection<T>.TryGetPredecessor(T item, [MaybeNullWhen(false)] out T result)
+        bool INavigableCollection<T>.TryGetPredecessor([AllowNull] T item, [MaybeNullWhen(false)] out T result)
             => TryGetPredecessor(item, out result);
 
-        bool INavigableCollection<T>.TryGetSuccessor(T item, [MaybeNullWhen(false)] out T result)
+        bool INavigableCollection<T>.TryGetSuccessor([AllowNull] T item, [MaybeNullWhen(false)] out T result)
             => TryGetSuccessor(item, out result);
 
-        bool INavigableCollection<T>.TryGetFloor(T item, [MaybeNullWhen(false)] out T result)
+        bool INavigableCollection<T>.TryGetFloor([AllowNull] T item, [MaybeNullWhen(false)] out T result)
             => TryGetFloor(item, out result);
 
-        bool INavigableCollection<T>.TryGetCeiling(T item, [MaybeNullWhen(false)] out T result)
+        bool INavigableCollection<T>.TryGetCeiling([AllowNull] T item, [MaybeNullWhen(false)] out T result)
             => TryGetCeiling(item, out result);
 
         IEnumerable<T> INavigableCollection<T>.Reverse()
