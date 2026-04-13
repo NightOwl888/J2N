@@ -4963,7 +4963,7 @@ namespace J2N.Collections.Generic
         /// Returns an <see cref="IEnumerable{T}"/> that iterates over the
         /// <see cref="SortedSet{T}"/> in reverse order.
         /// </summary>
-        /// <returns>An enumerator that iterates over the <see cref="SortedSet{T}"/> in reverse order.</returns>
+        /// <returns>An enumerable that iterates over the <see cref="SortedSet{T}"/> in reverse order.</returns>
         /// <remarks>
         /// This corresponds roughly to the <c>descendingIterator()</c> method in the JDK.
         /// </remarks>

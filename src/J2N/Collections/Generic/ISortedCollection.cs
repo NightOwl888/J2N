@@ -1,4 +1,4 @@
-﻿#region Copyright 2019-2025 by Shad Storhaug, Licensed under the Apache License, Version 2.0
+﻿#region Copyright 2019-2026 by Shad Storhaug, Licensed under the Apache License, Version 2.0
 /*  Licensed to the Apache Software Foundation (ASF) under one or more
  *  contributor license agreements.  See the NOTICE file distributed with
  *  this work for additional information regarding copyright ownership.
@@ -26,7 +26,7 @@ namespace J2N.Collections.Generic
     /// <typeparam name="T">The type of element in the collection.</typeparam>
     /// <remarks>
     /// This interface can be used to identify collections that maintain a specific order of elements,
-    /// which can signifcantly impact performance of constructor or bulk operations of <see cref="SortedSet{T}"/>
+    /// which can significantly impact performance of constructor or bulk operations of <see cref="SortedSet{T}"/>
     /// and <see cref="SortedDictionary{TKey, TValue}"/>.
     /// </remarks>
     public interface ISortedCollection<T> : ICollection<T>

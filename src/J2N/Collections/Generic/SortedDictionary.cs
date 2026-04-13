@@ -1138,7 +1138,7 @@ namespace J2N.Collections.Generic
 
         /// <summary>
         /// Gets the entry in the <see cref="SortedDictionary{TKey, TValue}"/> whose key
-        /// is the lease element greater than or equal to the specified <paramref name="key"/>.
+        /// is the least element greater than or equal to the specified <paramref name="key"/>.
         /// </summary>
         /// <param name="key">The key of the entry to get the ceiling of.</param>
         /// <param name="resultKey">Upon successful return, contains the key of the ceiling.</param>
@@ -1740,7 +1740,7 @@ namespace J2N.Collections.Generic
         /// Returns an <see cref="IEnumerable{T}"/> of <see cref="KeyValuePair{TKey, TValue}"/> that iterates over the
         /// <see cref="SortedDictionary{TKey, TValue}"/> in reverse order.
         /// </summary>
-        /// <returns>An enumerator that iterates over the <see cref="SortedDictionary{TKey, TValue}"/> in reverse order.</returns>
+        /// <returns>An enumerable that iterates over the <see cref="SortedDictionary{TKey, TValue}"/> in reverse order.</returns>
         /// <remarks>
         /// This corresponds roughly to the <c>descendingKeySet()</c> method in the JDK.
         /// </remarks>
@@ -1933,9 +1933,9 @@ namespace J2N.Collections.Generic
         /// <returns>A view that contains the values of the current <see cref="SortedDictionary{TKey, TValue}"/> in reverse order.</returns>
         /// <remarks>
         /// This method returns a reverse order view of the range of elements of this <see cref="SortedDictionary{TKey, TValue}"/>,
-        /// as defined by the comparer. This method does not copy elements from the <see cref="SortedSet{T}"/>, but provides a
-        /// window into the underlying <see cref="SortedSet{T}"/> itself.
-        /// You can make changes in both the view and in the underlying <see cref="SortedSet{T}"/>.
+        /// as defined by the comparer. This method does not copy elements from the <see cref="SortedDictionary{TKey, TValue}"/>, but provides a
+        /// window into the underlying <see cref="SortedDictionary{TKey, TValue}"/> itself.
+        /// You can make changes in both the view and in the underlying <see cref="SortedDictionary{TKey, TValue}"/>.
         /// <para/>
         /// This corresponds to the <c>descendingMap()</c> method in the JDK.
         /// </remarks>

@@ -1,4 +1,4 @@
-﻿#region Copyright 2019-2025 by Shad Storhaug, Licensed under the Apache License, Version 2.0
+﻿#region Copyright 2019-2026 by Shad Storhaug, Licensed under the Apache License, Version 2.0
 /*  Licensed to the Apache Software Foundation (ASF) under one or more
  *  contributor license agreements.  See the NOTICE file distributed with
  *  this work for additional information regarding copyright ownership.
@@ -77,8 +77,6 @@ namespace J2N.Collections.Generic
         /// <param name="result">The predessor, if any.</param>
         /// <returns><see langword="true"/> if a predecessor to <paramref name="item"/> exists; otherwise, <see langword="false"/>.</returns>
         /// <remarks>
-        /// This method is a O(log <c>n</c>) operation.
-        /// <para/>
         /// This is referred to as <c>strict predecessor</c> in order theory.
         /// <para/>
         /// Usage Note: This corresponds to the <c>lower()</c> method in the JDK.
@@ -87,14 +85,12 @@ namespace J2N.Collections.Generic
 
         /// <summary>
         /// Gets the entry in the <see cref="INavigableCollection{T}"/> whose value
-        /// is the sucessor of the specified <paramref name="item"/>.
+        /// is the successor of the specified <paramref name="item"/>.
         /// </summary>
         /// <param name="item">The entry to get the successor of.</param>
         /// <param name="result">The successor, if any.</param>
         /// <returns><see langword="true"/> if a successor to <paramref name="item"/> exists; otherwise, <see langword="false"/>.</returns>
         /// <remarks>
-        /// This method is a O(log <c>n</c>) operation.
-        /// <para/>
         /// This is referred to as <c>strict successor</c> in order theory.
         /// <para/>
         /// Usage Note: This corresponds to the <c>higher()</c> method in the JDK.
@@ -109,8 +105,6 @@ namespace J2N.Collections.Generic
         /// <param name="result">The floor, if any.</param>
         /// <returns><see langword="true"/> if a floor to <paramref name="item"/> exists; otherwise, <see langword="false"/>.</returns>
         /// <remarks>
-        /// This method is a O(log <c>n</c>) operation.
-        /// <para/>
         /// This is referred to as <c>weak predecessor</c> in order theory.
         /// <para/>
         /// Usage Note: This corresponds to the <c>floor()</c> method in the JDK.
@@ -125,8 +119,6 @@ namespace J2N.Collections.Generic
         /// <param name="result">The ceiling, if any.</param>
         /// <returns><see langword="true"/> if a ceiling to <paramref name="item"/> exists; otherwise, <see langword="false"/>.</returns>
         /// <remarks>
-        /// This method is a O(log <c>n</c>) operation.
-        /// <para/>
         /// This is referred to as <b>weak successor</b> in order theory.
         /// <para/>
         /// Usage Note: This corresponds to the <c>ceiling()</c> method in the JDK.
@@ -137,7 +129,7 @@ namespace J2N.Collections.Generic
         /// Returns an <see cref="IEnumerable{T}"/> that iterates over the
         /// <see cref="INavigableCollection{T}"/> in reverse order.
         /// </summary>
-        /// <returns>An enumerator that iterates over the <see cref="INavigableCollection{T}"/> in reverse order.</returns>
+        /// <returns>An enumerable that iterates over the <see cref="INavigableCollection{T}"/> in reverse order.</returns>
         /// <remarks>
         /// This corresponds roughly to the <c>descendingIterator()</c> method in the JDK.
         /// </remarks>
