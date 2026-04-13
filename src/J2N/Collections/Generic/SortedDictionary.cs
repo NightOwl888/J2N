@@ -58,7 +58,7 @@ namespace J2N.Collections.Generic
 #if FEATURE_SERIALIZABLE
     [Serializable]
 #endif
-    public class SortedDictionary<TKey, TValue> : IDictionary<TKey, TValue>, IDictionary, INavigableCollection<KeyValuePair<TKey, TValue>>, ICollectionView,
+    public class SortedDictionary<TKey, TValue> : IDictionary<TKey, TValue>, IDictionary, INavigableDictionary<TKey, TValue>, INavigableCollection<KeyValuePair<TKey, TValue>>, ICollectionView,
 #if FEATURE_IREADONLYCOLLECTIONS
         IReadOnlyDictionary<TKey, TValue>,
 #endif
@@ -934,238 +934,6 @@ namespace J2N.Collections.Generic
 
         #endregion Members for Alternate Lookup
 
-        #region Java TreeMap-like Members
-
-        /// <summary>
-        /// Gets the entry in the <see cref="SortedDictionary{TKey, TValue}"/> whose key
-        /// is the first (lowest) value, as defined by the comparer.
-        /// </summary>
-        /// <param name="key">Upon successful return, contains the first (lowest) key in the collection.</param>
-        /// <param name="value">Upon successful return, contains the value corresponding to the first (lowest) key in the collection.</param>
-        /// <returns><see langword="true"/> if a first <paramref name="key"/> exists; otherwise, <see langword="false"/>.</returns>
-        /// <remarks>
-        /// Usage Note: This corresponds to both the <c>firstKey()</c> and <c>firstEntry()</c> methods in the JDK.
-        /// </remarks>
-        public bool TryGetFirst([MaybeNullWhen(false)] out TKey key, [MaybeNullWhen(false)] out TValue value)
-        {
-            if (_set.TryGetFirst(out KeyValuePair<TKey, TValue> result))
-            {
-                key = result.Key;
-                value = result.Value;
-                return true;
-            }
-            key = default;
-            value = default;
-            return false;
-        }
-
-        /// <summary>
-        /// Gets the entry in the <see cref="SortedDictionary{TKey, TValue}"/> whose key
-        /// is the last (highest) value, as defined by the comparer.
-        /// </summary>
-        /// <param name="key">Upon successful return, contains the last (highest) key in the collection.</param>
-        /// <param name="value">Upon successful return, contains the value corresponding to the last (highest) key in the collection.</param>
-        /// <returns><see langword="true"/> if a last <paramref name="key"/> exists; otherwise, <see langword="false"/>.</returns>
-        /// <remarks>
-        /// Usage Note: This corresponds to both the <c>lastKey()</c> and <c>lastEntry()</c> methods in the JDK.
-        /// </remarks>
-        public bool TryGetLast([MaybeNullWhen(false)] out TKey key, [MaybeNullWhen(false)] out TValue value)
-        {
-            if (_set.TryGetLast(out KeyValuePair<TKey, TValue> result))
-            {
-                key = result.Key;
-                value = result.Value;
-                return true;
-            }
-            key = default;
-            value = default;
-            return false;
-        }
-
-        /// <summary>
-        /// Removes the first (lowest) element in the <see cref="SortedDictionary{TKey, TValue}"/>, as defined by the comparer.
-        /// </summary>
-        /// <param name="key">The key of the element before it is removed.</param>
-        /// <param name="value">The value of the element before it is removed.</param>
-        /// <returns><see langword="true"/>  if the element is successfully removed; otherwise, <see langword="false"/>.</returns>
-        /// <remarks>
-        /// This corresponds to the <c>pollFirstEntry()</c> method in the JDK.
-        /// </remarks>
-        public bool RemoveFirst([MaybeNullWhen(false)] out TKey key, [MaybeNullWhen(false)] out TValue value)
-        {
-            if (_set.RemoveFirst(out KeyValuePair<TKey, TValue> result))
-            {
-                key = result.Key;
-                value = result.Value;
-                return true;
-            }
-            key = default;
-            value = default;
-            return false;
-        }
-
-        /// <summary>
-        /// Removes the last (highest) element in the <see cref="SortedDictionary{TKey, TValue}"/>, as defined by the comparer.
-        /// </summary>
-        /// <param name="key">The key of the element before it is removed.</param>
-        /// <param name="value">The value of the element before it is removed.</param>
-        /// <returns><see langword="true"/>  if the element is successfully removed; otherwise, <see langword="false"/>.</returns>
-        /// <remarks>
-        /// This corresponds to the <c>pollLastEntry()</c> method in the JDK.
-        /// </remarks>
-        public bool RemoveLast([MaybeNullWhen(false)] out TKey key, [MaybeNullWhen(false)] out TValue value)
-        {
-            if (_set.RemoveLast(out KeyValuePair<TKey, TValue> result))
-            {
-                key = result.Key;
-                value = result.Value;
-                return true;
-            }
-            key = default;
-            value = default;
-            return false;
-        }
-
-        /// <summary>
-        /// Gets the entry in the <see cref="SortedDictionary{TKey, TValue}"/> whose key
-        /// is the predecessor of the specified <paramref name="key"/>.
-        /// </summary>
-        /// <param name="key">The key of the entry to get the predecessor of.</param>
-        /// <param name="result">The <see cref="KeyValuePair{TKey, TValue}"/> representing the predecessor, if any.</param>
-        /// <returns><see langword="true"/> if a predecessor to <paramref name="key"/> exists; otherwise, <see langword="false"/>.</returns>
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public bool TryGetPredecessor(TKey key, out KeyValuePair<TKey, TValue> result) // J2N TODO: API - make this obsolete in 3.0
-        {
-            return _set.TryGetPredecessor(new KeyValuePair<TKey, TValue>(key, default!), out result);
-        }
-
-        /// <summary>
-        /// Gets the entry in the <see cref="SortedDictionary{TKey, TValue}"/> whose key
-        /// is the predecessor of the specified <paramref name="key"/>.
-        /// </summary>
-        /// <param name="key">The key of the entry to get the predecessor of.</param>
-        /// <param name="resultKey">Upon successful return, contains the key of the predecessor.</param>
-        /// <param name="resultValue">Upon successful return, contains the value of the predecessor.</param>
-        /// <returns><see langword="true"/> if a predecessor to <paramref name="key"/> exists; otherwise, <see langword="false"/>.</returns>
-        /// <remarks>
-        /// This method is a O(log <c>n</c>) operation.
-        /// <para/>
-        /// This is referred to as <c>strict predecessor</c> in order theory.
-        /// <para/>
-        /// Usage Note: This corresponds to the <c>lowerEntry()</c> method in the JDK.
-        /// </remarks>
-        public bool TryGetPredecessor(TKey key, [MaybeNullWhen(false)] out TKey resultKey, [MaybeNullWhen(false)] out TValue resultValue)
-        {
-            if (_set.TryGetPredecessor(new KeyValuePair<TKey, TValue>(key, default!), out KeyValuePair<TKey, TValue> result))
-            {
-                resultKey = result.Key;
-                resultValue = result.Value;
-                return true;
-            }
-            resultKey = default;
-            resultValue = default;
-            return false;
-        }
-
-        /// <summary>
-        /// Gets the entry in the <see cref="SortedDictionary{TKey, TValue}"/> whose key
-        /// is the successor of the specified <paramref name="key"/>.
-        /// </summary>
-        /// <param name="key">The key of the entry to get the successor of.</param>
-        /// <param name="result">The <see cref="KeyValuePair{TKey, TValue}"/> representing the successor, if any.</param>
-        /// <returns><see langword="true"/> if a successor to <paramref name="key"/> exists; otherwise, <see langword="false"/>.</returns>
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public bool TryGetSuccessor(TKey key, out KeyValuePair<TKey, TValue> result) // J2N TODO: API - make this obsolete in 3.0
-        {
-            return _set.TryGetSuccessor(new KeyValuePair<TKey, TValue>(key, default!), out result);
-        }
-
-        /// <summary>
-        /// Gets the entry in the <see cref="SortedDictionary{TKey, TValue}"/> whose key
-        /// is the successor of the specified <paramref name="key"/>.
-        /// </summary>
-        /// <param name="key">The key of the entry to get the successor of.</param>
-        /// <param name="resultKey">Upon successful return, contains the key of the successor.</param>
-        /// <param name="resultValue">Upon successful return, contains the value of the successor.</param>
-        /// <returns><see langword="true"/> if a successor to <paramref name="key"/> exists; otherwise, <see langword="false"/>.</returns>
-        /// <remarks>
-        /// This method is a O(log <c>n</c>) operation.
-        /// <para/>
-        /// This is referred to as <c>strict successor</c> in order theory.
-        /// <para/>
-        /// Usage Note: This corresponds to the <c>higherEntry()</c> method in the JDK.
-        /// </remarks>
-        public bool TryGetSuccessor(TKey key, [MaybeNullWhen(false)] out TKey resultKey, [MaybeNullWhen(false)] out TValue resultValue)
-        {
-            if (_set.TryGetSuccessor(new KeyValuePair<TKey, TValue>(key, default!), out KeyValuePair<TKey, TValue> result))
-            {
-                resultKey = result.Key;
-                resultValue = result.Value;
-                return true;
-            }
-            resultKey = default;
-            resultValue = default;
-            return false;
-        }
-
-        /// <summary>
-        /// Gets the entry in the <see cref="SortedDictionary{TKey, TValue}"/> whose key
-        /// is the greatest element less than or equal to the specified <paramref name="key"/>.
-        /// </summary>
-        /// <param name="key">The key of the entry to get the floor of.</param>
-        /// <param name="resultKey">Upon successful return, contains the key of the floor.</param>
-        /// <param name="resultValue">Upon successful return, contains the value of the floor.</param>
-        /// <returns><see langword="true"/> if a floor to <paramref name="key"/> exists; otherwise, <see langword="false"/>.</returns>
-        /// <remarks>
-        /// This method is a O(log <c>n</c>) operation.
-        /// <para/>
-        /// This is referred to as <c>weak predecessor</c> in order theory.
-        /// <para/>
-        /// Usage Note: This corresponds to the <c>floorEntry()</c> method in the JDK.
-        /// </remarks>
-        public bool TryGetFloor(TKey key, [MaybeNullWhen(false)] out TKey resultKey, [MaybeNullWhen(false)] out TValue resultValue)
-        {
-            if (_set.TryGetFloor(new KeyValuePair<TKey, TValue>(key, default!), out KeyValuePair<TKey, TValue> result))
-            {
-                resultKey = result.Key;
-                resultValue = result.Value;
-                return true;
-            }
-            resultKey = default;
-            resultValue = default;
-            return false;
-        }
-
-        /// <summary>
-        /// Gets the entry in the <see cref="SortedDictionary{TKey, TValue}"/> whose key
-        /// is the least element greater than or equal to the specified <paramref name="key"/>.
-        /// </summary>
-        /// <param name="key">The key of the entry to get the ceiling of.</param>
-        /// <param name="resultKey">Upon successful return, contains the key of the ceiling.</param>
-        /// <param name="resultValue">Upon successful return, contains the value of the ceiling.</param>
-        /// <returns><see langword="true"/> if a ceiling to <paramref name="key"/> exists; otherwise, <see langword="false"/>.</returns>
-        /// <remarks>
-        /// This method is a O(log <c>n</c>) operation.
-        /// <para/>
-        /// This is referred to as <b>weak successor</b> in order theory.
-        /// <para/>
-        /// Usage Note: This corresponds to the <c>ceilingEntry()</c> method in the JDK.
-        /// </remarks>
-        public bool TryGetCeiling(TKey key, [MaybeNullWhen(false)] out TKey resultKey, [MaybeNullWhen(false)] out TValue resultValue)
-        {
-            if (_set.TryGetCeiling(new KeyValuePair<TKey, TValue>(key, default!), out KeyValuePair<TKey, TValue> result))
-            {
-                resultKey = result.Key;
-                resultValue = result.Value;
-                return true;
-            }
-            resultKey = default;
-            resultValue = default;
-            return false;
-        }
-
-        #endregion
-
         #region SpanAlternateLookup
 
         /// <summary>
@@ -1712,8 +1480,34 @@ namespace J2N.Collections.Generic
         INavigableCollection<KeyValuePair<TKey, TValue>> INavigableCollection<KeyValuePair<TKey, TValue>>.GetViewDescending()
             => _set.GetViewDescending();
 
+        /// <summary>
+        /// Gets the entry in the <see cref="SortedDictionary{TKey, TValue}"/> whose key
+        /// is the predecessor of the specified <paramref name="key"/>.
+        /// </summary>
+        /// <param name="key">The key of the entry to get the predecessor of.</param>
+        /// <param name="result">The <see cref="KeyValuePair{TKey, TValue}"/> representing the predecessor, if any.</param>
+        /// <returns><see langword="true"/> if a predecessor to <paramref name="key"/> exists; otherwise, <see langword="false"/>.</returns>
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public bool TryGetPredecessor(TKey key, out KeyValuePair<TKey, TValue> result) // J2N TODO: API - make this obsolete in 3.0
+        {
+            return _set.TryGetPredecessor(new KeyValuePair<TKey, TValue>(key, default!), out result);
+        }
+
         bool INavigableCollection<KeyValuePair<TKey, TValue>>.TryGetPredecessor(KeyValuePair<TKey, TValue> item, out KeyValuePair<TKey, TValue> result)
             => _set.TryGetPredecessor(item, out result);
+
+        /// <summary>
+        /// Gets the entry in the <see cref="SortedDictionary{TKey, TValue}"/> whose key
+        /// is the successor of the specified <paramref name="key"/>.
+        /// </summary>
+        /// <param name="key">The key of the entry to get the successor of.</param>
+        /// <param name="result">The <see cref="KeyValuePair{TKey, TValue}"/> representing the successor, if any.</param>
+        /// <returns><see langword="true"/> if a successor to <paramref name="key"/> exists; otherwise, <see langword="false"/>.</returns>
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public bool TryGetSuccessor(TKey key, out KeyValuePair<TKey, TValue> result) // J2N TODO: API - make this obsolete in 3.0
+        {
+            return _set.TryGetSuccessor(new KeyValuePair<TKey, TValue>(key, default!), out result);
+        }
 
         bool INavigableCollection<KeyValuePair<TKey, TValue>>.TryGetSuccessor(KeyValuePair<TKey, TValue> item, out KeyValuePair<TKey, TValue> result)
             => _set.TryGetSuccessor(item, out result);
@@ -1730,11 +1524,237 @@ namespace J2N.Collections.Generic
 
         #endregion INavigableCollection<KeyValuePair<TKey, TValue>> members
 
-        #region ICollectionView Members
+        #region INavigableDictionary<TKey, TValue> members
 
-        bool ICollectionView.IsView => _set is ICollectionView view && view.IsView;
+        IComparer<TKey> INavigableDictionary<TKey, TValue>.Comparer => Comparer;
 
-        #endregion
+        INavigableCollection <TKey> INavigableDictionary<TKey, TValue>.Keys => (INavigableCollection<TKey>)Keys;
+
+        /// <summary>
+        /// Gets the entry in the <see cref="SortedDictionary{TKey, TValue}"/> whose key
+        /// is the first (lowest) value, as defined by the comparer.
+        /// </summary>
+        /// <param name="key">Upon successful return, contains the first (lowest) key in the collection.</param>
+        /// <param name="value">Upon successful return, contains the value corresponding to the first (lowest) key in the collection.</param>
+        /// <returns><see langword="true"/> if a first <paramref name="key"/> exists; otherwise, <see langword="false"/>.</returns>
+        /// <remarks>
+        /// Usage Note: This corresponds to both the <c>firstKey()</c> and <c>firstEntry()</c> methods in the JDK.
+        /// </remarks>
+        public bool TryGetFirst([MaybeNullWhen(false)] out TKey key, [MaybeNullWhen(false)] out TValue value)
+        {
+            if (_set.TryGetFirst(out KeyValuePair<TKey, TValue> result))
+            {
+                key = result.Key;
+                value = result.Value;
+                return true;
+            }
+            key = default;
+            value = default;
+            return false;
+        }
+
+        bool INavigableDictionary<TKey, TValue>.TryGetFirst(out TKey key, out TValue value)
+            => TryGetFirst(out key, out value);
+
+        /// <summary>
+        /// Gets the entry in the <see cref="SortedDictionary{TKey, TValue}"/> whose key
+        /// is the last (highest) value, as defined by the comparer.
+        /// </summary>
+        /// <param name="key">Upon successful return, contains the last (highest) key in the collection.</param>
+        /// <param name="value">Upon successful return, contains the value corresponding to the last (highest) key in the collection.</param>
+        /// <returns><see langword="true"/> if a last <paramref name="key"/> exists; otherwise, <see langword="false"/>.</returns>
+        /// <remarks>
+        /// Usage Note: This corresponds to both the <c>lastKey()</c> and <c>lastEntry()</c> methods in the JDK.
+        /// </remarks>
+        public bool TryGetLast([MaybeNullWhen(false)] out TKey key, [MaybeNullWhen(false)] out TValue value)
+        {
+            if (_set.TryGetLast(out KeyValuePair<TKey, TValue> result))
+            {
+                key = result.Key;
+                value = result.Value;
+                return true;
+            }
+            key = default;
+            value = default;
+            return false;
+        }
+
+        bool INavigableDictionary<TKey, TValue>.TryGetLast(out TKey key, out TValue value)
+            => TryGetLast(out key, out value);
+
+        /// <summary>
+        /// Removes the first (lowest) element in the <see cref="SortedDictionary{TKey, TValue}"/>, as defined by the comparer.
+        /// </summary>
+        /// <param name="key">The key of the element before it is removed.</param>
+        /// <param name="value">The value of the element before it is removed.</param>
+        /// <returns><see langword="true"/>  if the element is successfully removed; otherwise, <see langword="false"/>.</returns>
+        /// <remarks>
+        /// This corresponds to the <c>pollFirstEntry()</c> method in the JDK.
+        /// </remarks>
+        public bool RemoveFirst([MaybeNullWhen(false)] out TKey key, [MaybeNullWhen(false)] out TValue value)
+        {
+            if (_set.RemoveFirst(out KeyValuePair<TKey, TValue> result))
+            {
+                key = result.Key;
+                value = result.Value;
+                return true;
+            }
+            key = default;
+            value = default;
+            return false;
+        }
+
+        bool INavigableDictionary<TKey, TValue>.RemoveFirst(out TKey key, out TValue value)
+            => RemoveFirst(out key, out value);
+
+        /// <summary>
+        /// Removes the last (highest) element in the <see cref="SortedDictionary{TKey, TValue}"/>, as defined by the comparer.
+        /// </summary>
+        /// <param name="key">The key of the element before it is removed.</param>
+        /// <param name="value">The value of the element before it is removed.</param>
+        /// <returns><see langword="true"/>  if the element is successfully removed; otherwise, <see langword="false"/>.</returns>
+        /// <remarks>
+        /// This corresponds to the <c>pollLastEntry()</c> method in the JDK.
+        /// </remarks>
+        public bool RemoveLast([MaybeNullWhen(false)] out TKey key, [MaybeNullWhen(false)] out TValue value)
+        {
+            if (_set.RemoveLast(out KeyValuePair<TKey, TValue> result))
+            {
+                key = result.Key;
+                value = result.Value;
+                return true;
+            }
+            key = default;
+            value = default;
+            return false;
+        }
+
+        bool INavigableDictionary<TKey, TValue>.RemoveLast(out TKey key, out TValue value)
+            => RemoveLast(out key, out value);
+
+        /// <summary>
+        /// Gets the entry in the <see cref="SortedDictionary{TKey, TValue}"/> whose key
+        /// is the predecessor of the specified <paramref name="key"/>.
+        /// </summary>
+        /// <param name="key">The key of the entry to get the predecessor of.</param>
+        /// <param name="resultKey">Upon successful return, contains the key of the predecessor.</param>
+        /// <param name="resultValue">Upon successful return, contains the value of the predecessor.</param>
+        /// <returns><see langword="true"/> if a predecessor to <paramref name="key"/> exists; otherwise, <see langword="false"/>.</returns>
+        /// <remarks>
+        /// This method is a O(log <c>n</c>) operation.
+        /// <para/>
+        /// This is referred to as <c>strict predecessor</c> in order theory.
+        /// <para/>
+        /// Usage Note: This corresponds to the <c>lowerEntry()</c> method in the JDK.
+        /// </remarks>
+        public bool TryGetPredecessor(TKey key, [MaybeNullWhen(false)] out TKey resultKey, [MaybeNullWhen(false)] out TValue resultValue)
+        {
+            if (_set.TryGetPredecessor(new KeyValuePair<TKey, TValue>(key, default!), out KeyValuePair<TKey, TValue> result))
+            {
+                resultKey = result.Key;
+                resultValue = result.Value;
+                return true;
+            }
+            resultKey = default;
+            resultValue = default;
+            return false;
+        }
+
+        bool INavigableDictionary<TKey, TValue>.TryGetPredecessor(TKey key, out TKey resultKey, out TValue resultValue)
+            => TryGetPredecessor(key, out resultKey, out resultValue);
+
+        /// <summary>
+        /// Gets the entry in the <see cref="SortedDictionary{TKey, TValue}"/> whose key
+        /// is the successor of the specified <paramref name="key"/>.
+        /// </summary>
+        /// <param name="key">The key of the entry to get the successor of.</param>
+        /// <param name="resultKey">Upon successful return, contains the key of the successor.</param>
+        /// <param name="resultValue">Upon successful return, contains the value of the successor.</param>
+        /// <returns><see langword="true"/> if a successor to <paramref name="key"/> exists; otherwise, <see langword="false"/>.</returns>
+        /// <remarks>
+        /// This method is a O(log <c>n</c>) operation.
+        /// <para/>
+        /// This is referred to as <c>strict successor</c> in order theory.
+        /// <para/>
+        /// Usage Note: This corresponds to the <c>higherEntry()</c> method in the JDK.
+        /// </remarks>
+        public bool TryGetSuccessor(TKey key, [MaybeNullWhen(false)] out TKey resultKey, [MaybeNullWhen(false)] out TValue resultValue)
+        {
+            if (_set.TryGetSuccessor(new KeyValuePair<TKey, TValue>(key, default!), out KeyValuePair<TKey, TValue> result))
+            {
+                resultKey = result.Key;
+                resultValue = result.Value;
+                return true;
+            }
+            resultKey = default;
+            resultValue = default;
+            return false;
+        }
+
+        bool INavigableDictionary<TKey, TValue>.TryGetSuccessor(TKey key, out TKey resultKey, out TValue resultValue)
+            => TryGetSuccessor(key, out resultKey, out resultValue);
+
+        /// <summary>
+        /// Gets the entry in the <see cref="SortedDictionary{TKey, TValue}"/> whose key
+        /// is the greatest element less than or equal to the specified <paramref name="key"/>.
+        /// </summary>
+        /// <param name="key">The key of the entry to get the floor of.</param>
+        /// <param name="resultKey">Upon successful return, contains the key of the floor.</param>
+        /// <param name="resultValue">Upon successful return, contains the value of the floor.</param>
+        /// <returns><see langword="true"/> if a floor to <paramref name="key"/> exists; otherwise, <see langword="false"/>.</returns>
+        /// <remarks>
+        /// This method is a O(log <c>n</c>) operation.
+        /// <para/>
+        /// This is referred to as <c>weak predecessor</c> in order theory.
+        /// <para/>
+        /// Usage Note: This corresponds to the <c>floorEntry()</c> method in the JDK.
+        /// </remarks>
+        public bool TryGetFloor(TKey key, [MaybeNullWhen(false)] out TKey resultKey, [MaybeNullWhen(false)] out TValue resultValue)
+        {
+            if (_set.TryGetFloor(new KeyValuePair<TKey, TValue>(key, default!), out KeyValuePair<TKey, TValue> result))
+            {
+                resultKey = result.Key;
+                resultValue = result.Value;
+                return true;
+            }
+            resultKey = default;
+            resultValue = default;
+            return false;
+        }
+
+        bool INavigableDictionary<TKey, TValue>.TryGetFloor(TKey key, out TKey resultKey, out TValue resultValue)
+            => TryGetFloor(key, out resultKey, out resultValue);
+
+        /// <summary>
+        /// Gets the entry in the <see cref="SortedDictionary{TKey, TValue}"/> whose key
+        /// is the least element greater than or equal to the specified <paramref name="key"/>.
+        /// </summary>
+        /// <param name="key">The key of the entry to get the ceiling of.</param>
+        /// <param name="resultKey">Upon successful return, contains the key of the ceiling.</param>
+        /// <param name="resultValue">Upon successful return, contains the value of the ceiling.</param>
+        /// <returns><see langword="true"/> if a ceiling to <paramref name="key"/> exists; otherwise, <see langword="false"/>.</returns>
+        /// <remarks>
+        /// This method is a O(log <c>n</c>) operation.
+        /// <para/>
+        /// This is referred to as <b>weak successor</b> in order theory.
+        /// <para/>
+        /// Usage Note: This corresponds to the <c>ceilingEntry()</c> method in the JDK.
+        /// </remarks>
+        public bool TryGetCeiling(TKey key, [MaybeNullWhen(false)] out TKey resultKey, [MaybeNullWhen(false)] out TValue resultValue)
+        {
+            if (_set.TryGetCeiling(new KeyValuePair<TKey, TValue>(key, default!), out KeyValuePair<TKey, TValue> result))
+            {
+                resultKey = result.Key;
+                resultValue = result.Value;
+                return true;
+            }
+            resultKey = default;
+            resultValue = default;
+            return false;
+        }
+
+        bool INavigableDictionary<TKey, TValue>.TryGetCeiling(TKey key, out TKey resultKey, out TValue resultValue)
+            => TryGetCeiling(key, out resultKey, out resultValue);
 
         /// <summary>
         /// Returns an <see cref="IEnumerable{T}"/> of <see cref="KeyValuePair{TKey, TValue}"/> that iterates over the
@@ -1747,7 +1767,8 @@ namespace J2N.Collections.Generic
         public IEnumerable<KeyValuePair<TKey, TValue>> Reverse()
             => _set.Reverse();
 
-        #region GetView Members
+        IEnumerable<KeyValuePair<TKey, TValue>> INavigableDictionary<TKey, TValue>.Reverse()
+            => Reverse();
 
         /// <summary>
         /// Returns a view of a sub dictionary in a <see cref="SortedDictionary{TKey, TValue}"/>.
@@ -1784,6 +1805,9 @@ namespace J2N.Collections.Generic
 
             return new SortedDictionary<TKey, TValue>(viewSet);
         }
+
+        INavigableDictionary<TKey, TValue> INavigableDictionary<TKey, TValue>.GetView(TKey fromKey, TKey toKey)
+            => GetView(fromKey, toKey);
 
         /// <summary>
         /// Returns a view of a sub dictionary in a <see cref="SortedDictionary{TKey, TValue}"/>.
@@ -1825,6 +1849,9 @@ namespace J2N.Collections.Generic
             return new SortedDictionary<TKey, TValue>(viewSet);
         }
 
+        INavigableDictionary<TKey, TValue> INavigableDictionary<TKey, TValue>.GetView(TKey fromKey, bool fromInclusive, TKey toKey, bool toInclusive)
+            => GetView(fromKey, fromInclusive, toKey, toInclusive);
+
         /// <summary>
         /// Returns the view of a subset in a <see cref="SortedDictionary{TKey, TValue}"/> with no lower bound.
         /// </summary>
@@ -1847,6 +1874,9 @@ namespace J2N.Collections.Generic
 
             return new SortedDictionary<TKey, TValue>(viewSet);
         }
+
+        INavigableDictionary<TKey, TValue> INavigableDictionary<TKey, TValue>.GetViewBefore(TKey toKey)
+            => GetViewBefore(toKey);
 
         /// <summary>
         /// Returns the view of a subset in a <see cref="SortedDictionary{TKey, TValue}"/> with no lower bound.
@@ -1877,6 +1907,9 @@ namespace J2N.Collections.Generic
             return new SortedDictionary<TKey, TValue>(viewSet);
         }
 
+        INavigableDictionary<TKey, TValue> INavigableDictionary<TKey, TValue>.GetViewBefore(TKey toKey, bool inclusive)
+            => GetViewBefore(toKey, inclusive);
+
         /// <summary>
         /// Returns a view of a subset in a <see cref="SortedDictionary{TKey, TValue}"/> with no upper bound.
         /// </summary>
@@ -1899,6 +1932,9 @@ namespace J2N.Collections.Generic
 
             return new SortedDictionary<TKey, TValue>(viewSet);
         }
+
+        INavigableDictionary<TKey, TValue> INavigableDictionary<TKey, TValue>.GetViewAfter(TKey fromKey)
+            => GetViewAfter(fromKey);
 
         /// <summary>
         /// Returns a view of a subset in a <see cref="SortedDictionary{TKey, TValue}"/> with no upper bound.
@@ -1927,6 +1963,9 @@ namespace J2N.Collections.Generic
             return new SortedDictionary<TKey, TValue>(viewSet);
         }
 
+        INavigableDictionary<TKey, TValue> INavigableDictionary<TKey, TValue>.GetViewAfter(TKey fromKey, bool inclusive)
+            => GetViewAfter(fromKey, inclusive);
+
         /// <summary>
         /// Returns a reverse order view of the elements of the current <see cref="SortedDictionary{TKey, TValue}"/>.
         /// </summary>
@@ -1945,7 +1984,16 @@ namespace J2N.Collections.Generic
             return new SortedDictionary<TKey, TValue>(viewSet);
         }
 
-        #endregion GetView Members
+        INavigableDictionary<TKey, TValue> INavigableDictionary<TKey, TValue>.GetViewDescending()
+            => GetViewDescending();
+
+        #endregion INavigableDictionary<TKey, TValue> members
+
+        #region ICollectionView Members
+
+        bool ICollectionView.IsView => _set is ICollectionView view && view.IsView;
+
+        #endregion
 
         #region Structural Equality
 
