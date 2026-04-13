@@ -456,14 +456,13 @@ namespace J2N.Collections.Tests
                 Assert.NotEqual(first, currentFirst); // Sanity check - the collection should not contain first
             }
 
-            Assert.NotEqual(first, set.First); // Sanity check - the collection should not contain first
-
             if (FirstInclusive)
             {
                 set.Add(first);
                 Assert.Equal(count + 1, set.Count); // collection is also updated.
                 Assert.Equal(count + 1, OriginalSet.Count);
-                Assert.Equal(first, set.First);
+                Assert.True(set.TryGetFirst(out currentFirst));
+                Assert.Equal(first, currentFirst);
             }
             else
             {
@@ -488,7 +487,8 @@ namespace J2N.Collections.Tests
                 set.Add(last);
                 Assert.Equal(count + 1, set.Count); // collection is also updated.
                 Assert.Equal(count + 1, OriginalSet.Count);
-                Assert.Equal(last, set.Last);
+                Assert.True(set.TryGetLast(out currentLast));
+                Assert.Equal(last, currentLast);
             }
             else
             {
@@ -513,13 +513,15 @@ namespace J2N.Collections.Tests
                 Assert.True(set.Add(first));
                 Assert.Equal(count + 1, set.Count); // collection is also updated.
                 Assert.Equal(count + 1, OriginalSet.Count);
-                Assert.Equal(first, set.First);
+                Assert.True(set.TryGetFirst(out currentFirst));
+                Assert.Equal(first, currentFirst);
                 Assert.True(set.Contains(first));
             }
             else
             {
                 Assert.Throws<ArgumentOutOfRangeException>(() => set.Add(first));
-                Assert.NotEqual(first, set.First);
+                set.TryGetFirst(out currentFirst); // collection may be empty, that is fine
+                Assert.NotEqual(first, currentFirst);
                 Assert.False(set.Contains(first));
             }
         }
@@ -541,13 +543,15 @@ namespace J2N.Collections.Tests
                 Assert.True(set.Add(last));
                 Assert.Equal(count + 1, set.Count); // collection is also updated.
                 Assert.Equal(count + 1, OriginalSet.Count);
-                Assert.Equal(last, set.Last);
+                Assert.True(set.TryGetLast(out currentLast));
+                Assert.Equal(last, currentLast);
                 Assert.True(set.Contains(last));
             }
             else
             {
                 Assert.Throws<ArgumentOutOfRangeException>(() => set.Add(last));
-                Assert.NotEqual(last, set.Last);
+                set.TryGetLast(out currentLast); // collection may be empty, that is fine
+                Assert.NotEqual(last, currentLast);
                 Assert.False(set.Contains(last));
             }
         }
@@ -570,7 +574,8 @@ namespace J2N.Collections.Tests
                 Assert.True(set.Add(first));
                 Assert.Equal(count + 1, set.Count); // collection is also updated.
                 Assert.Equal(count + 1, OriginalSet.Count);
-                Assert.Equal(first, set.First);
+                Assert.True(set.TryGetFirst(out currentFirst));
+                Assert.Equal(first, currentFirst);
                 Assert.True(set.Remove(first));
             }
             else
@@ -602,7 +607,8 @@ namespace J2N.Collections.Tests
                 Assert.True(set.Add(last));
                 Assert.Equal(count + 1, set.Count); // collection is also updated.
                 Assert.Equal(count + 1, OriginalSet.Count);
-                Assert.Equal(last, set.Last);
+                Assert.True(set.TryGetLast(out currentLast));
+                Assert.Equal(last, currentLast);
                 Assert.True(set.Remove(last));
             }
             else

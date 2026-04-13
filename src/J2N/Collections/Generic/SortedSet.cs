@@ -3725,7 +3725,10 @@ namespace J2N.Collections.Generic
                 if (ComparerEquals(comparer, navigableCollection.Comparer))
                 {
                     // Outside range, no point in doing anything
-                    if (comparer.Compare(navigableCollection.Last!, MinInternal!) >= 0 && comparer.Compare(navigableCollection.First!, MaxInternal!) <= 0)
+                    if (navigableCollection.TryGetLast(out T? otherLast) &&
+                        navigableCollection.TryGetFirst(out T? otherFirst) &&
+                        comparer.Compare(otherLast, MinInternal!) >= 0 &&
+                        comparer.Compare(otherFirst, MaxInternal!) <= 0)
                     {
                         T? first = MinInternal;
                         T? last = MaxInternal;
@@ -4039,7 +4042,7 @@ namespace J2N.Collections.Generic
 
             // J2N: We cannot make any assumptions about the whether the inclusivity of the other collection is the same as this one,
             // so we override it. The Contains() call will weed out the bounds if they are different.
-            INavigableCollection<T> prunedOther = navigableCollection.GetView(First, fromInclusive: true, Last, toInclusive: true);
+            INavigableCollection<T> prunedOther = navigableCollection.GetView(MinInternal, fromInclusive: true, MaxInternal, toInclusive: true);
             foreach (T item in this)
             {
                 if (!prunedOther.Contains(item))
@@ -4298,9 +4301,15 @@ namespace J2N.Collections.Generic
             if (this is ICollectionView view && view.IsView)
                 return IsSupersetOfEnumerableWithSameComparer(navigableCollection);
 
+            if (!navigableCollection.TryGetFirst(out T? otherFirst) || !navigableCollection.TryGetLast(out T? otherLast))
+            {
+                // Other is empty, so we are done.
+                return true;
+            }
+
             // J2N: We cannot make any assumptions about the whether the inclusivity of this collection is the same as the other one,
             // so we use explicit bounds. The Contains() call will weed out the bounds if they are different.
-            SortedSet<T> pruned = GetView(navigableCollection.First, fromInclusive: true, navigableCollection.Last, toInclusive: true);
+            SortedSet<T> pruned = GetView(otherFirst, fromInclusive: true, otherLast, toInclusive: true);
             foreach (T item in navigableCollection)
             {
                 if (!pruned.Contains(item))
@@ -4636,13 +4645,14 @@ namespace J2N.Collections.Generic
                     return false;
             }
 
-            // J2N: Note that views (whether this or other) are up to date by this point because of the calls to Count above,
-            // so no special-case handling is required.
             if (other is INavigableCollection<T> navigableCollection)
             {
                 IComparer<T> comparer = Comparer;
                 if (ComparerEquals(comparer, navigableCollection.Comparer) &&
-                    (comparer.Compare(MinInternal!, navigableCollection.Last!) > 0 || comparer.Compare(MaxInternal!, navigableCollection.First!) < 0))
+                    (!navigableCollection.TryGetLast(out T? otherLast) || 
+                    !navigableCollection.TryGetFirst(out T? otherFirst) ||
+                    comparer.Compare(MinInternal!, otherLast!) > 0 ||
+                    comparer.Compare(MaxInternal!, otherFirst!) < 0))
                 {
                     return false;
                 }
@@ -4791,10 +4801,6 @@ namespace J2N.Collections.Generic
 
         #region INavigableCollection<T> members
 
-        T? INavigableCollection<T>.First => MinInternal;
-
-        T? INavigableCollection<T>.Last => MaxInternal;
-
         INavigableCollection<T> INavigableCollection<T>.GetView([AllowNull] T fromValue, [AllowNull] T toValue)
             => GetView(fromValue, toValue);
 
@@ -4869,35 +4875,10 @@ namespace J2N.Collections.Generic
         /// <summary>
         /// Gets the first (lowest) value in the <see cref="SortedSet{T}"/>, as defined by the comparer.
         /// </summary>
-        /// <remarks>
-        /// If the <see cref="SortedSet{T}"/> has no elements, then the <see cref="First"/> property returns
-        /// the default value of <typeparamref name="T"/>.
-        /// <para/>
-        /// This corresponds to the <c>first()</c> method in the JDK.
-        /// </remarks>
-        public T? First => MinInternal; // J2N: Added for consistency with other view members (Min doesn't correspond well with GetViewBefore())
-
-        /// <summary>
-        /// Gets the last (highest) value in the <see cref="SortedSet{T}"/>, as defined by the comparer.
-        /// </summary>
-        /// <remarks>
-        /// If the <see cref="SortedSet{T}"/> has no elements, then the <see cref="Last"/> property returns
-        /// the default value of <typeparamref name="T"/>.
-        /// <para/>
-        /// This corresponds to the <c>last()</c> method in the JDK.
-        /// </remarks>
-        public T? Last => MaxInternal; // J2N: Added for consistency with other view members (Max doesn't correspond well with GetViewAfter())
-
-        /// <summary>
-        /// Gets the first (lowest) value in the <see cref="SortedSet{T}"/>, as defined by the comparer.
-        /// </summary>
         /// <param name="result">Upon successful return, contains the first (lowest) value.</param>
         /// <returns><see langword="true"/> if a first value exists; otherwise, <see langword="false"/>.</returns>
         /// <remarks>
-        /// This corresponds to the <c>first()</c> method in the JDK. Calling <see cref="TryGetFirst(out T)"/> is
-        /// generally a better fit than using <see cref="First"/>, since using <see cref="First"/> requires to
-        /// check for <see cref="ICollection{T}.Count"/> > 0 on value types to determine whether a first value
-        /// exists in the collection.
+        /// This corresponds to the <c>first()</c> method in the JDK.
         /// </remarks>
         public bool TryGetFirst([MaybeNullWhen(false)] out T result) => DoTryGetFirst(out result);
 
@@ -4918,10 +4899,7 @@ namespace J2N.Collections.Generic
         /// <param name="result">Upon successful return, contains the last (highest) value.</param>
         /// <returns><see langword="true"/> if a last value exists; otherwise, <see langword="false"/>.</returns>
         /// <remarks>
-        /// This corresponds to the <c>last()</c> method in the JDK. Calling <see cref="TryGetLast(out T)"/> is
-        /// generally a better fit than using <see cref="Last"/>, since using <see cref="Last"/> requires to
-        /// check for <see cref="ICollection{T}.Count"/> > 0 on value types to determine whether a last value
-        /// exists in the collection.
+        /// This corresponds to the <c>last()</c> method in the JDK.
         /// </remarks>
         public bool TryGetLast([MaybeNullWhen(false)] out T result) => DoTryGetLast(out result);
 

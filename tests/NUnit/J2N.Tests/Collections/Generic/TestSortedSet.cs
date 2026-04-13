@@ -628,13 +628,13 @@ namespace J2N.Collections.Generic
             SortedSet<int> view = set.GetView(2, 4);
 
             // Sanity check
-            Assert.AreEqual(2, view.First);
+            Assert.AreEqual(2, view.Min);
 
             // Mutate underlying set in a way that affects the view
             set.Remove(2);
 
             // BUG: Without VersionCheck() in MinInternal, this returns 2
-            Assert.AreEqual(3, view.First);
+            Assert.AreEqual(3, view.Min);
         }
 
         [Test] // J2N: Regression test for BCL bug on Max (out of date)
@@ -648,7 +648,7 @@ namespace J2N.Collections.Generic
             set.Clear();
 
             // BUG: Without VersionCheck() in MaxInternal, returns "4"
-            Assert.AreEqual(null, view.Last);
+            Assert.AreEqual(null, view.Max);
         }
 
         #region Loading and Comparing

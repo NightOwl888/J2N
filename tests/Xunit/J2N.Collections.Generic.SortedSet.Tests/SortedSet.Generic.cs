@@ -49,12 +49,6 @@ namespace J2N.Collections.Tests
             Assert.True(view.Contains(7));
             Assert.False(view.Contains(9));
 
-            Assert.Equal(1, set.First);
-            Assert.Equal(9, set.Last);
-
-            Assert.Equal(5, view.First);
-            Assert.Equal(7, view.Last);
-
             Assert.True(set.TryGetFirst(out int value));
             Assert.Equal(1, value);
 
@@ -69,29 +63,26 @@ namespace J2N.Collections.Tests
 
             Assert.True(set.RemoveFirst(out value));
             Assert.Equal(1, value);
-            Assert.Equal(3, set.First);
-            Assert.Equal(5, view.First);
+            Assert.True(set.TryGetFirst(out value));
+            Assert.Equal(3, value);
             Assert.True(view.TryGetFirst(out value));
             Assert.Equal(5, value);
 
             Assert.True(view.RemoveFirst(out value));
             Assert.Equal(5, value);
-            Assert.Equal(7, view.First);
             Assert.True(view.TryGetFirst(out value));
             Assert.Equal(7, value);
 
             Assert.True(set.RemoveLast(out value));
             Assert.Equal(9, value);
-            Assert.Equal(7, set.Last);
-            Assert.Equal(7, view.Last);
+            Assert.True(set.TryGetLast(out value));
+            Assert.Equal(7, value);
             Assert.True(view.TryGetLast(out value));
             Assert.Equal(7, value);
 
             Assert.True(view.RemoveLast(out value));
             Assert.Equal(7, value);
             Assert.Equal(0, view.Count);
-            Assert.Equal(0, view.First);
-            Assert.Equal(0, view.Last);
             Assert.False(view.TryGetFirst(out value));
             Assert.Equal(0, value);
             Assert.False(view.TryGetLast(out value));
@@ -138,7 +129,7 @@ namespace J2N.Collections.Tests
             }
         }
 
-        // J2N: Added First and Last properties to replace Min and Max
+        // J2N: Added TryGetFirst and TryGetLast methods to replace Min and Max
         [Fact]
         public void SortedSet_Generic_GetView_FirstLast_Exhaustive()
         {
@@ -151,17 +142,11 @@ namespace J2N.Collections.Tests
 
                     if (j < i || (j == i && i % 2 == 0))
                     {
-                        Assert.Equal(default(int), view.First);
-                        Assert.Equal(default(int), view.Last);
-
                         Assert.False(view.TryGetFirst(out _));
                         Assert.False(view.TryGetLast(out _));
                     }
                     else
                     {
-                        Assert.Equal(i + ((i + 1) % 2), view.First);
-                        Assert.Equal(j - ((j + 1) % 2), view.Last);
-
                         Assert.True(view.TryGetFirst(out int value));
                         Assert.Equal(i + ((i + 1) % 2), value);
 

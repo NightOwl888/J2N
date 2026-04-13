@@ -538,7 +538,8 @@ namespace J2N.Collections.Tests
                 dictionary.Add(firstKey, default(TValue));
                 Assert.Equal(count + 1, dictionary.Count); // collection is also updated.
                 Assert.Equal(count + 1, OriginalDictionary.Count);
-                Assert.Equal(firstKey, dictionary.FirstKey);
+                Assert.True(dictionary.TryGetFirst(out TKey key, out _));
+                Assert.Equal(firstKey, key);
             }
             else
             {
@@ -563,7 +564,8 @@ namespace J2N.Collections.Tests
                 dictionary.Add(lastKey, default(TValue));
                 Assert.Equal(count + 1, dictionary.Count); // collection is also updated.
                 Assert.Equal(count + 1, OriginalDictionary.Count);
-                Assert.Equal(lastKey, dictionary.LastKey);
+                Assert.True(dictionary.TryGetLast(out TKey key, out _));
+                Assert.Equal(lastKey, key);
             }
             else
             {
@@ -588,13 +590,15 @@ namespace J2N.Collections.Tests
                 dictionary.Add(firstKey, default(TValue));
                 Assert.Equal(count + 1, dictionary.Count); // collection is also updated.
                 Assert.Equal(count + 1, OriginalDictionary.Count);
-                Assert.Equal(firstKey, dictionary.FirstKey);
+                Assert.True(dictionary.TryGetFirst(out TKey key, out _));
+                Assert.Equal(firstKey, key);
                 Assert.True(dictionary.ContainsKey(firstKey));
             }
             else
             {
                 Assert.Throws<ArgumentOutOfRangeException>(() => dictionary.Add(firstKey, default(TValue)));
-                Assert.NotEqual(firstKey, dictionary.FirstKey);
+                dictionary.TryGetFirst(out TKey key, out _); // collection may be empty, that is fine
+                Assert.NotEqual(firstKey, key);
                 Assert.False(dictionary.ContainsKey(firstKey));
             }
         }
@@ -616,13 +620,15 @@ namespace J2N.Collections.Tests
                 dictionary.Add(lastKey, default(TValue));
                 Assert.Equal(count + 1, dictionary.Count); // collection is also updated.
                 Assert.Equal(count + 1, OriginalDictionary.Count);
-                Assert.Equal(lastKey, dictionary.LastKey);
+                Assert.True(dictionary.TryGetLast(out TKey key, out _));
+                Assert.Equal(lastKey, key);
                 Assert.True(dictionary.ContainsKey(lastKey));
             }
             else
             {
                 Assert.Throws<ArgumentOutOfRangeException>(() => dictionary.Add(lastKey, default(TValue)));
-                Assert.NotEqual(lastKey, dictionary.LastKey);
+                dictionary.TryGetLast(out TKey key, out _); // collection may be empty, that is fine
+                Assert.NotEqual(lastKey, key);
                 Assert.False(dictionary.ContainsKey(lastKey));
             }
         }
@@ -644,7 +650,8 @@ namespace J2N.Collections.Tests
                 dictionary.Add(firstKey, default(TValue));
                 Assert.Equal(count + 1, dictionary.Count); // collection is also updated.
                 Assert.Equal(count + 1, OriginalDictionary.Count);
-                Assert.Equal(firstKey, dictionary.FirstKey);
+                Assert.True(dictionary.TryGetFirst(out TKey key, out _));
+                Assert.Equal(firstKey, key);
                 Assert.True(dictionary.Remove(firstKey));
             }
             else
@@ -676,7 +683,8 @@ namespace J2N.Collections.Tests
                 dictionary.Add(lastKey, default(TValue));
                 Assert.Equal(count + 1, dictionary.Count); // collection is also updated.
                 Assert.Equal(count + 1, OriginalDictionary.Count);
-                Assert.Equal(lastKey, dictionary.LastKey);
+                Assert.True(dictionary.TryGetLast(out TKey key, out _));
+                Assert.Equal(lastKey, key);
                 Assert.True(dictionary.Remove(lastKey));
             }
             else

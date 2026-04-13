@@ -937,28 +937,6 @@ namespace J2N.Collections.Generic
         #region Java TreeMap-like Members
 
         /// <summary>
-        /// Gets the first (lowest) key in the <see cref="SortedDictionary{TKey, TValue}"/>, as defined by the comparer.
-        /// </summary>
-        /// <remarks>
-        /// If the <see cref="SortedDictionary{TKey, TValue}"/> has no elements, then the <see cref="FirstKey"/> property returns
-        /// the default value of <typeparamref name="TKey"/>.
-        /// <para/>
-        /// This corresponds to the <c>firstKey()</c> method in the JDK.
-        /// </remarks>
-        public TKey? FirstKey => _set.TryGetFirst(out KeyValuePair<TKey, TValue> result) ? result.Key : default;
-
-        /// <summary>
-        /// Gets the last (highest) key in the <see cref="SortedDictionary{TKey, TValue}"/>, as defined by the comparer.
-        /// </summary>
-        /// <remarks>
-        /// If the <see cref="SortedDictionary{TKey, TValue}"/> has no elements, then the <see cref="LastKey"/> property returns
-        /// the default value of <typeparamref name="TKey"/>.
-        /// <para/>
-        /// This corresponds to the <c>lastKey()</c> method in the JDK.
-        /// </remarks>
-        public TKey? LastKey => _set.TryGetLast(out KeyValuePair<TKey, TValue> result) ? result.Key : default;
-
-        /// <summary>
         /// Gets the entry in the <see cref="SortedDictionary{TKey, TValue}"/> whose key
         /// is the first (lowest) value, as defined by the comparer.
         /// </summary>
@@ -966,7 +944,7 @@ namespace J2N.Collections.Generic
         /// <param name="value">Upon successful return, contains the value corresponding to the first (lowest) key in the collection.</param>
         /// <returns><see langword="true"/> if a first <paramref name="key"/> exists; otherwise, <see langword="false"/>.</returns>
         /// <remarks>
-        /// Usage Note: This corresponds to the <c>firstEntry()</c> method in the JDK.
+        /// Usage Note: This corresponds to both the <c>firstKey()</c> and <c>firstEntry()</c> methods in the JDK.
         /// </remarks>
         public bool TryGetFirst([MaybeNullWhen(false)] out TKey key, [MaybeNullWhen(false)] out TValue value)
         {
@@ -989,7 +967,7 @@ namespace J2N.Collections.Generic
         /// <param name="value">Upon successful return, contains the value corresponding to the last (highest) key in the collection.</param>
         /// <returns><see langword="true"/> if a last <paramref name="key"/> exists; otherwise, <see langword="false"/>.</returns>
         /// <remarks>
-        /// Usage Note: This corresponds to the <c>lastEntry()</c> method in the JDK.
+        /// Usage Note: This corresponds to both the <c>lastKey()</c> and <c>lastEntry()</c> methods in the JDK.
         /// </remarks>
         public bool TryGetLast([MaybeNullWhen(false)] out TKey key, [MaybeNullWhen(false)] out TValue value)
         {
@@ -1704,10 +1682,6 @@ namespace J2N.Collections.Generic
         #region INavigableCollection<KeyValuePair<TKey, TValue>> members
 
         IComparer<KeyValuePair<TKey, TValue>> ISortedCollection<KeyValuePair<TKey, TValue>>.Comparer => _set.Comparer;
-
-        KeyValuePair<TKey, TValue> INavigableCollection<KeyValuePair<TKey, TValue>>.First => _set.MinInternal;
-
-        KeyValuePair<TKey, TValue> INavigableCollection<KeyValuePair<TKey, TValue>>.Last => _set.MaxInternal;
 
         bool INavigableCollection<KeyValuePair<TKey, TValue>>.TryGetFirst(out KeyValuePair<TKey, TValue> result) => _set.TryGetFirst(out result);
 
@@ -2504,10 +2478,6 @@ namespace J2N.Collections.Generic
             object ICollection.SyncRoot => ((ICollection)_dictionary).SyncRoot;
 
             #region INavigableSet<T> members
-
-            TKey? INavigableCollection<TKey>.First => _dictionary._set.TryGetFirst(out KeyValuePair<TKey, TValue> result) ? result.Key : default;
-
-            TKey? INavigableCollection<TKey>.Last => _dictionary._set.TryGetLast(out KeyValuePair<TKey, TValue> result) ? result.Key : default;
 
             bool INavigableCollection<TKey>.TryGetFirst([MaybeNullWhen(false)] out TKey result)
             {

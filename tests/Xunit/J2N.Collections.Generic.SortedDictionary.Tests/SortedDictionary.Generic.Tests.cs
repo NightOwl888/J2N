@@ -1084,9 +1084,9 @@ namespace J2N.Collections.Tests
 
         #endregion GetSpanAlternateLookup
 
-        #region FirstKey and LastKey
+        #region First and Last
 
-        // J2N: Added FirstKey and LastKey properties to replace Min and Max
+        // J2N: Added TryGetFirst and TryGetLast methods to replace Min and Max
         [Theory]
         [MemberData(nameof(ValidCollectionSizes))]
         public void SortedDictionary_Generic_FirstAndLast(int count)
@@ -1106,9 +1106,6 @@ namespace J2N.Collections.Tests
             }
             else
             {
-                Assert.Equal(default(TKey), dictionary.FirstKey);
-                Assert.Equal(default(TKey), dictionary.LastKey);
-
                 Assert.False(dictionary.TryGetFirst(out TKey key, out TValue value));
                 Assert.Equal(default(TKey), key);
                 Assert.Equal(default(TValue), value);
@@ -1120,9 +1117,6 @@ namespace J2N.Collections.Tests
 
             static void AssertFirstLastMatch(List<SCG.KeyValuePair<TKey, TValue>> expected, SortedDictionary<TKey, TValue> dictionary, int count)
             {
-                Assert.Equal(expected[0].Key, dictionary.FirstKey);
-                Assert.Equal(expected[count - 1].Key, dictionary.LastKey);
-
                 Assert.True(dictionary.TryGetFirst(out TKey key, out TValue value));
                 Assert.Equal(expected[0].Key, key);
                 Assert.Equal(expected[0].Value, value);
@@ -1133,7 +1127,7 @@ namespace J2N.Collections.Tests
             }
         }
 
-        #endregion FirstKey and LastKey
+        #endregion First and Last
 
         #region GetView
 
@@ -1448,9 +1442,6 @@ namespace J2N.Collections.Tests
             SortedDictionary<TKey, TValue> view = dictionary.GetView(secondElement.Key, nextToLastElement.Key);
             Assert.Equal(0, view.Count);
 
-            Assert.Equal(default(TKey), view.FirstKey);
-            Assert.Equal(default(TKey), view.LastKey);
-
             Assert.False(view.TryGetFirst(out TKey key, out TValue value));
             Assert.Equal(default(TKey), key);
             Assert.Equal(default(TValue), value);
@@ -1633,9 +1624,6 @@ namespace J2N.Collections.Tests
             SortedDictionary<TKey, TValue> view = dictionary.GetViewBefore(nextToLastElement.Key);
             Assert.Equal(0, view.Count);
 
-            Assert.Equal(default(TKey), view.FirstKey);
-            Assert.Equal(default(TKey), view.LastKey);
-
             Assert.False(view.TryGetFirst(out TKey key, out TValue value));
             Assert.Equal(default(TKey), key);
             Assert.Equal(default(TValue), value);
@@ -1817,9 +1805,6 @@ namespace J2N.Collections.Tests
 
             SortedDictionary<TKey, TValue> view = dictionary.GetViewAfter(secondElement.Key);
             Assert.Equal(0, view.Count);
-
-            Assert.Equal(default(TKey), view.FirstKey);
-            Assert.Equal(default(TKey), view.LastKey);
 
             Assert.False(view.TryGetFirst(out TKey key, out TValue value));
             Assert.Equal(default(TKey), key);

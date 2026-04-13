@@ -138,7 +138,7 @@ namespace J2N.Collections.Tests
 
         #region First and Last
 
-        // J2N: Added First and Last properties to replace Min and Max
+        // J2N: Added TryGetFirst and TryGetLast methods to replace Min and Max
         [Theory]
         [MemberData(nameof(ValidCollectionSizes))]
         public void SortedSet_Generic_FirstAndLast(int setLength)
@@ -158,9 +158,6 @@ namespace J2N.Collections.Tests
             }
             else
             {
-                Assert.Equal(default(T), set.First);
-                Assert.Equal(default(T), set.Last);
-
                 Assert.False(set.TryGetFirst(out T value));
                 Assert.Equal(default(T), value);
 
@@ -170,9 +167,6 @@ namespace J2N.Collections.Tests
 
             static void AssertFirstLastMatch(List<T> expected, SortedSet< T> set, int setLength)
             {
-                Assert.Equal(expected[0], set.First);
-                Assert.Equal(expected[setLength - 1], set.Last);
-
                 Assert.True(set.TryGetFirst(out T value));
                 Assert.Equal(expected[0], value);
 
@@ -423,9 +417,6 @@ namespace J2N.Collections.Tests
 
             Assert.Equal(default(T), view.Min);
             Assert.Equal(default(T), view.Max);
-
-            Assert.Equal(default(T), view.First);
-            Assert.Equal(default(T), view.Last);
 
             Assert.False(view.TryGetFirst(out T value));
             Assert.Equal(default(T), value);
@@ -758,9 +749,6 @@ namespace J2N.Collections.Tests
             Assert.Equal(default(T), view.Min);
             Assert.Equal(default(T), view.Max);
 
-            Assert.Equal(default(T), view.First);
-            Assert.Equal(default(T), view.Last);
-
             Assert.False(view.TryGetFirst(out T value));
             Assert.Equal(default(T), value);
 
@@ -945,9 +933,6 @@ namespace J2N.Collections.Tests
             Assert.Equal(default(T), view.Min);
             Assert.Equal(default(T), view.Max);
 
-            Assert.Equal(default(T), view.First);
-            Assert.Equal(default(T), view.Last);
-
             Assert.False(view.TryGetFirst(out T value));
             Assert.Equal(default(T), value);
 
@@ -1130,9 +1115,6 @@ namespace J2N.Collections.Tests
 
             Assert.Equal(default(T), view.Min);
             Assert.Equal(default(T), view.Max);
-
-            Assert.Equal(default(T), view.First);
-            Assert.Equal(default(T), view.Last);
 
             Assert.False(view.TryGetFirst(out T value));
             Assert.Equal(default(T), value);
