@@ -98,6 +98,70 @@ namespace J2N.Collections.Generic
         bool RemoveLast([MaybeNullWhen(false)] out T value); // J2N: The parameter naming of "value" instead of "result" is intentional here because this is a mutation, not a query
 
         /// <summary>
+        /// Gets the entry in the <see cref="INavigableCollection{T}"/> whose value
+        /// is the predecessor of the specified <paramref name="item"/>.
+        /// </summary>
+        /// <param name="item">The entry to get the predecessor of.</param>
+        /// <param name="result">The predessor, if any.</param>
+        /// <returns><see langword="true"/> if a predecessor to <paramref name="item"/> exists; otherwise, <see langword="false"/>.</returns>
+        /// <remarks>
+        /// This method is a O(log <c>n</c>) operation.
+        /// <para/>
+        /// This is referred to as <c>strict predecessor</c> in order theory.
+        /// <para/>
+        /// Usage Note: This corresponds to the <c>lower()</c> method in the JDK.
+        /// </remarks>
+        bool TryGetPredecessor(T item, [MaybeNullWhen(false)] out T result);
+
+        /// <summary>
+        /// Gets the entry in the <see cref="INavigableCollection{T}"/> whose value
+        /// is the sucessor of the specified <paramref name="item"/>.
+        /// </summary>
+        /// <param name="item">The entry to get the successor of.</param>
+        /// <param name="result">The successor, if any.</param>
+        /// <returns><see langword="true"/> if a successor to <paramref name="item"/> exists; otherwise, <see langword="false"/>.</returns>
+        /// <remarks>
+        /// This method is a O(log <c>n</c>) operation.
+        /// <para/>
+        /// This is referred to as <c>strict successor</c> in order theory.
+        /// <para/>
+        /// Usage Note: This corresponds to the <c>higher()</c> method in the JDK.
+        /// </remarks>
+        bool TryGetSuccessor(T item, [MaybeNullWhen(false)] out T result);
+
+        /// <summary>
+        /// Gets the value in the <see cref="INavigableCollection{T}"/> whose value
+        /// is the greatest element less than or equal to <paramref name="item"/>.
+        /// </summary>
+        /// <param name="item">The entry to get the floor of.</param>
+        /// <param name="result">The floor, if any.</param>
+        /// <returns><see langword="true"/> if a floor to <paramref name="item"/> exists; otherwise, <see langword="false"/>.</returns>
+        /// <remarks>
+        /// This method is a O(log <c>n</c>) operation.
+        /// <para/>
+        /// This is referred to as <c>weak predecessor</c> in order theory.
+        /// <para/>
+        /// Usage Note: This corresponds to the <c>floor()</c> method in the JDK.
+        /// </remarks>
+        bool TryGetFloor(T item, [MaybeNullWhen(false)] out T result);
+
+        /// <summary>
+        /// Gets the value in the <see cref="INavigableCollection{T}"/> whose value
+        /// is the least element greater than or equal to <paramref name="item"/>.
+        /// </summary>
+        /// <param name="item">The entry to get the ceiling of.</param>
+        /// <param name="result">The ceiling, if any.</param>
+        /// <returns><see langword="true"/> if a ceiling to <paramref name="item"/> exists; otherwise, <see langword="false"/>.</returns>
+        /// <remarks>
+        /// This method is a O(log <c>n</c>) operation.
+        /// <para/>
+        /// This is referred to as <b>weak successor</b> in order theory.
+        /// <para/>
+        /// Usage Note: This corresponds to the <c>ceiling()</c> method in the JDK.
+        /// </remarks>
+        bool TryGetCeiling(T item, [MaybeNullWhen(false)] out T result);
+
+        /// <summary>
         /// Returns a view of a subset in a <see cref="INavigableCollection{T}"/>.
         /// <para/>
         /// Usage Note: In Java, the <paramref name="toValue"/> of TreeSet.subSet() is exclusive. To match the behavior, call
@@ -222,7 +286,7 @@ namespace J2N.Collections.Generic
         /// <para/>
         /// This corresponds to the <c>tailSet()</c> method in the JDK.
         /// </remarks>
-        INavigableCollection<T> GetViewAfter([AllowNull] T fromValue,  bool inclusive);
+        INavigableCollection<T> GetViewAfter([AllowNull] T fromValue, bool inclusive);
 
         /// <summary>
         /// Returns a reverse order view of the elements of the current <see cref="INavigableCollection{T}"/>.
@@ -237,69 +301,5 @@ namespace J2N.Collections.Generic
         /// This corresponds to the <c>descendingSet()</c> method in the JDK.
         /// </remarks>
         INavigableCollection<T> GetViewDescending();
-
-        /// <summary>
-        /// Gets the entry in the <see cref="INavigableCollection{T}"/> whose value
-        /// is the predecessor of the specified <paramref name="item"/>.
-        /// </summary>
-        /// <param name="item">The entry to get the predecessor of.</param>
-        /// <param name="result">The predessor, if any.</param>
-        /// <returns><see langword="true"/> if a predecessor to <paramref name="item"/> exists; otherwise, <see langword="false"/>.</returns>
-        /// <remarks>
-        /// This method is a O(log <c>n</c>) operation.
-        /// <para/>
-        /// This is referred to as <c>strict predecessor</c> in order theory.
-        /// <para/>
-        /// Usage Note: This corresponds to the <c>lower()</c> method in the JDK.
-        /// </remarks>
-        bool TryGetPredecessor(T item, [MaybeNullWhen(false)] out T result);
-
-        /// <summary>
-        /// Gets the entry in the <see cref="INavigableCollection{T}"/> whose value
-        /// is the sucessor of the specified <paramref name="item"/>.
-        /// </summary>
-        /// <param name="item">The entry to get the successor of.</param>
-        /// <param name="result">The successor, if any.</param>
-        /// <returns><see langword="true"/> if a successor to <paramref name="item"/> exists; otherwise, <see langword="false"/>.</returns>
-        /// <remarks>
-        /// This method is a O(log <c>n</c>) operation.
-        /// <para/>
-        /// This is referred to as <c>strict successor</c> in order theory.
-        /// <para/>
-        /// Usage Note: This corresponds to the <c>higher()</c> method in the JDK.
-        /// </remarks>
-        bool TryGetSuccessor(T item, [MaybeNullWhen(false)] out T result);
-
-        /// <summary>
-        /// Gets the value in the <see cref="INavigableCollection{T}"/> whose value
-        /// is the greatest element less than or equal to <paramref name="item"/>.
-        /// </summary>
-        /// <param name="item">The entry to get the floor of.</param>
-        /// <param name="result">The floor, if any.</param>
-        /// <returns><see langword="true"/> if a floor to <paramref name="item"/> exists; otherwise, <see langword="false"/>.</returns>
-        /// <remarks>
-        /// This method is a O(log <c>n</c>) operation.
-        /// <para/>
-        /// This is referred to as <c>weak predecessor</c> in order theory.
-        /// <para/>
-        /// Usage Note: This corresponds to the <c>floor()</c> method in the JDK.
-        /// </remarks>
-        bool TryGetFloor(T item, [MaybeNullWhen(false)] out T result);
-
-        /// <summary>
-        /// Gets the value in the <see cref="INavigableCollection{T}"/> whose value
-        /// is the least element greater than or equal to <paramref name="item"/>.
-        /// </summary>
-        /// <param name="item">The entry to get the ceiling of.</param>
-        /// <param name="result">The ceiling, if any.</param>
-        /// <returns><see langword="true"/> if a ceiling to <paramref name="item"/> exists; otherwise, <see langword="false"/>.</returns>
-        /// <remarks>
-        /// This method is a O(log <c>n</c>) operation.
-        /// <para/>
-        /// This is referred to as <b>weak successor</b> in order theory.
-        /// <para/>
-        /// Usage Note: This corresponds to the <c>ceiling()</c> method in the JDK.
-        /// </remarks>
-        bool TryGetCeiling(T item, [MaybeNullWhen(false)] out T result);
     }
 }
