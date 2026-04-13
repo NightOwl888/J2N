@@ -4801,10 +4801,27 @@ namespace J2N.Collections.Generic
 
         #region INavigableCollection<T> members
 
+        IComparer<T> ISortedCollection<T>.Comparer => Comparer;
+
+        bool INavigableCollection<T>.TryGetPredecessor(T item, [MaybeNullWhen(false)] out T result)
+            => TryGetPredecessor(item, out result);
+
+        bool INavigableCollection<T>.TryGetSuccessor(T item, [MaybeNullWhen(false)] out T result)
+            => TryGetSuccessor(item, out result);
+
+        bool INavigableCollection<T>.TryGetFloor(T item, [MaybeNullWhen(false)] out T result)
+            => TryGetFloor(item, out result);
+
+        bool INavigableCollection<T>.TryGetCeiling(T item, [MaybeNullWhen(false)] out T result)
+            => TryGetCeiling(item, out result);
+
+        IEnumerable<T> INavigableCollection<T>.Reverse()
+            => Reverse();
+
         INavigableCollection<T> INavigableCollection<T>.GetView([AllowNull] T fromValue, [AllowNull] T toValue)
             => GetView(fromValue, toValue);
 
-        INavigableCollection<T> INavigableCollection<T>.GetView([AllowNull] T fromValue, bool fromInclusive, [AllowNull] T toValue, bool toInclusive) 
+        INavigableCollection<T> INavigableCollection<T>.GetView([AllowNull] T fromValue, bool fromInclusive, [AllowNull] T toValue, bool toInclusive)
             => GetView(fromValue, fromInclusive, toValue, toInclusive);
 
         INavigableCollection<T> INavigableCollection<T>.GetViewBefore([AllowNull] T toValue)
@@ -4821,20 +4838,6 @@ namespace J2N.Collections.Generic
 
         INavigableCollection<T> INavigableCollection<T>.GetViewDescending()
             => GetViewDescending();
-
-        IComparer<T> ISortedCollection<T>.Comparer => Comparer;
-
-        bool INavigableCollection<T>.TryGetPredecessor(T item, [MaybeNullWhen(false)] out T result)
-            => TryGetPredecessor(item, out result);
-
-        bool INavigableCollection<T>.TryGetSuccessor(T item, [MaybeNullWhen(false)] out T result)
-            => TryGetSuccessor(item, out result);
-
-        bool INavigableCollection<T>.TryGetFloor(T item, [MaybeNullWhen(false)] out T result)
-            => TryGetFloor(item, out result);
-
-        bool INavigableCollection<T>.TryGetCeiling(T item, [MaybeNullWhen(false)] out T result)
-            => TryGetCeiling(item, out result);
 
         #endregion INavigableCollection<T> members
 
@@ -4961,6 +4964,9 @@ namespace J2N.Collections.Generic
         /// <see cref="SortedSet{T}"/> in reverse order.
         /// </summary>
         /// <returns>An enumerator that iterates over the <see cref="SortedSet{T}"/> in reverse order.</returns>
+        /// <remarks>
+        /// This corresponds roughly to the <c>descendingIterator()</c> method in the JDK.
+        /// </remarks>
         public IEnumerable<T> Reverse()
         {
             Enumerator e = new Enumerator(this, reverse: !IsReversed);

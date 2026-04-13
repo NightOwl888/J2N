@@ -1724,6 +1724,10 @@ namespace J2N.Collections.Generic
         bool INavigableCollection<KeyValuePair<TKey, TValue>>.TryGetCeiling(KeyValuePair<TKey, TValue> item, out KeyValuePair<TKey, TValue> result)
             => _set.TryGetCeiling(item, out result);
 
+        IEnumerable<KeyValuePair<TKey, TValue>> INavigableCollection<KeyValuePair<TKey, TValue>>.Reverse()
+            => _set.Reverse();
+
+
         #endregion INavigableCollection<KeyValuePair<TKey, TValue>> members
 
         #region ICollectionView Members
@@ -1737,14 +1741,11 @@ namespace J2N.Collections.Generic
         /// <see cref="SortedDictionary{TKey, TValue}"/> in reverse order.
         /// </summary>
         /// <returns>An enumerator that iterates over the <see cref="SortedDictionary{TKey, TValue}"/> in reverse order.</returns>
+        /// <remarks>
+        /// This corresponds roughly to the <c>descendingKeySet()</c> method in the JDK.
+        /// </remarks>
         public IEnumerable<KeyValuePair<TKey, TValue>> Reverse()
-        {
-            Enumerator e = new Enumerator(this, Enumerator.KeyValuePair, reverse: true);
-            while (e.MoveNext())
-            {
-                yield return e.Current;
-            }
-        }
+            => _set.Reverse();
 
         #region GetView Members
 
@@ -2106,13 +2107,8 @@ namespace J2N.Collections.Generic
             internal const int DictEntry = 2;
 
             internal Enumerator(SortedDictionary<TKey, TValue> dictionary, int getEnumeratorRetType)
-                : this(dictionary, getEnumeratorRetType, reverse: false)
             {
-            }
-
-            internal Enumerator(SortedDictionary<TKey, TValue> dictionary, int getEnumeratorRetType, bool reverse)
-            {
-                _treeEnum = dictionary._set.GetEnumeratorInternal(reverse);
+                _treeEnum = dictionary._set.GetEnumeratorInternal(reverse: false);
                 _getEnumeratorRetType = getEnumeratorRetType;
             }
 
@@ -2479,6 +2475,8 @@ namespace J2N.Collections.Generic
 
             #region INavigableSet<T> members
 
+            IComparer<TKey> ISortedCollection<TKey>.Comparer => _dictionary.Comparer;
+
             bool INavigableCollection<TKey>.TryGetFirst([MaybeNullWhen(false)] out TKey result)
             {
                 if (_dictionary._set.TryGetFirst(out KeyValuePair<TKey, TValue> kvp))
@@ -2521,6 +2519,27 @@ namespace J2N.Collections.Generic
                 }
                 value = default;
                 return false;
+            }
+
+            bool INavigableCollection<TKey>.TryGetPredecessor(TKey item, [MaybeNullWhen(false)] out TKey result)
+                => _dictionary.TryGetPredecessor(item, out result, out _);
+
+            bool INavigableCollection<TKey>.TryGetSuccessor(TKey item, [MaybeNullWhen(false)] out TKey result)
+                => _dictionary.TryGetSuccessor(item, out result, out _);
+
+            bool INavigableCollection<TKey>.TryGetFloor(TKey item, [MaybeNullWhen(false)] out TKey result)
+                => _dictionary.TryGetFloor(item, out result, out _);
+
+            bool INavigableCollection<TKey>.TryGetCeiling(TKey item, [MaybeNullWhen(false)] out TKey result)
+                => _dictionary.TryGetCeiling(item, out result, out _);
+
+            IEnumerable<TKey> INavigableCollection<TKey>.Reverse()
+            {
+                var e = _dictionary._set.GetEnumeratorInternal(reverse: true);
+                while (e.MoveNext())
+                {
+                    yield return e.Current.Key;
+                }
             }
 
             INavigableCollection<TKey> INavigableCollection<TKey>.GetView([AllowNull] TKey fromValue, [AllowNull] TKey toValue)
@@ -2578,20 +2597,6 @@ namespace J2N.Collections.Generic
                 SortedDictionary<TKey, TValue> viewDictionary = _dictionary.GetViewDescending();
                 return new KeyCollection(viewDictionary);
             }
-
-            bool INavigableCollection<TKey>.TryGetPredecessor(TKey item, [MaybeNullWhen(false)] out TKey result)
-                => _dictionary.TryGetPredecessor(item, out result, out _);
-
-            bool INavigableCollection<TKey>.TryGetSuccessor(TKey item, [MaybeNullWhen(false)] out TKey result)
-                => _dictionary.TryGetSuccessor(item, out result, out _);
-
-            bool INavigableCollection<TKey>.TryGetFloor(TKey item, [MaybeNullWhen(false)] out TKey result)
-                => _dictionary.TryGetFloor(item, out result, out _);
-
-            bool INavigableCollection<TKey>.TryGetCeiling(TKey item, [MaybeNullWhen(false)] out TKey result)
-                => _dictionary.TryGetCeiling(item, out result, out _);
-
-            IComparer<TKey> ISortedCollection<TKey>.Comparer => _dictionary.Comparer;
 
             #endregion INavigableSet<T> members
 

@@ -134,6 +134,16 @@ namespace J2N.Collections.Generic
         bool TryGetCeiling(T item, [MaybeNullWhen(false)] out T result);
 
         /// <summary>
+        /// Returns an <see cref="IEnumerable{T}"/> that iterates over the
+        /// <see cref="INavigableCollection{T}"/> in reverse order.
+        /// </summary>
+        /// <returns>An enumerator that iterates over the <see cref="INavigableCollection{T}"/> in reverse order.</returns>
+        /// <remarks>
+        /// This corresponds roughly to the <c>descendingIterator()</c> method in the JDK.
+        /// </remarks>
+        IEnumerable<T> Reverse();
+
+        /// <summary>
         /// Returns a view of a subset in a <see cref="INavigableCollection{T}"/>.
         /// <para/>
         /// Usage Note: In Java, the <paramref name="toValue"/> of TreeSet.subSet() is exclusive. To match the behavior, call
