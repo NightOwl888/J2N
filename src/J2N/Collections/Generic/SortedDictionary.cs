@@ -1487,8 +1487,9 @@ namespace J2N.Collections.Generic
         /// <param name="key">The key of the entry to get the predecessor of.</param>
         /// <param name="result">The <see cref="KeyValuePair{TKey, TValue}"/> representing the predecessor, if any.</param>
         /// <returns><see langword="true"/> if a predecessor to <paramref name="key"/> exists; otherwise, <see langword="false"/>.</returns>
+        [Obsolete("Use TryGetPredecessor(TKey, out TKey, out TValue) or INavigableCollection<KeyValuePair<TKey, TValue>>.TryGetPredecessor(TKey, out KeyValuePair<TKey, TValue>) instead.")]
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public bool TryGetPredecessor(TKey key, out KeyValuePair<TKey, TValue> result) // J2N TODO: API - make this obsolete in 3.0
+        public bool TryGetPredecessor(TKey key, out KeyValuePair<TKey, TValue> result)
         {
             return _set.TryGetPredecessor(new KeyValuePair<TKey, TValue>(key, default!), out result);
         }
@@ -1503,8 +1504,9 @@ namespace J2N.Collections.Generic
         /// <param name="key">The key of the entry to get the successor of.</param>
         /// <param name="result">The <see cref="KeyValuePair{TKey, TValue}"/> representing the successor, if any.</param>
         /// <returns><see langword="true"/> if a successor to <paramref name="key"/> exists; otherwise, <see langword="false"/>.</returns>
+        [Obsolete("Use TryGetSuccessor(TKey, out TKey, out TValue) or INavigableCollection<KeyValuePair<TKey, TValue>>.TryGetSuccessor(TKey, out KeyValuePair<TKey, TValue>) instead.")]
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public bool TryGetSuccessor(TKey key, out KeyValuePair<TKey, TValue> result) // J2N TODO: API - make this obsolete in 3.0
+        public bool TryGetSuccessor(TKey key, out KeyValuePair<TKey, TValue> result)
         {
             return _set.TryGetSuccessor(new KeyValuePair<TKey, TValue>(key, default!), out result);
         }
