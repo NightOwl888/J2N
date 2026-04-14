@@ -2549,22 +2549,14 @@ namespace J2N.Collections.Generic
 
             bool INavigableCollection<TKey>.RemoveFirst([MaybeNullWhen(false)] out TKey value)
             {
-                if (_dictionary._set.RemoveFirst(out KeyValuePair<TKey, TValue> kvp))
-                {
-                    value = kvp.Key;
-                    return true;
-                }
+                ThrowHelper.ThrowNotSupportedException(ExceptionResource.NotSupported_KeyCollectionSet);
                 value = default;
                 return false;
             }
 
             bool INavigableCollection<TKey>.RemoveLast([MaybeNullWhen(false)] out TKey value)
             {
-                if (_dictionary._set.RemoveLast(out KeyValuePair<TKey, TValue> kvp))
-                {
-                    value = kvp.Key;
-                    return true;
-                }
+                ThrowHelper.ThrowNotSupportedException(ExceptionResource.NotSupported_KeyCollectionSet);
                 value = default;
                 return false;
             }
