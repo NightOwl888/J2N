@@ -889,7 +889,7 @@ namespace J2N.Collections.Tests
             if (setLength >= 3)
             {
                 SortedSet<T> set = (SortedSet<T>)GenericISetFactory(setLength);
-                SCG.IComparer<T> comparer = GetForwardIComparer();
+                SCG.IComparer<T> comparer = GetIComparer() ?? Comparer<T>.Default;
                 T firstElement = set.ElementAt(0);
                 T middleElement = set.ElementAt(setLength / 2);
                 T lastElement = set.ElementAt(setLength - 1);
@@ -1072,7 +1072,7 @@ namespace J2N.Collections.Tests
             if (setLength >= 3)
             {
                 SortedSet<T> set = (SortedSet<T>)GenericISetFactory(setLength);
-                SCG.IComparer<T> comparer = GetForwardIComparer();
+                SCG.IComparer<T> comparer = GetIComparer() ?? Comparer<T>.Default;
                 T firstElement = set.ElementAt(0);
                 T middleElement = set.ElementAt(setLength / 2);
                 T lastElement = set.ElementAt(setLength - 1);

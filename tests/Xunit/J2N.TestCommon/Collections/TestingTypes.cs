@@ -467,5 +467,39 @@ namespace J2N.Collections.Tests
         public int GetHashCode(T obj) => 42;
     }
 
+    /// <summary>
+    /// Class to provide an indirection around a Key comparer. Allows us to use a key comparer as a KeyValuePair comparer
+    /// by only looking at the key of a KeyValuePair.
+    /// </summary>
+    public class KeyValuePairComparer<TKey, TValue> : IComparer<KeyValuePair<TKey, TValue>>
+    {
+        private IComparer<TKey> _comparer;
+
+        public KeyValuePairComparer(IComparer<TKey> comparer)
+        {
+            _comparer = comparer;
+        }
+
+        public IComparer<TKey> KeyComparer => _comparer;
+
+        public int Compare(KeyValuePair<TKey, TValue> x, KeyValuePair<TKey, TValue> y)
+        {
+            return _comparer.Compare(x.Key, y.Key);
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is KeyValuePairComparer<TKey, TValue> other)
+                return _comparer.Equals(other._comparer);
+
+            return false;
+        }
+
+        public override int GetHashCode()
+        {
+            return _comparer.GetHashCode();
+        }
+    }
+
     #endregion
 }

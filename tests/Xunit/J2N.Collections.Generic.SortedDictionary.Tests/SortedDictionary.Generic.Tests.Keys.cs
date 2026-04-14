@@ -130,5 +130,45 @@ namespace J2N.Collections.Tests
                 Assert.Equal(array[i++], obj);
         }
     }
+
+    public class SortedDictionary_Generic_Tests_Keys_AsGenericINavigableCollection : INavigableCollection_Generic_Tests<string>
+    {
+        protected override bool DefaultValueAllowed => true; // J2N allows null keys
+        protected override bool DuplicateValuesAllowed => false;
+        protected override bool IsReadOnly => true;
+        protected override bool Enumerator_Empty_UsesSingletonInstance => true;
+        protected override bool Enumerator_Current_UndefinedOperation_Throws => false;
+
+        protected override bool Enumerator_Empty_Current_UndefinedOperation_Throws => true;
+        protected override SCG.IEnumerable<ModifyEnumerable> GetModifyEnumerables(ModifyOperation operations) => new List<ModifyEnumerable>();
+
+        protected override SCG.ICollection<string> GenericICollectionFactory()
+        {
+            return (SCG.ICollection<string>)new SortedDictionary<string, string>().Keys;
+        }
+
+        protected override SCG.ICollection<string> GenericICollectionFactory(int count)
+        {
+            SortedDictionary<string, string> list = new SortedDictionary<string, string>();
+            int seed = 13453;
+            for (int i = 0; i < count; i++)
+                list.Add(CreateT(seed++), CreateT(seed++));
+            return (SCG.ICollection<string>)(list.Keys);
+        }
+
+        protected override void AddToCollection(SCG.ICollection<string> collection, int numberOfItemsToAdd)
+        {
+            Debug.Assert(false);
+        }
+
+        protected override string CreateT(int seed)
+        {
+            int stringLength = seed % 10 + 5;
+            Random rand = new Random(seed);
+            byte[] bytes = new byte[stringLength];
+            rand.NextBytes(bytes);
+            return Convert.ToBase64String(bytes);
+        }
+    }
 }
 
