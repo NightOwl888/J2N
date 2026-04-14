@@ -27,7 +27,7 @@ namespace J2N.Collections.Generic
     /// sorted by a <see cref="IComparer{T}"/>, and has navigation capabilities.
     /// </summary>
     /// <typeparam name="T">The type of element in the collection.</typeparam>
-    internal interface INavigableCollection<T> : IDistinctSortedCollection<T>
+    public interface INavigableCollection<T> : IDistinctSortedCollection<T>
     {
         /// <summary>
         /// Gets the first (lowest) value in the <see cref="INavigableCollection{T}"/>, as defined by the comparer.
@@ -74,7 +74,7 @@ namespace J2N.Collections.Generic
         /// is the predecessor of the specified <paramref name="item"/>.
         /// </summary>
         /// <param name="item">The entry to get the predecessor of.</param>
-        /// <param name="result">The predessor, if any.</param>
+        /// <param name="result">The predecessor, if any.</param>
         /// <returns><see langword="true"/> if a predecessor to <paramref name="item"/> exists; otherwise, <see langword="false"/>.</returns>
         /// <remarks>
         /// This is referred to as <c>strict predecessor</c> in order theory.

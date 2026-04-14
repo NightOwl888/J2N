@@ -28,7 +28,7 @@ namespace J2N.Collections.Generic
     /// </summary>
     /// <typeparam name="TKey">The type of key in the collection.</typeparam>
     /// <typeparam name="TValue">The type of value in the collection.</typeparam>
-    internal interface INavigableDictionary<TKey, TValue> : IDictionary<TKey, TValue>, IDistinctSortedCollection<KeyValuePair<TKey, TValue>>
+    public interface INavigableDictionary<TKey, TValue> : IDictionary<TKey, TValue>, IDistinctSortedCollection<KeyValuePair<TKey, TValue>>
     {
         /// <summary>
         /// Gets the <see cref="IComparer{T}"/> used to order the elements of the <see cref="INavigableDictionary{TKey, TValue}"/>.
