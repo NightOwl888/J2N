@@ -4850,7 +4850,7 @@ namespace J2N.Collections.Generic
         /// If the <see cref="SortedSet{T}"/> has no elements, then the <see cref="Min"/> property returns
         /// the default value of <typeparamref name="T"/>.
         /// </remarks>
-        [Obsolete("This property is deprecated because the name does not match the behavior in descending order views. Use TryGetFirst(out T) (preferred) or the First property instead.")]
+        [Obsolete("This property is deprecated because the name does not match the behavior in descending order views. Use TryGetFirst(out T) instead.")]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public T? Min => MinInternal;
 
@@ -4866,7 +4866,7 @@ namespace J2N.Collections.Generic
         /// If the <see cref="SortedSet{T}"/> has no elements, then the <see cref="Max"/> property returns
         /// the default value of <typeparamref name="T"/>.
         /// </remarks>
-        [Obsolete("This property is deprecated because the name does not match the behavior in descending order views. Use TryGetLast(out T) (preferred) or the Last property instead.")]
+        [Obsolete("This property is deprecated because the name does not match the behavior in descending order views. Use TryGetLast(out T) instead.")]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public T? Max => MaxInternal;
 
