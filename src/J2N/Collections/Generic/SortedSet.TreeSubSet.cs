@@ -51,12 +51,11 @@ namespace J2N.Collections.Generic
             {
                 get
                 {
-                    IComparer<T> cmp = _underlying.ComparerInternal;
                     if (_reverse)
                     {
-                        return _reverseComparer ??= ReverseComparer<T>.Create(cmp);
+                        return _reverseComparer ??= ReverseComparer<T>.Create(_underlying.ComparerInternal);
                     }
-                    return cmp;
+                    return _underlying.ComparerInternal;
                 }
             }
 
