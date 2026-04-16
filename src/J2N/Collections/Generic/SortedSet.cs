@@ -3326,9 +3326,10 @@ namespace J2N.Collections.Generic
 
             if (TryGetSortedCollection(source, out ISortedCollection<T>? sortedCollection))
             {
-                if (ComparerEquals(Comparer, sortedCollection.Comparer))
+                IComparer<T>? comparer = Comparer;
+                if (ComparerEquals(comparer, sortedCollection.Comparer))
                 {
-                    items = EnumerableHelpers.ToDistinctArray(source, out count);
+                    items = EnumerableHelpers.ToDistinctArray(source, out count, comparer);
                     return true;
                 }
                 return false;

@@ -653,6 +653,47 @@ namespace J2N.Collections.Generic
 
         #region Loading and Comparing
 
+        [Test] // J2N: Regression for ToDistinctArray using EqualityComparer<T>.Default instead of comparer
+        public void Test_Constructor_SortedCollection_CustomComparer_Deduplicates()
+        {
+            var comparer = new FirstCharComparer();
+
+            // Sorted, but contains "duplicates" per comparer (same first char)
+            SortedCollection<string> src = new(comparer)
+            {
+                "a1",
+                "a2",
+                "b1",
+                "b2"
+            };
+
+            SortedSet<string> set = new(src, comparer);
+
+            // Expected (correct behavior): deduplicated by comparer: one "a", one "b"
+            // Actual (bug): all 4 elements remain because EqualityComparer<T>.Default is used
+            CollectionAssert.AreEqual(new[] { "a1", "b1" }, set);
+        }
+
+        private sealed class FirstCharComparer : IComparer<string>
+        {
+            public int Compare(string? x, string? y)
+            {
+                // only first char matters (forces "duplicates" for "a1"/"a2" and "b1"/"b2")
+                // that disobey the rules of EqualityComparer<T>.Default, which considers all chars
+                return x![0].CompareTo(y![0]);
+            }
+
+            public override bool Equals(object? obj)
+            {
+                return typeof(FirstCharComparer) == obj?.GetType();
+            }
+
+            public override int GetHashCode()
+            {
+                return typeof(FirstCharComparer).GetHashCode();
+            }
+        }
+
         [Test]
         public void Test_Constructor_BclSortedSet_WithSameComparer()
         {

@@ -101,12 +101,31 @@ namespace J2N.Collections.Generic
         /// <typeparam name="T"></typeparam>
         /// <param name="source">The enumerable to convert.</param>
         /// <param name="length">The number of items stored in the resulting array, 0-indexed.</param>
+        /// <param name="comparer">The <see cref="IComparer{T}"/> to use when comparing elements for equality.
+        /// If <c>null</c>, the default J2N comparer will be used.</param>
         /// <returns>
         /// The resulting array.  The length of the array may be greater than <paramref name="length"/>,
         /// which is the actual number of elements in the array.
         /// </returns>
-        internal static T[] ToDistinctArray<T>(IEnumerable<T> source, out int length)
+        internal static T[] ToDistinctArray<T>(IEnumerable<T> source, out int length, IComparer<T>? comparer)
+            => ToDistinctArray(source, out length, ComparerToEqualityComparerAdapter<T>.Create(comparer));
+
+        /// <summary>
+        /// Converts a sorted enumerable to an array, removing any duplicates. The
+        /// <paramref name="source"/> data must already be sorted.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="source">The enumerable to convert.</param>
+        /// <param name="length">The number of items stored in the resulting array, 0-indexed.</param>
+        /// <param name="comparer">The <see cref="IEqualityComparer{T}"/> to use when comparing elements for equality.
+        /// If <c>null</c>, the default J2N comparer will be used.</param>
+        /// <returns>
+        /// The resulting array.  The length of the array may be greater than <paramref name="length"/>,
+        /// which is the actual number of elements in the array.
+        /// </returns>
+        internal static T[] ToDistinctArray<T>(IEnumerable<T> source, out int length, IEqualityComparer<T>? comparer)
         {
+            comparer ??= EqualityComparer<T>.Default;
             // Fast path: ICollection<T> gives us max size
             if (source is ICollection<T> ic)
             {
@@ -130,7 +149,7 @@ namespace J2N.Collections.Generic
 
                 foreach (T current in source)
                 {
-                    if (!hasPrev || !EqualityComparer<T>.Default.Equals(current, prev))
+                    if (!hasPrev || !comparer.Equals(current, prev))
                     {
                         arr[write++] = current;
                         prev = current;
@@ -161,7 +180,7 @@ namespace J2N.Collections.Generic
                 while (en.MoveNext())
                 {
                     T current = en.Current;
-                    if (!EqualityComparer<T>.Default.Equals(current, prev))
+                    if (!comparer.Equals(current, prev))
                     {
                         if (write == arr.Length)
                         {
@@ -187,6 +206,31 @@ namespace J2N.Collections.Generic
 
                 length = write;
                 return arr;
+            }
+        }
+
+        private sealed class ComparerToEqualityComparerAdapter<T> : IEqualityComparer<T>
+        {
+            private readonly IComparer<T> _comparer;
+
+            private ComparerToEqualityComparerAdapter(IComparer<T>? comparer)
+            {
+                _comparer = comparer ?? Comparer<T>.Default;
+            }
+
+            public static ComparerToEqualityComparerAdapter<T> Create(IComparer<T>? comparer)
+            {
+                return new ComparerToEqualityComparerAdapter<T>(comparer);
+            }
+
+            public bool Equals(T? x, T? y)
+            {
+                return _comparer.Compare(x!, y!) == 0;
+            }
+
+            public int GetHashCode(T? obj)
+            {
+                throw new NotSupportedException();
             }
         }
     }
