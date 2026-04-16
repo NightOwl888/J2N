@@ -1255,7 +1255,7 @@ namespace J2N.Collections.Generic
 
             /// <summary>
             /// Gets the entry in the <see cref="SortedDictionary{TKey, TValue}"/> whose key
-            /// is the lease element greater than or equal to the specified <paramref name="key"/>.
+            /// is the least element greater than or equal to the specified <paramref name="key"/>.
             /// </summary>
             /// <param name="key">The key of the entry to get the ceiling of.</param>
             /// <param name="resultKey">Upon successful return, contains the key of the ceiling.</param>
