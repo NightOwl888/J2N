@@ -2523,7 +2523,7 @@ namespace J2N.Collections.Generic
 
             object ICollection.SyncRoot => ((ICollection)_dictionary).SyncRoot;
 
-            #region INavigableSet<T> members
+            #region INavigableCollection<T> members
 
             IComparer<TKey> ISortedCollection<TKey>.Comparer => _dictionary.Comparer;
 
@@ -2640,7 +2640,7 @@ namespace J2N.Collections.Generic
                 return new KeyCollection(viewDictionary);
             }
 
-            #endregion INavigableSet<T> members
+            #endregion INavigableCollection<T> members
 
             #region ICollectionView Members
 
