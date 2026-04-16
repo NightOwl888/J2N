@@ -2690,7 +2690,7 @@ namespace J2N.Collections.Generic
             }
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            internal bool IsTooHigh(ReadOnlySpan<TAlternateSpan> item, ISpanAlternateComparer<TAlternateSpan, T> comparer)
+            private bool IsTooHigh(ReadOnlySpan<TAlternateSpan> item, ISpanAlternateComparer<TAlternateSpan, T> comparer)
             {
                 SortedSet<T> set = Set;
 
