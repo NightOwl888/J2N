@@ -9,6 +9,7 @@ using System.Linq;
 using System.Reflection;
 using Xunit;
 using SCG = System.Collections.Generic;
+using static J2N.Collections.Tests.NavigableCollectionHelper;
 
 namespace J2N.Collections.Tests
 {
@@ -191,7 +192,7 @@ namespace J2N.Collections.Tests
                 T firstElement = set.ElementAt(0);
                 T lastElement = set.ElementAt(setLength - 1);
                 SortedSet<T> view = set.GetViewBetween(firstElement, lastElement);
-                List<T> expected = NavigableCollectionHelper.GetViewExpected<T>(set, firstElement, true, lastElement, true, GetIComparer());
+                List<T> expected = GetViewExpected(set, firstElement, true, lastElement, true, GetIComparer());
                 Assert.Equal(expected.Count, view.Count);
                 Assert.True(view.SequenceEqual(expected));
             }
@@ -207,7 +208,7 @@ namespace J2N.Collections.Tests
                 T firstElement = set.ElementAt(0);
                 T lastElement = set.ElementAt(setLength - 1);
                 SortedSet<T> view = set.GetViewBetween(firstElement, true, lastElement, true);
-                List<T> expected = NavigableCollectionHelper.GetViewExpected<T>(set, firstElement, true, lastElement, true, GetIComparer());
+                List<T> expected = GetViewExpected(set, firstElement, true, lastElement, true, GetIComparer());
                 Assert.Equal(expected.Count, view.Count);
                 Assert.True(view.SequenceEqual(expected));
             }
@@ -223,7 +224,7 @@ namespace J2N.Collections.Tests
                 T firstElement = set.ElementAt(0);
                 T lastElement = set.ElementAt(setLength - 1);
                 SortedSet<T> view = set.GetViewBetween(firstElement, true, lastElement, false);
-                List<T> expected = NavigableCollectionHelper.GetViewExpected<T>(set, firstElement, true, lastElement, false, GetIComparer());
+                List<T> expected = GetViewExpected(set, firstElement, true, lastElement, false, GetIComparer());
                 Assert.Equal(expected.Count, view.Count);
                 Assert.True(view.SequenceEqual(expected));
             }
@@ -239,7 +240,7 @@ namespace J2N.Collections.Tests
                 T firstElement = set.ElementAt(0);
                 T lastElement = set.ElementAt(setLength - 1);
                 SortedSet<T> view = set.GetViewBetween(firstElement, false, lastElement, true);
-                List<T> expected = NavigableCollectionHelper.GetViewExpected<T>(set, firstElement, false, lastElement, true, GetIComparer());
+                List<T> expected = GetViewExpected(set, firstElement, false, lastElement, true, GetIComparer());
                 Assert.Equal(expected.Count, view.Count);
                 Assert.True(view.SequenceEqual(expected));
             }
@@ -255,7 +256,7 @@ namespace J2N.Collections.Tests
                 T firstElement = set.ElementAt(0);
                 T lastElement = set.ElementAt(setLength - 1);
                 SortedSet<T> view = set.GetViewBetween(firstElement, false, lastElement, false);
-                List<T> expected = NavigableCollectionHelper.GetViewExpected<T>(set, firstElement, false, lastElement, false, GetIComparer());
+                List<T> expected = GetViewExpected(set, firstElement, false, lastElement, false, GetIComparer());
                 Assert.Equal(expected.Count, view.Count);
                 Assert.True(view.SequenceEqual(expected));
             }
@@ -271,7 +272,7 @@ namespace J2N.Collections.Tests
                 T firstElement = set.ElementAt(1);
                 T lastElement = set.ElementAt(setLength - 2);
                 SortedSet<T> view = set.GetViewBetween(firstElement, lastElement);
-                List<T> expected = NavigableCollectionHelper.GetViewExpected<T>(set, firstElement, true, lastElement, true, GetIComparer());
+                List<T> expected = GetViewExpected(set, firstElement, true, lastElement, true, GetIComparer());
                 Assert.Equal(expected.Count, view.Count);
                 Assert.True(view.SequenceEqual(expected));
             }
@@ -287,7 +288,7 @@ namespace J2N.Collections.Tests
                 T firstElement = set.ElementAt(1);
                 T lastElement = set.ElementAt(setLength - 2);
                 SortedSet<T> view = set.GetViewBetween(firstElement, true, lastElement, true);
-                List<T> expected = NavigableCollectionHelper.GetViewExpected<T>(set, firstElement, true, lastElement, true, GetIComparer());
+                List<T> expected = GetViewExpected(set, firstElement, true, lastElement, true, GetIComparer());
                 Assert.Equal(expected.Count, view.Count);
                 Assert.True(view.SequenceEqual(expected));
             }
@@ -303,7 +304,7 @@ namespace J2N.Collections.Tests
                 T firstElement = set.ElementAt(1);
                 T lastElement = set.ElementAt(setLength - 2);
                 SortedSet<T> view = set.GetViewBetween(firstElement, true, lastElement, false);
-                List<T> expected = NavigableCollectionHelper.GetViewExpected<T>(set, firstElement, true, lastElement, false, GetIComparer());
+                List<T> expected = GetViewExpected(set, firstElement, true, lastElement, false, GetIComparer());
                 Assert.Equal(expected.Count, view.Count);
                 Assert.True(view.SequenceEqual(expected));
             }
@@ -319,7 +320,7 @@ namespace J2N.Collections.Tests
                 T firstElement = set.ElementAt(1);
                 T lastElement = set.ElementAt(setLength - 2);
                 SortedSet<T> view = set.GetViewBetween(firstElement, false, lastElement, true);
-                List<T> expected = NavigableCollectionHelper.GetViewExpected<T>(set, firstElement, false, lastElement, true, GetIComparer());
+                List<T> expected = GetViewExpected(set, firstElement, false, lastElement, true, GetIComparer());
                 Assert.Equal(expected.Count, view.Count);
                 Assert.True(view.SequenceEqual(expected));
             }
@@ -335,7 +336,7 @@ namespace J2N.Collections.Tests
                 T firstElement = set.ElementAt(1);
                 T lastElement = set.ElementAt(setLength - 2);
                 SortedSet<T> view = set.GetViewBetween(firstElement, false, lastElement, false);
-                List<T> expected = NavigableCollectionHelper.GetViewExpected<T>(set, firstElement, false, lastElement, false, GetIComparer());
+                List<T> expected = GetViewExpected(set, firstElement, false, lastElement, false, GetIComparer());
                 Assert.Equal(expected.Count, view.Count);
                 Assert.True(view.SequenceEqual(expected));
             }
@@ -429,7 +430,7 @@ namespace J2N.Collections.Tests
                 T firstElement = set.ElementAt(0);
                 T lastElement = set.ElementAt(setLength - 1);
                 SortedSet<T> view = set.GetView(firstElement, lastElement);
-                List<T> expected = NavigableCollectionHelper.GetViewExpected<T>(set, firstElement, true, lastElement, true, GetIComparer());
+                List<T> expected = GetViewExpected(set, firstElement, true, lastElement, true, GetIComparer());
                 Assert.Equal(expected.Count, view.Count);
                 Assert.True(view.SequenceEqual(expected));
             }
@@ -445,7 +446,7 @@ namespace J2N.Collections.Tests
                 T firstElement = set.ElementAt(0);
                 T lastElement = set.ElementAt(setLength - 1);
                 SortedSet<T> view = set.GetView(firstElement, true, lastElement, true);
-                List<T> expected = NavigableCollectionHelper.GetViewExpected<T>(set, firstElement, true, lastElement, true, GetIComparer());
+                List<T> expected = GetViewExpected(set, firstElement, true, lastElement, true, GetIComparer());
                 Assert.Equal(expected.Count, view.Count);
                 Assert.True(view.SequenceEqual(expected));
             }
@@ -461,7 +462,7 @@ namespace J2N.Collections.Tests
                 T firstElement = set.ElementAt(0);
                 T lastElement = set.ElementAt(setLength - 1);
                 SortedSet<T> view = set.GetView(firstElement, true, lastElement, false);
-                List<T> expected = NavigableCollectionHelper.GetViewExpected<T>(set, firstElement, true, lastElement, false, GetIComparer());
+                List<T> expected = GetViewExpected(set, firstElement, true, lastElement, false, GetIComparer());
                 Assert.Equal(expected.Count, view.Count);
                 Assert.True(view.SequenceEqual(expected));
             }
@@ -477,7 +478,7 @@ namespace J2N.Collections.Tests
                 T firstElement = set.ElementAt(0);
                 T lastElement = set.ElementAt(setLength - 1);
                 SortedSet<T> view = set.GetView(firstElement, false, lastElement, true);
-                List<T> expected = NavigableCollectionHelper.GetViewExpected<T>(set, firstElement, false, lastElement, true, GetIComparer());
+                List<T> expected = GetViewExpected(set, firstElement, false, lastElement, true, GetIComparer());
                 Assert.Equal(expected.Count, view.Count);
                 Assert.True(view.SequenceEqual(expected));
             }
@@ -493,7 +494,7 @@ namespace J2N.Collections.Tests
                 T firstElement = set.ElementAt(0);
                 T lastElement = set.ElementAt(setLength - 1);
                 SortedSet<T> view = set.GetView(firstElement, false, lastElement, false);
-                List<T> expected = NavigableCollectionHelper.GetViewExpected<T>(set, firstElement, false, lastElement, false, GetIComparer());
+                List<T> expected = GetViewExpected(set, firstElement, false, lastElement, false, GetIComparer());
                 Assert.Equal(expected.Count, view.Count);
                 Assert.True(view.SequenceEqual(expected));
             }
@@ -509,7 +510,7 @@ namespace J2N.Collections.Tests
                 T firstElement = set.ElementAt(1);
                 T lastElement = set.ElementAt(setLength - 2);
                 SortedSet<T> view = set.GetView(firstElement, lastElement);
-                List<T> expected = NavigableCollectionHelper.GetViewExpected<T>(set, firstElement, true, lastElement, true, GetIComparer());
+                List<T> expected = GetViewExpected(set, firstElement, true, lastElement, true, GetIComparer());
                 Assert.Equal(expected.Count, view.Count);
                 Assert.True(view.SequenceEqual(expected));
             }
@@ -525,7 +526,7 @@ namespace J2N.Collections.Tests
                 T firstElement = set.ElementAt(1);
                 T lastElement = set.ElementAt(setLength - 2);
                 SortedSet<T> view = set.GetView(firstElement, true, lastElement, true);
-                List<T> expected = NavigableCollectionHelper.GetViewExpected<T>(set, firstElement, true, lastElement, true, GetIComparer());
+                List<T> expected = GetViewExpected(set, firstElement, true, lastElement, true, GetIComparer());
                 Assert.Equal(expected.Count, view.Count);
                 Assert.True(view.SequenceEqual(expected));
             }
@@ -541,7 +542,7 @@ namespace J2N.Collections.Tests
                 T firstElement = set.ElementAt(1);
                 T lastElement = set.ElementAt(setLength - 2);
                 SortedSet<T> view = set.GetView(firstElement, true, lastElement, false);
-                List<T> expected = NavigableCollectionHelper.GetViewExpected<T>(set, firstElement, true, lastElement, false, GetIComparer());
+                List<T> expected = GetViewExpected(set, firstElement, true, lastElement, false, GetIComparer());
                 Assert.Equal(expected.Count, view.Count);
                 Assert.True(view.SequenceEqual(expected));
             }
@@ -557,7 +558,7 @@ namespace J2N.Collections.Tests
                 T firstElement = set.ElementAt(1);
                 T lastElement = set.ElementAt(setLength - 2);
                 SortedSet<T> view = set.GetView(firstElement, false, lastElement, true);
-                List<T> expected = NavigableCollectionHelper.GetViewExpected<T>(set, firstElement, false, lastElement, true, GetIComparer());
+                List<T> expected = GetViewExpected(set, firstElement, false, lastElement, true, GetIComparer());
                 Assert.Equal(expected.Count, view.Count);
                 Assert.True(view.SequenceEqual(expected));
             }
@@ -573,7 +574,7 @@ namespace J2N.Collections.Tests
                 T firstElement = set.ElementAt(1);
                 T lastElement = set.ElementAt(setLength - 2);
                 SortedSet<T> view = set.GetView(firstElement, false, lastElement, false);
-                List<T> expected = NavigableCollectionHelper.GetViewExpected<T>(set, firstElement, false, lastElement, false, GetIComparer());
+                List<T> expected = GetViewExpected(set, firstElement, false, lastElement, false, GetIComparer());
                 Assert.Equal(expected.Count, view.Count);
                 Assert.True(view.SequenceEqual(expected));
             }
@@ -713,7 +714,7 @@ namespace J2N.Collections.Tests
                 T firstElement = set.ElementAt(0);
                 T lastElement = set.ElementAt(setLength - 1);
                 SortedSet<T> view = set.GetViewBefore(lastElement);
-                List<T> expected = NavigableCollectionHelper.GetViewBeforeExpected<T>(set, lastElement, true, GetIComparer());
+                List<T> expected = GetViewBeforeExpected(set, lastElement, true, GetIComparer());
                 Assert.Equal(expected.Count, view.Count);
                 Assert.True(view.SequenceEqual(expected));
             }
@@ -729,7 +730,7 @@ namespace J2N.Collections.Tests
                 T firstElement = set.ElementAt(0);
                 T lastElement = set.ElementAt(setLength - 1);
                 SortedSet<T> view = set.GetViewBefore(lastElement, true);
-                List<T> expected = NavigableCollectionHelper.GetViewBeforeExpected<T>(set, lastElement, true, GetIComparer());
+                List<T> expected = GetViewBeforeExpected(set, lastElement, true, GetIComparer());
                 Assert.Equal(expected.Count, view.Count);
                 Assert.True(view.SequenceEqual(expected));
             }
@@ -745,7 +746,7 @@ namespace J2N.Collections.Tests
                 T firstElement = set.ElementAt(0);
                 T lastElement = set.ElementAt(setLength - 1);
                 SortedSet<T> view = set.GetViewBefore(lastElement, false);
-                List<T> expected = NavigableCollectionHelper.GetViewBeforeExpected<T>(set, lastElement, false, GetIComparer());
+                List<T> expected = GetViewBeforeExpected(set, lastElement, false, GetIComparer());
                 Assert.Equal(expected.Count, view.Count);
                 Assert.True(view.SequenceEqual(expected));
             }
@@ -761,7 +762,7 @@ namespace J2N.Collections.Tests
                 T firstElement = set.ElementAt(0);
                 T lastElement = set.ElementAt(setLength - 2);
                 SortedSet<T> view = set.GetViewBefore(lastElement);
-                List<T> expected = NavigableCollectionHelper.GetViewBeforeExpected<T>(set, lastElement, true, GetIComparer());
+                List<T> expected = GetViewBeforeExpected(set, lastElement, true, GetIComparer());
                 Assert.Equal(expected.Count, view.Count);
                 Assert.True(view.SequenceEqual(expected));
             }
@@ -777,7 +778,7 @@ namespace J2N.Collections.Tests
                 T firstElement = set.ElementAt(0);
                 T lastElement = set.ElementAt(setLength - 2);
                 SortedSet<T> view = set.GetViewBefore(lastElement, true);
-                List<T> expected = NavigableCollectionHelper.GetViewBeforeExpected<T>(set, lastElement, true, GetIComparer());
+                List<T> expected = GetViewBeforeExpected(set, lastElement, true, GetIComparer());
                 Assert.Equal(expected.Count, view.Count);
                 Assert.True(view.SequenceEqual(expected));
             }
@@ -793,7 +794,7 @@ namespace J2N.Collections.Tests
                 T firstElement = set.ElementAt(0);
                 T lastElement = set.ElementAt(setLength - 2);
                 SortedSet<T> view = set.GetViewBefore(lastElement, false);
-                List<T> expected = NavigableCollectionHelper.GetViewBeforeExpected<T>(set, lastElement, false, GetIComparer());
+                List<T> expected = GetViewBeforeExpected(set, lastElement, false, GetIComparer());
                 Assert.Equal(expected.Count, view.Count);
                 Assert.True(view.SequenceEqual(expected));
             }
@@ -871,7 +872,7 @@ namespace J2N.Collections.Tests
                 T firstElement = set.ElementAt(0);
                 T lastElement = set.ElementAt(setLength - 1);
                 SortedSet<T> view = set.GetViewAfter(firstElement);
-                List<T> expected = NavigableCollectionHelper.GetViewAfterExpected<T>(set, firstElement, true, GetIComparer());
+                List<T> expected = GetViewAfterExpected(set, firstElement, true, GetIComparer());
                 Assert.Equal(expected.Count, view.Count);
                 Assert.True(view.SequenceEqual(expected));
             }
@@ -887,7 +888,7 @@ namespace J2N.Collections.Tests
                 T firstElement = set.ElementAt(0);
                 T lastElement = set.ElementAt(setLength - 1);
                 SortedSet<T> view = set.GetViewAfter(firstElement, true);
-                List<T> expected = NavigableCollectionHelper.GetViewAfterExpected<T>(set, firstElement, true, GetIComparer());
+                List<T> expected = GetViewAfterExpected(set, firstElement, true, GetIComparer());
                 Assert.Equal(expected.Count, view.Count);
                 Assert.True(view.SequenceEqual(expected));
             }
@@ -903,7 +904,7 @@ namespace J2N.Collections.Tests
                 T firstElement = set.ElementAt(0);
                 T lastElement = set.ElementAt(setLength - 1);
                 SortedSet<T> view = set.GetViewAfter(firstElement, false);
-                List<T> expected = NavigableCollectionHelper.GetViewAfterExpected<T>(set, firstElement, false, GetIComparer());
+                List<T> expected = GetViewAfterExpected(set, firstElement, false, GetIComparer());
                 Assert.Equal(expected.Count, view.Count);
                 Assert.True(view.SequenceEqual(expected));
             }
@@ -919,7 +920,7 @@ namespace J2N.Collections.Tests
                 T firstElement = set.ElementAt(1);
                 T lastElement = set.ElementAt(setLength - 2);
                 SortedSet<T> view = set.GetViewAfter(firstElement);
-                List<T> expected = NavigableCollectionHelper.GetViewAfterExpected<T>(set, firstElement, true, GetIComparer());
+                List<T> expected = GetViewAfterExpected(set, firstElement, true, GetIComparer());
                 Assert.Equal(expected.Count, view.Count);
                 Assert.True(view.SequenceEqual(expected));
             }
@@ -935,7 +936,7 @@ namespace J2N.Collections.Tests
                 T firstElement = set.ElementAt(1);
                 T lastElement = set.ElementAt(setLength - 2);
                 SortedSet<T> view = set.GetViewAfter(firstElement, true);
-                List<T> expected = NavigableCollectionHelper.GetViewAfterExpected<T>(set, firstElement, true, GetIComparer());
+                List<T> expected = GetViewAfterExpected(set, firstElement, true, GetIComparer());
                 Assert.Equal(expected.Count, view.Count);
                 Assert.True(view.SequenceEqual(expected));
             }
@@ -951,7 +952,7 @@ namespace J2N.Collections.Tests
                 T firstElement = set.ElementAt(1);
                 T lastElement = set.ElementAt(setLength - 2);
                 SortedSet<T> view = set.GetViewAfter(firstElement, false);
-                List<T> expected = NavigableCollectionHelper.GetViewAfterExpected<T>(set, firstElement, false, GetIComparer());
+                List<T> expected = GetViewAfterExpected(set, firstElement, false, GetIComparer());
                 Assert.Equal(expected.Count, view.Count);
                 Assert.True(view.SequenceEqual(expected));
             }
@@ -2030,7 +2031,7 @@ namespace J2N.Collections.Tests
 
             foreach (T value in set)
             {
-                bool foundExpected = NavigableCollectionHelper.TryGetPredecessorExpected<T>(set, value, out T expectedValue, comparer);
+                bool foundExpected = TryGetPredecessorExpected(set, value, out T expectedValue, comparer);
                 bool foundActual = set.TryGetPredecessor(value, out T actualValue);
 
                 Assert.Equal(foundExpected, foundActual);
@@ -2043,7 +2044,7 @@ namespace J2N.Collections.Tests
 
             foreach (T value in desc)
             {
-                bool foundExpected = NavigableCollectionHelper.TryGetPredecessorExpected<T>(desc, value, out T expectedValue, ReverseComparer<T>.Create(comparer));
+                bool foundExpected = TryGetPredecessorExpected(desc, value, out T expectedValue, ReverseComparer<T>.Create(comparer));
                 bool foundActual = desc.TryGetPredecessor(value, out T actualValue);
 
                 Assert.Equal(foundExpected, foundActual);
@@ -2065,7 +2066,7 @@ namespace J2N.Collections.Tests
 
             foreach (T value in set)
             {
-                bool foundExpected = NavigableCollectionHelper.TryGetSuccessorExpected<T>(set, value, out T expectedValue, comparer);
+                bool foundExpected = TryGetSuccessorExpected(set, value, out T expectedValue, comparer);
                 bool foundActual = set.TryGetSuccessor(value, out T actualValue);
 
                 Assert.Equal(foundExpected, foundActual);
@@ -2078,7 +2079,7 @@ namespace J2N.Collections.Tests
 
             foreach (T value in desc)
             {
-                bool foundExpected = NavigableCollectionHelper.TryGetSuccessorExpected<T>(desc, value, out T expectedValue, ReverseComparer<T>.Create(comparer));
+                bool foundExpected = TryGetSuccessorExpected(desc, value, out T expectedValue, ReverseComparer<T>.Create(comparer));
                 bool foundActual = desc.TryGetSuccessor(value, out T actualValue);
 
                 Assert.Equal(foundExpected, foundActual);
@@ -2100,7 +2101,7 @@ namespace J2N.Collections.Tests
 
             foreach (T value in set)
             {
-                bool foundExpected = NavigableCollectionHelper.TryGetFloorExpected<T>(set, value, out T expectedValue, comparer);
+                bool foundExpected = TryGetFloorExpected(set, value, out T expectedValue, comparer);
                 bool foundActual = set.TryGetFloor(value, out T actualValue);
 
                 Assert.Equal(foundExpected, foundActual);
@@ -2112,7 +2113,7 @@ namespace J2N.Collections.Tests
 
             foreach (T value in desc)
             {
-                bool foundExpected = NavigableCollectionHelper.TryGetFloorExpected<T>(desc, value, out T expectedValue, ReverseComparer<T>.Create(comparer));
+                bool foundExpected = TryGetFloorExpected(desc, value, out T expectedValue, ReverseComparer<T>.Create(comparer));
                 bool foundActual = desc.TryGetFloor(value, out T actualValue);
 
                 Assert.Equal(foundExpected, foundActual);
@@ -2134,7 +2135,7 @@ namespace J2N.Collections.Tests
 
             foreach (T value in set)
             {
-                bool foundExpected = NavigableCollectionHelper.TryGetCeilingExpected<T>(set, value, out T expectedValue, comparer);
+                bool foundExpected = TryGetCeilingExpected(set, value, out T expectedValue, comparer);
                 bool foundActual = set.TryGetCeiling(value, out T actualValue);
 
                 Assert.Equal(foundExpected, foundActual);
@@ -2146,7 +2147,7 @@ namespace J2N.Collections.Tests
 
             foreach (T value in desc)
             {
-                bool foundExpected = NavigableCollectionHelper.TryGetCeilingExpected<T>(desc, value, out T expectedValue, ReverseComparer<T>.Create(comparer));
+                bool foundExpected = TryGetCeilingExpected(desc, value, out T expectedValue, ReverseComparer<T>.Create(comparer));
                 bool foundActual = desc.TryGetCeiling(value, out T actualValue);
 
                 Assert.Equal(foundExpected, foundActual);

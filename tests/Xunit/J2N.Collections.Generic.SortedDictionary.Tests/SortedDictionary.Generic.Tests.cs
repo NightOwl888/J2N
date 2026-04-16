@@ -7,7 +7,7 @@ using System;
 using System.Linq;
 using Xunit;
 using SCG = System.Collections.Generic;
-
+using static J2N.Collections.Tests.NavigableCollectionHelper;
 
 namespace J2N.Collections.Tests
 {
@@ -1141,7 +1141,7 @@ namespace J2N.Collections.Tests
                 SCG.KeyValuePair<TKey, TValue> firstElement = dictionary.ElementAt(0);
                 SCG.KeyValuePair<TKey, TValue> lastElement = dictionary.ElementAt(count - 1);
                 SortedDictionary<TKey, TValue> view = dictionary.GetView(firstElement.Key, lastElement.Key);
-                List<SCG.KeyValuePair<TKey, TValue>> expected = NavigableCollectionHelper.GetViewExpected<SCG.KeyValuePair<TKey, TValue>>(dictionary, firstElement, true, lastElement, true, GetIComparerOrDefault());
+                List<SCG.KeyValuePair<TKey, TValue>> expected = GetViewExpected(dictionary, firstElement, true, lastElement, true, GetIComparerOrDefault());
                 Assert.Equal(expected.Count, view.Count);
                 Assert.True(view.SequenceEqual(expected));
             }
@@ -1157,7 +1157,7 @@ namespace J2N.Collections.Tests
                 SCG.KeyValuePair<TKey, TValue> firstElement = dictionary.ElementAt(0);
                 SCG.KeyValuePair<TKey, TValue> lastElement = dictionary.ElementAt(count - 1);
                 SortedDictionary<TKey, TValue> view = dictionary.GetView(firstElement.Key, true, lastElement.Key, true);
-                List<SCG.KeyValuePair<TKey, TValue>> expected = NavigableCollectionHelper.GetViewExpected<SCG.KeyValuePair<TKey, TValue>>(dictionary, firstElement, true, lastElement, true, GetIComparerOrDefault());
+                List<SCG.KeyValuePair<TKey, TValue>> expected = GetViewExpected(dictionary, firstElement, true, lastElement, true, GetIComparerOrDefault());
                 Assert.Equal(expected.Count, view.Count);
                 Assert.True(view.SequenceEqual(expected));
             }
@@ -1173,7 +1173,7 @@ namespace J2N.Collections.Tests
                 SCG.KeyValuePair<TKey, TValue> firstElement = dictionary.ElementAt(0);
                 SCG.KeyValuePair<TKey, TValue> lastElement = dictionary.ElementAt(count - 1);
                 SortedDictionary<TKey, TValue> view = dictionary.GetView(firstElement.Key, true, lastElement.Key, false);
-                List<SCG.KeyValuePair<TKey, TValue>> expected = NavigableCollectionHelper.GetViewExpected<SCG.KeyValuePair<TKey, TValue>>(dictionary, firstElement, true, lastElement, false, GetIComparerOrDefault());
+                List<SCG.KeyValuePair<TKey, TValue>> expected = GetViewExpected(dictionary, firstElement, true, lastElement, false, GetIComparerOrDefault());
                 Assert.Equal(expected.Count, view.Count);
                 Assert.True(view.SequenceEqual(expected));
             }
@@ -1189,7 +1189,7 @@ namespace J2N.Collections.Tests
                 SCG.KeyValuePair<TKey, TValue> firstElement = dictionary.ElementAt(0);
                 SCG.KeyValuePair<TKey, TValue> lastElement = dictionary.ElementAt(count - 1);
                 SortedDictionary<TKey, TValue> view = dictionary.GetView(firstElement.Key, false, lastElement.Key, true);
-                List<SCG.KeyValuePair<TKey, TValue>> expected = NavigableCollectionHelper.GetViewExpected<SCG.KeyValuePair<TKey, TValue>>(dictionary, firstElement, false, lastElement, true, GetIComparerOrDefault());
+                List<SCG.KeyValuePair<TKey, TValue>> expected = GetViewExpected(dictionary, firstElement, false, lastElement, true, GetIComparerOrDefault());
                 Assert.Equal(expected.Count, view.Count);
                 Assert.True(view.SequenceEqual(expected));
             }
@@ -1205,7 +1205,7 @@ namespace J2N.Collections.Tests
                 SCG.KeyValuePair<TKey, TValue> firstElement = dictionary.ElementAt(0);
                 SCG.KeyValuePair<TKey, TValue> lastElement = dictionary.ElementAt(count - 1);
                 SortedDictionary<TKey, TValue> view = dictionary.GetView(firstElement.Key, false, lastElement.Key, false);
-                List<SCG.KeyValuePair<TKey, TValue>> expected = NavigableCollectionHelper.GetViewExpected<SCG.KeyValuePair<TKey, TValue>>(dictionary, firstElement, false, lastElement, false, GetIComparerOrDefault());
+                List<SCG.KeyValuePair<TKey, TValue>> expected = GetViewExpected(dictionary, firstElement, false, lastElement, false, GetIComparerOrDefault());
                 Assert.Equal(expected.Count, view.Count);
                 Assert.True(view.SequenceEqual(expected));
             }
@@ -1221,7 +1221,7 @@ namespace J2N.Collections.Tests
                 SCG.KeyValuePair<TKey, TValue> firstElement = dictionary.ElementAt(1);
                 SCG.KeyValuePair<TKey, TValue> lastElement = dictionary.ElementAt(count - 2);
                 SortedDictionary<TKey, TValue> view = dictionary.GetView(firstElement.Key, lastElement.Key);
-                List<SCG.KeyValuePair<TKey, TValue>> expected = NavigableCollectionHelper.GetViewExpected<SCG.KeyValuePair<TKey, TValue>>(dictionary, firstElement, true, lastElement, true, GetIComparerOrDefault());
+                List<SCG.KeyValuePair<TKey, TValue>> expected = GetViewExpected(dictionary, firstElement, true, lastElement, true, GetIComparerOrDefault());
                 Assert.Equal(expected.Count, view.Count);
                 Assert.True(view.SequenceEqual(expected));
             }
@@ -1237,7 +1237,7 @@ namespace J2N.Collections.Tests
                 SCG.KeyValuePair<TKey, TValue> firstElement = dictionary.ElementAt(1);
                 SCG.KeyValuePair<TKey, TValue> lastElement = dictionary.ElementAt(count - 2);
                 SortedDictionary<TKey, TValue> view = dictionary.GetView(firstElement.Key, true, lastElement.Key, true);
-                List<SCG.KeyValuePair<TKey, TValue>> expected = NavigableCollectionHelper.GetViewExpected<SCG.KeyValuePair<TKey, TValue>>(dictionary, firstElement, true, lastElement, true, GetIComparerOrDefault());
+                List<SCG.KeyValuePair<TKey, TValue>> expected = GetViewExpected(dictionary, firstElement, true, lastElement, true, GetIComparerOrDefault());
                 Assert.Equal(expected.Count, view.Count);
                 Assert.True(view.SequenceEqual(expected));
             }
@@ -1253,7 +1253,7 @@ namespace J2N.Collections.Tests
                 SCG.KeyValuePair<TKey, TValue> firstElement = dictionary.ElementAt(1);
                 SCG.KeyValuePair<TKey, TValue> lastElement = dictionary.ElementAt(count - 2);
                 SortedDictionary<TKey, TValue> view = dictionary.GetView(firstElement.Key, true, lastElement.Key, false);
-                List<SCG.KeyValuePair<TKey, TValue>> expected = NavigableCollectionHelper.GetViewExpected<SCG.KeyValuePair<TKey, TValue>>(dictionary, firstElement, true, lastElement, false, GetIComparerOrDefault());
+                List<SCG.KeyValuePair<TKey, TValue>> expected = GetViewExpected(dictionary, firstElement, true, lastElement, false, GetIComparerOrDefault());
                 Assert.Equal(expected.Count, view.Count);
                 Assert.True(view.SequenceEqual(expected));
             }
@@ -1269,7 +1269,7 @@ namespace J2N.Collections.Tests
                 SCG.KeyValuePair<TKey, TValue> firstElement = dictionary.ElementAt(1);
                 SCG.KeyValuePair<TKey, TValue> lastElement = dictionary.ElementAt(count - 2);
                 SortedDictionary<TKey, TValue> view = dictionary.GetView(firstElement.Key, false, lastElement.Key, true);
-                List<SCG.KeyValuePair<TKey, TValue>> expected = NavigableCollectionHelper.GetViewExpected<SCG.KeyValuePair<TKey, TValue>>(dictionary, firstElement, false, lastElement, true, GetIComparerOrDefault());
+                List<SCG.KeyValuePair<TKey, TValue>> expected = GetViewExpected(dictionary, firstElement, false, lastElement, true, GetIComparerOrDefault());
                 Assert.Equal(expected.Count, view.Count);
                 Assert.True(view.SequenceEqual(expected));
             }
@@ -1285,7 +1285,7 @@ namespace J2N.Collections.Tests
                 SCG.KeyValuePair<TKey, TValue> firstElement = dictionary.ElementAt(1);
                 SCG.KeyValuePair<TKey, TValue> lastElement = dictionary.ElementAt(count - 2);
                 SortedDictionary<TKey, TValue> view = dictionary.GetView(firstElement.Key, false, lastElement.Key, false);
-                List<SCG.KeyValuePair<TKey, TValue>> expected = NavigableCollectionHelper.GetViewExpected<SCG.KeyValuePair<TKey, TValue>>(dictionary, firstElement, false, lastElement, false, GetIComparerOrDefault());
+                List<SCG.KeyValuePair<TKey, TValue>> expected = GetViewExpected(dictionary, firstElement, false, lastElement, false, GetIComparerOrDefault());
                 Assert.Equal(expected.Count, view.Count);
                 Assert.True(view.SequenceEqual(expected));
             }
@@ -1424,7 +1424,7 @@ namespace J2N.Collections.Tests
                 SCG.KeyValuePair<TKey, TValue> firstElement = dictionary.ElementAt(0);
                 SCG.KeyValuePair<TKey, TValue> lastElement = dictionary.ElementAt(count - 1);
                 SortedDictionary<TKey, TValue> view = dictionary.GetViewBefore(lastElement.Key);
-                List<SCG.KeyValuePair<TKey, TValue>> expected = NavigableCollectionHelper.GetViewBeforeExpected<SCG.KeyValuePair<TKey, TValue>>(dictionary, lastElement, true, GetIComparerOrDefault());
+                List<SCG.KeyValuePair<TKey, TValue>> expected = GetViewBeforeExpected(dictionary, lastElement, true, GetIComparerOrDefault());
                 Assert.Equal(expected.Count, view.Count);
                 Assert.True(view.SequenceEqual(expected));
             }
@@ -1440,7 +1440,7 @@ namespace J2N.Collections.Tests
                 SCG.KeyValuePair<TKey, TValue> firstElement = dictionary.ElementAt(0);
                 SCG.KeyValuePair<TKey, TValue> lastElement = dictionary.ElementAt(count - 1);
                 SortedDictionary<TKey, TValue> view = dictionary.GetViewBefore(lastElement.Key, true);
-                List<SCG.KeyValuePair<TKey, TValue>> expected = NavigableCollectionHelper.GetViewBeforeExpected<SCG.KeyValuePair<TKey, TValue>>(dictionary, lastElement, true, GetIComparerOrDefault());
+                List<SCG.KeyValuePair<TKey, TValue>> expected = GetViewBeforeExpected(dictionary, lastElement, true, GetIComparerOrDefault());
                 Assert.Equal(expected.Count, view.Count);
                 Assert.True(view.SequenceEqual(expected));
             }
@@ -1456,7 +1456,7 @@ namespace J2N.Collections.Tests
                 SCG.KeyValuePair<TKey, TValue> firstElement = dictionary.ElementAt(0);
                 SCG.KeyValuePair<TKey, TValue> lastElement = dictionary.ElementAt(count - 1);
                 SortedDictionary<TKey, TValue> view = dictionary.GetViewBefore(lastElement.Key, false);
-                List<SCG.KeyValuePair<TKey, TValue>> expected = NavigableCollectionHelper.GetViewBeforeExpected<SCG.KeyValuePair<TKey, TValue>>(dictionary, lastElement, false, GetIComparerOrDefault());
+                List<SCG.KeyValuePair<TKey, TValue>> expected = GetViewBeforeExpected(dictionary, lastElement, false, GetIComparerOrDefault());
                 Assert.Equal(expected.Count, view.Count);
                 Assert.True(view.SequenceEqual(expected));
             }
@@ -1472,7 +1472,7 @@ namespace J2N.Collections.Tests
                 SCG.KeyValuePair<TKey, TValue> firstElement = dictionary.ElementAt(1);
                 SCG.KeyValuePair<TKey, TValue> lastElement = dictionary.ElementAt(count - 2);
                 SortedDictionary<TKey, TValue> view = dictionary.GetViewBefore(lastElement.Key);
-                List<SCG.KeyValuePair<TKey, TValue>> expected = NavigableCollectionHelper.GetViewBeforeExpected<SCG.KeyValuePair<TKey, TValue>>(dictionary, lastElement, true, GetIComparerOrDefault());
+                List<SCG.KeyValuePair<TKey, TValue>> expected = GetViewBeforeExpected(dictionary, lastElement, true, GetIComparerOrDefault());
                 Assert.Equal(expected.Count, view.Count);
                 Assert.True(view.SequenceEqual(expected));
             }
@@ -1488,7 +1488,7 @@ namespace J2N.Collections.Tests
                 SCG.KeyValuePair<TKey, TValue> firstElement = dictionary.ElementAt(1);
                 SCG.KeyValuePair<TKey, TValue> lastElement = dictionary.ElementAt(count - 2);
                 SortedDictionary<TKey, TValue> view = dictionary.GetViewBefore(lastElement.Key, true);
-                List<SCG.KeyValuePair<TKey, TValue>> expected = NavigableCollectionHelper.GetViewBeforeExpected<SCG.KeyValuePair<TKey, TValue>>(dictionary, lastElement, true, GetIComparerOrDefault());
+                List<SCG.KeyValuePair<TKey, TValue>> expected = GetViewBeforeExpected(dictionary, lastElement, true, GetIComparerOrDefault());
                 Assert.Equal(expected.Count, view.Count);
                 Assert.True(view.SequenceEqual(expected));
             }
@@ -1504,7 +1504,7 @@ namespace J2N.Collections.Tests
                 SCG.KeyValuePair<TKey, TValue> firstElement = dictionary.ElementAt(1);
                 SCG.KeyValuePair<TKey, TValue> lastElement = dictionary.ElementAt(count - 2);
                 SortedDictionary<TKey, TValue> view = dictionary.GetViewBefore(lastElement.Key, false);
-                List<SCG.KeyValuePair<TKey, TValue>> expected = NavigableCollectionHelper.GetViewBeforeExpected<SCG.KeyValuePair<TKey, TValue>>(dictionary, lastElement, false, GetIComparerOrDefault());
+                List<SCG.KeyValuePair<TKey, TValue>> expected = GetViewBeforeExpected(dictionary, lastElement, false, GetIComparerOrDefault());
                 Assert.Equal(expected.Count, view.Count);
                 Assert.True(view.SequenceEqual(expected));
             }
@@ -1581,7 +1581,7 @@ namespace J2N.Collections.Tests
                 SCG.KeyValuePair<TKey, TValue> firstElement = dictionary.ElementAt(0);
                 SCG.KeyValuePair<TKey, TValue> lastElement = dictionary.ElementAt(count - 1);
                 SortedDictionary<TKey, TValue> view = dictionary.GetViewAfter(firstElement.Key);
-                List<SCG.KeyValuePair<TKey, TValue>> expected = NavigableCollectionHelper.GetViewAfterExpected<SCG.KeyValuePair<TKey, TValue>>(dictionary, firstElement, true, GetIComparerOrDefault());
+                List<SCG.KeyValuePair<TKey, TValue>> expected = GetViewAfterExpected(dictionary, firstElement, true, GetIComparerOrDefault());
                 Assert.Equal(expected.Count, view.Count);
                 Assert.True(view.SequenceEqual(expected));
             }
@@ -1597,7 +1597,7 @@ namespace J2N.Collections.Tests
                 SCG.KeyValuePair<TKey, TValue> firstElement = dictionary.ElementAt(0);
                 SCG.KeyValuePair<TKey, TValue> lastElement = dictionary.ElementAt(count - 1);
                 SortedDictionary<TKey, TValue> view = dictionary.GetViewAfter(firstElement.Key, true);
-                List<SCG.KeyValuePair<TKey, TValue>> expected = NavigableCollectionHelper.GetViewAfterExpected<SCG.KeyValuePair<TKey, TValue>>(dictionary, firstElement, true, GetIComparerOrDefault());
+                List<SCG.KeyValuePair<TKey, TValue>> expected = GetViewAfterExpected(dictionary, firstElement, true, GetIComparerOrDefault());
                 Assert.Equal(expected.Count, view.Count);
                 Assert.True(view.SequenceEqual(expected));
             }
@@ -1613,7 +1613,7 @@ namespace J2N.Collections.Tests
                 SCG.KeyValuePair<TKey, TValue> firstElement = dictionary.ElementAt(0);
                 SCG.KeyValuePair<TKey, TValue> lastElement = dictionary.ElementAt(count - 1);
                 SortedDictionary<TKey, TValue> view = dictionary.GetViewAfter(firstElement.Key, false);
-                List<SCG.KeyValuePair<TKey, TValue>> expected = NavigableCollectionHelper.GetViewAfterExpected<SCG.KeyValuePair<TKey, TValue>>(dictionary, firstElement, false, GetIComparerOrDefault());
+                List<SCG.KeyValuePair<TKey, TValue>> expected = GetViewAfterExpected(dictionary, firstElement, false, GetIComparerOrDefault());
                 Assert.Equal(expected.Count, view.Count);
                 Assert.True(view.SequenceEqual(expected));
             }
@@ -1629,7 +1629,7 @@ namespace J2N.Collections.Tests
                 SCG.KeyValuePair<TKey, TValue> firstElement = dictionary.ElementAt(1);
                 SCG.KeyValuePair<TKey, TValue> lastElement = dictionary.ElementAt(count - 2);
                 SortedDictionary<TKey, TValue> view = dictionary.GetViewAfter(firstElement.Key);
-                List<SCG.KeyValuePair<TKey, TValue>> expected = NavigableCollectionHelper.GetViewAfterExpected<SCG.KeyValuePair<TKey, TValue>>(dictionary, firstElement, true, GetIComparerOrDefault());
+                List<SCG.KeyValuePair<TKey, TValue>> expected = GetViewAfterExpected(dictionary, firstElement, true, GetIComparerOrDefault());
                 Assert.Equal(expected.Count, view.Count);
                 Assert.True(view.SequenceEqual(expected));
             }
@@ -1645,7 +1645,7 @@ namespace J2N.Collections.Tests
                 SCG.KeyValuePair<TKey, TValue> firstElement = dictionary.ElementAt(1);
                 SCG.KeyValuePair<TKey, TValue> lastElement = dictionary.ElementAt(count - 2);
                 SortedDictionary<TKey, TValue> view = dictionary.GetViewAfter(firstElement.Key, true);
-                List<SCG.KeyValuePair<TKey, TValue>> expected = NavigableCollectionHelper.GetViewAfterExpected<SCG.KeyValuePair<TKey, TValue>>(dictionary, firstElement, true, GetIComparerOrDefault());
+                List<SCG.KeyValuePair<TKey, TValue>> expected = GetViewAfterExpected(dictionary, firstElement, true, GetIComparerOrDefault());
                 Assert.Equal(expected.Count, view.Count);
                 Assert.True(view.SequenceEqual(expected));
             }
@@ -1661,7 +1661,7 @@ namespace J2N.Collections.Tests
                 SCG.KeyValuePair<TKey, TValue> firstElement = dictionary.ElementAt(1);
                 SCG.KeyValuePair<TKey, TValue> lastElement = dictionary.ElementAt(count - 2);
                 SortedDictionary<TKey, TValue> view = dictionary.GetViewAfter(firstElement.Key, false);
-                List<SCG.KeyValuePair<TKey, TValue>> expected = NavigableCollectionHelper.GetViewAfterExpected<SCG.KeyValuePair<TKey, TValue>>(dictionary, firstElement, false, GetIComparerOrDefault());
+                List<SCG.KeyValuePair<TKey, TValue>> expected = GetViewAfterExpected(dictionary, firstElement, false, GetIComparerOrDefault());
                 Assert.Equal(expected.Count, view.Count);
                 Assert.True(view.SequenceEqual(expected));
             }
@@ -1756,7 +1756,7 @@ namespace J2N.Collections.Tests
 
             foreach (SCG.KeyValuePair<TKey, TValue> kvp in dictionary)
             {
-                bool foundExpected = NavigableCollectionHelper.TryGetPredecessorExpected<SCG.KeyValuePair<TKey, TValue>>(dictionary, kvp, out var expectedKvp, comparer);
+                bool foundExpected = TryGetPredecessorExpected(dictionary, kvp, out var expectedKvp, comparer);
                 bool foundActual = dictionary.TryGetPredecessor(kvp.Key, out TKey actualKey, out TValue actualValue);
 
                 Assert.Equal(foundExpected, foundActual);
@@ -1772,7 +1772,7 @@ namespace J2N.Collections.Tests
 
             foreach (SCG.KeyValuePair<TKey, TValue> kvp in desc)
             {
-                bool foundExpected = NavigableCollectionHelper.TryGetPredecessorExpected<SCG.KeyValuePair<TKey, TValue>>(desc, kvp, out var expectedKvp, ReverseComparer<SCG.KeyValuePair<TKey, TValue>>.Create(comparer));
+                bool foundExpected = TryGetPredecessorExpected(desc, kvp, out var expectedKvp, ReverseComparer<SCG.KeyValuePair<TKey, TValue>>.Create(comparer));
                 bool foundActual = desc.TryGetPredecessor(kvp.Key, out TKey actualKey, out TValue actualValue);
 
                 Assert.Equal(foundExpected, foundActual);
@@ -1797,7 +1797,7 @@ namespace J2N.Collections.Tests
 
             foreach (SCG.KeyValuePair<TKey, TValue> kvp in dictionary)
             {
-                bool foundExpected = NavigableCollectionHelper.TryGetSuccessorExpected<SCG.KeyValuePair<TKey, TValue>>(dictionary, kvp, out var expectedKvp, comparer);
+                bool foundExpected = TryGetSuccessorExpected(dictionary, kvp, out var expectedKvp, comparer);
                 bool foundActual = dictionary.TryGetSuccessor(kvp.Key, out TKey actualKey, out TValue actualValue);
 
                 Assert.Equal(foundExpected, foundActual);
@@ -1813,7 +1813,7 @@ namespace J2N.Collections.Tests
 
             foreach (SCG.KeyValuePair<TKey, TValue> kvp in desc)
             {
-                bool foundExpected = NavigableCollectionHelper.TryGetSuccessorExpected<SCG.KeyValuePair<TKey, TValue>>(desc, kvp, out var expectedKvp, ReverseComparer<SCG.KeyValuePair<TKey, TValue>>.Create(comparer));
+                bool foundExpected = TryGetSuccessorExpected(desc, kvp, out var expectedKvp, ReverseComparer<SCG.KeyValuePair<TKey, TValue>>.Create(comparer));
                 bool foundActual = desc.TryGetSuccessor(kvp.Key, out TKey actualKey, out TValue actualValue);
 
                 Assert.Equal(foundExpected, foundActual);
@@ -1838,7 +1838,7 @@ namespace J2N.Collections.Tests
 
             foreach (SCG.KeyValuePair<TKey, TValue> kvp in dictionary)
             {
-                bool foundExpected = NavigableCollectionHelper.TryGetFloorExpected<SCG.KeyValuePair<TKey, TValue>>(dictionary, kvp, out var expectedKvp, comparer);
+                bool foundExpected = TryGetFloorExpected(dictionary, kvp, out var expectedKvp, comparer);
                 bool foundActual = dictionary.TryGetFloor(kvp.Key, out TKey actualKey, out TValue actualValue);
 
                 Assert.Equal(foundExpected, foundActual);
@@ -1853,7 +1853,7 @@ namespace J2N.Collections.Tests
 
             foreach (SCG.KeyValuePair<TKey, TValue> kvp in desc)
             {
-                bool foundExpected = NavigableCollectionHelper.TryGetFloorExpected<SCG.KeyValuePair<TKey, TValue>>(desc, kvp, out var expectedKvp, ReverseComparer<SCG.KeyValuePair<TKey, TValue>>.Create(comparer));
+                bool foundExpected = TryGetFloorExpected(desc, kvp, out var expectedKvp, ReverseComparer<SCG.KeyValuePair<TKey, TValue>>.Create(comparer));
                 bool foundActual = desc.TryGetFloor(kvp.Key, out TKey actualKey, out TValue actualValue);
 
                 Assert.Equal(foundExpected, foundActual);
@@ -1878,7 +1878,7 @@ namespace J2N.Collections.Tests
 
             foreach (SCG.KeyValuePair<TKey, TValue> value in dictionary)
             {
-                bool foundExpected = NavigableCollectionHelper.TryGetCeilingExpected<SCG.KeyValuePair<TKey, TValue>>(dictionary, value, out var expectedKvp, comparer);
+                bool foundExpected = TryGetCeilingExpected(dictionary, value, out var expectedKvp, comparer);
                 bool foundActual = dictionary.TryGetCeiling(value.Key, out TKey actualKey, out TValue actualValue);
 
                 Assert.Equal(foundExpected, foundActual);
@@ -1893,7 +1893,7 @@ namespace J2N.Collections.Tests
 
             foreach (SCG.KeyValuePair<TKey, TValue> value in desc)
             {
-                bool foundExpected = NavigableCollectionHelper.TryGetCeilingExpected<SCG.KeyValuePair<TKey, TValue>>(desc, value, out var expectedKvp, ReverseComparer<SCG.KeyValuePair<TKey, TValue>>.Create(comparer));
+                bool foundExpected = TryGetCeilingExpected(desc, value, out var expectedKvp, ReverseComparer<SCG.KeyValuePair<TKey, TValue>>.Create(comparer));
                 bool foundActual = desc.TryGetCeiling(value.Key, out TKey actualKey, out TValue actualValue);
 
                 Assert.Equal(foundExpected, foundActual);
