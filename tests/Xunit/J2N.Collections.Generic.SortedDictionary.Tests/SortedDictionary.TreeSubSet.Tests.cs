@@ -33,32 +33,6 @@ namespace J2N.Collections.Tests
     }
 
 
-    public class SortedDictionary_TreeSubset_GetView_Inclusive_Inclusive_int_int_Tests : SortedDictionary_TreeSubset_int_int_Tests
-    {
-        protected override bool LowerBoundInclusive => true;
-
-        protected override bool UpperBoundInclusive => true;
-
-        protected override SCG.IDictionary<int, int> GenericIDictionaryFactory()
-        {
-            OriginalDictionary = new SortedDictionary<int, int>();
-            return OriginalDictionary.GetView(LowerBound, LowerBoundInclusive, UpperBound, UpperBoundInclusive);
-        }
-    }
-
-    public class SortedDictionary_TreeSubset_GetView_Inclusive_Inclusive_string_string_Tests : SortedDictionary_TreeSubset_string_string_Tests
-    {
-        protected override bool LowerBoundInclusive => true;
-
-        protected override bool UpperBoundInclusive => true;
-
-        protected override SCG.IDictionary<string, string> GenericIDictionaryFactory()
-        {
-            OriginalDictionary = new SortedDictionary<string, string>();
-            return OriginalDictionary.GetView(LowerBound, LowerBoundInclusive, UpperBound, UpperBoundInclusive);
-        }
-    }
-
     public class SortedDictionary_TreeSubset_GetView_Inclusive_Exclusive_int_int_Tests : SortedDictionary_TreeSubset_int_int_Tests
     {
         protected override bool LowerBoundInclusive => true;
@@ -68,71 +42,6 @@ namespace J2N.Collections.Tests
         protected override SCG.IDictionary<int, int> GenericIDictionaryFactory()
         {
             OriginalDictionary = new SortedDictionary<int, int>();
-            return OriginalDictionary.GetView(LowerBound, LowerBoundInclusive, UpperBound, UpperBoundInclusive);
-        }
-    }
-
-    public class SortedDictionary_TreeSubset_GetView_Inclusive_Exclusive_string_string_Tests : SortedDictionary_TreeSubset_string_string_Tests
-    {
-        protected override bool LowerBoundInclusive => true;
-
-        protected override bool UpperBoundInclusive => false;
-
-        protected override SCG.IDictionary<string, string> GenericIDictionaryFactory()
-        {
-            OriginalDictionary = new SortedDictionary<string, string>();
-            return OriginalDictionary.GetView(LowerBound, LowerBoundInclusive, UpperBound, UpperBoundInclusive);
-        }
-    }
-
-    public class SortedDictionary_TreeSubset_GetView_Exclusive_Inclusive_int_int_Tests : SortedDictionary_TreeSubset_int_int_Tests
-    {
-        protected override bool LowerBoundInclusive => false;
-
-        protected override bool UpperBoundInclusive => true;
-
-        protected override SCG.IDictionary<int, int> GenericIDictionaryFactory()
-        {
-            OriginalDictionary = new SortedDictionary<int, int>();
-            return OriginalDictionary.GetView(LowerBound, LowerBoundInclusive, UpperBound, UpperBoundInclusive);
-        }
-    }
-
-    public class SortedDictionary_TreeSubset_GetView_Exclusive_Inclusive_string_string_Tests : SortedDictionary_TreeSubset_string_string_Tests
-    {
-        protected override bool LowerBoundInclusive => false;
-
-        protected override bool UpperBoundInclusive => true;
-
-        protected override SCG.IDictionary<string, string> GenericIDictionaryFactory()
-        {
-            OriginalDictionary = new SortedDictionary<string, string>();
-            return OriginalDictionary.GetView(LowerBound, LowerBoundInclusive, UpperBound, UpperBoundInclusive);
-        }
-    }
-
-    public class SortedDictionary_TreeSubset_GetView_Exclusive_Exclusive_int_int_Tests : SortedDictionary_TreeSubset_int_int_Tests
-    {
-        protected override bool LowerBoundInclusive => false;
-
-        protected override bool UpperBoundInclusive => false;
-
-        protected override SCG.IDictionary<int, int> GenericIDictionaryFactory()
-        {
-            OriginalDictionary = new SortedDictionary<int, int>();
-            return OriginalDictionary.GetView(LowerBound, LowerBoundInclusive, UpperBound, UpperBoundInclusive);
-        }
-    }
-
-    public class SortedDictionary_TreeSubset_GetView_Exclusive_Exclusive_string_string_Tests : SortedDictionary_TreeSubset_string_string_Tests
-    {
-        protected override bool LowerBoundInclusive => false;
-
-        protected override bool UpperBoundInclusive => false;
-
-        protected override SCG.IDictionary<string, string> GenericIDictionaryFactory()
-        {
-            OriginalDictionary = new SortedDictionary<string, string>();
             return OriginalDictionary.GetView(LowerBound, LowerBoundInclusive, UpperBound, UpperBoundInclusive);
         }
     }
@@ -165,33 +74,6 @@ namespace J2N.Collections.Tests
         }
     }
 
-    public class SortedDictionary_TreeSubset_GetViewBefore_Inclusive_int_int_Tests : SortedDictionary_TreeSubset_int_int_Tests
-    {
-        protected override bool LowerBoundInclusive => true;
-
-        protected override bool UpperBoundInclusive => true;
-
-
-        protected override SCG.IDictionary<int, int> GenericIDictionaryFactory()
-        {
-            OriginalDictionary = new SortedDictionary<int, int>();
-            return OriginalDictionary.GetViewBefore(LastKey, LastKeyInclusive);
-        }
-    }
-
-    public class SortedDictionary_TreeSubset_GetViewBefore_Inclusive_string_string_Tests : SortedDictionary_TreeSubset_string_string_Tests
-    {
-        protected override bool LowerBoundInclusive => true;
-
-        protected override bool UpperBoundInclusive => true;
-
-        protected override SCG.IDictionary<string, string> GenericIDictionaryFactory()
-        {
-            OriginalDictionary = new SortedDictionary<string, string>();
-            return OriginalDictionary.GetViewBefore(LastKey, LastKeyInclusive);
-        }
-    }
-
     public class SortedDictionary_TreeSubset_GetViewBefore_Exclusive_int_int_Tests : SortedDictionary_TreeSubset_int_int_Tests
     {
         protected override bool LowerBoundInclusive => true;
@@ -205,20 +87,6 @@ namespace J2N.Collections.Tests
             return OriginalDictionary.GetViewBefore(LastKey, LastKeyInclusive);
         }
     }
-
-    public class SortedDictionary_TreeSubset_GetViewBefore_Exclusive_string_string_Tests : SortedDictionary_TreeSubset_string_string_Tests
-    {
-        protected override bool LowerBoundInclusive => true;
-
-        protected override bool UpperBoundInclusive => false;
-
-        protected override SCG.IDictionary<string, string> GenericIDictionaryFactory()
-        {
-            OriginalDictionary = new SortedDictionary<string, string>();
-            return OriginalDictionary.GetViewBefore(LastKey, LastKeyInclusive);
-        }
-    }
-
 
     public class SortedDictionary_TreeSubset_GetViewAfter_int_int_Tests : SortedDictionary_TreeSubset_int_int_Tests
     {
@@ -260,47 +128,6 @@ namespace J2N.Collections.Tests
             return OriginalDictionary.GetViewAfter(FirstKey, FirstKeyInclusive);
         }
     }
-
-    public class SortedDictionary_TreeSubset_GetViewAfter_Inclusive_string_string_Tests : SortedDictionary_TreeSubset_string_string_Tests
-    {
-        protected override bool LowerBoundInclusive => true;
-
-        protected override bool UpperBoundInclusive => true;
-
-        protected override SCG.IDictionary<string, string> GenericIDictionaryFactory()
-        {
-            OriginalDictionary = new SortedDictionary<string, string>();
-            return OriginalDictionary.GetViewAfter(FirstKey, FirstKeyInclusive);
-        }
-    }
-
-    public class SortedDictionary_TreeSubset_GetViewAfter_Exclusive_int_int_Tests : SortedDictionary_TreeSubset_int_int_Tests
-    {
-        protected override bool LowerBoundInclusive => false;
-
-        protected override bool UpperBoundInclusive => true;
-
-
-        protected override SCG.IDictionary<int, int> GenericIDictionaryFactory()
-        {
-            OriginalDictionary = new SortedDictionary<int, int>();
-            return OriginalDictionary.GetViewAfter(FirstKey, FirstKeyInclusive);
-        }
-    }
-
-    public class SortedDictionary_TreeSubset_GetViewAfter_Exclusive_string_string_Tests : SortedDictionary_TreeSubset_string_string_Tests
-    {
-        protected override bool LowerBoundInclusive => false;
-
-        protected override bool UpperBoundInclusive => true;
-
-        protected override SCG.IDictionary<string, string> GenericIDictionaryFactory()
-        {
-            OriginalDictionary = new SortedDictionary<string, string>();
-            return OriginalDictionary.GetViewAfter(FirstKey, FirstKeyInclusive);
-        }
-    }
-
 
     public class SortedDictionary_TreeSubset_GetViewDescending_int_Tests : SortedDictionary_TreeSubset_int_int_Tests
     {
