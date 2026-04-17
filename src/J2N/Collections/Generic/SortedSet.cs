@@ -2282,7 +2282,7 @@ namespace J2N.Collections.Generic
             /// <param name="toInclusive">If <see langword="true"/>, <paramref name="toItem"/> will be included in the range;
             /// otherwise, it is an exclusive bound.</param>
             /// <returns>A subset view that contains only the values in the specified range.</returns>
-            /// <exception cref="ArgumentException"><paramref name="fromItem"/> is after than <paramref name="toItem"/>
+            /// <exception cref="ArgumentException"><paramref name="fromItem"/> is after <paramref name="toItem"/>
             /// in the current view order according to the comparer.</exception>
             /// <exception cref="ArgumentOutOfRangeException">A tried operation on the view was outside the range
             /// specified by <paramref name="fromItem"/> and <paramref name="toItem"/>.</exception>
