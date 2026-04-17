@@ -2757,7 +2757,7 @@ namespace J2N.Collections.Generic
                 {
                     Debug.Assert(dictionary._entries != null, "expected entries to be != null");
 
-                    ISpanAlternateEqualityComparer<TAlternateKeySpan, TKey> comparer = GetAlternateComparer(dictionary); // J2N: Moved within null check, since we don't need to look this up for null keys
+                    ISpanAlternateEqualityComparer<TAlternateKeySpan, TKey> comparer = GetAlternateComparer(dictionary);
 
                     uint hashCode = (uint)comparer.GetHashCode(key);
                     int i = dictionary.GetBucket(hashCode);
