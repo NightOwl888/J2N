@@ -161,7 +161,18 @@ steps:
     function RunTests([string]$framework, [string]$fileRegexPattern) {
         if (!(IsSupportedFramework($framework))) { return }
         
-        $testBinaries = Get-ChildItem -Path "$testBinaryRootDirectory" -File -Recurse | Where-Object {$_.FullName -match "$framework"} | Where-Object {$_.FullName -match "$fileRegexPattern"} | Sort-Object @{ Expression = { $_.Name }; Descending = $true } | Select -ExpandProperty FullName
+        # Ensure we match the target framework, user specified pattern, and that the target assembly matches its folder name
+        $testBinaries = Get-ChildItem -Path "$testBinaryRootDirectory" -File -Recurse |
+            Where-Object { $_.FullName -match "$framework" } |
+            Where-Object { $_.FullName -match "$fileRegexPattern" } |
+            Where-Object {
+                $assemblyName = [System.IO.Path]::GetFileNameWithoutExtension($_.Name)
+                $folderName = $_.Directory.Name
+                $assemblyName -eq $folderName
+            } |
+            Sort-Object @{ Expression = { $_.Name }; Descending = $true } |
+            Select-Object -ExpandProperty FullName
+
         foreach ($testBinary in $testBinaries) {
             $testName = [System.IO.Path]::GetFileNameWithoutExtension($testBinary)
             
