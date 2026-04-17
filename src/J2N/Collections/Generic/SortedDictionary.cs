@@ -1459,23 +1459,23 @@ namespace J2N.Collections.Generic
 
         bool INavigableCollection<KeyValuePair<TKey, TValue>>.RemoveLast(out KeyValuePair<TKey, TValue> value) => _set.RemoveLast(out value);
 
-        INavigableCollection<KeyValuePair<TKey, TValue>> INavigableCollection<KeyValuePair<TKey, TValue>>.GetView(KeyValuePair<TKey, TValue> fromValue, KeyValuePair<TKey, TValue> toValue)
-            => _set.GetView(fromValue, toValue);
+        INavigableCollection<KeyValuePair<TKey, TValue>> INavigableCollection<KeyValuePair<TKey, TValue>>.GetView(KeyValuePair<TKey, TValue> fromItem, KeyValuePair<TKey, TValue> toItem)
+            => _set.GetView(fromItem, toItem);
 
-        INavigableCollection<KeyValuePair<TKey, TValue>> INavigableCollection<KeyValuePair<TKey, TValue>>.GetView(KeyValuePair<TKey, TValue> fromValue, bool fromInclusive, KeyValuePair<TKey, TValue> toValue, bool toInclusive)
-            => _set.GetView(fromValue, fromInclusive, toValue, toInclusive);
+        INavigableCollection<KeyValuePair<TKey, TValue>> INavigableCollection<KeyValuePair<TKey, TValue>>.GetView(KeyValuePair<TKey, TValue> fromItem, bool fromInclusive, KeyValuePair<TKey, TValue> toItem, bool toInclusive)
+            => _set.GetView(fromItem, fromInclusive, toItem, toInclusive);
 
-        INavigableCollection<KeyValuePair<TKey, TValue>> INavigableCollection<KeyValuePair<TKey, TValue>>.GetViewBefore(KeyValuePair<TKey, TValue> toValue)
-            => _set.GetViewBefore(toValue);
+        INavigableCollection<KeyValuePair<TKey, TValue>> INavigableCollection<KeyValuePair<TKey, TValue>>.GetViewBefore(KeyValuePair<TKey, TValue> toItem)
+            => _set.GetViewBefore(toItem);
 
-        INavigableCollection<KeyValuePair<TKey, TValue>> INavigableCollection<KeyValuePair<TKey, TValue>>.GetViewBefore(KeyValuePair<TKey, TValue> toValue, bool inclusive)
-            => _set.GetViewBefore(toValue, inclusive);
+        INavigableCollection<KeyValuePair<TKey, TValue>> INavigableCollection<KeyValuePair<TKey, TValue>>.GetViewBefore(KeyValuePair<TKey, TValue> toItem, bool inclusive)
+            => _set.GetViewBefore(toItem, inclusive);
 
-        INavigableCollection<KeyValuePair<TKey, TValue>> INavigableCollection<KeyValuePair<TKey, TValue>>.GetViewAfter(KeyValuePair<TKey, TValue> fromValue)
-            => _set.GetViewAfter(fromValue);
+        INavigableCollection<KeyValuePair<TKey, TValue>> INavigableCollection<KeyValuePair<TKey, TValue>>.GetViewAfter(KeyValuePair<TKey, TValue> fromItem)
+            => _set.GetViewAfter(fromItem);
 
-        INavigableCollection<KeyValuePair<TKey, TValue>> INavigableCollection<KeyValuePair<TKey, TValue>>.GetViewAfter(KeyValuePair<TKey, TValue> fromValue, bool inclusive)
-            => _set.GetViewAfter(fromValue, inclusive);
+        INavigableCollection<KeyValuePair<TKey, TValue>> INavigableCollection<KeyValuePair<TKey, TValue>>.GetViewAfter(KeyValuePair<TKey, TValue> fromItem, bool inclusive)
+            => _set.GetViewAfter(fromItem, inclusive);
 
         INavigableCollection<KeyValuePair<TKey, TValue>> INavigableCollection<KeyValuePair<TKey, TValue>>.GetViewDescending()
             => _set.GetViewDescending();
@@ -2584,51 +2584,51 @@ namespace J2N.Collections.Generic
                 }
             }
 
-            INavigableCollection<TKey> INavigableCollection<TKey>.GetView([AllowNull] TKey fromValue, [AllowNull] TKey toValue)
+            INavigableCollection<TKey> INavigableCollection<TKey>.GetView([AllowNull] TKey fromItem, [AllowNull] TKey toItem)
             {
                 // Note that if this is called on TreeSubSet, it overrides GetView() and properly
                 // cascades the call to the underlying set.
-                SortedDictionary<TKey, TValue> viewDictionary = _dictionary.GetView(fromValue, toValue);
+                SortedDictionary<TKey, TValue> viewDictionary = _dictionary.GetView(fromItem, toItem);
                 return new KeyCollection(viewDictionary);
             }
 
-            INavigableCollection<TKey> INavigableCollection<TKey>.GetView([AllowNull] TKey fromValue, bool fromInclusive, [AllowNull] TKey toValue, bool toInclusive)
+            INavigableCollection<TKey> INavigableCollection<TKey>.GetView([AllowNull] TKey fromItem, bool fromInclusive, [AllowNull] TKey toItem, bool toInclusive)
             {
                 // Note that if this is called on TreeSubSet, it overrides GetView() and properly
                 // cascades the call to the underlying set.
-                SortedDictionary<TKey, TValue> viewDictionary = _dictionary.GetView(fromValue, fromInclusive, toValue, toInclusive);
+                SortedDictionary<TKey, TValue> viewDictionary = _dictionary.GetView(fromItem, fromInclusive, toItem, toInclusive);
                 return new KeyCollection(viewDictionary);
             }
 
-            INavigableCollection<TKey> INavigableCollection<TKey>.GetViewBefore([AllowNull] TKey toValue)
+            INavigableCollection<TKey> INavigableCollection<TKey>.GetViewBefore([AllowNull] TKey toItem)
             {
                 // Note that if this is called on TreeSubSet, it overrides GetViewBefore() and properly
                 // cascades the call to the underlying set.
-                SortedDictionary<TKey, TValue> viewDictionary = _dictionary.GetViewBefore(toValue);
+                SortedDictionary<TKey, TValue> viewDictionary = _dictionary.GetViewBefore(toItem);
                 return new KeyCollection(viewDictionary);
             }
 
-            INavigableCollection<TKey> INavigableCollection<TKey>.GetViewBefore([AllowNull] TKey toValue, bool inclusive)
+            INavigableCollection<TKey> INavigableCollection<TKey>.GetViewBefore([AllowNull] TKey toItem, bool inclusive)
             {
                 // Note that if this is called on TreeSubSet, it overrides GetViewBefore() and properly
                 // cascades the call to the underlying set.
-                SortedDictionary<TKey, TValue> viewDictionary = _dictionary.GetViewBefore(toValue, inclusive);
+                SortedDictionary<TKey, TValue> viewDictionary = _dictionary.GetViewBefore(toItem, inclusive);
                 return new KeyCollection(viewDictionary);
             }
 
-            INavigableCollection<TKey> INavigableCollection<TKey>.GetViewAfter([AllowNull] TKey fromValue)
+            INavigableCollection<TKey> INavigableCollection<TKey>.GetViewAfter([AllowNull] TKey fromItem)
             {
                 // Note that if this is called on TreeSubSet, it overrides GetViewAfter() and properly
                 // cascades the call to the underlying set.
-                SortedDictionary<TKey, TValue> viewDictionary = _dictionary.GetViewAfter(fromValue);
+                SortedDictionary<TKey, TValue> viewDictionary = _dictionary.GetViewAfter(fromItem);
                 return new KeyCollection(viewDictionary);
             }
 
-            INavigableCollection<TKey> INavigableCollection<TKey>.GetViewAfter([AllowNull] TKey fromValue, bool inclusive)
+            INavigableCollection<TKey> INavigableCollection<TKey>.GetViewAfter([AllowNull] TKey fromItem, bool inclusive)
             {
                 // Note that if this is called on TreeSubSet, it overrides GetViewAfter() and properly
                 // cascades the call to the underlying set.
-                SortedDictionary<TKey, TValue> viewDictionary = _dictionary.GetViewAfter(fromValue, inclusive);
+                SortedDictionary<TKey, TValue> viewDictionary = _dictionary.GetViewAfter(fromItem, inclusive);
                 return new KeyCollection(viewDictionary);
             }
 

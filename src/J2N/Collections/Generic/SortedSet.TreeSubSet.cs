@@ -538,10 +538,10 @@ namespace J2N.Collections.Generic
             // This passes functionality down to the underlying tree, clipping edges and reversing
             // argument order if necessary. There's nothing gained by having a nested subset. May
             // as well draw it from the base. Cannot increase the bounds of the subset, can only decrease it.
-            internal override SortedSet<T> DoGetView([AllowNull] T fromValue, bool fromInclusive, ExceptionArgument fromArgumentName, [AllowNull] T toValue, bool toInclusive, ExceptionArgument toArgumentName)
+            internal override SortedSet<T> DoGetView([AllowNull] T fromItem, bool fromInclusive, ExceptionArgument fromArgumentName, [AllowNull] T toItem, bool toInclusive, ExceptionArgument toArgumentName)
             {
-                T? lower = _reverse ? toValue : fromValue;
-                T? upper = _reverse ? fromValue : toValue;
+                T? lower = _reverse ? toItem : fromItem;
+                T? upper = _reverse ? fromItem : toItem;
                 bool lowerInclusive = _reverse ? toInclusive : fromInclusive;
                 bool upperInclusive = _reverse ? fromInclusive : toInclusive;
                 ExceptionArgument lowerArgumentName = _reverse ? toArgumentName : fromArgumentName;
@@ -562,34 +562,34 @@ namespace J2N.Collections.Generic
             // This passes functionality down to the underlying tree, clipping edges if necessary
             // There's nothing gained by having a nested subset. May as well draw it from the base
             // Cannot increase the bounds of the subset, can only decrease it
-            internal override SortedSet<T> DoGetViewBefore([AllowNull] T toValue, bool inclusive, ExceptionArgument toArgumentName)
+            internal override SortedSet<T> DoGetViewBefore([AllowNull] T toItem, bool inclusive, ExceptionArgument toArgumentName)
             {
-                if (!IsWithinRange(toValue, inclusive))
+                if (!IsWithinRange(toItem, inclusive))
                 {
                     ThrowHelper.ThrowArgumentOutOfRangeException(toArgumentName);
                 }
 
                 return !_reverse
-                    ? GetViewBeforeCore(toValue, inclusive)
-                    : GetViewAfterCore(toValue, inclusive);
+                    ? GetViewBeforeCore(toItem, inclusive)
+                    : GetViewAfterCore(toItem, inclusive);
             }
 
             // This passes functionality down to the underlying tree, clipping edges if necessary
             // There's nothing gained by having a nested subset. May as well draw it from the base
             // Cannot increase the bounds of the subset, can only decrease it
-            internal override SortedSet<T> DoGetViewAfter([AllowNull] T fromValue, bool inclusive, ExceptionArgument fromArgumentName)
+            internal override SortedSet<T> DoGetViewAfter([AllowNull] T fromItem, bool inclusive, ExceptionArgument fromArgumentName)
             {
-                if (!IsWithinRange(fromValue, inclusive))
+                if (!IsWithinRange(fromItem, inclusive))
                 {
                     ThrowHelper.ThrowArgumentOutOfRangeException(fromArgumentName);
                 }
 
                 return !_reverse
-                    ? GetViewAfterCore(fromValue, inclusive)
-                    : GetViewBeforeCore(fromValue, inclusive);
+                    ? GetViewAfterCore(fromItem, inclusive)
+                    : GetViewBeforeCore(fromItem, inclusive);
             }
 
-            private SortedSet<T> GetViewBeforeCore([AllowNull] T toValue, bool inclusive)
+            private SortedSet<T> GetViewBeforeCore([AllowNull] T toItem, bool inclusive)
             {
                 T? upper;
                 bool upperInclusive;
@@ -597,17 +597,17 @@ namespace J2N.Collections.Generic
                 // Fast path - no upper bound, no equality possible
                 if (!_uBoundActive)
                 {
-                    upper = toValue;
+                    upper = toItem;
                     upperInclusive = inclusive;
                 }
                 else
                 {
                     // Compute comparison ONCE
-                    int cmp = comparer.Compare(toValue!, _max!);
+                    int cmp = comparer.Compare(toItem!, _max!);
                     if (cmp < 0)
                     {
                         // Override with new value
-                        upper = toValue;
+                        upper = toItem;
                         upperInclusive = inclusive;
                     }
                     else if (cmp > 0)
@@ -627,7 +627,7 @@ namespace J2N.Collections.Generic
                 return new TreeSubSet(_underlying, _min, _lBoundInclusive, upper, upperInclusive, _lBoundActive, true, _reverse);
             }
 
-            private SortedSet<T> GetViewAfterCore([AllowNull] T fromValue, bool inclusive)
+            private SortedSet<T> GetViewAfterCore([AllowNull] T fromItem, bool inclusive)
             {
                 T? lower;
                 bool lowerInclusive;
@@ -635,17 +635,17 @@ namespace J2N.Collections.Generic
                 // Fast path - no lower bound, no equality possible
                 if (!_lBoundActive)
                 {
-                    lower = fromValue;
+                    lower = fromItem;
                     lowerInclusive = inclusive;
                 }
                 else
                 {
                     // Compute comparison ONCE
-                    int cmp = comparer.Compare(fromValue!, _min!);
+                    int cmp = comparer.Compare(fromItem!, _min!);
                     if (cmp > 0)
                     {
                         // Override with new value
-                        lower = fromValue;
+                        lower = fromItem;
                         lowerInclusive = inclusive;
                     }
                     else if (cmp < 0)

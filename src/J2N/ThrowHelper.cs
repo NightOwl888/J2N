@@ -1110,10 +1110,10 @@ namespace J2N
                     return "fnUpdate";
                 case ExceptionArgument.formatProvider:
                     return "formatProvider";
+                case ExceptionArgument.fromItem:
+                    return "fromItem";
                 case ExceptionArgument.fromKey:
                     return "fromKey";
-                case ExceptionArgument.fromValue:
-                    return "fromValue";
                 case ExceptionArgument.hashSize:
                     return "hashSize";
                 case ExceptionArgument.index:
@@ -1218,12 +1218,12 @@ namespace J2N
                     return "text";
                 case ExceptionArgument.threadStart:
                     return "threadStart";
+                case ExceptionArgument.toItem:
+                    return "toItem";
                 case ExceptionArgument.toKey:
                     return "toKey";
                 case ExceptionArgument.toStringFormatProvider:
                     return "toStringFormatProvider";
-                case ExceptionArgument.toValue:
-                    return "toValue";
                 case ExceptionArgument.type:
                     return "type";
                 case ExceptionArgument.uiCulture:
@@ -1665,7 +1665,7 @@ namespace J2N
         fnUpdate,
         formatProvider,
         fromKey,
-        fromValue,
+        fromItem,
         hashSize,
         index,
         index1,
@@ -1720,7 +1720,7 @@ namespace J2N
         threadStart,
         toKey,
         toStringFormatProvider,
-        toValue,
+        toItem,
         type,
         uiCulture,
         upperValue,

@@ -592,8 +592,8 @@ namespace J2N.Collections.Tests
                 T lastElement = set.ElementAt(setLength - 1);
                 if (comparer.Compare(firstElement, lastElement) < 0)
                 {
-                    const string fromArgumentName = "fromValue";
-                    const string toArgumentName = "toValue";
+                    const string fromArgumentName = "fromItem";
+                    const string toArgumentName = "toItem";
                     string lowerArgumentName = IsDescending ? toArgumentName : fromArgumentName;
                     string upperArgumentName = IsDescending ? fromArgumentName : toArgumentName;
 
@@ -616,8 +616,8 @@ namespace J2N.Collections.Tests
                 T lastElement = set.ElementAt(setLength - 1);
                 if (comparer.Compare(firstElement, lastElement) < 0)
                 {
-                    const string fromArgumentName = "fromValue";
-                    const string toArgumentName = "toValue";
+                    const string fromArgumentName = "fromItem";
+                    const string toArgumentName = "toItem";
                     string lowerArgumentName = IsDescending ? toArgumentName : fromArgumentName;
                     string upperArgumentName = IsDescending ? fromArgumentName : toArgumentName;
 
@@ -642,7 +642,7 @@ namespace J2N.Collections.Tests
                 if ((comparer.Compare(firstElement, middleElement) < 0) && (comparer.Compare(middleElement, lastElement) < 0))
                 {
                     SortedSet<T> view = set.GetView(firstElement, middleElement);
-                    Assert.Throws<ArgumentOutOfRangeException>("toValue", () => view.GetView(middleElement, lastElement));
+                    Assert.Throws<ArgumentOutOfRangeException>("toItem", () => view.GetView(middleElement, lastElement));
                 }
             }
         }
@@ -661,7 +661,7 @@ namespace J2N.Collections.Tests
                 if ((comparer.Compare(firstElement, middleElement) < 0) && (comparer.Compare(middleElement, lastElement) < 0))
                 {
                     SortedSet<T> view = set.GetView(firstElement, middleElement);
-                    Assert.Throws<ArgumentOutOfRangeException>("toValue", () => view.GetView(middleElement, true, lastElement, true));
+                    Assert.Throws<ArgumentOutOfRangeException>("toItem", () => view.GetView(middleElement, true, lastElement, true));
                 }
             }
         }
