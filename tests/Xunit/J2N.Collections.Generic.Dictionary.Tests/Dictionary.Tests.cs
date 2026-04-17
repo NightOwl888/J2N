@@ -466,13 +466,17 @@ namespace J2N.Collections.Tests
         [ConditionalFact(typeof(PlatformDetection), nameof(PlatformDetection.IsBinaryFormatterSupported))]
         public void ComparerSerialization()
         {
+            // J2N: We don't care about the internal type names as long as we get back the BCL comparer type.
+            // Our deserialization works differently than the BCL so we can implement both J2N and BCL alternate
+            // comparer interfaces. We never rely on the internal BCL types for alternate lookup.
+
             // Strings switch between randomized and non-randomized comparers,
             // however this should never be observable externally.
-            TestComparerSerialization(J2N.Collections.Generic.EqualityComparer<string>.Default, "System.OrdinalComparer");
+            TestComparerSerialization(J2N.Collections.Generic.EqualityComparer<string>.Default /*, "System.OrdinalComparer"*/);
             // OrdinalCaseSensitiveComparer is internal and (de)serializes as OrdinalComparer
-            TestComparerSerialization(StringComparer.Ordinal, "System.OrdinalComparer");
+            TestComparerSerialization(StringComparer.Ordinal /*, "System.OrdinalComparer"*/);
             // OrdinalIgnoreCaseComparer is internal and (de)serializes as OrdinalComparer
-            TestComparerSerialization(StringComparer.OrdinalIgnoreCase, "System.OrdinalComparer");
+            TestComparerSerialization(StringComparer.OrdinalIgnoreCase /*, "System.OrdinalComparer"*/);
             TestComparerSerialization(StringComparer.CurrentCulture);
             TestComparerSerialization(StringComparer.CurrentCultureIgnoreCase);
             TestComparerSerialization(StringComparer.InvariantCulture);

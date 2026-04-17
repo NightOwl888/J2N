@@ -59,7 +59,7 @@ namespace J2N.Collections.Generic
             CultureName = cultureName;
 
             // J2N: Only IgnoreCase is supported by J2N, so we ignore any other options that are inadvertently specfied.
-            // No options are ever vaid for Ordinal or OrdinalIgnoreCase.
+            // No options are ever valid for Ordinal or OrdinalIgnoreCase.
 
             Options = type switch
             {
@@ -84,13 +84,15 @@ namespace J2N.Collections.Generic
                 return true;
             }
 
-            if (ReferenceEquals(comparer, StringComparer.InvariantCulture))
+            // NOTE: It is possible for users to create custom StringComparer instances that are invariant, so we need the extra check.
+            if (ReferenceEquals(comparer, StringComparer.InvariantCulture) || StringComparer.InvariantCulture.Equals(comparer))
             {
                 descriptor = new(Classification.InvariantCulture, cultureName: CultureInfo.InvariantCulture.Name, CompareOptions.None);
                 return true;
             }
 
-            if (ReferenceEquals(comparer, StringComparer.InvariantCultureIgnoreCase))
+            // NOTE: It is possible for users to create custom StringComparer instances that are invariant, so we need the extra check.
+            if (ReferenceEquals(comparer, StringComparer.InvariantCultureIgnoreCase) || StringComparer.InvariantCultureIgnoreCase.Equals(comparer))
             {
                 descriptor = new(Classification.InvariantCultureIgnoreCase, cultureName: CultureInfo.InvariantCulture.Name, CompareOptions.IgnoreCase);
                 return true;
@@ -105,8 +107,10 @@ namespace J2N.Collections.Generic
 #if FEATURE_STRINGCOMPARER_ISWELLKNOWNCULTUREAWARECOMPARER
             if (StringComparer.IsWellKnownCultureAwareComparer(sc, out CompareInfo? compareInfo, out CompareOptions options))
             {
+                bool ignoreCase = (options & CompareOptions.IgnoreCase) != 0;
+
                 descriptor = new(
-                    options.HasFlag(CompareOptions.IgnoreCase)
+                    ignoreCase
                         ? Classification.CurrentCultureIgnoreCase
                         : Classification.CurrentCulture,
                     cultureName: compareInfo.Name,
@@ -138,10 +142,10 @@ namespace J2N.Collections.Generic
             return false;
         }
 
-        public readonly bool TryCreateStringComparer(out StringComparer? comparer) =>
-            TryCreateStringComparer(in this, out comparer);
+        public readonly bool TryCreateStringComparer(object rawComparer, out StringComparer? comparer) =>
+            TryCreateStringComparer(rawComparer, in this, out comparer);
 
-        public static bool TryCreateStringComparer(in StringComparerDescriptor descriptor, [MaybeNullWhen(false)] out StringComparer comparer)
+        public static bool TryCreateStringComparer(object rawComparer, in StringComparerDescriptor descriptor, [MaybeNullWhen(false)] out StringComparer comparer)
         {
             comparer = null;
 
@@ -167,6 +171,18 @@ namespace J2N.Collections.Generic
                 case Classification.CurrentCultureIgnoreCase:
                     {
                         bool ignoreCase = (descriptor.Options & CompareOptions.IgnoreCase) != 0;
+                        StringComparer currentCulture = ignoreCase ? StringComparer.CurrentCultureIgnoreCase : StringComparer.CurrentCulture;
+
+                        // Use the well-known instance if it matches.
+                        // rawComparer is the deserialized instance to compare against. If the culture matches and casing matches,
+                        // we can use the well-known instance.
+                        if (currentCulture.Equals(rawComparer))
+                        {
+                            comparer = currentCulture;
+                            return true;
+                        }
+
+                        // Otherwise, try to create a StringComparer from the descriptor
                         try
                         {
                             CultureInfo culture = CultureInfo.GetCultureInfo(descriptor.CultureName!);
@@ -176,7 +192,7 @@ namespace J2N.Collections.Generic
                         catch (CultureNotFoundException)
                         {
                             // Culture doesn't exist on the current system (may happen after deserialization). Default to current culture.
-                            comparer = ignoreCase ? StringComparer.CurrentCultureIgnoreCase : StringComparer.CurrentCulture;
+                            comparer = currentCulture;
                             return true;
                         }
                     }

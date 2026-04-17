@@ -219,7 +219,7 @@ namespace J2N.Collections.Generic
                 }
             }
             else if (comparer is not null && // first check for null to avoid forcing default comparer instantiation unnecessarily
-                     !ReferenceEquals(comparer, EqualityComparer<T>.Default)) // J2N: use ReferenceEquals to be explicit
+                     comparer != EqualityComparer<T>.Default)
             {
                 _comparer = comparer;
             }
@@ -386,16 +386,17 @@ namespace J2N.Collections.Generic
             {
                 IEqualityComparer<T>? comparer = _comparer;
 
-                // If the key is a string, we may have substituted a non-randomized comparer during construction.
-                // If we did, fish out and return the actual comparer that had been provided.
-                if (typeof(T) == typeof(string) &&
-                    (comparer as NonRandomizedStringEqualityComparer)?.GetUnderlyingEqualityComparer() is IEqualityComparer<T> ec)
+                // J2N specific - using the implementation from HashSet<T> because we may have an IInternalStringEqualityComparer type that is
+                // not a NonRandomizedStringEqualityComparer. We still need to fetch the underlying comparer in this case.
+                if (typeof(T) == typeof(string))
                 {
-                    return ec;
+                    Debug.Assert(comparer is not null, "The comparer should never be null for a reference type.");
+                    return (IEqualityComparer<T>)InternalStringEqualityComparer.GetUnderlyingEqualityComparer((IEqualityComparer<string?>)comparer!);
                 }
-
-                // Otherwise, return whatever comparer we have, or the default if none was provided.
-                return comparer ?? EqualityComparer<T>.Default;
+                else
+                {
+                    return comparer ?? EqualityComparer<T>.Default;
+                }
             }
         }
 
@@ -1005,14 +1006,14 @@ namespace J2N.Collections.Generic
         }
 
         /// <summary>
-        /// Modifies the current <see cref="HashSet{T}"/> object to contain only elements that are
+        /// Modifies the current <see cref="OrderedHashSet{T}"/> object to contain only elements that are
         /// present in that object and in the specified collection.
         /// </summary>
-        /// <param name="other">The collection to compare to the current <see cref="HashSet{T}"/> object.</param>
+        /// <param name="other">The collection to compare to the current <see cref="OrderedHashSet{T}"/> object.</param>
         /// <exception cref="ArgumentNullException"><paramref name="other"/> is <c>null</c>.</exception>
         /// <remarks>
-        /// If the collection represented by the other parameter is a <see cref="HashSet{T}"/> collection with
-        /// the same equality comparer as the current <see cref="HashSet{T}"/> object, this method is an O(<c>n</c>) operation.
+        /// If the collection represented by the other parameter is a <see cref="OrderedHashSet{T}"/> collection with
+        /// the same equality comparer as the current <see cref="OrderedHashSet{T}"/> object, this method is an O(<c>n</c>) operation.
         /// Otherwise, this method is an O(<c>n</c> + <c>m</c>) operation, where <c>n</c> is <see cref="Count"/> and <c>m</c>
         /// is the number of elements in <paramref name="other"/>.
         /// </remarks>
@@ -1057,9 +1058,9 @@ namespace J2N.Collections.Generic
         }
 
         /// <summary>
-        /// Removes all elements in the specified collection from the current <see cref="HashSet{T}"/> object.
+        /// Removes all elements in the specified collection from the current <see cref="OrderedHashSet{T}"/> object.
         /// </summary>
-        /// <param name="other">The collection of items to remove from the <see cref="HashSet{T}"/> object.</param>
+        /// <param name="other">The collection of items to remove from the <see cref="OrderedHashSet{T}"/> object.</param>
         /// <exception cref="ArgumentNullException"><paramref name="other"/> is <c>null</c>.</exception>
         /// <remarks>
         /// The <see cref="ExceptWith(IEnumerable{T})"/> method is the equivalent of mathematical set subtraction.
@@ -1092,14 +1093,14 @@ namespace J2N.Collections.Generic
         }
 
         /// <summary>
-        /// Modifies the current <see cref="HashSet{T}"/> object to contain only elements that are present either
+        /// Modifies the current <see cref="OrderedHashSet{T}"/> object to contain only elements that are present either
         /// in that object or in the specified collection, but not both.
         /// </summary>
-        /// <param name="other">The collection to compare to the current <see cref="HashSet{T}"/> object.</param>
+        /// <param name="other">The collection to compare to the current <see cref="OrderedHashSet{T}"/> object.</param>
         /// <exception cref="ArgumentNullException"><paramref name="other"/> is <c>null</c>.</exception>
         /// <remarks>
-        /// If the other parameter is a <see cref="HashSet{T}"/> collection with the same equality comparer as
-        /// the current <see cref="HashSet{T}"/> object, this method is an O(<c>n</c>) operation. Otherwise,
+        /// If the other parameter is a <see cref="OrderedHashSet{T}"/> collection with the same equality comparer as
+        /// the current <see cref="OrderedHashSet{T}"/> object, this method is an O(<c>n</c>) operation. Otherwise,
         /// this method is an O(<c>n</c> + <c>m</c>) operation, where n is the number of elements in other and
         /// <c>m</c> is <see cref="Count"/>.
         /// </remarks>
@@ -1138,22 +1139,22 @@ namespace J2N.Collections.Generic
         }
 
         /// <summary>
-        /// Determines whether a <see cref="HashSet{T}"/> object is a subset of the specified collection.
+        /// Determines whether a <see cref="OrderedHashSet{T}"/> object is a subset of the specified collection.
         /// </summary>
-        /// <param name="other">The collection to compare to the current <see cref="HashSet{T}"/> object.</param>
-        /// <returns><c>true</c> if the <see cref="HashSet{T}"/> object is a subset of <paramref name="other"/>;
+        /// <param name="other">The collection to compare to the current <see cref="OrderedHashSet{T}"/> object.</param>
+        /// <returns><c>true</c> if the <see cref="OrderedHashSet{T}"/> object is a subset of <paramref name="other"/>;
         /// otherwise, <c>false</c>.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="other"/> is <c>null</c>.</exception>
         /// <remarks>
         /// An empty set is a subset of any other collection, including an empty set; therefore, this method returns
-        /// <c>true</c> if the collection represented by the current <see cref="HashSet{T}"/> object is empty,
+        /// <c>true</c> if the collection represented by the current <see cref="OrderedHashSet{T}"/> object is empty,
         /// even if the <paramref name="other"/> parameter is an empty set.
         /// <para/>
         /// This method always returns <c>false</c> if <see cref="Count"/> is greater than the number of
         /// elements in <paramref name="other"/>.
         /// <para/>
-        /// If the collection represented by other is a <see cref="HashSet{T}"/> collection with the same
-        /// equality comparer as the current <see cref="HashSet{T}"/> object, this method is an O(<c>n</c>) operation.
+        /// If the collection represented by other is a <see cref="OrderedHashSet{T}"/> collection with the same
+        /// equality comparer as the current <see cref="OrderedHashSet{T}"/> object, this method is an O(<c>n</c>) operation.
         /// Otherwise, this method is an O(<c>n</c> + <c>m</c>) operation, where <c>n</c> is <see cref="Count"/> and <c>m</c>
         /// is the number of elements in other.
         /// </remarks>
@@ -1197,22 +1198,22 @@ namespace J2N.Collections.Generic
         }
 
         /// <summary>
-        /// Determines whether a <see cref="HashSet{T}"/> object is a proper subset of the specified collection.
+        /// Determines whether a <see cref="OrderedHashSet{T}"/> object is a proper subset of the specified collection.
         /// </summary>
-        /// <param name="other">The collection to compare to the current <see cref="HashSet{T}"/> object.</param>
-        /// <returns><c>true</c> if the <see cref="HashSet{T}"/> object is a proper subset of <paramref name="other"/>;
+        /// <param name="other">The collection to compare to the current <see cref="OrderedHashSet{T}"/> object.</param>
+        /// <returns><c>true</c> if the <see cref="OrderedHashSet{T}"/> object is a proper subset of <paramref name="other"/>;
         /// otherwise, <c>false</c>.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="other"/> is <c>null</c>.</exception>
         /// <remarks>
         /// An empty set is a proper subset of any other collection. Therefore, this method returns <c>true</c> if the
-        /// collection represented by the current <see cref="HashSet{T}"/> object is empty unless the other
+        /// collection represented by the current <see cref="OrderedHashSet{T}"/> object is empty unless the other
         /// parameter is also an empty set.
         /// <para/>
         /// This method always returns <c>false</c> if <see cref="Count"/> is greater than or equal to the number of
         /// elements in <paramref name="other"/>.
         /// <para/>
-        /// If the collection represented by other is a <see cref="HashSet{T}"/> collection with the same equality
-        /// comparer as the current <see cref="HashSet{T}"/> object, then this method is an O(n) operation. Otherwise,
+        /// If the collection represented by other is a <see cref="OrderedHashSet{T}"/> collection with the same equality
+        /// comparer as the current <see cref="OrderedHashSet{T}"/> object, then this method is an O(n) operation. Otherwise,
         /// this method is an O(<c>n</c> + <c>m</c>) operation, where <c>n</c> is <see cref="Count"/> and <c>m</c> is the
         /// number of elements in other.
         /// </remarks>
@@ -1259,22 +1260,22 @@ namespace J2N.Collections.Generic
         }
 
         /// <summary>
-        /// Determines whether a <see cref="HashSet{T}"/> object is a superset of the specified collection.
+        /// Determines whether a <see cref="OrderedHashSet{T}"/> object is a superset of the specified collection.
         /// </summary>
-        /// <param name="other">The collection to compare to the current <see cref="HashSet{T}"/> object.</param>
-        /// <returns><c>true</c> if the <see cref="HashSet{T}"/> object is a superset of <paramref name="other"/>;
+        /// <param name="other">The collection to compare to the current <see cref="OrderedHashSet{T}"/> object.</param>
+        /// <returns><c>true</c> if the <see cref="OrderedHashSet{T}"/> object is a superset of <paramref name="other"/>;
         /// otherwise, <c>false</c>.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="other"/> is <c>null</c>.</exception>
         /// <remarks>
         /// All collections, including the empty set, are supersets of the empty set. Therefore, this method returns
         /// <c>true</c> if the collection represented by the other parameter is empty, even if the current
-        /// <see cref="HashSet{T}"/> object is empty.
+        /// <see cref="OrderedHashSet{T}"/> object is empty.
         /// <para/>
         /// This method always returns <c>false</c> if <see cref="Count"/> is less than the number of elements
         /// in <paramref name="other"/>.
         /// <para/>
-        /// If the collection represented by other is a <see cref="HashSet{T}"/> collection with the same
-        /// equality comparer as the current <see cref="HashSet{T}"/> object, this method is an O(<c>n</c>) operation.
+        /// If the collection represented by other is a <see cref="OrderedHashSet{T}"/> collection with the same
+        /// equality comparer as the current <see cref="OrderedHashSet{T}"/> object, this method is an O(<c>n</c>) operation.
         /// Otherwise, this method is an O(<c>n</c> + <c>m</c>) operation, where <c>n</c> is the number of elements in other
         /// and <c>m</c> is <see cref="Count"/>.
         /// </remarks>
@@ -1314,19 +1315,19 @@ namespace J2N.Collections.Generic
         }
 
         /// <summary>
-        /// Determines whether a <see cref="HashSet{T}"/> object is a proper superset of the specified collection.
+        /// Determines whether a <see cref="OrderedHashSet{T}"/> object is a proper superset of the specified collection.
         /// </summary>
-        /// <param name="other">The collection to compare to the current <see cref="HashSet{T}"/> object.</param>
-        /// <returns><c>true</c> if the <see cref="HashSet{T}"/> object is a proper superset of other; otherwise, <c>false</c>.</returns>
+        /// <param name="other">The collection to compare to the current <see cref="OrderedHashSet{T}"/> object.</param>
+        /// <returns><c>true</c> if the <see cref="OrderedHashSet{T}"/> object is a proper superset of other; otherwise, <c>false</c>.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="other"/> is <c>null</c>.</exception>
         /// <remarks>
         /// An empty set is a proper superset of any other collection. Therefore, this method returns <c>true</c> if the
-        /// collection represented by the other parameter is empty unless the current <see cref="HashSet{T}"/> collection is also empty.
+        /// collection represented by the other parameter is empty unless the current <see cref="OrderedHashSet{T}"/> collection is also empty.
         /// <para/>
         /// This method always returns <c>false</c> if <see cref="Count"/> is less than or equal to the number of elements in other.
         /// <para/>
-        /// If the collection represented by other is a <see cref="HashSet{T}"/> collection with the same equality
-        /// comparer as the current <see cref="HashSet{T}"/> object, this method is an O(<c>n</c>) operation. Otherwise,
+        /// If the collection represented by other is a <see cref="OrderedHashSet{T}"/> collection with the same equality
+        /// comparer as the current <see cref="OrderedHashSet{T}"/> object, this method is an O(<c>n</c>) operation. Otherwise,
         /// this method is an O(<c>n</c> + <c>m</c>) operation, where <c>n</c> is the number of elements in other and <c>m</c>
         /// is <see cref="Count"/>.
         /// </remarks>
@@ -1373,11 +1374,11 @@ namespace J2N.Collections.Generic
         }
 
         /// <summary>
-        /// Determines whether the current <see cref="HashSet{T}"/> object and a specified collection
+        /// Determines whether the current <see cref="OrderedHashSet{T}"/> object and a specified collection
         /// share common elements.
         /// </summary>
-        /// <param name="other">The collection to compare to the current <see cref="HashSet{T}"/> object.</param>
-        /// <returns><c>true</c> if the <see cref="HashSet{T}"/> object and <paramref name="other"/> share
+        /// <param name="other">The collection to compare to the current <see cref="OrderedHashSet{T}"/> object.</param>
+        /// <returns><c>true</c> if the <see cref="OrderedHashSet{T}"/> object and <paramref name="other"/> share
         /// at least one common element; otherwise, <c>false</c>.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="other"/> is <c>null</c>.</exception>
         /// <remarks>
@@ -1410,18 +1411,18 @@ namespace J2N.Collections.Generic
         }
 
         /// <summary>
-        /// Determines whether a <see cref="HashSet{T}"/> object and the specified collection contain the same elements.
+        /// Determines whether a <see cref="OrderedHashSet{T}"/> object and the specified collection contain the same elements.
         /// </summary>
-        /// <param name="other">The collection to compare to the current <see cref="HashSet{T}"/> object.</param>
-        /// <returns><c>true</c> if the <see cref="HashSet{T}"/> object is equal to <paramref name="other"/>;
+        /// <param name="other">The collection to compare to the current <see cref="OrderedHashSet{T}"/> object.</param>
+        /// <returns><c>true</c> if the <see cref="OrderedHashSet{T}"/> object is equal to <paramref name="other"/>;
         /// otherwise, <c>false</c>.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="other"/> is <c>null</c>.</exception>
         /// <remarks>
         /// The <see cref="SetEquals(IEnumerable{T})"/> method ignores duplicate entries and the order of elements in the
         /// <paramref name="other"/> parameter.
         /// <para/>
-        /// If the collection represented by other is a <see cref="HashSet{T}"/> collection with the same equality
-        /// comparer as the current <see cref="HashSet{T}"/> object, this method is an O(<c>n</c>) operation. Otherwise,
+        /// If the collection represented by other is a <see cref="OrderedHashSet{T}"/> collection with the same equality
+        /// comparer as the current <see cref="OrderedHashSet{T}"/> object, this method is an O(<c>n</c>) operation. Otherwise,
         /// this method is an O(<c>n</c> + <c>m</c>) operation, where <c>n</c> is the number of elements in other and
         /// <c>m</c> is <see cref="Count"/>.
         /// </remarks>
@@ -1717,7 +1718,9 @@ namespace J2N.Collections.Generic
             {
                 // Store the original randomized comparer instead of the non-randomized one.
                 Debug.Assert(_comparer is NonRandomizedStringEqualityComparer);
-                IEqualityComparer<T> comparer = _comparer = (IEqualityComparer<T>)((NonRandomizedStringEqualityComparer)_comparer!).GetUnderlyingEqualityComparer(); // [!]: asserted above
+                // J2N: We must use the internal RandomizedEqualityComparer rather than the underlying comparer here, since we have custom
+                // interfaces that must be respected for the span alternate lookup functionality.
+                IEqualityComparer<T> comparer = _comparer = (IEqualityComparer<T>)((NonRandomizedStringEqualityComparer)_comparer!).GetRandomizedEqualityComparer(); // [!]: asserted above
                 Debug.Assert(_comparer is not null);
                 Debug.Assert(_comparer is not NonRandomizedStringEqualityComparer);
 
@@ -1878,11 +1881,12 @@ namespace J2N.Collections.Generic
         /// using a <typeparamref name="TAlternate"/> instead of a <typeparamref name="T"/>.
         /// </summary>
         /// <typeparam name="TAlternate">The alternate type of instance for performing lookups.</typeparam>
-        /// <param name="lookup">The created lookup instance when the method returns true, or a default instance that should not be used if the method returns false.</param>
-        /// <returns>true if a lookup could be created; otherwise, false.</returns>
+        /// <param name="lookup">The created lookup instance when the method returns <see langword="true"/>, or a default
+        /// instance that should not be used if the method returns <see langword="false"/>.</param>
+        /// <returns><see langword="true"/> if a lookup could be created; otherwise, <see langword="false"/>.</returns>
         /// <remarks>
         /// The set must be using a comparer that implements <see cref="IAlternateEqualityComparer{TAlternate, T}"/> with
-        /// <typeparamref name="TAlternate"/> and <typeparamref name="T"/>. If it doesn't, the method returns false.
+        /// <typeparamref name="TAlternate"/> and <typeparamref name="T"/>. If it doesn't, the method returns <see langword="false"/>.
         /// </remarks>
         public bool TryGetAlternateLookup<TAlternate>(out AlternateLookup<TAlternate> lookup)
             where TAlternate : allows ref struct
@@ -1933,7 +1937,7 @@ namespace J2N.Collections.Generic
 
             /// <summary>Adds the specified element to a set.</summary>
             /// <param name="item">The element to add to the set.</param>
-            /// <returns>true if the element is added to the set; false if the element is already present.</returns>
+            /// <returns><see langword="true"/> if the element is added to the set; <see langword="false"/> if the element is already present.</returns>
             public bool Add(TAlternate item)
             {
                 OrderedHashSet<T> set = Set;
@@ -2040,7 +2044,7 @@ namespace J2N.Collections.Generic
 
             /// <summary>Removes the specified element from a set.</summary>
             /// <param name="item">The element to remove.</param>
-            /// <returns>true if the element is successfully found and removed; otherwise, false.</returns>
+            /// <returns><see langword="true"/> if the element is successfully found and removed; otherwise, <see langword="false"/>.</returns>
             public bool Remove(TAlternate item)
             {
                 OrderedHashSet<T> set = Set;
@@ -2111,7 +2115,7 @@ namespace J2N.Collections.Generic
 
             /// <summary>Determines whether a set contains the specified element.</summary>
             /// <param name="item">The element to locate in the set.</param>
-            /// <returns>true if the set contains the specified element; otherwise, false.</returns>
+            /// <returns><see langword="true"/> if the set contains the specified element; otherwise, <see langword="false"/>.</returns>
             public bool Contains(TAlternate item) => IndexOf(item) >= 0;
 
             /// <summary>Searches the set for a given value and returns the equal value it finds, if any.</summary>
@@ -2320,6 +2324,368 @@ namespace J2N.Collections.Generic
 #endif
 
         #endregion AlternateLookup
+
+        #region SpanAlternateLookup
+
+        /// <summary>
+        /// Gets an instance of a type that may be used to perform operations on the current <see cref="OrderedHashSet{T}"/>
+        /// using a <see cref="ReadOnlySpan{T}"/> of type <typeparamref name="TAlternateSpan"/> instead of a <typeparamref name="T"/>.
+        /// </summary>
+        /// <typeparam name="TAlternateSpan">The alternate type of <see cref="ReadOnlySpan{T}"/> instance for performing lookups.</typeparam>
+        /// <returns>The created lookup instance.</returns>
+        /// <exception cref="InvalidOperationException">The set's comparer is not compatible with <typeparamref name="TAlternateSpan"/>.</exception>
+        /// <remarks>
+        /// The set must be using a comparer that implements <see cref="ISpanAlternateEqualityComparer{TAlternateSpan, T}"/> with
+        /// a <see cref="ReadOnlySpan{T}"/> of type <typeparamref name="TAlternateSpan"/> and <typeparamref name="T"/>.
+        /// If it doesn't, an exception will be thrown.
+        /// </remarks>
+        public SpanAlternateLookup<TAlternateSpan> GetSpanAlternateLookup<TAlternateSpan>()
+        {
+            if (!SpanAlternateLookup<TAlternateSpan>.IsCompatibleItem(this))
+            {
+                ThrowHelper.ThrowInvalidOperationException(ExceptionResource.InvalidOperation_IncompatibleComparer);
+            }
+
+            return new SpanAlternateLookup<TAlternateSpan>(this);
+        }
+
+        /// <summary>
+        /// Gets an instance of a type that may be used to perform operations on the current <see cref="OrderedHashSet{T}"/>
+        /// using a <see cref="ReadOnlySpan{T}"/> of type <typeparamref name="TAlternateSpan"/> instead of a <typeparamref name="T"/>.
+        /// </summary>
+        /// <typeparam name="TAlternateSpan">The alternate type of <see cref="ReadOnlySpan{T}"/> instance for performing lookups.</typeparam>
+        /// <param name="lookup">The created lookup instance when the method returns <see langword="true"/>, or a default
+        /// instance that should not be used if the method returns <see langword="false"/>.</param>
+        /// <returns><see langword="true"/> if a lookup could be created; otherwise, <see langword="false"/>.</returns>
+        /// <remarks>
+        /// The set must be using a comparer that implements <see cref="ISpanAlternateEqualityComparer{TAlternateSpan, T}"/> with
+        /// a <see cref="ReadOnlySpan{T}"/> of type <typeparamref name="TAlternateSpan"/> and <typeparamref name="T"/>.
+        /// If it doesn't, the method returns <see langword="false"/>.
+        /// </remarks>
+        public bool TryGetSpanAlternateLookup<TAlternateSpan>(out SpanAlternateLookup<TAlternateSpan> lookup)
+        {
+            if (SpanAlternateLookup<TAlternateSpan>.IsCompatibleItem(this))
+            {
+                lookup = new SpanAlternateLookup<TAlternateSpan>(this);
+                return true;
+            }
+
+            lookup = default;
+            return false;
+        }
+
+        /// <summary>
+        /// Provides a type that may be used to perform operations on an <see cref="OrderedHashSet{T}"/>
+        /// using a <see cref="ReadOnlySpan{T}"/> of type <typeparamref name="TAlternateSpan"/> instead of a <typeparamref name="T"/>.
+        /// </summary>
+        /// <typeparam name="TAlternateSpan">The alternate type of instance for performing lookups.</typeparam>
+        public readonly struct SpanAlternateLookup<TAlternateSpan>
+        {
+            /// <summary>Initialize the instance. The set must have already been verified to have a compatible comparer.</summary>
+            internal SpanAlternateLookup(OrderedHashSet<T> set)
+            {
+                Debug.Assert(set is not null);
+                Debug.Assert(IsCompatibleItem(set!)); // [!]: asserted above
+                Set = set!; // [!]: asserted above
+            }
+
+            /// <summary>Gets the <see cref="OrderedHashSet{T}"/> against which this instance performs operations.</summary>
+            public OrderedHashSet<T> Set { get; }
+
+            /// <summary>Checks whether the set has a comparer compatible with <typeparamref name="TAlternateSpan"/>.</summary>
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            internal static bool IsCompatibleItem(OrderedHashSet<T> set)
+            {
+                Debug.Assert(set is not null);
+                return set!._comparer is ISpanAlternateEqualityComparer<TAlternateSpan, T>; // [!]: asserted above
+            }
+
+            /// <summary>Gets the set's alternate comparer. The set must have already been verified as compatible.</summary>
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            private static ISpanAlternateEqualityComparer<TAlternateSpan, T> GetAlternateComparer(OrderedHashSet<T> set)
+            {
+                Debug.Assert(IsCompatibleItem(set));
+                return Unsafe.As<ISpanAlternateEqualityComparer<TAlternateSpan, T>>(set._comparer)!;
+            }
+
+            /// <summary>Adds the specified element to a set.</summary>
+            /// <param name="item">The element to add to the set.</param>
+            /// <returns><see langword="true"/> if the element is added to the set; <see langword="false"/> if the element is already present.</returns>
+            public bool Add(ReadOnlySpan<TAlternateSpan> item)
+            {
+                OrderedHashSet<T> set = Set;
+                ISpanAlternateEqualityComparer<TAlternateSpan, T> comparer = GetAlternateComparer(set);
+
+                if (set._buckets == null)
+                {
+                    set.EnsureBucketsAndEntriesInitialized(0);
+                }
+                Debug.Assert(set._buckets != null);
+
+                Entry[]? entries = set._entries;
+                Debug.Assert(entries != null, "expected entries to be non-null");
+
+                uint hashCode;
+
+                uint collisionCount = 0;
+                ref int bucket = ref Unsafe.NullRef<int>();
+
+                Debug.Assert(comparer is not null);
+                hashCode = (uint)comparer!.GetHashCode(item); // [!]: asserted above
+                bucket = ref set.GetBucket(hashCode);
+                int i = bucket - 1; // Value in _buckets is 1-based
+                T mappedItem;
+
+                while (i >= 0)
+                {
+                    ref Entry entry = ref entries![i]; // [!]: asserted above
+                    if (entry.HashCode == hashCode && comparer.Equals(item, entry.Value))
+                    {
+                        return false;
+                    }
+                    i = entry.Next;
+
+                    collisionCount++;
+                    if (collisionCount > (uint)entries.Length)
+                    {
+                        // The chain of entries forms a loop, which means a concurrent update has happened.
+                        ThrowHelper.ThrowInvalidOperationException_ConcurrentOperationsNotSupported();
+                    }
+                }
+
+                // Invoke comparer.Create before allocating space in the collection in order to avoid corrupting
+                // the collection if the operation fails.
+                mappedItem = comparer.Create(item);
+
+                // Since OrderedHashSet maintains insertion order (unlike HashSet which uses a free list),
+                // we always append to the end
+                int index = set._count;
+                if (index == entries!.Length) // [!]: asserted above
+                {
+                    set.Resize(HashHelpers.ExpandPrime(entries.Length));
+                    bucket = ref set.GetBucket(hashCode);
+                    entries = set._entries;
+                }
+
+                {
+                    ref Entry entry = ref entries![index];
+                    entry.HashCode = hashCode;
+                    entry.Next = bucket - 1; // Value in _buckets is 1-based
+                    entry.Value = mappedItem;
+                    bucket = index + 1;
+                    set._count = index + 1;
+                    set._version++;
+                }
+
+                // Value types never rehash
+                if (!typeof(T).IsValueType && collisionCount > HashHelpers.HashCollisionThreshold && comparer is NonRandomizedStringEqualityComparer)
+                {
+                    // If we hit the collision threshold we'll need to switch to the comparer which is using randomized string hashing
+                    // i.e. EqualityComparer<string>.Default.
+                    set.Resize(entries.Length, forceNewHashCodes: true);
+                }
+
+                return true;
+            }
+
+            /// <summary>Removes the specified element from a set.</summary>
+            /// <param name="item">The element to remove.</param>
+            /// <returns><see langword="true"/> if the element is successfully found and removed; otherwise, <see langword="false"/>.</returns>
+            public bool Remove(ReadOnlySpan<TAlternateSpan> item)
+            {
+                OrderedHashSet<T> set = Set;
+                ISpanAlternateEqualityComparer<TAlternateSpan, T> comparer = GetAlternateComparer(set);
+
+                if (set._buckets != null)
+                {
+                    Entry[]? entries = set._entries;
+                    Debug.Assert(entries != null, "entries should be non-null");
+
+                    uint collisionCount = 0;
+
+                    uint hashCode = (uint)comparer.GetHashCode(item);
+                    ref int bucket = ref set.GetBucket(hashCode);
+                    int i = bucket - 1; // Value in buckets is 1-based
+
+                    while (i >= 0)
+                    {
+                        ref Entry entry = ref entries![i]; // [!]: asserted above
+
+                        if (entry.HashCode == hashCode && comparer.Equals(item, entry.Value))
+                        {
+                            // J2N: Since we are ordered, it is easier to just use RemoveAt
+                            set.RemoveAt(i);
+                            return true;
+                        }
+
+                        i = entry.Next;
+
+                        collisionCount++;
+                        if (collisionCount > (uint)entries.Length)
+                        {
+                            // The chain of entries forms a loop; which means a concurrent update has happened.
+                            ThrowHelper.ThrowInvalidOperationException_ConcurrentOperationsNotSupported();
+                        }
+                    }
+                }
+
+                return false;
+            }
+
+            /// <summary>Determines whether a set contains the specified element.</summary>
+            /// <param name="item">The element to locate in the set.</param>
+            /// <returns><see langword="true"/> if the set contains the specified element; otherwise, <see langword="false"/>.</returns>
+            public bool Contains(ReadOnlySpan<TAlternateSpan> item) => IndexOf(item) >= 0;
+
+            /// <summary>Searches the set for a given value and returns the equal value it finds, if any.</summary>
+            /// <param name="equalValue">The value to search for.</param>
+            /// <param name="actualValue">The value from the set that the search found, or the default value of <typeparamref name="T"/> when the search yielded no match.</param>
+            /// <returns>A value indicating whether the search was successful.</returns>
+            public bool TryGetValue(ReadOnlySpan<TAlternateSpan> equalValue, [MaybeNullWhen(false)] out T actualValue)
+            {
+                ref T value = ref FindValue(equalValue);
+                if (!Unsafe.IsNullRef(ref value))
+                {
+                    actualValue = value;
+                    return true;
+                }
+
+                actualValue = default!;
+                return false;
+            }
+
+            /// <summary>Determines the index of a specific value in the <see cref="OrderedHashSet{T}"/>.</summary>
+            /// <param name="value">The value to locate.</param>
+            /// <returns>The index of <paramref name="value"/> if found; otherwise, -1.</returns>
+            public int IndexOf(ReadOnlySpan<TAlternateSpan> value)
+            {
+                uint _ = 0;
+                return IndexOf(value, ref _, ref _);
+            }
+
+            private int IndexOf(ReadOnlySpan<TAlternateSpan> value, ref uint outHashCode, ref uint outCollisionCount)
+            {
+                OrderedHashSet<T> set = Set;
+                ISpanAlternateEqualityComparer<TAlternateSpan, T> comparer = GetAlternateComparer(set);
+
+                uint hashCode;
+                uint collisionCount = 0;
+
+                if (set._buckets is null)
+                {
+                    hashCode = (uint)comparer.GetHashCode(value);
+                    collisionCount = 0;
+                    goto ReturnNotFound;
+                }
+
+                int i = -1;
+                ref Entry entry = ref Unsafe.NullRef<Entry>();
+
+                Entry[]? entries = set._entries;
+                Debug.Assert(entries is not null, "expected entries to be is not null");
+
+                Debug.Assert(comparer is not null);
+                hashCode = (uint)comparer!.GetHashCode(value); // [!]: asserted above
+                i = set.GetBucket(hashCode) - 1; // Value in _buckets is 1-based; subtract 1 from i. We do it here so it fuses with the following conditional.
+
+                do
+                {
+                    // Test in if to drop range check for following array access
+                    if ((uint)i >= (uint)entries!.Length) // [!]: asserted above
+                    {
+                        goto ReturnNotFound;
+                    }
+
+                    entry = ref entries[i];
+                    if (entry.HashCode == hashCode &&
+                        comparer!.Equals(value!, entry.Value)) // [!]: asserted above, allow null keys
+                    {
+                        goto Return;
+                    }
+
+                    i = entry.Next;
+
+                    collisionCount++;
+                } while (collisionCount <= (uint)entries.Length);
+
+                // The chain of entries forms a loop; which means a concurrent update has happened.
+                // Break out of the loop and throw, rather than looping forever.
+                goto ConcurrentOperation;
+
+            ReturnNotFound:
+                i = -1;
+                outCollisionCount = collisionCount;
+                goto Return;
+
+            ConcurrentOperation:
+                // We examined more entries than are actually in the list, which means there's a cycle
+                // that's caused by erroneous concurrent use.
+                ThrowHelper.ThrowInvalidOperationException_ConcurrentOperationsNotSupported();
+
+            Return:
+                outHashCode = hashCode;
+                return i;
+            }
+
+            /// <summary>Finds the item in the set and returns a reference to the found item, or a null reference if not found.</summary>
+            /// <remarks>The returned value should not be mutated. It was changed from <c>ref readonly</c> to <c>ref</c> because
+            /// .NET Framework and .NET Standard target frameworks only support ref on Unsafe.IsNullRef.</remarks>
+            private ref T FindValue(ReadOnlySpan<TAlternateSpan> item)
+            {
+                OrderedHashSet<T> set = Set;
+                ISpanAlternateEqualityComparer<TAlternateSpan, T> comparer = GetAlternateComparer(set);
+
+                ref Entry entry = ref Unsafe.NullRef<Entry>();
+                if (set._buckets != null)
+                {
+                    Debug.Assert(set._entries != null, "expected entries to be != null");
+
+                    uint hashCode = (uint)comparer.GetHashCode(item);
+                    int i = set.GetBucket(hashCode);
+                    Entry[]? entries = set._entries;
+                    uint collisionCount = 0;
+                    i--; // Value in _buckets is 1-based; subtract 1 from i. We do it here so it fuses with the following conditional.
+
+                    do
+                    {
+                        // Should be a while loop https://github.com/dotnet/runtime/issues/9422
+                        // Test in if to drop range check for following array access
+                        if ((uint)i >= (uint)entries!.Length) // [!]: asserted above
+                        {
+                            goto ReturnNotFound;
+                        }
+
+                        entry = ref entries[i];
+                        if (entry.HashCode == hashCode && comparer.Equals(item, entry.Value))
+                        {
+                            goto ReturnFound;
+                        }
+
+                        i = entry.Next;
+
+                        collisionCount++;
+                    } while (collisionCount <= (uint)entries.Length);
+
+                    // The chain of entries forms a loop; which means a concurrent update has happened.
+                    // Break out of the loop and throw, rather than looping forever.
+                    goto ConcurrentOperation;
+                }
+
+                goto ReturnNotFound;
+
+            ConcurrentOperation:
+                ThrowHelper.ThrowInvalidOperationException_ConcurrentOperationsNotSupported();
+            ReturnFound:
+                ref T value = ref entry.Value;
+            Return:
+                return ref value;
+            ReturnNotFound:
+                value = ref Unsafe.NullRef<T>();
+                goto Return;
+            }
+        }
+
+        #endregion SpanAlternateLookup
 
         /// <summary>Returns an enumerator that iterates through the <see cref="OrderedHashSet{T}"/>.</summary>
         /// <returns>A <see cref="OrderedHashSet{T}.Enumerator"/> structure for the <see cref="OrderedHashSet{T}"/>.</returns>

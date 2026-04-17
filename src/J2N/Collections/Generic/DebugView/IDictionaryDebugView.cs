@@ -9,7 +9,8 @@ using System.Diagnostics;
 
 namespace J2N.Collections.Generic
 {
-    internal sealed class IDictionaryDebugView<K, V> where K : notnull
+    // J2N: Removed notnull constraint because J2N allows null keys in most cases
+    internal sealed class IDictionaryDebugView<K, V>
     {
         private readonly IDictionary<K, V> _dict;
 
