@@ -2475,7 +2475,12 @@ namespace J2N.Collections.Generic
         /// The <see cref="IEqualityComparer"/> object checks for equality for multiple levels.
         /// Nested reference types that implement <see cref="IStructuralEquatable"/> are also compared.
         /// </remarks>
-        public static IEqualityComparer<HashSet<T>> CreateSetComparer() => new HashSetEqualityComparer<T>();
+        // J2N NOTE: This does not match the BCL and is not intended to. Technically, this API is superfluous
+        // in J2N because the Equals() method on HashSet<T> already performs deep equality testing, but we include it
+        // for API compatibility with SCG.HashSet<T>. In the BCL, this only works when testing against other
+        // HashSet<T> instances, but in J2N, this works against any ISet<T> implementation that uses the default
+        // equality comparer and allows for nesting other types of J2N collections, which is more in line with what users would expect.
+        public static IEqualityComparer<ISet<T>> CreateSetComparer() => SetEqualityComparer<T>.Default;
 
         /// <summary>
         /// Initializes buckets and slots arrays. Uses suggested capacity by finding next prime

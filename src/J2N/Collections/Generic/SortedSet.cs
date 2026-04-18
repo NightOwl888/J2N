@@ -2922,11 +2922,23 @@ namespace J2N.Collections.Generic
         /// <summary>
         /// Returns an <see cref="IEqualityComparer{T}"/> object that can be used to create a collection that contains individual sets.
         /// </summary>
+        /// <remarks>
+        /// This API is an artifact of the BCL and not relevant to porting the JDK. It is not recommended for use in new code.
+        /// J2N collections are structurally comparable according to the JDK rules by using the <see cref="Equals(object?)"/> method.
+        /// Alternatively, the <see cref="SetEqualityComparer{T}"/> can be used directly to compare 2 <see cref="ISet{T}"/> implementations
+        /// for equality with J2N's default equality comparer.
+        /// </remarks>
         public static IEqualityComparer<SortedSet<T>> CreateSetComparer() => CreateSetComparer(memberEqualityComparer: null);
 
         /// <summary>
         /// Returns an <see cref="IEqualityComparer{T}"/> object, according to a specified comparer, that can be used to create a collection that contains individual sets.
         /// </summary>
+        /// <remarks>
+        /// This API is an artifact of the BCL and not relevant to porting the JDK. It is not recommended for use in new code.
+        /// J2N collections are structurally comparable according to the JDK rules by using the <see cref="Equals(object?)"/> method.
+        /// Alternatively, the <see cref="SetEqualityComparer{T}"/> can be used directly to compare 2 <see cref="ISet{T}"/> implementations
+        /// for equality with J2N's default equality comparer.
+        /// </remarks>
         public static IEqualityComparer<SortedSet<T>> CreateSetComparer(IEqualityComparer<T>? memberEqualityComparer)
         {
             return new SortedSetEqualityComparer<T>(memberEqualityComparer);
