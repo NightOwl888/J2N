@@ -38,10 +38,12 @@ namespace J2N
         /// </summary>
         private const long DoubleSignBitMask = unchecked((long)0x8000000000000000L);
 
+#if !FEATURE_MATH_LOG2
         /// <summary>
         /// The precomputed value of <see cref="Math.Log(double)"/> with a value of 2.
         /// </summary>
-        private const double LogOf2 = 0.693147180559945309417232121458176568; // precomputed log(2)
+        private static readonly double LogOf2 = Math.Log(2); // precomputed log(2)
+#endif
 
         /// <summary>
         /// Returns the signum function of the specified <see cref="int"/> value. (The
