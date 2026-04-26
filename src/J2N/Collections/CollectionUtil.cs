@@ -16,6 +16,7 @@
  */
 #endregion
 
+using J2N.Collections.Concurrent;
 using J2N.Collections.Generic;
 using J2N.Text;
 using System;
@@ -24,7 +25,6 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
-
 
 namespace J2N.Collections
 {
@@ -35,6 +35,12 @@ namespace J2N.Collections
     internal static class CollectionUtil
     {
         private const string SingleFormatArgument = "{0}";
+
+        private static readonly LurchTable<Type, Func<object, object, bool>> equalsCache = new(LurchTableOrder.Access, 256);
+        private static readonly LurchTable<Type, Func<object, int>> hashCodeCache = new(LurchTableOrder.Access, 256);
+        private static readonly LurchTable<Type, Func<object, IFormatProvider?, string>> toStringCache = new(LurchTableOrder.Access, 256);
+
+        #region Equals
 
         /// <summary>
         /// The same implementation of Equals from Java's AbstractList
@@ -125,43 +131,97 @@ namespace J2N.Collections
             else if (objA is IStructuralEquatable seObj)
                 return seObj.Equals(objB, StructuralEqualityComparer.Aggressive);
 
-            bool isGenericType = tA.IsGenericType;
-            if (isGenericType)
+            var listA = GetGenericInterface(tA, typeof(IList<>));
+            if (listA != null)
             {
-                bool shouldReturn = false;
+                var listB = GetGenericInterface(tB, typeof(IList<>));
+                if (listB == null)
+                    return false;
 
-                if (tA.ImplementsGenericInterface(typeof(IList<>)))
-                {
-                    if (!tB.ImplementsGenericInterface(typeof(IList<>)))
-                        return false; // type mismatch - must be a list
+                var dispatcher = equalsCache.GetOrAdd(listA, CreateListEqualsDispatcher);
+                return dispatcher(objA, objB);
+            }
 
-                    shouldReturn = true;
-                }
-                else if (tA.ImplementsGenericInterface(typeof(ISet<>)))
-                {
-                    if (!tB.ImplementsGenericInterface(typeof(ISet<>)))
-                        return false; // type mismatch - must be a set
+            var setA = GetGenericInterface(tA, typeof(ISet<>));
+            if (setA != null)
+            {
+                var setB = GetGenericInterface(tB, typeof(ISet<>));
+                if (setB == null)
+                    return false;
 
-                    shouldReturn = true;
-                }
-                else if (tA.ImplementsGenericInterface(typeof(IDictionary<,>)))
-                {
-                    if (!tB.ImplementsGenericInterface(typeof(IDictionary<,>)))
-                        return false; // type mismatch - must be a dictionary
+                var dispatcher = equalsCache.GetOrAdd(setA, CreateSetEqualsDispatcher);
+                return dispatcher(objA, objB);
+            }
 
-                    shouldReturn = true;
-                }
+            var dictA = GetGenericInterface(tA, typeof(IDictionary<,>));
+            if (dictA != null)
+            {
+                var dictB = GetGenericInterface(tB, typeof(IDictionary<,>));
+                if (dictB == null)
+                    return false;
 
-                if (shouldReturn)
-                {
-                    dynamic genericTypeA = Convert.ChangeType(objA, tA);
-                    dynamic genericTypeB = Convert.ChangeType(objB, tB);
-                    return Equals(genericTypeA, genericTypeB);
-                }
+                var dispatcher = equalsCache.GetOrAdd(dictA, CreateDictionaryEqualsDispatcher);
+                return dispatcher(objA, objB);
             }
 
             return J2N.Collections.Generic.EqualityComparer<object>.Default.Equals(objA, objB);
         }
+
+        #region Equals Dispatchers
+
+        private static Func<object, object, bool> CreateListEqualsDispatcher(Type listInterface)
+        {
+            Type elementType = listInterface.GetGenericArguments()[0];
+
+            MethodInfo method = typeof(CollectionUtil)
+                .GetMethod(nameof(EqualsListGeneric), BindingFlags.NonPublic | BindingFlags.Static)!
+                .MakeGenericMethod(elementType);
+
+            return (Func<object, object, bool>)Delegate.CreateDelegate(typeof(Func<object, object, bool>), method);
+        }
+
+        private static bool EqualsListGeneric<T>(object a, object b)
+        {
+            return Equals((IList<T>)a, (IList<T>)b);
+        }
+
+        private static Func<object, object, bool> CreateSetEqualsDispatcher(Type setInterface)
+        {
+            Type elementType = setInterface.GetGenericArguments()[0];
+
+            MethodInfo method = typeof(CollectionUtil)
+                .GetMethod(nameof(EqualsSetGeneric), BindingFlags.NonPublic | BindingFlags.Static)!
+                .MakeGenericMethod(elementType);
+
+            return (Func<object, object, bool>)Delegate.CreateDelegate(typeof(Func<object, object, bool>), method);
+        }
+
+        private static bool EqualsSetGeneric<T>(object a, object b)
+        {
+            return Equals((ISet<T>)a, (ISet<T>)b);
+        }
+
+        private static Func<object, object, bool> CreateDictionaryEqualsDispatcher(Type dictInterface)
+        {
+            Type[] args = dictInterface.GetGenericArguments();
+
+            MethodInfo method = typeof(CollectionUtil)
+                .GetMethod(nameof(EqualsDictionaryGeneric), BindingFlags.NonPublic | BindingFlags.Static)!
+                .MakeGenericMethod(args[0], args[1]);
+
+            return (Func<object, object, bool>)Delegate.CreateDelegate(typeof(Func<object, object, bool>), method);
+        }
+
+        private static bool EqualsDictionaryGeneric<TKey, TValue>(object a, object b)
+        {
+            return Equals((IDictionary<TKey, TValue>)a, (IDictionary<TKey, TValue>)b);
+        }
+
+        #endregion Equals Dispatchers
+
+        #endregion Equals
+
+        #region GetHashCode
 
         /// <summary>
         /// The same implementation of GetHashCode from Java's AbstractList
@@ -259,16 +319,86 @@ namespace J2N.Collections
             }
             else if (obj is IStructuralEquatable seObj)
                 return seObj.GetHashCode(StructuralEqualityComparer.Aggressive);
-            else if (t.IsGenericType && (t.ImplementsGenericInterface(typeof(IList<>))
-                || t.ImplementsGenericInterface(typeof(ISet<>))
-                || t.ImplementsGenericInterface(typeof(IDictionary<,>))))
+
+            var list = GetGenericInterface(t, typeof(IList<>));
+            if (list != null)
             {
-                dynamic genericType = Convert.ChangeType(obj, obj.GetType());
-                return GetHashCode(genericType);
+                var dispatcher = hashCodeCache.GetOrAdd(list, CreateListHashCodeDispatcher);
+                return dispatcher(obj);
             }
-            
+
+            var set = GetGenericInterface(t, typeof(ISet<>));
+            if (set != null)
+            {
+                var dispatcher = hashCodeCache.GetOrAdd(set, CreateSetHashCodeDispatcher);
+                return dispatcher(obj);
+            }
+
+            var dict = GetGenericInterface(t, typeof(IDictionary<,>));
+            if (dict != null)
+            {
+                var dispatcher = hashCodeCache.GetOrAdd(dict, CreateDictionaryHashCodeDispatcher);
+                return dispatcher(obj);
+            }
+
             return J2N.Collections.Generic.EqualityComparer<object>.Default.GetHashCode(obj);
         }
+
+        #region GetHashCode Dispatchers
+
+        private static Func<object, int> CreateListHashCodeDispatcher(Type listInterface)
+        {
+            Type elementType = listInterface.GetGenericArguments()[0];
+
+            MethodInfo method = typeof(CollectionUtil)
+                .GetMethod(nameof(GetHashCodeListGeneric), BindingFlags.NonPublic | BindingFlags.Static)!
+                .MakeGenericMethod(elementType);
+
+            return (Func<object, int>)Delegate.CreateDelegate(typeof(Func<object, int>), method);
+        }
+
+        private static int GetHashCodeListGeneric<T>(object obj)
+        {
+            return GetHashCode((IList<T>)obj);
+        }
+
+        private static Func<object, int> CreateSetHashCodeDispatcher(Type setInterface)
+        {
+            Type elementType = setInterface.GetGenericArguments()[0];
+
+            MethodInfo method = typeof(CollectionUtil)
+                .GetMethod(nameof(GetHashCodeSetGeneric), BindingFlags.NonPublic | BindingFlags.Static)!
+                .MakeGenericMethod(elementType);
+
+            return (Func<object, int>)Delegate.CreateDelegate(typeof(Func<object, int>), method);
+        }
+
+        private static int GetHashCodeSetGeneric<T>(object obj)
+        {
+            return GetHashCode((ISet<T>)obj);
+        }
+
+        private static Func<object, int> CreateDictionaryHashCodeDispatcher(Type dictInterface)
+        {
+            Type[] args = dictInterface.GetGenericArguments();
+
+            MethodInfo method = typeof(CollectionUtil)
+                .GetMethod(nameof(GetHashCodeDictionaryGeneric), BindingFlags.NonPublic | BindingFlags.Static)!
+                .MakeGenericMethod(args[0], args[1]);
+
+            return (Func<object, int>)Delegate.CreateDelegate(typeof(Func<object, int>), method);
+        }
+
+        private static int GetHashCodeDictionaryGeneric<TKey, TValue>(object obj)
+        {
+            return GetHashCode((IDictionary<TKey, TValue>)obj);
+        }
+
+        #endregion GetHashCode Dispatchers
+
+        #endregion GetHashCode
+
+        #region ToString
 
         ///// <summary>
         ///// This is the same implementation of ToString from Java's AbstractCollection
@@ -295,8 +425,7 @@ namespace J2N.Collections
         /// <summary>
         /// This is the same implementation of ToString from Java's AbstractCollection
         /// (the default implementation for all sets and lists), plus the ability
-        /// to specify culture for formatting of nested numbers and dates. Note that
-        /// this overload will change the culture of the current thread.
+        /// to specify culture for formatting of nested numbers and dates.
         /// </summary>
         public static string ToString<T>(ICollection<T>? collection, IFormatProvider? provider)
         {
@@ -401,8 +530,7 @@ namespace J2N.Collections
         /// <summary>
         /// This is a helper method that assists with recursively building
         /// a string of the current collection and all nested collections, plus the ability
-        /// to specify culture for formatting of nested numbers and dates. Note that
-        /// this overload will change the culture of the current thread.
+        /// to specify culture for formatting of nested numbers and dates.
         /// </summary>
         public static string ToString(object? obj, IFormatProvider? provider)
         {
@@ -419,8 +547,63 @@ namespace J2N.Collections
 
         public static string ToStringImpl(object? obj, Type type, IFormatProvider? provider)
         {
-            dynamic? genericType = Convert.ChangeType(obj, type);
-            return ToString(genericType, provider);
+            var dispatcher = toStringCache.GetOrAdd(type, CreateToStringDispatcher);
+            return dispatcher(obj!, provider);
+        }
+
+        #region ToString Dispatchers
+
+        private static Func<object, IFormatProvider?, string> CreateToStringDispatcher(Type type)
+        {
+            if (GetGenericInterface(type, typeof(IDictionary<,>)) is Type dict)
+            {
+                var args = dict.GetGenericArguments();
+
+                MethodInfo method = typeof(CollectionUtil)
+                    .GetMethod(nameof(ToStringDictionaryGeneric), BindingFlags.NonPublic | BindingFlags.Static)!
+                    .MakeGenericMethod(args[0], args[1]);
+
+                return (Func<object, IFormatProvider?, string>)
+                    Delegate.CreateDelegate(typeof(Func<object, IFormatProvider?, string>), method);
+            }
+
+            if (GetGenericInterface(type, typeof(ICollection<>)) is Type collection)
+            {
+                var arg = collection.GetGenericArguments()[0];
+
+                MethodInfo method = typeof(CollectionUtil)
+                    .GetMethod(nameof(ToStringCollectionGeneric), BindingFlags.NonPublic | BindingFlags.Static)!
+                    .MakeGenericMethod(arg);
+
+                return (Func<object, IFormatProvider?, string>)
+                    Delegate.CreateDelegate(typeof(Func<object, IFormatProvider?, string>), method);
+            }
+
+            throw new InvalidOperationException("Unsupported type");
+        }
+
+        private static string ToStringCollectionGeneric<T>(object obj, IFormatProvider? provider)
+        {
+            return ToString((ICollection<T>)obj, provider);
+        }
+
+        private static string ToStringDictionaryGeneric<TKey, TValue>(object obj, IFormatProvider? provider)
+        {
+            return ToString((IDictionary<TKey, TValue>)obj, provider);
+        }
+
+        #endregion ToString Dispatchers
+
+        #endregion ToString
+
+        private static Type? GetGenericInterface(Type type, Type openGeneric)
+        {
+            foreach (var i in type.GetInterfaces())
+            {
+                if (i.IsGenericType && i.GetGenericTypeDefinition() == openGeneric)
+                    return i;
+            }
+            return null;
         }
     }
 }
