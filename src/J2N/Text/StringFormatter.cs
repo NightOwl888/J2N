@@ -246,16 +246,14 @@ namespace J2N.Text
 //                return h.ToString(Number.ConvertFormat(format), formatProvider);
 //#endif
 
-            var argType = arg.GetType();
+            Type argType = arg.GetType();
             if (argType.IsArray)
             {
                 return Arrays.ToString((Array)arg, this);
             }
-            else if (
-                argType.ImplementsGenericInterface(typeof(ICollection<>)) ||
-                argType.ImplementsGenericInterface(typeof(IDictionary<,>)))
+            else if (CollectionUtil.TryFormat(arg, argType, this, out string? result))
             {
-                return CollectionUtil.ToStringImpl(arg, argType, this);
+                return result!;
             }
 
             return null!; // Not handled by this formatter

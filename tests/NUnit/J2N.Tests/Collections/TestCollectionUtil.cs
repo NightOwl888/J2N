@@ -2,6 +2,7 @@
 using J2N.Text;
 using NUnit.Framework;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using SCG = System.Collections.Generic;
@@ -15,7 +16,7 @@ namespace J2N.Collections
 #if FEATURE_SERIALIZABLE
         [Serializable]
 #endif
-        public class HashMap<TKey, TValue> : System.Collections.Generic.Dictionary<TKey, TValue>
+        public class HashMap<TKey, TValue> : SCG.Dictionary<TKey, TValue>
         {
 
             public HashMap() { }
@@ -293,7 +294,7 @@ namespace J2N.Collections
             {
                 new J2N.Collections.Generic.HashSet<string> { "1", "2", "3" },
                 new J2N.Collections.Generic.HashSet<string> { "4", "5", "6" },
-                new System.Collections.Generic.HashSet<string> { "7", "8", "9" },
+                new SCG.HashSet<string> { "7", "8", "9" },
             };
             var set2Expected = "[[1, 2, 3], [4, 5, 6], [7, 8, 9]]";
 
@@ -693,6 +694,356 @@ namespace J2N.Collections
             int hash = CollectionUtil.GetHashCode(list);
 
             Assert.AreNotEqual(0, hash);
+        }
+
+
+
+
+        [Test]
+        public void TestToString_NonGeneric_List()
+        {
+            var list = new NonGenericList { 1, 2, 3 };
+            Assert.AreEqual("[1, 2, 3]", CollectionUtil.ToString(list, StringFormatter.InvariantCulture));
+        }
+
+        [Test]
+        public void TestToString_NonGeneric_Nested()
+        {
+            var list = new NonGenericList
+            {
+                new NonGenericList { 1, 2 },
+                new NonGenericList { 3, 4 }
+            };
+
+            Assert.AreEqual("[[1, 2], [3, 4]]", CollectionUtil.ToString(list, StringFormatter.InvariantCulture));
+        }
+
+        [Test]
+        public void TestToString_NonGeneric_Culture()
+        {
+            var list = new NonGenericList { 1.23 };
+            var result = CollectionUtil.ToString(list, new StringFormatter(new CultureInfo("pt")));
+
+            Assert.IsTrue(result.Contains("1,23"));
+        }
+
+        [Test]
+        public void TestToString_NonGeneric_SelfReference()
+        {
+            var list = new NonGenericList();
+            list.Add(list);
+
+            var result = CollectionUtil.ToString(list, StringFormatter.InvariantCulture);
+
+            Assert.IsTrue(result.Contains("(this Collection)"));
+        }
+
+        [Test]
+        public void TestToString_NonGeneric_List_Empty()
+        {
+            var list = new NonGenericList();
+
+            var result = CollectionUtil.ToString(list, StringFormatter.InvariantCulture);
+            Assert.AreEqual("[]", result);
+        }
+
+        [Test]
+        public void TestToString_NonGeneric_List_Null()
+        {
+            NonGenericList list = null;
+
+            var result = CollectionUtil.ToString(list, StringFormatter.InvariantCulture);
+
+            Assert.AreEqual("null", result);
+        }
+
+
+
+        [Test]
+        public void TestToString_NonGeneric_Dictionary()
+        {
+            var dict = new NonGenericDictionary
+            {
+                ["a"] = 1,
+                ["b"] = 2
+            };
+
+            var result = CollectionUtil.ToString(dict, StringFormatter.InvariantCulture);
+
+            Assert.IsTrue(result == "{a=1, b=2}" || result == "{b=2, a=1}");
+        }
+
+        [Test]
+        public void TestToString_NonGeneric_Dictionary_Nested()
+        {
+            var dict = new NonGenericDictionary
+            {
+                ["x"] = new NonGenericDictionary
+                {
+                    ["a"] = 1
+                },
+                ["y"] = new NonGenericDictionary
+                {
+                    ["b"] = 2
+                }
+            };
+
+            var result = CollectionUtil.ToString(dict, StringFormatter.InvariantCulture);
+
+            Assert.IsTrue(result.Contains("{a=1}"));
+            Assert.IsTrue(result.Contains("{b=2}"));
+        }
+
+        [Test]
+        public void TestToString_NonGeneric_Mixed()
+        {
+            var list = new NonGenericList
+            {
+                new NonGenericDictionary { ["a"] = 1 },
+                new NonGenericDictionary { ["b"] = 2 }
+            };
+
+            var result = CollectionUtil.ToString(list, StringFormatter.InvariantCulture);
+
+            Assert.IsTrue(result.Contains("{a=1}"));
+            Assert.IsTrue(result.Contains("{b=2}"));
+        }
+
+        [Test]
+        public void TestToString_NonGeneric_Dictionary_Culture()
+        {
+            var dict = new NonGenericDictionary
+            {
+                ["value"] = 1.23
+            };
+
+            var result = CollectionUtil.ToString(dict, new StringFormatter(new CultureInfo("pt")));
+
+            Assert.IsTrue(result.Contains("1,23"));
+        }
+
+        [Test]
+        public void TestToString_NonGeneric_Dictionary_SelfReference()
+        {
+            var dict = new NonGenericDictionary();
+            dict["self"] = dict;
+
+            var result = CollectionUtil.ToString(dict, StringFormatter.InvariantCulture);
+
+            Assert.IsTrue(result.Contains("(this Dictionary)"));
+        }
+
+        [Test]
+        public void TestToString_NonGeneric_Dictionary_KeySelfReference()
+        {
+            var dict = new NonGenericDictionary();
+            dict[dict] = "value";
+
+            var result = CollectionUtil.ToString(dict, StringFormatter.InvariantCulture);
+
+            Assert.IsTrue(result.Contains("(this Dictionary)=value"));
+        }
+
+        [Test]
+        public void TestToString_NonGeneric_Dictionary_Empty()
+        {
+            var dict = new NonGenericDictionary();
+
+            var result = CollectionUtil.ToString(dict, StringFormatter.InvariantCulture);
+
+            Assert.AreEqual("{}", result);
+        }
+
+        [Test]
+        public void TestToString_NonGeneric_Dictionary_Null()
+        {
+            NonGenericDictionary dict = null;
+
+            var result = CollectionUtil.ToString(dict, StringFormatter.InvariantCulture);
+
+            Assert.AreEqual("null", result);
+        }
+
+
+        public sealed class NonGenericList : IList
+        {
+            private readonly SCG.List<object> list;
+
+            public NonGenericList()
+            {
+                this.list = new SCG.List<object>();
+            }
+
+            public NonGenericList(int capacity)
+            {
+                this.list = new SCG.List<object>(capacity);
+            }
+
+            public NonGenericList(IEnumerable<object> collection)
+            {
+                this.list = new SCG.List<object>(collection);
+            }
+
+            public object this[int index]
+            { 
+                get => list[index];
+                set => list[index] = value;
+            }
+
+            public bool IsFixedSize => ((IList)list).IsFixedSize;
+
+            public bool IsReadOnly => ((IList)list).IsReadOnly;
+
+            public int Count => list.Count;
+            public bool IsSynchronized => ((ICollection)list).IsSynchronized;
+
+            public object SyncRoot => ((ICollection)list).SyncRoot;
+
+            public int Add(object value)
+            {
+                list.Add(value);
+                return list.Count - 1;
+            }
+
+            public void Clear()
+            {
+                list.Clear();
+            }
+
+            public bool Contains(object value)
+            {
+                return list.Contains(value);
+            }
+
+            public void CopyTo(Array array, int index)
+            {
+                list.CopyTo((object[])array, index);
+            }
+
+            public IEnumerator GetEnumerator()
+            {
+                return list.GetEnumerator();
+            }
+
+            public int IndexOf(object value)
+            {
+                return list.IndexOf(value);
+            }
+
+            public void Insert(int index, object value)
+            {
+                list.Insert(index, value);
+            }
+
+            public void Remove(object value)
+            {
+                list.Remove(value);
+            }
+
+            public void RemoveAt(int index)
+            {
+                list.RemoveAt(index);
+            }
+        }
+
+        public sealed class NonGenericDictionary : IDictionary
+        {
+            private readonly SCG.Dictionary<object, object> dictionary;
+
+            public NonGenericDictionary()
+            {
+                this.dictionary = new SCG.Dictionary<object, object>();
+            }
+
+            public NonGenericDictionary(int capacity)
+            {
+                this.dictionary = new SCG.Dictionary<object, object>(capacity);
+            }
+
+            public NonGenericDictionary(IDictionary source)
+            {
+                this.dictionary = new SCG.Dictionary<object, object>(source.Count);
+                foreach (DictionaryEntry entry in source)
+                {
+                    dictionary.Add(entry.Key!, entry.Value!);
+                }
+            }
+
+            public object? this[object key]
+            {
+                get => dictionary[key];
+                set => dictionary[key] = value!;
+            }
+
+            public ICollection Keys => dictionary.Keys;
+            public ICollection Values => dictionary.Values;
+
+            public bool IsReadOnly => false;
+            public bool IsFixedSize => false;
+
+            public int Count => dictionary.Count;
+
+            public bool IsSynchronized => false;
+            public object SyncRoot => ((ICollection)dictionary).SyncRoot;
+
+            public void Add(object key, object? value)
+            {
+                dictionary.Add(key, value!);
+            }
+
+            public void Clear()
+            {
+                dictionary.Clear();
+            }
+
+            public bool Contains(object key)
+            {
+                return dictionary.ContainsKey(key);
+            }
+
+            public IDictionaryEnumerator GetEnumerator()
+            {
+                return new DictionaryEnumerator(dictionary.GetEnumerator());
+            }
+
+            IEnumerator IEnumerable.GetEnumerator()
+            {
+                return dictionary.GetEnumerator();
+            }
+
+            public void Remove(object key)
+            {
+                dictionary.Remove(key);
+            }
+
+            public void CopyTo(Array array, int index)
+            {
+                foreach (DictionaryEntry entry in this)
+                {
+                    array.SetValue(entry, index++);
+                }
+            }
+
+            private sealed class DictionaryEnumerator : IDictionaryEnumerator
+            {
+                private readonly IEnumerator<KeyValuePair<object, object>> enumerator;
+
+                public DictionaryEnumerator(IEnumerator<KeyValuePair<object, object>> enumerator)
+                {
+                    this.enumerator = enumerator;
+                }
+
+                public DictionaryEntry Entry => new DictionaryEntry(Key, Value);
+
+                public object Key => enumerator.Current.Key;
+                public object? Value => enumerator.Current.Value;
+
+                public object Current => Entry;
+
+                public bool MoveNext() => enumerator.MoveNext();
+
+                public void Reset() => throw new NotSupportedException();
+            }
         }
     }
 }
