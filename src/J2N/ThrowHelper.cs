@@ -586,6 +586,12 @@ namespace J2N
         //}
 
         [DoesNotReturn]
+        internal static void ThrowPlatformNotSupportedException(ExceptionResource resource)
+        {
+            throw new PlatformNotSupportedException(GetResourceString(resource));
+        }
+
+        [DoesNotReturn]
         internal static void ThrowObjectDisposedException(object? instance)
         {
             throw new ObjectDisposedException(instance?.GetType().FullName);
@@ -758,6 +764,12 @@ namespace J2N
         //{
         //    throw new InvalidOperationException(SR.InvalidOperation_HandleIsNotPinned);
         //}
+
+        [DoesNotReturn]
+        internal static void ThrowInvalidOperationException_UnexpectedDispatcherType(Type type)
+        {
+            throw new InvalidOperationException(SR.Format(SR.InvalidOperation_UnexpectedDispatcherType, type));
+        }
 
         [DoesNotReturn]
         internal static void ThrowArraySegmentCtorValidationFailedExceptions(Array? array, int offset, int count)
@@ -1619,6 +1631,11 @@ namespace J2N
                     return SR.Serialization_MissingValues;
                 case ExceptionResource.Serialization_InvalidOnDeser:
                     return SR.Serialization_InvalidOnDeser;
+                case ExceptionResource.PlatformNotSupported_DynamicCode:
+                    return SR.PlatformNotSupported_DynamicCode;
+                case ExceptionResource.InvalidOperation_UnexpectedDispatcherType:
+                    return SR.InvalidOperation_UnexpectedDispatcherType;
+
                 default:
                     Debug.Fail("The enum value is not defined, please check the ExceptionResource Enum.");
                     return "";
@@ -1932,5 +1949,7 @@ namespace J2N
         NotSupported_SerializationDeprecated,
         Serialization_MissingValues,
         Serialization_InvalidOnDeser,
+        PlatformNotSupported_DynamicCode,
+        InvalidOperation_UnexpectedDispatcherType,
     }
 }

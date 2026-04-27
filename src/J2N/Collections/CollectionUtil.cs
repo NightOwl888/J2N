@@ -22,6 +22,7 @@ using J2N.Text;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -35,10 +36,6 @@ namespace J2N.Collections
     internal static class CollectionUtil
     {
         private const string SingleFormatArgument = "{0}";
-
-        private static readonly LurchTable<Type, Func<object, object, bool>> equalsCache = new(LurchTableOrder.Access, 256);
-        private static readonly LurchTable<Type, Func<object, int>> hashCodeCache = new(LurchTableOrder.Access, 256);
-        private static readonly LurchTable<Type, Func<object, IFormatProvider?, string>> toStringCache = new(LurchTableOrder.Access, 256);
 
         #region Equals
 
@@ -56,6 +53,9 @@ namespace J2N.Collections
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool Equals<T>(IList<T>? listA, IList<T>? listB)
         {
+            if (!RuntimeFeature.IsDynamicCodeSupported)
+                ThrowHelper.ThrowPlatformNotSupportedException(ExceptionResource.PlatformNotSupported_DynamicCode);
+
             return ListEqualityComparer<T>.Aggressive.Equals(listA, listB);
         }
 
@@ -73,6 +73,9 @@ namespace J2N.Collections
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool Equals<T>(ISet<T>? setA, ISet<T>? setB)
         {
+            if (!RuntimeFeature.IsDynamicCodeSupported)
+                ThrowHelper.ThrowPlatformNotSupportedException(ExceptionResource.PlatformNotSupported_DynamicCode);
+
             return SetEqualityComparer<T>.Aggressive.Equals(setA, setB);
         }
 
@@ -90,6 +93,9 @@ namespace J2N.Collections
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool Equals<TKey, TValue>(IDictionary<TKey, TValue>? dictionaryA, IDictionary<TKey, TValue>? dictionaryB)
         {
+            if (!RuntimeFeature.IsDynamicCodeSupported)
+                ThrowHelper.ThrowPlatformNotSupportedException(ExceptionResource.PlatformNotSupported_DynamicCode);
+
             return DictionaryEqualityComparer<TKey, TValue>.Aggressive.Equals(dictionaryA, dictionaryB);
         }
 
@@ -102,6 +108,9 @@ namespace J2N.Collections
         /// </summary>
         new public static bool Equals(object? objA, object? objB)
         {
+            if (!RuntimeFeature.IsDynamicCodeSupported)
+                ThrowHelper.ThrowPlatformNotSupportedException(ExceptionResource.PlatformNotSupported_DynamicCode);
+
             if (objA is null)
                 return objB is null;
             else if (objB is null)
@@ -129,95 +138,42 @@ namespace J2N.Collections
                 return (!(eA.MoveNext() || eB.MoveNext()));
             }
             else if (objA is IStructuralEquatable seObj)
+            {
                 return seObj.Equals(objB, StructuralEqualityComparer.Aggressive);
-
-            var listA = GetGenericInterface(tA, typeof(IList<>));
-            if (listA != null)
-            {
-                var listB = GetGenericInterface(tB, typeof(IList<>));
-                if (listB == null)
-                    return false;
-
-                var dispatcher = equalsCache.GetOrAdd(listA, CreateListEqualsDispatcher);
-                return dispatcher(objA, objB);
             }
 
-            var setA = GetGenericInterface(tA, typeof(ISet<>));
-            if (setA != null)
-            {
-                var setB = GetGenericInterface(tB, typeof(ISet<>));
-                if (setB == null)
-                    return false;
-
-                var dispatcher = equalsCache.GetOrAdd(setA, CreateSetEqualsDispatcher);
-                return dispatcher(objA, objB);
-            }
-
-            var dictA = GetGenericInterface(tA, typeof(IDictionary<,>));
+            Type? dictA = GetGenericInterface(tA, typeof(IDictionary<,>));
             if (dictA != null)
             {
-                var dictB = GetGenericInterface(tB, typeof(IDictionary<,>));
+                Type? dictB = GetGenericInterface(tB, typeof(IDictionary<,>));
                 if (dictB == null)
                     return false;
 
-                var dispatcher = equalsCache.GetOrAdd(dictA, CreateDictionaryEqualsDispatcher);
-                return dispatcher(objA, objB);
+                return EqualsGenericDispatcher.Dispatch(objA, objB, dictA);
+            }
+
+            Type? setA = GetGenericInterface(tA, typeof(ISet<>));
+            if (setA != null)
+            {
+                Type? setB = GetGenericInterface(tB, typeof(ISet<>));
+                if (setB == null)
+                    return false;
+
+                return EqualsGenericDispatcher.Dispatch(objA, objB, setA);
+            }
+
+            Type? listA = GetGenericInterface(tA, typeof(IList<>));
+            if (listA != null)
+            {
+                Type? listB = GetGenericInterface(tB, typeof(IList<>));
+                if (listB == null)
+                    return false;
+
+                return EqualsGenericDispatcher.Dispatch(objA, objB, listA);
             }
 
             return J2N.Collections.Generic.EqualityComparer<object>.Default.Equals(objA, objB);
         }
-
-        #region Equals Dispatchers
-
-        private static Func<object, object, bool> CreateListEqualsDispatcher(Type listInterface)
-        {
-            Type elementType = listInterface.GetGenericArguments()[0];
-
-            MethodInfo method = typeof(CollectionUtil)
-                .GetMethod(nameof(EqualsListGeneric), BindingFlags.NonPublic | BindingFlags.Static)!
-                .MakeGenericMethod(elementType);
-
-            return (Func<object, object, bool>)Delegate.CreateDelegate(typeof(Func<object, object, bool>), method);
-        }
-
-        private static bool EqualsListGeneric<T>(object a, object b)
-        {
-            return Equals((IList<T>)a, (IList<T>)b);
-        }
-
-        private static Func<object, object, bool> CreateSetEqualsDispatcher(Type setInterface)
-        {
-            Type elementType = setInterface.GetGenericArguments()[0];
-
-            MethodInfo method = typeof(CollectionUtil)
-                .GetMethod(nameof(EqualsSetGeneric), BindingFlags.NonPublic | BindingFlags.Static)!
-                .MakeGenericMethod(elementType);
-
-            return (Func<object, object, bool>)Delegate.CreateDelegate(typeof(Func<object, object, bool>), method);
-        }
-
-        private static bool EqualsSetGeneric<T>(object a, object b)
-        {
-            return Equals((ISet<T>)a, (ISet<T>)b);
-        }
-
-        private static Func<object, object, bool> CreateDictionaryEqualsDispatcher(Type dictInterface)
-        {
-            Type[] args = dictInterface.GetGenericArguments();
-
-            MethodInfo method = typeof(CollectionUtil)
-                .GetMethod(nameof(EqualsDictionaryGeneric), BindingFlags.NonPublic | BindingFlags.Static)!
-                .MakeGenericMethod(args[0], args[1]);
-
-            return (Func<object, object, bool>)Delegate.CreateDelegate(typeof(Func<object, object, bool>), method);
-        }
-
-        private static bool EqualsDictionaryGeneric<TKey, TValue>(object a, object b)
-        {
-            return Equals((IDictionary<TKey, TValue>)a, (IDictionary<TKey, TValue>)b);
-        }
-
-        #endregion Equals Dispatchers
 
         #endregion Equals
 
@@ -237,6 +193,9 @@ namespace J2N.Collections
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int GetHashCode<T>(IList<T>? list)
         {
+            if (!RuntimeFeature.IsDynamicCodeSupported)
+                ThrowHelper.ThrowPlatformNotSupportedException(ExceptionResource.PlatformNotSupported_DynamicCode);
+
             return ListEqualityComparer<T>.Aggressive.GetHashCode(list);
         }
 
@@ -254,6 +213,9 @@ namespace J2N.Collections
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int GetHashCode<T>(ISet<T>? set)
         {
+            if (!RuntimeFeature.IsDynamicCodeSupported)
+                ThrowHelper.ThrowPlatformNotSupportedException(ExceptionResource.PlatformNotSupported_DynamicCode);
+
             return SetEqualityComparer<T>.Aggressive.GetHashCode(set);
         }
 
@@ -271,6 +233,9 @@ namespace J2N.Collections
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int GetHashCode<TKey, TValue>(IDictionary<TKey, TValue>? dictionary)
         {
+            if (!RuntimeFeature.IsDynamicCodeSupported)
+                ThrowHelper.ThrowPlatformNotSupportedException(ExceptionResource.PlatformNotSupported_DynamicCode);
+
             return DictionaryEqualityComparer<TKey, TValue>.Aggressive.GetHashCode(dictionary);
         }
 
@@ -289,6 +254,9 @@ namespace J2N.Collections
         /// object that is passed.</returns>
         public static int GetHashCode(object? obj)
         {
+            if (!RuntimeFeature.IsDynamicCodeSupported)
+                ThrowHelper.ThrowPlatformNotSupportedException(ExceptionResource.PlatformNotSupported_DynamicCode);
+
             if (obj == null)
                 return 0; // 0 for null
 
@@ -318,83 +286,30 @@ namespace J2N.Collections
                 return hashCode;
             }
             else if (obj is IStructuralEquatable seObj)
+            {
                 return seObj.GetHashCode(StructuralEqualityComparer.Aggressive);
-
-            var list = GetGenericInterface(t, typeof(IList<>));
-            if (list != null)
-            {
-                var dispatcher = hashCodeCache.GetOrAdd(list, CreateListHashCodeDispatcher);
-                return dispatcher(obj);
             }
 
-            var set = GetGenericInterface(t, typeof(ISet<>));
-            if (set != null)
-            {
-                var dispatcher = hashCodeCache.GetOrAdd(set, CreateSetHashCodeDispatcher);
-                return dispatcher(obj);
-            }
-
-            var dict = GetGenericInterface(t, typeof(IDictionary<,>));
+            Type? dict = GetGenericInterface(t, typeof(IDictionary<,>));
             if (dict != null)
             {
-                var dispatcher = hashCodeCache.GetOrAdd(dict, CreateDictionaryHashCodeDispatcher);
-                return dispatcher(obj);
+                return GetHashCodeGenericDispatcher.Dispatch(obj, dict);
+            }
+
+            Type? set = GetGenericInterface(t, typeof(ISet<>));
+            if (set != null)
+            {
+                return GetHashCodeGenericDispatcher.Dispatch(obj, set);
+            }
+
+            Type? list = GetGenericInterface(t, typeof(IList<>));
+            if (list != null)
+            {
+                return GetHashCodeGenericDispatcher.Dispatch(obj, list);
             }
 
             return J2N.Collections.Generic.EqualityComparer<object>.Default.GetHashCode(obj);
         }
-
-        #region GetHashCode Dispatchers
-
-        private static Func<object, int> CreateListHashCodeDispatcher(Type listInterface)
-        {
-            Type elementType = listInterface.GetGenericArguments()[0];
-
-            MethodInfo method = typeof(CollectionUtil)
-                .GetMethod(nameof(GetHashCodeListGeneric), BindingFlags.NonPublic | BindingFlags.Static)!
-                .MakeGenericMethod(elementType);
-
-            return (Func<object, int>)Delegate.CreateDelegate(typeof(Func<object, int>), method);
-        }
-
-        private static int GetHashCodeListGeneric<T>(object obj)
-        {
-            return GetHashCode((IList<T>)obj);
-        }
-
-        private static Func<object, int> CreateSetHashCodeDispatcher(Type setInterface)
-        {
-            Type elementType = setInterface.GetGenericArguments()[0];
-
-            MethodInfo method = typeof(CollectionUtil)
-                .GetMethod(nameof(GetHashCodeSetGeneric), BindingFlags.NonPublic | BindingFlags.Static)!
-                .MakeGenericMethod(elementType);
-
-            return (Func<object, int>)Delegate.CreateDelegate(typeof(Func<object, int>), method);
-        }
-
-        private static int GetHashCodeSetGeneric<T>(object obj)
-        {
-            return GetHashCode((ISet<T>)obj);
-        }
-
-        private static Func<object, int> CreateDictionaryHashCodeDispatcher(Type dictInterface)
-        {
-            Type[] args = dictInterface.GetGenericArguments();
-
-            MethodInfo method = typeof(CollectionUtil)
-                .GetMethod(nameof(GetHashCodeDictionaryGeneric), BindingFlags.NonPublic | BindingFlags.Static)!
-                .MakeGenericMethod(args[0], args[1]);
-
-            return (Func<object, int>)Delegate.CreateDelegate(typeof(Func<object, int>), method);
-        }
-
-        private static int GetHashCodeDictionaryGeneric<TKey, TValue>(object obj)
-        {
-            return GetHashCode((IDictionary<TKey, TValue>)obj);
-        }
-
-        #endregion GetHashCode Dispatchers
 
         #endregion GetHashCode
 
@@ -547,52 +462,8 @@ namespace J2N.Collections
 
         public static string ToStringImpl(object? obj, Type type, IFormatProvider? provider)
         {
-            var dispatcher = toStringCache.GetOrAdd(type, CreateToStringDispatcher);
-            return dispatcher(obj!, provider);
+            return ToStringGenericDispatcher.Dispatch(obj!, type, provider);
         }
-
-        #region ToString Dispatchers
-
-        private static Func<object, IFormatProvider?, string> CreateToStringDispatcher(Type type)
-        {
-            if (GetGenericInterface(type, typeof(IDictionary<,>)) is Type dict)
-            {
-                var args = dict.GetGenericArguments();
-
-                MethodInfo method = typeof(CollectionUtil)
-                    .GetMethod(nameof(ToStringDictionaryGeneric), BindingFlags.NonPublic | BindingFlags.Static)!
-                    .MakeGenericMethod(args[0], args[1]);
-
-                return (Func<object, IFormatProvider?, string>)
-                    Delegate.CreateDelegate(typeof(Func<object, IFormatProvider?, string>), method);
-            }
-
-            if (GetGenericInterface(type, typeof(ICollection<>)) is Type collection)
-            {
-                var arg = collection.GetGenericArguments()[0];
-
-                MethodInfo method = typeof(CollectionUtil)
-                    .GetMethod(nameof(ToStringCollectionGeneric), BindingFlags.NonPublic | BindingFlags.Static)!
-                    .MakeGenericMethod(arg);
-
-                return (Func<object, IFormatProvider?, string>)
-                    Delegate.CreateDelegate(typeof(Func<object, IFormatProvider?, string>), method);
-            }
-
-            throw new InvalidOperationException("Unsupported type");
-        }
-
-        private static string ToStringCollectionGeneric<T>(object obj, IFormatProvider? provider)
-        {
-            return ToString((ICollection<T>)obj, provider);
-        }
-
-        private static string ToStringDictionaryGeneric<TKey, TValue>(object obj, IFormatProvider? provider)
-        {
-            return ToString((IDictionary<TKey, TValue>)obj, provider);
-        }
-
-        #endregion ToString Dispatchers
 
         #endregion ToString
 
@@ -605,5 +476,231 @@ namespace J2N.Collections
             }
             return null;
         }
+
+        #region Nested Static Class: EqualsGenericDispatcher
+
+        [RequiresDynamicCode("Uses Reflection-based generic dispatch.")]
+        private static class EqualsGenericDispatcher
+        {
+            private static readonly LurchTable<Type, Func<object, object, bool>> cache = new(LurchTableOrder.Access, 256);
+
+            public static bool Dispatch(object objA, object objB, Type interfaceType)
+            {
+                Func<object, object, bool> dispatcher = cache.GetOrAdd(interfaceType, CreateDispatcher);
+                return dispatcher(objA, objB);
+            }
+
+            private static Func<object, object, bool> CreateDispatcher(Type interfaceType)
+            {
+                if (interfaceType.GetGenericTypeDefinition() == typeof(ISet<>))
+                    return CreateSetEqualsDispatcher(interfaceType);
+
+                if (interfaceType.GetGenericTypeDefinition() == typeof(IDictionary<,>))
+                    return CreateDictionaryEqualsDispatcher(interfaceType);
+
+                if (interfaceType.GetGenericTypeDefinition() == typeof(IList<>))
+                    return CreateListEqualsDispatcher(interfaceType);
+
+                ThrowHelper.ThrowInvalidOperationException_UnexpectedDispatcherType(interfaceType);
+                return null!; // Unreachable
+            }
+
+
+            #region Equals Dispatchers
+
+            private static Func<object, object, bool> CreateDictionaryEqualsDispatcher(Type dictInterface)
+            {
+                Type[] args = dictInterface.GetGenericArguments();
+
+                MethodInfo method = typeof(EqualsGenericDispatcher)
+                    .GetMethod(nameof(EqualsDictionaryGeneric), BindingFlags.NonPublic | BindingFlags.Static)!
+                    .MakeGenericMethod(args[0], args[1]);
+
+                return (Func<object, object, bool>)Delegate.CreateDelegate(typeof(Func<object, object, bool>), method);
+            }
+
+            private static bool EqualsDictionaryGeneric<TKey, TValue>(object a, object b)
+            {
+                return CollectionUtil.Equals((IDictionary<TKey, TValue>)a, (IDictionary<TKey, TValue>)b);
+            }
+
+            private static Func<object, object, bool> CreateSetEqualsDispatcher(Type setInterface)
+            {
+                Type elementType = setInterface.GetGenericArguments()[0];
+
+                MethodInfo method = typeof(EqualsGenericDispatcher)
+                    .GetMethod(nameof(EqualsSetGeneric), BindingFlags.NonPublic | BindingFlags.Static)!
+                    .MakeGenericMethod(elementType);
+
+                return (Func<object, object, bool>)Delegate.CreateDelegate(typeof(Func<object, object, bool>), method);
+            }
+
+            private static bool EqualsSetGeneric<T>(object a, object b)
+            {
+                return CollectionUtil.Equals((ISet<T>)a, (ISet<T>)b);
+            }
+
+            private static Func<object, object, bool> CreateListEqualsDispatcher(Type listInterface)
+            {
+                Type elementType = listInterface.GetGenericArguments()[0];
+
+                MethodInfo method = typeof(EqualsGenericDispatcher)
+                    .GetMethod(nameof(EqualsListGeneric), BindingFlags.NonPublic | BindingFlags.Static)!
+                    .MakeGenericMethod(elementType);
+
+                return (Func<object, object, bool>)Delegate.CreateDelegate(typeof(Func<object, object, bool>), method);
+            }
+
+            private static bool EqualsListGeneric<T>(object a, object b)
+            {
+                return CollectionUtil.Equals((IList<T>)a, (IList<T>)b);
+            }
+
+            #endregion Equals Dispatchers
+        }
+
+        #endregion Nested Static Class: EqualsGenericDispatcher
+
+        #region Nested Static Class: GetHashCodeGenericDispatcher
+
+        [RequiresDynamicCode("Uses Reflection-based generic dispatch.")]
+        private static class GetHashCodeGenericDispatcher
+        {
+            private static readonly LurchTable<Type, Func<object, int>> cache = new(LurchTableOrder.Access, 256);
+
+            public static int Dispatch(object obj, Type interfaceType)
+            {
+                Func<object, int> dispatcher = cache.GetOrAdd(interfaceType, CreateDispatcher);
+                return dispatcher(obj);
+            }
+
+            private static Func<object, int> CreateDispatcher(Type interfaceType)
+            {
+                if (interfaceType.GetGenericTypeDefinition() == typeof(IDictionary<,>))
+                    return CreateDictionaryHashCodeDispatcher(interfaceType);
+
+                if (interfaceType.GetGenericTypeDefinition() == typeof(ISet<>))
+                    return CreateSetHashCodeDispatcher(interfaceType);
+
+                if (interfaceType.GetGenericTypeDefinition() == typeof(IList<>))
+                    return CreateListHashCodeDispatcher(interfaceType);
+
+                ThrowHelper.ThrowInvalidOperationException_UnexpectedDispatcherType(interfaceType);
+                return null!; // Unreachable
+            }
+
+            #region GetHashCode Dispatchers
+
+            private static Func<object, int> CreateDictionaryHashCodeDispatcher(Type dictInterface)
+            {
+                Type[] args = dictInterface.GetGenericArguments();
+
+                MethodInfo method = typeof(GetHashCodeGenericDispatcher)
+                    .GetMethod(nameof(GetHashCodeDictionaryGeneric), BindingFlags.NonPublic | BindingFlags.Static)!
+                    .MakeGenericMethod(args[0], args[1]);
+
+                return (Func<object, int>)Delegate.CreateDelegate(typeof(Func<object, int>), method);
+            }
+
+            private static int GetHashCodeDictionaryGeneric<TKey, TValue>(object obj)
+            {
+                return CollectionUtil.GetHashCode((IDictionary<TKey, TValue>)obj);
+            }
+
+            private static Func<object, int> CreateSetHashCodeDispatcher(Type setInterface)
+            {
+                Type elementType = setInterface.GetGenericArguments()[0];
+
+                MethodInfo method = typeof(GetHashCodeGenericDispatcher)
+                    .GetMethod(nameof(GetHashCodeSetGeneric), BindingFlags.NonPublic | BindingFlags.Static)!
+                    .MakeGenericMethod(elementType);
+
+                return (Func<object, int>)Delegate.CreateDelegate(typeof(Func<object, int>), method);
+            }
+
+            private static int GetHashCodeSetGeneric<T>(object obj)
+            {
+                return CollectionUtil.GetHashCode((ISet<T>)obj);
+            }
+
+            private static Func<object, int> CreateListHashCodeDispatcher(Type listInterface)
+            {
+                Type elementType = listInterface.GetGenericArguments()[0];
+
+                MethodInfo method = typeof(GetHashCodeGenericDispatcher)
+                    .GetMethod(nameof(GetHashCodeListGeneric), BindingFlags.NonPublic | BindingFlags.Static)!
+                    .MakeGenericMethod(elementType);
+
+                return (Func<object, int>)Delegate.CreateDelegate(typeof(Func<object, int>), method);
+            }
+
+            private static int GetHashCodeListGeneric<T>(object obj)
+            {
+                return CollectionUtil.GetHashCode((IList<T>)obj);
+            }
+
+            #endregion GetHashCode Dispatchers
+        }
+
+        #endregion Nested Static Class: GetHashCodeGenericDispatcher
+
+        #region Nested Static Class: ToStringGenericDispatcher
+
+        [RequiresDynamicCode("Uses Reflection-based generic dispatch.")]
+        private static class ToStringGenericDispatcher
+        {
+            private static readonly LurchTable<Type, Func<object, IFormatProvider?, string>> cache = new(LurchTableOrder.Access, 256);
+
+            public static string Dispatch(object obj, Type type, IFormatProvider? provider)
+            {
+                if (!RuntimeFeature.IsDynamicCodeSupported)
+                    ThrowHelper.ThrowPlatformNotSupportedException(ExceptionResource.PlatformNotSupported_DynamicCode);
+
+                Func<object, IFormatProvider?, string> dispatcher = cache.GetOrAdd(type, CreateDispatcher);
+                return dispatcher(obj, provider);
+            }
+
+            private static Func<object, IFormatProvider?, string> CreateDispatcher(Type type)
+            {
+                if (GetGenericInterface(type, typeof(IDictionary<,>)) is Type dict)
+                {
+                    var args = dict.GetGenericArguments();
+
+                    MethodInfo method = typeof(ToStringGenericDispatcher)
+                        .GetMethod(nameof(ToStringDictionaryGeneric), BindingFlags.NonPublic | BindingFlags.Static)!
+                        .MakeGenericMethod(args[0], args[1]);
+
+                    return (Func<object, IFormatProvider?, string>)
+                        Delegate.CreateDelegate(typeof(Func<object, IFormatProvider?, string>), method);
+                }
+
+                if (GetGenericInterface(type, typeof(ICollection<>)) is Type collection)
+                {
+                    var arg = collection.GetGenericArguments()[0];
+
+                    MethodInfo method = typeof(ToStringGenericDispatcher)
+                        .GetMethod(nameof(ToStringCollectionGeneric), BindingFlags.NonPublic | BindingFlags.Static)!
+                        .MakeGenericMethod(arg);
+
+                    return (Func<object, IFormatProvider?, string>)
+                        Delegate.CreateDelegate(typeof(Func<object, IFormatProvider?, string>), method);
+                }
+
+                ThrowHelper.ThrowInvalidOperationException_UnexpectedDispatcherType(type);
+                return null!; // Unreachable
+            }
+
+            private static string ToStringCollectionGeneric<T>(object obj, IFormatProvider? provider)
+            {
+                return CollectionUtil.ToString((ICollection<T>)obj, provider);
+            }
+
+            private static string ToStringDictionaryGeneric<TKey, TValue>(object obj, IFormatProvider? provider)
+            {
+                return CollectionUtil.ToString((IDictionary<TKey, TValue>)obj, provider);
+            }
+        }
+
+        #endregion Nested Static Class: ToStringGenericDispatcher
     }
 }

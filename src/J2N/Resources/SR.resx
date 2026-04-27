@@ -480,4 +480,10 @@
   <data name="NotSupported_SerializationDeprecated" xml:space="preserve">
     <value>Binary serialization has been deprecated and is no longer supported.</value>
   </data>
+  <data name="PlatformNotSupported_DynamicCode" xml:space="preserve">
+    <value>This operation requires dynamic code generation and is not supported on this runtime.</value>
+  </data>
+  <data name="InvalidOperation_UnexpectedDispatcherType" xml:space="preserve">
+    <value>Unexpected type '{0}' encountered during generic dispatch.</value>
+  </data>
 </root>
