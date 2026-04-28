@@ -1601,7 +1601,6 @@ namespace J2N.Collections.Concurrent
         /// <returns><c>true</c> if <paramref name="other"/> is structurally equal to the current dictionary;
         /// otherwise, <c>false</c>.</returns>
         /// <exception cref="ArgumentNullException">If <paramref name="comparer"/> is <c>null</c>.</exception>
-        [RequiresDynamicCode("This API will use Reflection if passed DictionaryEqualityComparer<TKey, TValue>.Aggressive. Pass either DictionaryEqualityComparer<TKey, TValue>.Default or a custom implementation of IEqualityComparer instead.")]
         public virtual bool Equals(object? other, IEqualityComparer comparer)
             => DictionaryEqualityComparer<TKey, TValue>.Equals(this, other, comparer);
 
@@ -1612,7 +1611,6 @@ namespace J2N.Collections.Concurrent
         /// <param name="comparer">The <see cref="IEqualityComparer"/> implementation to use to generate
         /// the hash code.</param>
         /// <returns>A hash code representing the current dictionary.</returns>
-        [RequiresDynamicCode("This API will use Reflection if passed DictionaryEqualityComparer<TKey, TValue>.Aggressive. Pass either DictionaryEqualityComparer<TKey, TValue>.Default or a custom implementation of IEqualityComparer instead.")]
         public virtual int GetHashCode(IEqualityComparer comparer)
             => DictionaryEqualityComparer<TKey, TValue>.GetHashCode(this, comparer);
 

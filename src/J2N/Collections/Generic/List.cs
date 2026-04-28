@@ -2673,7 +2673,6 @@ namespace J2N.Collections.Generic
         /// <returns><c>true</c> if <paramref name="other"/> is structurally equal to the current list;
         /// otherwise, <c>false</c>.</returns>
         /// <exception cref="ArgumentNullException">If <paramref name="comparer"/> is <c>null</c>.</exception>
-        [RequiresDynamicCode("This API will use Reflection if passed ListEqualityComparer<T>.Aggressive. Pass either ListEqualityComparer<T>.Default or a custom implementation of IEqualityComparer instead.")]
         public virtual bool Equals(object? other, IEqualityComparer comparer)
         {
             CoModificationCheck();
@@ -2687,7 +2686,6 @@ namespace J2N.Collections.Generic
         /// <param name="comparer">The <see cref="IEqualityComparer"/> implementation to use to generate
         /// the hash code.</param>
         /// <returns>A hash code representing the current list.</returns>
-        [RequiresDynamicCode("This API will use Reflection if passed ListEqualityComparer<T>.Aggressive. Pass either ListEqualityComparer<T>.Default or a custom implementation of IEqualityComparer instead.")]
         public virtual int GetHashCode(IEqualityComparer comparer)
         {
             CoModificationCheck();

@@ -450,7 +450,6 @@ namespace J2N.Collections.ObjectModel
         /// <returns><c>true</c> if <paramref name="other"/> is structurally equal to the current set;
         /// otherwise, <c>false</c>.</returns>
         /// <exception cref="ArgumentNullException">If <paramref name="comparer"/> is <c>null</c>.</exception>
-        [RequiresDynamicCode("This API will use Reflection if passed SetEqualityComparer<T>.Aggressive. Pass either SetEqualityComparer<T>.Default or a custom implementation of IEqualityComparer instead.")]
         public virtual bool Equals(object? other, IEqualityComparer comparer)
             => SetEqualityComparer<T>.Equals(set, other, comparer);
 
@@ -461,7 +460,6 @@ namespace J2N.Collections.ObjectModel
         /// <param name="comparer">The <see cref="IEqualityComparer"/> implementation to use to generate
         /// the hash code.</param>
         /// <returns>A hash code representing the current set.</returns>
-        [RequiresDynamicCode("This API will use Reflection if passed SetEqualityComparer<T>.Aggressive. Pass either SetEqualityComparer<T>.Default or a custom implementation of IEqualityComparer instead.")]
         public virtual int GetHashCode(IEqualityComparer comparer)
             => SetEqualityComparer<T>.GetHashCode(set, comparer);
 
