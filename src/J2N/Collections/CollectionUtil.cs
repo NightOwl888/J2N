@@ -51,6 +51,7 @@ namespace J2N.Collections
         /// and <see cref="IDictionary{TKey, TValue}"/>.
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [RequiresDynamicCode("Uses reflection-based structural comparison.")]
         public static bool Equals<T>(IList<T>? listA, IList<T>? listB)
         {
             if (!RuntimeFeature.IsDynamicCodeSupported)
@@ -71,6 +72,7 @@ namespace J2N.Collections
         /// and <see cref="IDictionary{TKey, TValue}"/>.
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [RequiresDynamicCode("Uses reflection-based structural comparison.")]
         public static bool Equals<T>(ISet<T>? setA, ISet<T>? setB)
         {
             if (!RuntimeFeature.IsDynamicCodeSupported)
@@ -91,6 +93,7 @@ namespace J2N.Collections
         /// and <see cref="IDictionary{TKey, TValue}"/>.
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [RequiresDynamicCode("Uses reflection-based structural comparison.")]
         public static bool Equals<TKey, TValue>(IDictionary<TKey, TValue>? dictionaryA, IDictionary<TKey, TValue>? dictionaryB)
         {
             if (!RuntimeFeature.IsDynamicCodeSupported)
@@ -106,6 +109,7 @@ namespace J2N.Collections
         /// Note this operation currently only supports <see cref="IList{T}"/>, <see cref="ISet{T}"/>, 
         /// and <see cref="IDictionary{TKey, TValue}"/>.
         /// </summary>
+        [RequiresDynamicCode("Uses reflection-based structural comparison.")]
         new public static bool Equals(object? objA, object? objB)
         {
             if (!RuntimeFeature.IsDynamicCodeSupported)
@@ -191,6 +195,7 @@ namespace J2N.Collections
         /// and <see cref="IDictionary{TKey, TValue}"/>.
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [RequiresDynamicCode("Uses reflection-based structural comparison.")]
         public static int GetHashCode<T>(IList<T>? list)
         {
             if (!RuntimeFeature.IsDynamicCodeSupported)
@@ -211,6 +216,7 @@ namespace J2N.Collections
         /// and <see cref="IDictionary{TKey, TValue}"/>.
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [RequiresDynamicCode("Uses reflection-based structural comparison.")]
         public static int GetHashCode<T>(ISet<T>? set)
         {
             if (!RuntimeFeature.IsDynamicCodeSupported)
@@ -231,6 +237,7 @@ namespace J2N.Collections
         /// and <see cref="IDictionary{TKey, TValue}"/>.
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [RequiresDynamicCode("Uses reflection-based structural comparison.")]
         public static int GetHashCode<TKey, TValue>(IDictionary<TKey, TValue>? dictionary)
         {
             if (!RuntimeFeature.IsDynamicCodeSupported)
@@ -252,6 +259,7 @@ namespace J2N.Collections
         /// nested collection values in the object, provided the main object itself is 
         /// a collection, otherwise calls <see cref="object.GetHashCode()"/> on the 
         /// object that is passed.</returns>
+        [RequiresDynamicCode("Uses reflection-based structural comparison.")]
         public static int GetHashCode(object? obj)
         {
             if (!RuntimeFeature.IsDynamicCodeSupported)
