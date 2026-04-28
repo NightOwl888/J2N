@@ -578,6 +578,11 @@ namespace J2N.Collections
 
         #endregion ToString
 
+        [RequiresDynamicCode("Reflection-based generic interface discovery.")]
+        [UnconditionalSuppressMessage(
+            "Trimming",
+            "IL2070:Type.GetInterfaces may be trimmed",
+            Justification = "Only used when dynamic code is supported; not reachable in trimmed/AOT scenarios.")]
         private static Type? GetGenericInterface(Type type, Type openGeneric)
         {
             foreach (var i in type.GetInterfaces())

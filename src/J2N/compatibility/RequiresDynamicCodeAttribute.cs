@@ -1,4 +1,7 @@
-﻿#if !FEATURE_REQUIRESDYNAMICCODEATTRIBUTE
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+
+#if !FEATURE_REQUIRESDYNAMICCODEATTRIBUTE
 using System;
 
 #pragma warning disable IDE0130 // Namespace does not match folder structure
