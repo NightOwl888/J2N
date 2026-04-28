@@ -35,7 +35,7 @@ namespace J2N.Collections.ObjectModel
         private static readonly bool TValueIsValueTypeOrStringOrStructuralEquatable = typeof(TValue).IsValueType || typeof(IStructuralEquatable).IsAssignableFrom(typeof(TValue)) || typeof(string).Equals(typeof(TValue));
 
         internal readonly IDictionary<TKey, TValue> dictionary; // Internal for testing
-        private readonly DictionaryEqualityComparer<TKey, TValue> structuralEqualityComparer;
+        private readonly StructuralEqualityMode mode;
         private readonly IFormatProvider toStringFormatProvider;
 
 #if FEATURE_SERIALIZABLE
@@ -59,23 +59,21 @@ namespace J2N.Collections.ObjectModel
         [RequiresDynamicCode("This API may use Reflection if passed a collection that does not implement IStructuralEquatable and the generic closing type is a reference type other than System.String. All J2N collections support this contract, but collections in the BCL generally do not.")]
         public ReadOnlyDictionary(IDictionary<TKey, TValue> dictionary)
            : this(dictionary,
-                 TKeyIsValueTypeOrStringOrStructuralEquatable && TValueIsValueTypeOrStringOrStructuralEquatable ?
-                    DictionaryEqualityComparer<TKey, TValue>.Default :
-                    DictionaryEqualityComparer<TKey, TValue>.Aggressive,
+                 TKeyIsValueTypeOrStringOrStructuralEquatable && TValueIsValueTypeOrStringOrStructuralEquatable
+                    ? StructuralEqualityMode.Default
+                    : StructuralEqualityMode.Aggressive,
                  StringFormatter.CurrentCulture)
         {
         }
 
-        internal ReadOnlyDictionary(IDictionary<TKey, TValue> dictionary, DictionaryEqualityComparer<TKey, TValue> structuralEqualityComparer, IFormatProvider toStringFormatProvider)
+        internal ReadOnlyDictionary(IDictionary<TKey, TValue> dictionary, StructuralEqualityMode mode, IFormatProvider toStringFormatProvider)
         {
             if (dictionary is null)
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.dictionary);
-            if (structuralEqualityComparer is null)
-                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.structuralEqualityComparer);
             if (toStringFormatProvider is null)
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.toStringFormatProvider);
             this.dictionary = dictionary;
-            this.structuralEqualityComparer = structuralEqualityComparer;
+            this.mode = mode;
             this.toStringFormatProvider = toStringFormatProvider;
         }
 
@@ -398,6 +396,7 @@ namespace J2N.Collections.ObjectModel
         /// <returns><c>true</c> if <paramref name="other"/> is structurally equal to the current dictionary;
         /// otherwise, <c>false</c>.</returns>
         /// <exception cref="ArgumentNullException">If <paramref name="comparer"/> is <c>null</c>.</exception>
+        [RequiresDynamicCode("This API will use Reflection if passed DictionaryEqualityComparer<TKey, TValue>.Aggressive. Pass either DictionaryEqualityComparer<TKey, TValue>.Default or a custom implementation of IEqualityComparer instead.")]
         public virtual bool Equals(object? other, IEqualityComparer comparer)
             => DictionaryEqualityComparer<TKey, TValue>.Equals(dictionary, other, comparer);
 
@@ -408,6 +407,7 @@ namespace J2N.Collections.ObjectModel
         /// <param name="comparer">The <see cref="IEqualityComparer"/> implementation to use to generate
         /// the hash code.</param>
         /// <returns>A hash code representing the current dictionary.</returns>
+        [RequiresDynamicCode("This API will use Reflection if passed DictionaryEqualityComparer<TKey, TValue>.Aggressive. Pass either DictionaryEqualityComparer<TKey, TValue>.Default or a custom implementation of IEqualityComparer instead.")]
         public virtual int GetHashCode(IEqualityComparer comparer)
             => DictionaryEqualityComparer<TKey, TValue>.GetHashCode(dictionary, comparer);
 
@@ -421,7 +421,15 @@ namespace J2N.Collections.ObjectModel
         /// and it contains the same elements; otherwise, <c>false</c>.</returns>
         /// <seealso cref="Equals(object, IEqualityComparer)"/>
         public override bool Equals(object? obj)
-            => Equals(obj, structuralEqualityComparer);
+        {
+            return mode == StructuralEqualityMode.Default
+                ? DictionaryEqualityComparer<TKey, TValue>.Default.Equals(dictionary, obj)
+                : AggressiveEquals(dictionary, obj);
+        }
+
+        [RequiresDynamicCode("Uses reflection for structural comparison.")]
+        private static bool AggressiveEquals(IDictionary<TKey, TValue> dictionary, object? obj)
+            => DictionaryEqualityComparer<TKey, TValue>.Aggressive.Equals(dictionary, obj);
 
         /// <summary>
         /// Gets the hash code for the current dictionary. The hash code is calculated
@@ -430,7 +438,15 @@ namespace J2N.Collections.ObjectModel
         /// <returns>A hash code for the current object.</returns>
         /// <seealso cref="GetHashCode(IEqualityComparer)"/>
         public override int GetHashCode()
-            => GetHashCode(structuralEqualityComparer);
+        {
+            return mode == StructuralEqualityMode.Default
+                ? DictionaryEqualityComparer<TKey, TValue>.Default.GetHashCode(dictionary)
+                : AggressiveGetHashCode(dictionary);
+        }
+
+        [RequiresDynamicCode("Uses reflection for structural comparison.")]
+        private static int AggressiveGetHashCode(IDictionary<TKey, TValue> dictionary)
+            => DictionaryEqualityComparer<TKey, TValue>.Aggressive.GetHashCode(dictionary);
 
         #endregion
 

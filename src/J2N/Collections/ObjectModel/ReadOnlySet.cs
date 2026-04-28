@@ -55,7 +55,7 @@ namespace J2N.Collections.ObjectModel
         private static readonly bool TIsValueTypeOrStringOrStructuralEquatable = typeof(T).IsValueType || typeof(IStructuralEquatable).IsAssignableFrom(typeof(T)) || typeof(string).Equals(typeof(T));
 
         private readonly ISet<T> set;
-        private readonly SetEqualityComparer<T> structuralEqualityComparer;
+        private readonly StructuralEqualityMode mode;
         private readonly IFormatProvider toStringFormatProvider;
 
 #if FEATURE_SERIALIZABLE
@@ -79,23 +79,21 @@ namespace J2N.Collections.ObjectModel
         [RequiresDynamicCode("This API may use Reflection if passed a collection that does not implement IStructuralEquatable and the generic closing type is a reference type other than System.String. All J2N collections support this contract, but collections in the BCL generally do not.")]
         public ReadOnlySet(ISet<T> set)
             : this(set,
-                  TIsValueTypeOrStringOrStructuralEquatable
-                    ? SetEqualityComparer<T>.Default
-                    : SetEqualityComparer<T>.Aggressive,
-                  StringFormatter.CurrentCulture)
+                TIsValueTypeOrStringOrStructuralEquatable
+                    ? StructuralEqualityMode.Default
+                    : StructuralEqualityMode.Aggressive,
+                StringFormatter.CurrentCulture)
         {
         }
 
-        internal ReadOnlySet(ISet<T> set, SetEqualityComparer<T> structuralEqualityComparer, IFormatProvider toStringFormatProvider)
+        internal ReadOnlySet(ISet<T> set, StructuralEqualityMode mode, IFormatProvider toStringFormatProvider)
         {
             if (set is null)
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.set);
-            if (structuralEqualityComparer is null)
-                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.structuralEqualityComparer);
             if (toStringFormatProvider is null)
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.toStringFormatProvider);
             this.set = set;
-            this.structuralEqualityComparer = structuralEqualityComparer;
+            this.mode = mode;
             this.toStringFormatProvider = toStringFormatProvider;
         }
 
@@ -453,6 +451,7 @@ namespace J2N.Collections.ObjectModel
         /// <returns><c>true</c> if <paramref name="other"/> is structurally equal to the current set;
         /// otherwise, <c>false</c>.</returns>
         /// <exception cref="ArgumentNullException">If <paramref name="comparer"/> is <c>null</c>.</exception>
+        [RequiresDynamicCode("This API will use Reflection if passed SetEqualityComparer<T>.Aggressive. Pass either SetEqualityComparer<T>.Default or a custom implementation of IEqualityComparer instead.")]
         public virtual bool Equals(object? other, IEqualityComparer comparer)
             => SetEqualityComparer<T>.Equals(set, other, comparer);
 
@@ -463,6 +462,7 @@ namespace J2N.Collections.ObjectModel
         /// <param name="comparer">The <see cref="IEqualityComparer"/> implementation to use to generate
         /// the hash code.</param>
         /// <returns>A hash code representing the current set.</returns>
+        [RequiresDynamicCode("This API will use Reflection if passed SetEqualityComparer<T>.Aggressive. Pass either SetEqualityComparer<T>.Default or a custom implementation of IEqualityComparer instead.")]
         public virtual int GetHashCode(IEqualityComparer comparer)
             => SetEqualityComparer<T>.GetHashCode(set, comparer);
 
@@ -476,7 +476,15 @@ namespace J2N.Collections.ObjectModel
         /// and it contains the same elements; otherwise, <c>false</c>.</returns>
         /// <seealso cref="Equals(object, IEqualityComparer)"/>
         public override bool Equals(object? obj)
-            => Equals(obj, structuralEqualityComparer);
+        {
+            return mode == StructuralEqualityMode.Default
+                ? SetEqualityComparer<T>.Default.Equals(set, obj)
+                : AggressiveEquals(set, obj);
+        }
+
+        [RequiresDynamicCode("Uses reflection for structural comparison.")]
+        private static bool AggressiveEquals(ISet<T> set, object? obj)
+            => SetEqualityComparer<T>.Aggressive.Equals(set, obj);
 
         /// <summary>
         /// Gets the hash code for the current set. The hash code is calculated
@@ -485,7 +493,15 @@ namespace J2N.Collections.ObjectModel
         /// <returns>A hash code for the current object.</returns>
         /// <seealso cref="GetHashCode(IEqualityComparer)"/>
         public override int GetHashCode()
-            => GetHashCode(structuralEqualityComparer);
+        {
+            return mode == StructuralEqualityMode.Default
+                ? SetEqualityComparer<T>.Default.GetHashCode(set)
+                : AggressiveGetHashCode(set);
+        }
+
+        [RequiresDynamicCode("Uses reflection for structural comparison.")]
+        private static int AggressiveGetHashCode(ISet<T> set)
+            => SetEqualityComparer<T>.Aggressive.GetHashCode(set);
 
         #endregion
 
