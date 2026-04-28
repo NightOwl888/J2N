@@ -3,8 +3,11 @@
   <Import Project="$(RepositoryRoot).build/nuget.props" />
 
   <PropertyGroup Label="AOT Compatibility Features">
+    <IsTrimmable>true</IsTrimmable>
     <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
     <AnalysisLevel>latest</AnalysisLevel>
+    <TrimmerSingleWarn>false</TrimmerSingleWarn>
+    <SuppressTrimAnalysisWarnings>false</SuppressTrimAnalysisWarnings>
     <WarningsAsErrors>IL2026;IL2072;IL2075;IL3050</WarningsAsErrors>
   </PropertyGroup>
   
