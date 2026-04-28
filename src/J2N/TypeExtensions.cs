@@ -17,6 +17,7 @@
 #endregion
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 
@@ -40,6 +41,11 @@ namespace J2N
         /// <param name="interfaceType">The type of generic inteface to check.</param>
         /// <returns><c>true</c> if the type implements the generic interface; otherwise, <c>false</c>.</returns>
         /// <exception cref="ArgumentNullException">If <paramref name="target"/> is <c>null</c>.</exception>
+        [RequiresDynamicCode("Uses reflection to inspect generic interfaces.")]
+        [UnconditionalSuppressMessage(
+            "Trimming",
+            "IL2075:'this' argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The return value of the source method does not have matching annotations.",
+            Justification = "Only used when dynamic code is supported; not reachable in trimmed/AOT scenarios.")]
         public static bool ImplementsGenericInterface(this Type target, Type interfaceType) // J2N TODO: API - This should throw an ArgumentNullException like TypeInfoExtensions when interfaceType is null
         {
             if (target is null)
