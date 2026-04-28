@@ -864,6 +864,7 @@ namespace J2N.Collections
             Assert.AreEqual("null", result);
         }
 
+#nullable enable
 
         public sealed class NonGenericList : IList
         {
@@ -884,10 +885,10 @@ namespace J2N.Collections
                 this.list = new SCG.List<object>(collection);
             }
 
-            public object this[int index]
+            public object? this[int index]
             { 
                 get => list[index];
-                set => list[index] = value;
+                set => list[index] = value!;
             }
 
             public bool IsFixedSize => ((IList)list).IsFixedSize;
@@ -899,9 +900,9 @@ namespace J2N.Collections
 
             public object SyncRoot => ((ICollection)list).SyncRoot;
 
-            public int Add(object value)
+            public int Add(object? value)
             {
-                list.Add(value);
+                list.Add(value!);
                 return list.Count - 1;
             }
 
@@ -910,9 +911,9 @@ namespace J2N.Collections
                 list.Clear();
             }
 
-            public bool Contains(object value)
+            public bool Contains(object? value)
             {
-                return list.Contains(value);
+                return list.Contains(value!);
             }
 
             public void CopyTo(Array array, int index)
@@ -925,19 +926,19 @@ namespace J2N.Collections
                 return list.GetEnumerator();
             }
 
-            public int IndexOf(object value)
+            public int IndexOf(object? value)
             {
-                return list.IndexOf(value);
+                return list.IndexOf(value!);
             }
 
-            public void Insert(int index, object value)
+            public void Insert(int index, object? value)
             {
-                list.Insert(index, value);
+                list.Insert(index, value!);
             }
 
-            public void Remove(object value)
+            public void Remove(object? value)
             {
-                list.Remove(value);
+                list.Remove(value!);
             }
 
             public void RemoveAt(int index)
