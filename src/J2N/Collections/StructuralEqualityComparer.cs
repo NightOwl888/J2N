@@ -19,7 +19,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Reflection;
+using System.Diagnostics.CodeAnalysis;
 
 namespace J2N.Collections
 {
@@ -57,7 +57,11 @@ namespace J2N.Collections
         /// <see cref="ISet{T}"/>, or <see cref="IDictionary{TKey, TValue}"/>. All other types will
         /// be compared using <see cref="EqualityComparer{T}.Default"/>.
         /// </summary>
-        public static StructuralEqualityComparer Aggressive { get; } = new AggressiveStructuralEqualityComparer();
+        public static StructuralEqualityComparer Aggressive
+        {
+            [RequiresDynamicCode("Aggressive structural comparison uses reflection.")]
+            get => new AggressiveStructuralEqualityComparer();
+        } 
 
         /// <summary>
         /// Compares two objects for structural equality.
@@ -268,6 +272,7 @@ namespace J2N.Collections
 #endif
     internal class AggressiveStructuralEqualityComparer : StructuralEqualityComparer
     {
+        [RequiresDynamicCode("Uses reflection-based structural comparison.")]
         protected override int GetUnstructuredHashCode(object? obj)
         {
             if (StructuralEqualityUtil.IsValueType(obj))
@@ -288,6 +293,7 @@ namespace J2N.Collections
             }
         }
 
+        [RequiresDynamicCode("Uses reflection-based structural comparison.")]
         protected override bool UnstructuredEquals(object? x, object? y)
         {
             if (StructuralEqualityUtil.IsValueType(x))

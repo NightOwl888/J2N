@@ -84,7 +84,11 @@ namespace J2N.Collections.Generic
         /// <see cref="ISet{T}"/>, or <see cref="IDictionary{TKey, TValue}"/>. All other types will
         /// be compared using <see cref="EqualityComparer{T}.Default"/>.
         /// </summary>
-        public static DictionaryEqualityComparer<TKey, TValue> Aggressive { get; } = new AggressiveDictionaryEqualityComparer();
+        public static DictionaryEqualityComparer<TKey, TValue> Aggressive
+        {
+            [RequiresDynamicCode("Aggressive structural comparison uses reflection.")]
+            get => new AggressiveDictionaryEqualityComparer();
+        }
 
 #pragma warning disable CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
         internal DictionaryEqualityComparer(StructuralEqualityComparer structuralEqualityComparer)
@@ -326,6 +330,7 @@ namespace J2N.Collections.Generic
 #endif
         internal class AggressiveDictionaryEqualityComparer : DictionaryEqualityComparer<TKey, TValue>
         {
+            [RequiresDynamicCode("Aggressive structural comparison uses reflection.")]
             public AggressiveDictionaryEqualityComparer()
                 : base(StructuralEqualityComparer.Aggressive)
             { }
