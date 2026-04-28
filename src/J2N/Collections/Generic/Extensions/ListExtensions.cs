@@ -19,6 +19,7 @@
 using J2N.Collections.ObjectModel;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using SCG = System.Collections.Generic;
 
@@ -46,6 +47,7 @@ namespace J2N.Collections.Generic.Extensions
         /// This method is an O(1) operation.
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [RequiresDynamicCode("This API may use Reflection if passed a collection that does not implement IStructuralEquatable and the generic closing type is a reference type other than System.String. All J2N collections support this contract, but collections in the BCL generally do not.")]
         public static ReadOnlyList<T> AsReadOnly<T>(this IList<T> collection)
         {
             return new ReadOnlyList<T>(collection);

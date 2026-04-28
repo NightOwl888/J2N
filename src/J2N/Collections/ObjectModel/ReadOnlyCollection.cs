@@ -74,7 +74,11 @@ namespace J2N.Collections.ObjectModel
         /// This constructor is an O(1) operation.
         /// </remarks>
         public ReadOnlyCollection(ICollection<T> collection)
-            : this(collection, TIsValueTypeOrStringOrStructuralEquatable ? StructuralEqualityComparer.Default : StructuralEqualityComparer.Aggressive, StringFormatter.CurrentCulture)
+            : this(collection,
+                  TIsValueTypeOrStringOrStructuralEquatable
+                    ? StructuralEqualityComparer.Default
+                    : StructuralEqualityComparer.Aggressive,
+                  StringFormatter.CurrentCulture)
         {
         }
 

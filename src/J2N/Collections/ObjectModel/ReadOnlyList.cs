@@ -21,6 +21,7 @@ using J2N.Text;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
 
@@ -63,8 +64,13 @@ namespace J2N.Collections.ObjectModel
         /// <para/>
         /// This constructor is an O(1) operation.
         /// </remarks>
+        [RequiresDynamicCode("This API may use Reflection if passed a collection that does not implement IStructuralEquatable and the generic closing type is a reference type other than System.String. All J2N collections support this contract, but collections in the BCL generally do not.")]
         public ReadOnlyList(IList<T> list)
-            : this(list, TIsValueTypeOrStringOrStructuralEquatable ? ListEqualityComparer<T>.Default : ListEqualityComparer<T>.Aggressive, StringFormatter.CurrentCulture)
+            : this(list,
+                  TIsValueTypeOrStringOrStructuralEquatable
+                    ? ListEqualityComparer<T>.Default
+                    : ListEqualityComparer<T>.Aggressive,
+                  StringFormatter.CurrentCulture)
         {
         }
 
