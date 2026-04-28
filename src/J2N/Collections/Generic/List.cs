@@ -2673,6 +2673,7 @@ namespace J2N.Collections.Generic
         /// <returns><c>true</c> if <paramref name="other"/> is structurally equal to the current list;
         /// otherwise, <c>false</c>.</returns>
         /// <exception cref="ArgumentNullException">If <paramref name="comparer"/> is <c>null</c>.</exception>
+        [RequiresDynamicCode("This API will use Reflection if passed ListEqualityComparer<T>.Aggressive. Pass either ListEqualityComparer<T>.Default or a custom implementation of IEqualityComparer instead.")]
         public virtual bool Equals(object? other, IEqualityComparer comparer)
         {
             CoModificationCheck();
@@ -2686,6 +2687,7 @@ namespace J2N.Collections.Generic
         /// <param name="comparer">The <see cref="IEqualityComparer"/> implementation to use to generate
         /// the hash code.</param>
         /// <returns>A hash code representing the current list.</returns>
+        [RequiresDynamicCode("This API will use Reflection if passed ListEqualityComparer<T>.Aggressive. Pass either ListEqualityComparer<T>.Default or a custom implementation of IEqualityComparer instead.")]
         public virtual int GetHashCode(IEqualityComparer comparer)
         {
             CoModificationCheck();
@@ -2702,7 +2704,10 @@ namespace J2N.Collections.Generic
         /// and it contains the same elements in the same order; otherwise, <c>false</c>.</returns>
         /// <seealso cref="Equals(object, IEqualityComparer)"/>
         public override bool Equals(object? obj)
-            => Equals(obj, ListEqualityComparer<T>.Default);
+        {
+            CoModificationCheck();
+            return ListEqualityComparer<T>.Default.Equals(this, obj);
+        }
 
         /// <summary>
         /// Gets the hash code for the current list. The hash code is calculated
@@ -2710,7 +2715,10 @@ namespace J2N.Collections.Generic
         /// </summary>
         /// <returns>A hash code for the current object.</returns>
         public override int GetHashCode()
-            => GetHashCode(ListEqualityComparer<T>.Default);
+        {
+            CoModificationCheck();
+            return ListEqualityComparer<T>.Default.GetHashCode(this);
+        }
 
         #endregion
 
