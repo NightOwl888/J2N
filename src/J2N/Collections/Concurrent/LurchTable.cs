@@ -15,6 +15,7 @@
 
 using J2N.Collections.Generic;
 using J2N.Collections.ObjectModel;
+using J2N.Text;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -64,7 +65,7 @@ namespace J2N.Collections.Concurrent
 #if FEATURE_IREADONLYCOLLECTIONS
         IReadOnlyDictionary<TKey, TValue>,
 #endif
-        IDisposable
+        IStructuralEquatable, IStructuralFormattable, IDisposable
     {
         private static readonly string ThisTypeName = nameof(LurchTable<TKey, TValue>);
 
@@ -1587,6 +1588,118 @@ namespace J2N.Collections.Concurrent
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         #endregion
+
+        #region Structural Equality
+
+        /// <summary>
+        /// Determines whether the specified object is structurally equal to the current dictionary
+        /// using rules provided by the specified <paramref name="comparer"/>.
+        /// </summary>
+        /// <param name="other">The object to compare with the current object.</param>
+        /// <param name="comparer">The <see cref="IEqualityComparer"/> implementation to use to determine
+        /// whether the current object and <paramref name="other"/> are structurally equal.</param>
+        /// <returns><c>true</c> if <paramref name="other"/> is structurally equal to the current dictionary;
+        /// otherwise, <c>false</c>.</returns>
+        /// <exception cref="ArgumentNullException">If <paramref name="comparer"/> is <c>null</c>.</exception>
+        [RequiresDynamicCode("This API will use Reflection if passed DictionaryEqualityComparer<TKey, TValue>.Aggressive. Pass either DictionaryEqualityComparer<TKey, TValue>.Default or a custom implementation of IEqualityComparer instead.")]
+        public virtual bool Equals(object? other, IEqualityComparer comparer)
+            => DictionaryEqualityComparer<TKey, TValue>.Equals(this, other, comparer);
+
+        /// <summary>
+        /// Gets the hash code representing the current dictionary using rules specified by the
+        /// provided <paramref name="comparer"/>.
+        /// </summary>
+        /// <param name="comparer">The <see cref="IEqualityComparer"/> implementation to use to generate
+        /// the hash code.</param>
+        /// <returns>A hash code representing the current dictionary.</returns>
+        [RequiresDynamicCode("This API will use Reflection if passed DictionaryEqualityComparer<TKey, TValue>.Aggressive. Pass either DictionaryEqualityComparer<TKey, TValue>.Default or a custom implementation of IEqualityComparer instead.")]
+        public virtual int GetHashCode(IEqualityComparer comparer)
+            => DictionaryEqualityComparer<TKey, TValue>.GetHashCode(this, comparer);
+
+        /// <summary>
+        /// Determines whether the specified object is structurally equal to the current dictionary
+        /// using rules similar to those in the JDK's AbstractMap class. Two dictionaries are considered
+        /// equal when they both contain the same mappings (in any order).
+        /// </summary>
+        /// <param name="obj">The object to compare with the current object.</param>
+        /// <returns><c>true</c> if the specified object implements <see cref="IDictionary{TKey, TValue}"/>
+        /// and it contains the same elements; otherwise, <c>false</c>.</returns>
+        /// <seealso cref="Equals(object, IEqualityComparer)"/>
+        public override bool Equals(object? obj)
+            => DictionaryEqualityComparer<TKey, TValue>.Default.Equals(this, obj);
+
+        /// <summary>
+        /// Gets the hash code for the current dictionary. The hash code is calculated
+        /// by taking each nested element's hash code into account.
+        /// </summary>
+        /// <returns>A hash code for the current object.</returns>
+        /// <seealso cref="GetHashCode(IEqualityComparer)"/>
+        public override int GetHashCode()
+            => DictionaryEqualityComparer<TKey, TValue>.Default.GetHashCode(this);
+
+        #endregion Structural Equality
+
+        #region ToString
+
+        /// <summary>
+        /// Returns a string that represents the current dictionary using the specified
+        /// <paramref name="format"/> and <paramref name="formatProvider"/>.
+        /// </summary>
+        /// <returns>A string that represents the current dictionary.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="format"/> is <c>null</c>.</exception>
+        /// <exception cref="FormatException">
+        /// <paramref name="format"/> is invalid.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// The index of a format item is not zero.
+        /// </exception>
+        public virtual string ToString(string? format, IFormatProvider? formatProvider)
+            => CollectionUtil.ToString(formatProvider, format, this);
+
+        /// <summary>
+        /// Returns a string that represents the current dictionary using
+        /// <see cref="StringFormatter.CurrentCulture"/>.
+        /// <para/>
+        /// The presentation has a specific format. It is enclosed by curly
+        /// brackets ("{}"). Keys and values are separated by '=',
+        /// KeyValuePairs are separated by ', ' (comma and space).
+        /// </summary>
+        /// <returns>A string that represents the current list.</returns>
+        public override string ToString()
+            => ToString("{0}", StringFormatter.CurrentCulture);
+
+
+        /// <summary>
+        /// Returns a string that represents the current dictionary using the specified
+        /// <paramref name="formatProvider"/>.
+        /// </summary>
+        /// <returns>A string that represents the current dictionary.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="formatProvider"/> is <c>null</c>.</exception>
+        public virtual string ToString(IFormatProvider formatProvider)
+            => ToString("{0}", formatProvider);
+
+        /// <summary>
+        /// Returns a string that represents the current dictionary using the specified
+        /// <paramref name="format"/> and <see cref="StringFormatter.CurrentCulture"/>.
+        /// <para/>
+        /// The presentation has a specific format. It is enclosed by curly
+        /// brackets ("{}"). Keys and values are separated by '=',
+        /// KeyValuePairs are separated by ', ' (comma and space).
+        /// </summary>
+        /// <returns>A string that represents the current dictionary.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="format"/> is <c>null</c>.</exception>
+        /// <exception cref="FormatException">
+        /// <paramref name="format"/> is invalid.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// The index of a format item is not zero.
+        /// </exception>
+        public virtual string ToString(string format)
+            => ToString(format, StringFormatter.CurrentCulture);
+
+        #endregion ToString
 
         #region Nested Class: KeyCollection
 
