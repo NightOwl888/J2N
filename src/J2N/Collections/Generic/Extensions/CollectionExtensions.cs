@@ -44,7 +44,6 @@ namespace J2N.Collections.Generic.Extensions
         /// This method is an O(1) operation.
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        [RequiresDynamicCode("This API may use Reflection if passed a collection that does not implement IStructuralEquatable and the generic type is a reference type other than string. All J2N collections support this contract, but collections in the BCL generally do not.")]
         public static ICollection<T> AsReadOnly<T>(this ICollection<T> collection)
         {
             if (collection is ISet<T> set)
@@ -70,7 +69,6 @@ namespace J2N.Collections.Generic.Extensions
         /// <para/>
         /// This method is an O(1) operation.
         /// </remarks>
-        [RequiresDynamicCode("This API may use Reflection if passed a collection that does not implement IStructuralEquatable and the generic closing type is a reference type other than System.String. All J2N collections support this contract, but collections in the BCL generally do not.")]
         public static ICollection<KeyValuePair<TKey, TValue>> AsReadOnly<TKey, TValue>(this ICollection<KeyValuePair<TKey, TValue>> collection)
         {
            if (collection is IDictionary<TKey, TValue> dict)
@@ -79,6 +77,7 @@ namespace J2N.Collections.Generic.Extensions
             return AsReadOnlyCollection(collection);
         }
 
+        [RequiresDynamicCode("Uses Reflection and runtime type inspection to for structural equality comparisons.")]
         private static ReadOnlyCollection<T> AsReadOnlyCollection<T>(ICollection<T> collection)
         {
             if (!RuntimeFeature.IsDynamicCodeSupported)

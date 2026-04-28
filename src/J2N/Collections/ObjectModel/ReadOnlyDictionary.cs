@@ -56,7 +56,6 @@ namespace J2N.Collections.ObjectModel
         /// </summary>
         /// <param name="dictionary">The dictionary to wrap.</param>
         /// <exception cref="ArgumentNullException"><paramref name="dictionary"/> is <c>null</c>.</exception>
-        [RequiresDynamicCode("This API may use Reflection if passed a collection that does not implement IStructuralEquatable and the generic closing type is a reference type other than System.String. All J2N collections support this contract, but collections in the BCL generally do not.")]
         public ReadOnlyDictionary(IDictionary<TKey, TValue> dictionary)
            : this(dictionary,
                  TKeyIsValueTypeOrStringOrStructuralEquatable && TValueIsValueTypeOrStringOrStructuralEquatable

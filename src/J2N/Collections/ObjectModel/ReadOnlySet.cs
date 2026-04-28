@@ -76,7 +76,6 @@ namespace J2N.Collections.ObjectModel
         /// <para/>
         /// This constructor is an O(1) operation.
         /// </remarks>
-        [RequiresDynamicCode("This API may use Reflection if passed a collection that does not implement IStructuralEquatable and the generic closing type is a reference type other than System.String. All J2N collections support this contract, but collections in the BCL generally do not.")]
         public ReadOnlySet(ISet<T> set)
             : this(set,
                 TIsValueTypeOrStringOrStructuralEquatable

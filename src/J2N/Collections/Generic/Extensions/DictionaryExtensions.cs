@@ -18,7 +18,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 
 
@@ -45,7 +44,6 @@ namespace J2N.Collections.Generic.Extensions
         /// This method is an O(1) operation.
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        [RequiresDynamicCode("This API may use Reflection if passed a collection that does not implement IStructuralEquatable and either of the generic closing types is a reference type other than System.String. All J2N collections support this contract, but collections in the BCL generally do not.")]
         public static J2N.Collections.ObjectModel.ReadOnlyDictionary<TKey, TValue> AsReadOnly<TKey, TValue>(this IDictionary<TKey, TValue> collection)
         {
             return new J2N.Collections.ObjectModel.ReadOnlyDictionary<TKey, TValue>(collection);

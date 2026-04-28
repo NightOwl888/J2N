@@ -19,7 +19,6 @@
 using J2N.Collections.ObjectModel;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 
 
@@ -45,7 +44,6 @@ namespace J2N.Collections.Generic.Extensions
         /// This method is an O(1) operation.
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        [RequiresDynamicCode("This API may use Reflection if passed a collection that does not implement IStructuralEquatable and the generic closing type is a reference type other than System.String. All J2N collections support this contract, but collections in the BCL generally do not.")]
         public static ReadOnlySet<T> AsReadOnly<T>(this ISet<T> collection)
         {
             return new ReadOnlySet<T>(collection);
