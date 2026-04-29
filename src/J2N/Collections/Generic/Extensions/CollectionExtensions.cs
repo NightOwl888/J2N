@@ -19,7 +19,6 @@
 using J2N.Collections.ObjectModel;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 
 namespace J2N.Collections.Generic.Extensions
@@ -51,7 +50,7 @@ namespace J2N.Collections.Generic.Extensions
             if (collection is IList<T> list)
                 return new ReadOnlyList<T>(list);
 
-            return AsReadOnlyCollection(collection);
+            return new ReadOnlyCollection<T>(collection);
         }
 
         /// <summary>
@@ -74,16 +73,7 @@ namespace J2N.Collections.Generic.Extensions
            if (collection is IDictionary<TKey, TValue> dict)
                 return new ReadOnlyDictionary<TKey, TValue>(dict);
 
-            return AsReadOnlyCollection(collection);
-        }
-
-        [RequiresDynamicCode("Uses Reflection and runtime type inspection to for structural equality comparisons.")]
-        private static ReadOnlyCollection<T> AsReadOnlyCollection<T>(ICollection<T> collection)
-        {
-            if (!RuntimeFeature.IsDynamicCodeSupported)
-                ThrowHelper.ThrowPlatformNotSupportedException(ExceptionResource.PlatformNotSupported_DynamicCode);
-
-            return new ReadOnlyCollection<T>(collection);
+            return new ReadOnlyCollection<KeyValuePair<TKey, TValue>>(collection);
         }
 
         /// <summary>
