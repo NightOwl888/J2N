@@ -1624,7 +1624,7 @@ namespace J2N.Collections.Concurrent
         /// and it contains the same elements; otherwise, <c>false</c>.</returns>
         /// <seealso cref="Equals(object, IEqualityComparer)"/>
         public override bool Equals(object? obj)
-            => DictionaryEqualityComparer<TKey, TValue>.Default.Equals(this, obj);
+            => Equals(obj, DictionaryEqualityComparer<TKey, TValue>.Default);
 
         /// <summary>
         /// Gets the hash code for the current dictionary. The hash code is calculated
@@ -1633,7 +1633,7 @@ namespace J2N.Collections.Concurrent
         /// <returns>A hash code for the current object.</returns>
         /// <seealso cref="GetHashCode(IEqualityComparer)"/>
         public override int GetHashCode()
-            => DictionaryEqualityComparer<TKey, TValue>.Default.GetHashCode(this);
+            => GetHashCode(DictionaryEqualityComparer<TKey, TValue>.Default);
 
         #endregion Structural Equality
 

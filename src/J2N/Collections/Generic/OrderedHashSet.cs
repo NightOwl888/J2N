@@ -3199,7 +3199,7 @@ namespace J2N.Collections.Generic
         /// and it contains the same elements; otherwise, <c>false</c>.</returns>
         /// <seealso cref="Equals(object, IEqualityComparer)"/>
         public override bool Equals(object? obj)
-            => SetEqualityComparer<T>.Default.Equals(this, obj);
+            => Equals(obj, SetEqualityComparer<T>.Default);
 
         /// <summary>
         /// Gets the hash code for the current set. The hash code is calculated
@@ -3208,7 +3208,7 @@ namespace J2N.Collections.Generic
         /// <returns>A hash code for the current object.</returns>
         /// <seealso cref="GetHashCode(IEqualityComparer)"/>
         public override int GetHashCode()
-            => SetEqualityComparer<T>.Default.GetHashCode(this);
+            => GetHashCode(SetEqualityComparer<T>.Default);
 
         #endregion Structural Equality
 

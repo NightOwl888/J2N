@@ -2702,10 +2702,7 @@ namespace J2N.Collections.Generic
         /// and it contains the same elements in the same order; otherwise, <c>false</c>.</returns>
         /// <seealso cref="Equals(object, IEqualityComparer)"/>
         public override bool Equals(object? obj)
-        {
-            CoModificationCheck();
-            return ListEqualityComparer<T>.Default.Equals(this, obj);
-        }
+            => Equals(obj, ListEqualityComparer<T>.Default);
 
         /// <summary>
         /// Gets the hash code for the current list. The hash code is calculated
@@ -2713,10 +2710,7 @@ namespace J2N.Collections.Generic
         /// </summary>
         /// <returns>A hash code for the current object.</returns>
         public override int GetHashCode()
-        {
-            CoModificationCheck();
-            return ListEqualityComparer<T>.Default.GetHashCode(this);
-        }
+            => GetHashCode(ListEqualityComparer<T>.Default);
 
         #endregion
 
