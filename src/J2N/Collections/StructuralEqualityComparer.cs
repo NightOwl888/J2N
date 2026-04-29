@@ -272,7 +272,11 @@ namespace J2N.Collections
 #endif
     internal class AggressiveStructuralEqualityComparer : StructuralEqualityComparer
     {
-        [RequiresDynamicCode("Uses reflection-based structural comparison.")]
+        [RequiresDynamicCode("Aggressive structural comparison uses reflection.")]
+        internal AggressiveStructuralEqualityComparer()
+        {
+        }
+
         protected override int GetUnstructuredHashCode(object? obj)
         {
             if (StructuralEqualityUtil.IsValueType(obj))
@@ -293,7 +297,6 @@ namespace J2N.Collections
             }
         }
 
-        [RequiresDynamicCode("Uses reflection-based structural comparison.")]
         protected override bool UnstructuredEquals(object? x, object? y)
         {
             if (StructuralEqualityUtil.IsValueType(x))
