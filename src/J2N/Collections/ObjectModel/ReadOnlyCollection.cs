@@ -1,4 +1,4 @@
-﻿#region Copyright 2019-2021 by Shad Storhaug, Licensed under the Apache License, Version 2.0
+﻿#region Copyright 2019-2026 by Shad Storhaug, Licensed under the Apache License, Version 2.0
 /*  Licensed to the Apache Software Foundation (ASF) under one or more
  *  contributor license agreements.  See the NOTICE file distributed with
  *  this work for additional information regarding copyright ownership.
@@ -21,7 +21,6 @@ using J2N.Text;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 
 namespace J2N.Collections.ObjectModel
@@ -78,17 +77,6 @@ namespace J2N.Collections.ObjectModel
         {
         }
 
-        private static StructuralEqualityComparer ChooseComparer()
-        {
-            if (TIsValueTypeOrStringOrStructuralEquatable)
-                return StructuralEqualityComparer.Default;
-
-            if (!RuntimeFeature.IsDynamicCodeSupported)
-                return StructuralEqualityComparer.AggressiveNotSupported;
-
-            return StructuralEqualityComparer.Aggressive;
-        }
-
         internal ReadOnlyCollection(ICollection<T> collection, StructuralEqualityComparer structuralEqualityComparer, IFormatProvider toStringFormatProvider)
         {
             if (collection is null)
@@ -100,6 +88,17 @@ namespace J2N.Collections.ObjectModel
             this.collection = collection;
             this.structuralEqualityComparer = structuralEqualityComparer;
             this.toStringFormatProvider = toStringFormatProvider;
+        }
+
+        private static StructuralEqualityComparer ChooseComparer()
+        {
+            if (TIsValueTypeOrStringOrStructuralEquatable)
+                return StructuralEqualityComparer.Default;
+
+            if (!RuntimeFeature.IsDynamicCodeSupported)
+                return StructuralEqualityComparer.AggressiveNotSupported;
+
+            return StructuralEqualityComparer.Aggressive;
         }
 
         /// <summary>
@@ -309,6 +308,9 @@ namespace J2N.Collections.ObjectModel
         /// <exception cref="ArgumentNullException">If <paramref name="comparer"/> is <c>null</c>.</exception>
         public virtual bool Equals(object? other, IEqualityComparer comparer)
         {
+            if (comparer is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.comparer);
+
             if (!RuntimeFeature.IsDynamicCodeSupported)
             {
                 ThrowHelper.ThrowPlatformNotSupportedException(ExceptionResource.PlatformNotSupported_NoAggressiveMode);
@@ -389,8 +391,12 @@ namespace J2N.Collections.ObjectModel
         /// <param name="comparer">The <see cref="IEqualityComparer"/> implementation to use to generate
         /// the hash code.</param>
         /// <returns>A hash code representing the current list.</returns>
+        /// <exception cref="ArgumentNullException">If <paramref name="comparer"/> is <c>null</c>.</exception>
         public virtual int GetHashCode(IEqualityComparer comparer)
         {
+            if (comparer is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.comparer);
+
             if (!RuntimeFeature.IsDynamicCodeSupported)
             {
                 ThrowHelper.ThrowPlatformNotSupportedException(ExceptionResource.PlatformNotSupported_NoAggressiveMode);

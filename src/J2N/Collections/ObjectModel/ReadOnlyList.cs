@@ -1,4 +1,4 @@
-﻿#region Copyright 2019-2021 by Shad Storhaug, Licensed under the Apache License, Version 2.0
+﻿#region Copyright 2019-2026 by Shad Storhaug, Licensed under the Apache License, Version 2.0
 /*  Licensed to the Apache Software Foundation (ASF) under one or more
  *  contributor license agreements.  See the NOTICE file distributed with
  *  this work for additional information regarding copyright ownership.
@@ -21,7 +21,6 @@ using J2N.Text;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 
 
@@ -48,7 +47,7 @@ namespace J2N.Collections.ObjectModel
     {
         private static readonly bool TIsValueTypeOrStringOrStructuralEquatable = typeof(T).IsValueType || typeof(IStructuralEquatable).IsAssignableFrom(typeof(T)) || typeof(string).Equals(typeof(T));
 
-        private readonly StructuralEqualityMode mode;
+        private readonly ListEqualityComparer<T> structuralEqualityComparer;
         private readonly IFormatProvider toStringFormatProvider;
 
         /// <summary>
@@ -65,19 +64,26 @@ namespace J2N.Collections.ObjectModel
         /// This constructor is an O(1) operation.
         /// </remarks>
         public ReadOnlyList(IList<T> list)
-            : this(list,
-                TIsValueTypeOrStringOrStructuralEquatable
-                    ? StructuralEqualityMode.Default
-                    : StructuralEqualityMode.Aggressive,
-                StringFormatter.CurrentCulture)
+            : this(list, ChooseComparer(), StringFormatter.CurrentCulture)
         {
         }
 
-        internal ReadOnlyList(IList<T> list, StructuralEqualityMode mode, IFormatProvider toStringFormatProvider)
+        internal ReadOnlyList(IList<T> list, ListEqualityComparer<T> structuralEqualityComparer, IFormatProvider toStringFormatProvider)
             : base(list)
         {
-            this.mode = mode;
+            this.structuralEqualityComparer = structuralEqualityComparer ?? throw new ArgumentNullException(nameof(structuralEqualityComparer));
             this.toStringFormatProvider = toStringFormatProvider ?? throw new ArgumentNullException(nameof(toStringFormatProvider));
+        }
+
+        private static ListEqualityComparer<T> ChooseComparer()
+        {
+            if (TIsValueTypeOrStringOrStructuralEquatable)
+                return ListEqualityComparer<T>.Default;
+
+            if (!RuntimeFeature.IsDynamicCodeSupported)
+                return ListEqualityComparer<T>.AggressiveNotSupported;
+
+            return ListEqualityComparer<T>.Aggressive;
         }
 
         internal IList<T> List => base.Items; // for testing
@@ -104,6 +110,7 @@ namespace J2N.Collections.ObjectModel
         /// <param name="comparer">The <see cref="IEqualityComparer"/> implementation to use to generate
         /// the hash code.</param>
         /// <returns>A hash code representing the current list.</returns>
+        /// <exception cref="ArgumentNullException">If <paramref name="comparer"/> is <c>null</c>.</exception>
         public virtual int GetHashCode(IEqualityComparer comparer)
             => ListEqualityComparer<T>.GetHashCode(this, comparer);
 
@@ -117,18 +124,7 @@ namespace J2N.Collections.ObjectModel
         /// and it contains the same elements in the same order; otherwise, <c>false</c>.</returns>
         /// <seealso cref="Equals(object, IEqualityComparer)"/>
         public override bool Equals(object? obj)
-        {
-            if (mode == StructuralEqualityMode.Default)
-                return ListEqualityComparer<T>.Default.Equals(Items, obj);
-
-            if (!RuntimeFeature.IsDynamicCodeSupported)
-            {
-                ThrowHelper.ThrowPlatformNotSupportedException(ExceptionResource.PlatformNotSupported_NoAggressiveMode);
-                return ListEqualityComparer<T>.AggressiveNotSupported.Equals(Items, obj);
-            }
-
-            return ListEqualityComparer<T>.Aggressive.Equals(Items, obj);
-        }
+            => Equals(obj, structuralEqualityComparer);
 
         /// <summary>
         /// Gets the hash code for the current list. The hash code is calculated
@@ -136,18 +132,7 @@ namespace J2N.Collections.ObjectModel
         /// </summary>
         /// <returns>A hash code for the current object.</returns>
         public override int GetHashCode()
-        {
-            if (mode == StructuralEqualityMode.Default)
-                return ListEqualityComparer<T>.Default.GetHashCode(Items);
-
-            if (!RuntimeFeature.IsDynamicCodeSupported)
-            {
-                ThrowHelper.ThrowPlatformNotSupportedException(ExceptionResource.PlatformNotSupported_NoAggressiveMode);
-                return ListEqualityComparer<T>.AggressiveNotSupported.GetHashCode(Items);
-            }
-
-            return ListEqualityComparer<T>.Aggressive.GetHashCode(Items);
-        }
+            => GetHashCode(structuralEqualityComparer);
 
         #endregion
 
