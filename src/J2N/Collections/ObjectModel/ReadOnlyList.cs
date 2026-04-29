@@ -122,7 +122,10 @@ namespace J2N.Collections.ObjectModel
                 return ListEqualityComparer<T>.Default.Equals(Items, obj);
 
             if (!RuntimeFeature.IsDynamicCodeSupported)
+            {
                 ThrowHelper.ThrowPlatformNotSupportedException(ExceptionResource.PlatformNotSupported_NoAggressiveMode);
+                return ListEqualityComparer<T>.AggressiveNotSupported.Equals(Items, obj);
+            }
 
             return ListEqualityComparer<T>.Aggressive.Equals(Items, obj);
         }
@@ -138,7 +141,10 @@ namespace J2N.Collections.ObjectModel
                 return ListEqualityComparer<T>.Default.GetHashCode(Items);
 
             if (!RuntimeFeature.IsDynamicCodeSupported)
+            {
                 ThrowHelper.ThrowPlatformNotSupportedException(ExceptionResource.PlatformNotSupported_NoAggressiveMode);
+                return ListEqualityComparer<T>.AggressiveNotSupported.GetHashCode(Items);
+            }
 
             return ListEqualityComparer<T>.Aggressive.GetHashCode(Items);
         }

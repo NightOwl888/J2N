@@ -22,6 +22,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 
 namespace J2N.Collections.ObjectModel
 {
@@ -42,7 +43,6 @@ namespace J2N.Collections.ObjectModel
 #if FEATURE_SERIALIZABLE
     [Serializable]
 #endif
-    [RequiresDynamicCode("Uses runtime type inspection for structural operations.")]
     public class ReadOnlyCollection<T> : ICollection<T>,
 #if FEATURE_IREADONLYCOLLECTIONS
         IReadOnlyCollection<T>,
@@ -74,12 +74,19 @@ namespace J2N.Collections.ObjectModel
         /// This constructor is an O(1) operation.
         /// </remarks>
         public ReadOnlyCollection(ICollection<T> collection)
-            : this(collection,
-                  TIsValueTypeOrStringOrStructuralEquatable
-                    ? StructuralEqualityComparer.Default
-                    : StructuralEqualityComparer.Aggressive,
-                  StringFormatter.CurrentCulture)
+            : this(collection, ChooseComparer(), StringFormatter.CurrentCulture)
         {
+        }
+
+        private static StructuralEqualityComparer ChooseComparer()
+        {
+            if (TIsValueTypeOrStringOrStructuralEquatable)
+                return StructuralEqualityComparer.Default;
+
+            if (!RuntimeFeature.IsDynamicCodeSupported)
+                return StructuralEqualityComparer.AggressiveNotSupported;
+
+            return StructuralEqualityComparer.Aggressive;
         }
 
         internal ReadOnlyCollection(ICollection<T> collection, StructuralEqualityComparer structuralEqualityComparer, IFormatProvider toStringFormatProvider)
@@ -302,6 +309,12 @@ namespace J2N.Collections.ObjectModel
         /// <exception cref="ArgumentNullException">If <paramref name="comparer"/> is <c>null</c>.</exception>
         public virtual bool Equals(object? other, IEqualityComparer comparer)
         {
+            if (!RuntimeFeature.IsDynamicCodeSupported)
+            {
+                ThrowHelper.ThrowPlatformNotSupportedException(ExceptionResource.PlatformNotSupported_NoAggressiveMode);
+                return false;
+            }
+
             if (other is null)
                 return false;
             if (ReferenceEquals(collection, other))
@@ -378,6 +391,12 @@ namespace J2N.Collections.ObjectModel
         /// <returns>A hash code representing the current list.</returns>
         public virtual int GetHashCode(IEqualityComparer comparer)
         {
+            if (!RuntimeFeature.IsDynamicCodeSupported)
+            {
+                ThrowHelper.ThrowPlatformNotSupportedException(ExceptionResource.PlatformNotSupported_NoAggressiveMode);
+                return 0;
+            }
+
             if (collection.GetType().ImplementsGenericInterface(typeof(IDictionary<,>)))
             {
                 if (comparer is IDictionaryEqualityComparer dictionaryComparer)

@@ -61,7 +61,13 @@ namespace J2N.Collections
         {
             [RequiresDynamicCode("Aggressive structural comparison uses reflection.")]
             get => new AggressiveStructuralEqualityComparer();
-        } 
+        }
+
+        /// <summary>
+        /// Used as a fallback when aggressive mode is selected but the user doesn't have the ability to use Reflection (e.g. AOT trimming).
+        /// This comparer will throw a <see cref="PlatformNotSupportedException"/> when used.
+        /// </summary>
+        internal static StructuralEqualityComparer AggressiveNotSupported { get; } = new AggressiveModeUnsupportedStructuralEqualityComparer();
 
         /// <summary>
         /// Compares two objects for structural equality.
@@ -234,7 +240,7 @@ namespace J2N.Collections
 #if FEATURE_SERIALIZABLE
     [Serializable]
 #endif
-    internal class DefaultStructuralEqualityComparer : StructuralEqualityComparer
+    internal sealed class DefaultStructuralEqualityComparer : StructuralEqualityComparer
     {
         protected override bool UnstructuredEquals(object? x, object? y)
         {
@@ -270,7 +276,7 @@ namespace J2N.Collections
 #if FEATURE_SERIALIZABLE
     [Serializable]
 #endif
-    internal class AggressiveStructuralEqualityComparer : StructuralEqualityComparer
+    internal sealed class AggressiveStructuralEqualityComparer : StructuralEqualityComparer
     {
         [RequiresDynamicCode("Aggressive structural comparison uses reflection.")]
         internal AggressiveStructuralEqualityComparer()
@@ -315,6 +321,53 @@ namespace J2N.Collections
                 // Handle non-structured types (including built in .NET collections)
                 return CollectionUtil.Equals(x, y);
             }
+        }
+    }
+
+    /// <summary>
+    /// AOT trimming is not happy with simply throwing an exception when aggressive mode is selected and the user
+    /// doesn't make that decision. The compiler wants a real comparer with no Reflection in it to be able to trim
+    /// the code properly. So, this comparer is used when aggressive mode is selected but the user doesn't have the
+    /// ability to use Reflection (e.g. AOT trimming).
+    /// </summary>
+#if FEATURE_SERIALIZABLE
+    [Serializable]
+#endif
+    internal sealed class AggressiveModeUnsupportedStructuralEqualityComparer : StructuralEqualityComparer
+    {
+        protected override bool UnstructuredEquals(object? x, object? y)
+        {
+            ThrowHelper.ThrowPlatformNotSupportedException(ExceptionResource.PlatformNotSupported_NoAggressiveMode);
+            return false;
+        }
+        protected override int GetUnstructuredHashCode(object? obj)
+        {
+            ThrowHelper.ThrowPlatformNotSupportedException(ExceptionResource.PlatformNotSupported_NoAggressiveMode);
+            return 0;
+        }
+
+        public override bool Equals(object? obj)
+        {
+            ThrowHelper.ThrowPlatformNotSupportedException(ExceptionResource.PlatformNotSupported_NoAggressiveMode);
+            return false;
+        }
+
+        public override bool Equals(object? x, object? y)
+        {
+            ThrowHelper.ThrowPlatformNotSupportedException(ExceptionResource.PlatformNotSupported_NoAggressiveMode);
+            return false;
+        }
+
+        public override int GetHashCode(object? obj)
+        {
+            ThrowHelper.ThrowPlatformNotSupportedException(ExceptionResource.PlatformNotSupported_NoAggressiveMode);
+            return 0;
+        }
+
+        public override int GetHashCode()
+        {
+            ThrowHelper.ThrowPlatformNotSupportedException(ExceptionResource.PlatformNotSupported_NoAggressiveMode);
+            return 0;
         }
     }
 }

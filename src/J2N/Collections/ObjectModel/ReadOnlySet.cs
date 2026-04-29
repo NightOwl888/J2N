@@ -479,7 +479,10 @@ namespace J2N.Collections.ObjectModel
                 return SetEqualityComparer<T>.Default.Equals(set, obj);
 
             if (!RuntimeFeature.IsDynamicCodeSupported)
+            {
                 ThrowHelper.ThrowPlatformNotSupportedException(ExceptionResource.PlatformNotSupported_NoAggressiveMode);
+                return false;
+            }
 
             return SetEqualityComparer<T>.Aggressive.Equals(set, obj);
         }
@@ -496,7 +499,10 @@ namespace J2N.Collections.ObjectModel
                 return SetEqualityComparer<T>.Default.GetHashCode(set);
 
             if (!RuntimeFeature.IsDynamicCodeSupported)
+            {
                 ThrowHelper.ThrowPlatformNotSupportedException(ExceptionResource.PlatformNotSupported_NoAggressiveMode);
+                return 0;
+            }
 
             return SetEqualityComparer<T>.Aggressive.GetHashCode(set);
         }

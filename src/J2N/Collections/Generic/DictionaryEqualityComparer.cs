@@ -91,6 +91,12 @@ namespace J2N.Collections.Generic
             get => new AggressiveDictionaryEqualityComparer();
         }
 
+        /// <summary>
+        /// Used as a fallback when aggressive mode is selected but the user doesn't have the ability to use Reflection (e.g. AOT trimming).
+        /// This comparer will throw a <see cref="PlatformNotSupportedException"/> when used.
+        /// </summary>
+        internal static DictionaryEqualityComparer<TKey, TValue> AggressiveNotSupported { get; } = new AggressiveModeUnsupportedDictionaryEqualityComparer();
+
 #pragma warning disable CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
         internal DictionaryEqualityComparer(StructuralEqualityComparer structuralEqualityComparer)
 #pragma warning restore CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
@@ -234,7 +240,11 @@ namespace J2N.Collections.Generic
                 else
                 {
                     if (!RuntimeFeature.IsDynamicCodeSupported)
-                        ThrowHelper.ThrowPlatformNotSupportedException(ExceptionResource.PlatformNotSupported_DynamicCode);
+                    {
+                        ThrowHelper.ThrowPlatformNotSupportedException(ExceptionResource.PlatformNotSupported_NoAggressiveMode);
+                        equalityComparer = default;
+                        return false;
+                    }
 
                     equalityComparer = Aggressive;
                 }
@@ -326,7 +336,7 @@ namespace J2N.Collections.Generic
 #if FEATURE_SERIALIZABLE
         [Serializable]
 #endif
-        internal class DefaultDictionaryEqualityComparer : DictionaryEqualityComparer<TKey, TValue>
+        internal sealed class DefaultDictionaryEqualityComparer : DictionaryEqualityComparer<TKey, TValue>
         {
             public DefaultDictionaryEqualityComparer()
                 : base(StructuralEqualityComparer.Default)
@@ -336,12 +346,52 @@ namespace J2N.Collections.Generic
 #if FEATURE_SERIALIZABLE
         [Serializable]
 #endif
-        internal class AggressiveDictionaryEqualityComparer : DictionaryEqualityComparer<TKey, TValue>
+        internal sealed class AggressiveDictionaryEqualityComparer : DictionaryEqualityComparer<TKey, TValue>
         {
             [RequiresDynamicCode("Aggressive structural comparison uses reflection.")]
             public AggressiveDictionaryEqualityComparer()
                 : base(StructuralEqualityComparer.Aggressive)
             { }
+        }
+
+        /// <summary>
+        /// AOT trimming is not happy with simply throwing an exception when aggressive mode is selected and the user
+        /// doesn't make that decision. The compiler wants a real comparer with no Reflection in it to be able to trim
+        /// the code properly. So, this comparer is used when aggressive mode is selected but the user doesn't have the
+        /// ability to use Reflection (e.g. AOT trimming).
+        /// </summary>
+#if FEATURE_SERIALIZABLE
+        [Serializable]
+#endif
+        internal sealed class AggressiveModeUnsupportedDictionaryEqualityComparer : DictionaryEqualityComparer<TKey, TValue>
+        {
+            public AggressiveModeUnsupportedDictionaryEqualityComparer()
+                : base(StructuralEqualityComparer.AggressiveNotSupported)
+            { }
+
+            public override bool Equals(IDictionary<TKey, TValue>? dictionaryA, IDictionary<TKey, TValue>? dictionaryB)
+            {
+                ThrowHelper.ThrowPlatformNotSupportedException(ExceptionResource.PlatformNotSupported_NoAggressiveMode);
+                return false;
+            }
+
+            public override bool Equals(object? obj)
+            {
+                ThrowHelper.ThrowPlatformNotSupportedException(ExceptionResource.PlatformNotSupported_NoAggressiveMode);
+                return false;
+            }
+
+            public override int GetHashCode(IDictionary<TKey, TValue>? dictionary)
+            {
+                ThrowHelper.ThrowPlatformNotSupportedException(ExceptionResource.PlatformNotSupported_NoAggressiveMode);
+                return 0;
+            }
+
+            public override int GetHashCode()
+            {
+                ThrowHelper.ThrowPlatformNotSupportedException(ExceptionResource.PlatformNotSupported_NoAggressiveMode);
+                return 0;
+            }
         }
     }
 

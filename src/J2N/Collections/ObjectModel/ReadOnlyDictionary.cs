@@ -424,7 +424,10 @@ namespace J2N.Collections.ObjectModel
                 return DictionaryEqualityComparer<TKey, TValue>.Default.Equals(dictionary, obj);
 
             if (!RuntimeFeature.IsDynamicCodeSupported)
+            {
                 ThrowHelper.ThrowPlatformNotSupportedException(ExceptionResource.PlatformNotSupported_NoAggressiveMode);
+                return DictionaryEqualityComparer<TKey, TValue>.AggressiveNotSupported.Equals(dictionary, obj);
+            }
 
             return DictionaryEqualityComparer<TKey, TValue>.Aggressive.Equals(dictionary, obj);
         }
@@ -441,7 +444,10 @@ namespace J2N.Collections.ObjectModel
                 return DictionaryEqualityComparer<TKey, TValue>.Default.GetHashCode(dictionary);
 
             if (!RuntimeFeature.IsDynamicCodeSupported)
+            {
                 ThrowHelper.ThrowPlatformNotSupportedException(ExceptionResource.PlatformNotSupported_NoAggressiveMode);
+                return DictionaryEqualityComparer<TKey, TValue>.AggressiveNotSupported.GetHashCode(dictionary);
+            }
 
             return DictionaryEqualityComparer<TKey, TValue>.Aggressive.GetHashCode(dictionary);
         }

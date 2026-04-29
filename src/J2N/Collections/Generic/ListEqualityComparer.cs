@@ -81,7 +81,14 @@ namespace J2N.Collections.Generic
         {
             [RequiresDynamicCode("Aggressive structural comparison uses reflection.")]
             get => new AggressiveListEqualityComparer();
-        } 
+        }
+
+        /// <summary>
+        /// Used as a fallback when aggressive mode is selected but the user doesn't have the ability to use Reflection (e.g. AOT trimming).
+        /// This comparer will throw a <see cref="PlatformNotSupportedException"/> when used.
+        /// </summary>
+        internal static ListEqualityComparer<T> AggressiveNotSupported { get; } = new AggressiveModeUnsupportedListEqualityComparer();
+
 
 #pragma warning disable CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
         internal ListEqualityComparer(StructuralEqualityComparer structuralEqualityComparer)
@@ -204,7 +211,11 @@ namespace J2N.Collections.Generic
                 else
                 {
                     if (!RuntimeFeature.IsDynamicCodeSupported)
-                        ThrowHelper.ThrowPlatformNotSupportedException(ExceptionResource.PlatformNotSupported_DynamicCode);
+                    {
+                        ThrowHelper.ThrowPlatformNotSupportedException(ExceptionResource.PlatformNotSupported_NoAggressiveMode);
+                        equalityComparer = default;
+                        return false;
+                    }
 
                     equalityComparer = Aggressive;
                 }
@@ -285,7 +296,7 @@ namespace J2N.Collections.Generic
 #if FEATURE_SERIALIZABLE
         [Serializable]
 #endif
-        internal class DefaultListEqualityComparer : ListEqualityComparer<T>
+        internal sealed class DefaultListEqualityComparer : ListEqualityComparer<T>
         {
             public DefaultListEqualityComparer()
                 : base(StructuralEqualityComparer.Default)
@@ -295,12 +306,52 @@ namespace J2N.Collections.Generic
 #if FEATURE_SERIALIZABLE
         [Serializable]
 #endif
-        internal class AggressiveListEqualityComparer : ListEqualityComparer<T>
+        internal sealed class AggressiveListEqualityComparer : ListEqualityComparer<T>
         {
             [RequiresDynamicCode("Aggressive structural comparison uses reflection.")]
             public AggressiveListEqualityComparer()
                 : base(StructuralEqualityComparer.Aggressive)
             { }
+        }
+
+        /// <summary>
+        /// AOT trimming is not happy with simply throwing an exception when aggressive mode is selected and the user
+        /// doesn't make that decision. The compiler wants a real comparer with no Reflection in it to be able to trim
+        /// the code properly. So, this comparer is used when aggressive mode is selected but the user doesn't have the
+        /// ability to use Reflection (e.g. AOT trimming).
+        /// </summary>
+#if FEATURE_SERIALIZABLE
+        [Serializable]
+#endif
+        internal sealed class AggressiveModeUnsupportedListEqualityComparer : ListEqualityComparer<T>
+        {
+            public AggressiveModeUnsupportedListEqualityComparer()
+                : base(StructuralEqualityComparer.AggressiveNotSupported)
+            { }
+
+            public override bool Equals(IList<T>? listA, IList<T>? listB)
+            {
+                ThrowHelper.ThrowPlatformNotSupportedException(ExceptionResource.PlatformNotSupported_NoAggressiveMode);
+                return false;
+            }
+
+            public override bool Equals(object? obj)
+            {
+                ThrowHelper.ThrowPlatformNotSupportedException(ExceptionResource.PlatformNotSupported_NoAggressiveMode);
+                return false;
+            }
+
+            public override int GetHashCode(IList<T>? list)
+            {
+                ThrowHelper.ThrowPlatformNotSupportedException(ExceptionResource.PlatformNotSupported_NoAggressiveMode);
+                return 0;
+            }
+
+            public override int GetHashCode()
+            {
+                ThrowHelper.ThrowPlatformNotSupportedException(ExceptionResource.PlatformNotSupported_NoAggressiveMode);
+                return 0;
+            }
         }
     }
 }
