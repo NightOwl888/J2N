@@ -55,7 +55,10 @@ namespace J2N.Collections
         public static bool Equals<T>(IList<T>? listA, IList<T>? listB)
         {
             if (!RuntimeFeature.IsDynamicCodeSupported)
+            {
                 ThrowHelper.ThrowPlatformNotSupportedException(ExceptionResource.PlatformNotSupported_DynamicCode);
+                return false; // J2N: Important to have this return after the throw to satisfy the compiler, even though it is unreachable.
+            }
 
             return ListEqualityComparer<T>.Aggressive.Equals(listA, listB);
         }
@@ -76,7 +79,10 @@ namespace J2N.Collections
         public static bool Equals<T>(ISet<T>? setA, ISet<T>? setB)
         {
             if (!RuntimeFeature.IsDynamicCodeSupported)
+            {
                 ThrowHelper.ThrowPlatformNotSupportedException(ExceptionResource.PlatformNotSupported_DynamicCode);
+                return false; // J2N: Important to have this return after the throw to satisfy the compiler, even though it is unreachable.
+            }
 
             return SetEqualityComparer<T>.Aggressive.Equals(setA, setB);
         }
@@ -97,7 +103,10 @@ namespace J2N.Collections
         public static bool Equals<TKey, TValue>(IDictionary<TKey, TValue>? dictionaryA, IDictionary<TKey, TValue>? dictionaryB)
         {
             if (!RuntimeFeature.IsDynamicCodeSupported)
+            {
                 ThrowHelper.ThrowPlatformNotSupportedException(ExceptionResource.PlatformNotSupported_DynamicCode);
+                return false; // J2N: Important to have this return after the throw to satisfy the compiler, even though it is unreachable.
+            }
 
             return DictionaryEqualityComparer<TKey, TValue>.Aggressive.Equals(dictionaryA, dictionaryB);
         }
@@ -113,7 +122,10 @@ namespace J2N.Collections
         new public static bool Equals(object? objA, object? objB)
         {
             if (!RuntimeFeature.IsDynamicCodeSupported)
+            {
                 ThrowHelper.ThrowPlatformNotSupportedException(ExceptionResource.PlatformNotSupported_DynamicCode);
+                return false; // J2N: Important to have this return after the throw to satisfy the compiler, even though it is unreachable.
+            }
 
             if (objA is null)
                 return objB is null;
@@ -199,7 +211,10 @@ namespace J2N.Collections
         public static int GetHashCode<T>(IList<T>? list)
         {
             if (!RuntimeFeature.IsDynamicCodeSupported)
+            {
                 ThrowHelper.ThrowPlatformNotSupportedException(ExceptionResource.PlatformNotSupported_DynamicCode);
+                return 0; // J2N: Important to have this return after the throw to satisfy the compiler, even though it is unreachable.
+            }
 
             return ListEqualityComparer<T>.Aggressive.GetHashCode(list);
         }
@@ -220,7 +235,10 @@ namespace J2N.Collections
         public static int GetHashCode<T>(ISet<T>? set)
         {
             if (!RuntimeFeature.IsDynamicCodeSupported)
+            {
                 ThrowHelper.ThrowPlatformNotSupportedException(ExceptionResource.PlatformNotSupported_DynamicCode);
+                return 0; // J2N: Important to have this return after the throw to satisfy the compiler, even though it is unreachable.
+            }
 
             return SetEqualityComparer<T>.Aggressive.GetHashCode(set);
         }
@@ -241,7 +259,10 @@ namespace J2N.Collections
         public static int GetHashCode<TKey, TValue>(IDictionary<TKey, TValue>? dictionary)
         {
             if (!RuntimeFeature.IsDynamicCodeSupported)
+            {
                 ThrowHelper.ThrowPlatformNotSupportedException(ExceptionResource.PlatformNotSupported_DynamicCode);
+                return 0; // J2N: Important to have this return after the throw to satisfy the compiler, even though it is unreachable.
+            }
 
             return DictionaryEqualityComparer<TKey, TValue>.Aggressive.GetHashCode(dictionary);
         }
@@ -263,7 +284,10 @@ namespace J2N.Collections
         public static int GetHashCode(object? obj)
         {
             if (!RuntimeFeature.IsDynamicCodeSupported)
+            {
                 ThrowHelper.ThrowPlatformNotSupportedException(ExceptionResource.PlatformNotSupported_DynamicCode);
+                return 0; // J2N: Important to have this return after the throw to satisfy the compiler, even though it is unreachable.
+            }
 
             if (obj == null)
                 return 0; // 0 for null
