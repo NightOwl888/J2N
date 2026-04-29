@@ -424,14 +424,10 @@ namespace J2N.Collections.ObjectModel
                 return DictionaryEqualityComparer<TKey, TValue>.Default.Equals(dictionary, obj);
 
             if (!RuntimeFeature.IsDynamicCodeSupported)
-                ThrowHelper.ThrowPlatformNotSupportedException(ExceptionResource.PlatformNotSupported_DynamicCode);
+                ThrowHelper.ThrowPlatformNotSupportedException(ExceptionResource.PlatformNotSupported_NoAggressiveMode);
 
-            return AggressiveEquals(dictionary, obj);
+            return DictionaryEqualityComparer<TKey, TValue>.Aggressive.Equals(dictionary, obj);
         }
-
-        [RequiresDynamicCode("Uses reflection for structural comparison.")]
-        private static bool AggressiveEquals(IDictionary<TKey, TValue> dictionary, object? obj)
-            => DictionaryEqualityComparer<TKey, TValue>.Aggressive.Equals(dictionary, obj);
 
         /// <summary>
         /// Gets the hash code for the current dictionary. The hash code is calculated
@@ -445,14 +441,10 @@ namespace J2N.Collections.ObjectModel
                 return DictionaryEqualityComparer<TKey, TValue>.Default.GetHashCode(dictionary);
 
             if (!RuntimeFeature.IsDynamicCodeSupported)
-                ThrowHelper.ThrowPlatformNotSupportedException(ExceptionResource.PlatformNotSupported_DynamicCode);
+                ThrowHelper.ThrowPlatformNotSupportedException(ExceptionResource.PlatformNotSupported_NoAggressiveMode);
 
-            return AggressiveGetHashCode(dictionary);
+            return DictionaryEqualityComparer<TKey, TValue>.Aggressive.GetHashCode(dictionary);
         }
-
-        [RequiresDynamicCode("Uses reflection for structural comparison.")]
-        private static int AggressiveGetHashCode(IDictionary<TKey, TValue> dictionary)
-            => DictionaryEqualityComparer<TKey, TValue>.Aggressive.GetHashCode(dictionary);
 
         #endregion
 

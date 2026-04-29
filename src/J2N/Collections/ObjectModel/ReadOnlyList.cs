@@ -122,14 +122,10 @@ namespace J2N.Collections.ObjectModel
                 return ListEqualityComparer<T>.Default.Equals(Items, obj);
 
             if (!RuntimeFeature.IsDynamicCodeSupported)
-                ThrowHelper.ThrowPlatformNotSupportedException(ExceptionResource.PlatformNotSupported_DynamicCode);
+                ThrowHelper.ThrowPlatformNotSupportedException(ExceptionResource.PlatformNotSupported_NoAggressiveMode);
 
-            return AggressiveEquals(Items, obj);
+            return ListEqualityComparer<T>.Aggressive.Equals(Items, obj);
         }
-
-        [RequiresDynamicCode("Uses reflection for structural comparison.")]
-        private static bool AggressiveEquals(IList<T> list, object? obj)
-            => ListEqualityComparer<T>.Aggressive.Equals(list, obj);
 
         /// <summary>
         /// Gets the hash code for the current list. The hash code is calculated
@@ -142,14 +138,10 @@ namespace J2N.Collections.ObjectModel
                 return ListEqualityComparer<T>.Default.GetHashCode(Items);
 
             if (!RuntimeFeature.IsDynamicCodeSupported)
-                ThrowHelper.ThrowPlatformNotSupportedException(ExceptionResource.PlatformNotSupported_DynamicCode);
+                ThrowHelper.ThrowPlatformNotSupportedException(ExceptionResource.PlatformNotSupported_NoAggressiveMode);
 
-            return AggressiveGetHashCode(Items);
+            return ListEqualityComparer<T>.Aggressive.GetHashCode(Items);
         }
-
-        [RequiresDynamicCode("Uses reflection for structural comparison.")]
-        private static int AggressiveGetHashCode(IList<T> list)
-            => ListEqualityComparer<T>.Aggressive.GetHashCode(list);
 
         #endregion
 

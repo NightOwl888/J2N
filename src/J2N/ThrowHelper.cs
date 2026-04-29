@@ -1635,6 +1635,8 @@ namespace J2N
                     return SR.PlatformNotSupported_DynamicCode;
                 case ExceptionResource.InvalidOperation_UnexpectedDispatcherType:
                     return SR.InvalidOperation_UnexpectedDispatcherType;
+                case ExceptionResource.PlatformNotSupported_NoAggressiveMode:
+                    return SR.PlatformNotSupported_NoAggressiveMode;
 
                 default:
                     Debug.Fail("The enum value is not defined, please check the ExceptionResource Enum.");
@@ -1951,5 +1953,6 @@ namespace J2N
         Serialization_InvalidOnDeser,
         PlatformNotSupported_DynamicCode,
         InvalidOperation_UnexpectedDispatcherType,
+        PlatformNotSupported_NoAggressiveMode,
     }
 }

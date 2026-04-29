@@ -486,4 +486,7 @@
   <data name="InvalidOperation_UnexpectedDispatcherType" xml:space="preserve">
     <value>Unexpected type '{0}' encountered during generic dispatch.</value>
   </data>
+  <data name="PlatformNotSupported_NoAggressiveMode" xml:space="preserve">
+    <value>Aggressive mode is not supported on this platform. The collections in the BCL do not support structural equality and Aggressive mode uses Reflection to patch this behavior. We recommend using J2N collections exclusively which implement structural equality directly.</value>
+  </data>
 </root>

@@ -479,14 +479,10 @@ namespace J2N.Collections.ObjectModel
                 return SetEqualityComparer<T>.Default.Equals(set, obj);
 
             if (!RuntimeFeature.IsDynamicCodeSupported)
-                ThrowHelper.ThrowPlatformNotSupportedException(ExceptionResource.PlatformNotSupported_DynamicCode);
+                ThrowHelper.ThrowPlatformNotSupportedException(ExceptionResource.PlatformNotSupported_NoAggressiveMode);
 
-            return AggressiveEquals(set, obj);
+            return SetEqualityComparer<T>.Aggressive.Equals(set, obj);
         }
-
-        [RequiresDynamicCode("Uses reflection for structural comparison.")]
-        private static bool AggressiveEquals(ISet<T> set, object? obj)
-            => SetEqualityComparer<T>.Aggressive.Equals(set, obj);
 
         /// <summary>
         /// Gets the hash code for the current set. The hash code is calculated
@@ -500,14 +496,10 @@ namespace J2N.Collections.ObjectModel
                 return SetEqualityComparer<T>.Default.GetHashCode(set);
 
             if (!RuntimeFeature.IsDynamicCodeSupported)
-                ThrowHelper.ThrowPlatformNotSupportedException(ExceptionResource.PlatformNotSupported_DynamicCode);
+                ThrowHelper.ThrowPlatformNotSupportedException(ExceptionResource.PlatformNotSupported_NoAggressiveMode);
 
-            return AggressiveGetHashCode(set);
+            return SetEqualityComparer<T>.Aggressive.GetHashCode(set);
         }
-
-        [RequiresDynamicCode("Uses reflection for structural comparison.")]
-        private static int AggressiveGetHashCode(ISet<T> set)
-            => SetEqualityComparer<T>.Aggressive.GetHashCode(set);
 
         #endregion
 
