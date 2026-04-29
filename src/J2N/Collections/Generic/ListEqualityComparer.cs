@@ -20,6 +20,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 
 namespace J2N.Collections.Generic
 {
@@ -197,9 +198,16 @@ namespace J2N.Collections.Generic
             if (comparer is StructuralEqualityComparer seComparer)
             {
                 if (seComparer.Equals(StructuralEqualityComparer.Default))
+                {
                     equalityComparer = Default;
+                }
                 else
+                {
+                    if (!RuntimeFeature.IsDynamicCodeSupported)
+                        ThrowHelper.ThrowPlatformNotSupportedException(ExceptionResource.PlatformNotSupported_DynamicCode);
+
                     equalityComparer = Aggressive;
+                }
                 return true;
             }
             else if (comparer is ListEqualityComparer<T> listComparer)

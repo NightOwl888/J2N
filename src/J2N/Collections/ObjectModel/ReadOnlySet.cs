@@ -22,6 +22,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 
 namespace J2N.Collections.ObjectModel
 {
@@ -474,9 +475,13 @@ namespace J2N.Collections.ObjectModel
         /// <seealso cref="Equals(object, IEqualityComparer)"/>
         public override bool Equals(object? obj)
         {
-            return mode == StructuralEqualityMode.Default
-                ? SetEqualityComparer<T>.Default.Equals(set, obj)
-                : AggressiveEquals(set, obj);
+            if (mode == StructuralEqualityMode.Default)
+                return SetEqualityComparer<T>.Default.Equals(set, obj);
+
+            if (!RuntimeFeature.IsDynamicCodeSupported)
+                ThrowHelper.ThrowPlatformNotSupportedException(ExceptionResource.PlatformNotSupported_DynamicCode);
+
+            return AggressiveEquals(set, obj);
         }
 
         [RequiresDynamicCode("Uses reflection for structural comparison.")]
@@ -491,9 +496,13 @@ namespace J2N.Collections.ObjectModel
         /// <seealso cref="GetHashCode(IEqualityComparer)"/>
         public override int GetHashCode()
         {
-            return mode == StructuralEqualityMode.Default
-                ? SetEqualityComparer<T>.Default.GetHashCode(set)
-                : AggressiveGetHashCode(set);
+            if (mode == StructuralEqualityMode.Default)
+                return SetEqualityComparer<T>.Default.GetHashCode(set);
+
+            if (!RuntimeFeature.IsDynamicCodeSupported)
+                ThrowHelper.ThrowPlatformNotSupportedException(ExceptionResource.PlatformNotSupported_DynamicCode);
+
+            return AggressiveGetHashCode(set);
         }
 
         [RequiresDynamicCode("Uses reflection for structural comparison.")]
