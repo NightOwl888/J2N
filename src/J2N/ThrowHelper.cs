@@ -1633,8 +1633,6 @@ namespace J2N
                     return SR.Serialization_InvalidOnDeser;
                 case ExceptionResource.PlatformNotSupported_DynamicCode:
                     return SR.PlatformNotSupported_DynamicCode;
-                case ExceptionResource.InvalidOperation_UnexpectedDispatcherType:
-                    return SR.InvalidOperation_UnexpectedDispatcherType;
                 case ExceptionResource.PlatformNotSupported_NoAggressiveMode:
                     return SR.PlatformNotSupported_NoAggressiveMode;
 
@@ -1952,7 +1950,6 @@ namespace J2N
         Serialization_MissingValues,
         Serialization_InvalidOnDeser,
         PlatformNotSupported_DynamicCode,
-        InvalidOperation_UnexpectedDispatcherType,
         PlatformNotSupported_NoAggressiveMode,
     }
 }
