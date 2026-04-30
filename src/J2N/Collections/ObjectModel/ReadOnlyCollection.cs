@@ -309,7 +309,14 @@ namespace J2N.Collections.ObjectModel
         /// whether the current object and <paramref name="other"/> are structurally equal.</param>
         /// <returns><c>true</c> if <paramref name="other"/> is structurally equal to the current list;
         /// otherwise, <c>false</c>.</returns>
+        /// <remarks>
+        /// This method uses Reflection and is not safe for AOT trimming. It is highly recommended to use one of the
+        /// other read-only collections instead. AOT users should always use J2N collections instead of .NET collections,
+        /// as they are designed to never use Reflection for equality comparisons.
+        /// </remarks>
         /// <exception cref="ArgumentNullException">If <paramref name="comparer"/> is <c>null</c>.</exception>
+        [UnconditionalSuppressMessage("ReflectionAnalysis", "IL3050",
+            Justification = "Guarded by RuntimeFeature.IsDynamicCodeSupported. Not a supported API for AOT, but is also not commonly used.")]
         public virtual bool Equals(object? other, IEqualityComparer comparer)
         {
             if (comparer is null)
@@ -321,6 +328,12 @@ namespace J2N.Collections.ObjectModel
                 return false;
             }
 
+            return EqualsAggressive(other, comparer);
+        }
+
+        [RequiresDynamicCode("Aggressive structural comparison uses reflection.")]
+        private bool EqualsAggressive(object? other, IEqualityComparer comparer)
+        {
             if (other is null)
                 return false;
             if (ReferenceEquals(collection, other))
@@ -396,6 +409,13 @@ namespace J2N.Collections.ObjectModel
         /// the hash code.</param>
         /// <returns>A hash code representing the current list.</returns>
         /// <exception cref="ArgumentNullException">If <paramref name="comparer"/> is <c>null</c>.</exception>
+        /// <remarks>
+        /// This method uses Reflection and is not safe for AOT trimming. It is highly recommended to use one of the
+        /// other read-only collections instead. AOT users should always use J2N collections instead of .NET collections,
+        /// as they are designed to never use Reflection for equality comparisons.
+        /// </remarks>
+        [UnconditionalSuppressMessage("ReflectionAnalysis", "IL3050",
+            Justification = "Guarded by RuntimeFeature.IsDynamicCodeSupported. Not a supported API for AOT, but is also not commonly used.")]
         public virtual int GetHashCode(IEqualityComparer comparer)
         {
             if (comparer is null)
@@ -407,6 +427,12 @@ namespace J2N.Collections.ObjectModel
                 return 0;
             }
 
+            return GetHashCodeAggressive(comparer);
+        }
+
+        [RequiresDynamicCode("Aggressive structural comparison uses reflection.")]
+        private int GetHashCodeAggressive(IEqualityComparer comparer)
+        {
             if (collection.GetType().ImplementsGenericInterface(typeof(IDictionary<,>)))
             {
                 if (comparer is IDictionaryEqualityComparer dictionaryComparer)
