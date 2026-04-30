@@ -5,5 +5,16 @@
     <!-- NOTE: We purposely fail the build if documentation is missing -->
     <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
   </PropertyGroup>
+
+  <!-- Strict mode: general settings -->
+  <PropertyGroup Label="AOT Compatibility Features" Condition="'$(EnableAotStrict)' == 'true'">
+    <AnalysisLevel>latest</AnalysisLevel>
+    <WarningsAsErrors>IL2026;IL2072;IL2075;IL3050</WarningsAsErrors>
+  </PropertyGroup>
+
+  <!-- Only enable trim analyzer on modern TFMs -->
+  <PropertyGroup Label="AOT Compatibility Features" Condition="'$(EnableAotStrict)' == 'true' AND '$(TargetFramework)' == 'net9.0'">
+    <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
+  </PropertyGroup>
   
 </Project>
