@@ -218,6 +218,10 @@ namespace J2N.Collections.Generic
         /// <param name="comparer">The comparer to convert to a <see cref="SetEqualityComparer{T}"/>, if possible.</param>
         /// <param name="equalityComparer">The result <see cref="SetEqualityComparer{T}"/> of the conversion.</param>
         /// <returns><c>true</c> if the conversion was successful; otherwise, <c>false</c>.</returns>
+        [UnconditionalSuppressMessage(
+            "ReflectionAnalysis",
+            "IL3050",
+            Justification = "Guarded by RuntimeFeature.IsDynamicCodeSupported. AOT users will hit the PlatformNotSupportedException instead of the Aggressive property.")]
         public static bool TryGetSetEqualityComparer(IEqualityComparer comparer, [MaybeNullWhen(false)] out SetEqualityComparer<T> equalityComparer)
         {
             // StructuralEqualityComparer is too "dumb" to resolve generic collections.

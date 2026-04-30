@@ -233,6 +233,10 @@ namespace J2N.Collections.Generic
         /// <param name="comparer">The comparer to convert to a <see cref="DictionaryEqualityComparer{TKey, TValue}"/>, if possible.</param>
         /// <param name="equalityComparer">The result <see cref="DictionaryEqualityComparer{TKey, TValue}"/> of the conversion.</param>
         /// <returns><c>true</c> if the conversion was successful; otherwise, <c>false</c>.</returns>
+        [UnconditionalSuppressMessage(
+            "ReflectionAnalysis",
+            "IL3050",
+            Justification = "Guarded by RuntimeFeature.IsDynamicCodeSupported. AOT users will hit the PlatformNotSupportedException instead of the Aggressive property.")]
         public static bool TryGetDictionaryEqualityComparer(IEqualityComparer comparer, [MaybeNullWhen(false)] out DictionaryEqualityComparer<TKey, TValue> equalityComparer)
         {
             // StructuralEqualityComparer is too "dumb" to resolve generic collections.
