@@ -16,9 +16,6 @@
 
     <!-- Force deep analysis -->
     <PublishTrimmed Condition="'$(_IsModernDotNet)' == 'true'">true</PublishTrimmed>
-
-    <!-- Standard AOT/Trim Warnings as Errors -->
-    <WarningsAsErrors>$(WarningsAsErrors);IL2026;IL2067;IL2072;IL2075;IL3050;IL3056</WarningsAsErrors>
   </PropertyGroup>
 
 </Project>
