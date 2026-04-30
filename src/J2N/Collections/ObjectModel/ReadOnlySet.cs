@@ -95,6 +95,9 @@ namespace J2N.Collections.ObjectModel
             this.toStringFormatProvider = toStringFormatProvider;
         }
 
+        [UnconditionalSuppressMessage("ReflectionAnalysis",
+            "IL3050",
+            Justification = "The call to Aggressive is guarded by a check for RuntimeFeature.IsDynamicCodeSupported.")]
         private static SetEqualityComparer<T> ChooseComparer()
         {
             if (TIsValueTypeOrStringOrStructuralEquatable)

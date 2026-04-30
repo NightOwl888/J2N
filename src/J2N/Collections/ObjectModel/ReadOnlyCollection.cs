@@ -21,6 +21,7 @@ using J2N.Text;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 
 namespace J2N.Collections.ObjectModel
@@ -90,6 +91,9 @@ namespace J2N.Collections.ObjectModel
             this.toStringFormatProvider = toStringFormatProvider;
         }
 
+        [UnconditionalSuppressMessage("ReflectionAnalysis",
+            "IL3050",
+            Justification = "The call to Aggressive is guarded by a check for RuntimeFeature.IsDynamicCodeSupported.")]
         private static StructuralEqualityComparer ChooseComparer()
         {
             if (TIsValueTypeOrStringOrStructuralEquatable)
