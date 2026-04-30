@@ -1,0 +1,17 @@
+<Project Label="Skip Building All Projects That Import SkipBuild.props and SkipBuild.targets">
+
+  <PropertyGroup>
+    <!-- Clear the hooks that trigger compilation -->
+    <CoreCompileDependsOn></CoreCompileDependsOn>
+  </PropertyGroup>
+
+  <!--
+    We override these specific 'Core' targets. 
+    MSBuild uses these as the 'guts' of the build process. 
+  -->
+  <Target Name="Build" />
+  <Target Name="Restore" />
+  <Target Name="Publish" />
+  <Target Name="Pack" />
+
+</Project>

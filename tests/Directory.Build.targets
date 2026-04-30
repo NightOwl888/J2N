@@ -47,15 +47,6 @@
     <PackageReference Include="System.Runtime.Serialization.Formatters" Version="$(SystemRuntimeSerializationFormattersPackageReferenceVersion)" />
   </ItemGroup>
 
-  <PropertyGroup Label="Skip Building Tests During Build" Condition="'$(BuildGroup)' == 'LibrariesOnly'">
-    <!-- Skips the actual compilation task -->
-    <CoreCompileDependsOn></CoreCompileDependsOn>
-  </PropertyGroup>
-
-  <!-- Override the main targets to do nothing -->
-  <!-- This is to conditionally skip building these targets -->
-  <Target Name="Build" Condition="'$(BuildGroup)' == 'LibrariesOnly'" />
-  <Target Name="Publish" Condition="'$(BuildGroup)' == 'LibrariesOnly'" />
-  <Target Name="Pack" Condition="'$(BuildGroup)' == 'LibrariesOnly'" />
+  <Import Project="SkipBuild.targets" Condition="'$(BuildGroup)' == 'LibrariesOnly'" />
 
 </Project>

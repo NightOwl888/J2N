@@ -4,16 +4,7 @@
   <PropertyGroup Label="Assembly Publishing">
     <IsPublishable>true</IsPublishable>
   </PropertyGroup>
-  
-  <PropertyGroup Label="Skip Building Tests During Build" Condition="'$(BuildGroup)' == 'LibrariesOnly' ">
 
-    <!-- Prevents the project from being restored -->
-    <RestoreTargets>$(MSBuildThisFileDirectory)Empty.targets</RestoreTargets>
-    <NuGetAudit>false</NuGetAudit>
-    
-    <!-- Stops this project from building its own dependencies -->
-    <BuildProjectReferences>false</BuildProjectReferences>
-
-  </PropertyGroup>
+  <Import Project="SkipBuild.props" Condition="'$(BuildGroup)' == 'LibrariesOnly'" />
 
 </Project>
