@@ -52,6 +52,9 @@ namespace J2N.Collections
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [RequiresDynamicCode("Uses reflection-based structural comparison.")]
+        [UnconditionalSuppressMessage("ReflectionAnalysis",
+            "IL3050",
+            Justification = "The call to Aggressive is guarded by a check for RuntimeFeature.IsDynamicCodeSupported.")]
         public static bool Equals<T>(IList<T>? listA, IList<T>? listB)
         {
             if (!RuntimeFeature.IsDynamicCodeSupported)
@@ -76,6 +79,9 @@ namespace J2N.Collections
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [RequiresDynamicCode("Uses reflection-based structural comparison.")]
+        [UnconditionalSuppressMessage("ReflectionAnalysis",
+            "IL3050",
+            Justification = "The call to Aggressive is guarded by a check for RuntimeFeature.IsDynamicCodeSupported.")]
         public static bool Equals<T>(ISet<T>? setA, ISet<T>? setB)
         {
             if (!RuntimeFeature.IsDynamicCodeSupported)
@@ -100,6 +106,9 @@ namespace J2N.Collections
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [RequiresDynamicCode("Uses reflection-based structural comparison.")]
+        [UnconditionalSuppressMessage("ReflectionAnalysis",
+            "IL3050",
+            Justification = "The call to Aggressive is guarded by a check for RuntimeFeature.IsDynamicCodeSupported.")]
         public static bool Equals<TKey, TValue>(IDictionary<TKey, TValue>? dictionaryA, IDictionary<TKey, TValue>? dictionaryB)
         {
             if (!RuntimeFeature.IsDynamicCodeSupported)
@@ -119,6 +128,9 @@ namespace J2N.Collections
         /// and <see cref="IDictionary{TKey, TValue}"/>.
         /// </summary>
         [RequiresDynamicCode("Uses reflection-based structural comparison.")]
+        [UnconditionalSuppressMessage("ReflectionAnalysis",
+            "IL3050",
+            Justification = "The call to Aggressive is guarded by a check for RuntimeFeature.IsDynamicCodeSupported.")]
         new public static bool Equals(object? objA, object? objB)
         {
             if (!RuntimeFeature.IsDynamicCodeSupported)
@@ -208,6 +220,9 @@ namespace J2N.Collections
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [RequiresDynamicCode("Uses reflection-based structural comparison.")]
+        [UnconditionalSuppressMessage("ReflectionAnalysis",
+            "IL3050",
+            Justification = "The call to Aggressive is guarded by a check for RuntimeFeature.IsDynamicCodeSupported.")]
         public static int GetHashCode<T>(IList<T>? list)
         {
             if (!RuntimeFeature.IsDynamicCodeSupported)
@@ -232,6 +247,9 @@ namespace J2N.Collections
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [RequiresDynamicCode("Uses reflection-based structural comparison.")]
+        [UnconditionalSuppressMessage("ReflectionAnalysis",
+            "IL3050",
+            Justification = "The call to Aggressive is guarded by a check for RuntimeFeature.IsDynamicCodeSupported.")]
         public static int GetHashCode<T>(ISet<T>? set)
         {
             if (!RuntimeFeature.IsDynamicCodeSupported)
@@ -256,6 +274,9 @@ namespace J2N.Collections
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [RequiresDynamicCode("Uses reflection-based structural comparison.")]
+        [UnconditionalSuppressMessage("ReflectionAnalysis",
+            "IL3050",
+            Justification = "The call to Aggressive is guarded by a check for RuntimeFeature.IsDynamicCodeSupported.")]
         public static int GetHashCode<TKey, TValue>(IDictionary<TKey, TValue>? dictionary)
         {
             if (!RuntimeFeature.IsDynamicCodeSupported)
@@ -281,6 +302,9 @@ namespace J2N.Collections
         /// a collection, otherwise calls <see cref="object.GetHashCode()"/> on the 
         /// object that is passed.</returns>
         [RequiresDynamicCode("Uses reflection-based structural comparison.")]
+        [UnconditionalSuppressMessage("ReflectionAnalysis",
+            "IL3050",
+            Justification = "The call to Aggressive is guarded by a check for RuntimeFeature.IsDynamicCodeSupported.")]
         public static int GetHashCode(object? obj)
         {
             if (!RuntimeFeature.IsDynamicCodeSupported)
@@ -577,6 +601,10 @@ namespace J2N.Collections
             return obj.ToString()!;
         }
 
+        [UnconditionalSuppressMessage(
+            "ReflectionAnalysis",
+            "IL3050",
+            Justification = "The call to Reflection is guarded by a check for RuntimeFeature.IsDynamicCodeSupported.")]
         public static bool TryFormat(object obj, Type type, IFormatProvider? provider, out string? result)
         {
             if (RuntimeFeature.IsDynamicCodeSupported)
