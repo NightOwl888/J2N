@@ -21,6 +21,7 @@ properties {
 
     #test parameters
     [string]$testPlatforms         = Get-DefaultPlatform # Pass a parameter (not a property) to override
+    [bool]$buildTests              = $true
 }
 
 $backedUpFiles = New-Object System.Collections.ArrayList
@@ -62,6 +63,9 @@ task Init -depends CheckSDK -description "This tasks makes sure the build enviro
     $localAssemblyVersion = $versionInfo['AssemblyVersion']
     $localPackageVersion = $versionInfo['PackageVersion']
 
+    # $script scope lives across tasks
+    $script:buildGroup = if ($buildTests) { "All" } else { "LibrariesOnly" }
+
     Write-Host "Base Directory: $(Normalize-FileSystemSlashes "$baseDirectory")"
     Write-Host "Artifacts Directory: $(Normalize-FileSystemSlashes "$artifactsDirectory")"
     Write-Host "Source Directory: $(Normalize-FileSystemSlashes "$sourceDirectory")"
@@ -74,6 +78,8 @@ task Init -depends CheckSDK -description "This tasks makes sure the build enviro
     Write-Host "File Version: $localFileVersion"
     Write-Host "InformationalVersion Version: $localInformationalVersion"
     Write-Host "Configuration: $configuration"
+    Write-Host "Build Tests: $buildTests"
+    Write-Host "Build Group: $script:buildGroup"
     
     Ensure-Directory-Exists "$artifactsDirectory"
 }
@@ -93,7 +99,8 @@ task Compile -depends Clean, Init -description "This task compiles the solution"
             /p:AssemblyVersion="$localAssemblyVersion" `
             /p:TestAllTargetFrameworks=true `
             /p:PortableDebugTypeOnly=true `
-            /p:SkipGitVersioning=true
+            /p:SkipGitVersioning=true `
+            /p:BuildGroup="$script:buildGroup"
     }
 }
 
@@ -109,11 +116,19 @@ task Pack -depends Compile -description "This task creates the NuGet packages" {
             --no-build `
             --no-restore `
             /p:PackageVersion="$localPackageVersion" `
-            /p:SkipGitVersioning=true
+            /p:SkipGitVersioning=true `
+            /p:BuildGroup="$script:buildGroup" `
+            /p:BuildProjectReferences=false
     }
 }
 
 task Test -depends Pack -description "This task runs the tests" {
+
+    # Guard clause: If we didn't build tests, we can't run them
+    if (-not $buildTests) {
+        Write-Host "BuildGroup is set to LibrariesOnly. Skipping test execution." -ForegroundColor Yellow
+        return
+    }
 
     pushd $baseDirectory
     $testProjects = Get-ChildItem -Path "$testDirectory/**/*.csproj" -Recurse

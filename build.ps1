@@ -35,6 +35,8 @@ if ($runTests) {
 $parameters = @{}
 $properties = @{}
 
+$properties.buildTests=$runTests
+
 if (-not [string]::IsNullOrWhiteSpace($packageVersion)) {
     $properties.packageVersion=$packageVersion
 }
