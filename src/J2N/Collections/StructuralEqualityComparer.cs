@@ -283,6 +283,9 @@ namespace J2N.Collections
         {
         }
 
+        [UnconditionalSuppressMessage("ReflectionAnalysis",
+            "IL3050",
+            Justification = "We check for AOT compatibility in the constructor.")]
         protected override int GetUnstructuredHashCode(object? obj)
         {
             if (StructuralEqualityUtil.IsValueType(obj))
@@ -303,6 +306,10 @@ namespace J2N.Collections
             }
         }
 
+
+        [UnconditionalSuppressMessage("ReflectionAnalysis",
+            "IL3050",
+            Justification = "We check for AOT compatibility in the constructor.")]
         protected override bool UnstructuredEquals(object? x, object? y)
         {
             if (StructuralEqualityUtil.IsValueType(x))

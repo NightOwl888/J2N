@@ -21,6 +21,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
+using System.Threading;
 
 namespace J2N.Collections.Generic
 {
@@ -37,6 +38,7 @@ namespace J2N.Collections.Generic
     {
         private static readonly bool TIsValueType = typeof(T).IsValueType;
         private static readonly bool TIsObject = typeof(T).Equals(typeof(object));
+        private static ListEqualityComparer<T>? aggressive;
 
         private readonly StructuralEqualityComparer structuralEqualityComparer;
 
@@ -80,7 +82,10 @@ namespace J2N.Collections.Generic
         public static ListEqualityComparer<T> Aggressive
         {
             [RequiresDynamicCode("Aggressive structural comparison uses reflection.")]
-            get => new AggressiveListEqualityComparer();
+            get => LazyInitializer.EnsureInitialized(ref aggressive, () =>
+                RuntimeFeature.IsDynamicCodeSupported
+                    ? new AggressiveListEqualityComparer()
+                    : AggressiveNotSupported)!;
         }
 
         /// <summary>
@@ -100,6 +105,9 @@ namespace J2N.Collections.Generic
             LoadEqualityDelegates();
         }
 
+        [UnconditionalSuppressMessage("ReflectionAnalysis", "IL3050",
+            Justification = "Delegates are loaded based on the StructuralEqualityComparer provided. " +
+                            "If Aggressive mode was selected, the user was already warned at the property level.")]
         private void LoadEqualityDelegates()
         {
             this.getHashCode = StructuralEqualityUtil.LoadGetHashCodeDelegate<T>(TIsValueType, TIsObject, structuralEqualityComparer);

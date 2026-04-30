@@ -21,6 +21,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
+using System.Threading;
 
 namespace J2N.Collections.Generic
 {
@@ -40,6 +41,7 @@ namespace J2N.Collections.Generic
         private static readonly bool TKeyIsObject = typeof(TKey).Equals(typeof(object));
         private static readonly bool TValueIsValueType = typeof(TValue).IsValueType;
         private static readonly bool TValueIsObject = typeof(TValue).Equals(typeof(object));
+        private static DictionaryEqualityComparer<TKey, TValue>? aggressive;
 
         private readonly StructuralEqualityComparer structuralEqualityComparer;
 
@@ -88,7 +90,10 @@ namespace J2N.Collections.Generic
         public static DictionaryEqualityComparer<TKey, TValue> Aggressive
         {
             [RequiresDynamicCode("Aggressive structural comparison uses reflection.")]
-            get => new AggressiveDictionaryEqualityComparer();
+            get => LazyInitializer.EnsureInitialized(ref aggressive, () =>
+                RuntimeFeature.IsDynamicCodeSupported
+                    ? new AggressiveDictionaryEqualityComparer()
+                    : AggressiveNotSupported)!;
         }
 
         /// <summary>
@@ -107,6 +112,9 @@ namespace J2N.Collections.Generic
             LoadEqualityDelegates();
         }
 
+        [UnconditionalSuppressMessage("ReflectionAnalysis", "IL3050",
+            Justification = "Delegates are loaded based on the StructuralEqualityComparer provided. " +
+                            "If Aggressive mode was selected, the user was already warned at the property level.")]
         private void LoadEqualityDelegates()
         {
             this.getKeyHashCode = StructuralEqualityUtil.LoadGetHashCodeDelegate<TKey>(TKeyIsValueType, TKeyIsObject, structuralEqualityComparer);
