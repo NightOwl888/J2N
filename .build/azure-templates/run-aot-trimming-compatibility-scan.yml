@@ -1,0 +1,33 @@
+# Runs AOT compatibility scan on the test projects by building them with the EnableAotStrict property set to true.
+# This will log warnings for potential AOT/trimming issues in the test projects, but will not cause the build to fail.
+# No artifacts will be produced from this job, as the output of the build is not used and the build is not expected to succeed.
+# The main purpose of this job is to log potential AOT/trimming issues in the test projects for investigation.
+
+parameters:
+  buildConfiguration: 'Release' # Defines the build configuration. Default 'Release'.
+  buildPlatform: 'Any CPU' # Defines the build platform. Default 'Any CPU'.
+  solution: '$(Build.SourcesDirectory)/J2N.sln' # The solution to build.
+
+steps:
+- pwsh: |
+    function EnsureNotNullOrEmpty([string]$param, [string]$nameOfParam) {
+        if ([string]::IsNullOrEmpty($param)) {
+            Write-Host "##vso[task.logissue type=error;]Missing template parameter \"$nameOfParam\""
+            Write-Host "##vso[task.complete result=Failed;]"
+        }
+    }
+    EnsureNotNullOrEmpty('${{ parameters.buildConfiguration }}', 'buildConfiguration')
+    EnsureNotNullOrEmpty('${{ parameters.buildPlatform }}', 'buildPlatform')
+    EnsureNotNullOrEmpty('${{ parameters.solution }}', 'solution')
+  displayName: 'Validate Template Parameters'
+  condition: eq(variables['System.Debug'], 'true')
+
+  # Runs dotnet build with AOT compatibility scan properties enabled to check for potential AOT/trimming issues in deployable libraries.
+  # This will not cause the build to fail if issues are found, but will log warnings in the build output for investigation.
+- task: DotNetCoreCLI@2
+  displayName: 'AOT Compatibility Scan'
+  inputs:
+    command: custom
+    projects: '${{ parameters.solution }}'
+    custom: build
+    arguments: '--configuration ${{ parameters.buildConfiguration }} --verbosity minimal /p:Platform="${{ parameters.buildPlatform }}" /p:BuildGroup=LibrariesOnly /p:EnableAotStrict=true /p:TreatWarningsAsErrors=false /p:PortableDebugTypeOnly=true'

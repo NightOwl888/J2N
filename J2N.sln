@@ -44,6 +44,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "azure-templates", "azure-te
 		.build\azure-templates\publish-nuget-packages.yml = .build\azure-templates\publish-nuget-packages.yml
 		.build\azure-templates\publish-test-results-for-test-projects.yml = .build\azure-templates\publish-test-results-for-test-projects.yml
 		.build\azure-templates\publish-test-results.yml = .build\azure-templates\publish-test-results.yml
+		.build\azure-templates\run-aot-trimming-compatibility-scan.yml = .build\azure-templates\run-aot-trimming-compatibility-scan.yml
 		.build\azure-templates\run-tests-on-os.yml = .build\azure-templates\run-tests-on-os.yml
 		.build\azure-templates\show-all-environment-variables.yml = .build\azure-templates\show-all-environment-variables.yml
 		.build\azure-templates\show-all-files.yml = .build\azure-templates\show-all-files.yml

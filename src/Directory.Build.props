@@ -5,6 +5,7 @@
   <PropertyGroup Label="AOT Compatibility Features">
     <IsTrimmable>true</IsTrimmable>
     <EnableTrimAnalyzer>false</EnableTrimAnalyzer>
+    <EnableAotAnalyzer>false</EnableAotAnalyzer>
   </PropertyGroup>
 
 </Project>

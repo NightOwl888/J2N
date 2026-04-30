@@ -109,6 +109,32 @@ stages:
         publishLocation: 'pipeline'
       condition: succeededOrFailed()
 
+  - job: Trimming_Analysis
+    displayName: 'Analyze AOT Trimming Compatibility'
+    pool:
+      vmImage: 'windows-latest'
+    steps:
+    # Nerdbank.GitVersioning requires a deep clone. See: https://github.com/dotnet/Nerdbank.GitVersioning/blob/main/doc/cloudbuild.md#azure-pipelines
+    - checkout: self
+      fetchDepth: 0
+
+    - pwsh: |
+        $configuration = if ($env:BUILDCONFIGURATION) { $env:BUILDCONFIGURATION } else { "Release" }
+        Write-Host "##vso[task.setvariable variable=BuildConfiguration;]$configuration"
+        $platform = if ($env:BUILDPLATFORM) { $env:BUILDPLATFORM } else { "Any CPU" }
+        Write-Host "##vso[task.setvariable variable=BuildPlatform;]$platform"
+      displayName: 'Setup Default Variable Values'
+
+    - template: '.build/azure-templates/install-dotnet-sdk.yml'
+      parameters:
+        sdkVersion: '$(DotNetSDKVersion)'
+
+    - template: '.build/azure-templates/run-aot-trimming-compatibility-scan.yml'
+      parameters:
+        buildConfiguration: '$(BuildConfiguration)'
+        buildPlatform: '$(BuildPlatform)'
+
+
 - stage: Test_Stage
   displayName: 'Test Stage:'
   jobs:

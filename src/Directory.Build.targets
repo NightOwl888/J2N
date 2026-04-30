@@ -6,15 +6,19 @@
     <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
   </PropertyGroup>
 
-  <!-- Strict mode: general settings -->
   <PropertyGroup Label="AOT Compatibility Features" Condition="'$(EnableAotStrict)' == 'true'">
-    <AnalysisLevel>latest</AnalysisLevel>
-    <WarningsAsErrors>IL2026;IL2072;IL2075;IL3050</WarningsAsErrors>
+    <!-- Run only on modern .NET where the surface area is representative -->
+    <_IsModernDotNet>$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net8.0'))</_IsModernDotNet>
+    
+    <!-- Enable the analyzers -->
+    <EnableTrimAnalyzer Condition="'$(_IsModernDotNet)' == 'true'">true</EnableTrimAnalyzer>
+    <EnableAotAnalyzer Condition="'$(_IsModernDotNet)' == 'true'">true</EnableAotAnalyzer>
+
+    <!-- Force deep analysis -->
+    <PublishTrimmed Condition="'$(_IsModernDotNet)' == 'true'">true</PublishTrimmed>
+
+    <!-- Standard AOT/Trim Warnings as Errors -->
+    <WarningsAsErrors>$(WarningsAsErrors);IL2026;IL2067;IL2072;IL2075;IL3050;IL3056</WarningsAsErrors>
   </PropertyGroup>
 
-  <!-- Only enable trim analyzer on modern TFMs -->
-  <PropertyGroup Label="AOT Compatibility Features" Condition="'$(EnableAotStrict)' == 'true' AND '$(TargetFramework)' == 'net9.0'">
-    <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
-  </PropertyGroup>
-  
 </Project>
