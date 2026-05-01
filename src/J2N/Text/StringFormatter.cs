@@ -253,7 +253,7 @@ namespace J2N.Text
             }
             else if (CollectionUtil.TryFormat(arg, argType, this, out string? result))
             {
-                return result!;
+                return result;
             }
 
             return null!; // Not handled by this formatter

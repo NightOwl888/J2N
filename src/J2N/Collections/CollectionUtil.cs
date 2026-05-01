@@ -572,7 +572,7 @@ namespace J2N.Collections
         {
             if (obj is null) return "null";
             if (TryFormat(obj, obj.GetType(), provider, out string? result))
-                return result!;
+                return result;
 
             return obj.ToString()!;
         }
@@ -581,7 +581,7 @@ namespace J2N.Collections
             "ReflectionAnalysis",
             "IL3050",
             Justification = "The call to Reflection is guarded by a check for RuntimeFeature.IsDynamicCodeSupported.")]
-        public static bool TryFormat(object obj, Type type, IFormatProvider? provider, out string? result)
+        public static bool TryFormat(object obj, Type type, IFormatProvider? provider, [NotNullWhen(true)] out string? result)
         {
             if (RuntimeFeature.IsDynamicCodeSupported)
             {
