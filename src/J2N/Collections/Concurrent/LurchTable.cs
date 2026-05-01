@@ -1601,6 +1601,10 @@ namespace J2N.Collections.Concurrent
         /// <returns><c>true</c> if <paramref name="other"/> is structurally equal to the current dictionary;
         /// otherwise, <c>false</c>.</returns>
         /// <exception cref="ArgumentNullException">If <paramref name="comparer"/> is <c>null</c>.</exception>
+        /// <remarks>
+        /// Structural equality comparison relies on the enumerator, which makes it inherently
+        /// not threadsafe.
+        /// </remarks>
         public virtual bool Equals(object? other, IEqualityComparer comparer)
             => DictionaryEqualityComparer<TKey, TValue>.Equals(this, other, comparer);
 
@@ -1611,6 +1615,10 @@ namespace J2N.Collections.Concurrent
         /// <param name="comparer">The <see cref="IEqualityComparer"/> implementation to use to generate
         /// the hash code.</param>
         /// <returns>A hash code representing the current dictionary.</returns>
+        /// <remarks>
+        /// Structural equality comparison relies on the enumerator, which makes it inherently
+        /// not threadsafe.
+        /// </remarks>
         public virtual int GetHashCode(IEqualityComparer comparer)
             => DictionaryEqualityComparer<TKey, TValue>.GetHashCode(this, comparer);
 
@@ -1622,6 +1630,10 @@ namespace J2N.Collections.Concurrent
         /// <param name="obj">The object to compare with the current object.</param>
         /// <returns><c>true</c> if the specified object implements <see cref="IDictionary{TKey, TValue}"/>
         /// and it contains the same elements; otherwise, <c>false</c>.</returns>
+        /// <remarks>
+        /// Structural equality comparison relies on the enumerator, which makes it inherently
+        /// not threadsafe.
+        /// </remarks>
         /// <seealso cref="Equals(object, IEqualityComparer)"/>
         public override bool Equals(object? obj)
             => Equals(obj, DictionaryEqualityComparer<TKey, TValue>.Default);
@@ -1632,6 +1644,10 @@ namespace J2N.Collections.Concurrent
         /// </summary>
         /// <returns>A hash code for the current object.</returns>
         /// <seealso cref="GetHashCode(IEqualityComparer)"/>
+        /// <remarks>
+        /// Structural equality comparison relies on the enumerator, which makes it inherently
+        /// not threadsafe.
+        /// </remarks>
         public override int GetHashCode()
             => GetHashCode(DictionaryEqualityComparer<TKey, TValue>.Default);
 
@@ -1652,6 +1668,10 @@ namespace J2N.Collections.Concurrent
         /// <para/>
         /// The index of a format item is not zero.
         /// </exception>
+        /// <remarks>
+        /// Structural formatting relies on the enumerator, which makes it inherently
+        /// not threadsafe.
+        /// </remarks>
         public virtual string ToString(string? format, IFormatProvider? formatProvider)
             => CollectionUtil.ToString(formatProvider, format, this);
 
@@ -1664,6 +1684,10 @@ namespace J2N.Collections.Concurrent
         /// KeyValuePairs are separated by ', ' (comma and space).
         /// </summary>
         /// <returns>A string that represents the current list.</returns>
+        /// <remarks>
+        /// Structural formatting relies on the enumerator, which makes it inherently
+        /// not threadsafe.
+        /// </remarks>
         public override string ToString()
             => ToString("{0}", StringFormatter.CurrentCulture);
 
@@ -1674,6 +1698,10 @@ namespace J2N.Collections.Concurrent
         /// </summary>
         /// <returns>A string that represents the current dictionary.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="formatProvider"/> is <c>null</c>.</exception>
+        /// <remarks>
+        /// Structural formatting relies on the enumerator, which makes it inherently
+        /// not threadsafe.
+        /// </remarks>
         public virtual string ToString(IFormatProvider formatProvider)
             => ToString("{0}", formatProvider);
 
@@ -1694,6 +1722,10 @@ namespace J2N.Collections.Concurrent
         /// <para/>
         /// The index of a format item is not zero.
         /// </exception>
+        /// <remarks>
+        /// Structural formatting relies on the enumerator, which makes it inherently
+        /// not threadsafe.
+        /// </remarks>
         public virtual string ToString(string format)
             => ToString(format, StringFormatter.CurrentCulture);
 
