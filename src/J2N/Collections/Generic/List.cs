@@ -759,8 +759,8 @@ namespace J2N.Collections.Generic
         /// <param name="item">The object to locate in the <see cref="List{T}"/>. The value can be <c>null</c> for reference types.</param>
         /// <returns><c>true</c> if item is found in the <see cref="List{T}"/>; otherwise, <c>false</c>.</returns>
         /// <remarks>
-        /// This method determines equality by using the default equality comparer, as defined by the object's implementation of
-        /// the <see cref="IEquatable{T}.Equals(T)"/> method for <typeparamref name="T"/> (the type of values in the list).
+        /// This method determines equality using J2N's default equality comparer <see cref="EqualityComparer{T}.Default"/>
+        /// for <typeparamref name="T"/>, the type of values in the list.
         /// <para/>
         /// This method performs a linear search; therefore, this method is an O(<c>n</c>) operation, where <c>n</c> is <see cref="Count"/>.
         /// </remarks>
@@ -2225,9 +2225,8 @@ namespace J2N.Collections.Generic
         /// <returns><c>true</c> if item is successfully removed; otherwise, <c>false</c>. This method
         /// also returns <c>false</c> if item was not found in the <see cref="List{T}"/>.</returns>
         /// <remarks>
-        /// If type <typeparamref name="T"/> implements the <see cref="IEquatable{T}"/> generic interface,
-        /// the equality comparer is the <see cref="IEquatable{T}.Equals(T)"/> method of that interface;
-        /// otherwise, the default equality comparer is <see cref="Object.Equals(object)"/>.
+        /// This method determines equality using J2N's default equality comparer <see cref="EqualityComparer{T}.Default"/>
+        /// for <typeparamref name="T"/>, the type of values in the list.
         /// <para/>
         /// This method performs a linear search; therefore, this method is an O(<c>n</c>) operation,
         /// where <c>n</c> is <see cref="Count"/>.
