@@ -11,6 +11,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
+using static J2N.Collections.CollectionUtil;
 
 namespace J2N.Collections.Generic
 {
@@ -1614,8 +1615,52 @@ namespace J2N.Collections.Generic
             CoModificationCheck();
             Debug.Assert(Origin._items == _items); // J2N: Ensure SubList uses the latest array instance
             int offset = Offset;
-            int result = Array.IndexOf(_items, item, offset, Size);
-            return result > -1 ? result - offset : result;
+
+            // J2N: In the Array.IndexOf() method, -0.0 and 0.0 are considered equal,
+            // but in Java ArrayList<E>, they are not considered equal. So we need to
+            // check for this special case before calling Array.IndexOf().
+            if (typeof(T) == typeof(double))
+            {
+                double value = Unsafe.As<T, double>(ref item);
+                if (value == 0.0d)
+                {
+                    return CorrectOffset(
+                        IndexOfSignedZero<double, DoubleStrategy, long>(Unsafe.As<T[], double[]>(ref _items), value, offset, Size),
+                        offset);
+                }
+            }
+            if (typeof(T) == typeof(float))
+            {
+                float value = Unsafe.As<T, float>(ref item);
+                if (value == 0.0f)
+                {
+                    return CorrectOffset(
+                        IndexOfSignedZero<float, SingleStrategy, int>(Unsafe.As<T[], float[]>(ref _items), value, offset, Size),
+                        offset);
+                }
+            }
+            if (typeof(T) == typeof(double?))
+            {
+                double? value = Unsafe.As<T, double?>(ref item);
+                if (value.HasValue && value.Value == 0.0d) // Let the BCL handle the null case
+                {
+                    return CorrectOffset(
+                        IndexOfSignedZero<double?, NullableDoubleStrategy, long>(Unsafe.As<T[], double?[]>(ref _items), value, offset, Size),
+                        offset);
+                }
+            }
+            if (typeof(T) == typeof(float?))
+            {
+                float? value = Unsafe.As<T, float?>(ref item);
+                if (value.HasValue && value.Value == 0.0f) // Let the BCL handle the null case
+                {
+                    return CorrectOffset(
+                        IndexOfSignedZero<float?, NullableSingleStrategy, int>(Unsafe.As<T[], float?[]>(ref _items), value, offset, Size),
+                        offset);
+                }
+            }
+
+            return CorrectOffset(Array.IndexOf(_items, item, offset, Size), offset);
         }
 
         int IList.IndexOf(object? item)
@@ -1656,8 +1701,52 @@ namespace J2N.Collections.Generic
 
             Debug.Assert(Origin._items == _items); // J2N: Ensure SubList uses the latest array instance
             int offset = Offset;
-            int result = Array.IndexOf(_items, item, index + offset, Size - index);
-            return result > -1 ? result - offset : result;
+
+            // J2N: In the Array.IndexOf() method, -0.0 and 0.0 are considered equal,
+            // but in Java ArrayList<E>, they are not considered equal. So we need to
+            // check for this special case before calling Array.IndexOf().
+            if (typeof(T) == typeof(double))
+            {
+                double value = Unsafe.As<T, double>(ref item);
+                if (value == 0.0d)
+                {
+                    return CorrectOffset(
+                        IndexOfSignedZero<double, DoubleStrategy, long>(Unsafe.As<T[], double[]>(ref _items), value, index + offset, Size - index),
+                        offset);
+                }
+            }
+            if (typeof(T) == typeof(float))
+            {
+                float value = Unsafe.As<T, float>(ref item);
+                if (value == 0.0f)
+                {
+                    return CorrectOffset(
+                        IndexOfSignedZero<float, SingleStrategy, int>(Unsafe.As<T[], float[]>(ref _items), value, index + offset, Size - index),
+                        offset);
+                }
+            }
+            if (typeof(T) == typeof(double?))
+            {
+                double? value = Unsafe.As<T, double?>(ref item);
+                if (value.HasValue && value.Value == 0.0d) // Let the BCL handle the null case
+                {
+                    return CorrectOffset(
+                        IndexOfSignedZero<double?, NullableDoubleStrategy, long>(Unsafe.As<T[], double?[]>(ref _items), value, index + offset, Size - index),
+                        offset);
+                }
+            }
+            if (typeof(T) == typeof(float?))
+            {
+                float? value = Unsafe.As<T, float?>(ref item);
+                if (value.HasValue && value.Value == 0.0f) // Let the BCL handle the null case
+                {
+                    return CorrectOffset(
+                        IndexOfSignedZero<float?, NullableSingleStrategy, int>(Unsafe.As<T[], float?[]>(ref _items), value, index + offset, Size - index),
+                        offset);
+                }
+            }
+
+            return CorrectOffset(Array.IndexOf(_items, item, index + offset, Size - index), offset);
         }
 
         /// <summary>
@@ -1701,8 +1790,63 @@ namespace J2N.Collections.Generic
 
             Debug.Assert(Origin._items == _items); // J2N: Ensure SubList uses the latest array instance
             int offset = Offset;
-            int result = Array.IndexOf(_items, item, index + offset, count);
-            return result > -1 ? result - offset : result;
+
+            // J2N: In the Array.IndexOf() method, -0.0 and 0.0 are considered equal,
+            // but in Java ArrayList<E>, they are not considered equal. So we need to
+            // check for this special case before calling Array.IndexOf().
+            if (typeof(T) == typeof(double))
+            {
+                double value = Unsafe.As<T, double>(ref item);
+                if (value == 0.0d)
+                {
+                    return CorrectOffset(
+                        IndexOfSignedZero<double, DoubleStrategy, long>(Unsafe.As<T[], double[]>(ref _items), value, index + offset, count),
+                        offset);
+                }
+            }
+            if (typeof(T) == typeof(float))
+            {
+                float value = Unsafe.As<T, float>(ref item);
+                if (value == 0.0f)
+                {
+                    return CorrectOffset(
+                        IndexOfSignedZero<float, SingleStrategy, int>(Unsafe.As<T[], float[]>(ref _items), value, index + offset, count),
+                        offset);
+                }
+            }
+            if (typeof(T) == typeof(double?))
+            {
+                double? value = Unsafe.As<T, double?>(ref item);
+                if (value.HasValue && value.Value == 0.0d) // Let the BCL handle the null case
+                {
+                    return CorrectOffset(
+                        IndexOfSignedZero<double?, NullableDoubleStrategy, long>(Unsafe.As<T[], double?[]>(ref _items), value.Value, index + offset, count),
+                        offset);
+                }
+            }
+            if (typeof(T) == typeof(float?))
+            {
+                float? value = Unsafe.As<T, float?>(ref item);
+                if (value.HasValue && value.Value == 0.0f) // Let the BCL handle the null case
+                {
+                    return CorrectOffset(
+                        IndexOfSignedZero<float?, NullableSingleStrategy, int>(Unsafe.As<T[], float?[]>(ref _items), value.Value, index + offset, count),
+                        offset);
+                }
+            }
+
+            return CorrectOffset(Array.IndexOf(_items, item, index + offset, count), offset);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static int CorrectOffset(int index, int offset)
+        {
+            if (index > -1)
+            {
+                Debug.Assert(index - offset >= 0);
+                return index - offset;
+            }
+            return -1;
         }
 
         /// <summary>
@@ -2024,8 +2168,52 @@ namespace J2N.Collections.Generic
                 ThrowHelper.ThrowArgumentOutOfRangeException(count, ExceptionArgument.count, ExceptionResource.ArgumentOutOfRange_BiggerThanCollection);
 
             int offset = Offset;
-            int result = Array.LastIndexOf(_items, item, index + offset, count);
-            return result > -1 ? result - offset : result;
+
+            // J2N: In the Array.IndexOf() method, -0.0 and 0.0 are considered equal,
+            // but in Java ArrayList<E>, they are not considered equal. So we need to
+            // check for this special case before calling Array.IndexOf().
+            if (typeof(T) == typeof(double))
+            {
+                double value = Unsafe.As<T, double>(ref item);
+                if (value == 0.0d)
+                {
+                    return CorrectOffset(
+                        LastIndexOfSignedZero<double, DoubleStrategy, long>(Unsafe.As<T[], double[]>(ref _items), value, index + offset, count),
+                        offset);
+                }
+            }
+            if (typeof(T) == typeof(float))
+            {
+                float value = Unsafe.As<T, float>(ref item);
+                if (value == 0.0f)
+                {
+                    return CorrectOffset(
+                        LastIndexOfSignedZero<float, SingleStrategy, int>(Unsafe.As<T[], float[]>(ref _items), value, index + offset, count),
+                        offset);
+                }
+            }
+            if (typeof(T) == typeof(double?))
+            {
+                double? value = Unsafe.As<T, double?>(ref item);
+                if (value.HasValue && value.Value == 0.0d) // Let the BCL handle the null case
+                {
+                    return CorrectOffset(
+                        LastIndexOfSignedZero<double?, NullableDoubleStrategy, long>(Unsafe.As<T[], double?[]>(ref _items), value, index + offset, count),
+                        offset);
+                }
+            }
+            if (typeof(T) == typeof(float?))
+            {
+                float? value = Unsafe.As<T, float?>(ref item);
+                if (value.HasValue && value.Value == 0.0f) // Let the BCL handle the null case
+                {
+                    return CorrectOffset(
+                        LastIndexOfSignedZero<float?, NullableSingleStrategy, int>(Unsafe.As<T[], float?[]>(ref _items), value, index + offset, count),
+                        offset);
+                }
+            }
+
+            return CorrectOffset(Array.LastIndexOf(_items, item, index + offset, count), offset);
         }
 
         /// <summary>

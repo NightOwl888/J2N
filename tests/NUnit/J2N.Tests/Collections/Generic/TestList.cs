@@ -73,6 +73,7 @@ namespace J2N.Collections.Generic
         }
 #endif
 
+
         [Test]
         public void TestSubList_SelfAddRange()
         {
@@ -2038,6 +2039,649 @@ namespace J2N.Collections.Generic
             //{
             //    return new MockHashSet<T>(elements);
             //}
+        }
+
+
+        /// <summary>
+        /// Special case tests not covered by tests from Harmony. These are regression tests
+        /// for when we find mismatching comparison behavior between Java and .NET that we correct
+        /// by making the comparison behavior mirror the JDK.
+        /// </summary>
+        public class Comparisons
+        {
+
+            #region IndexOf/LastIndexOf Tests
+
+            // These tests ensure that float and double IndexOf/LastIndexOf methods match Java's behavior
+            // regarding NaN and signed zero comparisons.
+
+            public abstract class FloatingPointIndexOfTests<T>
+            {
+                protected abstract T PositiveZero { get; }
+                protected abstract T NegativeZero { get; }
+                protected abstract T NaN { get; }
+                protected abstract T CreateCustomNaN();
+                protected abstract T GetNonMatchingValue();
+                protected abstract bool IsNaN(T value);
+
+                protected virtual List<T> CreateList(int capacity)
+                {
+                    return new List<T>(capacity);
+                }
+
+                protected List<T> CreateListWithSingleValue(int index, T value)
+                {
+                    List<T> list = CreateList(10);
+                    for (int i = 0; i < 10; i++)
+                    {
+                        list.Add(GetNonMatchingValue());
+                    }
+
+                    list[index] = value;
+                    return list;
+                }
+
+                protected List<T> CreateListFrom(params T[] items)
+                {
+                    var list = CreateList(items.Length);
+                    for (int i = 0; i < items.Length; i++)
+                    {
+                        list.Add(items[i]);
+                    }
+                    return list;
+                }
+
+                public static IEnumerable<int> Positions()
+                {
+                    yield return 0;
+                    yield return 1;
+                    yield return 5;
+                    yield return 8;
+                }
+
+                public static IEnumerable<(int index, int count)> Ranges()
+                {
+                    yield return (0, 10); // full range
+                    yield return (0, 5);  // first half
+                    yield return (2, 5);  // middle
+                    yield return (5, 5);  // second half
+                    yield return (6, 4);  // tail
+                }
+
+                // --- NaN tests ---
+
+                [TestCaseSource(nameof(Positions))]
+                public void Test_IndexOf_NaN_FindsCustomNaN(int index)
+                {
+                    T customNaN = CreateCustomNaN();
+                    Assert.IsTrue(IsNaN(customNaN));
+
+                    var list = CreateListWithSingleValue(index, customNaN);
+
+                    AssertIndexOfOverloads(list, NaN, index);
+                    AssertLastIndexOfOverloads(list, NaN, index);
+                }
+
+                [TestCaseSource(nameof(Ranges))]
+                public void Test_IndexOf_NaN_WithRanges((int index, int count) range)
+                {
+                    int targetIndex = 5;
+
+                    T customNaN = CreateCustomNaN();
+                    var list = CreateListWithSingleValue(targetIndex, customNaN);
+
+                    int index = range.index;
+                    int count = range.count;
+
+                    int expected = (targetIndex >= index && targetIndex < index + count)
+                        ? targetIndex
+                        : -1;
+
+                    Assert.AreEqual(expected, list.IndexOf(NaN, index, count));
+                    Assert.AreEqual(expected, list.LastIndexOf(NaN, index + count - 1, count));
+                }
+
+                [Test]
+                public void Test_IndexOf_NaN_MultipleOccurrences_SelectsCorrectOne()
+                {
+                    T nan1 = CreateCustomNaN();
+                    T nan2 = NaN;
+                    T nan3 = CreateCustomNaN();
+
+                    List<T> list = CreateListFrom(
+                        nan1,                 // index 0
+                        GetNonMatchingValue(),
+                        nan2,                 // index 2
+                        GetNonMatchingValue(),
+                        nan3                  // index 4
+                    );
+
+                    // IndexOf should return FIRST NaN
+                    AssertIndexOfOverloads(list, NaN, 0);
+                    // Restrict to middle (should skip first NaN)
+                    Assert.AreEqual(2, list.IndexOf(NaN, 1));
+                    Assert.AreEqual(2, list.IndexOf(NaN, 1, 3));
+
+                    // LastIndexOf should return LAST NaN
+                    AssertLastIndexOfOverloads(list, NaN, 4);
+                    // Reverse: restrict to exclude last NaN
+                    Assert.AreEqual(2, list.LastIndexOf(NaN, 3));
+                    Assert.AreEqual(2, list.LastIndexOf(NaN, 3, 3));
+                }
+
+                [Test]
+                public void Test_IndexOf_NaN_StartIndex_SkipsEarlierMatch()
+                {
+                    T nan1 = CreateCustomNaN();
+                    T nan2 = NaN;
+
+                    List<T> list = CreateListFrom(
+                        nan1,                 // index 0
+                        GetNonMatchingValue(),
+                        nan2,                 // index 2
+                        GetNonMatchingValue()
+                    );
+
+                    // Start after first NaN - should find second
+                    Assert.AreEqual(2, list.IndexOf(NaN, 1));
+                    Assert.AreEqual(2, list.IndexOf(NaN, 1, list.Count - 1));
+
+                    // Reverse search from index 2 - should find index 2
+                    Assert.AreEqual(2, list.LastIndexOf(NaN, 2));
+                    Assert.AreEqual(2, list.LastIndexOf(NaN, 2, 1));
+
+                    // Reverse range: exclude index 2 - miss
+                    Assert.AreEqual(-1, list.LastIndexOf(NaN, 1, 1));
+                }
+
+                // --- Signed zero: mismatch ---
+
+                [TestCaseSource(nameof(Positions))]
+                public void Test_IndexOf_PositiveZero_DoesNotFindNegativeZero(int index)
+                {
+                    var list = CreateListWithSingleValue(index, NegativeZero);
+
+                    Assert.AreEqual(-1, list.IndexOf(PositiveZero));
+                    Assert.AreEqual(-1, list.LastIndexOf(PositiveZero));
+                }
+
+                [TestCaseSource(nameof(Positions))]
+                public void Test_IndexOf_NegativeZero_DoesNotFindPositiveZero(int index)
+                {
+                    List<T> list = CreateListWithSingleValue(index, PositiveZero);
+
+                    Assert.AreEqual(-1, list.IndexOf(NegativeZero));
+                    Assert.AreEqual(-1, list.LastIndexOf(NegativeZero));
+                }
+
+                [TestCaseSource(nameof(Ranges))]
+                public void Test_IndexOf_SignedZero_Mismatch_WithRanges((int index, int count) range)
+                {
+                    int targetIndex = 5;
+
+                    List<T> list = CreateListWithSingleValue(targetIndex, NegativeZero);
+
+                    int index = range.index;
+                    int count = range.count;
+
+                    Assert.AreEqual(-1, list.IndexOf(PositiveZero, index, count));
+                    Assert.AreEqual(-1, list.LastIndexOf(PositiveZero, index + count - 1, count));
+                }
+
+                // --- Signed zero: match ---
+
+                [TestCaseSource(nameof(Positions))]
+                public void Test_IndexOf_SignedZero_FindsSameSign(int index)
+                {
+                    List<T> list = CreateListWithSingleValue(index, NegativeZero);
+
+                    Assert.AreEqual(index, list.IndexOf(NegativeZero));
+                    Assert.AreEqual(index, list.LastIndexOf(NegativeZero));
+                }
+
+                [TestCaseSource(nameof(Ranges))]
+                public void Test_IndexOf_SignedZero_Match_WithRanges((int index, int count) range)
+                {
+                    int targetIndex = 5;
+
+                    List<T> list = CreateListWithSingleValue(targetIndex, NegativeZero);
+
+                    int index = range.index;
+                    int count = range.count;
+
+                    int expected = (targetIndex >= index && targetIndex < index + count)
+                        ? targetIndex
+                        : -1;
+
+                    Assert.AreEqual(expected, list.IndexOf(NegativeZero, index, count));
+                    Assert.AreEqual(expected, list.LastIndexOf(NegativeZero, index + count - 1, count));
+                }
+
+                // --- Slow path correctness (forward) ---
+
+                [Test]
+                public void Test_IndexOf_SignedZero_SlowPath_Forward()
+                {
+                    List<T> list = CreateListFrom(
+                        NegativeZero,
+                        GetNonMatchingValue(), GetNonMatchingValue(), GetNonMatchingValue(),
+                        PositiveZero,
+                        GetNonMatchingValue(), GetNonMatchingValue(), GetNonMatchingValue(), GetNonMatchingValue(), GetNonMatchingValue()
+                    );
+
+                    AssertIndexOfOverloads(list, PositiveZero, 4);
+                }
+
+                // --- Slow path correctness (reverse) ---
+
+                [Test]
+                public void Test_LastIndexOf_SignedZero_SlowPath_Reverse()
+                {
+                    var list = CreateListFrom(
+                        PositiveZero,
+                        GetNonMatchingValue(), GetNonMatchingValue(), GetNonMatchingValue(),
+                        NegativeZero,
+                        GetNonMatchingValue(), GetNonMatchingValue(), GetNonMatchingValue(), GetNonMatchingValue(), GetNonMatchingValue()
+                    );
+
+                    AssertLastIndexOfOverloads(list, PositiveZero, 0);
+                }
+
+                // --- Signed zero: multi-occurrence (forward) ---
+
+                [Test]
+                public void Test_IndexOf_SignedZero_MultipleOccurrences_SelectsFirstMatch()
+                {
+                    var list = CreateListFrom(
+                        PositiveZero,  // index 0
+                        GetNonMatchingValue(),
+                        NegativeZero,  // index 2
+                        PositiveZero,  // index 3
+                        GetNonMatchingValue()
+                    );
+
+                    Assert.AreEqual(0, list.IndexOf(PositiveZero));
+                    Assert.AreEqual(2, list.IndexOf(NegativeZero));
+
+                    // Start after first +0 - should find second +0
+                    Assert.AreEqual(3, list.IndexOf(PositiveZero, 1));
+
+                    // Range that excludes first +0
+                    Assert.AreEqual(3, list.IndexOf(PositiveZero, 1, 3));
+
+                    // Range that excludes both - miss
+                    Assert.AreEqual(-1, list.IndexOf(PositiveZero, 4, 1));
+
+                    // Negative zero range checks
+                    Assert.AreEqual(2, list.IndexOf(NegativeZero, 1));
+                    Assert.AreEqual(2, list.IndexOf(NegativeZero, 1, 3));
+                }
+
+                // --- Signed zero: multi-occurrence (reverse) ---
+
+                [Test]
+                public void Test_LastIndexOf_SignedZero_MultipleOccurrences_SelectsLastMatch()
+                {
+                    var list = CreateListFrom(
+                        PositiveZero,  // index 0
+                        GetNonMatchingValue(),
+                        NegativeZero,  // index 2
+                        PositiveZero,  // index 3
+                        GetNonMatchingValue()
+                    );
+
+                    Assert.AreEqual(3, list.LastIndexOf(PositiveZero));
+                    Assert.AreEqual(2, list.LastIndexOf(NegativeZero));
+
+                    // Restrict to exclude last +0
+                    Assert.AreEqual(0, list.LastIndexOf(PositiveZero, 2));
+
+                    // Restrict to only middle region (should miss)
+                    Assert.AreEqual(-1, list.LastIndexOf(PositiveZero, 2, 2));
+
+                    // Negative zero reverse range
+                    Assert.AreEqual(2, list.LastIndexOf(NegativeZero, 3));
+                    Assert.AreEqual(2, list.LastIndexOf(NegativeZero, 3, 3));
+                }
+
+                // --- Signed zero: start index behavior (reverse) ---
+
+                [Test]
+                public void Test_LastIndexOf_SignedZero_RespectsStartIndex()
+                {
+                    var list = CreateListFrom(
+                        PositiveZero,  // index 0
+                        GetNonMatchingValue(),
+                        NegativeZero,  // index 2
+                        PositiveZero,  // index 3
+                        GetNonMatchingValue()
+                    );
+
+                    // Restrict search to first half
+                    Assert.AreEqual(0, list.LastIndexOf(PositiveZero, 1));
+                    Assert.AreEqual(-1, list.LastIndexOf(NegativeZero, 1));
+
+                    // Only index 1 - no matches
+                    Assert.AreEqual(-1, list.LastIndexOf(PositiveZero, 1, 1));
+                    Assert.AreEqual(-1, list.LastIndexOf(NegativeZero, 1, 1));
+
+                    // Include index 0
+                    Assert.AreEqual(0, list.LastIndexOf(PositiveZero, 1, 2));
+
+                    // Include index 2 only
+                    Assert.AreEqual(2, list.LastIndexOf(NegativeZero, 2, 1));
+                }
+
+                
+
+                protected void AssertIndexOfOverloads(List<T> list, T value, int expected)
+                {
+                    Assert.AreEqual(expected, list.IndexOf(value), "IndexOf(item)");
+
+                    Assert.AreEqual(expected, list.IndexOf(value, 0), "IndexOf(item, index)");
+
+                    Assert.AreEqual(expected, list.IndexOf(value, 0, list.Count), "IndexOf(item, index, count)");
+                }
+
+                protected void AssertLastIndexOfOverloads(List<T> list, T value, int expected)
+                {
+                    Assert.AreEqual(expected, list.LastIndexOf(value), "LastIndexOf(item)");
+
+                    Assert.AreEqual(expected, list.LastIndexOf(value, list.Count - 1), "LastIndexOf(item, index)");
+
+                    Assert.AreEqual(expected, list.LastIndexOf(value, list.Count - 1, list.Count), "LastIndexOf(item, index, count)");
+                }
+            }
+
+            public abstract class NullableFloatingPointIndexOfTests<T> : FloatingPointIndexOfTests<T>
+            {
+                protected abstract T NullValue { get; }
+                protected abstract bool IsNull(T value);
+
+                // --- Null tests ---
+
+                [TestCaseSource(nameof(Positions))]
+                public void Test_IndexOf_Null_FindsNull(int index)
+                {
+                    List<T> list = CreateListWithSingleValue(index, NullValue);
+
+                    AssertIndexOfOverloads(list, NullValue, index);
+                    AssertLastIndexOfOverloads(list, NullValue, index);
+                }
+
+                [Test]
+                public void Test_IndexOf_Null_DoesNotMatchNonNull()
+                {
+                    List<T> list = CreateListFrom(GetNonMatchingValue());
+
+                    Assert.AreEqual(-1, list.IndexOf(NullValue));
+                    Assert.AreEqual(-1, list.LastIndexOf(NullValue));
+                }
+
+                [Test]
+                public void Test_IndexOf_Null_MultipleOccurrences()
+                {
+                    List<T> list = CreateListFrom(
+                        NullValue,                // 0
+                        GetNonMatchingValue(),
+                        NullValue,                // 2
+                        GetNonMatchingValue()
+                    );
+
+                    Assert.AreEqual(0, list.IndexOf(NullValue));
+                    Assert.AreEqual(2, list.LastIndexOf(NullValue));
+
+                    Assert.AreEqual(2, list.IndexOf(NullValue, 1));
+                    Assert.AreEqual(0, list.LastIndexOf(NullValue, 1));
+                }
+
+                [Test]
+                public void Test_IndexOf_Nullable_SignedZero_DoesNotMatchNull()
+                {
+                    List<T> list = CreateListFrom(
+                        NullValue,
+                        PositiveZero,
+                        NegativeZero
+                    );
+
+                    Assert.AreEqual(1, list.IndexOf(PositiveZero));
+                    Assert.AreEqual(2, list.IndexOf(NegativeZero));
+                }
+
+                [Test]
+                public void Test_IndexOf_Nullable_NaN_DoesNotMatchNull()
+                {
+                    List<T> list = CreateListFrom(
+                        NullValue,
+                        CreateCustomNaN()
+                    );
+
+                    Assert.AreEqual(1, list.IndexOf(NaN));
+                    Assert.AreEqual(-1, list.IndexOf(NullValue, 1));
+                }
+
+                [Test]
+                public void Test_IndexOf_Chaos_AllFloatingPointEdgeCases()
+                {
+                    T nan1 = CreateCustomNaN();
+                    T nan2 = NaN;
+                    T nan3 = CreateCustomNaN();
+
+                    List<T> list = CreateListFrom(
+                        NullValue,              // 0
+                        PositiveZero,           // 1
+                        NegativeZero,           // 2
+                        nan1,                   // 3
+                        GetNonMatchingValue(),  // 4
+                        nan2,                   // 5
+                        NullValue,              // 6
+                        NegativeZero,           // 7
+                        PositiveZero,           // 8
+                        nan3                    // 9
+                    );
+
+                    // --- NULL ---
+                    Assert.AreEqual(0, list.IndexOf(NullValue));
+                    Assert.AreEqual(6, list.LastIndexOf(NullValue));
+
+                    // --- POSITIVE ZERO ---
+                    Assert.AreEqual(1, list.IndexOf(PositiveZero));
+                    Assert.AreEqual(8, list.LastIndexOf(PositiveZero));
+
+                    // --- NEGATIVE ZERO ---
+                    Assert.AreEqual(2, list.IndexOf(NegativeZero));
+                    Assert.AreEqual(7, list.LastIndexOf(NegativeZero));
+
+                    // --- NaN (all variants must match) ---
+                    Assert.AreEqual(3, list.IndexOf(NaN));
+                    Assert.AreEqual(9, list.LastIndexOf(NaN));
+
+                    // --- RANGE RESTRICTIONS ---
+
+                    // Skip first null
+                    Assert.AreEqual(6, list.IndexOf(NullValue, 1));
+
+                    // Skip first +0
+                    Assert.AreEqual(8, list.IndexOf(PositiveZero, 2));
+
+                    // Skip first -0
+                    Assert.AreEqual(7, list.IndexOf(NegativeZero, 3));
+
+                    // Middle NaN only
+                    Assert.AreEqual(5, list.IndexOf(NaN, 4, 3));
+
+                    // Reverse restricted ranges
+
+                    Assert.AreEqual(6, list.LastIndexOf(NullValue, 6));
+                    Assert.AreEqual(1, list.LastIndexOf(PositiveZero, 2));
+                    Assert.AreEqual(2, list.LastIndexOf(NegativeZero, 3));
+
+                    // --- NON-MATCHES ---
+
+                    Assert.AreEqual(-1, list.IndexOf(PositiveZero, 9, 1)); // only NaN
+                    Assert.AreEqual(-1, list.LastIndexOf(NegativeZero, 0, 1)); // only null
+
+                    // --- CROSS-TYPE SAFETY ---
+
+                    // null should never match anything else
+                    Assert.AreEqual(-1, list.IndexOf(NullValue, 1, 5)); // region without null
+
+                    // NaN should not match zeros
+                    Assert.AreEqual(-1, list.IndexOf(NaN, 1, 2)); // only zeros
+
+                    // zeros should not match each other
+                    Assert.AreEqual(-1, list.IndexOf(PositiveZero, 2, 1)); // only -0
+                    Assert.AreEqual(-1, list.IndexOf(NegativeZero, 1, 1)); // only +0
+                }
+            }
+
+            [TestFixture]
+            public class DoubleIndexOfTests : FloatingPointIndexOfTests<double>
+            {
+                protected override double PositiveZero => 0.0;
+
+                protected override double NegativeZero =>
+                    BitConversion.Int64BitsToDouble(unchecked((long)0x8000000000000000));
+
+                protected override double NaN => double.NaN;
+
+                protected override double CreateCustomNaN() =>
+                    BitConversion.Int64BitsToDouble(0x7FF8000000000001L);
+
+                protected override bool IsNaN(double value) => double.IsNaN(value);
+
+                protected override double GetNonMatchingValue() => 1.0;
+            }
+
+            [TestFixture]
+            public class NullableDoubleIndexOfTests : NullableFloatingPointIndexOfTests<double?>
+            {
+                protected override double? PositiveZero => 0.0;
+                protected override double? NegativeZero =>
+                    BitConversion.Int64BitsToDouble(unchecked((long)0x8000000000000000));
+
+                protected override double? NaN => double.NaN;
+
+                protected override double? CreateCustomNaN() =>
+                    BitConversion.Int64BitsToDouble(0x7FF8000000000001L);
+
+                protected override bool IsNaN(double? value) =>
+                    value.HasValue && double.IsNaN(value.Value);
+
+                protected override double? GetNonMatchingValue() => 1.0;
+
+                protected override double? NullValue => null;
+
+                protected override bool IsNull(double? value) => !value.HasValue;
+            }
+
+            [TestFixture]
+            public class SingleIndexOfTests : FloatingPointIndexOfTests<float>
+            {
+                protected override float PositiveZero => 0.0f;
+
+                protected override float NegativeZero =>
+                    BitConversion.Int32BitsToSingle(unchecked((int)0x80000000));
+
+                protected override float NaN => float.NaN;
+
+                protected override float CreateCustomNaN() =>
+                    BitConversion.Int32BitsToSingle(0x7FC00001);
+
+                protected override bool IsNaN(float value) => float.IsNaN(value);
+
+                protected override float GetNonMatchingValue() => 1.0f;
+            }
+
+            [TestFixture]
+            public class NullableSingleIndexOfTests : NullableFloatingPointIndexOfTests<float?>
+            {
+                protected override float? PositiveZero => 0.0f;
+
+                protected override float? NegativeZero =>
+                    BitConversion.Int32BitsToSingle(unchecked((int)0x80000000));
+
+                protected override float? NaN => float.NaN;
+
+                protected override float? CreateCustomNaN() =>
+                    BitConversion.Int32BitsToSingle(0x7FC00001);
+
+                protected override bool IsNaN(float? value) =>
+                    value.HasValue && float.IsNaN(value.Value);
+
+                protected override float? GetNonMatchingValue() => 1.0f;
+
+                protected override float? NullValue => null;
+
+                protected override bool IsNull(float? value) => !value.HasValue;
+            }
+
+            public static class SubList
+            {
+                [TestFixture]
+                public class DoubleIndexOfTests : Comparisons.DoubleIndexOfTests
+                {
+                    protected override List<double> CreateList(int capacity)
+                    {
+                        // Create parent with padding before + after
+                        var parent = new List<double>(capacity + 10);
+
+                        for (int i = 0; i < 10; i++)
+                            parent.Add(GetNonMatchingValue());
+
+                        // return sublist view (offset = 5)
+                        return parent.GetView(5, 0);
+                    }
+                }
+
+                [TestFixture]
+                public class NullableDoubleIndexOfTests : Comparisons.NullableDoubleIndexOfTests
+                {
+                    protected override List<double?> CreateList(int capacity)
+                    {
+                        var parent = new List<double?>(capacity + 10);
+
+                        for (int i = 0; i < 10; i++)
+                            parent.Add(GetNonMatchingValue());
+
+                        return parent.GetView(5, 0);
+                    }
+                }
+
+                [TestFixture]
+                public class SingleIndexOfTests : Comparisons.SingleIndexOfTests
+                {
+                    protected override List<float> CreateList(int capacity)
+                    {
+                        // Create parent with padding before + after
+                        var parent = new List<float>(capacity + 10);
+
+                        for (int i = 0; i < 10; i++)
+                            parent.Add(GetNonMatchingValue());
+
+                        // return sublist view (offset = 5)
+                        return parent.GetView(5, 0);
+                    }
+                }
+
+                [TestFixture]
+                public class NullableSingleIndexOfTests : Comparisons.NullableSingleIndexOfTests
+                {
+                    protected override List<float?> CreateList(int capacity)
+                    {
+                        // Create parent with padding before + after
+                        var parent = new List<float?>(capacity + 10);
+
+                        for (int i = 0; i < 10; i++)
+                            parent.Add(GetNonMatchingValue());
+
+                        // return sublist view (offset = 5)
+                        return parent.GetView(5, 0);
+                    }
+                }
+            }
+
+            #endregion IndexOf/LastIndexOf Tests
         }
 
     }

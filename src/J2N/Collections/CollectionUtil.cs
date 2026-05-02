@@ -22,6 +22,7 @@ using J2N.Text;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -36,6 +37,244 @@ namespace J2N.Collections
     {
         private const string SingleFormatArgument = "{0}";
         private const int CharStackBufferSize = 256;
+
+        #region IndexOf/LastIndexOf
+
+        /// <summary>
+        /// A strategy to handle JIT inlining with signed zero values in floating point types.
+        /// </summary>
+        /// <typeparam name="T">The type of value (a floating point type).</typeparam>
+        /// <typeparam name="TBits">The bit representation of the floating point type
+        /// (e.g. <see cref="long"/> or <see cref="int"/>).</typeparam>
+        /// <remarks>
+        /// This is a technique used in the BCL to optimize for JIT inlining of methods
+        /// that need to handle signed zero values in floating point types. Implementations
+        /// of this type must always remain a readonly struct and should never be boxed to
+        /// <see cref="ISignedZeroStrategy{T, TBits}"/> in practice.
+        /// </remarks>
+        internal interface ISignedZeroStrategy<T, TBits>
+        {
+            bool HasValue(T value);              // for nullable
+            bool IsZero(T value);
+            TBits GetBits(T value);
+        }
+
+        internal readonly struct DoubleStrategy : ISignedZeroStrategy<double, long>
+        {
+            public bool HasValue(double value) => true;
+
+            public bool IsZero(double value) => value == 0.0d;
+
+            public long GetBits(double value)
+                // NOTE: This is the same operation as BitConversion.DoubleToRawInt64Bits
+                => Unsafe.As<double, long>(ref value);
+        }
+
+        internal readonly struct SingleStrategy : ISignedZeroStrategy<float, int>
+        {
+            public bool HasValue(float value) => true;
+
+            public bool IsZero(float value) => value == 0.0f;
+
+            public int GetBits(float value)
+                // NOTE: This is the same operation as BitConversion.SingleToRawInt32Bits
+                => Unsafe.As<float, int>(ref value);
+        }
+
+        internal readonly struct NullableDoubleStrategy : ISignedZeroStrategy<double?, long>
+        {
+            public bool HasValue(double? value) => value.HasValue;
+
+            public bool IsZero(double? value) => value!.Value == 0.0d;
+
+            public long GetBits(double? value)
+            {
+                double v = value!.Value;
+                // NOTE: This is the same operation as BitConversion.DoubleToRawInt64Bits
+                return Unsafe.As<double, long>(ref v);
+            }
+        }
+
+        internal readonly struct NullableSingleStrategy : ISignedZeroStrategy<float?, int>
+        {
+            public bool HasValue(float? value) => value.HasValue;
+
+            public bool IsZero(float? value) => value!.Value == 0.0f;
+
+            public int GetBits(float? value)
+            {
+                float v = value!.Value;
+                // NOTE: This is the same operation as BitConversion.SingleToRawInt32Bits
+                return Unsafe.As<float, int>(ref v);
+            }
+        }
+
+        /// <summary>
+        /// Searches for the specified signed zero and returns the index of its first occurrence in a
+        /// one-dimensional array of floating point numbers. This is not a "normal" index of operation,
+        /// it narrowly searches only for signed zero to cover a special case omitted by the BCL that exists
+        /// in the JDK and is specifically to provide behavior consistent with the <c>java.util.Double</c> and
+        /// <c>java.util.Float</c> implementations when used in collections.
+        /// </summary>
+        /// <typeparam name="T">The type of floating point number.</typeparam>
+        /// <typeparam name="TStrategy">A strategy struct that implements <see cref="ISignedZeroStrategy{T, TBits}"/>
+        /// that supplies information about the underlying type.</typeparam>
+        /// <typeparam name="TBits">The integral type representation of the floating point number when
+        /// converted to raw bits.</typeparam>
+        /// <param name="array">The one-dimensional array to search.</param>
+        /// <param name="value">The signed zero to locate in the array.</param>
+        /// <param name="startIndex">The starting index of the search. 0 (zero) is valid in an empty array.</param>
+        /// <param name="count">The number of elements to search.</param>
+        /// <returns>The index of the first occurrence of signed zero <paramref name="value"/>, if it's found in the
+        /// <paramref name="array"/> from index <paramref name="startIndex"/> to <paramref name="startIndex"/> +
+        /// <paramref name="count"/> - 1; otherwise, the lower bound of the array minus 1.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="array"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="startIndex"/> is outside the range of valid indexes for <paramref name="array"/>.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="count"/> is less than 0.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="startIndex"/> and <paramref name="count"/> do not specify a valid section in the <paramref name="array"/>.
+        /// </exception>
+        /// <exception cref="RankException"><paramref name="array"/> is multidimensional.</exception>
+        /// <remarks>
+        /// This method treats negative zero and positive zero for floating point numbers as two distinct values that
+        /// are not equal.
+        /// <para/>
+        /// The caller is responsible for ensuring <paramref name="value"/> is a zero value and that it is not
+        /// <see langword="null"/> if it is a <see cref="Nullable{T}"/> type.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal static int IndexOfSignedZero<T, TStrategy, TBits>(T[] array, T value, int startIndex, int count)
+            where TStrategy : struct, ISignedZeroStrategy<T, TBits>
+            where TBits : unmanaged
+        {
+            TStrategy strategy = default; // The compiler hands us the right strategy struct based on TStrategy
+
+            Debug.Assert(strategy.HasValue(value), "Caller must ensure the value is not null.");
+            Debug.Assert(strategy.IsZero(value), "Caller must ensure the value is zero.");
+
+            // First pass goes to the BCL to find the first zero value.
+            // We also guard the input values with this call for invalid input.
+            int result = Array.IndexOf(array, value, startIndex, count);
+
+            // No zeros at all - we are done
+            if (result < 0)
+                return -1;
+
+            TBits targetBits = strategy.GetBits(value);
+
+            // We may miss if the sign of the zero value doesn't match what we are looking for
+            if (strategy.HasValue(array[result]) &&
+                strategy.GetBits(array[result]).Equals(targetBits))
+            {
+                return result;
+            }
+
+            // We found a zero value, but it was not the one we are looking for, so we must
+            // keep looking starting where the BCL left off for the one with the correct sign
+            int end = startIndex + count;
+
+            for (int i = result + 1; i < end; i++)
+            {
+                if (strategy.HasValue(array[i]) &&
+                    strategy.IsZero(array[i]) &&
+                    strategy.GetBits(array[i]).Equals(targetBits))
+                {
+                    return i;
+                }
+            }
+
+            return -1;
+        }
+
+        /// <summary>
+        /// Searches for the specified signed zero and returns the index of its last occurrence in a
+        /// one-dimensional array of floating point numbers. This is not a "normal" last index of operation,
+        /// it narrowly searches only for signed zero to cover a special case omitted by the BCL that exists
+        /// in the JDK and is specifically to provide behavior consistent with the <c>java.util.Double</c> and
+        /// <c>java.util.Float</c> implementations when used in collections.
+        /// </summary>
+        /// <typeparam name="T">The type of floating point number.</typeparam>
+        /// <typeparam name="TStrategy">A strategy struct that implements <see cref="ISignedZeroStrategy{T, TBits}"/>
+        /// that supplies information about the underlying type.</typeparam>
+        /// <typeparam name="TBits">The integral type representation of the floating point number when
+        /// converted to raw bits.</typeparam>
+        /// <param name="array">The one-dimensional array to search.</param>
+        /// <param name="value">The signed zero to locate in the array.</param>
+        /// <param name="startIndex">The zero-based starting index of the backward search.</param>
+        /// <param name="count">The number of elements in the section to search.</param>
+        /// <returns>The zero-based index of the last occurrence of value within the range of elements
+        /// in <paramref name="array"/> that contains the number of elements specified in <paramref name="count"/>
+        /// and ends at <paramref name="startIndex"/>, if found; otherwise, -1.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="array"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="startIndex"/> is outside the range of valid indexes for <paramref name="array"/>.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="count"/> is less than 0.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="startIndex"/> and <paramref name="count"/> do not specify a valid section in the <paramref name="array"/>.
+        /// </exception>
+        /// <remarks>
+        /// This method treats negative zero and positive zero for floating point numbers as two distinct values that
+        /// are not equal.
+        /// <para/>
+        /// The caller is responsible for ensuring <paramref name="value"/> is a zero value and that it is not
+        /// <see langword="null"/> if it is a <see cref="Nullable{T}"/> type.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal static int LastIndexOfSignedZero<T, TStrategy, TBits>(T[] array, T value, int startIndex, int count)
+            where TStrategy : struct, ISignedZeroStrategy<T, TBits>
+            where TBits : unmanaged
+        {
+            TStrategy strategy = default; // The compiler hands us the right strategy struct based on TStrategy
+
+            Debug.Assert(strategy.HasValue(value), "Caller must ensure the value is not null.");
+            Debug.Assert(strategy.IsZero(value), "Caller must ensure the value is zero.");
+
+            // First pass goes to the BCL to find the last zero value.
+            // We also guard the input values with this call for invalid input.
+            int result = Array.LastIndexOf(array, value, startIndex, count);
+
+            // No zeros at all - we are done
+            if (result < 0)
+                return -1;
+
+            TBits targetBits = strategy.GetBits(value);
+
+            // We may miss if the sign of the zero value doesn't match what we are looking for
+            if (strategy.HasValue(array[result]) && 
+                strategy.GetBits(array[result]).Equals(targetBits))
+            {
+                return result;
+            }
+
+            // We found a zero value, but it was not the one we are looking for, so we must
+            // keep looking starting where the BCL left off for the one with the correct sign
+            int end = startIndex - count + 1;
+
+            for (int i = result - 1; i >= end; i--)
+            {
+                if (strategy.HasValue(array[i]) &&
+                    strategy.IsZero(array[i]) &&
+                    strategy.GetBits(array[i]).Equals(targetBits))
+                {
+                    return i;
+                }
+            }
+
+            return -1;
+        }
+
+        #endregion IndexOf/LastIndexOf
 
         #region Equals
 
