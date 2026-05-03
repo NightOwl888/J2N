@@ -2682,7 +2682,206 @@ namespace J2N.Collections.Generic
             }
 
             #endregion IndexOf/LastIndexOf Tests
-        }
 
+            #region Contains Tests
+
+            [TestFixture]
+            public class ContainsTests
+            {
+                // Smoke tests to confirm that -0.0 and 0.0 are not considered equal on Contains()
+
+                [Test]
+                public void Test_Contains_Double_SignedZero()
+                {
+                    var list = new List<double> { -0.0 };
+                    Assert.IsFalse(list.Contains(0.0));
+                }
+
+                [Test]
+                public void Test_Contains_NullableDouble_SignedZero()
+                {
+                    var list = new List<double?> { -0.0 };
+                    Assert.IsFalse(list.Contains(0.0));
+                }
+
+                [Test]
+                public void Test_Contains_Single_SignedZero()
+                {
+                    var list = new List<float> { -0.0f };
+                    Assert.IsFalse(list.Contains(0.0f));
+                }
+
+                [Test]
+                public void Test_Contains_NullableSingle_SignedZero()
+                {
+                    var list = new List<float?> { -0.0f };
+                    Assert.IsFalse(list.Contains(0.0f));
+                }
+
+                // Smoke tests to confirm that NaN is considered equal to another NaN value
+
+                [Test]
+                public void Test_Contains_Double_NaN()
+                {
+                    double nan1 = BitConversion.Int64BitsToDouble(0x7FF8000000000001L);
+                    double nan2 = double.NaN;
+
+                    var list = new List<double> { nan1 };
+
+                    Assert.IsTrue(double.IsNaN(nan1));
+                    Assert.IsTrue(double.IsNaN(nan2));
+
+                    Assert.IsTrue(list.Contains(nan2));
+                }
+
+                [Test]
+                public void Test_Contains_NullableDouble_NaN()
+                {
+                    double? nan1 = BitConversion.Int64BitsToDouble(0x7FF8000000000001L);
+                    double? nan2 = double.NaN;
+
+                    var list = new List<double?> { nan1 };
+
+                    Assert.IsTrue(nan1.HasValue && double.IsNaN(nan1.Value));
+                    Assert.IsTrue(nan2.HasValue && double.IsNaN(nan2.Value));
+
+                    Assert.IsTrue(list.Contains(nan2));
+                }
+
+                [Test]
+                public void Test_Contains_Single_NaN()
+                {
+                    float nan1 = BitConversion.Int32BitsToSingle(0x7FC00001);
+                    float nan2 = float.NaN;
+
+                    var list = new List<float> { nan1 };
+
+                    Assert.IsTrue(float.IsNaN(nan1));
+                    Assert.IsTrue(float.IsNaN(nan2));
+
+                    Assert.IsTrue(list.Contains(nan2));
+                }
+
+                [Test]
+                public void Test_Contains_NullableSingle_NaN()
+                {
+                    float? nan1 = BitConversion.Int32BitsToSingle(0x7FC00001);
+                    float? nan2 = float.NaN;
+
+                    var list = new List<float?> { nan1 };
+
+                    Assert.IsTrue(nan1.HasValue && float.IsNaN(nan1.Value));
+                    Assert.IsTrue(nan2.HasValue && float.IsNaN(nan2.Value));
+
+                    Assert.IsTrue(list.Contains(nan2));
+                }
+            }
+
+            #endregion Contains Tests
+
+            #region Remove Tests
+
+            [TestFixture]
+            public class RemoveTests
+            {
+                // Smoke tests to confirm that -0.0 and 0.0 are not considered equal on Remove
+
+                [Test]
+                public void Test_Remove_Double_SignedZero()
+                {
+                    var list = new List<double> { -0.0 };
+                    Assert.IsFalse(list.Remove(0.0));
+                    Assert.AreEqual(1, list.Count);
+                    Assert.AreEqual(-0.0, list[0]);
+                }
+
+                [Test]
+                public void Test_Remove_NullableDouble_SignedZero()
+                {
+                    var list = new List<double?> { -0.0 };
+                    Assert.IsFalse(list.Remove(0.0));
+                    Assert.AreEqual(1, list.Count);
+                    Assert.AreEqual(-0.0, list[0]);
+                }
+
+                [Test]
+                public void Test_Remove_Single_SignedZero()
+                {
+                    var list = new List<float> { -0.0f };
+                    Assert.IsFalse(list.Remove(0.0f));
+                    Assert.AreEqual(1, list.Count);
+                    Assert.AreEqual(-0.0f, list[0]);
+                }
+
+                [Test]
+                public void Test_Remove_NullableSingle_SignedZero()
+                {
+                    var list = new List<float?> { -0.0f };
+                    Assert.IsFalse(list.Remove(0.0f));
+                    Assert.AreEqual(1, list.Count);
+                    Assert.AreEqual(-0.0f, list[0]);
+                }
+
+                // Smoke tests to confirm that NaN is considered equal to another NaN value
+
+                [Test]
+                public void Test_Remove_Double_NaN()
+                {
+                    double nan1 = BitConversion.Int64BitsToDouble(0x7FF8000000000001L);
+                    double nan2 = double.NaN;
+
+                    Assert.IsTrue(nan1.IsNaN());
+
+                    var list = new List<double> { nan1 };
+
+                    Assert.IsTrue(list.Remove(nan2));
+                    Assert.AreEqual(0, list.Count);
+                }
+
+                [Test]
+                public void Test_Remove_NullableDouble_NaN()
+                {
+                    double? nan1 = BitConversion.Int64BitsToDouble(0x7FF8000000000001L);
+                    double? nan2 = double.NaN;
+
+                    Assert.IsTrue(nan1.Value.IsNaN());
+
+                    var list = new List<double?> { nan1 };
+
+                    Assert.IsTrue(list.Remove(nan2));
+                    Assert.AreEqual(0, list.Count);
+                }
+
+                [Test]
+                public void Test_Remove_Single_NaN()
+                {
+                    float nan1 = BitConversion.Int32BitsToSingle(0x7FC00001);
+                    float nan2 = float.NaN;
+
+                    Assert.IsTrue(nan1.IsNaN());
+
+                    var list = new List<float> { nan1 };
+
+                    Assert.IsTrue(list.Remove(nan2));
+                    Assert.AreEqual(0, list.Count);
+                }
+
+                [Test]
+                public void Test_Remove_NullableSingle_NaN()
+                {
+                    float? nan1 = BitConversion.Int32BitsToSingle(0x7FC00001);
+                    float? nan2 = float.NaN;
+
+                    Assert.IsTrue(nan1.Value.IsNaN());
+
+                    var list = new List<float?> { nan1 };
+
+                    Assert.IsTrue(list.Remove(nan2));
+                    Assert.AreEqual(0, list.Count);
+                }
+            }
+
+            #endregion Remove Tests
+        }
     }
 }
