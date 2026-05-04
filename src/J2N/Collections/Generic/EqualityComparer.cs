@@ -197,28 +197,11 @@ namespace J2N.Collections.Generic
 
         public override bool Equals(double x, double y)
         {
-            if (x < y || x > y)
-                return false;
-
-            if (0.0d != x && x == y)
-                return true;
-
-            if (double.IsNaN(x) && double.IsNaN(y))
-                return true;
-
-            // Deal with +0.0 and -0.0
-            long d1 = BitConversion.DoubleToRawInt64Bits(x); // NaN already dealt with, so we can use "raw" here
-            long d2 = BitConversion.DoubleToRawInt64Bits(y);
-            // The below expression is equivalent to:
-            // (d1 == d2) ? 0 : (d1 < d2) ? -1 : 1
-            return (int)((d1 >> 63) - (d2 >> 63)) == 0;
+            return BitConversion.DoubleToInt64Bits(x) == BitConversion.DoubleToInt64Bits(y);
         }
 
         public override int GetHashCode(double obj)
         {
-            if (obj != 0 && !double.IsNaN(obj))
-                return obj.GetHashCode();
-
             // Make positive zero and negative zero have different hash codes,
             // and NaN always have the same hash code.
             // We intentionlly call the non "raw" overload here to get that behavior.
@@ -276,28 +259,11 @@ namespace J2N.Collections.Generic
 
         public override bool Equals(float x, float y)
         {
-            if (x < y || x > y)
-                return false;
-
-            if (0.0f != x && x == y)
-                return true;
-
-            if (float.IsNaN(x) && float.IsNaN(y))
-                return true;
-
-            // Deal with +0.0 and -0.0
-            int f1 = BitConversion.SingleToRawInt32Bits(x); // NaN already dealt with, so we can use "raw" here
-            int f2 = BitConversion.SingleToRawInt32Bits(y);
-            // The below expression is equivalent to:
-            // (f1 == f2) ? 0 : (f1 < f2) ? -1 : 1
-            return (f1 >> 31) - (f2 >> 31) == 0;
+            return BitConversion.SingleToInt32Bits(x) == BitConversion.SingleToInt32Bits(y);
         }
 
         public override int GetHashCode(float obj)
         {
-            if (obj != 0 && !float.IsNaN(obj))
-                return obj.GetHashCode();
-
             // Make positive zero and negative zero have different hash codes,
             // and NaN always have the same hash code.
             // We intentionlly call the non "raw" overload here to get that behavior.
