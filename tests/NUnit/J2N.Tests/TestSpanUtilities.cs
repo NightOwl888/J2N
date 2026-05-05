@@ -229,7 +229,7 @@ namespace J2N
 
         [Test]
         public void Test_IndexOf_InvalidComparison()
-            => Assert.Throws<ArgumentOutOfRangeException>(() =>
+            => Assert.Throws<ArgumentException>(() =>
                 SpanUtilities.IndexOf("abc".AsSpan(), "a", (StringComparison)999));
     }
 }

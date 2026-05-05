@@ -947,7 +947,7 @@ namespace J2N
         private static void CheckStringComparison(StringComparison comparisonType)
         {
             if (comparisonType < StringComparison.CurrentCulture || comparisonType > StringComparison.OrdinalIgnoreCase)
-                throw new ArgumentOutOfRangeException(nameof(comparisonType));
+                ThrowHelper.ThrowArgumentException(ExceptionResource.NotSupported_StringComparison, ExceptionArgument.comparisonType);
         }
     }
 }
