@@ -1092,6 +1092,8 @@ namespace J2N
                     return "comparer";
                 case ExceptionArgument.comparison:
                     return "comparison";
+                case ExceptionArgument.comparisonType:
+                    return "comparisonType";
                 case ExceptionArgument.converter:
                     return "converter";
                 case ExceptionArgument.count:
@@ -1305,9 +1307,6 @@ namespace J2N
                 //case ExceptionArgument.comparable:
                 //    return "comparable";
 
-
-                //case ExceptionArgument.comparisonType:
-                //    return "comparisonType";
                 //case ExceptionArgument.manager:
                 //    return "manager";
                 //case ExceptionArgument.sourceBytesToCopy:
