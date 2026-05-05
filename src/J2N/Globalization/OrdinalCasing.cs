@@ -126,26 +126,28 @@ namespace J2N.Globalization
         //    /* F800-FFFF */    0b11001000,
         //];
 
-        //[MethodImpl(MethodImplOptions.AggressiveInlining)]
-        //internal static char ToUpper(char c)
-        //{
-        //    int pageNumber = ((int)c) >> 8;
-        //    if (pageNumber == 0) // optimize for ASCII range
-        //    {
-        //        return (char)s_basicLatin[(int)c];
-        //    }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal static char ToUpper(char c)
+        {
+            int pageNumber = ((int)c) >> 8;
+            if (pageNumber == 0) // optimize for ASCII range
+            {
+                return (char)s_basicLatin[(int)c];
+            }
 
-        //    ushort[]? casingTable = s_casingTable[pageNumber];
+            return char.ToUpperInvariant(c);
 
-        //    if (casingTable == NoCasingPage)
-        //    {
-        //        return c;
-        //    }
+            //ushort[]? casingTable = s_casingTable[pageNumber];
 
-        //    casingTable ??= InitOrdinalCasingPage(pageNumber);
+            //if (casingTable == NoCasingPage)
+            //{
+            //    return c;
+            //}
 
-        //    return (char)casingTable[((int)c) & 0xFF];
-        //}
+            //casingTable ??= InitOrdinalCasingPage(pageNumber);
+
+            //return (char)casingTable[((int)c) & 0xFF];
+        }
 
         //[MethodImpl(MethodImplOptions.AggressiveInlining)]
         //internal static char ToUpperInvariantMode(char c) => c <= '\u00FF' ? (char)s_basicLatin[(int)c] : c;
@@ -309,132 +311,132 @@ namespace J2N.Globalization
             return lengthA - lengthB;
         }
 
-        //internal static unsafe int IndexOf(ReadOnlySpan<char> source, ReadOnlySpan<char> value)
-        //{
-        //    Debug.Assert(value.Length > 0);
-        //    Debug.Assert(value.Length <= source.Length);
+        internal static unsafe int IndexOf(ReadOnlySpan<char> source, ReadOnlySpan<char> value)
+        {
+            Debug.Assert(value.Length > 0);
+            Debug.Assert(value.Length <= source.Length);
 
-        //    Debug.Assert(!GlobalizationMode.Invariant);
-        //    Debug.Assert(!GlobalizationMode.UseNls);
+            //Debug.Assert(!GlobalizationMode.Invariant);
+            //Debug.Assert(!GlobalizationMode.UseNls);
 
-        //    fixed (char* pSource = &MemoryMarshal.GetReference(source))
-        //    fixed (char* pValue = &MemoryMarshal.GetReference(value))
-        //    {
-        //        char* pSourceLimit = pSource + (source.Length - value.Length);
-        //        char* pValueLimit = pValue + value.Length - 1;
-        //        char* pCurrentSource = pSource;
+            fixed (char* pSource = &MemoryMarshal.GetReference(source))
+            fixed (char* pValue = &MemoryMarshal.GetReference(value))
+            {
+                char* pSourceLimit = pSource + (source.Length - value.Length);
+                char* pValueLimit = pValue + value.Length - 1;
+                char* pCurrentSource = pSource;
 
-        //        while (pCurrentSource <= pSourceLimit)
-        //        {
-        //            char* pVal = pValue;
-        //            char* pSrc = pCurrentSource;
+                while (pCurrentSource <= pSourceLimit)
+                {
+                    char* pVal = pValue;
+                    char* pSrc = pCurrentSource;
 
-        //            while (pVal <= pValueLimit)
-        //            {
-        //                if (!char.IsHighSurrogate(*pVal) || pVal == pValueLimit)
-        //                {
-        //                    if (*pVal != *pSrc && ToUpper(*pVal) != ToUpper(*pSrc))
-        //                        break; // no match
+                    while (pVal <= pValueLimit)
+                    {
+                        if (!char.IsHighSurrogate(*pVal) || pVal == pValueLimit)
+                        {
+                            if (*pVal != *pSrc && ToUpper(*pVal) != ToUpper(*pSrc))
+                                break; // no match
 
-        //                    pVal++;
-        //                    pSrc++;
-        //                    continue;
-        //                }
+                            pVal++;
+                            pSrc++;
+                            continue;
+                        }
 
-        //                if (char.IsHighSurrogate(*pSrc) && char.IsLowSurrogate(*(pSrc + 1)) && char.IsLowSurrogate(*(pVal + 1)))
-        //                {
-        //                    // Well formed surrogates
-        //                    // both the source and the Value have well-formed surrogates.
-        //                    if (!SurrogateCasing.Equal(*pSrc, *(pSrc + 1), *pVal, *(pVal + 1)))
-        //                        break; // no match
+                        if (char.IsHighSurrogate(*pSrc) && char.IsLowSurrogate(*(pSrc + 1)) && char.IsLowSurrogate(*(pVal + 1)))
+                        {
+                            // Well formed surrogates
+                            // both the source and the Value have well-formed surrogates.
+                            if (!SurrogateCasing.Equal(*pSrc, *(pSrc + 1), *pVal, *(pVal + 1)))
+                                break; // no match
 
-        //                    pSrc += 2;
-        //                    pVal += 2;
-        //                    continue;
-        //                }
+                            pSrc += 2;
+                            pVal += 2;
+                            continue;
+                        }
 
-        //                if (*pVal != *pSrc)
-        //                    break; // no match
+                        if (*pVal != *pSrc)
+                            break; // no match
 
-        //                pSrc++;
-        //                pVal++;
-        //            }
+                        pSrc++;
+                        pVal++;
+                    }
 
-        //            if (pVal > pValueLimit)
-        //            {
-        //                // Found match.
-        //                return (int)(pCurrentSource - pSource);
-        //            }
+                    if (pVal > pValueLimit)
+                    {
+                        // Found match.
+                        return (int)(pCurrentSource - pSource);
+                    }
 
-        //            pCurrentSource++;
-        //        }
+                    pCurrentSource++;
+                }
 
-        //        return -1;
-        //    }
-        //}
+                return -1;
+            }
+        }
 
-        //internal static unsafe int LastIndexOf(ReadOnlySpan<char> source, ReadOnlySpan<char> value)
-        //{
-        //    Debug.Assert(value.Length > 0);
-        //    Debug.Assert(value.Length <= source.Length);
+        internal static unsafe int LastIndexOf(ReadOnlySpan<char> source, ReadOnlySpan<char> value)
+        {
+            Debug.Assert(value.Length > 0);
+            Debug.Assert(value.Length <= source.Length);
 
-        //    Debug.Assert(!GlobalizationMode.Invariant);
-        //    Debug.Assert(!GlobalizationMode.UseNls);
+            //Debug.Assert(!GlobalizationMode.Invariant);
+            //Debug.Assert(!GlobalizationMode.UseNls);
 
-        //    fixed (char* pSource = &MemoryMarshal.GetReference(source))
-        //    fixed (char* pValue = &MemoryMarshal.GetReference(value))
-        //    {
-        //        char* pValueLimit = pValue + value.Length - 1;
-        //        char* pCurrentSource = pSource + (source.Length - value.Length);
+            fixed (char* pSource = &MemoryMarshal.GetReference(source))
+            fixed (char* pValue = &MemoryMarshal.GetReference(value))
+            {
+                char* pValueLimit = pValue + value.Length - 1;
+                char* pCurrentSource = pSource + (source.Length - value.Length);
 
-        //        while (pCurrentSource >= pSource)
-        //        {
-        //            char* pVal = pValue;
-        //            char* pSrc = pCurrentSource;
+                while (pCurrentSource >= pSource)
+                {
+                    char* pVal = pValue;
+                    char* pSrc = pCurrentSource;
 
-        //            while (pVal <= pValueLimit)
-        //            {
-        //                if (!char.IsHighSurrogate(*pVal) || pVal == pValueLimit)
-        //                {
-        //                    if (*pVal != *pSrc && ToUpper(*pVal) != ToUpper(*pSrc))
-        //                        break; // no match
+                    while (pVal <= pValueLimit)
+                    {
+                        if (!char.IsHighSurrogate(*pVal) || pVal == pValueLimit)
+                        {
+                            if (*pVal != *pSrc && ToUpper(*pVal) != ToUpper(*pSrc))
+                                break; // no match
 
-        //                    pVal++;
-        //                    pSrc++;
-        //                    continue;
-        //                }
+                            pVal++;
+                            pSrc++;
+                            continue;
+                        }
 
-        //                if (char.IsHighSurrogate(*pSrc) && char.IsLowSurrogate(*(pSrc + 1)) && char.IsLowSurrogate(*(pVal + 1)))
-        //                {
-        //                    // Well formed surrogates
-        //                    // both the source and the Value have well-formed surrogates.
-        //                    if (!SurrogateCasing.Equal(*pSrc, *(pSrc + 1), *pVal, *(pVal + 1)))
-        //                        break; // no match
+                        if (char.IsHighSurrogate(*pSrc) && char.IsLowSurrogate(*(pSrc + 1)) && char.IsLowSurrogate(*(pVal + 1)))
+                        {
+                            // Well formed surrogates
+                            // both the source and the Value have well-formed surrogates.
+                            if (!SurrogateCasing.Equal(*pSrc, *(pSrc + 1), *pVal, *(pVal + 1)))
+                                break; // no match
 
-        //                    pSrc += 2;
-        //                    pVal += 2;
-        //                    continue;
-        //                }
+                            pSrc += 2;
+                            pVal += 2;
+                            continue;
+                        }
 
-        //                if (*pVal != *pSrc)
-        //                    break; // no match
+                        if (*pVal != *pSrc)
+                            break; // no match
 
-        //                pSrc++;
-        //                pVal++;
-        //            }
+                        pSrc++;
+                        pVal++;
+                    }
 
-        //            if (pVal > pValueLimit)
-        //            {
-        //                // Found match.
-        //                return (int)(pCurrentSource - pSource);
-        //            }
+                    if (pVal > pValueLimit)
+                    {
+                        // Found match.
+                        return (int)(pCurrentSource - pSource);
+                    }
 
-        //            pCurrentSource--;
-        //        }
+                    pCurrentSource--;
+                }
 
-        //        return -1;
-        //    }
-        //}
+                return -1;
+            }
+        }
 
         //private static ushort[]?[] InitCasingTable()
         //{

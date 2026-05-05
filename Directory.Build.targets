@@ -55,7 +55,12 @@
 
   <!-- Features in .NET 7.x, .NET 8.x and .NET 9.x only -->
   <PropertyGroup Condition=" $(TargetFramework.StartsWith('net7.')) Or $(TargetFramework.StartsWith('net8.')) Or $(TargetFramework.StartsWith('net9.')) ">
-    
+
+    <!-- J2N NOTE: This API exists on .NET Framework/.NET Standard, but only Ordinal is optimized. All other StringComparison values
+         allocate 2 strings to make the comparison. As such, it should be avoided on .NET Framework. -->
+    <DefineConstants>$(DefineConstants);FEATURE_MEMORYEXTENSIONS_INDEXOF_STRINGCOMPARISON</DefineConstants>
+    <!-- J2N NOTE: This is technically supported in .NET 6.0, but we don't have a target for it so we are testing .NET Standard 2.1, which doesn't support it -->
+    <DefineConstants>$(DefineConstants);FEATURE_MEMORYEXTENSIONS_LASTINDEXOF_STRINGCOMPARISON</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_REQUIRESDYNAMICCODEATTRIBUTE</DefineConstants>
     
   </PropertyGroup>

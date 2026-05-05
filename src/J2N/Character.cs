@@ -2038,6 +2038,43 @@ namespace J2N
             return -1;
         }
 
+        // Return true for all characters below or equal U+007f, which is ASCII.
+
+        /// <summary>
+        /// Returns <see langword="true"/> if <paramref name="c"/> is an ASCII
+        /// character ([ U+0000..U+007F ]).
+        /// </summary>
+        /// <remarks>
+        /// Per http://www.unicode.org/glossary/#ASCII, ASCII is only U+0000..U+007F.
+        /// </remarks>
+        internal static bool IsAscii(char c) => (uint)c <= '\x007f'; // Cover .NET
+
+        /// <summary>Indicates whether a character is categorized as an ASCII letter.</summary>
+        /// <param name="c">The character to evaluate.</param>
+        /// <returns>true if <paramref name="c"/> is an ASCII letter; otherwise, false.</returns>
+        /// <remarks>
+        /// This determines whether the character is in the range 'A' through 'Z', inclusive,
+        /// or 'a' through 'z', inclusive.
+        /// </remarks>
+        internal static bool IsAsciiLetter(char c) => (uint)((c | 0x20) - 'a') <= 'z' - 'a';
+
+        /// <summary>Indicates whether a character is categorized as a lowercase ASCII letter.</summary>
+        /// <param name="c">The character to evaluate.</param>
+        /// <returns>true if <paramref name="c"/> is a lowercase ASCII letter; otherwise, false.</returns>
+        /// <remarks>
+        /// This determines whether the character is in the range 'a' through 'z', inclusive.
+        /// </remarks>
+        internal static bool IsAsciiLetterLower(char c) => IsBetween(c, 'a', 'z');
+
+        /// <summary>Indicates whether a character is categorized as an uppercase ASCII letter.</summary>
+        /// <param name="c">The character to evaluate.</param>
+        /// <returns>true if <paramref name="c"/> is an uppercase ASCII letter; otherwise, false.</returns>
+        /// <remarks>
+        /// This determines whether the character is in the range 'A' through 'Z', inclusive.
+        /// </remarks>
+        internal static bool IsAsciiLetterUpper(char c) => IsBetween(c, 'A', 'Z');
+
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static bool IsAsciiHexDigit(int c)
         {
@@ -2048,6 +2085,19 @@ namespace J2N
             }
             return false;
         }
+
+        /// <summary>Indicates whether a character is within the specified inclusive range.</summary>
+        /// <param name="c">The character to evaluate.</param>
+        /// <param name="minInclusive">The lower bound, inclusive.</param>
+        /// <param name="maxInclusive">The upper bound, inclusive.</param>
+        /// <returns>true if <paramref name="c"/> is within the specified range; otherwise, false.</returns>
+        /// <remarks>
+        /// The method does not validate that <paramref name="maxInclusive"/> is greater than or equal
+        /// to <paramref name="minInclusive"/>.  If <paramref name="maxInclusive"/> is less than
+        /// <paramref name="minInclusive"/>, the behavior is undefined.
+        /// </remarks>
+        internal static bool IsBetween(char c, char minInclusive, char maxInclusive) =>
+            (uint)(c - minInclusive) <= (uint)(maxInclusive - minInclusive);
 
         /// <summary>
         /// Search the sorted characters in the string and return the nearest index.
