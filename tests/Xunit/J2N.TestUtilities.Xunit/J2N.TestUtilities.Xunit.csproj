@@ -28,6 +28,7 @@
     <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="$(SystemRuntimeCompilerServicesUnsafePackageReferenceVersion)" />
   </ItemGroup>
 
+  <Import Project="..\..\MicrosoftBclMemoryReferenceOverride.targets" />
   <Import Project="..\..\SystemMemoryReferenceOverride.targets" />
 
   <ItemGroup>

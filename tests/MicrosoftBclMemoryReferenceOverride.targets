@@ -1,0 +1,14 @@
+<Project>
+
+  <!-- See the following post to understand this approach: https://duanenewman.net/blog/post/a-better-way-to-override-references-with-packagereference/ -->
+  
+  <!-- This package seems broken with respect to SetTargetFramework, so we explicitly exclude it from all test projects
+       on target frameworks that are testing net40 and net45. -->
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net47' Or '$(TargetFramework)' == 'net472'">
+    <PackageReference Include="Microsoft.Bcl.Memory" Version="$(MicrosoftBclMemoryPackageReferenceVersion)" ExcludeAssets="all" />
+  </ItemGroup>
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net472' ">
+    <PackageReference Include="IndexRange" Version="$(IndexRangePackageReferenceVersion)" />
+  </ItemGroup>
+  
+</Project>
