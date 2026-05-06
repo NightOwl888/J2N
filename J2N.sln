@@ -16,6 +16,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{B71E854C
 		tests\Empty.targets = tests\Empty.targets
 		tests\SkipBuild.props = tests\SkipBuild.props
 		tests\SkipBuild.targets = tests\SkipBuild.targets
+		tests\MicrosoftBclMemoryReferenceOverride.targets = tests\MicrosoftBclMemoryReferenceOverride.targets
 		tests\SystemMemoryReferenceOverride.targets = tests\SystemMemoryReferenceOverride.targets
 	EndProjectSection
 EndProject

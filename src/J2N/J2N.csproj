@@ -46,16 +46,18 @@
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
+    <PackageReference Include="Microsoft.Bcl.Memory" Version="$(MicrosoftBclMemoryPackageReferenceVersion)" />
     <PackageReference Include="System.Memory" Version="$(SystemMemoryPackageReferenceVersion)" />
     <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="$(SystemRuntimeCompilerServicesUnsafePackageReferenceVersion)" />
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net462' ">
+    <PackageReference Include="Microsoft.Bcl.Memory" Version="$(MicrosoftBclMemoryPackageReferenceVersion)" />
     <PackageReference Include="System.Memory" Version="$(SystemMemoryPackageReferenceVersion)" />
-    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="$(SystemRuntimeCompilerServicesUnsafePackageReferenceVersion)" />
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
+    <PackageReference Include="IndexRange" Version="$(IndexRangePackageReferenceVersion)" />
     <PackageReference Include="NetFx.System.Memory" Version="$(NetFxSystemMemoryPackageReferenceVersion)" />
   </ItemGroup>
 
