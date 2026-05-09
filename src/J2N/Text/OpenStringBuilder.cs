@@ -430,7 +430,7 @@ namespace J2N.Text
         /// the empty string (that is, it contains <see cref="string.Empty"/>).</param>
         /// <remarks>If <paramref name="value"/> is <c>null</c>, the new <see cref="OpenStringBuilder"/> will
         /// contain the empty string (that is, it contains <see cref="string.Empty"/>).</remarks>
-        public OpenStringBuilder(ICharSequence? value) // J2N TODO: Add overloads to slice the ICharsequence and set capacity?
+        public OpenStringBuilder(ICharSequence? value) // Coverage for the JDK // J2N TODO: Add overloads to slice the ICharsequence and set capacity?
         {
             m_MaxCapacity = int.MaxValue;
             int length = value?.Length ?? 0;
@@ -5896,7 +5896,7 @@ namespace J2N.Text
         /// <para/>
         /// <paramref name="startIndex"/> is greater than <see cref="OpenStringBuilder.Length"/>.
         /// </exception>
-        public OpenStringBuilder Delete(int startIndex, int count)
+        public OpenStringBuilder Delete(int startIndex, int count) // Coverage for the JDK
         {
             if ((uint)startIndex > (uint)m_Position)
                 ThrowHelper.ThrowArgumentOutOfRange_ArgumentOutOfRange_IndexString(startIndex, ExceptionArgument.startIndex);
@@ -5943,7 +5943,7 @@ namespace J2N.Text
         /// <seealso cref="StringExtensions.ReverseText(string)"/>
         /// <seealso cref="MemoryExtensions.ReverseText(Span{char})"/>
         /// <seealso cref="StringBuilderExtensions.Reverse(StringBuilder)"/>
-        public OpenStringBuilder Reverse()
+        public OpenStringBuilder Reverse() // Coverage for the JDK
         {
             m_Chars.AsSpan(0, m_Position).ReverseText();
             return this;
@@ -5963,7 +5963,7 @@ namespace J2N.Text
         /// <para/>
         /// If the capacity is already equal to the current length, this method has no effect.
         /// </remarks>
-        public void TrimExcess()
+        public void TrimExcess() // Coverage for the JDK
         {
             if (m_Position < m_Chars.Length)
             {
