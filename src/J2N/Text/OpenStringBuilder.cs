@@ -180,9 +180,9 @@ namespace J2N.Text
             m_MaxCapacity = int.MaxValue;
             if (capacity == 0)
             {
-                capacity = DefaultCapacity;
+                capacity = length + DefaultCapacity;
             }
-            capacity = Math.Max(capacity, length);
+            capacity = Math.Max(capacity, length + DefaultCapacity);
 
             // J2N: We assume that subclasses will not expose or call this constructor if they want
             // full control over how the buffer is allocated.
@@ -2343,15 +2343,18 @@ namespace J2N.Text
             int charsWritten;
             while (!value.TryFormat(m_Chars.AsSpan(m_Position), out charsWritten, format, provider))
             {
+                int length = m_Chars.Length;
+                int additionalCapacity = length - m_Position == length ? m_Chars.Length + 1 : m_Chars.Length; // Ensure we request enough to cause a re-grow
+
                 // Check if the valueCount will put us over m_MaxCapacity.
                 // Doing the check here prevents corruption of the OpenStringBuilder.
-                int newLength = m_Position + 16;
+                int newLength = m_Position + additionalCapacity;
                 if (newLength > m_MaxCapacity)
                 {
                     ThrowHelper.ThrowArgumentOutOfRangeException(value, ExceptionArgument.valueCount, ExceptionResource.ArgumentOutOfRange_LengthGreaterThanCapacity);
                 }
 
-                Grow(16);
+                Grow(additionalCapacity);
             }
 
             m_Position += charsWritten;
