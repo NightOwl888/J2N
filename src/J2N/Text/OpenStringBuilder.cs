@@ -1824,6 +1824,35 @@ namespace J2N.Text
             return this;
         }
 
+        /// <summary>
+        /// Removes the character at the specified index from this instance.
+        /// </summary>
+        /// <param name="index">The zero-based position in this instance of the character to remove.</param>
+        /// <returns>A reference to this instance after the excise operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> is less than zero or
+        /// greater than the length of this instance.</exception>
+        /// <remarks>
+        /// The current method removes the specified character from the current instance. The characters at
+        /// (<paramref name="index"/> + 1) are moved to <paramref name="index"/>, and
+        /// the string value of the current instance is shortened by 1. The capacity of the
+        /// current instance is unaffected.
+        /// </remarks>
+        public OpenStringBuilder RemoveAt(int index) // Coverage for the JDK (deleteCharAt)
+        {
+            if (index < 0)
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(index, ExceptionArgument.index);
+
+            int currentLength = Length;
+            if ((uint)index > (uint)currentLength)
+            {
+                ThrowHelper.ThrowArgumentOutOfRange_IndexMustBeLessOrEqualException(index, ExceptionArgument.index);
+            }
+
+            RemoveCore(index, 1, zeroBeyondPosition: true);
+
+            return this;
+        }
+
         private void RemoveCore(int startIndex, int length, bool zeroBeyondPosition)
         {
             Debug.Assert(length >= 0);
@@ -5371,6 +5400,9 @@ namespace J2N.Text
         /// <paramref name="newValue"/> is inserted at <paramref name="startIndex"/>.
         /// This <see cref="ValueStringBuilder"/> will be lengthened to accommodate the
         /// specified <paramref name="newValue"/> if necessary.
+        /// <para/>
+        /// IMPORTANT: This method has .NET semantics. That is, the <paramref name="count"/> parameter is a count rather than
+        /// an exclusive end index. To translate from Java, use <c>end - start</c> for <paramref name="count"/>.
         /// </summary>
         /// <param name="startIndex">The inclusive begin index in this builder.</param>
         /// <param name="count">The number of characters to replace.</param>
@@ -5407,6 +5439,9 @@ namespace J2N.Text
         /// <paramref name="newValue"/> is inserted at <paramref name="startIndex"/>.
         /// This <see cref="ValueStringBuilder"/> will be lengthened to accommodate the
         /// specified <paramref name="newValue"/> if necessary.
+        /// <para/>
+        /// IMPORTANT: This method has .NET semantics. That is, the <paramref name="count"/> parameter is a count rather than
+        /// an exclusive end index. To translate from Java, use <c>end - start</c> for <paramref name="count"/>.
         /// </summary>
         /// <param name="startIndex">The inclusive begin index in this builder.</param>
         /// <param name="count">The number of characters to replace.</param>
