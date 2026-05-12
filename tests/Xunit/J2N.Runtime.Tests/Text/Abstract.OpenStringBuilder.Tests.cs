@@ -10,23 +10,113 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text;
+using Xunit;
 //using System.Tests;
 //using Microsoft.DotNet.RemoteExecutor;
-using Xunit;
+#nullable enable
 
 namespace J2N.Text.Tests
 {
-    public partial class OpenStringBuilderTests
+    /// <summary>
+    /// Contains tests that ensure the correctness (compliance with the BCL) of an <see cref="OpenStringBuilder"/> implementation
+    /// including subclasses.
+    /// </summary>
+    /// <remarks>
+    /// J2N: This class does not map exactly to the upstream code. It was refactored to be an abstract class that can be used for testing
+    /// multiple implementations of <see cref="OpenStringBuilder"/>. Each implementation is presumed to have the same behavior, but
+    /// may have different internal implementations. For example, one implementation may use a buffer that is allocated on the heap,
+    /// while another may use a buffer that is allocated from an array pool. The tests in this class are designed to ensure that all
+    /// implementations behave correctly and consistently with the BCL.
+    /// </remarks>
+    public abstract partial class Abstract_OpenStringBuilder_Tests
     {
         private static readonly string s_noCapacityParamName = "valueCount";
 
         internal static readonly string s_chunkSplitSource = new string('a', 30);
         //internal static StringBuilder StringBuilderWithMultipleChunks() => new StringBuilder(20).Append(s_chunkSplitSource);
 
+        #region OpenStringBuilder Helper Methods
+
+        /// <summary>
+        /// Creates an instance of an <see cref="OpenStringBuilder"/> that can be used for testing.
+        /// </summary>
+        /// <returns>An instance of <see cref="OpenStringBuilder"/> that can be used for testing.</returns>
+        protected abstract OpenStringBuilder OpenStringBuilderFactory();
+
+        /// <summary>
+        /// Creates an instance of an <see cref="OpenStringBuilder"/> that can be used for testing.
+        /// </summary>
+        /// <returns>An instance of <see cref="OpenStringBuilder"/> that can be used for testing.</returns>
+        protected abstract OpenStringBuilder OpenStringBuilderFactory(int capacity);
+
+        /// <summary>
+        /// Creates an instance of an <see cref="OpenStringBuilder"/> that can be used for testing.
+        /// </summary>
+        /// <returns>An instance of <see cref="OpenStringBuilder"/> that can be used for testing.</returns>
+        protected abstract OpenStringBuilder OpenStringBuilderFactory(int capacity, int maxCapacity);
+
+        /// <summary>
+        /// Creates an instance of an <see cref="OpenStringBuilder"/> that can be used for testing.
+        /// </summary>
+        /// <returns>An instance of <see cref="OpenStringBuilder"/> that can be used for testing.</returns>
+        protected abstract OpenStringBuilder OpenStringBuilderFactory(string? value);
+
+        /// <summary>
+        /// Creates an instance of an <see cref="OpenStringBuilder"/> that can be used for testing.
+        /// </summary>
+        /// <returns>An instance of <see cref="OpenStringBuilder"/> that can be used for testing.</returns>
+        protected abstract OpenStringBuilder OpenStringBuilderFactory(string? value, int startIndex, int length, int capacity);
+
+        /// <summary>
+        /// Creates an instance of an <see cref="OpenStringBuilder"/> that can be used for testing.
+        /// </summary>
+        /// <returns>An instance of <see cref="OpenStringBuilder"/> that can be used for testing.</returns>
+        protected abstract OpenStringBuilder OpenStringBuilderFactory(string? value, int capacity);
+
+        /// <summary>
+        /// Creates an instance of an <see cref="OpenStringBuilder"/> that can be used for testing.
+        /// </summary>
+        /// <returns>An instance of <see cref="OpenStringBuilder"/> that can be used for testing.</returns>
+        protected abstract OpenStringBuilder OpenStringBuilderFactory(ReadOnlySpan<char> value);
+
+        /// <summary>
+        /// Creates an instance of an <see cref="OpenStringBuilder"/> that can be used for testing.
+        /// </summary>
+        /// <returns>An instance of <see cref="OpenStringBuilder"/> that can be used for testing.</returns>
+        protected abstract OpenStringBuilder OpenStringBuilderFactory(ReadOnlySpan<char> value, int capacity);
+
+        /// <summary>
+        /// Creates an instance of an <see cref="OpenStringBuilder"/> that can be used for testing.
+        /// </summary>
+        /// <returns>An instance of <see cref="OpenStringBuilder"/> that can be used for testing.</returns>
+        protected abstract OpenStringBuilder OpenStringBuilderFactory(StringBuilder? value);
+
+        /// <summary>
+        /// Creates an instance of an <see cref="OpenStringBuilder"/> that can be used for testing.
+        /// </summary>
+        /// <returns>An instance of <see cref="OpenStringBuilder"/> that can be used for testing.</returns>
+        protected abstract OpenStringBuilder OpenStringBuilderFactory(StringBuilder? value, int capacity);
+
+        /// <summary>
+        /// Creates an instance of an <see cref="OpenStringBuilder"/> that can be used for testing.
+        /// </summary>
+        /// <returns>An instance of <see cref="OpenStringBuilder"/> that can be used for testing.</returns>
+        protected abstract OpenStringBuilder OpenStringBuilderFactory(StringBuilder? value, int startIndex, int length, int capacity);
+
+        /// <summary>
+        /// Creates an instance of an <see cref="OpenStringBuilder"/> that can be used for testing.
+        /// </summary>
+        /// <returns>An instance of <see cref="OpenStringBuilder"/> that can be used for testing.</returns>
+        protected abstract OpenStringBuilder OpenStringBuilderFactory(ICharSequence? value);
+
+        #endregion OpenStringBuilder Helper Methods
+
+        #region Constructor Tests
+
         [Fact]
-        public static void Ctor_Empty()
+        public void Ctor_Empty()
         {
-            var builder = new OpenStringBuilder();
+            OpenStringBuilder builder = OpenStringBuilderFactory();
             Assert.Same(string.Empty, builder.ToString());
             Assert.Equal(string.Empty, builder.ToString(0, 0));
             Assert.Equal(0, builder.Length);
@@ -34,9 +124,9 @@ namespace J2N.Text.Tests
         }
 
         [Fact]
-        public static void Ctor_Int()
+        public void Ctor_Int()
         {
-            var builder = new OpenStringBuilder(42);
+            OpenStringBuilder builder = OpenStringBuilderFactory(42);
             Assert.Same(string.Empty, builder.ToString());
             Assert.Equal(0, builder.Length);
 
@@ -45,16 +135,16 @@ namespace J2N.Text.Tests
         }
 
         [Fact]
-        public static void Ctor_Int_NegativeCapacity_ThrowsArgumentOutOfRangeException()
+        public void Ctor_Int_NegativeCapacity_ThrowsArgumentOutOfRangeException()
         {
-            AssertExtensions.Throws<ArgumentOutOfRangeException>("capacity", () => new OpenStringBuilder(-1)); // Capacity < 0
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("capacity", () => OpenStringBuilderFactory(-1)); // Capacity < 0
         }
 
         [Fact]
-        public static void Ctor_Int_Int()
+        public void Ctor_Int_Int()
         {
             // The second int parameter is MaxCapacity but in CLR4.0 and later, OpenStringBuilder isn't required to honor it.
-            var builder = new OpenStringBuilder(42, 50);
+            OpenStringBuilder builder = OpenStringBuilderFactory(42, 50);
             Assert.Equal("", builder.ToString());
             Assert.Equal(0, builder.Length);
 
@@ -63,21 +153,21 @@ namespace J2N.Text.Tests
         }
 
         [Fact]
-        public static void Ctor_Int_Int_Invalid()
+        public void Ctor_Int_Int_Invalid()
         {
-            AssertExtensions.Throws<ArgumentOutOfRangeException>("capacity", () => new OpenStringBuilder(-1, 1)); // Capacity < 0
-            AssertExtensions.Throws<ArgumentOutOfRangeException>("maxCapacity", () => new OpenStringBuilder(0, 0)); // MaxCapacity < 1
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("capacity", () => OpenStringBuilderFactory(-1, 1)); // Capacity < 0
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("maxCapacity", () => OpenStringBuilderFactory(0, 0)); // MaxCapacity < 1
 
-            AssertExtensions.Throws<ArgumentOutOfRangeException>("capacity", () => new OpenStringBuilder(2, 1)); // Capacity > maxCapacity
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("capacity", () => OpenStringBuilderFactory(2, 1)); // Capacity > maxCapacity
         }
 
         [Theory]
         [InlineData("Hello")]
         [InlineData("")]
         [InlineData(null)]
-        public static void Ctor_String(string value)
+        public void Ctor_String(string? value)
         {
-            var builder = new OpenStringBuilder(value);
+            OpenStringBuilder builder = OpenStringBuilderFactory(value);
 
             string expected = value ?? "";
             Assert.Equal(expected, builder.ToString());
@@ -88,9 +178,9 @@ namespace J2N.Text.Tests
         [InlineData("Hello")]
         [InlineData("")]
         [InlineData(null)]
-        public static void Ctor_String_Int(string value)
+        public void Ctor_String_Int(string? value)
         {
-            var builder = new OpenStringBuilder(value, 42);
+            OpenStringBuilder builder = OpenStringBuilderFactory(value, 42);
 
             string expected = value ?? "";
             Assert.Equal(expected, builder.ToString());
@@ -100,9 +190,9 @@ namespace J2N.Text.Tests
         }
 
         [Fact]
-        public static void Ctor_String_Int_NegativeCapacity_ThrowsArgumentOutOfRangeException()
+        public void Ctor_String_Int_NegativeCapacity_ThrowsArgumentOutOfRangeException()
         {
-            AssertExtensions.Throws<ArgumentOutOfRangeException>("capacity", () => new OpenStringBuilder("", -1)); // Capacity < 0
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("capacity", () => OpenStringBuilderFactory("", -1)); // Capacity < 0
         }
 
         [Theory]
@@ -110,9 +200,9 @@ namespace J2N.Text.Tests
         [InlineData("Hello", 2, 3)]
         [InlineData("", 0, 0)]
         [InlineData(null, 0, 0)]
-        public static void Ctor_String_Int_Int_Int(string value, int startIndex, int length)
+        public void Ctor_String_Int_Int_Int(string? value, int startIndex, int length)
         {
-            var builder = new OpenStringBuilder(value, startIndex, length, 42);
+            OpenStringBuilder builder = OpenStringBuilderFactory(value, startIndex, length, 42);
 
             string expected = value?.Substring(startIndex, length) ?? "";
             Assert.Equal(expected, builder.ToString());
@@ -123,14 +213,13 @@ namespace J2N.Text.Tests
         }
 
         [Fact]
-        public static void Ctor_String_Int_Int_Int_Invalid()
+        public void Ctor_String_Int_Int_Int_Invalid()
         {
-            AssertExtensions.Throws<ArgumentOutOfRangeException>("startIndex", () => new OpenStringBuilder("foo", -1, 0, 0)); // Start index < 0
-            AssertExtensions.Throws<ArgumentOutOfRangeException>("length", () => new OpenStringBuilder("foo", 0, -1, 0)); // Length < 0
-            AssertExtensions.Throws<ArgumentOutOfRangeException>("capacity", () => new OpenStringBuilder("foo", 0, 0, -1)); // Capacity < 0
-
-            AssertExtensions.Throws<ArgumentOutOfRangeException>("length", () => new OpenStringBuilder("foo", 4, 0, 0)); // Start index + length > builder.Length
-            AssertExtensions.Throws<ArgumentOutOfRangeException>("length", () => new OpenStringBuilder("foo", 3, 1, 0)); // Start index + length > builder.Length
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("startIndex", () => OpenStringBuilderFactory("foo", -1, 0, 0)); // Start index < 0
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("length", () => OpenStringBuilderFactory("foo", 0, -1, 0)); // Length < 0
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("capacity", () => OpenStringBuilderFactory("foo", 0, 0, -1)); // Capacity < 0
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("length", () => OpenStringBuilderFactory("foo", 4, 0, 0)); // Start index + length > builder.Length
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("length", () => OpenStringBuilderFactory("foo", 3, 1, 0)); // Start index + length > builder.Length
         }
 
         [Theory] // J2N specific
@@ -138,9 +227,9 @@ namespace J2N.Text.Tests
         [InlineData("Hello", 2, 3)]
         [InlineData("", 0, 0)]
         [InlineData(null, 0, 0)]
-        public static void Ctor_ReadOnlySpan(string value, int startIndex, int length)
+        public void Ctor_ReadOnlySpan(string? value, int startIndex, int length)
         {
-            var builder = new OpenStringBuilder(value.AsSpan(startIndex, length));
+            OpenStringBuilder builder = OpenStringBuilderFactory(value.AsSpan(startIndex, length));
 
             string expected = value?.Substring(startIndex, length) ?? "";
             Assert.Equal(expected, builder.ToString());
@@ -153,9 +242,9 @@ namespace J2N.Text.Tests
         [InlineData("Hello", 2, 3)]
         [InlineData("", 0, 0)]
         [InlineData(null, 0, 0)]
-        public static void Ctor_ReadOnlySpan_Int(string value, int startIndex, int length)
+        public void Ctor_ReadOnlySpan_Int(string? value, int startIndex, int length)
         {
-            var builder = new OpenStringBuilder(value.AsSpan(startIndex, length), 42);
+            OpenStringBuilder builder = OpenStringBuilderFactory(value.AsSpan(startIndex, length), 42);
 
             string expected = value?.Substring(startIndex, length) ?? "";
             Assert.Equal(expected, builder.ToString());
@@ -166,19 +255,19 @@ namespace J2N.Text.Tests
         }
 
         [Fact] // J2N specific
-        public static void Ctor_ReadOnlySpan_Int_Invalid()
+        public void Ctor_ReadOnlySpan_Int_Invalid()
         {
-            AssertExtensions.Throws<ArgumentOutOfRangeException>("capacity", () => new OpenStringBuilder("foo".AsSpan(0, 0), -1)); // Capacity < 0
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("capacity", () => OpenStringBuilderFactory("foo".AsSpan(0, 0), -1)); // Capacity < 0
         }
 
         [Theory] // J2N specific
         [InlineData("Hello")]
         [InlineData("")]
         [InlineData(null)]
-        public static void Ctor_StringBuilder(string value)
+        public void Ctor_StringBuilder(string? value)
         {
-            var sb = value is not null ? new StringBuilder(value) : (StringBuilder)null;
-            var builder = new OpenStringBuilder(sb);
+            var sb = value is not null ? new StringBuilder(value) : (StringBuilder?)null;
+            OpenStringBuilder builder = OpenStringBuilderFactory(sb);
 
             string expected = value ?? "";
             Assert.Equal(expected, builder.ToString());
@@ -189,10 +278,10 @@ namespace J2N.Text.Tests
         [InlineData("Hello")]
         [InlineData("")]
         [InlineData(null)]
-        public static void Ctor_StringBuilder_Int(string value)
+        public void Ctor_StringBuilder_Int(string? value)
         {
-            var sb = value is not null ? new StringBuilder(value) : (StringBuilder)null;
-            var builder = new OpenStringBuilder(sb, 42);
+            var sb = value is not null ? new StringBuilder(value) : (StringBuilder?)null;
+            OpenStringBuilder builder = OpenStringBuilderFactory(sb, 42);
 
             string expected = value ?? "";
             Assert.Equal(expected, builder.ToString());
@@ -202,9 +291,9 @@ namespace J2N.Text.Tests
         }
 
         [Fact] // J2N specific
-        public static void Ctor_StringBuilder_Int_NegativeCapacity_ThrowsArgumentOutOfRangeException()
+        public void Ctor_StringBuilder_Int_NegativeCapacity_ThrowsArgumentOutOfRangeException()
         {
-            AssertExtensions.Throws<ArgumentOutOfRangeException>("capacity", () => new OpenStringBuilder(new StringBuilder(""), -1)); // Capacity < 0
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("capacity", () => OpenStringBuilderFactory(new StringBuilder(""), -1)); // Capacity < 0
         }
 
         [Theory] // J2N specific
@@ -212,10 +301,10 @@ namespace J2N.Text.Tests
         [InlineData("Hello", 2, 3)]
         [InlineData("", 0, 0)]
         [InlineData(null, 0, 0)]
-        public static void Ctor_StringBuilder_Int_Int_Int(string value, int startIndex, int length)
+        public void Ctor_StringBuilder_Int_Int_Int(string? value, int startIndex, int length)
         {
-            var sb = value is not null ? new StringBuilder(value) : (StringBuilder)null;
-            var builder = new OpenStringBuilder(sb, startIndex, length, 42);
+            var sb = value is not null ? new StringBuilder(value) : (StringBuilder?)null;
+            OpenStringBuilder builder = OpenStringBuilderFactory(sb, startIndex, length, 42);
 
             string expected = value?.Substring(startIndex, length) ?? "";
             Assert.Equal(expected, builder.ToString());
@@ -226,21 +315,38 @@ namespace J2N.Text.Tests
         }
 
         [Fact] // J2N specific
-        public static void Ctor_StringBuilder_Int_Int_Int_Invalid()
+        public void Ctor_StringBuilder_Int_Int_Int_Invalid()
         {
-            AssertExtensions.Throws<ArgumentOutOfRangeException>("startIndex", () => new OpenStringBuilder(new StringBuilder("foo"), -1, 0, 0)); // Start index < 0
-            AssertExtensions.Throws<ArgumentOutOfRangeException>("length", () => new OpenStringBuilder(new StringBuilder("foo"), 0, -1, 0)); // Length < 0
-            AssertExtensions.Throws<ArgumentOutOfRangeException>("capacity", () => new OpenStringBuilder(new StringBuilder("foo"), 0, 0, -1)); // Capacity < 0
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("startIndex", () => OpenStringBuilderFactory(new StringBuilder("foo"), -1, 0, 0)); // Start index < 0
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("length", () => OpenStringBuilderFactory(new StringBuilder("foo"), 0, -1, 0)); // Length < 0
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("capacity", () => OpenStringBuilderFactory(new StringBuilder("foo"), 0, 0, -1)); // Capacity < 0
 
-            AssertExtensions.Throws<ArgumentOutOfRangeException>("length", () => new OpenStringBuilder(new StringBuilder("foo"), 4, 0, 0)); // Start index + length > builder.Length
-            AssertExtensions.Throws<ArgumentOutOfRangeException>("length", () => new OpenStringBuilder(new StringBuilder("foo"), 3, 1, 0)); // Start index + length > builder.Length
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("length", () => OpenStringBuilderFactory(new StringBuilder("foo"), 4, 0, 0)); // Start index + length > builder.Length
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("length", () => OpenStringBuilderFactory(new StringBuilder("foo"), 3, 1, 0)); // Start index + length > builder.Length
         }
 
+        [Theory] // J2N specific
+        [InlineData("Hello")]
+        [InlineData("")]
+        [InlineData(null)]
+        public void Ctor_ICharSequence(string? value)
+        {
+            var sb = value is not null ? value.AsCharSequence() : (ICharSequence?)null;
+            OpenStringBuilder builder = OpenStringBuilderFactory(sb);
+
+            string expected = value ?? "";
+            Assert.Equal(expected, builder.ToString());
+            Assert.Equal(expected.Length, builder.Length);
+        }
+
+        #endregion Constructor Tests
+
+
         [Fact]
-        public static void Item_Get_Set()
+        public void Item_Get_Set()
         {
             string s = "Hello";
-            var builder = new OpenStringBuilder(s);
+            var builder = OpenStringBuilderFactory(s);
 
             for (int i = 0; i < s.Length; i++)
             {
@@ -254,9 +360,9 @@ namespace J2N.Text.Tests
         }
 
         [Fact]
-        public static void Item_Get_Set_InvalidIndex()
+        public void Item_Get_Set_InvalidIndex()
         {
-            var builder = new OpenStringBuilder("Hello");
+            var builder = OpenStringBuilderFactory("Hello");
 
             Assert.Throws<IndexOutOfRangeException>(() => builder[-1]); // Index < 0
             Assert.Throws<IndexOutOfRangeException>(() => builder[5]); // Index >= string.Length
@@ -266,9 +372,9 @@ namespace J2N.Text.Tests
         }
 
         [Fact]
-        public static void Capacity_Get_Set()
+        public void Capacity_Get_Set()
         {
-            var builder = new OpenStringBuilder("Hello");
+            var builder = OpenStringBuilderFactory("Hello");
             Assert.True(builder.Capacity >= builder.Length);
 
             builder.Capacity = 10;
@@ -284,9 +390,9 @@ namespace J2N.Text.Tests
         }
 
         [Fact]
-        public static void Capacity_Set_Invalid_ThrowsArgumentOutOfRangeException()
+        public void Capacity_Set_Invalid_ThrowsArgumentOutOfRangeException()
         {
-            var builder = new OpenStringBuilder(10, 10);
+            var builder = OpenStringBuilderFactory(10, 10);
             builder.Append("Hello");
             AssertExtensions.Throws<ArgumentOutOfRangeException>("value", () => builder.Capacity = -1); // Capacity < 0
             AssertExtensions.Throws<ArgumentOutOfRangeException>("value", () => builder.Capacity = builder.MaxCapacity + 1); // Capacity > builder.MaxCapacity
@@ -294,9 +400,9 @@ namespace J2N.Text.Tests
         }
 
         [Fact]
-        public static void Length_Get_Set()
+        public void Length_Get_Set()
         {
-            var builder = new OpenStringBuilder("Hello");
+            var builder = OpenStringBuilderFactory("Hello");
 
             builder.Length = 2;
             Assert.Equal(2, builder.Length);
@@ -308,9 +414,9 @@ namespace J2N.Text.Tests
         }
 
         [Fact]
-        public static void Length_Set_InvalidValue_ThrowsArgumentOutOfRangeException()
+        public void Length_Set_InvalidValue_ThrowsArgumentOutOfRangeException()
         {
-            var builder = new OpenStringBuilder(10, 10);
+            var builder = OpenStringBuilderFactory(10, 10);
             builder.Append("Hello");
 
             AssertExtensions.Throws<ArgumentOutOfRangeException>("value", () => builder.Length = -1); // Value < 0
@@ -321,17 +427,17 @@ namespace J2N.Text.Tests
         [InlineData("Hello", (ushort)0, "Hello0")]
         [InlineData("Hello", (ushort)123, "Hello123")]
         [InlineData("", (ushort)456, "456")]
-        public static void Append_UShort(string original, ushort value, string expected)
+        public void Append_UShort(string? original, ushort value, string expected)
         {
-            var builder = new OpenStringBuilder(original);
+            var builder = OpenStringBuilderFactory(original);
             builder.Append(value);
             Assert.Equal(expected, builder.ToString());
         }
 
         [Fact]
-        public static void Append_UShort_NoSpareCapacity_ThrowsArgumentOutOfRangeException()
+        public void Append_UShort_NoSpareCapacity_ThrowsArgumentOutOfRangeException()
         {
-            var builder = new OpenStringBuilder(0, 5);
+            var builder = OpenStringBuilderFactory(0, 5);
             builder.Append("Hello");
 
             AssertExtensions.Throws<ArgumentOutOfRangeException>(s_noCapacityParamName, () => builder.Append((ushort)1));
@@ -350,17 +456,17 @@ namespace J2N.Text.Tests
         }
 
         [Fact]
-        public static void Test_Append_Bool()
+        public void Test_Append_Bool()
         {
             foreach (var testdata in Append_Bool_TestData())
             {
-                if(((BooleanFormat)testdata[2]) == BooleanFormat.Lowercase)
+                if (((BooleanFormat)testdata[2]) == BooleanFormat.Lowercase)
                     Append_Bool_Format((string)testdata[0], (bool)testdata[1], null, (string)testdata[3]);
             }
         }
 
         [Fact]
-        public static void Test_Append_Bool_Format()
+        public void Test_Append_Bool_Format()
         {
             foreach (var testdata in Append_Bool_TestData())
             {
@@ -368,9 +474,9 @@ namespace J2N.Text.Tests
             }
         }
 
-        private static void Append_Bool_Format(string original, bool value, BooleanFormat? format, string expected)
+        private void Append_Bool_Format(string original, bool value, BooleanFormat? format, string expected)
         {
-            var builder = new OpenStringBuilder(original);
+            var builder = OpenStringBuilderFactory(original);
             if (format is null)
                 builder.Append(value);
             else
@@ -379,9 +485,9 @@ namespace J2N.Text.Tests
         }
 
         [Fact]
-        public static void Append_Bool_NoSpareCapacity_ThrowsArgumentOutOfRangeException()
+        public void Append_Bool_NoSpareCapacity_ThrowsArgumentOutOfRangeException()
         {
-            var builder = new OpenStringBuilder(0, 5);
+            var builder = OpenStringBuilderFactory(0, 5);
             builder.Append("Hello");
 
             AssertExtensions.Throws<ArgumentOutOfRangeException>(s_noCapacityParamName, () => builder.Append(true));
@@ -395,7 +501,7 @@ namespace J2N.Text.Tests
         }
 
         [Fact]
-        public static void Test_Append_Decimal()
+        public void Test_Append_Decimal()
         {
             using (new ThreadCultureChange(CultureInfo.InvariantCulture))
             {
@@ -406,17 +512,17 @@ namespace J2N.Text.Tests
             }
         }
 
-        private static void Append_Decimal(string original, double doubleValue, string expected)
+        private void Append_Decimal(string original, double doubleValue, string expected)
         {
-            var builder = new OpenStringBuilder(original);
+            var builder = OpenStringBuilderFactory(original);
             builder.Append(new decimal(doubleValue));
             Assert.Equal(expected, builder.ToString());
         }
 
         [Fact]
-        public static void Append_Decimal_NoSpareCapacity_ThrowsArgumentOutOfRangeException()
+        public void Append_Decimal_NoSpareCapacity_ThrowsArgumentOutOfRangeException()
         {
-            var builder = new OpenStringBuilder(0, 5);
+            var builder = OpenStringBuilderFactory(0, 5);
             builder.Append("Hello");
 
             AssertExtensions.Throws<ArgumentOutOfRangeException>(s_noCapacityParamName, () => builder.Append((decimal)1));
@@ -429,7 +535,7 @@ namespace J2N.Text.Tests
         }
 
         [Fact]
-        public static void Test_Append_Double()
+        public void Test_Append_Double()
         {
             using (new ThreadCultureChange(CultureInfo.InvariantCulture))
             {
@@ -440,17 +546,17 @@ namespace J2N.Text.Tests
             }
         }
 
-        private static void Append_Double(string original, double value, string expected)
+        private void Append_Double(string original, double value, string expected)
         {
-            var builder = new OpenStringBuilder(original);
+            var builder = OpenStringBuilderFactory(original);
             builder.Append(value);
             Assert.Equal(expected, builder.ToString());
         }
 
         [Fact]
-        public static void Append_Double_NoSpareCapacity_ThrowsArgumentOutOfRangeException()
+        public void Append_Double_NoSpareCapacity_ThrowsArgumentOutOfRangeException()
         {
-            var builder = new OpenStringBuilder(0, 5);
+            var builder = OpenStringBuilderFactory(0, 5);
             builder.Append("Hello");
 
             AssertExtensions.Throws<ArgumentOutOfRangeException>(s_noCapacityParamName, () => builder.Append((double)1));
@@ -460,17 +566,17 @@ namespace J2N.Text.Tests
         [InlineData("Hello", (short)0, "Hello0")]
         [InlineData("Hello", (short)123, "Hello123")]
         [InlineData("", (short)-456, "-456")]
-        public static void Append_Short(string original, short value, string expected)
+        public void Append_Short(string? original, short value, string expected)
         {
-            var builder = new OpenStringBuilder(original);
+            var builder = OpenStringBuilderFactory(original);
             builder.Append(value);
             Assert.Equal(expected, builder.ToString());
         }
 
         [Fact]
-        public static void Append_Short_NoSpareCapacity_ThrowsArgumentOutOfRangeException()
+        public void Append_Short_NoSpareCapacity_ThrowsArgumentOutOfRangeException()
         {
-            var builder = new OpenStringBuilder(0, 5);
+            var builder = OpenStringBuilderFactory(0, 5);
             builder.Append("Hello");
 
             AssertExtensions.Throws<ArgumentOutOfRangeException>(s_noCapacityParamName, () => builder.Append((short)1));
@@ -480,17 +586,17 @@ namespace J2N.Text.Tests
         [InlineData("Hello", 0, "Hello0")]
         [InlineData("Hello", 123, "Hello123")]
         [InlineData("", -456, "-456")]
-        public static void Append_Int(string original, int value, string expected)
+        public void Append_Int(string? original, int value, string expected)
         {
-            var builder = new OpenStringBuilder(original);
+            var builder = OpenStringBuilderFactory(original);
             builder.Append(value);
             Assert.Equal(expected, builder.ToString());
         }
 
         [Fact]
-        public static void Append_Int_NoSpareCapacity_ThrowsArgumentOutOfRangeException()
+        public void Append_Int_NoSpareCapacity_ThrowsArgumentOutOfRangeException()
         {
-            var builder = new OpenStringBuilder(0, 5);
+            var builder = OpenStringBuilderFactory(0, 5);
             builder.Append("Hello");
 
             AssertExtensions.Throws<ArgumentOutOfRangeException>(s_noCapacityParamName, () => builder.Append(1));
@@ -500,17 +606,17 @@ namespace J2N.Text.Tests
         [InlineData("Hello", (long)0, "Hello0")]
         [InlineData("Hello", (long)123, "Hello123")]
         [InlineData("", (long)-456, "-456")]
-        public static void Append_Long(string original, long value, string expected)
+        public void Append_Long(string? original, long value, string expected)
         {
-            var builder = new OpenStringBuilder(original);
+            var builder = OpenStringBuilderFactory(original);
             builder.Append(value);
             Assert.Equal(expected, builder.ToString());
         }
 
         [Fact]
-        public static void Append_Long_NoSpareCapacity_ThrowsArgumentOutOfRangeException()
+        public void Append_Long_NoSpareCapacity_ThrowsArgumentOutOfRangeException()
         {
-            var builder = new OpenStringBuilder(0, 5);
+            var builder = OpenStringBuilderFactory(0, 5);
             builder.Append("Hello");
 
             AssertExtensions.Throws<ArgumentOutOfRangeException>(s_noCapacityParamName, () => builder.Append((long)1));
@@ -522,17 +628,17 @@ namespace J2N.Text.Tests
         [InlineData("", "g", "g")]
         [InlineData("Hello", "", "Hello")]
         [InlineData("Hello", null, "Hello")]
-        public static void Append_Object(string original, object value, string expected)
+        public void Append_Object(string? original, object? value, string expected)
         {
-            var builder = new OpenStringBuilder(original);
+            var builder = OpenStringBuilderFactory(original);
             builder.Append(value);
             Assert.Equal(expected, builder.ToString());
         }
 
         [Fact]
-        public static void Append_Object_NoSpareCapacity_ThrowsArgumentOutOfRangeException()
+        public void Append_Object_NoSpareCapacity_ThrowsArgumentOutOfRangeException()
         {
-            var builder = new OpenStringBuilder(0, 5);
+            var builder = OpenStringBuilderFactory(0, 5);
             builder.Append("Hello");
 
             AssertExtensions.Throws<ArgumentOutOfRangeException>(s_noCapacityParamName, () => builder.Append(new object()));
@@ -542,17 +648,17 @@ namespace J2N.Text.Tests
         [InlineData("Hello", (sbyte)0, "Hello0")]
         [InlineData("Hello", (sbyte)123, "Hello123")]
         [InlineData("", (sbyte)-123, "-123")]
-        public static void Append_SByte(string original, sbyte value, string expected)
+        public void Append_SByte(string original, sbyte value, string expected)
         {
-            var builder = new OpenStringBuilder(original);
+            var builder = OpenStringBuilderFactory(original);
             builder.Append(value);
             Assert.Equal(expected, builder.ToString());
         }
 
         [Fact]
-        public static void Append_SByte_NoSpareCapacity_ThrowsArgumentOutOfRangeException()
+        public void Append_SByte_NoSpareCapacity_ThrowsArgumentOutOfRangeException()
         {
-            var builder = new OpenStringBuilder(0, 5);
+            var builder = OpenStringBuilderFactory(0, 5);
             builder.Append("Hello");
 
             AssertExtensions.Throws<ArgumentOutOfRangeException>(s_noCapacityParamName, () => builder.Append((sbyte)1));
@@ -566,7 +672,7 @@ namespace J2N.Text.Tests
         }
 
         [Fact]
-        public static void Test_Append_Float()
+        public void Test_Append_Float()
         {
             using (new ThreadCultureChange(CultureInfo.InvariantCulture))
             {
@@ -577,17 +683,17 @@ namespace J2N.Text.Tests
             }
         }
 
-        private static void Append_Float(string original, float value, string expected)
+        private void Append_Float(string? original, float value, string expected)
         {
-            var builder = new OpenStringBuilder(original);
+            var builder = OpenStringBuilderFactory(original);
             builder.Append(value);
             Assert.Equal(expected, builder.ToString());
         }
 
         [Fact]
-        public static void Append_Float_NoSpareCapacity_ThrowsArgumentOutOfRangeException()
+        public void Append_Float_NoSpareCapacity_ThrowsArgumentOutOfRangeException()
         {
-            var builder = new OpenStringBuilder(0, 5);
+            var builder = OpenStringBuilderFactory(0, 5);
             builder.Append("Hello");
 
             AssertExtensions.Throws<ArgumentOutOfRangeException>(s_noCapacityParamName, () => builder.Append((float)1));
@@ -597,17 +703,17 @@ namespace J2N.Text.Tests
         [InlineData("Hello", (byte)0, "Hello0")]
         [InlineData("Hello", (byte)123, "Hello123")]
         [InlineData("", (byte)123, "123")]
-        public static void Append_Byte(string original, byte value, string expected)
+        public void Append_Byte(string? original, byte value, string expected)
         {
-            var builder = new OpenStringBuilder(original);
+            var builder = OpenStringBuilderFactory(original);
             builder.Append(value);
             Assert.Equal(expected, builder.ToString());
         }
 
         [Fact]
-        public static void Append_Byte_NoSpareCapacity_ThrowsArgumentOutOfRangeException()
+        public void Append_Byte_NoSpareCapacity_ThrowsArgumentOutOfRangeException()
         {
-            var builder = new OpenStringBuilder(0, 5);
+            var builder = OpenStringBuilderFactory(0, 5);
             builder.Append("Hello");
 
             AssertExtensions.Throws<ArgumentOutOfRangeException>(s_noCapacityParamName, () => builder.Append((byte)1));
@@ -617,17 +723,17 @@ namespace J2N.Text.Tests
         [InlineData("Hello", (uint)0, "Hello0")]
         [InlineData("Hello", (uint)123, "Hello123")]
         [InlineData("", (uint)456, "456")]
-        public static void Append_UInt(string original, uint value, string expected)
+        public void Append_UInt(string original, uint value, string expected)
         {
-            var builder = new OpenStringBuilder(original);
+            var builder = OpenStringBuilderFactory(original);
             builder.Append(value);
             Assert.Equal(expected, builder.ToString());
         }
 
         [Fact]
-        public static void Append_UInt_NoSpareCapacity_ThrowsArgumentOutOfRangeException()
+        public void Append_UInt_NoSpareCapacity_ThrowsArgumentOutOfRangeException()
         {
-            var builder = new OpenStringBuilder(0, 5);
+            var builder = OpenStringBuilderFactory(0, 5);
             builder.Append("Hello");
 
             AssertExtensions.Throws<ArgumentOutOfRangeException>(s_noCapacityParamName, () => builder.Append((uint)1));
@@ -637,17 +743,17 @@ namespace J2N.Text.Tests
         [InlineData("Hello", (ulong)0, "Hello0")]
         [InlineData("Hello", (ulong)123, "Hello123")]
         [InlineData("", (ulong)456, "456")]
-        public static void Append_ULong(string original, ulong value, string expected)
+        public void Append_ULong(string original, ulong value, string expected)
         {
-            var builder = new OpenStringBuilder(original);
+            var builder = OpenStringBuilderFactory(original);
             builder.Append(value);
             Assert.Equal(expected, builder.ToString());
         }
 
         [Fact]
-        public static void Append_ULong_NoSpareCapacity_ThrowsArgumentOutOfRangeException()
+        public void Append_ULong_NoSpareCapacity_ThrowsArgumentOutOfRangeException()
         {
-            var builder = new OpenStringBuilder(0, 5);
+            var builder = OpenStringBuilderFactory(0, 5);
             builder.Append("Hello");
 
             AssertExtensions.Throws<ArgumentOutOfRangeException>(s_noCapacityParamName, () => builder.Append((ulong)1));
@@ -659,33 +765,33 @@ namespace J2N.Text.Tests
         [InlineData("", 'b', 1, "b")]
         [InlineData("Hello", 'c', 2, "Hellocc")]
         [InlineData("Hello", '\0', 0, "Hello")]
-        public static void Append_Char(string original, char value, int repeatCount, string expected)
+        public void Append_Char(string original, char value, int repeatCount, string expected)
         {
             OpenStringBuilder builder;
             if (repeatCount == 1)
             {
                 // Use Append(char)
-                builder = new OpenStringBuilder(original);
+                builder = OpenStringBuilderFactory(original);
                 builder.Append(value);
                 Assert.Equal(expected, builder.ToString());
             }
             // Use Append(char, int)
-            builder = new OpenStringBuilder(original);
+            builder = OpenStringBuilderFactory(original);
             builder.Append(value, repeatCount);
             Assert.Equal(expected, builder.ToString());
         }
 
         [Fact]
-        public static void Append_Char_NegativeRepeatCount_ThrowsArgumentOutOfRangeException()
+        public void Append_Char_NegativeRepeatCount_ThrowsArgumentOutOfRangeException()
         {
-            var builder = new OpenStringBuilder(0, 5);
+            var builder = OpenStringBuilderFactory(0, 5);
             AssertExtensions.Throws<ArgumentOutOfRangeException>("repeatCount", () => builder.Append('a', -1));
         }
 
         [Fact]
-        public static void Append_Char_NoSpareCapacity_ThrowsArgumentOutOfRangeException()
+        public void Append_Char_NoSpareCapacity_ThrowsArgumentOutOfRangeException()
         {
-            var builder = new OpenStringBuilder(0, 5);
+            var builder = OpenStringBuilderFactory(0, 5);
             builder.Append("Hello");
 
             AssertExtensions.Throws<ArgumentOutOfRangeException>("requiredLength", () => builder.Append('a'));
@@ -700,28 +806,28 @@ namespace J2N.Text.Tests
         [InlineData("", new char[] { 'a' }, 0, "")]
         [InlineData("Hello", new char[0], 0, "Hello")]
         [InlineData("Hello", null, 0, "Hello")]
-        public static unsafe void Append_CharPointer(string original, char[] charArray, int valueCount, string expected)
+        public unsafe void Append_CharPointer(string? original, char[]? charArray, int valueCount, string expected)
         {
             _ = charArray; // https://github.com/xunit/xunit/issues/1969
             fixed (char* value = charArray)
             {
-                var builder = new OpenStringBuilder(original);
+                var builder = OpenStringBuilderFactory(original);
                 builder.Append(value, valueCount);
                 Assert.Equal(expected, builder.ToString());
             }
         }
 
         [Fact]
-        public static unsafe void Append_CharPointer_Null_ThrowsNullReferenceException()
+        public unsafe void Append_CharPointer_Null_ThrowsNullReferenceException()
         {
-            var builder = new OpenStringBuilder();
+            var builder = OpenStringBuilderFactory();
             Assert.Throws<NullReferenceException>(() => builder.Append(null, 2));
         }
 
         [Fact]
-        public static unsafe void Append_CharPointer_NegativeValueCount_ThrowsArgumentOutOfRangeException()
+        public unsafe void Append_CharPointer_NegativeValueCount_ThrowsArgumentOutOfRangeException()
         {
-            var builder = new OpenStringBuilder(0, 5);
+            var builder = OpenStringBuilderFactory(0, 5);
             builder.Append("Hello");
 
             AssertExtensions.Throws<ArgumentOutOfRangeException>("valueCount", () =>
@@ -731,9 +837,9 @@ namespace J2N.Text.Tests
         }
 
         [Fact]
-        public static unsafe void Append_CharPointer_NoSpareCapacity_ThrowsArgumentOutOfRangeException()
+        public unsafe void Append_CharPointer_NoSpareCapacity_ThrowsArgumentOutOfRangeException()
         {
-            var builder = new OpenStringBuilder(0, 5);
+            var builder = OpenStringBuilderFactory(0, 5);
             builder.Append("Hello");
 
             AssertExtensions.Throws<ArgumentOutOfRangeException>(s_noCapacityParamName, () =>
@@ -751,50 +857,50 @@ namespace J2N.Text.Tests
         [InlineData("Hello", "g", 0, 0, "Hello")]
         [InlineData("Hello", "", 0, 0, "Hello")]
         [InlineData("Hello", null, 0, 0, "Hello")]
-        public static void Append_String(string original, string value, int startIndex, int count, string expected)
+        public void Append_String(string? original, string? value, int startIndex, int count, string expected)
         {
             OpenStringBuilder builder;
             if (startIndex == 0 && count == (value?.Length ?? 0))
             {
                 // Use Append(string)
-                builder = new OpenStringBuilder(original);
+                builder = OpenStringBuilderFactory(original);
                 builder.Append(value);
                 Assert.Equal(expected, builder.ToString());
             }
             // Use Append(string, int, int)
-            builder = new OpenStringBuilder(original);
+            builder = OpenStringBuilderFactory(original);
             builder.Append(value, startIndex, count);
             Assert.Equal(expected, builder.ToString());
         }
 
         [Fact]
-        public static void Append_String_NullValueNonZeroStartIndexCount_ThrowsArgumentNullException()
+        public void Append_String_NullValueNonZeroStartIndexCount_ThrowsArgumentNullException()
         {
-            var builder = new OpenStringBuilder();
-            AssertExtensions.Throws<ArgumentNullException>("value", () => builder.Append((string)null, 1, 1));
+            var builder = OpenStringBuilderFactory();
+            AssertExtensions.Throws<ArgumentNullException>("value", () => builder.Append((string?)null, 1, 1));
         }
 
         [Theory]
         [InlineData("", -1, 0)]
         [InlineData("hello", 5, 1)]
         [InlineData("hello", 4, 2)]
-        public static void Append_String_InvalidIndexPlusCount_ThrowsArgumentOutOfRangeException(string value, int startIndex, int count)
+        public void Append_String_InvalidIndexPlusCount_ThrowsArgumentOutOfRangeException(string value, int startIndex, int count)
         {
-            var builder = new OpenStringBuilder();
+            var builder = OpenStringBuilderFactory();
             AssertExtensions.Throws<ArgumentOutOfRangeException>("startIndex", () => builder.Append(value, startIndex, count));
         }
 
         [Fact]
-        public static void Append_String_NegativeCount_ThrowsArgumentOutOfRangeException()
+        public void Append_String_NegativeCount_ThrowsArgumentOutOfRangeException()
         {
-            var builder = new OpenStringBuilder();
+            var builder = OpenStringBuilderFactory();
             AssertExtensions.Throws<ArgumentOutOfRangeException>("count", () => builder.Append("", 0, -1));
         }
 
         [Fact]
-        public static void Append_String_NoSpareCapacity_ThrowsArgumentOutOfRangeException()
+        public void Append_String_NoSpareCapacity_ThrowsArgumentOutOfRangeException()
         {
-            var builder = new OpenStringBuilder(0, 5);
+            var builder = OpenStringBuilderFactory(0, 5);
             builder.Append("Hello");
 
             AssertExtensions.Throws<ArgumentOutOfRangeException>(s_noCapacityParamName, () => builder.Append("a"));
@@ -811,29 +917,29 @@ namespace J2N.Text.Tests
         [InlineData("Hello", new char[] { 'e' }, 0, 0, "Hello")]
         [InlineData("Hello", new char[0], 0, 0, "Hello")]
         [InlineData("Hello", null, 0, 0, "Hello")]
-        public static void Append_CharArray(string original, char[] value, int startIndex, int charCount, string expected)
+        public void Append_CharArray(string? original, char[]? value, int startIndex, int charCount, string expected)
         {
             OpenStringBuilder builder;
             if (startIndex == 0 && charCount == (value?.Length ?? 0))
             {
                 // Use Append(char[])
-                builder = new OpenStringBuilder(original);
+                builder = OpenStringBuilderFactory(original);
                 builder.Append(value);
                 Assert.Equal(expected, builder.ToString());
             }
             // Use Append(char[], int, int)
-            builder = new OpenStringBuilder(original);
+            builder = OpenStringBuilderFactory(original);
             builder.Append(value, startIndex, charCount);
             Assert.Equal(expected, builder.ToString());
         }
 
         [Fact]
-        public static void Append_CharArray_Invalid()
+        public void Append_CharArray_Invalid()
         {
-            var builder = new OpenStringBuilder(0, 5);
+            var builder = OpenStringBuilderFactory(0, 5);
             builder.Append("Hello");
 
-            AssertExtensions.Throws<ArgumentNullException>("value", () => builder.Append((char[])null, 1, 1)); // Value is null, startIndex > 0 and count > 0
+            AssertExtensions.Throws<ArgumentNullException>("value", () => builder.Append((char[]?)null, 1, 1)); // Value is null, startIndex > 0 and count > 0
 
             AssertExtensions.Throws<ArgumentOutOfRangeException>("startIndex", () => builder.Append(new char[0], -1, 0)); // Start index < 0
             AssertExtensions.Throws<ArgumentOutOfRangeException>("charCount", () => builder.Append(new char[0], 0, -1)); // Count < 0
@@ -844,6 +950,8 @@ namespace J2N.Text.Tests
             AssertExtensions.Throws<ArgumentOutOfRangeException>("valueCount", () => builder.Append(new char[] { 'a' })); // New length > builder.MaxCapacity
             AssertExtensions.Throws<ArgumentOutOfRangeException>("valueCount", () => builder.Append(new char[] { 'a' }, 0, 1)); // New length > builder.MaxCapacity
         }
+
+#nullable disable
 
         public static IEnumerable<object[]> AppendFormat_TestData()
         {
@@ -919,9 +1027,11 @@ namespace J2N.Text.Tests
             yield return new object[] { "", CultureInfo.InvariantCulture, "{0}", new object[] { new Version(1, 2, 3, 4) }, "1.2.3.4" };
         }
 
+#nullable enable
+
         [Theory]
         [MemberData(nameof(AppendFormat_TestData))]
-        public static void AppendFormat(string original, IFormatProvider provider, string format, object[] values, string expected)
+        public void AppendFormat(string original, IFormatProvider provider, string format, object?[]? values, string expected)
         {
             OpenStringBuilder builder;
             if (values != null)
@@ -932,12 +1042,12 @@ namespace J2N.Text.Tests
                     if (provider == null)
                     {
                         // Use AppendFormat(string, object)
-                        builder = new OpenStringBuilder(original);
+                        builder = OpenStringBuilderFactory(original);
                         builder.AppendFormat(format, values[0]);
                         Assert.Equal(expected, builder.ToString());
                     }
                     // Use AppendFormat(IFormatProvider, string, object)
-                    builder = new OpenStringBuilder(original);
+                    builder = OpenStringBuilderFactory(original);
                     builder.AppendFormat(provider, format, values[0]);
                     Assert.Equal(expected, builder.ToString());
                 }
@@ -947,12 +1057,12 @@ namespace J2N.Text.Tests
                     if (provider == null)
                     {
                         // Use AppendFormat(string, object, object)
-                        builder = new OpenStringBuilder(original);
+                        builder = OpenStringBuilderFactory(original);
                         builder.AppendFormat(format, values[0], values[1]);
                         Assert.Equal(expected, builder.ToString());
                     }
                     // Use AppendFormat(IFormatProvider, string, object, object)
-                    builder = new OpenStringBuilder(original);
+                    builder = OpenStringBuilderFactory(original);
                     builder.AppendFormat(provider, format, values[0], values[1]);
                     Assert.Equal(expected, builder.ToString());
                 }
@@ -962,12 +1072,12 @@ namespace J2N.Text.Tests
                     if (provider == null)
                     {
                         // Use AppendFormat(string, object, object, object)
-                        builder = new OpenStringBuilder(original);
+                        builder = OpenStringBuilderFactory(original);
                         builder.AppendFormat(format, values[0], values[1], values[2]);
                         Assert.Equal(expected, builder.ToString());
                     }
                     // Use AppendFormat(IFormatProvider, string, object, object, object)
-                    builder = new OpenStringBuilder(original);
+                    builder = OpenStringBuilderFactory(original);
                     builder.AppendFormat(provider, format, values[0], values[1], values[2]);
                     Assert.Equal(expected, builder.ToString());
                 }
@@ -976,33 +1086,35 @@ namespace J2N.Text.Tests
             if (provider == null)
             {
                 // Use AppendFormat(string, object[])
-                builder = new OpenStringBuilder(original);
-                builder.AppendFormat(format, values);
+                builder = OpenStringBuilderFactory(original);
+                builder.AppendFormat(format, values!);
                 Assert.Equal(expected, builder.ToString());
             }
             // Use AppendFormat(IFormatProvider, string, object[])
-            builder = new OpenStringBuilder(original);
-            builder.AppendFormat(provider, format, values);
+            builder = OpenStringBuilderFactory(original);
+            builder.AppendFormat(provider, format, values!);
             Assert.Equal(expected, builder.ToString());
 
             // Use AppendFormat(string, ReadOnlySpan<object>) or AppendFormat(IFormatProvider, string, ReadOnlySpan<object>)
             if (provider == null)
             {
                 // Use AppendFormat(string, ReadOnlySpan<object>)
-                builder = new OpenStringBuilder(original);
-                builder.AppendFormat(format, (ReadOnlySpan<object>)values);
+                builder = OpenStringBuilderFactory(original);
+                builder.AppendFormat(format, (ReadOnlySpan<object?>)values);
                 Assert.Equal(expected, builder.ToString());
             }
             // Use AppendFormat(IFormatProvider, string, ReadOnlySpan<object>)
-            builder = new OpenStringBuilder(original);
-            builder.AppendFormat(provider, format, (ReadOnlySpan<object>)values);
+            builder = OpenStringBuilderFactory(original);
+            builder.AppendFormat(provider, format, (ReadOnlySpan<object?>)values);
             Assert.Equal(expected, builder.ToString());
         }
 
+#nullable disable
+
         [Fact]
-        public static void AppendFormat_Invalid()
+        public void AppendFormat_Invalid()
         {
-            var builder = new OpenStringBuilder(0, 5);
+            var builder = OpenStringBuilderFactory(0, 5);
             builder.Append("Hello");
 
             IFormatProvider formatter = null;
@@ -1098,11 +1210,13 @@ namespace J2N.Text.Tests
 
             Assert.Throws<FormatException>(() => builder.AppendFormat("{0}", new TooManyCharsWrittenSpanFormattable())); // ISpanFormattable that returns more characters than it actually wrote
         }
+#nullable enable
+
 #if FEATURE_SPANFORMATTABLE
-        private struct TooManyCharsWrittenSpanFormattable : ISpanFormattable
+        private readonly struct TooManyCharsWrittenSpanFormattable : ISpanFormattable
         {
-            public string ToString(string format, IFormatProvider formatProvider) => "abc";
-            public bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format, IFormatProvider provider)
+            public string ToString(string? format, IFormatProvider? formatProvider) => "abc";
+            public bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format, IFormatProvider? provider)
             {
                 "abc".AsSpan().TryCopyTo(destination);
                 charsWritten = 1_000_000;
@@ -1112,9 +1226,9 @@ namespace J2N.Text.Tests
 #else
         private class TooManyCharsWrittenSpanFormattable : Number
         {
-            public override string ToString(string format, IFormatProvider provider) => "abc";
+            public override string ToString(string? format, IFormatProvider? provider) => "abc";
 
-            public override bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format, IFormatProvider provider)
+            public override bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format, IFormatProvider? provider)
             {
                 "abc".AsSpan().TryCopyTo(destination);
                 charsWritten = 1_000_000;
@@ -1132,10 +1246,10 @@ namespace J2N.Text.Tests
 
 
         [Fact]
-        public static void AppendFormat_NoEscapedBracesInCustomFormatSpecifier()
+        public void AppendFormat_NoEscapedBracesInCustomFormatSpecifier()
         {
             // Tests new rule which does not allow escaped braces in the custom format specifier
-            var builder = new OpenStringBuilder();
+            var builder = OpenStringBuilderFactory();
             builder.AppendFormat("{0:}}}", 0);
 
             // Previous behavior: first two closing braces would be escaped and passed in as the custom format specifier, thus result = "}"
@@ -1146,10 +1260,10 @@ namespace J2N.Text.Tests
         }
 
         [Fact]
-        public static void AppendFormat_NewLengthGreaterThanBuilderLength_ThrowsArgumentOutOfRangeException()
+        public void AppendFormat_NewLengthGreaterThanBuilderLength_ThrowsArgumentOutOfRangeException()
         {
-            var builder = new OpenStringBuilder(0, 5);
-            IFormatProvider formatter = null;
+            var builder = OpenStringBuilderFactory(0, 5);
+            IFormatProvider? formatter = null;
             builder.Append("Hello");
 
             AssertExtensions.Throws<ArgumentOutOfRangeException>(s_noCapacityParamName, () => builder.AppendFormat("{0}", "a"));
@@ -1162,79 +1276,107 @@ namespace J2N.Text.Tests
             AssertExtensions.Throws<ArgumentOutOfRangeException>(s_noCapacityParamName, () => builder.AppendFormat(formatter, "{0}", "a", "", "", ""));
         }
 
-        public static IEnumerable<object[]> AppendLine_TestData()
+        public static IEnumerable<object?[]> AppendLine_TestData()
         {
-            yield return new object[] { "Hello", "abc", "Helloabc" + Environment.NewLine };
-            yield return new object[] { "Hello", "", "Hello" + Environment.NewLine };
-            yield return new object[] { "Hello", null, "Hello" + Environment.NewLine };
+            yield return new object?[] { "Hello", "abc", "Helloabc" + Environment.NewLine };
+            yield return new object?[] { "Hello", "", "Hello" + Environment.NewLine };
+            yield return new object?[] { "Hello", null, "Hello" + Environment.NewLine };
         }
 
         [Theory]
         [MemberData(nameof(AppendLine_TestData))]
-        public static void AppendLine(string original, string value, string expected)
+        public void AppendLine_String(string? original, string? value, string expected)
         {
             OpenStringBuilder builder;
             if (string.IsNullOrEmpty(value))
             {
                 // Use AppendLine()
-                builder = new OpenStringBuilder(original);
+                builder = OpenStringBuilderFactory(original);
                 builder.AppendLine();
                 Assert.Equal(expected, builder.ToString());
             }
             // Use AppendLine(string)
-            builder = new OpenStringBuilder(original);
+            builder = OpenStringBuilderFactory(original);
             builder.AppendLine(value);
             Assert.Equal(expected, builder.ToString());
         }
 
         [Fact]
-        public static void AppendLine_NoSpareCapacity_ThrowsArgumentOutOfRangeException()
+        public void AppendLine_String_NoSpareCapacity_ThrowsArgumentOutOfRangeException()
         {
-            var builder = new OpenStringBuilder(0, 5);
+            var builder = OpenStringBuilderFactory(0, 5);
             builder.Append("Hello");
 
             AssertExtensions.Throws<ArgumentOutOfRangeException>(s_noCapacityParamName, () => builder.AppendLine());
             AssertExtensions.Throws<ArgumentOutOfRangeException>(s_noCapacityParamName, () => builder.AppendLine("a"));
         }
 
-        [Fact]
-        public static void Clear()
+        [Theory]
+        [MemberData(nameof(AppendLine_TestData))]
+        public void AppendLine_ReadOnlySpan(string? original, string? value, string expected)
         {
-            var builder = new OpenStringBuilder("Hello");
+            OpenStringBuilder builder;
+            if (string.IsNullOrEmpty(value))
+            {
+                // Use AppendLine()
+                builder = OpenStringBuilderFactory(original);
+                builder.AppendLine();
+                Assert.Equal(expected, builder.ToString());
+            }
+            // Use AppendLine(ReadOnlySpan<char>)
+            builder = OpenStringBuilderFactory(original);
+            builder.AppendLine(value.AsSpan());
+            Assert.Equal(expected, builder.ToString());
+        }
+
+        [Fact]
+        public void AppendLine_ReadOnlySpan_NoSpareCapacity_ThrowsArgumentOutOfRangeException()
+        {
+            var builder = OpenStringBuilderFactory(0, 5);
+            builder.Append("Hello");
+
+            AssertExtensions.Throws<ArgumentOutOfRangeException>(s_noCapacityParamName, () => builder.AppendLine());
+            AssertExtensions.Throws<ArgumentOutOfRangeException>(s_noCapacityParamName, () => builder.AppendLine("a".AsSpan()));
+        }
+
+        [Fact]
+        public void Clear()
+        {
+            var builder = OpenStringBuilderFactory("Hello");
             builder.Clear();
             Assert.Equal(0, builder.Length);
             Assert.Same(string.Empty, builder.ToString());
         }
 
         [Fact]
-        public static void Clear_Empty_CapacityNotZero()
+        public void Clear_Empty_CapacityNotZero()
         {
-            var builder = new OpenStringBuilder();
+            var builder = OpenStringBuilderFactory();
             builder.Clear();
             Assert.NotEqual(0, builder.Capacity);
         }
 
         [Fact]
-        public static void Clear_Empty_CapacityStaysUnchanged()
+        public void Clear_Empty_CapacityStaysUnchanged()
         {
-            var sb = new OpenStringBuilder(14);
+            var sb = OpenStringBuilderFactory(14);
             sb.Clear();
             Assert.Equal(14, sb.Capacity);
         }
 
         [Fact]
-        public static void Clear_Full_CapacityStaysUnchanged()
+        public void Clear_Full_CapacityStaysUnchanged()
         {
-            var sb = new OpenStringBuilder(14);
+            var sb = OpenStringBuilderFactory(14);
             sb.Append("Hello World!!!");
             sb.Clear();
             Assert.Equal(14, sb.Capacity);
         }
 
         [Fact]
-        public static void Clear_AtMaxCapacity_CapacityStaysUnchanged()
+        public void Clear_AtMaxCapacity_CapacityStaysUnchanged()
         {
-            var builder = new OpenStringBuilder(14, 14);
+            var builder = OpenStringBuilderFactory(14, 14);
             builder.Append("Hello World!!!");
             builder.Clear();
             Assert.Equal(14, builder.Capacity);
@@ -1245,16 +1387,16 @@ namespace J2N.Text.Tests
         [InlineData("Hello", 0, new char[] { '\0', '\0', '\0', '\0', '\0', '\0' }, 1, 5, new char[] { '\0', 'H', 'e', 'l', 'l', 'o' })]
         [InlineData("Hello", 0, new char[] { '\0', '\0', '\0', '\0' }, 0, 4, new char[] { 'H', 'e', 'l', 'l' })]
         [InlineData("Hello", 1, new char[] { '\0', '\0', '\0', '\0', '\0', '\0', '\0' }, 2, 4, new char[] { '\0', '\0', 'e', 'l', 'l', 'o', '\0' })]
-        public static void CopyTo(string value, int sourceIndex, char[] destination, int destinationIndex, int count, char[] expected)
+        public void CopyTo(string value, int sourceIndex, char[] destination, int destinationIndex, int count, char[] expected)
         {
-            var builder = new OpenStringBuilder(value);
+            var builder = OpenStringBuilderFactory(value);
             builder.CopyTo(sourceIndex, destination, destinationIndex, count);
             Assert.Equal(expected, destination);
         }
 
         // J2N TODO: Multiple chunk tests?
         //[Fact]
-        //public static void CopyTo_StringBuilderWithMultipleChunks()
+        //public void CopyTo_StringBuilderWithMultipleChunks()
         //{
         //    OpenStringBuilder builder = StringBuilderWithMultipleChunks();
         //    char[] destination = new char[builder.Length];
@@ -1263,10 +1405,10 @@ namespace J2N.Text.Tests
         //}
 
         [Fact]
-        public static void CopyTo_Invalid()
+        public void CopyTo_Invalid()
         {
-            var builder = new OpenStringBuilder("Hello");
-            AssertExtensions.Throws<ArgumentNullException>("destination", () => builder.CopyTo(0, null, 0, 0)); // Destination is null
+            var builder = OpenStringBuilderFactory("Hello");
+            AssertExtensions.Throws<ArgumentNullException>("destination", () => builder.CopyTo(0, null!, 0, 0)); // Destination is null
 
             AssertExtensions.Throws<ArgumentOutOfRangeException>("sourceIndex", () => builder.CopyTo(-1, new char[10], 0, 0)); // Source index < 0
             AssertExtensions.Throws<ArgumentOutOfRangeException>("sourceIndex", () => builder.CopyTo(6, new char[10], 0, 0)); // Source index > builder.Length
@@ -1282,9 +1424,9 @@ namespace J2N.Text.Tests
         }
 
         [Fact]
-        public static void EnsureCapacity()
+        public void EnsureCapacity()
         {
-            var builder = new OpenStringBuilder(40);
+            var builder = OpenStringBuilderFactory(40);
 
             builder.EnsureCapacity(20);
             Assert.True(builder.Capacity >= 20);
@@ -1299,51 +1441,58 @@ namespace J2N.Text.Tests
         }
 
         [Fact]
-        public static void EnsureCapacity_InvalidCapacity_ThrowsArgumentOutOfRangeException()
+        public void EnsureCapacity_InvalidCapacity_ThrowsArgumentOutOfRangeException()
         {
-            var builder = new OpenStringBuilder("Hello", 10);
+            var builder = OpenStringBuilderFactory("Hello", 10);
             AssertExtensions.Throws<ArgumentOutOfRangeException>("capacity", () => builder.EnsureCapacity(-1)); // Capacity < 0
             AssertExtensions.Throws<ArgumentOutOfRangeException>("capacity", () => builder.EnsureCapacity(unchecked(builder.MaxCapacity + 1))); // Capacity > builder.MaxCapacity
         }
 
-        public static IEnumerable<object[]> Equals_TestData()
+        public IEnumerable<object?[]> Equals_TestData()
         {
-            var sb1 = new OpenStringBuilder("Hello");
-            var sb2 = new OpenStringBuilder("Hello");
-            var sb3 = new OpenStringBuilder("HelloX");
+            var sb1 = OpenStringBuilderFactory("Hello");
+            var sb2 = OpenStringBuilderFactory("Hello");
+            var sb3 = OpenStringBuilderFactory("HelloX");
 
-            var sb4 = new OpenStringBuilder(10, 20);
-            var sb5 = new OpenStringBuilder(10, 20);
+            var sb4 = OpenStringBuilderFactory(10, 20);
+            var sb5 = OpenStringBuilderFactory(10, 20);
 
-            var sb6 = new OpenStringBuilder(10, 20).Append("Hello");
-            var sb7 = new OpenStringBuilder(10, 20).Append("Hello");
-            var sb8 = new OpenStringBuilder(10, 20).Append("HelloX");
+            var sb6 = OpenStringBuilderFactory(10, 20).Append("Hello");
+            var sb7 = OpenStringBuilderFactory(10, 20).Append("Hello");
+            var sb8 = OpenStringBuilderFactory(10, 20).Append("HelloX");
 
-            yield return new object[] { sb1, sb1, true };
-            yield return new object[] { sb1, sb2, true };
-            yield return new object[] { sb1, sb3, false };
+            yield return new object?[] { sb1, sb1, true };
+            yield return new object?[] { sb1, sb2, true };
+            yield return new object?[] { sb1, sb3, false };
 
-            yield return new object[] { sb4, sb5, true };
+            yield return new object?[] { sb4, sb5, true };
 
-            yield return new object[] { sb6, sb7, true };
-            yield return new object[] { sb6, sb8, false };
-
-            yield return new object[] { sb1, null, false };
+            yield return new object?[] { sb6, sb7, true };
+            yield return new object?[] { sb6, sb8, false };
+            
+            yield return new object?[] { sb1, null, false };
 
             // J2N TODO: StringBuilder with multiple chunks?
             //StringBuilder chunkSplitBuilder = StringBuilderWithMultipleChunks();
-            //yield return new object[] { chunkSplitBuilder, StringBuilderWithMultipleChunks(), true };
-            //yield return new object[] { sb1, chunkSplitBuilder, false };
-            //yield return new object[] { chunkSplitBuilder, sb1, false };
-            //yield return new object[] { chunkSplitBuilder, StringBuilderWithMultipleChunks().Append("b"), false };
+            //yield return new object?[] { chunkSplitBuilder, StringBuilderWithMultipleChunks(), true };
+            //yield return new object?[] { sb1, chunkSplitBuilder, false };
+            //yield return new object?[] { chunkSplitBuilder, sb1, false };
+            //yield return new object?[] { chunkSplitBuilder, StringBuilderWithMultipleChunks().Append("b"), false };
 
-            yield return new object[] { new OpenStringBuilder(), new OpenStringBuilder(), true };
-            yield return new object[] { new OpenStringBuilder(), new OpenStringBuilder().Clear(), true };
+            yield return new object?[] { OpenStringBuilderFactory(), OpenStringBuilderFactory(), true };
+            yield return new object?[] { OpenStringBuilderFactory(), OpenStringBuilderFactory().Clear(), true };
         }
 
-        [Theory]
-        [MemberData(nameof(Equals_TestData))]
-        public static void EqualsTest(OpenStringBuilder sb1, OpenStringBuilder sb2, bool expected)
+        [Fact]
+        public void Test_Equals()
+        {
+            foreach (var testData in Equals_TestData())
+            {
+                EqualsTest((OpenStringBuilder)testData[0]!, (OpenStringBuilder?)testData[1], (bool)testData[2]!);
+            }
+        }
+
+        private static void EqualsTest(OpenStringBuilder sb1, OpenStringBuilder? sb2, bool expected)
         {
             Assert.Equal(expected, sb1.Equals(sb2));
         }
@@ -1352,17 +1501,17 @@ namespace J2N.Text.Tests
         [InlineData("Hello", 0, (uint)0, "0Hello")]
         [InlineData("Hello", 3, (uint)123, "Hel123lo")]
         [InlineData("Hello", 5, (uint)456, "Hello456")]
-        public static void Insert_UInt(string original, int index, uint value, string expected)
+        public void Insert_UInt(string original, int index, uint value, string expected)
         {
-            var builder = new OpenStringBuilder(original);
+            var builder = OpenStringBuilderFactory(original);
             builder.Insert(index, value);
             Assert.Equal(expected, builder.ToString());
         }
 
         [Fact]
-        public static void Insert_UInt_Invalid()
+        public void Insert_UInt_Invalid()
         {
-            var builder = new OpenStringBuilder(0, 5);
+            var builder = OpenStringBuilderFactory(0, 5);
             builder.Append("Hello");
 
             AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => builder.Insert(-1, (uint)1)); // Index < 0
@@ -1383,7 +1532,7 @@ namespace J2N.Text.Tests
         }
 
         [Fact]
-        public static void Test_Insert_Bool()
+        public void Test_Insert_Bool()
         {
             foreach (var testdata in Insert_Bool_TestData())
             {
@@ -1393,7 +1542,7 @@ namespace J2N.Text.Tests
         }
 
         [Fact]
-        public static void Test_Insert_Bool_Format()
+        public void Test_Insert_Bool_Format()
         {
             foreach (var testdata in Insert_Bool_TestData())
             {
@@ -1401,9 +1550,9 @@ namespace J2N.Text.Tests
             }
         }
 
-        private static void Insert_Bool_Format(string original, int index, bool value, BooleanFormat? format, string expected)
+        private void Insert_Bool_Format(string original, int index, bool value, BooleanFormat? format, string expected)
         {
-            var builder = new OpenStringBuilder(original);
+            var builder = OpenStringBuilderFactory(original);
             if (format is null)
                 builder.Insert(index, value);
             else
@@ -1412,9 +1561,9 @@ namespace J2N.Text.Tests
         }
 
         [Fact]
-        public static void Insert_Bool_Invalid()
+        public void Insert_Bool_Invalid()
         {
-            var builder = new OpenStringBuilder(0, 5);
+            var builder = OpenStringBuilderFactory(0, 5);
             builder.Append("Hello");
 
             AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => builder.Insert(-1, true)); // Index < 0
@@ -1426,17 +1575,17 @@ namespace J2N.Text.Tests
         [InlineData("Hello", 0, (byte)0, "0Hello")]
         [InlineData("Hello", 3, (byte)123, "Hel123lo")]
         [InlineData("Hello", 5, (byte)123, "Hello123")]
-        public static void Insert_Byte(string original, int index, byte value, string expected)
+        public void Insert_Byte(string original, int index, byte value, string expected)
         {
-            var builder = new OpenStringBuilder(original);
+            var builder = OpenStringBuilderFactory(original);
             builder.Insert(index, value);
             Assert.Equal(expected, builder.ToString());
         }
 
         [Fact]
-        public static void Insert_Byte_Invalid()
+        public void Insert_Byte_Invalid()
         {
-            var builder = new OpenStringBuilder(0, 5);
+            var builder = OpenStringBuilderFactory(0, 5);
             builder.Append("Hello");
 
             AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => builder.Insert(-1, (byte)1)); // Index < 0
@@ -1448,17 +1597,17 @@ namespace J2N.Text.Tests
         [InlineData("Hello", 0, (ulong)0, "0Hello")]
         [InlineData("Hello", 3, (ulong)123, "Hel123lo")]
         [InlineData("Hello", 5, (ulong)456, "Hello456")]
-        public static void Insert_ULong(string original, int index, ulong value, string expected)
+        public void Insert_ULong(string original, int index, ulong value, string expected)
         {
-            var builder = new OpenStringBuilder(original);
+            var builder = OpenStringBuilderFactory(original);
             builder.Insert(index, value);
             Assert.Equal(expected, builder.ToString());
         }
 
         [Fact]
-        public static void Insert_ULong_Invalid()
+        public void Insert_ULong_Invalid()
         {
-            var builder = new OpenStringBuilder(0, 5);
+            var builder = OpenStringBuilderFactory(0, 5);
             builder.Append("Hello");
 
             AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => builder.Insert(-1, (ulong)1)); // Index < 0
@@ -1470,17 +1619,17 @@ namespace J2N.Text.Tests
         [InlineData("Hello", 0, (ushort)0, "0Hello")]
         [InlineData("Hello", 3, (ushort)123, "Hel123lo")]
         [InlineData("Hello", 5, (ushort)456, "Hello456")]
-        public static void Insert_UShort(string original, int index, ushort value, string expected)
+        public void Insert_UShort(string original, int index, ushort value, string expected)
         {
-            var builder = new OpenStringBuilder(original);
+            var builder = OpenStringBuilderFactory(original);
             builder.Insert(index, value);
             Assert.Equal(expected, builder.ToString());
         }
 
         [Fact]
-        public static void Insert_UShort_Invalid()
+        public void Insert_UShort_Invalid()
         {
-            var builder = new OpenStringBuilder(0, 5);
+            var builder = OpenStringBuilderFactory(0, 5);
             builder.Append("Hello");
 
             AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => builder.Insert(-1, (ushort)1)); // Index < 0
@@ -1492,17 +1641,17 @@ namespace J2N.Text.Tests
         [InlineData("Hello", 0, '\0', "\0Hello")]
         [InlineData("Hello", 3, 'a', "Helalo")]
         [InlineData("Hello", 5, 'b', "Hellob")]
-        public static void Insert_Char(string original, int index, char value, string expected)
+        public void Insert_Char(string original, int index, char value, string expected)
         {
-            var builder = new OpenStringBuilder(original);
+            var builder = OpenStringBuilderFactory(original);
             builder.Insert(index, value);
             Assert.Equal(expected, builder.ToString());
         }
 
         [Fact]
-        public static void Insert_Char_Invalid()
+        public void Insert_Char_Invalid()
         {
-            var builder = new OpenStringBuilder(0, 5);
+            var builder = OpenStringBuilderFactory(0, 5);
             builder.Append("Hello");
 
             AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => builder.Insert(-1, '\0')); // Index < 0
@@ -1518,28 +1667,28 @@ namespace J2N.Text.Tests
         [InlineData("", 0, new char[] { 'a' }, 0, "")]
         [InlineData("Hello", 2, new char[0], 0, "Hello")]
         [InlineData("Hello", 3, null, 0, "Hello")]
-        public static unsafe void Insert_CharPointer(string original, int index, char[] charArray, int valueCount, string expected)
+        public unsafe void Insert_CharPointer(string? original, int index, char[]? charArray, int valueCount, string expected)
         {
             _ = charArray; // https://github.com/xunit/xunit/issues/1969
             fixed (char* value = charArray)
             {
-                var builder = new OpenStringBuilder(original);
+                var builder = OpenStringBuilderFactory(original);
                 builder.Insert(index, value, valueCount);
                 Assert.Equal(expected, builder.ToString());
             }
         }
 
         [Fact] // J2N specific
-        public static unsafe void Insert_CharPointer_Null_ThrowsNullReferenceException()
+        public unsafe void Insert_CharPointer_Null_ThrowsNullReferenceException()
         {
-            var builder = new OpenStringBuilder();
+            var builder = OpenStringBuilderFactory();
             Assert.Throws<NullReferenceException>(() => builder.Insert(0, (char*)null, 2));
         }
 
         [Fact] // J2N specific
-        public static unsafe void Insert_CharPointer_NegativeValueCount_ThrowsArgumentOutOfRangeException()
+        public unsafe void Insert_CharPointer_NegativeValueCount_ThrowsArgumentOutOfRangeException()
         {
-            var builder = new OpenStringBuilder(0, 5);
+            var builder = OpenStringBuilderFactory(0, 5);
             builder.Append("Hello");
 
             AssertExtensions.Throws<ArgumentOutOfRangeException>("valueCount", () =>
@@ -1549,9 +1698,9 @@ namespace J2N.Text.Tests
         }
 
         [Fact] // J2N specific
-        public static unsafe void Insert_CharPointer_NoSpareCapacity_ThrowsArgumentOutOfRangeException()
+        public unsafe void Insert_CharPointer_NoSpareCapacity_ThrowsArgumentOutOfRangeException()
         {
-            var builder = new OpenStringBuilder(0, 5);
+            var builder = OpenStringBuilderFactory(0, 5);
             builder.Append("Hello");
 
             AssertExtensions.Throws<ArgumentOutOfRangeException>(s_noCapacityParamName, () =>
@@ -1561,9 +1710,9 @@ namespace J2N.Text.Tests
         }
 
         [Fact] // J2N specific
-        public static unsafe void Insert_CharPointer_NegativeIndex_ThrowsArgumentOutOfRangeException()
+        public unsafe void Insert_CharPointer_NegativeIndex_ThrowsArgumentOutOfRangeException()
         {
-            var builder = new OpenStringBuilder(0, 5);
+            var builder = OpenStringBuilderFactory(0, 5);
             builder.Append("Hello");
 
             AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () =>
@@ -1580,7 +1729,7 @@ namespace J2N.Text.Tests
         }
 
         [Fact]
-        public static void Test_Insert_Float()
+        public void Test_Insert_Float()
         {
             using (new ThreadCultureChange(CultureInfo.InvariantCulture))
             {
@@ -1591,17 +1740,17 @@ namespace J2N.Text.Tests
             }
         }
 
-        private static void Insert_Float(string original, int index, float value, string expected)
+        private void Insert_Float(string original, int index, float value, string expected)
         {
-            var builder = new OpenStringBuilder(original);
+            var builder = OpenStringBuilderFactory(original);
             builder.Insert(index, value);
             Assert.Equal(expected, builder.ToString());
         }
 
         [Fact]
-        public static void Insert_Float_Invalid()
+        public void Insert_Float_Invalid()
         {
-            var builder = new OpenStringBuilder(0, 5);
+            var builder = OpenStringBuilderFactory(0, 5);
             builder.Append("Hello");
 
             AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => builder.Insert(-1, (float)1)); // Index < 0
@@ -1615,17 +1764,17 @@ namespace J2N.Text.Tests
         [InlineData("Hello", 5, "def", "Hellodef")]
         [InlineData("Hello", 0, "", "Hello")]
         [InlineData("Hello", 0, null, "Hello")]
-        public static void Insert_Object(string original, int index, object value, string expected)
+        public void Insert_Object(string? original, int index, object? value, string expected)
         {
-            var builder = new OpenStringBuilder(original);
+            var builder = OpenStringBuilderFactory(original);
             builder.Insert(index, value);
             Assert.Equal(expected, builder.ToString());
         }
 
         [Fact]
-        public static void Insert_Object_Invalid()
+        public void Insert_Object_Invalid()
         {
-            var builder = new OpenStringBuilder(0, 5);
+            var builder = OpenStringBuilderFactory(0, 5);
             builder.Append("Hello");
 
             AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => builder.Insert(-1, new object())); // Index < 0
@@ -1637,17 +1786,17 @@ namespace J2N.Text.Tests
         [InlineData("Hello", 0, (long)0, "0Hello")]
         [InlineData("Hello", 3, (long)123, "Hel123lo")]
         [InlineData("Hello", 5, (long)-456, "Hello-456")]
-        public static void Insert_Long(string original, int index, long value, string expected)
+        public void Insert_Long(string original, int index, long value, string expected)
         {
-            var builder = new OpenStringBuilder(original);
+            var builder = OpenStringBuilderFactory(original);
             builder.Insert(index, value);
             Assert.Equal(expected, builder.ToString());
         }
 
         [Fact]
-        public static void Insert_Long_Invalid()
+        public void Insert_Long_Invalid()
         {
-            var builder = new OpenStringBuilder(0, 5);
+            var builder = OpenStringBuilderFactory(0, 5);
             builder.Append("Hello");
 
             AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => builder.Insert(-1, (long)1)); // Index < 0
@@ -1659,17 +1808,17 @@ namespace J2N.Text.Tests
         [InlineData("Hello", 0, 0, "0Hello")]
         [InlineData("Hello", 3, 123, "Hel123lo")]
         [InlineData("Hello", 5, -456, "Hello-456")]
-        public static void Insert_Int(string original, int index, int value, string expected)
+        public void Insert_Int(string original, int index, int value, string expected)
         {
-            var builder = new OpenStringBuilder(original);
+            var builder = OpenStringBuilderFactory(original);
             builder.Insert(index, value);
             Assert.Equal(expected, builder.ToString());
         }
 
         [Fact]
-        public static void Insert_Int_Invalid()
+        public void Insert_Int_Invalid()
         {
-            var builder = new OpenStringBuilder(0, 5);
+            var builder = OpenStringBuilderFactory(0, 5);
             builder.Append("Hello");
 
             AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => builder.Insert(-1, 1)); // Index < 0
@@ -1681,17 +1830,17 @@ namespace J2N.Text.Tests
         [InlineData("Hello", 0, (short)0, "0Hello")]
         [InlineData("Hello", 3, (short)123, "Hel123lo")]
         [InlineData("Hello", 5, (short)-456, "Hello-456")]
-        public static void Insert_Short(string original, int index, short value, string expected)
+        public void Insert_Short(string original, int index, short value, string expected)
         {
-            var builder = new OpenStringBuilder(original);
+            var builder = OpenStringBuilderFactory(original);
             builder.Insert(index, value);
             Assert.Equal(expected, builder.ToString());
         }
 
         [Fact]
-        public static void Insert_Short_Invalid()
+        public void Insert_Short_Invalid()
         {
-            var builder = new OpenStringBuilder(0, 5);
+            var builder = OpenStringBuilderFactory(0, 5);
             builder.Append("Hello");
 
             AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => builder.Insert(-1, (short)1)); // Index < 0
@@ -1707,7 +1856,7 @@ namespace J2N.Text.Tests
         }
 
         [Fact]
-        public static void Test_Insert_Double()
+        public void Test_Insert_Double()
         {
             using (new ThreadCultureChange(CultureInfo.InvariantCulture))
             {
@@ -1718,17 +1867,17 @@ namespace J2N.Text.Tests
             }
         }
 
-        private static void Insert_Double(string original, int index, double value, string expected)
+        private void Insert_Double(string original, int index, double value, string expected)
         {
-            var builder = new OpenStringBuilder(original);
+            var builder = OpenStringBuilderFactory(original);
             builder.Insert(index, value);
             Assert.Equal(expected, builder.ToString());
         }
 
         [Fact]
-        public static void Insert_Double_Invalid()
+        public void Insert_Double_Invalid()
         {
-            var builder = new OpenStringBuilder(0, 5);
+            var builder = OpenStringBuilderFactory(0, 5);
             builder.Append("Hello");
 
             AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => builder.Insert(-1, (double)1)); // Index < 0
@@ -1744,7 +1893,7 @@ namespace J2N.Text.Tests
         }
 
         [Fact]
-        public static void Test_Insert_Decimal()
+        public void Test_Insert_Decimal()
         {
             using (new ThreadCultureChange(CultureInfo.InvariantCulture))
             {
@@ -1755,17 +1904,17 @@ namespace J2N.Text.Tests
             }
         }
 
-        private static void Insert_Decimal(string original, int index, double doubleValue, string expected)
+        private void Insert_Decimal(string original, int index, double doubleValue, string expected)
         {
-            var builder = new OpenStringBuilder(original);
+            var builder = OpenStringBuilderFactory(original);
             builder.Insert(index, new decimal(doubleValue));
             Assert.Equal(expected, builder.ToString());
         }
 
         [Fact]
-        public static void Insert_Decimal_Invalid()
+        public void Insert_Decimal_Invalid()
         {
-            var builder = new OpenStringBuilder(0, 5);
+            var builder = OpenStringBuilderFactory(0, 5);
             builder.Append("Hello");
 
             AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => builder.Insert(-1, (decimal)1)); // Index < 0
@@ -1777,17 +1926,17 @@ namespace J2N.Text.Tests
         [InlineData("Hello", 0, (sbyte)0, "0Hello")]
         [InlineData("Hello", 3, (sbyte)123, "Hel123lo")]
         [InlineData("Hello", 5, (sbyte)-123, "Hello-123")]
-        public static void Insert_SByte(string original, int index, sbyte value, string expected)
+        public void Insert_SByte(string original, int index, sbyte value, string expected)
         {
-            var builder = new OpenStringBuilder(original);
+            var builder = OpenStringBuilderFactory(original);
             builder.Insert(index, value);
             Assert.Equal(expected, builder.ToString());
         }
 
         [Fact]
-        public static void Insert_SByte_Invalid()
+        public void Insert_SByte_Invalid()
         {
-            var builder = new OpenStringBuilder(0, 5);
+            var builder = OpenStringBuilderFactory(0, 5);
             builder.Append("Hello");
 
             AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => builder.Insert(-1, (sbyte)1)); // Index < 0
@@ -1804,26 +1953,26 @@ namespace J2N.Text.Tests
         [InlineData("Hello", 0, null, 1, "Hello")]
         [InlineData("Hello", 3, "abc", 2, "Helabcabclo")]
         [InlineData("Hello", 5, "def", 2, "Hellodefdef")]
-        public static void Insert_String_Count(string original, int index, string value, int count, string expected)
+        public void Insert_String_Count(string? original, int index, string? value, int count, string expected)
         {
             OpenStringBuilder builder;
             if (count == 1)
             {
                 // Use Insert(int, string)
-                builder = new OpenStringBuilder(original);
+                builder = OpenStringBuilderFactory(original);
                 builder.Insert(index, value);
                 Assert.Equal(expected, builder.ToString());
             }
             // Use Insert(int, string, int)
-            builder = new OpenStringBuilder(original);
+            builder = OpenStringBuilderFactory(original);
             builder.Insert(index, value, count);
             Assert.Equal(expected, builder.ToString());
         }
 
         [Fact]
-        public static void Insert_String_Count_Invalid()
+        public void Insert_String_Count_Invalid()
         {
-            var builder = new OpenStringBuilder(0, 6);
+            var builder = OpenStringBuilderFactory(0, 6);
             builder.Append("Hello");
 
             AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => builder.Insert(-1, "")); // Index < 0
@@ -1839,6 +1988,52 @@ namespace J2N.Text.Tests
             Assert.Throws<OutOfMemoryException>(() => builder.Insert(builder.Length, "a", 2)); // New length > builder.MaxCapacity
         }
 
+
+        [Theory] // J2N specific
+        [InlineData("Hello", 0, "\0", 0, "Hello")]
+        [InlineData("Hello", 0, "\0", 1, "\0Hello")]
+        [InlineData("Hello", 3, "abc", 1, "Helabclo")]
+        [InlineData("Hello", 5, "def", 1, "Hellodef")]
+        [InlineData("Hello", 0, "", 1, "Hello")]
+        [InlineData("Hello", 0, null, 1, "Hello")]
+        [InlineData("Hello", 3, "abc", 2, "Helabcabclo")]
+        [InlineData("Hello", 5, "def", 2, "Hellodefdef")]
+        public void Insert_ReadOnlySpan_Count(string? original, int index, string? value, int count, string expected)
+        {
+            OpenStringBuilder builder;
+            if (count == 1)
+            {
+                // Use Insert(int, ReadOnlySpan<char>)
+                builder = OpenStringBuilderFactory(original);
+                builder.Insert(index, value.AsSpan());
+                Assert.Equal(expected, builder.ToString());
+            }
+            // Use Insert(int, ReadOnlySpan<char>, int)
+            builder = OpenStringBuilderFactory(original);
+            builder.Insert(index, value.AsSpan(), count);
+            Assert.Equal(expected, builder.ToString());
+        }
+
+        [Fact] // J2N specific
+        public void Insert_ReadOnlySpan_Count_Invalid()
+        {
+            var builder = OpenStringBuilderFactory(0, 6);
+            builder.Append("Hello");
+
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => builder.Insert(-1, "".AsSpan())); // Index < 0
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => builder.Insert(-1, "".AsSpan(), 0)); // Index < 0
+
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => builder.Insert(builder.Length + 1, "".AsSpan())); // Index > builder.Length
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => builder.Insert(builder.Length + 1, "".AsSpan(), 0)); // Index > builder.Length
+
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("count", () => builder.Insert(0, "".AsSpan(), -1)); // Count < 0
+
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("requiredLength", () => builder.Insert(builder.Length, "aa".AsSpan())); // New length > builder.MaxCapacity
+            Assert.Throws<OutOfMemoryException>(() => builder.Insert(builder.Length, "aa".AsSpan(), 1)); // New length > builder.MaxCapacity
+            Assert.Throws<OutOfMemoryException>(() => builder.Insert(builder.Length, "a".AsSpan(), 2)); // New length > builder.MaxCapacity
+        }
+
+
         [Theory]
         [InlineData("Hello", 0, new char[] { '\0' }, 0, 1, "\0Hello")]
         [InlineData("Hello", 3, new char[] { 'a', 'b', 'c' }, 0, 1, "Helalo")]
@@ -1846,30 +2041,30 @@ namespace J2N.Text.Tests
         [InlineData("Hello", 5, new char[] { 'd', 'e', 'f' }, 0, 1, "Hellod")]
         [InlineData("Hello", 5, new char[] { 'd', 'e', 'f' }, 0, 3, "Hellodef")]
         [InlineData("Hello", 0, new char[0], 0, 0, "Hello")]
-        [InlineData("Hello", 0, null, 0, 0, "Hello")]
+        [InlineData("Hello", 0, null!, 0, 0, "Hello")]
         [InlineData("Hello", 3, new char[] { 'a', 'b', 'c' }, 1, 1, "Helblo")]
         [InlineData("Hello", 3, new char[] { 'a', 'b', 'c' }, 1, 2, "Helbclo")]
         [InlineData("Hello", 3, new char[] { 'a', 'b', 'c' }, 0, 2, "Helablo")]
-        public static void Insert_CharArray(string original, int index, char[] value, int startIndex, int charCount, string expected)
+        public void Insert_CharArray(string? original, int index, char[]? value, int startIndex, int charCount, string expected)
         {
             OpenStringBuilder builder;
             if (startIndex == 0 && charCount == (value?.Length ?? 0))
             {
                 // Use Insert(int, char[])
-                builder = new OpenStringBuilder(original);
+                builder = OpenStringBuilderFactory(original);
                 builder.Insert(index, value);
                 Assert.Equal(expected, builder.ToString());
             }
             // Use Insert(int, char[], int, int)
-            builder = new OpenStringBuilder(original);
+            builder = OpenStringBuilderFactory(original);
             builder.Insert(index, value, startIndex, charCount);
             Assert.Equal(expected, builder.ToString());
         }
 
         [Fact]
-        public static void Insert_CharArray_Invalid()
+        public void Insert_CharArray_Invalid()
         {
-            var builder = new OpenStringBuilder(0, 5);
+            var builder = OpenStringBuilderFactory(0, 5);
             builder.Append("Hello");
 
             AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => builder.Insert(-1, new char[1])); // Index < 0
@@ -1878,7 +2073,7 @@ namespace J2N.Text.Tests
             AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => builder.Insert(builder.Length + 1, new char[1])); // Index > builder.Length
             AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => builder.Insert(builder.Length + 1, new char[0], 0, 0)); // Index > builder.Length
 
-            Assert.Throws<ArgumentNullException>(() => builder.Insert(0, (char[])null, 1, 1)); // Value is null (startIndex and count are not zero)
+            Assert.Throws<ArgumentNullException>(() => builder.Insert(0, (char[]?)null, 1, 1)); // Value is null (startIndex and count are not zero)
             AssertExtensions.Throws<ArgumentOutOfRangeException>("startIndex", () => builder.Insert(0, new char[0], -1, 0)); // Start index < 0
 
             AssertExtensions.Throws<ArgumentOutOfRangeException>("startIndex", () => builder.Insert(0, new char[3], 4, 0)); // Start index + char count > value.Length
@@ -1890,17 +2085,17 @@ namespace J2N.Text.Tests
         }
 
         [Fact]
-        public static void Insert_CharArray_InvalidCount()
+        public void Insert_CharArray_InvalidCount()
         {
-            var builder = new OpenStringBuilder(0, 5);
+            var builder = OpenStringBuilderFactory(0, 5);
             builder.Append("Hello");
             AssertExtensions.Throws<ArgumentOutOfRangeException>("charCount", () => builder.Insert(0, new char[0], 0, -1)); // Char count < 0
         }
 
         [Fact]
-        public static void Insert_CharArray_InvalidCharCount()
+        public void Insert_CharArray_InvalidCharCount()
         {
-            var builder = new OpenStringBuilder(0, 5);
+            var builder = OpenStringBuilderFactory(0, 5);
             builder.Append("Hello");
             AssertExtensions.Throws<ArgumentOutOfRangeException>("charCount", () => builder.Insert(0, new char[0], 0, -1)); // Char count < 0
         }
@@ -1914,9 +2109,9 @@ namespace J2N.Text.Tests
         [InlineData("Hello", 5, 0, "Hello")]
         [InlineData("Hello", 1, 2, "Hlo")]
         [InlineData("HelloHello", 1, 2, "HloHello")]
-        public static void Remove(string value, int startIndex, int length, string expected)
+        public void Remove(string value, int startIndex, int length, string expected)
         {
-            var builder = new OpenStringBuilder(value);
+            var builder = OpenStringBuilderFactory(value);
             builder.Remove(startIndex, length);
             Assert.Equal(expected, builder.ToString());
         }
@@ -1927,7 +2122,7 @@ namespace J2N.Text.Tests
         //[InlineData(0, 29, "a")]
         //[InlineData(20, 10, "aaaaaaaaaaaaaaaaaaaa")]
         //[InlineData(0, 15, "aaaaaaaaaaaaaaa")]
-        //public static void Remove_StringBuilderWithMultipleChunks(int startIndex, int count, string expected)
+        //public void Remove_StringBuilderWithMultipleChunks(int startIndex, int count, string expected)
         //{
         //    StringBuilder builder = StringBuilderWithMultipleChunks();
         //    builder.Remove(startIndex, count);
@@ -1935,9 +2130,9 @@ namespace J2N.Text.Tests
         //}
 
         [Fact]
-        public static void Remove_Invalid()
+        public void Remove_Invalid()
         {
-            var builder = new OpenStringBuilder("Hello");
+            var builder = OpenStringBuilderFactory("Hello");
             AssertExtensions.Throws<ArgumentOutOfRangeException>("startIndex", () => builder.Remove(-1, 0)); // Start index < 0
             AssertExtensions.Throws<ArgumentOutOfRangeException>("length", () => builder.Remove(0, -1)); // Length < 0
             AssertExtensions.Throws<ArgumentOutOfRangeException>("length", () => builder.Remove(6, 0)); // Start index + length > 0
@@ -1954,25 +2149,25 @@ namespace J2N.Text.Tests
         [InlineData("aaaabbbbccccdddd", 'b', '!', 0, 0, "aaaabbbbccccdddd")]
         [InlineData("aaaabbbbccccdddd", 'a', '!', 16, 0, "aaaabbbbccccdddd")]
         [InlineData("aaaabbbbccccdddd", 'e', '!', 0, 16, "aaaabbbbccccdddd")]
-        public static void Replace_Char(string value, char oldChar, char newChar, int startIndex, int count, string expected)
+        public void Replace_Char(string value, char oldChar, char newChar, int startIndex, int count, string expected)
         {
             OpenStringBuilder builder;
             if (startIndex == 0 && count == value.Length)
             {
                 // Use Replace(char, char)
-                builder = new OpenStringBuilder(value);
+                builder = OpenStringBuilderFactory(value);
                 builder.Replace(oldChar, newChar);
                 Assert.Equal(expected, builder.ToString());
             }
             // Use Replace(char, char, int, int)
-            builder = new OpenStringBuilder(value);
+            builder = OpenStringBuilderFactory(value);
             builder.Replace(oldChar, newChar, startIndex, count);
             Assert.Equal(expected, builder.ToString());
         }
 
         // J2N TODO: StringBuilder with multiple chunks?
         //[Fact]
-        //public static void Replace_Char_StringBuilderWithMultipleChunks()
+        //public void Replace_Char_StringBuilderWithMultipleChunks()
         //{
         //    StringBuilder builder = StringBuilderWithMultipleChunks();
         //    builder.Replace('a', 'b', 0, builder.Length);
@@ -1980,9 +2175,9 @@ namespace J2N.Text.Tests
         //}
 
         [Fact]
-        public static void Replace_Char_Invalid()
+        public void Replace_Char_Invalid()
         {
-            var builder = new OpenStringBuilder("Hello");
+            var builder = OpenStringBuilderFactory("Hello");
             AssertExtensions.Throws<ArgumentOutOfRangeException>("startIndex", () => builder.Replace('a', 'b', -1, 0)); // Start index < 0
             AssertExtensions.Throws<ArgumentOutOfRangeException>("count", () => builder.Replace('a', 'b', 0, -1)); // Count < 0
 
@@ -1999,9 +2194,9 @@ namespace J2N.Text.Tests
         [InlineData("Hello", 4, 0, "")]
         [InlineData("Hello", 0, 0, "")]
         [InlineData("", 0, 0, "")]
-        public static void ToStringTest(string value, int startIndex, int length, string expected)
+        public void ToStringTest(string value, int startIndex, int length, string expected)
         {
-            var builder = new OpenStringBuilder(value);
+            var builder = OpenStringBuilderFactory(value);
             if (startIndex == 0 && length == value.Length)
             {
                 Assert.Equal(expected, builder.ToString());
@@ -2011,7 +2206,7 @@ namespace J2N.Text.Tests
 
         // J2N TODO: StringBuilder with multiple chunks?
         //[Fact]
-        //public static void ToString_StringBuilderWithMultipleChunks()
+        //public void ToString_StringBuilderWithMultipleChunks()
         //{
         //    StringBuilder builder = StringBuilderWithMultipleChunks();
         //    Assert.Equal(s_chunkSplitSource, builder.ToString());
@@ -2021,9 +2216,9 @@ namespace J2N.Text.Tests
         //}
 
         [Fact]
-        public static void ToString_Invalid()
+        public void ToString_Invalid()
         {
-            var builder = new OpenStringBuilder("Hello");
+            var builder = OpenStringBuilderFactory("Hello");
             AssertExtensions.Throws<ArgumentOutOfRangeException>("startIndex", () => builder.ToString(-1, 0)); // Start index < 0
             AssertExtensions.Throws<ArgumentOutOfRangeException>("length", () => builder.ToString(0, -1)); // Length < 0
 
@@ -2034,58 +2229,58 @@ namespace J2N.Text.Tests
 
         public class CustomFormatter : ICustomFormatter, IFormatProvider
         {
-            public string Format(string format, object arg, IFormatProvider formatProvider) => "abc";
-            public object GetFormat(Type formatType) => this;
+            public string Format(string? format, object? arg, IFormatProvider? formatProvider) => "abc";
+            public object? GetFormat(Type? formatType) => this;
         }
 
         [Fact]
-        public static void AppendJoin_NullValues_ThrowsArgumentNullException()
+        public void AppendJoin_NullValues_ThrowsArgumentNullException()
         {
-            AssertExtensions.Throws<ArgumentNullException>("values", () => new OpenStringBuilder().AppendJoin('|', (object[])null));
-            AssertExtensions.Throws<ArgumentNullException>("values", () => new OpenStringBuilder().AppendJoin('|', (IEnumerable<object>)null));
-            AssertExtensions.Throws<ArgumentNullException>("values", () => new OpenStringBuilder().AppendJoin('|', (string[])null));
-            AssertExtensions.Throws<ArgumentNullException>("values", () => new OpenStringBuilder().AppendJoin("|", (object[])null));
-            AssertExtensions.Throws<ArgumentNullException>("values", () => new OpenStringBuilder().AppendJoin("|", (IEnumerable<object>)null));
-            AssertExtensions.Throws<ArgumentNullException>("values", () => new OpenStringBuilder().AppendJoin("|", (string[])null));
+            AssertExtensions.Throws<ArgumentNullException>("values", () => OpenStringBuilderFactory().AppendJoin('|', (object?[])null!));
+            AssertExtensions.Throws<ArgumentNullException>("values", () => OpenStringBuilderFactory().AppendJoin('|', (IEnumerable<object?>)null!));
+            AssertExtensions.Throws<ArgumentNullException>("values", () => OpenStringBuilderFactory().AppendJoin('|', (string?[])null!));
+            AssertExtensions.Throws<ArgumentNullException>("values", () => OpenStringBuilderFactory().AppendJoin("|", (object?[])null!));
+            AssertExtensions.Throws<ArgumentNullException>("values", () => OpenStringBuilderFactory().AppendJoin("|", (IEnumerable<object?>)null!));
+            AssertExtensions.Throws<ArgumentNullException>("values", () => OpenStringBuilderFactory().AppendJoin("|", (string?[])null!));
         }
 
         [Theory]
-        [InlineData(new object[0], "")]
-        [InlineData(new object[] { null }, "")]
-        [InlineData(new object[] { 10 }, "10")]
-        [InlineData(new object[] { null, null }, "|")]
-        [InlineData(new object[] { null, 20 }, "|20")]
-        [InlineData(new object[] { 10, null }, "10|")]
-        [InlineData(new object[] { 10, 20 }, "10|20")]
-        [InlineData(new object[] { null, null, null }, "||")]
-        [InlineData(new object[] { null, null, 30 }, "||30")]
-        [InlineData(new object[] { null, 20, null }, "|20|")]
-        [InlineData(new object[] { null, 20, 30 }, "|20|30")]
-        [InlineData(new object[] { 10, null, null }, "10||")]
-        [InlineData(new object[] { 10, null, 30 }, "10||30")]
-        [InlineData(new object[] { 10, 20, null }, "10|20|")]
-        [InlineData(new object[] { 10, 20, 30 }, "10|20|30")]
-        [InlineData(new object[] { "" }, "")]
-        [InlineData(new object[] { "", "" }, "|")]
-        public static void AppendJoin_TestValues(object[] values, string expected)
+        [InlineData(new object?[0], "")]
+        [InlineData(new object?[] { null }, "")]
+        [InlineData(new object?[] { 10 }, "10")]
+        [InlineData(new object?[] { null, null }, "|")]
+        [InlineData(new object?[] { null, 20 }, "|20")]
+        [InlineData(new object?[] { 10, null }, "10|")]
+        [InlineData(new object?[] { 10, 20 }, "10|20")]
+        [InlineData(new object?[] { null, null, null }, "||")]
+        [InlineData(new object?[] { null, null, 30 }, "||30")]
+        [InlineData(new object?[] { null, 20, null }, "|20|")]
+        [InlineData(new object?[] { null, 20, 30 }, "|20|30")]
+        [InlineData(new object?[] { 10, null, null }, "10||")]
+        [InlineData(new object?[] { 10, null, 30 }, "10||30")]
+        [InlineData(new object?[] { 10, 20, null }, "10|20|")]
+        [InlineData(new object?[] { 10, 20, 30 }, "10|20|30")]
+        [InlineData(new object?[] { "" }, "")]
+        [InlineData(new object?[] { "", "" }, "|")]
+        public void AppendJoin_TestValues(object?[] values, string expected)
         {
             var stringValues = Array.ConvertAll(values, _ => _?.ToString());
             var enumerable = values.Select(_ => _);
 
-            Assert.Equal(expected, new OpenStringBuilder().AppendJoin('|', values).ToString());
-            Assert.Equal(expected, new OpenStringBuilder().AppendJoin('|', (ReadOnlySpan<object>)values).ToString());
-            Assert.Equal(expected, new OpenStringBuilder().AppendJoin('|', enumerable).ToString());
-            Assert.Equal(expected, new OpenStringBuilder().AppendJoin('|', stringValues).ToString());
-            Assert.Equal(expected, new OpenStringBuilder().AppendJoin('|', (ReadOnlySpan<string>)stringValues).ToString());
-            Assert.Equal(expected, new OpenStringBuilder().AppendJoin("|", values).ToString());
-            Assert.Equal(expected, new OpenStringBuilder().AppendJoin("|", (ReadOnlySpan<object>)values).ToString());
-            Assert.Equal(expected, new OpenStringBuilder().AppendJoin("|", enumerable).ToString());
-            Assert.Equal(expected, new OpenStringBuilder().AppendJoin("|", stringValues).ToString());
-            Assert.Equal(expected, new OpenStringBuilder().AppendJoin("|", (ReadOnlySpan<string>)stringValues).ToString());
+            Assert.Equal(expected, OpenStringBuilderFactory().AppendJoin('|', values).ToString());
+            Assert.Equal(expected, OpenStringBuilderFactory().AppendJoin('|', (ReadOnlySpan<object?>)values).ToString());
+            Assert.Equal(expected, OpenStringBuilderFactory().AppendJoin('|', enumerable).ToString());
+            Assert.Equal(expected, OpenStringBuilderFactory().AppendJoin('|', stringValues).ToString());
+            Assert.Equal(expected, OpenStringBuilderFactory().AppendJoin('|', (ReadOnlySpan<string?>)stringValues).ToString());
+            Assert.Equal(expected, OpenStringBuilderFactory().AppendJoin("|", values).ToString());
+            Assert.Equal(expected, OpenStringBuilderFactory().AppendJoin("|", (ReadOnlySpan<object?>)values).ToString());
+            Assert.Equal(expected, OpenStringBuilderFactory().AppendJoin("|", enumerable).ToString());
+            Assert.Equal(expected, OpenStringBuilderFactory().AppendJoin("|", stringValues).ToString());
+            Assert.Equal(expected, OpenStringBuilderFactory().AppendJoin("|", (ReadOnlySpan<string?>)stringValues).ToString());
         }
 
         [Fact]
-        public static void AppendJoin_NullToStringValues()
+        public void AppendJoin_NullToStringValues()
         {
             AppendJoin_TestValues(new object[] { new NullToStringObject() }, "");
             AppendJoin_TestValues(new object[] { new NullToStringObject(), new NullToStringObject() }, "|");
@@ -2093,7 +2288,7 @@ namespace J2N.Text.Tests
 
         private sealed class NullToStringObject
         {
-            public override string ToString() => null;
+            public override string ToString() => null!;
         }
 
         [Theory]
@@ -2101,30 +2296,30 @@ namespace J2N.Text.Tests
         [InlineData("", "123")]
         [InlineData(" ", "1 2 3")]
         [InlineData(", ", "1, 2, 3")]
-        public static void AppendJoin_TestStringSeparators(string separator, string expected)
+        public void AppendJoin_TestStringSeparators(string? separator, string expected)
         {
-            var values = new object[] { 1, 2, 3 };
-            var stringValues = new string[] { "1", "2", "3" };
+            var values = new object?[] { 1, 2, 3 };
+            var stringValues = new string?[] { "1", "2", "3" };
 
-            Assert.Equal(expected, new OpenStringBuilder().AppendJoin(separator, values).ToString());
-            Assert.Equal(expected, new OpenStringBuilder().AppendJoin(separator, (ReadOnlySpan<object>)values).ToString());
-            Assert.Equal(expected, new OpenStringBuilder().AppendJoin(separator, Enumerable.Range(1, 3)).ToString());
-            Assert.Equal(expected, new OpenStringBuilder().AppendJoin(separator, stringValues).ToString());
-            Assert.Equal(expected, new OpenStringBuilder().AppendJoin(separator, (ReadOnlySpan<string>)stringValues).ToString());
+            Assert.Equal(expected, OpenStringBuilderFactory().AppendJoin(separator, values).ToString());
+            Assert.Equal(expected, OpenStringBuilderFactory().AppendJoin(separator, (ReadOnlySpan<object?>)values).ToString());
+            Assert.Equal(expected, OpenStringBuilderFactory().AppendJoin(separator, Enumerable.Range(1, 3)).ToString());
+            Assert.Equal(expected, OpenStringBuilderFactory().AppendJoin(separator, stringValues).ToString());
+            Assert.Equal(expected, OpenStringBuilderFactory().AppendJoin(separator, (ReadOnlySpan<string?>)stringValues).ToString());
         }
 
 
-        private static OpenStringBuilder CreateBuilderWithNoSpareCapacity()
+        private OpenStringBuilder CreateBuilderWithNoSpareCapacity()
         {
-            return new OpenStringBuilder(0, 5).Append("Hello");
+            return OpenStringBuilderFactory(0, 5).Append("Hello");
         }
 
         [Theory]
-        [InlineData(null, new object[] { null, null })]
-        [InlineData("", new object[] { "", "" })]
-        [InlineData(" ", new object[] { })]
-        [InlineData(", ", new object[] { "" })]
-        public static void AppendJoin_NoValues_NoSpareCapacity_DoesNotThrow(string separator, object[] values)
+        [InlineData(null, new object?[] { null, null })]
+        [InlineData("", new object?[] { "", "" })]
+        [InlineData(" ", new object?[] { })]
+        [InlineData(", ", new object?[] { "" })]
+        public void AppendJoin_NoValues_NoSpareCapacity_DoesNotThrow(string? separator, object?[] values)
         {
             var stringValues = Array.ConvertAll(values, _ => _?.ToString());
             var enumerable = values.Select(_ => _);
@@ -2132,27 +2327,28 @@ namespace J2N.Text.Tests
             if (separator?.Length == 1)
             {
                 CreateBuilderWithNoSpareCapacity().AppendJoin(separator[0], values);
-                CreateBuilderWithNoSpareCapacity().AppendJoin(separator[0], (ReadOnlySpan<object>)values);
+                CreateBuilderWithNoSpareCapacity().AppendJoin(separator[0], (ReadOnlySpan<object?>)values);
                 CreateBuilderWithNoSpareCapacity().AppendJoin(separator[0], enumerable);
                 CreateBuilderWithNoSpareCapacity().AppendJoin(separator[0], stringValues);
-                CreateBuilderWithNoSpareCapacity().AppendJoin(separator[0], (ReadOnlySpan<string>)stringValues);
+                CreateBuilderWithNoSpareCapacity().AppendJoin(separator[0], (ReadOnlySpan<string?>)stringValues);
             }
             CreateBuilderWithNoSpareCapacity().AppendJoin(separator, values);
-            CreateBuilderWithNoSpareCapacity().AppendJoin(separator, (ReadOnlySpan<object>)values);
+            CreateBuilderWithNoSpareCapacity().AppendJoin(separator, (ReadOnlySpan<object?>)values);
             CreateBuilderWithNoSpareCapacity().AppendJoin(separator, enumerable);
             CreateBuilderWithNoSpareCapacity().AppendJoin(separator, stringValues);
-            CreateBuilderWithNoSpareCapacity().AppendJoin(separator, (ReadOnlySpan<string>)stringValues);
+            CreateBuilderWithNoSpareCapacity().AppendJoin(separator, (ReadOnlySpan<string?>)stringValues);
         }
 
         [Theory]
-        [InlineData(null, new object[] { " " })]
-        [InlineData(" ", new object[] { " " })]
-        [InlineData(" ", new object[] { null, null })]
-        [InlineData(" ", new object[] { "", "" })]
-        public static void AppendJoin_NoSpareCapacity_ThrowsArgumentOutOfRangeException(string separator, object[] values)
+        [InlineData(null, new object?[] { " " })]
+        [InlineData(" ", new object?[] { " " })]
+        [InlineData(" ", new object?[] { null, null })]
+        [InlineData(" ", new object?[] { "", "" })]
+        public void AppendJoin_NoSpareCapacity_ThrowsArgumentOutOfRangeException(string? separator, object?[] values)
         {
-            var builder = new OpenStringBuilder(0, 5);
-            builder.Append("Hello");
+            // J2N: Stray code from upstream - not used in below test
+            //var builder = OpenStringBuilderFactory(0, 5);
+            //builder.Append("Hello");
 
             var stringValues = Array.ConvertAll(values, _ => _?.ToString());
             var enumerable = values.Select(_ => _);
@@ -2160,16 +2356,16 @@ namespace J2N.Text.Tests
             if (separator?.Length == 1)
             {
                 AssertExtensions.Throws<ArgumentOutOfRangeException>(s_noCapacityParamName, () => CreateBuilderWithNoSpareCapacity().AppendJoin(separator[0], values));
-                AssertExtensions.Throws<ArgumentOutOfRangeException>(s_noCapacityParamName, () => CreateBuilderWithNoSpareCapacity().AppendJoin(separator[0], (ReadOnlySpan<object>)values));
+                AssertExtensions.Throws<ArgumentOutOfRangeException>(s_noCapacityParamName, () => CreateBuilderWithNoSpareCapacity().AppendJoin(separator[0], (ReadOnlySpan<object?>)values));
                 AssertExtensions.Throws<ArgumentOutOfRangeException>(s_noCapacityParamName, () => CreateBuilderWithNoSpareCapacity().AppendJoin(separator[0], enumerable));
                 AssertExtensions.Throws<ArgumentOutOfRangeException>(s_noCapacityParamName, () => CreateBuilderWithNoSpareCapacity().AppendJoin(separator[0], stringValues));
-                AssertExtensions.Throws<ArgumentOutOfRangeException>(s_noCapacityParamName, () => CreateBuilderWithNoSpareCapacity().AppendJoin(separator[0], (ReadOnlySpan<string>)stringValues));
+                AssertExtensions.Throws<ArgumentOutOfRangeException>(s_noCapacityParamName, () => CreateBuilderWithNoSpareCapacity().AppendJoin(separator[0], (ReadOnlySpan<string?>)stringValues));
             }
             AssertExtensions.Throws<ArgumentOutOfRangeException>(s_noCapacityParamName, () => CreateBuilderWithNoSpareCapacity().AppendJoin(separator, values));
-            AssertExtensions.Throws<ArgumentOutOfRangeException>(s_noCapacityParamName, () => CreateBuilderWithNoSpareCapacity().AppendJoin(separator, (ReadOnlySpan<object>)values));
+            AssertExtensions.Throws<ArgumentOutOfRangeException>(s_noCapacityParamName, () => CreateBuilderWithNoSpareCapacity().AppendJoin(separator, (ReadOnlySpan<object?>)values));
             AssertExtensions.Throws<ArgumentOutOfRangeException>(s_noCapacityParamName, () => CreateBuilderWithNoSpareCapacity().AppendJoin(separator, enumerable));
             AssertExtensions.Throws<ArgumentOutOfRangeException>(s_noCapacityParamName, () => CreateBuilderWithNoSpareCapacity().AppendJoin(separator, stringValues));
-            AssertExtensions.Throws<ArgumentOutOfRangeException>(s_noCapacityParamName, () => CreateBuilderWithNoSpareCapacity().AppendJoin(separator, (ReadOnlySpan<string>)stringValues));
+            AssertExtensions.Throws<ArgumentOutOfRangeException>(s_noCapacityParamName, () => CreateBuilderWithNoSpareCapacity().AppendJoin(separator, (ReadOnlySpan<string?>)stringValues));
         }
 
         [Theory]
@@ -2178,9 +2374,9 @@ namespace J2N.Text.Tests
         [InlineData("Hello", new char[] { 'b', '\0', 'd' }, "Hellob\0d")]
         [InlineData("", new char[] { 'e', 'f', 'g' }, "efg")]
         [InlineData("Hello", new char[0], "Hello")]
-        public static void Append_CharSpan(string original, char[] value, string expected)
+        public void Append_CharSpan(string? original, char[]? value, string expected)
         {
-            var builder = new OpenStringBuilder(original);
+            var builder = OpenStringBuilderFactory(original);
             builder.Append(new ReadOnlySpan<char>(value));
             Assert.Equal(expected, builder.ToString());
         }
@@ -2191,9 +2387,9 @@ namespace J2N.Text.Tests
         [InlineData("Hello", new char[] { 'b', '\0', 'd' }, "Hellob\0d")]
         [InlineData("", new char[] { 'e', 'f', 'g' }, "efg")]
         [InlineData("Hello", new char[0], "Hello")]
-        public static void Append_CharMemory(string original, char[] value, string expected)
+        public void Append_CharMemory(string? original, char[]? value, string expected)
         {
-            var builder = new OpenStringBuilder(original);
+            var builder = OpenStringBuilderFactory(original);
             builder.Append(value.AsMemory());
             Assert.Equal(expected, builder.ToString());
         }
@@ -2202,9 +2398,9 @@ namespace J2N.Text.Tests
         //[Theory]
         //[InlineData(1)]
         //[InlineData(10000)]
-        //public static void Clear_AppendAndInsertBeforeClearManyTimes_CapacityStaysWithinRange(int times)
+        //public void Clear_AppendAndInsertBeforeClearManyTimes_CapacityStaysWithinRange(int times)
         //{
-        //    var builder = new OpenStringBuilder();
+        //    var builder = OpenStringBuilderFactory();
         //    var originalCapacity = builder.Capacity;
         //    var s = new string(' ', 10);
         //    int oldLength = 0;
@@ -2224,9 +2420,9 @@ namespace J2N.Text.Tests
 
         // J2N: We don't shrink on Clear() because that would cause another allocation
         //[Fact]
-        //public static void Clear_InitialCapacityMuchLargerThanLength_CapacityReducedToInitialCapacity()
+        //public void Clear_InitialCapacityMuchLargerThanLength_CapacityReducedToInitialCapacity()
         //{
-        //    var builder = new OpenStringBuilder(100);
+        //    var builder = OpenStringBuilderFactory(100);
         //    var initialCapacity = builder.Capacity;
         //    builder.Append(new string('a', 40));
         //    builder.Insert(0, new string('a', 10));
@@ -2243,9 +2439,9 @@ namespace J2N.Text.Tests
 
         // J2N: We don't shrink on Clear() because that would cause another allocation
         //[Fact]
-        //public static void Clear_StringBuilderHasTwoChunks_OneChunkIsEmpty_ClearReducesCapacity()
+        //public void Clear_StringBuilderHasTwoChunks_OneChunkIsEmpty_ClearReducesCapacity()
         //{
-        //    var sb = new OpenStringBuilder(string.Empty);
+        //    var sb = OpenStringBuilderFactory(string.Empty);
         //    int initialCapacity = sb.Capacity;
         //    for (int i = 0; i < initialCapacity; i++)
         //    {
@@ -2266,27 +2462,27 @@ namespace J2N.Text.Tests
         [InlineData("Hello", 0, new char[] { '\0', '\0', '\0', '\0', '\0' }, 5, new char[] { 'H', 'e', 'l', 'l', 'o' })]
         [InlineData("Hello", 0, new char[] { '\0', '\0', '\0', '\0' }, 4, new char[] { 'H', 'e', 'l', 'l' })]
         [InlineData("Hello", 1, new char[] { '\0', '\0', '\0', '\0', '\0' }, 4, new char[] { 'e', 'l', 'l', 'o', '\0' })]
-        public static void CopyTo_CharSpan(string value, int sourceIndex, char[] destination, int count, char[] expected)
+        public void CopyTo_CharSpan(string value, int sourceIndex, char[] destination, int count, char[] expected)
         {
-            var builder = new OpenStringBuilder(value);
+            var builder = OpenStringBuilderFactory(value);
             builder.CopyTo(sourceIndex, new Span<char>(destination), count);
             Assert.Equal(expected, destination);
         }
 
         // J2N TODO: StringBuilder with multiple chunks?
         //[Fact]
-        //public static void CopyTo_CharSpan_StringBuilderWithMultipleChunks()
+        //public void CopyTo_CharSpan_StringBuilderWithMultipleChunks()
         //{
-        //    StringBuilder builder = StringBuilderWithMultipleChunks();
+        //    OpenStringBuilder builder = StringBuilderWithMultipleChunks();
         //    char[] destination = new char[builder.Length];
         //    builder.CopyTo(0, new Span<char>(destination), destination.Length);
         //    Assert.Equal(s_chunkSplitSource.ToCharArray(), destination);
         //}
 
         [Fact]
-        public static void CopyTo_CharSpan_Invalid()
+        public void CopyTo_CharSpan_Invalid()
         {
-            var builder = new OpenStringBuilder("Hello");
+            var builder = OpenStringBuilderFactory("Hello");
 
             AssertExtensions.Throws<ArgumentOutOfRangeException>("sourceIndex", () => builder.CopyTo(-1, new Span<char>(new char[10]), 0)); // Source index < 0
             AssertExtensions.Throws<ArgumentOutOfRangeException>("sourceIndex", () => builder.CopyTo(6, new Span<char>(new char[10]), 0)); // Source index > builder.Length
@@ -2304,17 +2500,17 @@ namespace J2N.Text.Tests
         [InlineData("Hello", 3, new char[] { 'a', 'b', 'c' }, "Helabclo")]
         [InlineData("Hello", 5, new char[] { 'd', 'e', 'f' }, "Hellodef")]
         [InlineData("Hello", 0, new char[0], "Hello")]
-        public static void Insert_CharSpan(string original, int index, char[] value, string expected)
+        public void Insert_CharSpan(string original, int index, char[] value, string expected)
         {
-            var builder = new OpenStringBuilder(original);
+            var builder = OpenStringBuilderFactory(original);
             builder.Insert(index, new ReadOnlySpan<char>(value));
             Assert.Equal(expected, builder.ToString());
         }
 
         [Fact]
-        public static void Insert_CharSpan_Invalid()
+        public void Insert_CharSpan_Invalid()
         {
-            var builder = new OpenStringBuilder(0, 5);
+            var builder = OpenStringBuilderFactory(0, 5);
             builder.Append("Hello");
 
             AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => builder.Insert(-1, new ReadOnlySpan<char>(new char[0]))); // Index < 0
@@ -2322,118 +2518,132 @@ namespace J2N.Text.Tests
             AssertExtensions.Throws<ArgumentOutOfRangeException>("requiredLength", () => builder.Insert(builder.Length, new ReadOnlySpan<char>(new char[1]))); // New length > builder.MaxCapacity
         }
 
-        public static IEnumerable<object[]> Append_StringBuilder_TestData()
+        public IEnumerable<object?[]> Append_StringBuilder_TestData()
         {
             string mediumString = new string('a', 30);
             string largeString = new string('b', 1000);
 
-            var sb1 = new OpenStringBuilder("Hello");
-            var sb2 = new OpenStringBuilder("one");
-            var sb3 = new OpenStringBuilder(20).Append(mediumString);
+            var sb1 = OpenStringBuilderFactory("Hello");
+            var sb2 = OpenStringBuilderFactory("one");
+            var sb3 = OpenStringBuilderFactory(20).Append(mediumString);
 
-            yield return new object[] { new OpenStringBuilder("Hello"), sb1, "HelloHello" };
-            yield return new object[] { new OpenStringBuilder("Hello"), sb2, "Helloone" };
-            yield return new object[] { new OpenStringBuilder("Hello"), new OpenStringBuilder(), "Hello" };
+            yield return new object?[] { OpenStringBuilderFactory("Hello"), sb1, "HelloHello" };
+            yield return new object?[] { OpenStringBuilderFactory("Hello"), sb2, "Helloone" };
+            yield return new object?[] { OpenStringBuilderFactory("Hello"), OpenStringBuilderFactory(), "Hello" };
 
-            yield return new object[] { new OpenStringBuilder("one"), sb3, "one" + mediumString };
+            yield return new object?[] { OpenStringBuilderFactory("one"), sb3, "one" + mediumString };
 
-            yield return new object[] { new OpenStringBuilder(20).Append(mediumString), sb3, mediumString + mediumString };
-            yield return new object[] { new OpenStringBuilder(10).Append(mediumString), sb3, mediumString + mediumString };
+            yield return new object?[] { OpenStringBuilderFactory(20).Append(mediumString), sb3, mediumString + mediumString };
+            yield return new object?[] { OpenStringBuilderFactory(10).Append(mediumString), sb3, mediumString + mediumString };
 
-            yield return new object[] { new OpenStringBuilder(20).Append(largeString), sb3, largeString + mediumString };
-            yield return new object[] { new OpenStringBuilder(10).Append(largeString), sb3, largeString + mediumString };
+            yield return new object?[] { OpenStringBuilderFactory(20).Append(largeString), sb3, largeString + mediumString };
+            yield return new object?[] { OpenStringBuilderFactory(10).Append(largeString), sb3, largeString + mediumString };
 
-            yield return new object[] { new OpenStringBuilder(10), sb3, mediumString };
-            yield return new object[] { new OpenStringBuilder(30), sb3, mediumString };
-            yield return new object[] { new OpenStringBuilder(10), new OpenStringBuilder(20), string.Empty };
+            yield return new object?[] { OpenStringBuilderFactory(10), sb3, mediumString };
+            yield return new object?[] { OpenStringBuilderFactory(30), sb3, mediumString };
+            yield return new object?[] { OpenStringBuilderFactory(10), OpenStringBuilderFactory(20), string.Empty };
 
-            yield return new object[] { sb1, null, "Hello" };
-            yield return new object[] { sb1, sb1, "HelloHello" };
+            yield return new object?[] { sb1, null, "Hello" };
+            yield return new object?[] { sb1, sb1, "HelloHello" };
         }
 
-        [Theory]
-        [MemberData(nameof(Append_StringBuilder_TestData))]
-        public static void Append_StringBuilder(OpenStringBuilder s1, OpenStringBuilder s2, string s)
+        [Fact]
+        public void Test_Append_StringBuilder()
+        {
+            foreach (var testData in Append_StringBuilder_TestData())
+            {
+                Append_StringBuilder((OpenStringBuilder)testData[0]!, (OpenStringBuilder?)testData[1], (string)testData[2]!);
+            }
+        }
+
+        private static void Append_StringBuilder(OpenStringBuilder s1, OpenStringBuilder? s2, string s)
         {
             Assert.Equal(s, s1.Append(s2).ToString());
         }
 
-        public static IEnumerable<object[]> Append_StringBuilder_Substring_TestData()
+        public IEnumerable<object?[]> Append_StringBuilder_Substring_TestData()
         {
             string mediumString = new string('a', 30);
             string largeString = new string('b', 1000);
 
-            var sb1 = new OpenStringBuilder("Hello");
-            var sb2 = new OpenStringBuilder("one");
-            var sb3 = new OpenStringBuilder(20).Append(mediumString);
+            var sb1 = OpenStringBuilderFactory("Hello");
+            var sb2 = OpenStringBuilderFactory("one");
+            var sb3 = OpenStringBuilderFactory(20).Append(mediumString);
 
-            yield return new object[] { new OpenStringBuilder("Hello"), sb1, 0, 5, "HelloHello" };
-            yield return new object[] { new OpenStringBuilder("Hello"), sb1, 0, 0, "Hello" };
-            yield return new object[] { new OpenStringBuilder("Hello"), sb1, 2, 3, "Hellollo" };
-            yield return new object[] { new OpenStringBuilder("Hello"), sb1, 2, 2, "Helloll" };
-            yield return new object[] { new OpenStringBuilder("Hello"), sb1, 2, 0, "Hello" };
-            yield return new object[] { new OpenStringBuilder("Hello"), new OpenStringBuilder(), 0, 0, "Hello" };
-            yield return new object[] { new OpenStringBuilder("Hello"), null, 0, 0, "Hello" };
-            yield return new object[] { new OpenStringBuilder(), new OpenStringBuilder("Hello"), 2, 3, "llo" };
-            yield return new object[] { new OpenStringBuilder("Hello"), sb2, 0, 3, "Helloone" };
+            yield return new object?[] { OpenStringBuilderFactory("Hello"), sb1, 0, 5, "HelloHello" };
+            yield return new object?[] { OpenStringBuilderFactory("Hello"), sb1, 0, 0, "Hello" };
+            yield return new object?[] { OpenStringBuilderFactory("Hello"), sb1, 2, 3, "Hellollo" };
+            yield return new object?[] { OpenStringBuilderFactory("Hello"), sb1, 2, 2, "Helloll" };
+            yield return new object?[] { OpenStringBuilderFactory("Hello"), sb1, 2, 0, "Hello" };
+            yield return new object?[] { OpenStringBuilderFactory("Hello"), OpenStringBuilderFactory(), 0, 0, "Hello" };
+            yield return new object?[] { OpenStringBuilderFactory("Hello"), null, 0, 0, "Hello" };
+            yield return new object?[] { OpenStringBuilderFactory(), OpenStringBuilderFactory("Hello"), 2, 3, "llo" };
+            yield return new object?[] { OpenStringBuilderFactory("Hello"), sb2, 0, 3, "Helloone" };
 
-            yield return new object[] { new OpenStringBuilder("one"), sb3, 5, 25, "one" + new string('a', 25) };
-            yield return new object[] { new OpenStringBuilder("one"), sb3, 5, 20, "one" + new string('a', 20) };
-            yield return new object[] { new OpenStringBuilder("one"), sb3, 10, 10, "one" + new string('a', 10) };
+            yield return new object?[] { OpenStringBuilderFactory("one"), sb3, 5, 25, "one" + new string('a', 25) };
+            yield return new object?[] { OpenStringBuilderFactory("one"), sb3, 5, 20, "one" + new string('a', 20) };
+            yield return new object?[] { OpenStringBuilderFactory("one"), sb3, 10, 10, "one" + new string('a', 10) };
 
-            yield return new object[] { new OpenStringBuilder(20).Append(mediumString), sb3, 20, 10, new string('a', 40) };
-            yield return new object[] { new OpenStringBuilder(10).Append(mediumString), sb3, 10, 10, new string('a', 40) };
+            yield return new object?[] { OpenStringBuilderFactory(20).Append(mediumString), sb3, 20, 10, new string('a', 40) };
+            yield return new object?[] { OpenStringBuilderFactory(10).Append(mediumString), sb3, 10, 10, new string('a', 40) };
 
-            yield return new object[] { new OpenStringBuilder(20).Append(largeString), new OpenStringBuilder(20).Append(largeString), 100, 50, largeString + new string('b', 50) };
-            yield return new object[] { new OpenStringBuilder(10).Append(mediumString), new OpenStringBuilder(20).Append(largeString), 20, 10, mediumString + new string('b', 10) };
-            yield return new object[] { new OpenStringBuilder(10).Append(mediumString), new OpenStringBuilder(20).Append(largeString), 100, 50, mediumString + new string('b', 50) };
+            yield return new object?[] { OpenStringBuilderFactory(20).Append(largeString), OpenStringBuilderFactory(20).Append(largeString), 100, 50, largeString + new string('b', 50) };
+            yield return new object?[] { OpenStringBuilderFactory(10).Append(mediumString), OpenStringBuilderFactory(20).Append(largeString), 20, 10, mediumString + new string('b', 10) };
+            yield return new object?[] { OpenStringBuilderFactory(10).Append(mediumString), OpenStringBuilderFactory(20).Append(largeString), 100, 50, mediumString + new string('b', 50) };
 
-            yield return new object[] { sb1, sb1, 2, 3, "Hellollo" };
-            yield return new object[] { sb2, sb2, 2, 0, "one" };
+            yield return new object?[] { sb1, sb1, 2, 3, "Hellollo" };
+            yield return new object?[] { sb2, sb2, 2, 0, "one" };
         }
 
-        [Theory]
-        [MemberData(nameof(Append_StringBuilder_Substring_TestData))]
-        public static void Append_StringBuilder_Substring(OpenStringBuilder s1, OpenStringBuilder s2, int startIndex, int count, string s)
+        [Fact]
+        public void Test_Append_StringBuilder_Substring()
+        {
+            foreach (var testData in Append_StringBuilder_Substring_TestData())
+            {
+                Append_StringBuilder_Substring((OpenStringBuilder)testData[0]!, (OpenStringBuilder?)testData[1], (int)testData[2]!, (int)testData[3]!, (string)testData[4]!);
+            }
+        }
+
+        public static void Append_StringBuilder_Substring(OpenStringBuilder s1, OpenStringBuilder? s2, int startIndex, int count, string s)
         {
             Assert.Equal(s, s1.Append(s2, startIndex, count).ToString());
         }
 
         [Fact]
-        public static void Append_StringBuilder_InvalidInput()
+        public void Append_StringBuilder_InvalidInput()
         {
-            OpenStringBuilder sb = new OpenStringBuilder(5, 5).Append("Hello");
+            OpenStringBuilder sb = OpenStringBuilderFactory(5, 5).Append("Hello");
 
             Assert.Throws<ArgumentOutOfRangeException>(() => sb.Append(sb, -1, 0));
             Assert.Throws<ArgumentOutOfRangeException>(() => sb.Append(sb, 0, -1));
             Assert.Throws<ArgumentOutOfRangeException>(() => sb.Append(sb, 4, 5));
 
-            Assert.Throws<ArgumentNullException>(() => sb.Append((OpenStringBuilder)null, 2, 2));
-            Assert.Throws<ArgumentNullException>(() => sb.Append((OpenStringBuilder)null, 2, 3));
-            Assert.Throws<ArgumentOutOfRangeException>(() => new OpenStringBuilder(3, 6).Append("Hello").Append(sb));
-            Assert.Throws<ArgumentOutOfRangeException>(() => new OpenStringBuilder(3, 6).Append("Hello").Append("Hello"));
+            Assert.Throws<ArgumentNullException>(() => sb.Append((OpenStringBuilder?)null, 2, 2));
+            Assert.Throws<ArgumentNullException>(() => sb.Append((OpenStringBuilder?)null, 2, 3));
+            Assert.Throws<ArgumentOutOfRangeException>(() => OpenStringBuilderFactory(3, 6).Append("Hello").Append(sb));
+            Assert.Throws<ArgumentOutOfRangeException>(() => OpenStringBuilderFactory(3, 6).Append("Hello").Append("Hello"));
 
             Assert.Throws<ArgumentOutOfRangeException>(() => sb.Append(sb));
         }
 
-        public static IEnumerable<object[]> Equals_String_TestData()
+        public IEnumerable<object[]> Equals_String_TestData()
         {
             string mediumString = new string('a', 30);
             string largeString = new string('a', 1000);
             string extraLargeString = new string('a', 41000); // 8000 is the maximum chunk size
 
-            var sb1 = new OpenStringBuilder("Hello");
-            var sb2 = new OpenStringBuilder(20).Append(mediumString);
-            var sb3 = new OpenStringBuilder(20).Append(largeString);
-            var sb4 = new OpenStringBuilder(20).Append(extraLargeString);
+            var sb1 = OpenStringBuilderFactory("Hello");
+            var sb2 = OpenStringBuilderFactory(20).Append(mediumString);
+            var sb3 = OpenStringBuilderFactory(20).Append(largeString);
+            var sb4 = OpenStringBuilderFactory(20).Append(extraLargeString);
 
             yield return new object[] { sb1, "Hello", true };
             yield return new object[] { sb1, "Hel", false };
             yield return new object[] { sb1, "Hellz", false };
             yield return new object[] { sb1, "Helloz", false };
             yield return new object[] { sb1, "", false };
-            yield return new object[] { new OpenStringBuilder(), "", true };
-            yield return new object[] { new OpenStringBuilder(), "Hello", false };
+            yield return new object[] { OpenStringBuilderFactory(), "", true };
+            yield return new object[] { OpenStringBuilderFactory(), "Hello", false };
             yield return new object[] { sb2, mediumString, true };
             yield return new object[] { sb2, "H", false };
             yield return new object[] { sb3, largeString, true };
@@ -2443,21 +2653,28 @@ namespace J2N.Text.Tests
             yield return new object[] { sb4, "H", false };
         }
 
-        [Theory]
-        [MemberData(nameof(Equals_String_TestData))]
+        [Fact]
+        public void Test_Equals_String()
+        {
+            foreach (var testData in Equals_String_TestData())
+            {
+                Equals_String((OpenStringBuilder)testData[0]!, (string)testData[1]!, (bool)testData[2]!);
+            }
+        }
+
         public static void Equals_String(OpenStringBuilder sb1, string value, bool expected)
         {
             Assert.Equal(expected, sb1.Equals(value.AsSpan()));
         }
 
         [Fact]
-        public static void ForEach()
+        public void ForEach()
         {
             // Test on a variety of lengths, at least up to the point of 9 8K chunks = 72K because this is where
             // we start using a different technique for creating the ChunkEnumerator.   200 * 500 = 100K which hits this.
             for (int i = 0; i < 200; i++)
             {
-                OpenStringBuilder inBuilder = new OpenStringBuilder();
+                OpenStringBuilder inBuilder = OpenStringBuilderFactory();
                 for (int j = 0; j < i; j++)
                 {
                     // Make some unique strings that are at least 500 bytes long.
@@ -2480,9 +2697,9 @@ namespace J2N.Text.Tests
         }
 
         [Fact] // J2N specific
-        public static void Equals_StringBuilder_IgnoresCapacity()
+        public void Equals_StringBuilder_IgnoresCapacity()
         {
-            var sb1 = new OpenStringBuilder(5);
+            var sb1 = OpenStringBuilderFactory(5);
             var sb2 = new StringBuilder(10);
 
             Assert.True(sb1.Equals(sb2));
@@ -2494,10 +2711,10 @@ namespace J2N.Text.Tests
         }
 
         [Fact]
-        public static void Equals_OpenStringBuilder_IgnoresCapacity()
+        public void Equals_OpenStringBuilder_IgnoresCapacity()
         {
-            var sb1 = new OpenStringBuilder(5);
-            var sb2 = new OpenStringBuilder(10);
+            var sb1 = OpenStringBuilderFactory(5);
+            var sb2 = OpenStringBuilderFactory(10);
 
             Assert.True(sb1.Equals(sb2));
 
@@ -2508,9 +2725,9 @@ namespace J2N.Text.Tests
         }
 
         [Fact] // J2N specific
-        public static void Equals_StringBuilder_IgnoresMaxCapacity()
+        public void Equals_StringBuilder_IgnoresMaxCapacity()
         {
-            var sb1 = new OpenStringBuilder(5, 5);
+            var sb1 = OpenStringBuilderFactory(5, 5);
             var sb2 = new StringBuilder(5, 10);
 
             Assert.True(sb1.Equals(sb2));
@@ -2522,10 +2739,10 @@ namespace J2N.Text.Tests
         }
 
         [Fact]
-        public static void Equals_OpenStringBuilder_IgnoresMaxCapacity()
+        public void Equals_OpenStringBuilder_IgnoresMaxCapacity()
         {
-            var sb1 = new OpenStringBuilder(5, 5);
-            var sb2 = new OpenStringBuilder(5, 10);
+            var sb1 = OpenStringBuilderFactory(5, 5);
+            var sb2 = OpenStringBuilderFactory(5, 10);
 
             Assert.True(sb1.Equals(sb2));
 
@@ -2536,9 +2753,9 @@ namespace J2N.Text.Tests
         }
 
         [Fact] // J2N specific
-        public static void Equals_StringBuilder_MultipleChunks()
+        public void Equals_StringBuilder_MultipleChunks()
         {
-            var sb1 = new OpenStringBuilder(5);
+            var sb1 = OpenStringBuilderFactory(5);
             var sb2 = new StringBuilder(5);
 
             Assert.True(sb1.Equals(sb2));
@@ -2558,13 +2775,13 @@ namespace J2N.Text.Tests
         // J2N TODO: Finish
         //[ActiveIssue("https://github.com/dotnet/runtime/issues/40625")] // Hangs expanding the SB
         //[ConditionalFact(typeof(RemoteExecutor), nameof(RemoteExecutor.IsSupported))]
-        //public static unsafe void FailureOnLargeString()
+        //public unsafe void FailureOnLargeString()
         //{
         //    RemoteExecutor.Invoke(() => // Uses lots of memory
         //    {
         //        AssertExtensions.ThrowsAny<ArgumentOutOfRangeException, OutOfMemoryException>(() =>
         //        {
-        //            OpenStringBuilder sb = new OpenStringBuilder();
+        //            OpenStringBuilder sb = OpenStringBuilderFactory();
         //            sb.Append(new char[2_000_000_000]);
         //            sb.Length--;
         //            string s = new string('x', 500_000_000);
@@ -2575,10 +2792,10 @@ namespace J2N.Text.Tests
 
 
         [Fact] // J2N specific - copied over from ValueStringBuilder
-        public static void AppendSpan_DataAppendedCorrectly()
+        public void AppendSpan_DataAppendedCorrectly()
         {
             var sb = new StringBuilder();
-            var osb = new OpenStringBuilder();
+            var osb = OpenStringBuilderFactory();
 
             for (int i = 1; i <= 1000; i++)
             {
@@ -2597,9 +2814,9 @@ namespace J2N.Text.Tests
         }
 
         [Fact] // J2N specific
-        public static void AppendSpan_ZerosBuffer()
+        public void AppendSpan_ZerosBuffer()
         {
-            var builder = new OpenStringBuilder();
+            var builder = OpenStringBuilderFactory();
             builder.Append("Hello");
             builder.Length = 0;
 
@@ -2608,9 +2825,9 @@ namespace J2N.Text.Tests
         }
 
         [Fact] // J2N specific
-        public static void AppendSpan_Invalid()
+        public void AppendSpan_Invalid()
         {
-            var builder = new OpenStringBuilder(0, 5);
+            var builder = OpenStringBuilderFactory(0, 5);
             builder.Append("Hello");
 
             AssertExtensions.Throws<ArgumentOutOfRangeException>("length", () => builder.AppendSpan(-1)); // length < 0
