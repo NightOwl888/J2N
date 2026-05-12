@@ -178,11 +178,10 @@ namespace J2N.Text
             }
 
             m_MaxCapacity = int.MaxValue;
-            if (capacity == 0)
-            {
-                capacity = length + DefaultCapacity;
-            }
-            capacity = Math.Max(capacity, length + DefaultCapacity);
+
+            int minimumCapacity = length + DefaultCapacity;
+            if (capacity < minimumCapacity)
+                capacity = minimumCapacity;
 
             // J2N: We assume that subclasses will not expose or call this constructor if they want
             // full control over how the buffer is allocated.
@@ -287,11 +286,11 @@ namespace J2N.Text
 
             int length = value.Length;
             m_MaxCapacity = int.MaxValue;
-            if (capacity == 0)
-            {
-                capacity = length + DefaultCapacity;
-            }
-            capacity = Math.Max(capacity, length + DefaultCapacity);
+
+            int minimumCapacity = length + DefaultCapacity;
+            if (capacity < minimumCapacity)
+                capacity = minimumCapacity;
+
 
             // J2N: We assume that subclasses will not expose or call this method if they want
             // full control over how the buffer is allocated.
@@ -329,12 +328,14 @@ namespace J2N.Text
             }
 
             int length = value.Length;
+            int capacity = length + DefaultCapacity;
+
             // J2N: We assume that subclasses will not expose or call this constructor if they want
             // full control over how the buffer is allocated.
 #if FEATURE_GC_ALLOCATEUNINITIALIZEDARRAY
-            m_Chars = GC.AllocateUninitializedArray<char>(value.Capacity); // J2N NOTE: If we decide to expose the actual array, we must use new char[] here.
+            m_Chars = GC.AllocateUninitializedArray<char>(capacity); // J2N NOTE: If we decide to expose the actual array, we must use new char[] here.
 #else
-            m_Chars = new char[value.Capacity];
+            m_Chars = new char[capacity];
 #endif
             value.CopyTo(0, m_Chars, 0, length);
             m_Position = length;
@@ -403,6 +404,10 @@ namespace J2N.Text
             {
                 ThrowHelper.ThrowArgumentOutOfRange_IndexLengthString(startIndex, length);
             }
+
+            int minimumCapacity = length + DefaultCapacity;
+            if (capacity < minimumCapacity)
+                capacity = minimumCapacity;
 
             // J2N: We assume that subclasses will not expose or call this constructor if they want
             // full control over how the buffer is allocated.
@@ -680,13 +685,12 @@ namespace J2N.Text
             if (capacity < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(capacity, ExceptionArgument.capacity);
 
-            int currentCapacity = Capacity;
-            if (currentCapacity < capacity)
+            if (capacity > m_Chars.Length)
             {
-                int twice = (currentCapacity << 1) + 2;
-                Capacity = twice > capacity ? twice : capacity;
+                ReplaceBuffer(CalculateNewArrayLength(capacity - m_Position));
             }
-            return Capacity;
+
+            return m_Chars.Length;
         }
 
         /// <summary>
@@ -5796,12 +5800,14 @@ namespace J2N.Text
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private int CalculateNewArrayLength(int additionalCapacityBeyondPos)
         {
-            // Increase to at least the required size (m_Position + additionalCapacityBeyondPos), but try
-            // to double the size if possible, bounding the doubling to not go beyond the max array length.
-            int newCapacity = (int)Math.Max(
-                (uint)(m_Position + additionalCapacityBeyondPos),
-                Math.Min((uint)m_Chars.Length * 2, Arrays.MaxArrayLength));
-            return newCapacity;
+            // J2N: Changed growth calculation to more closely parallel the JDK.
+            uint minimum = (uint)(m_Position + additionalCapacityBeyondPos);
+
+            uint preferred = Math.Min(
+                ((uint)m_Chars.Length * 2) + 2,
+                (uint)Arrays.MaxArrayLength);
+
+            return (int)Math.Max(minimum, preferred);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
