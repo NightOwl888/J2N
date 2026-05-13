@@ -3243,7 +3243,7 @@ namespace J2N.Text
         /// <para/>
         /// -or-
         /// <para/>
-        /// <paramref name="startIndex"/> plus <paramref name="charCount"/> is not a position within paramref name="value"/>.
+        /// <paramref name="startIndex"/> plus <paramref name="charCount"/> is not a position within <paramref name="value"/>.
         /// <para/>
         /// -or-
         /// <para/>
@@ -3288,6 +3288,75 @@ namespace J2N.Text
             if (charCount > 0)
             {
                 Insert(index, ref value[startIndex], charCount);
+            }
+            return this;
+        }
+
+        /// <summary>
+        /// Inserts the string representation of a specified string
+        /// into this instance at the specified character position.
+        /// </summary>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">A character array.</param>
+        /// <param name="startIndex">The starting index within <paramref name="value"/>.</param>
+        /// <param name="count">The number of characters to insert.</param>
+        /// <returns>A reference to this instance after the insert operation has completed.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="value"/> is <c>null</c>, and <paramref name="startIndex"/>
+        /// and <paramref name="count"/> are not zero.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="index"/>, <paramref name="startIndex"/>, or <paramref name="count"/> is less than zero.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="index"/> is greater than the length of this instance.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="startIndex"/> plus <paramref name="count"/> is not a position within <paramref name="value"/>.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.
+        /// </exception>
+        /// <remarks>
+        /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
+        /// </remarks>
+        /// <seealso cref="char"/>
+        public OpenStringBuilder Insert(int index, string? value, int startIndex, int count) // J2N: Added to cover the JDK better (rather than ICharSequence only)
+        {
+            int currentLength = Length;
+            if ((uint)index > (uint)currentLength)
+            {
+                ThrowHelper.ThrowArgumentOutOfRange_IndexMustBeLessOrEqualException(index);
+            }
+
+            if (value == null)
+            {
+                if (startIndex == 0 && count == 0)
+                {
+                    return this;
+                }
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.value);
+            }
+
+            if (startIndex < 0)
+            {
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(startIndex, ExceptionArgument.startIndex);
+            }
+
+            if (count < 0)
+            {
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(count, ExceptionArgument.charCount);
+            }
+
+            if (startIndex > value.Length - count)
+            {
+                ThrowHelper.ThrowArgumentOutOfRange_IndexMustBeLessOrEqualException(startIndex, ExceptionArgument.startIndex);
+            }
+
+            if (count > 0)
+            {
+                Insert(index, ref MemoryMarshal.GetReference(value.AsSpan(startIndex)), count);
             }
             return this;
         }
