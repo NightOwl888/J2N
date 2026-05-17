@@ -30,8 +30,8 @@ namespace J2N.Text
     ///         block of <see cref="char"/>s.
     ///     </description></item>
     ///     <item><description>
-    ///         Memory is directly accessible using <see cref="MemoryExtensions.AsSpan(MutableTextBuffer)"/> and
-    ///         <see cref="MemoryExtensions.AsMemory(MutableTextBuffer)"/> overloads including the ability to slice.
+    ///         Memory is directly accessible using <see cref="TextMemoryExtensions.AsSpan(MutableTextBuffer)"/> and
+    ///         <see cref="TextMemoryExtensions.AsMemory(MutableTextBuffer)"/> overloads including the ability to slice.
     ///         So, there is no need to allocate memory to call methods that require System.Memory types, such as
     ///         <see cref="ReadOnlySpan{T}"/>.
     ///     </description></item>
@@ -508,8 +508,8 @@ namespace J2N.Text
         /// Ownership of <paramref name="initialBuffer"/> is transferred to the new instance. The
         /// caller must not use or modify the array after passing it to this constructor. To read
         /// the raw characters of the underlying <see cref="MutableTextBuffer"/>, call one of the
-        /// <see cref="MemoryExtensions.AsSpan(MutableTextBuffer)"/> or
-        /// <see cref="MemoryExtensions.AsMemory(MutableTextBuffer)"/> overloads.
+        /// <see cref="TextMemoryExtensions.AsSpan(MutableTextBuffer)"/> or
+        /// <see cref="TextMemoryExtensions.AsMemory(MutableTextBuffer)"/> overloads.
         /// </remarks>
         protected MutableTextBuffer(char[] initialBuffer) : this(initialBuffer, initialLength: 0) { }
 
@@ -539,8 +539,8 @@ namespace J2N.Text
         /// Ownership of <paramref name="initialBuffer"/> is transferred to the new instance. The
         /// caller must not use or modify the array after passing it to this constructor. To read
         /// the raw characters of the underlying <see cref="MutableTextBuffer"/>, call one of the
-        /// <see cref="MemoryExtensions.AsSpan(MutableTextBuffer)"/> or
-        /// <see cref="MemoryExtensions.AsMemory(MutableTextBuffer)"/> overloads.
+        /// <see cref="TextMemoryExtensions.AsSpan(MutableTextBuffer)"/> or
+        /// <see cref="TextMemoryExtensions.AsMemory(MutableTextBuffer)"/> overloads.
         /// </remarks>
         protected MutableTextBuffer(char[] initialBuffer, int initialLength)
         {
@@ -705,7 +705,7 @@ namespace J2N.Text
         /// <returns>A string whose value is the same as this instance.</returns>
         /// <remarks>
         /// This method causes a heap allocation. As an allocation-free alternative,
-        /// you may call the <see cref="MemoryExtensions.AsSpan(MutableTextBuffer)"/> method
+        /// you may call the <see cref="TextMemoryExtensions.AsSpan(MutableTextBuffer)"/> method
         /// to get a <see cref="ReadOnlySpan{T}"/> representing the characters of this
         /// <see cref="MutableTextBuffer"/> instance.
         /// <para/>
@@ -736,7 +736,7 @@ namespace J2N.Text
         /// <see cref="Length"/>.</exception>
         /// <remarks>
         /// This method causes a heap allocation. As an allocation-free alternative,
-        /// you may call the <see cref="MemoryExtensions.AsSpan(MutableTextBuffer, int)"/> method
+        /// you may call the <see cref="TextMemoryExtensions.AsSpan(MutableTextBuffer, int)"/> method
         /// to get a <see cref="ReadOnlySpan{T}"/> representing the characters of the substring of this
         /// <see cref="MutableTextBuffer"/> instance.
         /// <para/>
@@ -770,7 +770,7 @@ namespace J2N.Text
         /// </exception>
         /// <remarks>
         /// This method causes a heap allocation. As an allocation-free alternative,
-        /// you may call the <see cref="MemoryExtensions.AsSpan(MutableTextBuffer, int, int)"/> method
+        /// you may call the <see cref="TextMemoryExtensions.AsSpan(MutableTextBuffer, int, int)"/> method
         /// to get a <see cref="ReadOnlySpan{T}"/> representing the characters of the substring of this
         /// <see cref="MutableTextBuffer"/> instance.
         /// <para/>
@@ -944,8 +944,8 @@ namespace J2N.Text
         /// <returns>An enumerator for the chunks in the <see cref="ReadOnlyMemory{Char}"/>.</returns>
         /// <remarks>This API is for compatibility with <c>StringBuilder.GetChuncks()</c> method.
         /// <see cref="MutableTextBuffer"/> will never have more than a single chunk of memory so it is generally more efficient
-        /// to use <see cref="MemoryExtensions.AsSpan(MutableTextBuffer)"/> or
-        /// <see cref="MemoryExtensions.AsMemory(MutableTextBuffer)"/> when you need to access the underlying memory.</remarks>
+        /// to use <see cref="TextMemoryExtensions.AsSpan(MutableTextBuffer)"/> or
+        /// <see cref="TextMemoryExtensions.AsMemory(MutableTextBuffer)"/> when you need to access the underlying memory.</remarks>
         public ChunkEnumerator GetChunks() => new ChunkEnumerator(this);
 
 
@@ -1644,7 +1644,7 @@ namespace J2N.Text
         /// fixed size, preallocated, reusable, and possibly globally accessible.
         /// <para/>
         /// To access the characters for processing without allocating any heap memory, better alternatives are to use
-        /// <see cref="this[int]"/>, <see cref="MemoryExtensions.AsSpan(MutableTextBuffer, int, int)"/> or <see cref="CopyTo(int, Span{char}, int)"/>.
+        /// <see cref="this[int]"/>, <see cref="TextMemoryExtensions.AsSpan(MutableTextBuffer, int, int)"/> or <see cref="CopyTo(int, Span{char}, int)"/>.
         /// </remarks>
         public void CopyTo(int sourceIndex, char[] destination, int destinationIndex, int count)
         {
@@ -1688,7 +1688,7 @@ namespace J2N.Text
         /// when you need to efficiently copy successive sections of a <see cref="MutableTextBuffer"/> object to a span.
         /// <para/>
         /// To access the characters for processing without alocating any heap memory, better alternatives are to use
-        /// <see cref="this[int]"/> or <see cref="MemoryExtensions.AsSpan(MutableTextBuffer, int, int)"/>.
+        /// <see cref="this[int]"/> or <see cref="TextMemoryExtensions.AsSpan(MutableTextBuffer, int, int)"/>.
         /// </remarks>
         public void CopyTo(int sourceIndex, Span<char> destination, int count)
         {
