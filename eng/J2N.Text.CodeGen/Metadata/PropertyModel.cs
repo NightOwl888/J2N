@@ -12,7 +12,6 @@
 
         public bool IsIndexer { get; init; }
 
-        public List<ParameterModel> IndexParameters { get; init; }
-            = new List<ParameterModel>();
+        public List<ParameterModel> IndexParameters { get; init; } = new();
     }
 }

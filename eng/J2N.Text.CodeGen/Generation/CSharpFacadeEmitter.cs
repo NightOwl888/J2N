@@ -30,7 +30,7 @@ namespace J2N.Text.CodeGen.Generation
 
             foreach (PropertyModel property in model.Properties)
             {
-                EmitProperty(sb, property, model.Name, backingFieldName);
+                EmitProperty(sb, property, backingFieldName);
             }
 
             sb.AppendLine("    }");
@@ -63,7 +63,7 @@ namespace J2N.Text.CodeGen.Generation
             sb.AppendLine($"        public {returnType} {method.Name}({parameterList})");
             sb.AppendLine("        {");
 
-            if (method.ReturnsSelf)
+            if (method.IsBuilderMethod && method.ReturnsSelf)
             {
                 sb.AppendLine($"            {backingFieldName}.{method.Name}({argumentList});");
                 sb.AppendLine("            return this;");
@@ -84,38 +84,48 @@ namespace J2N.Text.CodeGen.Generation
         private static void EmitProperty(
             StringBuilder sb,
             PropertyModel property,
-            string facadeName,
             string backingFieldName)
         {
-            string type = property.TypeName;
+            if (!property.IsIndexer)
+            {
+                sb.AppendLine($"        public {property.TypeName} {property.Name}");
+                sb.AppendLine("        {");
 
-            sb.AppendLine($"        public {type} {property.Name}");
+                if (property.HasGetter)
+                {
+                    sb.AppendLine($"            get => {backingFieldName}.{property.Name};");
+                }
+
+                if (property.HasSetter)
+                {
+                    sb.AppendLine($"            set => {backingFieldName}.{property.Name} = value;");
+                }
+
+                sb.AppendLine("        }");
+                sb.AppendLine();
+                return;
+            }
+
+            // Indexer
+            string indexParams =
+                string.Join(", ",
+                    property.IndexParameters.Select(p => $"{p.TypeName} {p.Name}"));
+
+            string args =
+                string.Join(", ",
+                    property.IndexParameters.Select(p => p.Name));
+
+            sb.AppendLine($"        public {property.TypeName} this[{indexParams}]");
             sb.AppendLine("        {");
 
             if (property.HasGetter)
             {
-                if (property.IsIndexer)
-                {
-                    string args = string.Join(", ", property.IndexParameters.Select(p => p.Name));
-                    sb.AppendLine($"            get => {backingFieldName}[{args}];");
-                }
-                else
-                {
-                    sb.AppendLine($"            get => {backingFieldName}.{property.Name};");
-                }
+                sb.AppendLine($"            get => {backingFieldName}[{args}];");
             }
 
             if (property.HasSetter)
             {
-                if (property.IsIndexer)
-                {
-                    string args = string.Join(", ", property.IndexParameters.Select(p => p.Name));
-                    sb.AppendLine($"            set => {backingFieldName}[{args}] = value;");
-                }
-                else
-                {
-                    sb.AppendLine($"            set => {backingFieldName}.{property.Name} = value;");
-                }
+                sb.AppendLine($"            set => {backingFieldName}[{args}] = value;");
             }
 
             sb.AppendLine("        }");
