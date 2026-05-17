@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="Metadata\" />
+    <Folder Include="Generation\" />
+    <Folder Include="Documentation\" />
+    <Folder Include="Transforms\" />
+    <Folder Include="Validation\" />
+  </ItemGroup>
+
+</Project>
