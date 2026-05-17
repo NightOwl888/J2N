@@ -7,5 +7,7 @@
         public required string Name { get; init; }
 
         public required List<MethodModel> Methods { get; init; }
+
+        public required List<PropertyModel> Properties { get; init; }
     }
 }

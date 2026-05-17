@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Linq;
+using System.Text;
 using J2N.Text.CodeGen.Metadata;
 
 namespace J2N.Text.CodeGen.Generation
@@ -26,6 +27,11 @@ namespace J2N.Text.CodeGen.Generation
             foreach (MethodModel method in model.Methods)
             {
                 EmitMethod(sb, method, facadeName, backingFieldName);
+            }
+
+            foreach (PropertyModel property in model.Properties)
+            {
+                EmitProperty(sb, property, backingFieldName);
             }
 
             sb.AppendLine("    }");
@@ -73,6 +79,59 @@ namespace J2N.Text.CodeGen.Generation
             }
 
             sb.AppendLine("        }");
+            sb.AppendLine();
+        }
+
+        private static void EmitProperty(
+            StringBuilder sb,
+            PropertyModel property,
+            string backingFieldName)
+        {
+            if (property.IsIndexer)
+            {
+                string parameterList =
+                    string.Join(
+                        ", ",
+                        property.IndexParameters.Select(p => $"{p.TypeName} {p.Name}"));
+
+                string argumentList =
+                    string.Join(
+                        ", ",
+                        property.IndexParameters.Select(p => p.Name));
+
+                sb.AppendLine($"        public {property.TypeName} this[{parameterList}]");
+                sb.AppendLine("        {");
+
+                if (property.HasGetter)
+                {
+                    sb.AppendLine($"            get => {backingFieldName}[{argumentList}];");
+                }
+
+                if (property.HasSetter)
+                {
+                    sb.AppendLine($"            set => {backingFieldName}[{argumentList}] = value;");
+                }
+
+                sb.AppendLine("        }");
+            }
+            else
+            {
+                sb.AppendLine($"        public {property.TypeName} {property.Name}");
+                sb.AppendLine("        {");
+
+                if (property.HasGetter)
+                {
+                    sb.AppendLine($"            get => {backingFieldName}.{property.Name};");
+                }
+
+                if (property.HasSetter)
+                {
+                    sb.AppendLine($"            set => {backingFieldName}.{property.Name} = value;");
+                }
+
+                sb.AppendLine("        }");
+            }
+
             sb.AppendLine();
         }
     }

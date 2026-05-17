@@ -9,58 +9,92 @@
                 Types =
                 [
                     new TypeModel
-                {
-                    Namespace = "J2N.Text",
-                    Name = "MutableTextBuffer",
-                    Methods =
-                    [
-                        new MethodModel
-                        {
-                            Name = "Append",
-                            ReturnType = "MutableTextBuffer",
-                            ReturnsSelf = true,
-                            Parameters =
-                            [
-                                new ParameterModel
-                                {
-                                    TypeName = "string?",
-                                    Name = "value"
-                                }
-                            ]
-                        },
+                    {
+                        Namespace = "J2N.Text",
+                        Name = "MutableTextBuffer",
 
-                        new MethodModel
-                        {
-                            Name = "Clear",
-                            ReturnType = "void",
-                            ReturnsSelf = false,
-                            Parameters =
-                            [
-                            ]
-                        },
+                        Methods =
+                        [
+                            new MethodModel
+                            {
+                                Name = "Append",
+                                ReturnType = "MutableTextBuffer",
+                                ReturnsSelf = true,
 
-                        new MethodModel
-                        {
-                            Name = "Insert",
-                            ReturnType = "MutableTextBuffer",
-                            ReturnsSelf = true,
-                            Parameters =
-                            [
-                                new ParameterModel
-                                {
-                                    TypeName = "int",
-                                    Name = "index"
-                                },
+                                Parameters =
+                                [
+                                    new ParameterModel
+                                    {
+                                        TypeName = "string?",
+                                        Name = "value"
+                                    }
+                                ]
+                            },
 
-                                new ParameterModel
-                                {
-                                    TypeName = "string?",
-                                    Name = "value"
-                                }
-                            ]
-                        }
-                    ]
-                }
+                            new MethodModel
+                            {
+                                Name = "Clear",
+                                ReturnType = "void",
+                                ReturnsSelf = false,
+
+                                Parameters =
+                                [
+                                ]
+                            },
+
+                            new MethodModel
+                            {
+                                Name = "Insert",
+                                ReturnType = "MutableTextBuffer",
+                                ReturnsSelf = true,
+
+                                Parameters =
+                                [
+                                    new ParameterModel
+                                    {
+                                        TypeName = "int",
+                                        Name = "index"
+                                    },
+
+                                    new ParameterModel
+                                    {
+                                        TypeName = "string?",
+                                        Name = "value"
+                                    }
+                                ]
+                            }
+                        ],
+
+                        Properties =
+                        [
+                            new PropertyModel
+                            {
+                                Name = "Length",
+                                TypeName = "int",
+                                HasGetter = true,
+                                HasSetter = true,
+                                IsIndexer = false
+                            },
+
+                            new PropertyModel
+                            {
+                                Name = "Item",
+                                TypeName = "char",
+                                HasGetter = true,
+                                HasSetter = true,
+                                IsIndexer = true,
+
+                                IndexParameters =
+                                [
+                                    new ParameterModel
+                                    {
+                                        TypeName = "int",
+                                        Name = "index"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
                 ]
             };
         }

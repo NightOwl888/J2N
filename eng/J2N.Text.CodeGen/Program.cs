@@ -11,14 +11,14 @@ var emitter = new CSharpFacadeEmitter();
 string code =
     emitter.EmitFacade(
         mutableTextBuffer,
-        "Lucene.Net.Analysis.Common",
-        "OpenStringBuilder",
-        "_buffer");
+        "J2N.Text",
+        "TextBuilder",
+        "buffer");
 
 string outputPath =
     Path.Combine(
         AppContext.BaseDirectory,
-        "OpenStringBuilder.g.cs");
+        "TextBuilder.g.cs");
 
 File.WriteAllText(outputPath, code);
 
