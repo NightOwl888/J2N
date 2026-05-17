@@ -30,16 +30,16 @@ namespace J2N.Text.CodeGen.Generation
             sb.AppendLine($"    public partial class {model.Name}");
             sb.AppendLine("    {");
 
-            foreach (MethodModel method in model.Methods)
-            {
-                EmitDocumentation(sb, method.Documentation, method.Parameters);
-                EmitMethod(sb, method, model.Name, backingFieldName);
-            }
-
             foreach (PropertyModel property in model.Properties)
             {
                 EmitDocumentation(sb, property.Documentation, property.IndexParameters);
                 EmitProperty(sb, property, backingFieldName);
+            }
+
+            foreach (MethodModel method in model.Methods)
+            {
+                EmitDocumentation(sb, method.Documentation, method.Parameters);
+                EmitMethod(sb, method, model.Name, backingFieldName);
             }
 
             sb.AppendLine("    }");
