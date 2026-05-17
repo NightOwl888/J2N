@@ -13,7 +13,7 @@ namespace J2N.Text.Tests
     public static partial class ReadOnlySpanTests
     {
         [Fact]
-        public static void OpenStringBuilderAsSpanNullary()
+        public static void MutableTextBufferAsSpanNullary()
         {
             MutableTextBuffer s = new MutableTextBuffer("Hello");
             ReadOnlySpan<char> span = s.AsSpan();
@@ -22,7 +22,7 @@ namespace J2N.Text.Tests
         }
 
         [Fact]
-        public static void StringAsSpanEmptyString()
+        public static void MutableTextBufferAsSpanEmptyString()
         {
             MutableTextBuffer s = new MutableTextBuffer();
             ReadOnlySpan<char> span = s.AsSpan();
@@ -30,7 +30,7 @@ namespace J2N.Text.Tests
         }
 
         [Fact]
-        public static void StringAsSpanNullChecked()
+        public static void MutableTextBufferAsSpanNullChecked()
         {
 #pragma warning disable CA2265 // Do not compare Span<T> to null or default
             MutableTextBuffer s = null;
@@ -49,7 +49,7 @@ namespace J2N.Text.Tests
         }
 
         [Fact]
-        public static void StringAsSpanNullNonZeroStartAndLength()
+        public static void MutableTextBufferAsSpanNullNonZeroStartAndLength()
         {
             MutableTextBuffer str = null;
 
