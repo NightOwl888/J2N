@@ -2711,7 +2711,7 @@ namespace J2N.Text.Tests
         }
 
         [Fact]
-        public void Equals_OpenStringBuilder_IgnoresCapacity()
+        public void Equals_MutableTextBuffer_IgnoresCapacity()
         {
             var sb1 = MutableTextBufferFactory(5);
             var sb2 = MutableTextBufferFactory(10);
@@ -2739,7 +2739,7 @@ namespace J2N.Text.Tests
         }
 
         [Fact]
-        public void Equals_OpenStringBuilder_IgnoresMaxCapacity()
+        public void Equals_MutableTextBuffer_IgnoresMaxCapacity()
         {
             var sb1 = MutableTextBufferFactory(5, 5);
             var sb2 = MutableTextBufferFactory(5, 10);
