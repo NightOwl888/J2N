@@ -245,9 +245,9 @@ namespace J2N.Text.CodeGen.Roslyn
 
             return new DocumentationModel
             {
-                Summary = Normalize(root.Element("summary")?.Value),
-                Remarks = Normalize(root.Element("remarks")?.Value),
-                Returns = Normalize(root.Element("returns")?.Value)
+                Summary = ExtractElementInnerXml(root, "summary"),
+                Remarks = ExtractElementInnerXml(root, "remarks"),
+                Returns = ExtractElementInnerXml(root, "returns")
             };
         }
 
@@ -286,18 +286,37 @@ namespace J2N.Text.CodeGen.Roslyn
                     .FirstOrDefault(x =>
                         x.Attribute("name")?.Value == paramName);
 
-            return Normalize(param?.Value);
+            //return Normalize(param?.Value);
+
+            return param is null
+                ? null
+                : NormalizeXml(param.Nodes());
         }
 
-        private static string? Normalize(string? text)
+        private static string? ExtractElementInnerXml(
+            XElement root,
+            string elementName)
         {
-            if (string.IsNullOrWhiteSpace(text))
+            XElement? element = root.Element(elementName);
+
+            if (element is null)
                 return null;
+
+            return NormalizeXml(element.Nodes());
+        }
+
+        private static string NormalizeXml(IEnumerable<XNode> nodes)
+        {
+            string raw =
+                string.Concat(nodes.Select(n => n.ToString()));
+
+            string[] lines =
+                raw.Replace("\r\n", "\n")
+                    .Split('\n');
 
             return string.Join(
                 Environment.NewLine,
-                text.Split('\n')
-                    .Select(x => x.Trim()));
+                lines.Select(l => l.TrimEnd()));
         }
 
         private static bool IsUnsafeType(string typeName)

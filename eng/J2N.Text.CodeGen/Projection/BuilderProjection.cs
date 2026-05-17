@@ -69,6 +69,8 @@ namespace J2N.Text.CodeGen.Projection
                 Attributes = method.Attributes
                     .Select(CloneAttribute)
                     .ToList(),
+
+                Documentation = method.Documentation,
             };
         }
 
@@ -96,6 +98,8 @@ namespace J2N.Text.CodeGen.Projection
                 Attributes = property.Attributes
                     .Select(CloneAttribute)
                     .ToList(),
+
+                Documentation = property.Documentation,
             };
         }
 
