@@ -28,7 +28,7 @@ namespace J2N.Text.Tests
     /// while another may use a buffer that is allocated from an array pool. The tests in this class are designed to ensure that all
     /// implementations behave correctly and consistently with the BCL.
     /// </remarks>
-    public abstract partial class Abstract_OpenStringBuilder_Tests
+    public abstract partial class StringBuilder_Tests
     {
         private static readonly string s_noCapacityParamName = "valueCount";
 

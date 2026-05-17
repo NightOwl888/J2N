@@ -4,7 +4,7 @@ using System.Text;
 
 namespace J2N.Text.Tests
 {
-    public partial class OpenStringBuilder_Tests : Abstract_OpenStringBuilder_Tests
+    public partial class OpenStringBuilder_Tests : StringBuilder_Tests
     {
         protected override MutableTextBuffer OpenStringBuilderFactory()
             => new MutableTextBuffer();

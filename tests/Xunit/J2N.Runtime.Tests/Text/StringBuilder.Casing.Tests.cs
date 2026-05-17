@@ -23,7 +23,7 @@ using Xunit;
 
 namespace J2N.Text.Tests
 {
-    public abstract partial class Abstract_OpenStringBuilder_Tests
+    public abstract partial class StringBuilder_Tests
     {
         // ------------------------------
         // AppendLower()
