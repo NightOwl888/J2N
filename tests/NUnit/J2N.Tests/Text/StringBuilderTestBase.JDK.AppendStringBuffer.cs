@@ -33,7 +33,7 @@ using System;
 
 namespace J2N.Text
 {
-    public abstract partial class OpenStringBuilderTestBase
+    public abstract partial class StringBuilderTestBase
     {
         private static Randomizer generator = new Randomizer();
 

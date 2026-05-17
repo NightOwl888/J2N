@@ -28,7 +28,7 @@ using System;
 
 namespace J2N.Text
 {
-    public abstract partial class OpenStringBuilderTestBase
+    public abstract partial class StringBuilderTestBase
     {
         private sealed class MyChars : ICharSequence
         {

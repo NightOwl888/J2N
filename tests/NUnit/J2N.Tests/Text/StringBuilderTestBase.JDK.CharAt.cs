@@ -37,7 +37,7 @@ using System.Collections.Generic;
 
 namespace J2N.Text
 {
-    public abstract partial class OpenStringBuilderTestBase
+    public abstract partial class StringBuilderTestBase
     {
         /**
          * StringBuilder/-Buffer.charAt throws:

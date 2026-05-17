@@ -35,7 +35,7 @@ using System.Collections.Generic;
 
 namespace J2N.Text
 {
-    public abstract partial class OpenStringBuilderTestBase
+    public abstract partial class StringBuilderTestBase
     {
         private const int DEFAULT_CAPACITY = 16;
 

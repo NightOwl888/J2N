@@ -22,7 +22,7 @@ using System.Text;
 
 namespace J2N.Text
 {
-    public abstract partial class OpenStringBuilderTestBase : TestCase
+    public abstract partial class StringBuilderTestBase : TestCase
     {
         #region MutableTextBuffer Helper Methods
 

@@ -26,7 +26,7 @@ using NUnit.Framework;
 
 namespace J2N.Text
 {
-    public abstract partial class OpenStringBuilderTestBase
+    public abstract partial class StringBuilderTestBase
     {
         [Test]
         public void Test_insertFalse()

@@ -37,7 +37,7 @@ namespace J2N.Text
     /// Port of OpenJDK Exceptions.java test.
     /// Adapted to NUnit idioms and .NET exception behavior.
     /// </summary>
-    public abstract partial class OpenStringBuilderTestBase
+    public abstract partial class StringBuilderTestBase
     {
         private static void Pass(string scenario)
         {

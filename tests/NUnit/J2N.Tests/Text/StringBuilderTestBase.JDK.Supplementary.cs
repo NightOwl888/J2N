@@ -35,7 +35,7 @@ namespace J2N.Text
      * @summary Unit tests for supplementary character support (JSR-204)
      */
 
-    public abstract partial class OpenStringBuilderTestBase
+    public abstract partial class StringBuilderTestBase
     {
         /* Text strings which are used as input data.
          * The comment above each text string means the index of each 16-bit char

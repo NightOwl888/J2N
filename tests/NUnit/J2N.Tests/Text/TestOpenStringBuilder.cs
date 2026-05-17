@@ -22,7 +22,7 @@ using System.Text;
 
 namespace J2N.Text
 {
-    public class TestOpenStringBuilder : OpenStringBuilderTestBase
+    public class TestOpenStringBuilder : StringBuilderTestBase
     {
         protected override MutableTextBuffer OpenStringBuilderFactory()
             => new MutableTextBuffer() { UseInvariantDefaults = true };

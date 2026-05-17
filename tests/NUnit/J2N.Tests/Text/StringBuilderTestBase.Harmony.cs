@@ -31,7 +31,7 @@ namespace J2N.Text
     /// <summary>
     /// Tests from Apache Harmony, StringBuilderTest.java
     /// </summary>
-    public abstract partial class OpenStringBuilderTestBase
+    public abstract partial class StringBuilderTestBase
     {
         /**
          * @tests java.lang.StringBuilder.StringBuilder()

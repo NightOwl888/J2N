@@ -35,7 +35,7 @@ using System.Collections.Generic;
 
 namespace J2N.Text
 {
-    public abstract partial class OpenStringBuilderTestBase
+    public abstract partial class StringBuilderTestBase
     {
         private const string A_STRING_BUFFER_VAL = "aStringBuffer";
         private const string A_STRING_BUILDER_VAL = "aStringBuilder";
