@@ -192,17 +192,7 @@ namespace J2N.Text.CodeGen.Generation
             if (docs is null && !parameters.Any())
                 return;
 
-            if (!string.IsNullOrWhiteSpace(docs?.Summary))
-            {
-                sb.AppendLine("        /// <summary>");
-
-                foreach (string line in docs.Summary.Split('\n'))
-                {
-                    sb.AppendLine($"        /// {line.Trim()}");
-                }
-
-                sb.AppendLine("        /// </summary>");
-            }
+            EmitXmlElement(sb, "summary", docs?.SummaryXml);
 
             foreach (ParameterModel parameter in parameters)
             {
@@ -213,23 +203,27 @@ namespace J2N.Text.CodeGen.Generation
                 }
             }
 
-            if (!string.IsNullOrWhiteSpace(docs?.Returns))
+            EmitXmlElement(sb, "returns", docs?.ReturnsXml);
+
+            EmitXmlElement(sb, "remarks", docs?.RemarksXml);
+        }
+
+        private static void EmitXmlElement(
+            StringBuilder sb,
+            string elementName,
+            string? content)
+        {
+            if (string.IsNullOrWhiteSpace(content))
+                return;
+
+            sb.AppendLine($"        /// <{elementName}>");
+
+            foreach (string line in content.Split('\n'))
             {
-                sb.AppendLine(
-                    $"        /// <returns>{docs.Returns}</returns>");
+                sb.AppendLine($"        /// {line.TrimEnd()}");
             }
 
-            if (!string.IsNullOrWhiteSpace(docs?.Remarks))
-            {
-                sb.AppendLine("        /// <remarks>");
-
-                foreach (string line in docs.Remarks.Split('\n'))
-                {
-                    sb.AppendLine($"        /// {line.Trim()}");
-                }
-
-                sb.AppendLine("        /// </remarks>");
-            }
+            sb.AppendLine($"        /// </{elementName}>");
         }
     }
 }

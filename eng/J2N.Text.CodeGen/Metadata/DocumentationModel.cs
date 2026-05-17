@@ -2,10 +2,10 @@
 {
     public sealed class DocumentationModel
     {
-        public string? Summary { get; init; }
+        public string? SummaryXml { get; init; }
 
-        public string? Remarks { get; init; }
+        public string? RemarksXml { get; init; }
 
-        public string? Returns { get; init; }
+        public string? ReturnsXml { get; init; }
     }
 }
