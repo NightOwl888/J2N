@@ -57,7 +57,9 @@ namespace J2N.Text.CodeGen.Projection
                             TypeName = RewriteType(
                                 p.TypeName,
                                 sourceType,
-                                facadeName)
+                                facadeName),
+
+                            Documentation = p.Documentation,
                         })
                         .ToList(),
 
@@ -91,7 +93,8 @@ namespace J2N.Text.CodeGen.Projection
                         .Select(p => new ParameterModel
                         {
                             Name = p.Name,
-                            TypeName = p.TypeName
+                            TypeName = p.TypeName,
+                            Documentation = p.Documentation,
                         })
                         .ToList(),
 
