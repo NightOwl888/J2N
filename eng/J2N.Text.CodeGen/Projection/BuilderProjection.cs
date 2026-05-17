@@ -61,6 +61,11 @@ namespace J2N.Text.CodeGen.Projection
                         })
                         .ToList(),
 
+                GenericParameters =
+                    method.GenericParameters
+                        .Select(CloneGenericParameter)
+                        .ToList(),
+
                 Attributes = method.Attributes
                     .Select(CloneAttribute)
                     .ToList(),
@@ -108,6 +113,15 @@ namespace J2N.Text.CodeGen.Projection
             {
                 Name = attribute.Name,
                 Arguments = attribute.Arguments.ToList()
+            };
+        }
+
+        private static GenericParameterModel CloneGenericParameter(GenericParameterModel parameter)
+        {
+            return new GenericParameterModel
+            {
+                Name = parameter.Name,
+                Constraints = parameter.Constraints.ToList()
             };
         }
     }

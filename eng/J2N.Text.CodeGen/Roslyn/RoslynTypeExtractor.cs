@@ -93,6 +93,7 @@ namespace J2N.Text.CodeGen.Roslyn
                     || parameters.Any(p => IsUnsafeType(p.TypeName)),
                 Documentation = ExtractDocumentation(method),
                 Parameters = parameters,
+                GenericParameters = ExtractGenericParameters(method),
                 Attributes = ExtractAttributes(method.AttributeLists),
             };
         }
@@ -174,6 +175,41 @@ namespace J2N.Text.CodeGen.Roslyn
 
                     result.Add(model);
                 }
+            }
+
+            return result;
+        }
+
+        private static List<GenericParameterModel> ExtractGenericParameters(MethodDeclarationSyntax method)
+        {
+            var result = new List<GenericParameterModel>();
+
+            if (method.TypeParameterList is null)
+            {
+                return result;
+            }
+
+            foreach (TypeParameterSyntax parameter in method.TypeParameterList.Parameters)
+            {
+                var model = new GenericParameterModel
+                {
+                    Name = parameter.Identifier.Text
+                };
+
+                foreach (TypeParameterConstraintClauseSyntax clause in method.ConstraintClauses)
+                {
+                    if (clause.Name.ToString() != model.Name)
+                    {
+                        continue;
+                    }
+
+                    foreach (TypeParameterConstraintSyntax constraint in clause.Constraints)
+                    {
+                        model.Constraints.Add(constraint.ToString());
+                    }
+                }
+
+                result.Add(model);
             }
 
             return result;

@@ -16,6 +16,8 @@
 
         public List<ParameterModel> Parameters { get; init; } = [];
 
+        public List<GenericParameterModel> GenericParameters { get; set; } = [];
+
         public List<AttributeModel> Attributes { get; init; } = [];
     }
 }

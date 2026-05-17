@@ -62,6 +62,11 @@ namespace J2N.Text.CodeGen.Generation
                     ", ",
                     method.Parameters.Select(p => $"{p.TypeName} {p.Name}"));
 
+            string genericParameterList =
+                method.GenericParameters.Count == 0
+                    ? ""
+                    : "<" + string.Join(", ", method.GenericParameters.Select(p => p.Name)) + ">";
+
             string argumentList =
                 string.Join(
                     ", ",
@@ -73,7 +78,19 @@ namespace J2N.Text.CodeGen.Generation
                     : method.ReturnType;
 
             string unsafeModifier = method.IsUnsafe ? " unsafe" : "";
-            sb.AppendLine($"        public{unsafeModifier} {returnType} {method.Name}({parameterList})");
+            sb.AppendLine($"        public{unsafeModifier} {returnType} {method.Name}{genericParameterList}({parameterList})");
+            foreach (GenericParameterModel parameter in method.GenericParameters)
+            {
+                if (parameter.Constraints.Count == 0)
+                {
+                    continue;
+                }
+
+                sb.Append("            where ");
+                sb.Append(parameter.Name);
+                sb.Append(" : ");
+                sb.AppendLine(string.Join(", ", parameter.Constraints));
+            }
             sb.AppendLine("        {");
 
             if (method.IsBuilderMethod && method.ReturnsSelf)
