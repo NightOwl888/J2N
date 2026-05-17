@@ -1,5 +1,4 @@
 ﻿using J2N.Text.CodeGen.Metadata;
-using System.ComponentModel.DataAnnotations;
 
 namespace J2N.Text.CodeGen.Projection
 {
@@ -19,12 +18,22 @@ namespace J2N.Text.CodeGen.Projection
 
             foreach (MethodModel method in source.Methods)
             {
-                projected.Methods.Add(ProjectMethod(method, source.SourceType, facadeName));
+                projected.Methods.Add(
+                    ProjectMethod(
+                        method,
+                        source,
+                        source.SourceType,
+                        facadeName));
             }
 
             foreach (PropertyModel property in source.Properties)
             {
-                projected.Properties.Add(ProjectProperty(property));
+                projected.Properties.Add(
+                    ProjectProperty(
+                        property,
+                        source,
+                        source.SourceType,
+                        facadeName));
             }
 
             return projected;
@@ -32,6 +41,7 @@ namespace J2N.Text.CodeGen.Projection
 
         private static MethodModel ProjectMethod(
             MethodModel method,
+            TypeModel source,
             string sourceType,
             string facadeName)
         {
@@ -39,10 +49,11 @@ namespace J2N.Text.CodeGen.Projection
             {
                 Name = method.Name,
 
-                ReturnType = RewriteType(
-                    method.ReturnType,
-                    sourceType: sourceType,
-                    facadeName),
+                ReturnType =
+                    RewriteType(
+                        method.ReturnType,
+                        sourceType,
+                        facadeName),
 
                 ReturnsSelf = method.ReturnsSelf,
                 IsBuilderMethod = method.IsBuilderMethod,
@@ -54,12 +65,17 @@ namespace J2N.Text.CodeGen.Projection
                         {
                             Name = p.Name,
 
-                            TypeName = RewriteType(
-                                p.TypeName,
-                                sourceType,
-                                facadeName),
+                            TypeName =
+                                RewriteType(
+                                    p.TypeName,
+                                    sourceType,
+                                    facadeName),
 
-                            Documentation = p.Documentation,
+                            Documentation =
+                                RewriteDocumentation(
+                                    p.Documentation,
+                                    source.Name,
+                                    facadeName)
                         })
                         .ToList(),
 
@@ -68,21 +84,53 @@ namespace J2N.Text.CodeGen.Projection
                         .Select(CloneGenericParameter)
                         .ToList(),
 
-                Attributes = method.Attributes
-                    .Select(CloneAttribute)
-                    .ToList(),
+                Attributes =
+                    method.Attributes
+                        .Select(CloneAttribute)
+                        .ToList(),
 
-                Documentation = method.Documentation,
+                Documentation =
+                    method.Documentation is null
+                        ? null
+                        : new DocumentationModel
+                        {
+                            SummaryXml =
+                                RewriteDocumentation(
+                                    method.Documentation.SummaryXml,
+                                    source.Name,
+                                    facadeName),
+
+                            RemarksXml =
+                                RewriteDocumentation(
+                                    method.Documentation.RemarksXml,
+                                    source.Name,
+                                    facadeName),
+
+                            ReturnsXml =
+                                RewriteDocumentation(
+                                    method.Documentation.ReturnsXml,
+                                    source.Name,
+                                    facadeName)
+                        },
             };
         }
 
         private static PropertyModel ProjectProperty(
-            PropertyModel property)
+            PropertyModel property,
+            TypeModel source,
+            string sourceType,
+            string facadeName)
         {
             return new PropertyModel
             {
                 Name = property.Name,
-                TypeName = property.TypeName,
+
+                TypeName =
+                    RewriteType(
+                        property.TypeName,
+                        sourceType,
+                        facadeName),
+
                 HasGetter = property.HasGetter,
                 HasSetter = property.HasSetter,
                 IsIndexer = property.IsIndexer,
@@ -93,16 +141,49 @@ namespace J2N.Text.CodeGen.Projection
                         .Select(p => new ParameterModel
                         {
                             Name = p.Name,
-                            TypeName = p.TypeName,
-                            Documentation = p.Documentation,
+
+                            TypeName =
+                                RewriteType(
+                                    p.TypeName,
+                                    sourceType,
+                                    facadeName),
+
+                            Documentation =
+                                RewriteDocumentation(
+                                    p.Documentation,
+                                    source.Name,
+                                    facadeName)
                         })
                         .ToList(),
 
-                Attributes = property.Attributes
-                    .Select(CloneAttribute)
-                    .ToList(),
+                Attributes =
+                    property.Attributes
+                        .Select(CloneAttribute)
+                        .ToList(),
 
-                Documentation = property.Documentation,
+                Documentation =
+                    property.Documentation is null
+                        ? null
+                        : new DocumentationModel
+                        {
+                            SummaryXml =
+                                RewriteDocumentation(
+                                    property.Documentation.SummaryXml,
+                                    source.Name,
+                                    facadeName),
+
+                            RemarksXml =
+                                RewriteDocumentation(
+                                    property.Documentation.RemarksXml,
+                                    source.Name,
+                                    facadeName),
+
+                            ReturnsXml =
+                                RewriteDocumentation(
+                                    property.Documentation.ReturnsXml,
+                                    source.Name,
+                                    facadeName)
+                        },
             };
         }
 
@@ -114,7 +195,19 @@ namespace J2N.Text.CodeGen.Projection
             return typeName.Replace(sourceType, facadeName);
         }
 
-        private static AttributeModel CloneAttribute(AttributeModel attribute)
+        private static string? RewriteDocumentation(
+            string? xml,
+            string sourceType,
+            string facadeType)
+        {
+            if (string.IsNullOrWhiteSpace(xml))
+                return xml;
+
+            return xml.Replace(sourceType, facadeType);
+        }
+
+        private static AttributeModel CloneAttribute(
+            AttributeModel attribute)
         {
             return new AttributeModel
             {
@@ -123,7 +216,8 @@ namespace J2N.Text.CodeGen.Projection
             };
         }
 
-        private static GenericParameterModel CloneGenericParameter(GenericParameterModel parameter)
+        private static GenericParameterModel CloneGenericParameter(
+            GenericParameterModel parameter)
         {
             return new GenericParameterModel
             {
