@@ -78,7 +78,9 @@ namespace J2N.Text.CodeGen.Generation
                     : method.ReturnType;
 
             string unsafeModifier = method.IsUnsafe ? " unsafe" : "";
-            sb.AppendLine($"        public{unsafeModifier} {returnType} {method.Name}{genericParameterList}({parameterList})");
+            string modifier = IsObjectMethod(method) ? " override" : "";
+
+            sb.AppendLine($"        public{modifier}{unsafeModifier} {returnType} {method.Name}{genericParameterList}({parameterList})");
             foreach (GenericParameterModel parameter in method.GenericParameters)
             {
                 if (parameter.Constraints.Count == 0)
@@ -237,6 +239,29 @@ namespace J2N.Text.CodeGen.Generation
             }
 
             sb.AppendLine($"        /// </{elementName}>");
+        }
+
+        private static bool IsObjectMethod(MethodModel method)
+        {
+            if (method.Name == "ToString"
+                && method.Parameters.Count == 0)
+            {
+                return true;
+            }
+
+            if (method.Name == "GetHashCode"
+                && method.Parameters.Count == 0)
+            {
+                return true;
+            }
+
+            if (method.Name == "Equals"
+                && method.Parameters.Count == 1 && (method.Parameters[0].TypeName == "object?" || method.Parameters[0].TypeName == "object"))
+            {
+                return true;
+            }
+
+            return false;
         }
     }
 }
