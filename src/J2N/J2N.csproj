@@ -95,7 +95,6 @@
     <InternalsVisibleTo Include="J2N.Collections.Generic.SortedDictionary.TreeSubSet.Tests" />
     <InternalsVisibleTo Include="J2N.Collections.Generic.SortedSet.Tests" />
     <InternalsVisibleTo Include="J2N.Collections.Generic.SortedSet.TreeSubSet.Tests"/>
-    <InternalsVisibleTo Include="J2N.Memory.Tests" />
     <InternalsVisibleTo Include="J2N.Runtime.Tests" />
   </ItemGroup>
 
