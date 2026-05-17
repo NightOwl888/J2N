@@ -4,6 +4,8 @@
     <ICU4NPackageReferenceVersion>60.1.0-alpha.354</ICU4NPackageReferenceVersion>
     <IndexRangePackageReferenceVersion>1.0.3</IndexRangePackageReferenceVersion>
     <MicrosoftBclMemoryPackageReferenceVersion>10.0.7</MicrosoftBclMemoryPackageReferenceVersion>
+    <MicrosoftCodeAnalysisCSharpPackageReferenceVersion>5.3.0</MicrosoftCodeAnalysisCSharpPackageReferenceVersion>
+    <MicrosoftCodeAnalysisCSharpWorkspacesPackageReferenceVersion>5.3.0</MicrosoftCodeAnalysisCSharpWorkspacesPackageReferenceVersion>
     <MicrosoftNETFrameworkReferenceAssembliesPackageReferenceVersion>1.0.3</MicrosoftNETFrameworkReferenceAssembliesPackageReferenceVersion>
     <MicrosoftNETTestSdkPackageReferenceVersion>17.11.0</MicrosoftNETTestSdkPackageReferenceVersion>
     <MicrosoftSourceLinkAzureReposGitPackageReferenceVersion>1.1.1</MicrosoftSourceLinkAzureReposGitPackageReferenceVersion>

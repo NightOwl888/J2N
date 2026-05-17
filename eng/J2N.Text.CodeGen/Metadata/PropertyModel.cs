@@ -12,6 +12,8 @@
 
         public bool IsIndexer { get; init; }
 
+        public DocumentationModel? Documentation { get; init; }
+
         public List<ParameterModel> IndexParameters { get; init; } = new();
     }
 }

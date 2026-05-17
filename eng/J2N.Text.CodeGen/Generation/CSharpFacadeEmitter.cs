@@ -25,11 +25,13 @@ namespace J2N.Text.CodeGen.Generation
 
             foreach (MethodModel method in model.Methods)
             {
+                EmitDocumentation(sb, method.Documentation, method.Parameters);
                 EmitMethod(sb, method, model.Name, backingFieldName);
             }
 
             foreach (PropertyModel property in model.Properties)
             {
+                EmitDocumentation(sb, property.Documentation, property.IndexParameters);
                 EmitProperty(sb, property, backingFieldName);
             }
 
@@ -130,6 +132,54 @@ namespace J2N.Text.CodeGen.Generation
 
             sb.AppendLine("        }");
             sb.AppendLine();
+        }
+
+        private static void EmitDocumentation(
+            StringBuilder sb,
+            DocumentationModel? docs,
+            IEnumerable<ParameterModel> parameters)
+        {
+            if (docs is null && !parameters.Any())
+                return;
+
+            if (!string.IsNullOrWhiteSpace(docs?.Summary))
+            {
+                sb.AppendLine("        /// <summary>");
+
+                foreach (string line in docs.Summary.Split('\n'))
+                {
+                    sb.AppendLine($"        /// {line.Trim()}");
+                }
+
+                sb.AppendLine("        /// </summary>");
+            }
+
+            foreach (ParameterModel parameter in parameters)
+            {
+                if (!string.IsNullOrWhiteSpace(parameter.Documentation))
+                {
+                    sb.AppendLine(
+                        $"        /// <param name=\"{parameter.Name}\">{parameter.Documentation}</param>");
+                }
+            }
+
+            if (!string.IsNullOrWhiteSpace(docs?.Returns))
+            {
+                sb.AppendLine(
+                    $"        /// <returns>{docs.Returns}</returns>");
+            }
+
+            if (!string.IsNullOrWhiteSpace(docs?.Remarks))
+            {
+                sb.AppendLine("        /// <remarks>");
+
+                foreach (string line in docs.Remarks.Split('\n'))
+                {
+                    sb.AppendLine($"        /// {line.Trim()}");
+                }
+
+                sb.AppendLine("        /// </remarks>");
+            }
         }
     }
 }

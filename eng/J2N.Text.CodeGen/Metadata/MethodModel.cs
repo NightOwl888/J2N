@@ -6,9 +6,11 @@
 
         public required string ReturnType { get; init; }
 
-        public required bool ReturnsSelf { get; init; }
+        public bool ReturnsSelf { get; init; }
 
-        public bool IsBuilderMethod { get; init; } = true;
+        public bool IsBuilderMethod { get; init; }
+
+        public DocumentationModel? Documentation { get; init; }
 
         public List<ParameterModel> Parameters { get; init; } = new();
     }
