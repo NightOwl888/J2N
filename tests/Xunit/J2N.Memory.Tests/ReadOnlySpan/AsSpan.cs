@@ -16,7 +16,7 @@ namespace J2N.SpanTests
         [Fact]
         public static void OpenStringBuilderAsSpanNullary()
         {
-            OpenStringBuilder s = new OpenStringBuilder("Hello");
+            MutableTextBuffer s = new MutableTextBuffer("Hello");
             ReadOnlySpan<char> span = s.AsSpan();
             char[] expected = s.ToCharArray();
             span.Validate(expected);
@@ -25,7 +25,7 @@ namespace J2N.SpanTests
         [Fact]
         public static void StringAsSpanEmptyString()
         {
-            OpenStringBuilder s = new OpenStringBuilder();
+            MutableTextBuffer s = new MutableTextBuffer();
             ReadOnlySpan<char> span = s.AsSpan();
             span.ValidateNonNullEmpty();
         }
@@ -34,7 +34,7 @@ namespace J2N.SpanTests
         public static void StringAsSpanNullChecked()
         {
 #pragma warning disable CA2265 // Do not compare Span<T> to null or default
-            OpenStringBuilder s = null;
+            MutableTextBuffer s = null;
             ReadOnlySpan<char> span = s.AsSpan();
             span.Validate();
             Assert.True(span == default);
@@ -52,7 +52,7 @@ namespace J2N.SpanTests
         [Fact]
         public static void StringAsSpanNullNonZeroStartAndLength()
         {
-            OpenStringBuilder str = null;
+            MutableTextBuffer str = null;
 
             Assert.Throws<ArgumentOutOfRangeException>(() => str.AsSpan(1).DontBox());
             Assert.Throws<ArgumentOutOfRangeException>(() => str.AsSpan(-1).DontBox());
@@ -77,7 +77,7 @@ namespace J2N.SpanTests
         [MemberData(nameof(TestHelpers.StringSliceTestData), MemberType = typeof(TestHelpers))]
         public static void AsSpan_StartAndLength(string textStr, int start, int length)
         {
-            OpenStringBuilder text = new OpenStringBuilder(textStr);
+            MutableTextBuffer text = new MutableTextBuffer(textStr);
 
             if (start == -1)
             {
@@ -103,7 +103,7 @@ namespace J2N.SpanTests
             }
 
 
-            static unsafe void Validate(OpenStringBuilder text, int start, int length, ReadOnlySpan<char> span)
+            static unsafe void Validate(MutableTextBuffer text, int start, int length, ReadOnlySpan<char> span)
             {
                 Assert.Equal(length, span.Length);
                 fixed (char* pText = text.m_Chars)
@@ -120,7 +120,7 @@ namespace J2N.SpanTests
         [MemberData(nameof(TestHelpers.StringSlice2ArgTestOutOfRangeData), MemberType = typeof(TestHelpers))]
         public static unsafe void AsSpan_2Arg_OutOfRange(string textStr, int start)
         {
-            OpenStringBuilder text = new OpenStringBuilder(textStr);
+            MutableTextBuffer text = new MutableTextBuffer(textStr);
 
             AssertExtensions.Throws<ArgumentOutOfRangeException>("start", () => text.AsSpan(start).DontBox());
 #if FEATURE_INDEX_RANGE
@@ -136,7 +136,7 @@ namespace J2N.SpanTests
         [MemberData(nameof(TestHelpers.StringSlice3ArgTestOutOfRangeData), MemberType = typeof(TestHelpers))]
         public static unsafe void AsSpan_3Arg_OutOfRange(string textStr, int start, int length)
         {
-            OpenStringBuilder text = new OpenStringBuilder(textStr);
+            MutableTextBuffer text = new MutableTextBuffer(textStr);
 
             AssertExtensions.Throws<ArgumentOutOfRangeException>("start", () => text.AsSpan(start, length).DontBox());
 #if FEATURE_INDEX_RANGE

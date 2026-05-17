@@ -20,7 +20,7 @@ using System;
 
 namespace J2N.Text
 {
-    public partial class OpenStringBuilder
+    public partial class MutableTextBuffer
     {
         /// <summary>
         /// Reports the zero-based index of the first occurrence of the specified Unicode character

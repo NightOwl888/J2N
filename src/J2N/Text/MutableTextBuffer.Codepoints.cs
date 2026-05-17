@@ -2,7 +2,7 @@
 
 namespace J2N.Text
 {
-    public partial class OpenStringBuilder
+    public partial class MutableTextBuffer
     {
         /// <summary>
         /// Appends the string representation of the <paramref name="codePoint"/>
@@ -15,14 +15,14 @@ namespace J2N.Text
         /// The overall effect is exactly as if the argument were
         /// converted to a <see cref="char"/> array by the method
         /// <see cref="Character.ToChars(int)"/> and the character in that array
-        /// were then <see cref="OpenStringBuilder.Append(char[])">appended</see> to this
-        /// <see cref="OpenStringBuilder"/>.
+        /// were then <see cref="Append(char[])">appended</see> to this
+        /// <see cref="MutableTextBuffer"/>.
         /// </para>
         /// </summary>
         /// <param name="codePoint">A Unicode code point.</param>
-        /// <returns>This <see cref="OpenStringBuilder"/>, for chaining.</returns>
+        /// <returns>This <see cref="MutableTextBuffer"/>, for chaining.</returns>
         /// <exception cref="ArgumentException"><paramref name="codePoint"/> is not a valid Unicode code point.</exception>
-        public OpenStringBuilder AppendCodePoint(int codePoint) // Coverage for the JDK
+        public MutableTextBuffer AppendCodePoint(int codePoint) // Coverage for the JDK
         {
             int count = Character.ToChars(codePoint, out char high, out char low);
 
@@ -58,17 +58,17 @@ namespace J2N.Text
         /// The overall effect is exactly as if the argument were
         /// converted to a <see cref="char"/> array by the method
         /// <see cref="Character.ToChars(int)"/> and the character in that array
-        /// were then <see cref="OpenStringBuilder.Insert(int, char[])">inserted</see> into this
-        /// <see cref="OpenStringBuilder"/>.
+        /// were then <see cref="Insert(int, char[])">inserted</see> into this
+        /// <see cref="MutableTextBuffer"/>.
         /// </para>
         /// </summary>
         /// <param name="index">The position in this instance where insertion begins.</param>
         /// <param name="codePoint">A Unicode code point.</param>
-        /// <returns>This <see cref="OpenStringBuilder"/>.</returns>
+        /// <returns>This <see cref="MutableTextBuffer"/>.</returns>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> is less than zero or greater
         /// than the length of this instance.</exception>
         /// <exception cref="ArgumentException"><paramref name="codePoint"/> is not a valid Unicode code point.</exception>
-        public OpenStringBuilder InsertCodePoint(int index, int codePoint)
+        public MutableTextBuffer InsertCodePoint(int index, int codePoint)
         {
             if ((uint)index > Length)
                 ThrowHelper.ThrowArgumentOutOfRange_ArgumentOutOfRange_IndexString(index, ExceptionArgument.index);
@@ -100,10 +100,10 @@ namespace J2N.Text
         /// point represented by the pair is returned; otherwise the <see cref="char"/>
         /// value at <paramref name="index"/> is returned.
         /// </summary>
-        /// <param name="index">The position in this <see cref="OpenStringBuilder"/> from which to retrieve the code
+        /// <param name="index">The position in this <see cref="MutableTextBuffer"/> from which to retrieve the code
         /// point.</param>
         /// <returns>The Unicode code point or <see cref="char"/> value at <paramref name="index"/> in
-        /// this <see cref="OpenStringBuilder"/>.</returns>
+        /// this <see cref="MutableTextBuffer"/>.</returns>
         /// <exception cref="ArgumentOutOfRangeException">
         /// <paramref name="index"/> is greater than or equal to <see cref="Length"/>.
         /// <para/>
@@ -122,10 +122,10 @@ namespace J2N.Text
         /// point represented by the pair is returned; otherwise the <see cref="char"/>
         /// value at <c><paramref name="index"/> - 1</c> is returned.
         /// </summary>
-        /// <param name="index">The position in this <see cref="OpenStringBuilder"/> following the code
+        /// <param name="index">The position in this <see cref="MutableTextBuffer"/> following the code
         /// point that should be returned.</param>
         /// <returns>The Unicode code point or <see cref="char"/> value before <paramref name="index"/>
-        /// in this <see cref="OpenStringBuilder"/>.</returns>
+        /// in this <see cref="MutableTextBuffer"/>.</returns>
         /// <exception cref="ArgumentOutOfRangeException">If the <paramref name="index"/> is less than
         /// 1 or greater than <see cref="Length"/>.</exception>
         public int CodePointBefore(int index) // Coverage for the JDK
@@ -142,11 +142,11 @@ namespace J2N.Text
         /// Java, use <c>endIndex - startIndex</c> to obtain the length.
         /// </summary>
         /// <param name="startIndex">The index to the first char of the text range.</param>
-        /// <param name="length">The number of characters to consider in this <see cref="OpenStringBuilder"/>.</param>
+        /// <param name="length">The number of characters to consider in this <see cref="MutableTextBuffer"/>.</param>
         /// <returns>The number of Unicode code points in the specified text range.</returns>
         /// <exception cref="ArgumentOutOfRangeException">
         /// <paramref name="startIndex"/> plus <paramref name="length"/> indicates a position not within
-        /// this <see cref="OpenStringBuilder"/>.
+        /// this <see cref="MutableTextBuffer"/>.
         /// <para/>
         /// -or-
         /// <para/>

@@ -21,7 +21,7 @@ namespace J2N
         /// <returns>The read-only span representation of the string.</returns>
         /// <remarks>Returns <c>default</c> when <paramref name="text"/> is <c>null</c>.</remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<char> AsSpan(this OpenStringBuilder text)
+        public static ReadOnlySpan<char> AsSpan(this MutableTextBuffer text)
         {
             if (text is null)
                 return default;
@@ -47,7 +47,7 @@ namespace J2N
         /// </exception>
         /// <exception cref="ArgumentNullException"><paramref name="text"/> is <c>null</c>.</exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<char> AsSpan(this OpenStringBuilder text, int start)
+        public static ReadOnlySpan<char> AsSpan(this MutableTextBuffer text, int start)
         {
             if (text == null)
             {
@@ -83,7 +83,7 @@ namespace J2N
         /// in the range of <paramref name="text"/>.
         /// </exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<char> AsSpan(this OpenStringBuilder text, int start, int length)
+        public static ReadOnlySpan<char> AsSpan(this MutableTextBuffer text, int start, int length)
         {
             if (text == null)
             {
@@ -127,7 +127,7 @@ namespace J2N
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="startIndex"/> is less
         /// than 0 or greater than <c>text.Length</c>.</exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<char> AsSpan(this OpenStringBuilder text, Index startIndex)
+        public static ReadOnlySpan<char> AsSpan(this MutableTextBuffer text, Index startIndex)
         {
             if (text is null)
             {
@@ -169,7 +169,7 @@ namespace J2N
         /// <paramref name="range"/>'s start index is greater than its end index.
         /// </exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<char> AsSpan(this OpenStringBuilder text, Range range)
+        public static ReadOnlySpan<char> AsSpan(this MutableTextBuffer text, Range range)
         {
             if (text is null)
             {
@@ -207,7 +207,7 @@ namespace J2N
         /// <returns>The read-only character memory representation of the string, or <c>default</c> if
         /// <paramref name="text"/> is <c>null</c>.</returns>
         /// <remarks>Returns default when <paramref name="text"/> is <c>null</c>.</remarks>
-        public static ReadOnlyMemory<char> AsMemory(this OpenStringBuilder text)
+        public static ReadOnlyMemory<char> AsMemory(this MutableTextBuffer text)
         {
             if (text is null)
                 return default;
@@ -226,7 +226,7 @@ namespace J2N
         /// (<paramref name="start"/> is &lt;0 or &gt;<c>text.Length</c>).
         /// </exception>
         /// <remarks>Returns default when <paramref name="text"/> is <c>null</c>.</remarks>
-        public static ReadOnlyMemory<char> AsMemory(this OpenStringBuilder text, int start)
+        public static ReadOnlyMemory<char> AsMemory(this MutableTextBuffer text, int start)
         {
             if (text == null)
             {
@@ -252,7 +252,7 @@ namespace J2N
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="start"/>, <paramref name="length"/>,
         /// or <paramref name="start"/> + <paramref name="length"/> is not in the range of <paramref name="text"/>.</exception>
         /// <remarks>Returns <c>default</c> when <paramref name="text"/> is <c>null</c>.</remarks>
-        public static ReadOnlyMemory<char> AsMemory(this OpenStringBuilder text, int start, int length)
+        public static ReadOnlyMemory<char> AsMemory(this MutableTextBuffer text, int start, int length)
         {
             if (text == null)
             {
@@ -286,7 +286,7 @@ namespace J2N
         /// <exception cref="ArgumentNullException"><paramref name="text"/> is <c>null</c>.</exception>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="startIndex"/> is less
         /// than 0 or greater than <c>text.Length</c>.</exception>
-        public static ReadOnlyMemory<char> AsMemory(this OpenStringBuilder text, Index startIndex)
+        public static ReadOnlyMemory<char> AsMemory(this MutableTextBuffer text, Index startIndex)
         {
             if (text == null)
             {
@@ -315,7 +315,7 @@ namespace J2N
         /// -or-
         /// <paramref name="range"/>'s start index is greater than its end index.
         /// </exception>
-        public static ReadOnlyMemory<char> AsMemory(this OpenStringBuilder text, Range range)
+        public static ReadOnlyMemory<char> AsMemory(this MutableTextBuffer text, Range range)
         {
             if (text == null)
             {

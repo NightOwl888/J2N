@@ -51,7 +51,7 @@ namespace J2N.Text
 
                 String concatResult = s1 + s2 + s3;
 
-                OpenStringBuilder test = OpenStringBuilderFactory();
+                MutableTextBuffer test = OpenStringBuilderFactory();
                 test.Append(sb1);
                 test.Append(sb2);
                 test.Append(sb3);

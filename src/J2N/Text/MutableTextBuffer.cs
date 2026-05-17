@@ -22,16 +22,16 @@ namespace J2N.Text
     /// Represents a mutable string of characters and provides access to the underlying memory.
     /// </summary>
     /// <remarks>
-    /// <see cref="OpenStringBuilder"/> differs from <see cref="StringBuilder"/> in the following ways:
+    /// <see cref="MutableTextBuffer"/> differs from <see cref="StringBuilder"/> in the following ways:
     /// 
     /// <list type="bullet">
     ///     <item><description>
-    ///         Rather than managing chunks of memory, <see cref="OpenStringBuilder"/> manages a single contiguous
+    ///         Rather than managing chunks of memory, <see cref="MutableTextBuffer"/> manages a single contiguous
     ///         block of <see cref="char"/>s.
     ///     </description></item>
     ///     <item><description>
-    ///         Memory is directly accessible using <see cref="MemoryExtensions.AsSpan(OpenStringBuilder)"/> and
-    ///         <see cref="MemoryExtensions.AsMemory(OpenStringBuilder)"/> overloads including the ability to slice.
+    ///         Memory is directly accessible using <see cref="MemoryExtensions.AsSpan(MutableTextBuffer)"/> and
+    ///         <see cref="MemoryExtensions.AsMemory(MutableTextBuffer)"/> overloads including the ability to slice.
     ///         So, there is no need to allocate memory to call methods that require System.Memory types, such as
     ///         <see cref="ReadOnlySpan{T}"/>.
     ///     </description></item>
@@ -40,7 +40,7 @@ namespace J2N.Text
     ///     </description></item>
     /// </list>
     /// </remarks>
-    public partial class OpenStringBuilder : IAppendable, ISpanAppendable, ICharSequence
+    public partial class MutableTextBuffer : IAppendable, ISpanAppendable, ICharSequence
         //, IEnumerable<char> // ICU4N TODO: Implement?
     {
         private const int CharStackBufferSize = 32;
@@ -61,22 +61,22 @@ namespace J2N.Text
         internal int m_MaxCapacity;
 
         /// <summary>
-        /// The default capacity of an <see cref="OpenStringBuilder"/>.
+        /// The default capacity of an <see cref="MutableTextBuffer"/>.
         /// </summary>
         internal const int DefaultCapacity = 16;
 
         #region BCL Constructors
 
-        // IMPORTANT: Constructor signatures should be aligned to match factory method signatures in OpenStringBuilder.DefaultCulture.cs
+        // IMPORTANT: Constructor signatures should be aligned to match factory method signatures in MutableTextBuffer.DefaultCulture.cs
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="OpenStringBuilder"/> class.
+        /// Initializes a new instance of the <see cref="MutableTextBuffer"/> class.
         /// </summary>
         /// <remarks>
         /// The string value of this instance is set to <see cref="string.Empty"/>, and the capacity is set to
         /// the implementation-specific default capacity.
         /// </remarks>
-        public OpenStringBuilder()
+        public MutableTextBuffer()
         {
             m_MaxCapacity = int.MaxValue;
             // J2N: We assume that subclasses will not expose or call this constructor if they want
@@ -85,68 +85,68 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="OpenStringBuilder"/> class using the specified capacity.
+        /// Initializes a new instance of the <see cref="MutableTextBuffer"/> class using the specified capacity.
         /// </summary>
         /// <param name="capacity">The suggested starting size of this instance.</param>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="capacity"/> is less than zero.</exception>
         /// <remarks>The <paramref name="capacity"/> parameter defines the maximum number of characters that can be stored
         /// in the memory allocated by the current instance. Its value is assigned to the <see cref="Capacity"/> property.
         /// If the number of characters to be stored in the current instance exceeds this <paramref name="capacity"/> value,
-        /// the <see cref="OpenStringBuilder"/> object allocates additional memory to store them.
+        /// the <see cref="MutableTextBuffer"/> object allocates additional memory to store them.
         /// <para/>
         /// The string value of this instance is set to <see cref="string.Empty"/>. If capacity is zero, the
         /// implementation-specific default capacity is used.</remarks>
         /// <seealso cref="Capacity"/>
-        public OpenStringBuilder(int capacity)
+        public MutableTextBuffer(int capacity)
             : this(capacity, int.MaxValue)
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="OpenStringBuilder"/> class using the specified string.
+        /// Initializes a new instance of the <see cref="MutableTextBuffer"/> class using the specified string.
         /// </summary>
         /// <param name="value">The string used to initialize the value of the instance. If <paramref name="value"/>
-        /// is <c>null</c>, the new <see cref="OpenStringBuilder"/> will contain the empty string (that is, it
+        /// is <c>null</c>, the new <see cref="MutableTextBuffer"/> will contain the empty string (that is, it
         /// contains <see cref="string.Empty"/>).</param>
-        /// <remarks>If <paramref name="value"/> is <c>null</c>, the new <see cref="OpenStringBuilder"/> will
+        /// <remarks>If <paramref name="value"/> is <c>null</c>, the new <see cref="MutableTextBuffer"/> will
         /// contain the empty string (that is, it contains <see cref="string.Empty"/>).</remarks>
-        public OpenStringBuilder(string? value)
+        public MutableTextBuffer(string? value)
             : this(value, DefaultCapacity)
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="OpenStringBuilder"/> class with the specified string
+        /// Initializes a new instance of the <see cref="MutableTextBuffer"/> class with the specified string
         /// and capacity.
         /// </summary>
         /// <param name="value">The string used to initialize the value of the instance. If <paramref name="value"/>
-        /// is <c>null</c>, the new <see cref="OpenStringBuilder"/> will contain the empty string (that is, it
+        /// is <c>null</c>, the new <see cref="MutableTextBuffer"/> will contain the empty string (that is, it
         /// contains <see cref="string.Empty"/>).</param>
-        /// <param name="capacity">The suggested starting size of the <see cref="OpenStringBuilder"/>.</param>
+        /// <param name="capacity">The suggested starting size of the <see cref="MutableTextBuffer"/>.</param>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="capacity"/> is less than zero.</exception>
         /// <remarks>The <paramref name="capacity"/> parameter defines the maximum number of characters that can be
         /// stored in the memory allocated by the current instance. Its value is assigned to the <see cref="Capacity"/>
         /// property. If the number of characters to be stored in the current instance exceeds this <paramref name="capacity"/>
-        /// value, the <see cref="OpenStringBuilder"/> object allocates additional memory to store them.
+        /// value, the <see cref="MutableTextBuffer"/> object allocates additional memory to store them.
         /// <para/>
         /// If <paramref name="capacity"/> is zero, the implementation-specific default capacity is used.
         /// </remarks>
         /// <seealso cref="Capacity"/>
-        public OpenStringBuilder(string? value, int capacity)
+        public MutableTextBuffer(string? value, int capacity)
             : this(value, 0, value?.Length ?? 0, capacity)
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="OpenStringBuilder"/> class from the specified
+        /// Initializes a new instance of the <see cref="MutableTextBuffer"/> class from the specified
         /// substring and capacity.
         /// </summary>
         /// <param name="value">The string that contains the substring used to initialize the value of this instance.
-        /// If <paramref name="value"/> is <c>null</c>, the new <see cref="OpenStringBuilder"/> will contain the empty
+        /// If <paramref name="value"/> is <c>null</c>, the new <see cref="MutableTextBuffer"/> will contain the empty
         /// string (that is, it contains <see cref="string.Empty"/>).</param>
         /// <param name="startIndex">The position within <paramref name="value"/> where the substring begins.</param>
         /// <param name="length">The number of characters in the substring.</param>
-        /// <param name="capacity">The suggested starting size of the <see cref="OpenStringBuilder"/>.</param>
+        /// <param name="capacity">The suggested starting size of the <see cref="MutableTextBuffer"/>.</param>
         /// <exception cref="ArgumentOutOfRangeException">
         /// <paramref name="capacity"/> is less than zero.
         /// <para/>
@@ -158,12 +158,12 @@ namespace J2N.Text
         /// The <paramref name="capacity"/> parameter defines the maximum number of characters that can be
         /// stored in the memory allocated by the current instance. Its value is assigned to the <see cref="Capacity"/>
         /// property. If the number of characters to be stored in the current instance exceeds this <paramref name="capacity"/>
-        /// value, the <see cref="OpenStringBuilder"/> object allocates additional memory to store them.
+        /// value, the <see cref="MutableTextBuffer"/> object allocates additional memory to store them.
         /// <para/>
         /// If <paramref name="capacity"/> is zero, the implementation-specific default capacity is used.
         /// </remarks>
         /// <seealso cref="Capacity"/>
-        public OpenStringBuilder(string? value, int startIndex, int length, int capacity)
+        public MutableTextBuffer(string? value, int startIndex, int length, int capacity)
         {
             if (capacity < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(capacity, ExceptionArgument.capacity);
@@ -198,10 +198,10 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="OpenStringBuilder"/> class that starts with a specified capacity
+        /// Initializes a new instance of the <see cref="MutableTextBuffer"/> class that starts with a specified capacity
         /// and can grow to a specified maximum.
         /// </summary>
-        /// <param name="capacity">The suggested starting size of the <see cref="OpenStringBuilder"/>.</param>
+        /// <param name="capacity">The suggested starting size of the <see cref="MutableTextBuffer"/>.</param>
         /// <param name="maxCapacity">The maximum number of characters the current string can contain.</param>
         /// <exception cref="ArgumentOutOfRangeException">
         /// <paramref name="maxCapacity"/> is less than one, <paramref name="capacity"/> is less than zero,
@@ -211,25 +211,25 @@ namespace J2N.Text
         /// The <paramref name="capacity"/> parameter defines the maximum number of characters that can be stored
         /// in the memory allocated by the current instance. Its value is assigned to the <see cref="Capacity"/> property.
         /// If the number of characters to be stored in the current instance exceeds this <paramref name="capacity"/> value,
-        /// the <see cref="OpenStringBuilder"/> object allocates additional memory to store them.
+        /// the <see cref="MutableTextBuffer"/> object allocates additional memory to store them.
         /// <para/>
         /// If <paramref name="capacity"/> is zero, the implementation-specific default capacity is used.
         /// <para/>
         /// The <paramref name="maxCapacity"/> property defines the maximum number of characters that the current
         /// instance can hold. Its value is assigned to the <see cref="MaxCapacity"/> property. If the number of
         /// characters to be stored in the current instance exceeds this <paramref name="maxCapacity"/> value,
-        /// the <see cref="OpenStringBuilder"/> object does not allocate additional memory, but instead throws an exception.
+        /// the <see cref="MutableTextBuffer"/> object does not allocate additional memory, but instead throws an exception.
         /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
-        /// When you instantiate an <see cref="OpenStringBuilder"/> object by calling the <see cref="OpenStringBuilder(int, int)"/>
-        /// constructor, both the length and the capacity of the <see cref="OpenStringBuilder"/> instance can grow beyond
+        /// When you instantiate an <see cref="MutableTextBuffer"/> object by calling the <see cref="MutableTextBuffer(int, int)"/>
+        /// constructor, both the length and the capacity of the <see cref="MutableTextBuffer"/> instance can grow beyond
         /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
         /// </remarks>
         /// <seealso cref="Capacity"/>
         /// <seealso cref="MaxCapacity"/>
-        public OpenStringBuilder(int capacity, int maxCapacity)
+        public MutableTextBuffer(int capacity, int maxCapacity)
         {
             if (capacity > maxCapacity)
                 ThrowHelper.ThrowArgumentOutOfRangeException(capacity, ExceptionArgument.capacity, ExceptionResource.ArgumentOutOfRange_Capacity);
@@ -258,30 +258,30 @@ namespace J2N.Text
         #region J2N Constructors
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="OpenStringBuilder"/> with the specified sequence of characters.
+        /// Initializes a new instance of the <see cref="MutableTextBuffer"/> with the specified sequence of characters.
         /// </summary>
         /// <param name="value">The characters used to initialize this instance.</param>
         /// <remarks>The characters from the span are copied to the heap memory of this instance.</remarks>
-        public OpenStringBuilder(ReadOnlySpan<char> value)
+        public MutableTextBuffer(ReadOnlySpan<char> value)
             : this(value, DefaultCapacity)
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="OpenStringBuilder"/> with the specified sequence of characters.
+        /// Initializes a new instance of the <see cref="MutableTextBuffer"/> with the specified sequence of characters.
         /// </summary>
         /// <param name="value">The characters used to initialize this instance.</param>
-        /// <param name="capacity">The suggested starting size of the <see cref="OpenStringBuilder"/>.</param>
+        /// <param name="capacity">The suggested starting size of the <see cref="MutableTextBuffer"/>.</param>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="capacity"/> is less than zero.</exception>
         /// <remarks>The <paramref name="capacity"/> parameter defines the maximum number of characters that can be
         /// stored in the memory allocated by the current instance. Its value is assigned to the <see cref="Capacity"/>
         /// property. If the number of characters to be stored in the current instance exceeds this <paramref name="capacity"/>
-        /// value, the <see cref="OpenStringBuilder"/> object allocates additional memory to store them.
+        /// value, the <see cref="MutableTextBuffer"/> object allocates additional memory to store them.
         /// <para/>
         /// If <paramref name="capacity"/> is zero, the implementation-specific default capacity is used.
         /// </remarks>
         /// <seealso cref="Capacity"/>
-        public OpenStringBuilder(ReadOnlySpan<char> value, int capacity)
+        public MutableTextBuffer(ReadOnlySpan<char> value, int capacity)
         {
             if (capacity < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(capacity, ExceptionArgument.capacity);
@@ -307,18 +307,18 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="OpenStringBuilder"/> class using the specified
+        /// Initializes a new instance of the <see cref="MutableTextBuffer"/> class using the specified
         /// <see cref="StringBuilder"/>.
         /// </summary>
         /// <param name="value">The string used to initialize the value of the instance. If <paramref name="value"/>
-        /// is <c>null</c>, the new <see cref="OpenStringBuilder"/> will contain the empty string (that is, it
+        /// is <c>null</c>, the new <see cref="MutableTextBuffer"/> will contain the empty string (that is, it
         /// contains <see cref="string.Empty"/>).</param>
-        /// <remarks>If <paramref name="value"/> is <c>null</c>, the new <see cref="OpenStringBuilder"/> will
+        /// <remarks>If <paramref name="value"/> is <c>null</c>, the new <see cref="MutableTextBuffer"/> will
         /// contain the empty string (that is, it contains <see cref="string.Empty"/>).
         /// <para/>
         /// If value is non-<c>null</c>, <see cref="Capacity"/> is set using the <see cref="StringBuilder.Capacity"/>.
         /// </remarks>
-        public OpenStringBuilder(StringBuilder? value)
+        public MutableTextBuffer(StringBuilder? value)
         {
             m_MaxCapacity = int.MaxValue;
 
@@ -344,37 +344,37 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="OpenStringBuilder"/> class with the specified
+        /// Initializes a new instance of the <see cref="MutableTextBuffer"/> class with the specified
         /// <see cref="StringBuilder"/> and capacity.
         /// </summary>
         /// <param name="value">The <see cref="StringBuilder"/> used to initialize the value of the instance.
-        /// If <paramref name="value"/>is <c>null</c>, the new <see cref="OpenStringBuilder"/> will contain
+        /// If <paramref name="value"/>is <c>null</c>, the new <see cref="MutableTextBuffer"/> will contain
         /// the empty string (that is, it contains <see cref="string.Empty"/>).</param>
-        /// <param name="capacity">The suggested starting size of the <see cref="OpenStringBuilder"/>.</param>
+        /// <param name="capacity">The suggested starting size of the <see cref="MutableTextBuffer"/>.</param>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="capacity"/> is less than zero.</exception>
         /// <remarks>The <paramref name="capacity"/> parameter defines the maximum number of characters that can be
         /// stored in the memory allocated by the current instance. Its value is assigned to the <see cref="Capacity"/>
         /// property. If the number of characters to be stored in the current instance exceeds this <paramref name="capacity"/>
-        /// value, the <see cref="OpenStringBuilder"/> object allocates additional memory to store them.
+        /// value, the <see cref="MutableTextBuffer"/> object allocates additional memory to store them.
         /// <para/>
         /// If <paramref name="capacity"/> is zero, the implementation-specific default capacity is used.
         /// </remarks>
         /// <seealso cref="Capacity"/>
-        public OpenStringBuilder(StringBuilder? value, int capacity)
+        public MutableTextBuffer(StringBuilder? value, int capacity)
             : this(value, 0, value?.Length ?? 0, capacity)
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="OpenStringBuilder"/> class from the specified
+        /// Initializes a new instance of the <see cref="MutableTextBuffer"/> class from the specified
         /// substring and capacity.
         /// </summary>
         /// <param name="value">The <see cref="StringBuilder"/> that contains the substring used to initialize the
-        /// value of this instance. If <paramref name="value"/> is <c>null</c>, the new <see cref="OpenStringBuilder"/>
+        /// value of this instance. If <paramref name="value"/> is <c>null</c>, the new <see cref="MutableTextBuffer"/>
         /// will contain the empty string (that is, it contains <see cref="string.Empty"/>).</param>
         /// <param name="startIndex">The position within <paramref name="value"/> where the substring begins.</param>
         /// <param name="length">The number of characters in the substring.</param>
-        /// <param name="capacity">The suggested starting size of the <see cref="OpenStringBuilder"/>.</param>
+        /// <param name="capacity">The suggested starting size of the <see cref="MutableTextBuffer"/>.</param>
         /// <exception cref="ArgumentOutOfRangeException">
         /// <paramref name="capacity"/> is less than zero.
         /// <para/>
@@ -386,12 +386,12 @@ namespace J2N.Text
         /// The <paramref name="capacity"/> parameter defines the maximum number of characters that can be
         /// stored in the memory allocated by the current instance. Its value is assigned to the <see cref="Capacity"/>
         /// property. If the number of characters to be stored in the current instance exceeds this <paramref name="capacity"/>
-        /// value, the <see cref="OpenStringBuilder"/> object allocates additional memory to store them.
+        /// value, the <see cref="MutableTextBuffer"/> object allocates additional memory to store them.
         /// <para/>
         /// If <paramref name="capacity"/> is zero, the implementation-specific default capacity is used.
         /// </remarks>
         /// <seealso cref="Capacity"/>
-        public OpenStringBuilder(StringBuilder? value, int startIndex, int length, int capacity)
+        public MutableTextBuffer(StringBuilder? value, int startIndex, int length, int capacity)
         {
             if (capacity < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(capacity, ExceptionArgument.capacity);
@@ -430,14 +430,14 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="OpenStringBuilder"/> with the specified sequence of characters.
+        /// Initializes a new instance of the <see cref="MutableTextBuffer"/> with the specified sequence of characters.
         /// </summary>
         /// <param name="value">The <see cref="ICharSequence"/> used to initialize the value of the instance.
-        /// If <paramref name="value"/> is <c>null</c>, the new <see cref="OpenStringBuilder"/> will contain
+        /// If <paramref name="value"/> is <c>null</c>, the new <see cref="MutableTextBuffer"/> will contain
         /// the empty string (that is, it contains <see cref="string.Empty"/>).</param>
-        /// <remarks>If <paramref name="value"/> is <c>null</c>, the new <see cref="OpenStringBuilder"/> will
+        /// <remarks>If <paramref name="value"/> is <c>null</c>, the new <see cref="MutableTextBuffer"/> will
         /// contain the empty string (that is, it contains <see cref="string.Empty"/>).</remarks>
-        public OpenStringBuilder(ICharSequence? value) // Coverage for the JDK // J2N TODO: Add overloads to slice the ICharsequence and set capacity?
+        public MutableTextBuffer(ICharSequence? value) // Coverage for the JDK // J2N TODO: Add overloads to slice the ICharsequence and set capacity?
         {
             m_MaxCapacity = int.MaxValue;
             int length = value?.Length ?? 0;
@@ -465,7 +465,7 @@ namespace J2N.Text
             {
                 sb.Value!.CopyTo(0, m_Chars, 0, sb.Length);
             }
-            else if (value is OpenStringBuilder osb)
+            else if (value is MutableTextBuffer osb)
             {
                 osb.CopyTo(0, m_Chars, 0, osb.Length);
             }
@@ -491,10 +491,10 @@ namespace J2N.Text
             m_Position = length;
         }
 
-        // IMPORTANT: Constructor signatures should be aligned to match factory method signatures in OpenStringBuilder.DefaultCulture.cs
+        // IMPORTANT: Constructor signatures should be aligned to match factory method signatures in MutableTextBuffer.DefaultCulture.cs
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="OpenStringBuilder"/> class using the specified
+        /// Initializes a new instance of the <see cref="MutableTextBuffer"/> class using the specified
         /// initial character buffer.
         /// </summary>
         /// <param name="initialBuffer">
@@ -507,14 +507,14 @@ namespace J2N.Text
         /// <para/>
         /// Ownership of <paramref name="initialBuffer"/> is transferred to the new instance. The
         /// caller must not use or modify the array after passing it to this constructor. To read
-        /// the raw characters of the underlying <see cref="OpenStringBuilder"/>, call one of the
-        /// <see cref="MemoryExtensions.AsSpan(OpenStringBuilder)"/> or
-        /// <see cref="MemoryExtensions.AsMemory(OpenStringBuilder)"/> overloads.
+        /// the raw characters of the underlying <see cref="MutableTextBuffer"/>, call one of the
+        /// <see cref="MemoryExtensions.AsSpan(MutableTextBuffer)"/> or
+        /// <see cref="MemoryExtensions.AsMemory(MutableTextBuffer)"/> overloads.
         /// </remarks>
-        protected OpenStringBuilder(char[] initialBuffer) : this(initialBuffer, initialLength: 0) { }
+        protected MutableTextBuffer(char[] initialBuffer) : this(initialBuffer, initialLength: 0) { }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="OpenStringBuilder"/> class using the specified
+        /// Initializes a new instance of the <see cref="MutableTextBuffer"/> class using the specified
         /// initial character buffer and initial content length.
         /// </summary>
         /// <param name="initialBuffer">
@@ -538,18 +538,18 @@ namespace J2N.Text
         /// <para/>
         /// Ownership of <paramref name="initialBuffer"/> is transferred to the new instance. The
         /// caller must not use or modify the array after passing it to this constructor. To read
-        /// the raw characters of the underlying <see cref="OpenStringBuilder"/>, call one of the
-        /// <see cref="MemoryExtensions.AsSpan(OpenStringBuilder)"/> or
-        /// <see cref="MemoryExtensions.AsMemory(OpenStringBuilder)"/> overloads.
+        /// the raw characters of the underlying <see cref="MutableTextBuffer"/>, call one of the
+        /// <see cref="MemoryExtensions.AsSpan(MutableTextBuffer)"/> or
+        /// <see cref="MemoryExtensions.AsMemory(MutableTextBuffer)"/> overloads.
         /// </remarks>
-        protected OpenStringBuilder(char[] initialBuffer, int initialLength)
+        protected MutableTextBuffer(char[] initialBuffer, int initialLength)
         {
             m_Chars = initialBuffer ?? throw new ArgumentNullException(nameof(initialBuffer));
             m_Position = initialLength;
             m_MaxCapacity = int.MaxValue;
         }
 
-        // IMPORTANT: Constructor signatures should be aligned to match factory method signatures in OpenStringBuilder.DefaultCulture.cs
+        // IMPORTANT: Constructor signatures should be aligned to match factory method signatures in MutableTextBuffer.DefaultCulture.cs
 
         #endregion J2N Constructors
 
@@ -627,8 +627,8 @@ namespace J2N.Text
         /// <see cref="Capacity"/> does not affect the string value of the current instance. <see cref="Capacity"/> can
         /// be decreased as long as it is not less than <see cref="Length"/>.
         /// <para/>
-        /// The <see cref="OpenStringBuilder"/> dynamically allocates more space when required and increases
-        /// <see cref="Capacity"/> accordingly. For performance reasons, a <see cref="OpenStringBuilder"/> might
+        /// The <see cref="MutableTextBuffer"/> dynamically allocates more space when required and increases
+        /// <see cref="Capacity"/> accordingly. For performance reasons, a <see cref="MutableTextBuffer"/> might
         /// allocate more memory than needed. The amount of memory allocated is implementation-specific.
         /// </remarks>
         public int Capacity
@@ -657,13 +657,13 @@ namespace J2N.Text
         /// <remarks>
         /// The maximum capacity for this implementation is <see cref="int.MaxValue"/>.
         /// However, this value is implementation-specific and might be different in other or
-        /// later implementations. You can explicitly set the maximum capacity of a <see cref="OpenStringBuilder"/>
-        /// object by calling the <see cref="OpenStringBuilder(int, int)"/> constructor.
+        /// later implementations. You can explicitly set the maximum capacity of a <see cref="MutableTextBuffer"/>
+        /// object by calling the <see cref="MutableTextBuffer(int, int)"/> constructor.
         /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
-        /// When you instantiate an <see cref="OpenStringBuilder"/> object by calling the <see cref="OpenStringBuilder(int, int)"/>
-        /// constructor, both the length and the capacity of the <see cref="OpenStringBuilder"/> instance can grow beyond
+        /// When you instantiate an <see cref="MutableTextBuffer"/> object by calling the <see cref="MutableTextBuffer(int, int)"/>
+        /// constructor, both the length and the capacity of the <see cref="MutableTextBuffer"/> instance can grow beyond
         /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
         /// </remarks>
@@ -705,13 +705,13 @@ namespace J2N.Text
         /// <returns>A string whose value is the same as this instance.</returns>
         /// <remarks>
         /// This method causes a heap allocation. As an allocation-free alternative,
-        /// you may call the <see cref="MemoryExtensions.AsSpan(OpenStringBuilder)"/> method
+        /// you may call the <see cref="MemoryExtensions.AsSpan(MutableTextBuffer)"/> method
         /// to get a <see cref="ReadOnlySpan{T}"/> representing the characters of this
-        /// <see cref="OpenStringBuilder"/> instance.
+        /// <see cref="MutableTextBuffer"/> instance.
         /// <para/>
         /// Call the <see cref="ToString()"/> method to convert the
-        /// <see cref="OpenStringBuilder"/> object to a <see cref="string"/> object before
-        /// you can pass the string represented by the <see cref="OpenStringBuilder"/> object to
+        /// <see cref="MutableTextBuffer"/> object to a <see cref="string"/> object before
+        /// you can pass the string represented by the <see cref="MutableTextBuffer"/> object to
         /// a method that has a <see cref="string"/> parameter or display it in the user interface.
         /// </remarks>
         public override string ToString()
@@ -736,13 +736,13 @@ namespace J2N.Text
         /// <see cref="Length"/>.</exception>
         /// <remarks>
         /// This method causes a heap allocation. As an allocation-free alternative,
-        /// you may call the <see cref="MemoryExtensions.AsSpan(OpenStringBuilder, int)"/> method
+        /// you may call the <see cref="MemoryExtensions.AsSpan(MutableTextBuffer, int)"/> method
         /// to get a <see cref="ReadOnlySpan{T}"/> representing the characters of the substring of this
-        /// <see cref="OpenStringBuilder"/> instance.
+        /// <see cref="MutableTextBuffer"/> instance.
         /// <para/>
         /// Call the <see cref="ToString(int)"/> method to convert the
-        /// <see cref="OpenStringBuilder"/> object to a <see cref="string"/> object before
-        /// you can pass the string represented by the <see cref="OpenStringBuilder"/> object to
+        /// <see cref="MutableTextBuffer"/> object to a <see cref="string"/> object before
+        /// you can pass the string represented by the <see cref="MutableTextBuffer"/> object to
         /// a method that has a <see cref="string"/> parameter or display it in the user interface.
         /// </remarks>
         public string ToString(int startIndex)
@@ -770,13 +770,13 @@ namespace J2N.Text
         /// </exception>
         /// <remarks>
         /// This method causes a heap allocation. As an allocation-free alternative,
-        /// you may call the <see cref="MemoryExtensions.AsSpan(OpenStringBuilder, int, int)"/> method
+        /// you may call the <see cref="MemoryExtensions.AsSpan(MutableTextBuffer, int, int)"/> method
         /// to get a <see cref="ReadOnlySpan{T}"/> representing the characters of the substring of this
-        /// <see cref="OpenStringBuilder"/> instance.
+        /// <see cref="MutableTextBuffer"/> instance.
         /// <para/>
         /// Call the <see cref="ToString(int)"/> method to convert the
-        /// <see cref="OpenStringBuilder"/> object to a <see cref="string"/> object before
-        /// you can pass the string represented by the <see cref="OpenStringBuilder"/> object to
+        /// <see cref="MutableTextBuffer"/> object to a <see cref="string"/> object before
+        /// you can pass the string represented by the <see cref="MutableTextBuffer"/> object to
         /// a method that has a <see cref="string"/> parameter or display it in the user interface.
         /// </remarks>
         public string ToString(int startIndex, int length)
@@ -796,35 +796,35 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// Removes all characters from the current <see cref="OpenStringBuilder"/> instance.
+        /// Removes all characters from the current <see cref="MutableTextBuffer"/> instance.
         /// </summary>
         /// <returns>An object whose <see cref="Length"/> is 0 (zero).</returns>
         /// <remarks><see cref="Clear"/> is a convenience method that is equivalent to setting
         /// the <see cref="Length"/> property of the current instance to 0 (zero).</remarks>
-        public OpenStringBuilder Clear()
+        public MutableTextBuffer Clear()
         {
             this.Length = 0;
             return this;
         }
 
         /// <summary>
-        /// Gets or sets the length of the current <see cref="OpenStringBuilder"/> object.
+        /// Gets or sets the length of the current <see cref="MutableTextBuffer"/> object.
         /// </summary>
         /// <value>The length of this instance.</value>
         /// <exception cref="ArgumentOutOfRangeException">The value specified for a set operation
         /// is less than zero or greater than <see cref="MaxCapacity"/>.</exception>
         /// <remarks>
-        /// The length of a <see cref="OpenStringBuilder"/> object is defined by its number of 
+        /// The length of a <see cref="MutableTextBuffer"/> object is defined by its number of 
         /// <see cref="char"/> objects.
         /// <para/>
         /// Like the <see cref="string.Length"/> property, the <see cref="Length"/> property indicates
         /// the length of the current string object. Unlike the <see cref="string.Length"/> property,
         /// which is read-only, the <see cref="Length"/> property allows you to modify the length of
-        /// the string stored to the <see cref="OpenStringBuilder"/> object.
+        /// the string stored to the <see cref="MutableTextBuffer"/> object.
         /// <para/>
-        /// If the specified length is less than the current length, the current <see cref="OpenStringBuilder"/>
+        /// If the specified length is less than the current length, the current <see cref="MutableTextBuffer"/>
         /// object is truncated to the specified length. If the specified length is greater than the current
-        /// length, the end of the string value of the current <see cref="OpenStringBuilder"/> object is padded
+        /// length, the end of the string value of the current <see cref="MutableTextBuffer"/> object is padded
         /// with the Unicode NULL character (U+0000).
         /// <para/>
         /// If the specified length is greater than the current capacity, <see cref="Capacity"/> increases so
@@ -868,12 +868,12 @@ namespace J2N.Text
         /// <exception cref="IndexOutOfRangeException"><paramref name="index"/> is outside the bounds
         /// of this instance while getting a character.</exception>
         /// <remarks>
-        /// The index parameter is the position of a character within the <see cref="OpenStringBuilder"/>.
+        /// The index parameter is the position of a character within the <see cref="MutableTextBuffer"/>.
         /// The first character in the string is at index 0. The length of a string is the number of
-        /// characters it contains. The last accessible character of a <see cref="OpenStringBuilder"/> instance
+        /// characters it contains. The last accessible character of a <see cref="MutableTextBuffer"/> instance
         /// is at index Length - 1.
         /// <para/>
-        /// <see cref="this[int]"/> is the default property of the <see cref="OpenStringBuilder"/>  class.
+        /// <see cref="this[int]"/> is the default property of the <see cref="MutableTextBuffer"/>  class.
         /// In C#, it is an indexer. This means that individual characters can be retrieved from the <see cref="this[int]"/>
         /// property as shown in the following example, which counts the number of alphabetic, white-space, and punctuation
         /// characters in a string.
@@ -888,7 +888,7 @@ namespace J2N.Text
         ///         int nAlphabeticChars = 0;
         ///         int nWhitespace = 0;
         ///         int nPunctuation = 0;
-        ///         OpenStringBuilder sb = new OpenStringBuilder("This is a simple sentence.");
+        ///         MutableTextBuffer sb = new MutableTextBuffer("This is a simple sentence.");
         ///
         ///         for (int ctr = 0; ctr &lt; sb.Length; ctr++)
         ///         {
@@ -911,8 +911,8 @@ namespace J2N.Text
         /// //          Punctuation characters: 1
         /// </code>
         /// <para/>
-        /// Unlike the <see cref="StringBuilder"/> class, <see cref="OpenStringBuilder"/>'s indexer does
-        /// not suffer from degraded performance due to chunky memory, since <see cref="OpenStringBuilder"/>
+        /// Unlike the <see cref="StringBuilder"/> class, <see cref="MutableTextBuffer"/>'s indexer does
+        /// not suffer from degraded performance due to chunky memory, since <see cref="MutableTextBuffer"/>
         /// uses a single contiguous block of characters in memory.
         /// </remarks>
         [IndexerName("Chars")]
@@ -939,13 +939,13 @@ namespace J2N.Text
 
         /// <summary>
         /// Returns an object that can be used to iterate through the chunks of characters represented in a
-        /// <see cref="ReadOnlyMemory{Char}"/> created from this <see cref="OpenStringBuilder"/> instance.
+        /// <see cref="ReadOnlyMemory{Char}"/> created from this <see cref="MutableTextBuffer"/> instance.
         /// </summary>
         /// <returns>An enumerator for the chunks in the <see cref="ReadOnlyMemory{Char}"/>.</returns>
         /// <remarks>This API is for compatibility with <c>StringBuilder.GetChuncks()</c> method.
-        /// <see cref="OpenStringBuilder"/> will never have more than a single chunk of memory so it is generally more efficient
-        /// to use <see cref="MemoryExtensions.AsSpan(OpenStringBuilder)"/> or
-        /// <see cref="MemoryExtensions.AsMemory(OpenStringBuilder)"/> when you need to access the underlying memory.</remarks>
+        /// <see cref="MutableTextBuffer"/> will never have more than a single chunk of memory so it is generally more efficient
+        /// to use <see cref="MemoryExtensions.AsSpan(MutableTextBuffer)"/> or
+        /// <see cref="MemoryExtensions.AsMemory(MutableTextBuffer)"/> when you need to access the underlying memory.</remarks>
         public ChunkEnumerator GetChunks() => new ChunkEnumerator(this);
 
 
@@ -955,7 +955,7 @@ namespace J2N.Text
         // (which is why it is a nested type).
 
         /// <summary>
-        /// Supports simple iteration over the chunks of an <see cref="OpenStringBuilder"/> instance.
+        /// Supports simple iteration over the chunks of an <see cref="MutableTextBuffer"/> instance.
         /// </summary>
         /// <remarks>
         /// A <see cref="ChunkEnumerator"/> is returned by the <see cref="GetChunks()"/> method. It supports both the
@@ -967,8 +967,8 @@ namespace J2N.Text
         /// </remarks>
         public struct ChunkEnumerator
         {
-            private readonly OpenStringBuilder _firstChunk;
-            private OpenStringBuilder? _currentChunk;
+            private readonly MutableTextBuffer _firstChunk;
+            private MutableTextBuffer? _currentChunk;
 
             /// <summary>
             /// Provides an <see cref="System.Collections.IEnumerable.GetEnumerator()"/> implementation that
@@ -1011,7 +1011,7 @@ namespace J2N.Text
                 }
             }
 
-            internal ChunkEnumerator(OpenStringBuilder stringBuilder)
+            internal ChunkEnumerator(MutableTextBuffer stringBuilder)
             {
                 Debug.Assert(stringBuilder != null);
                 _firstChunk = stringBuilder!;
@@ -1037,10 +1037,10 @@ namespace J2N.Text
         /// The <see cref="Append(char, int)"/> method modifies the existing instance of this class;
         /// it does not return a new class instance. Because of this, you can call a method or property
         /// on the existing reference and you do not have to assign the return value to an
-        /// <see cref="OpenStringBuilder"/> object, as the following example illustrates.
+        /// <see cref="MutableTextBuffer"/> object, as the following example illustrates.
         /// <code>
         /// decimal value = 1346.19m;
-        /// J2N.Text.OpenStringBuilder sb = new J2N.Text.OpenStringBuilder();
+        /// J2N.Text.MutableTextBuffer sb = new J2N.Text.MutableTextBuffer();
         /// sb.Append('*', 5).AppendFormat("{0:C2}", value).Append('*', 5);
         /// Console.WriteLine(sb);
         /// // The example displays the following output:
@@ -1051,13 +1051,13 @@ namespace J2N.Text
         /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
-        /// When you instantiate an <see cref="OpenStringBuilder"/> object by calling the <see cref="OpenStringBuilder(int, int)"/>
-        /// constructor, both the length and the capacity of the <see cref="OpenStringBuilder"/> instance can grow beyond
+        /// When you instantiate an <see cref="MutableTextBuffer"/> object by calling the <see cref="MutableTextBuffer(int, int)"/>
+        /// constructor, both the length and the capacity of the <see cref="MutableTextBuffer"/> instance can grow beyond
         /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
         /// </remarks>
         /// <seealso cref="char"/>
-        public OpenStringBuilder Append(char value, int repeatCount)
+        public MutableTextBuffer Append(char value, int repeatCount)
         {
             if (repeatCount < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(repeatCount, ExceptionArgument.repeatCount);
@@ -1133,11 +1133,11 @@ namespace J2N.Text
         /// <para/>
         /// The <see cref="Append(char[], int, int)"/> method modifies the existing instance of this class; it does
         /// not return a new class instance. Because of this, you can call a method or property on the existing
-        /// reference and you do not have to assign the return value to an <see cref="OpenStringBuilder"/> object,
+        /// reference and you do not have to assign the return value to an <see cref="MutableTextBuffer"/> object,
         /// as the following example illustrates.
         /// <code>
         /// char[] chars = { 'a', 'b', 'c', 'd', 'e'};
-        /// J2N.Text.OpenStringBuilder sb = new J2N.Text.OpenStringBuilder();
+        /// J2N.Text.MutableTextBuffer sb = new J2N.Text.MutableTextBuffer();
         /// int startPosition = Array.IndexOf(chars, 'a');
         /// int endPosition = Array.IndexOf(chars, 'c');
         /// if (startPosition >= 0 &amp;&amp; endPosition >= 0) {
@@ -1154,13 +1154,13 @@ namespace J2N.Text
         /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
-        /// When you instantiate an <see cref="OpenStringBuilder"/> object by calling the <see cref="OpenStringBuilder(int, int)"/>
-        /// constructor, both the length and the capacity of the <see cref="OpenStringBuilder"/> instance can grow beyond
+        /// When you instantiate an <see cref="MutableTextBuffer"/> object by calling the <see cref="MutableTextBuffer(int, int)"/>
+        /// constructor, both the length and the capacity of the <see cref="MutableTextBuffer"/> instance can grow beyond
         /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
         /// </remarks>
         /// <seealso cref="char"/>
-        public OpenStringBuilder Append(char[]? value, int startIndex, int charCount)
+        public MutableTextBuffer Append(char[]? value, int startIndex, int charCount)
         {
             if (startIndex < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(startIndex, ExceptionArgument.startIndex);
@@ -1200,10 +1200,10 @@ namespace J2N.Text
         /// The <see cref="Append(string)"/> method modifies the existing instance of this class;
         /// it does not return a new class instance. Because of this, you can call a method or
         /// property on the existing reference and you do not have to assign the return value
-        /// to an <see cref="OpenStringBuilder"/> object, as the following example illustrates.
+        /// to an <see cref="MutableTextBuffer"/> object, as the following example illustrates.
         /// <code>
         /// bool flag = false;
-        /// J2N.Text.OpenStringBuilder sb = new J2N.Text.OpenStringBuilder();
+        /// J2N.Text.MutableTextBuffer sb = new J2N.Text.MutableTextBuffer();
         /// sb.Append("The value of the flag is ").Append(flag).Append(".");
         /// Console.WriteLine(sb.ToString());
         /// // The example displays the following output:
@@ -1216,13 +1216,13 @@ namespace J2N.Text
         /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
-        /// When you instantiate an <see cref="OpenStringBuilder"/> object by calling the <see cref="OpenStringBuilder(int, int)"/>
-        /// constructor, both the length and the capacity of the <see cref="OpenStringBuilder"/> instance can grow beyond
+        /// When you instantiate an <see cref="MutableTextBuffer"/> object by calling the <see cref="MutableTextBuffer(int, int)"/>
+        /// constructor, both the length and the capacity of the <see cref="MutableTextBuffer"/> instance can grow beyond
         /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
         /// </remarks>
         /// <seealso cref="string"/>
-        public OpenStringBuilder Append(string? value)
+        public MutableTextBuffer Append(string? value)
         {
             if (value is not null)
             {
@@ -1263,12 +1263,12 @@ namespace J2N.Text
         /// <para/>
         /// The <see cref="Append(string, int, int)"/> method modifies the existing instance of this class; it does
         /// not return a new class instance. Because of this, you can call a method or property on the existing
-        /// reference and you do not have to assign the return value to an <see cref="OpenStringBuilder"/> object,
+        /// reference and you do not have to assign the return value to an <see cref="MutableTextBuffer"/> object,
         /// as the following example illustrates.
         /// <code>
         /// string str = "First;George Washington;1789;1797";
         /// int index = 0;
-        /// J2N.Text.OpenStringBuilder sb = new J2N.Text.OpenStringBuilder();
+        /// J2N.Text.MutableTextBuffer sb = new J2N.Text.MutableTextBuffer();
         /// int length = str.IndexOf(';', index);
         /// sb.Append(str, index, length).Append(" President of the United States: ");
         /// index += length + 1;
@@ -1288,13 +1288,13 @@ namespace J2N.Text
         /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
-        /// When you instantiate an <see cref="OpenStringBuilder"/> object by calling the <see cref="OpenStringBuilder(int, int)"/>
-        /// constructor, both the length and the capacity of the <see cref="OpenStringBuilder"/> instance can grow beyond
+        /// When you instantiate an <see cref="MutableTextBuffer"/> object by calling the <see cref="MutableTextBuffer(int, int)"/>
+        /// constructor, both the length and the capacity of the <see cref="MutableTextBuffer"/> instance can grow beyond
         /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
         /// </remarks>
         /// <seealso cref="string"/>
-        public OpenStringBuilder Append(string? value, int startIndex, int count)
+        public MutableTextBuffer Append(string? value, int startIndex, int count)
         {
             if (startIndex < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(startIndex, ExceptionArgument.startIndex);
@@ -1335,7 +1335,7 @@ namespace J2N.Text
         /// The <see cref="Append(StringBuilder)"/> method modifies the existing instance of this class;
         /// it does not return a new class instance. Because of this, you can call a method or
         /// property on the existing reference and you do not have to assign the return value
-        /// to an <see cref="OpenStringBuilder"/> object.
+        /// to an <see cref="MutableTextBuffer"/> object.
         /// <para/>
         /// If <paramref name="value"/> is <c>null</c>, no changes are made.
         /// <para/>
@@ -1343,13 +1343,13 @@ namespace J2N.Text
         /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
-        /// When you instantiate an <see cref="OpenStringBuilder"/> object by calling the <see cref="OpenStringBuilder(int, int)"/>
-        /// constructor, both the length and the capacity of the <see cref="OpenStringBuilder"/> instance can grow beyond
+        /// When you instantiate an <see cref="MutableTextBuffer"/> object by calling the <see cref="MutableTextBuffer(int, int)"/>
+        /// constructor, both the length and the capacity of the <see cref="MutableTextBuffer"/> instance can grow beyond
         /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
         /// </remarks>
         /// <seealso cref="StringBuilder"/>
-        public OpenStringBuilder Append(StringBuilder? value)
+        public MutableTextBuffer Append(StringBuilder? value)
         {
             if (value != null && value.Length != 0)
             {
@@ -1389,13 +1389,13 @@ namespace J2N.Text
         /// <para/>
         /// The <see cref="Append(string, int, int)"/> method modifies the existing instance of this class; it does
         /// not return a new class instance. Because of this, you can call a method or property on the existing
-        /// reference and you do not have to assign the return value to an <see cref="OpenStringBuilder"/> object,
+        /// reference and you do not have to assign the return value to an <see cref="MutableTextBuffer"/> object,
         /// as the following example illustrates.
         /// <code>
         /// string str = "First;George Washington;1789;1797";
         /// System.Text.StringBuilder builder = new System.Text.StringBuilder(str);
         /// int index = 0;
-        /// J2N.Text.OpenStringBuilder sb = new J2N.Text.OpenStringBuilder();
+        /// J2N.Text.MutableTextBuffer sb = new J2N.Text.MutableTextBuffer();
         /// int length = str.IndexOf(';', index);
         /// sb.Append(builder, index, length).Append(" President of the United States: ");
         /// index += length + 1;
@@ -1415,13 +1415,13 @@ namespace J2N.Text
         /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
-        /// When you instantiate an <see cref="OpenStringBuilder"/> object by calling the <see cref="OpenStringBuilder(int, int)"/>
-        /// constructor, both the length and the capacity of the <see cref="OpenStringBuilder"/> instance can grow beyond
+        /// When you instantiate an <see cref="MutableTextBuffer"/> object by calling the <see cref="MutableTextBuffer(int, int)"/>
+        /// constructor, both the length and the capacity of the <see cref="MutableTextBuffer"/> instance can grow beyond
         /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
         /// </remarks>
         /// <seealso cref="StringBuilder"/>
-        public OpenStringBuilder Append(StringBuilder? value, int startIndex, int count)
+        public MutableTextBuffer Append(StringBuilder? value, int startIndex, int count)
         {
             if (startIndex < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(startIndex, ExceptionArgument.startIndex);
@@ -1450,7 +1450,7 @@ namespace J2N.Text
             return AppendCore(value, startIndex, count);
         }
 
-        private OpenStringBuilder AppendCore(StringBuilder value, int startIndex, int count)
+        private MutableTextBuffer AppendCore(StringBuilder value, int startIndex, int count)
         {
             int newLength = Length + count;
 
@@ -1473,7 +1473,7 @@ namespace J2N.Text
 
         #region Custom Append
 
-        public OpenStringBuilder Append(OpenStringBuilder? value)
+        public MutableTextBuffer Append(MutableTextBuffer? value)
         {
             if (value != null && value.Length != 0)
             {
@@ -1482,7 +1482,7 @@ namespace J2N.Text
             return this;
         }
 
-        public OpenStringBuilder Append(OpenStringBuilder? value, int startIndex, int count)
+        public MutableTextBuffer Append(MutableTextBuffer? value, int startIndex, int count)
         {
             if (startIndex < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(startIndex, ExceptionArgument.startIndex);
@@ -1511,7 +1511,7 @@ namespace J2N.Text
             return AppendCore(value, startIndex, count);
         }
 
-        private OpenStringBuilder AppendCore(OpenStringBuilder value, int startIndex, int count)
+        private MutableTextBuffer AppendCore(MutableTextBuffer value, int startIndex, int count)
         {
             if (value == this)
             {
@@ -1540,7 +1540,7 @@ namespace J2N.Text
         #endregion Custom Append
 
         /// <summary>
-        /// Appends the default line terminator to the end of the current <see cref="OpenStringBuilder"/> object.
+        /// Appends the default line terminator to the end of the current <see cref="MutableTextBuffer"/> object.
         /// </summary>
         /// <returns>A reference to this instance after the append operation has completed.</returns>
         /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed
@@ -1552,16 +1552,16 @@ namespace J2N.Text
         /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
-        /// When you instantiate an <see cref="OpenStringBuilder"/> object by calling the <see cref="OpenStringBuilder(int, int)"/>
-        /// constructor, both the length and the capacity of the <see cref="OpenStringBuilder"/> instance can grow beyond
+        /// When you instantiate an <see cref="MutableTextBuffer"/> object by calling the <see cref="MutableTextBuffer(int, int)"/>
+        /// constructor, both the length and the capacity of the <see cref="MutableTextBuffer"/> instance can grow beyond
         /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
         /// </remarks>
-        public OpenStringBuilder AppendLine() => Append(Environment.NewLine);
+        public MutableTextBuffer AppendLine() => Append(Environment.NewLine);
 
         /// <summary>
         /// Appends a copy of the specified string followed by the default line terminator to the end of the
-        /// current <see cref="OpenStringBuilder"/> object.
+        /// current <see cref="MutableTextBuffer"/> object.
         /// </summary>
         /// <param name="value">The string to append.</param>
         /// <returns>A reference to this instance after the append operation has completed.</returns>
@@ -1574,13 +1574,13 @@ namespace J2N.Text
         /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
-        /// When you instantiate an <see cref="OpenStringBuilder"/> object by calling the <see cref="OpenStringBuilder(int, int)"/>
-        /// constructor, both the length and the capacity of the <see cref="OpenStringBuilder"/> instance can grow beyond
+        /// When you instantiate an <see cref="MutableTextBuffer"/> object by calling the <see cref="MutableTextBuffer(int, int)"/>
+        /// constructor, both the length and the capacity of the <see cref="MutableTextBuffer"/> instance can grow beyond
         /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
         /// </remarks>
         /// <seealso cref="string"/>
-        public OpenStringBuilder AppendLine(string? value)
+        public MutableTextBuffer AppendLine(string? value)
         {
             Append(value);
             return Append(Environment.NewLine);
@@ -1588,7 +1588,7 @@ namespace J2N.Text
 
         /// <summary>
         /// Appends a copy of the specified sequence of characters followed by the default line terminator to the end of the
-        /// current <see cref="OpenStringBuilder"/> object.
+        /// current <see cref="MutableTextBuffer"/> object.
         /// </summary>
         /// <param name="value">The sequence of characters to append.</param>
         /// <returns>A reference to this instance after the append operation has completed.</returns>
@@ -1601,13 +1601,13 @@ namespace J2N.Text
         /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
-        /// When you instantiate an <see cref="OpenStringBuilder"/> object by calling the <see cref="OpenStringBuilder(int, int)"/>
-        /// constructor, both the length and the capacity of the <see cref="OpenStringBuilder"/> instance can grow beyond
+        /// When you instantiate an <see cref="MutableTextBuffer"/> object by calling the <see cref="MutableTextBuffer(int, int)"/>
+        /// constructor, both the length and the capacity of the <see cref="MutableTextBuffer"/> instance can grow beyond
         /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
         /// </remarks>
         /// <seealso cref="ReadOnlySpan{Char}"/>
-        public OpenStringBuilder AppendLine(ReadOnlySpan<char> value)
+        public MutableTextBuffer AppendLine(ReadOnlySpan<char> value)
         {
             Append(value);
             return Append(Environment.NewLine);
@@ -1640,11 +1640,11 @@ namespace J2N.Text
         /// </exception>
         /// <remarks>
         /// The <see cref="CopyTo(int, char[], int, int)"/> method is intended to be used in the rare situation when you need to
-        /// efficiently copy successive sections of a <see cref="OpenStringBuilder"/> object to an array. The array should be a
+        /// efficiently copy successive sections of a <see cref="MutableTextBuffer"/> object to an array. The array should be a
         /// fixed size, preallocated, reusable, and possibly globally accessible.
         /// <para/>
         /// To access the characters for processing without allocating any heap memory, better alternatives are to use
-        /// <see cref="this[int]"/>, <see cref="MemoryExtensions.AsSpan(OpenStringBuilder, int, int)"/> or <see cref="CopyTo(int, Span{char}, int)"/>.
+        /// <see cref="this[int]"/>, <see cref="MemoryExtensions.AsSpan(MutableTextBuffer, int, int)"/> or <see cref="CopyTo(int, Span{char}, int)"/>.
         /// </remarks>
         public void CopyTo(int sourceIndex, char[] destination, int destinationIndex, int count)
         {
@@ -1685,10 +1685,10 @@ namespace J2N.Text
         /// </exception>
         /// <remarks>
         /// The <see cref="CopyTo(int, Span{char}, int)"/> method is intended to be used in the rare situation
-        /// when you need to efficiently copy successive sections of a <see cref="OpenStringBuilder"/> object to a span.
+        /// when you need to efficiently copy successive sections of a <see cref="MutableTextBuffer"/> object to a span.
         /// <para/>
         /// To access the characters for processing without alocating any heap memory, better alternatives are to use
-        /// <see cref="this[int]"/> or <see cref="MemoryExtensions.AsSpan(OpenStringBuilder, int, int)"/>.
+        /// <see cref="this[int]"/> or <see cref="MemoryExtensions.AsSpan(MutableTextBuffer, int, int)"/>.
         /// </remarks>
         public void CopyTo(int sourceIndex, Span<char> destination, int count)
         {
@@ -1725,16 +1725,16 @@ namespace J2N.Text
         /// <paramref name="count"/> is less than zero.
         /// </exception>
         /// <exception cref="OutOfMemoryException">
-        /// The current length of this <see cref="OpenStringBuilder"/> object plus the length of <paramref name="value"/>
+        /// The current length of this <see cref="MutableTextBuffer"/> object plus the length of <paramref name="value"/>
         /// times <paramref name="count"/> exceeds <see cref="MaxCapacity"/>.
         /// </exception>
         /// <remarks>
         /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
         /// <para/>
-        /// This <see cref="OpenStringBuilder"/> object is not changed if <paramref name="value"/> is <c>null</c>, 
+        /// This <see cref="MutableTextBuffer"/> object is not changed if <paramref name="value"/> is <c>null</c>, 
         /// <paramref name="value"/> is not <c>null</c> but its length is zero, or <paramref name="count"/> is zero.
         /// </remarks>
-        public OpenStringBuilder Insert(int index, string? value, int count) => Insert(index, value.AsSpan(), count);
+        public MutableTextBuffer Insert(int index, string? value, int count) => Insert(index, value.AsSpan(), count);
 
         /// <summary>
         /// Inserts one or more copies of a specified sequence of characters into this instance at the specified character position.
@@ -1751,16 +1751,16 @@ namespace J2N.Text
         /// <paramref name="count"/> is less than zero.
         /// </exception>
         /// <exception cref="OutOfMemoryException">
-        /// The current length of this <see cref="OpenStringBuilder"/> object plus the length of <paramref name="value"/>
+        /// The current length of this <see cref="MutableTextBuffer"/> object plus the length of <paramref name="value"/>
         /// times <paramref name="count"/> exceeds <see cref="MaxCapacity"/>.
         /// </exception>
         /// <remarks>
         /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
         /// <para/>
-        /// This <see cref="OpenStringBuilder"/> object is not changed if the length of <paramref name="value"/> is zero or
+        /// This <see cref="MutableTextBuffer"/> object is not changed if the length of <paramref name="value"/> is zero or
         /// <paramref name="count"/> is zero.
         /// </remarks>
-        public OpenStringBuilder Insert(int index, ReadOnlySpan<char> value, int count) // J2N: Made public to match ValueStringBuilder API
+        public MutableTextBuffer Insert(int index, ReadOnlySpan<char> value, int count) // J2N: Made public to match ValueStringBuilder API
         {
             if (count < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(count, ExceptionArgument.count);
@@ -1813,7 +1813,7 @@ namespace J2N.Text
         /// the string value of the current instance is shortened by <paramref name="length"/>. The capacity of the
         /// current instance is unaffected.
         /// </remarks>
-        public OpenStringBuilder Remove(int startIndex, int length)
+        public MutableTextBuffer Remove(int startIndex, int length)
         {
             if (length < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(length, ExceptionArgument.length);
@@ -1843,7 +1843,7 @@ namespace J2N.Text
         /// the string value of the current instance is shortened by 1. The capacity of the
         /// current instance is unaffected.
         /// </remarks>
-        public OpenStringBuilder RemoveAt(int index) // Coverage for the JDK (deleteCharAt)
+        public MutableTextBuffer RemoveAt(int index) // Coverage for the JDK (deleteCharAt)
         {
             if (index < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(index, ExceptionArgument.index);
@@ -1896,7 +1896,7 @@ namespace J2N.Text
         /// The capacity of this instance is adjusted as needed.
         /// </remarks>
         /// <seealso cref="bool"/>
-        public OpenStringBuilder Append(bool value) => Append(value, format: BooleanFormat.Lowercase);
+        public MutableTextBuffer Append(bool value) => Append(value, format: BooleanFormat.Lowercase);
 
         /// <summary>
         /// Appends the string representation of a specified Boolean value to this instance
@@ -1909,7 +1909,7 @@ namespace J2N.Text
         /// <remarks>The capacity of this instance is adjusted as needed. </remarks>
         /// <seealso cref="bool"/>
         /// <seealso cref="BooleanFormat"/>
-        public OpenStringBuilder Append(bool value, BooleanFormat format)
+        public MutableTextBuffer Append(bool value, BooleanFormat format)
         {
             string text = FormatBoolean(value, format);
             Append(ref MemoryMarshal.GetReference(text.AsSpan()), text.Length);
@@ -1923,11 +1923,11 @@ namespace J2N.Text
         /// <remarks>
         /// The <see cref="Append(char)"/> method modifies the existing instance of this class;
         /// it does not return a new class instance. Because of this, you can call a method or property
-        /// on the existing reference and you do not have to assign the return value to an <see cref="OpenStringBuilder"/>
+        /// on the existing reference and you do not have to assign the return value to an <see cref="MutableTextBuffer"/>
         /// object, as the following example illustrates.
         /// <code>
         /// string str = "Characters in a string.";
-        /// J2N.Text.OpenStringBuilder sb = new J2N.Text.OpenStringBuilder();
+        /// J2N.Text.MutableTextBuffer sb = new J2N.Text.MutableTextBuffer();
         /// foreach (var ch in str)
         ///    sb.Append(" '").Append(ch).Append("' ");
         /// 
@@ -1942,13 +1942,13 @@ namespace J2N.Text
         /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
-        /// When you instantiate an <see cref="OpenStringBuilder"/> object by calling the <see cref="OpenStringBuilder(int, int)"/>
-        /// constructor, both the length and the capacity of the <see cref="OpenStringBuilder"/> instance can grow beyond
+        /// When you instantiate an <see cref="MutableTextBuffer"/> object by calling the <see cref="MutableTextBuffer(int, int)"/>
+        /// constructor, both the length and the capacity of the <see cref="MutableTextBuffer"/> instance can grow beyond
         /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
         /// </remarks>
         /// <seealso cref="char"/>
-        public OpenStringBuilder Append(char value)
+        public MutableTextBuffer Append(char value)
         {
             int pos = m_Position;
             if ((uint)pos < (uint)m_Chars.Length)
@@ -1986,14 +1986,14 @@ namespace J2N.Text
         /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
-        /// When you instantiate an <see cref="OpenStringBuilder"/> object by calling the <see cref="OpenStringBuilder(int, int)"/>
-        /// constructor, both the length and the capacity of the <see cref="OpenStringBuilder"/> instance can grow beyond
+        /// When you instantiate an <see cref="MutableTextBuffer"/> object by calling the <see cref="MutableTextBuffer(int, int)"/>
+        /// constructor, both the length and the capacity of the <see cref="MutableTextBuffer"/> instance can grow beyond
         /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
         /// </remarks>
         /// <seealso cref="sbyte"/>
         [CLSCompliant(false)]
-        public OpenStringBuilder Append(sbyte value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
+        public MutableTextBuffer Append(sbyte value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
             => AppendSpanFormattable(value, format, provider);
 #else
@@ -2020,13 +2020,13 @@ namespace J2N.Text
         /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
-        /// When you instantiate an <see cref="OpenStringBuilder"/> object by calling the <see cref="OpenStringBuilder(int, int)"/>
-        /// constructor, both the length and the capacity of the <see cref="OpenStringBuilder"/> instance can grow beyond
+        /// When you instantiate an <see cref="MutableTextBuffer"/> object by calling the <see cref="MutableTextBuffer(int, int)"/>
+        /// constructor, both the length and the capacity of the <see cref="MutableTextBuffer"/> instance can grow beyond
         /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
         /// </remarks>
         /// <seealso cref="byte"/>
-        public OpenStringBuilder Append(byte value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
+        public MutableTextBuffer Append(byte value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
             => AppendSpanFormattable(value, format, provider);
 #else
@@ -2053,13 +2053,13 @@ namespace J2N.Text
         /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
-        /// When you instantiate an <see cref="OpenStringBuilder"/> object by calling the <see cref="OpenStringBuilder(int, int)"/>
-        /// constructor, both the length and the capacity of the <see cref="OpenStringBuilder"/> instance can grow beyond
+        /// When you instantiate an <see cref="MutableTextBuffer"/> object by calling the <see cref="MutableTextBuffer(int, int)"/>
+        /// constructor, both the length and the capacity of the <see cref="MutableTextBuffer"/> instance can grow beyond
         /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
         /// </remarks>
         /// <seealso cref="short"/>
-        public OpenStringBuilder Append(short value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
+        public MutableTextBuffer Append(short value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
             => AppendSpanFormattable(value, format, provider);
 #else
@@ -2086,13 +2086,13 @@ namespace J2N.Text
         /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
-        /// When you instantiate an <see cref="OpenStringBuilder"/> object by calling the <see cref="OpenStringBuilder(int, int)"/>
-        /// constructor, both the length and the capacity of the <see cref="OpenStringBuilder"/> instance can grow beyond
+        /// When you instantiate an <see cref="MutableTextBuffer"/> object by calling the <see cref="MutableTextBuffer(int, int)"/>
+        /// constructor, both the length and the capacity of the <see cref="MutableTextBuffer"/> instance can grow beyond
         /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
         /// </remarks>
         /// <seealso cref="int"/>
-        public OpenStringBuilder Append(int value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
+        public MutableTextBuffer Append(int value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
             => AppendSpanFormattable(value, format, provider);
 #else
@@ -2119,13 +2119,13 @@ namespace J2N.Text
         /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
-        /// When you instantiate an <see cref="OpenStringBuilder"/> object by calling the <see cref="OpenStringBuilder(int, int)"/>
-        /// constructor, both the length and the capacity of the <see cref="OpenStringBuilder"/> instance can grow beyond
+        /// When you instantiate an <see cref="MutableTextBuffer"/> object by calling the <see cref="MutableTextBuffer(int, int)"/>
+        /// constructor, both the length and the capacity of the <see cref="MutableTextBuffer"/> instance can grow beyond
         /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
         /// </remarks>
         /// <seealso cref="long"/>
-        public OpenStringBuilder Append(long value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
+        public MutableTextBuffer Append(long value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
             => AppendSpanFormattable(value, format, provider);
 #else
@@ -2151,13 +2151,13 @@ namespace J2N.Text
         /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
-        /// When you instantiate an <see cref="OpenStringBuilder"/> object by calling the <see cref="OpenStringBuilder(int, int)"/>
-        /// constructor, both the length and the capacity of the <see cref="OpenStringBuilder"/> instance can grow beyond
+        /// When you instantiate an <see cref="MutableTextBuffer"/> object by calling the <see cref="MutableTextBuffer(int, int)"/>
+        /// constructor, both the length and the capacity of the <see cref="MutableTextBuffer"/> instance can grow beyond
         /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
         /// </remarks>
         /// <seealso cref="float"/>
-        public OpenStringBuilder Append(float value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
+        public MutableTextBuffer Append(float value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
             => AppendNumberCore<float, SingleFormatter>(6, value, format.AsSpan(), provider);
 
         /// <summary>
@@ -2180,13 +2180,13 @@ namespace J2N.Text
         /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
-        /// When you instantiate an <see cref="OpenStringBuilder"/> object by calling the <see cref="OpenStringBuilder(int, int)"/>
-        /// constructor, both the length and the capacity of the <see cref="OpenStringBuilder"/> instance can grow beyond
+        /// When you instantiate an <see cref="MutableTextBuffer"/> object by calling the <see cref="MutableTextBuffer(int, int)"/>
+        /// constructor, both the length and the capacity of the <see cref="MutableTextBuffer"/> instance can grow beyond
         /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
         /// </remarks>
         /// <seealso cref="double"/>
-        public OpenStringBuilder Append(double value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
+        public MutableTextBuffer Append(double value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
             => AppendNumberCore<double, DoubleFormatter>(14, value, format.AsSpan(), provider);
 
         /// <summary>
@@ -2209,14 +2209,14 @@ namespace J2N.Text
         /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
-        /// When you instantiate an <see cref="OpenStringBuilder"/> object by calling the <see cref="OpenStringBuilder(int, int)"/>
-        /// constructor, both the length and the capacity of the <see cref="OpenStringBuilder"/> instance can grow beyond
+        /// When you instantiate an <see cref="MutableTextBuffer"/> object by calling the <see cref="MutableTextBuffer(int, int)"/>
+        /// constructor, both the length and the capacity of the <see cref="MutableTextBuffer"/> instance can grow beyond
         /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
         /// </remarks>
         /// <seealso cref="decimal"/>
         // J2N TODO: Since BigDecimal in Java doesn't use the same default format as this, we will need to change the default before this can be made public
-        internal OpenStringBuilder Append(decimal value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
+        internal MutableTextBuffer Append(decimal value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
             => AppendSpanFormattable(value, format, provider);
 #else
@@ -2243,14 +2243,14 @@ namespace J2N.Text
         /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
-        /// When you instantiate an <see cref="OpenStringBuilder"/> object by calling the <see cref="OpenStringBuilder(int, int)"/>
-        /// constructor, both the length and the capacity of the <see cref="OpenStringBuilder"/> instance can grow beyond
+        /// When you instantiate an <see cref="MutableTextBuffer"/> object by calling the <see cref="MutableTextBuffer(int, int)"/>
+        /// constructor, both the length and the capacity of the <see cref="MutableTextBuffer"/> instance can grow beyond
         /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
         /// </remarks>
         /// <seealso cref="ushort"/>
         [CLSCompliant(false)]
-        public OpenStringBuilder Append(ushort value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
+        public MutableTextBuffer Append(ushort value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
             => AppendSpanFormattable(value, format, provider);
 #else
@@ -2276,14 +2276,14 @@ namespace J2N.Text
         /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
-        /// When you instantiate an <see cref="OpenStringBuilder"/> object by calling the <see cref="OpenStringBuilder(int, int)"/>
-        /// constructor, both the length and the capacity of the <see cref="OpenStringBuilder"/> instance can grow beyond
+        /// When you instantiate an <see cref="MutableTextBuffer"/> object by calling the <see cref="MutableTextBuffer(int, int)"/>
+        /// constructor, both the length and the capacity of the <see cref="MutableTextBuffer"/> instance can grow beyond
         /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
         /// </remarks>
         /// <seealso cref="uint"/>
         [CLSCompliant(false)]
-        public OpenStringBuilder Append(uint value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
+        public MutableTextBuffer Append(uint value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
             => AppendSpanFormattable(value, format, provider);
 #else
@@ -2310,14 +2310,14 @@ namespace J2N.Text
         /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
-        /// When you instantiate an <see cref="OpenStringBuilder"/> object by calling the <see cref="OpenStringBuilder(int, int)"/>
-        /// constructor, both the length and the capacity of the <see cref="OpenStringBuilder"/> instance can grow beyond
+        /// When you instantiate an <see cref="MutableTextBuffer"/> object by calling the <see cref="MutableTextBuffer(int, int)"/>
+        /// constructor, both the length and the capacity of the <see cref="MutableTextBuffer"/> instance can grow beyond
         /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
         /// </remarks>
         /// <seealso cref="ulong"/>
         [CLSCompliant(false)]
-        public OpenStringBuilder Append(ulong value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
+        public MutableTextBuffer Append(ulong value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
             => AppendSpanFormattable(value, format, provider);
 #else
@@ -2327,7 +2327,7 @@ namespace J2N.Text
         // J2N: Helper method for supported types so we don't need to duplicate all of this business logic
         // on every number type.
 
-        private OpenStringBuilder AppendNumberCore<T, TFormatter>(
+        private MutableTextBuffer AppendNumberCore<T, TFormatter>(
             int ensureAdditionalCapacityBeyondPos, T value, ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
             where TFormatter : struct, INumberFormatter<T>
         {
@@ -2336,7 +2336,7 @@ namespace J2N.Text
             if ((uint)m_Position + (uint)ensureAdditionalCapacityBeyondPos > (uint)m_Chars.Length)
             {
                 // Check if the valueCount will put us over m_MaxCapacity.
-                // Doing the check here prevents corruption of the OpenStringBuilder.
+                // Doing the check here prevents corruption of the MutableTextBuffer.
                 int newLength = m_Position + ensureAdditionalCapacityBeyondPos;
                 if (newLength > m_MaxCapacity)
                 {
@@ -2350,7 +2350,7 @@ namespace J2N.Text
             while (!default(TFormatter).TryFormat(value, format, provider, m_Chars.AsSpan(m_Position), out charsWritten))
             {
                 // Check if the valueCount will put us over m_MaxCapacity.
-                // Doing the check here prevents corruption of the OpenStringBuilder.
+                // Doing the check here prevents corruption of the MutableTextBuffer.
                 int newLength = m_Chars.Length * 2;
                 if (newLength > m_MaxCapacity)
                 {
@@ -2369,7 +2369,7 @@ namespace J2N.Text
         #endregion Append Number
 
 
-        private OpenStringBuilder AppendSpanFormattable<T>(T value, ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
+        private MutableTextBuffer AppendSpanFormattable<T>(T value, ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
             where T : ISpanFormattable
 #else
@@ -2386,7 +2386,7 @@ namespace J2N.Text
                 int additionalCapacity = length - m_Position == length ? m_Chars.Length + 1 : m_Chars.Length; // Ensure we request enough to cause a re-grow
 
                 // Check if the valueCount will put us over m_MaxCapacity.
-                // Doing the check here prevents corruption of the OpenStringBuilder.
+                // Doing the check here prevents corruption of the MutableTextBuffer.
                 int newLength = m_Position + additionalCapacity;
                 if (newLength > m_MaxCapacity)
                 {
@@ -2418,13 +2418,13 @@ namespace J2N.Text
         /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
-        /// When you instantiate an <see cref="OpenStringBuilder"/> object by calling the <see cref="OpenStringBuilder(int, int)"/>
-        /// constructor, both the length and the capacity of the <see cref="OpenStringBuilder"/> instance can grow beyond
+        /// When you instantiate an <see cref="MutableTextBuffer"/> object by calling the <see cref="MutableTextBuffer(int, int)"/>
+        /// constructor, both the length and the capacity of the <see cref="MutableTextBuffer"/> instance can grow beyond
         /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
         /// </remarks>
         /// <seealso cref="object"/>
-        public OpenStringBuilder Append(object? value, string? format = null, IFormatProvider? provider = null)
+        public MutableTextBuffer Append(object? value, string? format = null, IFormatProvider? provider = null)
         {
             if (value is null)
                 return this; // no-op
@@ -2457,11 +2457,11 @@ namespace J2N.Text
         /// <para/>
         /// The <see cref="Append(char[])"/> method modifies the existing instance of this class; it does not
         /// return a new class instance. Because of this, you can call a method or property on the existing
-        /// reference and you do not have to assign the return value to an <see cref="OpenStringBuilder"/> object,
+        /// reference and you do not have to assign the return value to an <see cref="MutableTextBuffer"/> object,
         /// as the following example illustrates.
         /// <code>
         /// char[] chars = { 'a', 'e', 'i', 'o', 'u' };
-        /// J2N.Text.OpenStringBuilder sb = new J2N.Text.OpenStringBuilder();
+        /// J2N.Text.MutableTextBuffer sb = new J2N.Text.MutableTextBuffer();
         /// sb.Append("The characters in the array: ").Append(chars);
         /// Console.WriteLine(sb);
         /// // The example displays the following output:
@@ -2472,13 +2472,13 @@ namespace J2N.Text
         /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
-        /// When you instantiate an <see cref="OpenStringBuilder"/> object by calling the <see cref="OpenStringBuilder(int, int)"/>
-        /// constructor, both the length and the capacity of the <see cref="OpenStringBuilder"/> instance can grow beyond
+        /// When you instantiate an <see cref="MutableTextBuffer"/> object by calling the <see cref="MutableTextBuffer(int, int)"/>
+        /// constructor, both the length and the capacity of the <see cref="MutableTextBuffer"/> instance can grow beyond
         /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
         /// </remarks>
         /// <seealso cref="char"/>
-        public OpenStringBuilder Append(char[]? value)
+        public MutableTextBuffer Append(char[]? value)
         {
             if (value is not null)
             {
@@ -2498,7 +2498,7 @@ namespace J2N.Text
         /// <param name="value">The read-only character span to append.</param>
         /// <returns>A reference to this instance after the append operation is completed.</returns>
         /// <seealso cref="ReadOnlySpan{Char}"/>
-        public OpenStringBuilder Append(ReadOnlySpan<char> value)
+        public MutableTextBuffer Append(ReadOnlySpan<char> value)
         {
             Append(ref MemoryMarshal.GetReference(value), value.Length);
             return this;
@@ -2510,35 +2510,35 @@ namespace J2N.Text
         /// <param name="value">The read-only character memory region to append.</param>
         /// <returns>A reference to this instance after the append operation is completed.</returns>
         /// <seealso cref="ReadOnlyMemory{Char}"/>
-        public OpenStringBuilder Append(ReadOnlyMemory<char> value) => Append(value.Span);
+        public MutableTextBuffer Append(ReadOnlyMemory<char> value) => Append(value.Span);
 
         // J2N TODO: API - String interpolation for J2N formatters
 
         ///// <summary>Appends the specified interpolated string to this instance.</summary>
         ///// <param name="handler">The interpolated string to append.</param>
         ///// <returns>A reference to this instance after the append operation has completed.</returns>
-        //public OpenStringBuilder Append([InterpolatedStringHandlerArgument("")] ref AppendInterpolatedStringHandler handler) => this;
+        //public MutableTextBuffer Append([InterpolatedStringHandlerArgument("")] ref AppendInterpolatedStringHandler handler) => this;
 
         ///// <summary>Appends the specified interpolated string to this instance.</summary>
         ///// <param name="provider">An object that supplies culture-specific formatting information.</param>
         ///// <param name="handler">The interpolated string to append.</param>
         ///// <returns>A reference to this instance after the append operation has completed.</returns>
-        //public OpenStringBuilder Append(IFormatProvider? provider, [InterpolatedStringHandlerArgument("", nameof(provider))] ref AppendInterpolatedStringHandler handler) => this;
+        //public MutableTextBuffer Append(IFormatProvider? provider, [InterpolatedStringHandlerArgument("", nameof(provider))] ref AppendInterpolatedStringHandler handler) => this;
 
-        ///// <summary>Appends the specified interpolated string followed by the default line terminator to the end of the current OpenStringBuilder object.</summary>
+        ///// <summary>Appends the specified interpolated string followed by the default line terminator to the end of the current MutableTextBuffer object.</summary>
         ///// <param name="handler">The interpolated string to append.</param>
         ///// <returns>A reference to this instance after the append operation has completed.</returns>
-        //public OpenStringBuilder AppendLine([InterpolatedStringHandlerArgument("")] ref AppendInterpolatedStringHandler handler) => AppendLine();
+        //public MutableTextBuffer AppendLine([InterpolatedStringHandlerArgument("")] ref AppendInterpolatedStringHandler handler) => AppendLine();
 
-        ///// <summary>Appends the specified interpolated string followed by the default line terminator to the end of the current OpenStringBuilder object.</summary>
+        ///// <summary>Appends the specified interpolated string followed by the default line terminator to the end of the current MutableTextBuffer object.</summary>
         ///// <param name="provider">An object that supplies culture-specific formatting information.</param>
         ///// <param name="handler">The interpolated string to append.</param>
         ///// <returns>A reference to this instance after the append operation has completed.</returns>
-        //public OpenStringBuilder AppendLine(IFormatProvider? provider, [InterpolatedStringHandlerArgument("", nameof(provider))] ref AppendInterpolatedStringHandler handler) => AppendLine();
+        //public MutableTextBuffer AppendLine(IFormatProvider? provider, [InterpolatedStringHandlerArgument("", nameof(provider))] ref AppendInterpolatedStringHandler handler) => AppendLine();
 
         #region AppendJoin
 
-        public OpenStringBuilder AppendJoin(string? separator, params object?[] values)
+        public MutableTextBuffer AppendJoin(string? separator, params object?[] values)
         {
             if (values is null)
             {
@@ -2549,24 +2549,13 @@ namespace J2N.Text
             return AppendJoinCore(ref MemoryMarshal.GetReference(separator.AsSpan()), separator.Length, values);
         }
 
-        public OpenStringBuilder AppendJoin(string? separator, params ReadOnlySpan<object?> values)
+        public MutableTextBuffer AppendJoin(string? separator, params ReadOnlySpan<object?> values)
         {
             separator ??= string.Empty;
             return AppendJoinCore(ref MemoryMarshal.GetReference(separator.AsSpan()), separator.Length, values);
         }
 
-        public OpenStringBuilder AppendJoin<T>(string? separator, IEnumerable<T> values)
-        {
-            if (values is null)
-            {
-                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.values);
-            }
-
-            separator ??= string.Empty;
-            return AppendJoinCore(ref MemoryMarshal.GetReference(separator.AsSpan()), separator.Length, values);
-        }
-
-        public OpenStringBuilder AppendJoin(string? separator, params string?[] values)
+        public MutableTextBuffer AppendJoin<T>(string? separator, IEnumerable<T> values)
         {
             if (values is null)
             {
@@ -2577,13 +2566,24 @@ namespace J2N.Text
             return AppendJoinCore(ref MemoryMarshal.GetReference(separator.AsSpan()), separator.Length, values);
         }
 
-        public OpenStringBuilder AppendJoin(string? separator, params ReadOnlySpan<string?> values)
+        public MutableTextBuffer AppendJoin(string? separator, params string?[] values)
+        {
+            if (values is null)
+            {
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.values);
+            }
+
+            separator ??= string.Empty;
+            return AppendJoinCore(ref MemoryMarshal.GetReference(separator.AsSpan()), separator.Length, values);
+        }
+
+        public MutableTextBuffer AppendJoin(string? separator, params ReadOnlySpan<string?> values)
         {
             separator ??= string.Empty;
             return AppendJoinCore(ref MemoryMarshal.GetReference(separator.AsSpan()), separator.Length, values);
         }
 
-        public OpenStringBuilder AppendJoin(char separator, params object?[] values)
+        public MutableTextBuffer AppendJoin(char separator, params object?[] values)
         {
             if (values is null)
             {
@@ -2593,10 +2593,10 @@ namespace J2N.Text
             return AppendJoinCore(ref separator, 1, values);
         }
 
-        public OpenStringBuilder AppendJoin(char separator, params ReadOnlySpan<object?> values) =>
+        public MutableTextBuffer AppendJoin(char separator, params ReadOnlySpan<object?> values) =>
             AppendJoinCore(ref separator, 1, values);
 
-        public OpenStringBuilder AppendJoin<T>(char separator, IEnumerable<T> values)
+        public MutableTextBuffer AppendJoin<T>(char separator, IEnumerable<T> values)
         {
             if (values is null)
             {
@@ -2606,7 +2606,7 @@ namespace J2N.Text
             return AppendJoinCore(ref separator, 1, values);
         }
 
-        public OpenStringBuilder AppendJoin(char separator, params string?[] values)
+        public MutableTextBuffer AppendJoin(char separator, params string?[] values)
         {
             if (values is null)
             {
@@ -2616,10 +2616,10 @@ namespace J2N.Text
             return AppendJoinCore(ref separator, 1, values);
         }
 
-        public OpenStringBuilder AppendJoin(char separator, params ReadOnlySpan<string?> values) =>
+        public MutableTextBuffer AppendJoin(char separator, params ReadOnlySpan<string?> values) =>
             AppendJoinCore(ref separator, 1, values);
 
-        private OpenStringBuilder AppendJoinCore<T>(ref char separator, int separatorLength, IEnumerable<T> values)
+        private MutableTextBuffer AppendJoinCore<T>(ref char separator, int separatorLength, IEnumerable<T> values)
         {
             Debug.Assert(values != null);
             Debug.Assert(!Unsafe.IsNullRef(ref separator));
@@ -2651,7 +2651,7 @@ namespace J2N.Text
             return this;
         }
 
-        private OpenStringBuilder AppendJoinCore<T>(ref char separator, int separatorLength, ReadOnlySpan<T> values)
+        private MutableTextBuffer AppendJoinCore<T>(ref char separator, int separatorLength, ReadOnlySpan<T> values)
         {
             if (values.IsEmpty)
             {
@@ -2687,16 +2687,16 @@ namespace J2N.Text
         /// <para/>
         /// -or-
         /// <para/>
-        /// The current length of this <see cref="OpenStringBuilder"/> object plus the length of
+        /// The current length of this <see cref="MutableTextBuffer"/> object plus the length of
         /// <paramref name="value"/> exceeds <see cref="MaxCapacity"/>.
         /// </exception>
         /// <remarks>
         /// Existing characters are shifted to make room for the new text. The capacity is adjusted as needed.
         /// <para/>
-        /// This instance of <see cref="OpenStringBuilder"/> is not changed if <paramref name="value"/> is <c>null</c>,
+        /// This instance of <see cref="MutableTextBuffer"/> is not changed if <paramref name="value"/> is <c>null</c>,
         /// or <paramref name="value"/> is not <c>null</c> but its length is zero.
         /// </remarks>
-        public OpenStringBuilder Insert(int index, string? value)
+        public MutableTextBuffer Insert(int index, string? value)
         {
             if ((uint)index > (uint)Length)
             {
@@ -2723,7 +2723,7 @@ namespace J2N.Text
         /// <para/>
         /// -or-
         /// <para/>
-        /// The current length of this <see cref="OpenStringBuilder"/> object plus the length of
+        /// The current length of this <see cref="MutableTextBuffer"/> object plus the length of
         /// <paramref name="value"/> exceeds <see cref="MaxCapacity"/>.
         /// </exception>
         /// <remarks>
@@ -2733,7 +2733,7 @@ namespace J2N.Text
         /// Existing characters are shifted to make room for the new text. The capacity is adjusted as needed.
         /// </remarks>
         /// <seealso cref="bool"/>
-        public OpenStringBuilder Insert(int index, bool value) => Insert(index, value, BooleanFormat.Lowercase);
+        public MutableTextBuffer Insert(int index, bool value) => Insert(index, value, BooleanFormat.Lowercase);
 
         /// <summary>
         /// Inserts the string representation of a specified Boolean value to this instance
@@ -2749,7 +2749,7 @@ namespace J2N.Text
         /// <para/>
         /// -or-
         /// <para/>
-        /// The current length of this <see cref="OpenStringBuilder"/> object plus the length of
+        /// The current length of this <see cref="MutableTextBuffer"/> object plus the length of
         /// <paramref name="value"/> exceeds <see cref="MaxCapacity"/>.
         /// </exception>
         /// <remarks>
@@ -2757,7 +2757,7 @@ namespace J2N.Text
         /// </remarks>
         /// <seealso cref="bool"/>
         /// <seealso cref="BooleanFormat"/>
-        public OpenStringBuilder Insert(int index, bool value, BooleanFormat format)
+        public MutableTextBuffer Insert(int index, bool value, BooleanFormat format)
         {
             string text = FormatBoolean(value, format);
             // We don't use Insert(int, ReadOnlySpan<char>) for exception compatibility;
@@ -2785,7 +2785,7 @@ namespace J2N.Text
         /// <para/>
         /// -or-
         /// <para/>
-        /// The current length of this <see cref="OpenStringBuilder"/> object plus the length of
+        /// The current length of this <see cref="MutableTextBuffer"/> object plus the length of
         /// <paramref name="value"/> exceeds <see cref="MaxCapacity"/>.
         /// </exception>
         /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
@@ -2794,7 +2794,7 @@ namespace J2N.Text
         /// </remarks>
         /// <seealso cref="sbyte"/>
         [CLSCompliant(false)]
-        public OpenStringBuilder Insert(int index, sbyte value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
+        public MutableTextBuffer Insert(int index, sbyte value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
             => InsertSpanFormattable(index, value, format.AsSpan(), provider);
 #else
@@ -2818,7 +2818,7 @@ namespace J2N.Text
         /// <para/>
         /// -or-
         /// <para/>
-        /// The current length of this <see cref="OpenStringBuilder"/> object plus the length of
+        /// The current length of this <see cref="MutableTextBuffer"/> object plus the length of
         /// <paramref name="value"/> exceeds <see cref="MaxCapacity"/>.
         /// </exception>
         /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
@@ -2826,7 +2826,7 @@ namespace J2N.Text
         /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
         /// </remarks>
         /// <seealso cref="byte"/>
-        public OpenStringBuilder Insert(int index, byte value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
+        public MutableTextBuffer Insert(int index, byte value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
             => InsertSpanFormattable(index, value, format, provider);
 #else
@@ -2850,7 +2850,7 @@ namespace J2N.Text
         /// <para/>
         /// -or-
         /// <para/>
-        /// The current length of this <see cref="OpenStringBuilder"/> object plus the length of
+        /// The current length of this <see cref="MutableTextBuffer"/> object plus the length of
         /// <paramref name="value"/> exceeds <see cref="MaxCapacity"/>.
         /// </exception>
         /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
@@ -2858,7 +2858,7 @@ namespace J2N.Text
         /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
         /// </remarks>
         /// <seealso cref="short"/>
-        public OpenStringBuilder Insert(int index, short value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
+        public MutableTextBuffer Insert(int index, short value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
             => InsertSpanFormattable(index, value, format, provider);
 #else
@@ -2881,7 +2881,7 @@ namespace J2N.Text
         /// <para/>
         /// -or-
         /// <para/>
-        /// The current length of this <see cref="OpenStringBuilder"/> object plus the length of
+        /// The current length of this <see cref="MutableTextBuffer"/> object plus the length of
         /// <paramref name="value"/> exceeds <see cref="MaxCapacity"/>.
         /// </exception>
         /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
@@ -2890,7 +2890,7 @@ namespace J2N.Text
         /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
         /// </remarks>
         /// <seealso cref="int"/>
-        public OpenStringBuilder Insert(int index, int value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
+        public MutableTextBuffer Insert(int index, int value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
             => InsertSpanFormattable(index, value, format, provider);
 #else
@@ -2914,7 +2914,7 @@ namespace J2N.Text
         /// <para/>
         /// -or-
         /// <para/>
-        /// The current length of this <see cref="OpenStringBuilder"/> object plus the length of
+        /// The current length of this <see cref="MutableTextBuffer"/> object plus the length of
         /// <paramref name="value"/> exceeds <see cref="MaxCapacity"/>.
         /// </exception>
         /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
@@ -2922,7 +2922,7 @@ namespace J2N.Text
         /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
         /// </remarks>
         /// <seealso cref="long"/>
-        public OpenStringBuilder Insert(int index, long value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
+        public MutableTextBuffer Insert(int index, long value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
             => InsertSpanFormattable(index, value, format, provider);
 #else
@@ -2946,7 +2946,7 @@ namespace J2N.Text
         /// <para/>
         /// -or-
         /// <para/>
-        /// The current length of this <see cref="OpenStringBuilder"/> object plus the length of
+        /// The current length of this <see cref="MutableTextBuffer"/> object plus the length of
         /// <paramref name="value"/> exceeds <see cref="MaxCapacity"/>.
         /// </exception>
         /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
@@ -2954,7 +2954,7 @@ namespace J2N.Text
         /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
         /// </remarks>
         /// <seealso cref="float"/>
-        public OpenStringBuilder Insert(int index, float value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
+        public MutableTextBuffer Insert(int index, float value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
             => InsertNumberCore<float, SingleFormatter>(index, value, format.AsSpan(), provider);
 
         /// <summary>
@@ -2974,7 +2974,7 @@ namespace J2N.Text
         /// <para/>
         /// -or-
         /// <para/>
-        /// The current length of this <see cref="OpenStringBuilder"/> object plus the length of
+        /// The current length of this <see cref="MutableTextBuffer"/> object plus the length of
         /// <paramref name="value"/> exceeds <see cref="MaxCapacity"/>.
         /// </exception>
         /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
@@ -2982,7 +2982,7 @@ namespace J2N.Text
         /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
         /// </remarks>
         /// <seealso cref="double"/>
-        public OpenStringBuilder Insert(int index, double value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
+        public MutableTextBuffer Insert(int index, double value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
             => InsertNumberCore<double, DoubleFormatter>(index, value, format.AsSpan(), provider);
 
         /// <summary>
@@ -3002,7 +3002,7 @@ namespace J2N.Text
         /// <para/>
         /// -or-
         /// <para/>
-        /// The current length of this <see cref="OpenStringBuilder"/> object plus the length of
+        /// The current length of this <see cref="MutableTextBuffer"/> object plus the length of
         /// <paramref name="value"/> exceeds <see cref="MaxCapacity"/>.
         /// </exception>
         /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
@@ -3011,7 +3011,7 @@ namespace J2N.Text
         /// </remarks>
         /// <seealso cref="decimal"/>
         // J2N TODO: Since BigDecimal in Java doesn't use the same default format as this, we will need to change the default before this can be made public
-        internal OpenStringBuilder Insert(int index, decimal value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
+        internal MutableTextBuffer Insert(int index, decimal value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
             => InsertSpanFormattable(index, value, format, provider);
 #else
@@ -3035,7 +3035,7 @@ namespace J2N.Text
         /// <para/>
         /// -or-
         /// <para/>
-        /// The current length of this <see cref="OpenStringBuilder"/> object plus the length of
+        /// The current length of this <see cref="MutableTextBuffer"/> object plus the length of
         /// <paramref name="value"/> exceeds <see cref="MaxCapacity"/>.
         /// </exception>
         /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
@@ -3044,7 +3044,7 @@ namespace J2N.Text
         /// </remarks>
         /// <seealso cref="ushort"/>
         [CLSCompliant(false)]
-        public OpenStringBuilder Insert(int index, ushort value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
+        public MutableTextBuffer Insert(int index, ushort value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
             => InsertSpanFormattable(index, value, format, provider);
 #else
@@ -3068,7 +3068,7 @@ namespace J2N.Text
         /// <para/>
         /// -or-
         /// <para/>
-        /// The current length of this <see cref="OpenStringBuilder"/> object plus the length of
+        /// The current length of this <see cref="MutableTextBuffer"/> object plus the length of
         /// <paramref name="value"/> exceeds <see cref="MaxCapacity"/>.
         /// </exception>
         /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
@@ -3077,7 +3077,7 @@ namespace J2N.Text
         /// </remarks>
         /// <seealso cref="uint"/>
         [CLSCompliant(false)]
-        public OpenStringBuilder Insert(int index, uint value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
+        public MutableTextBuffer Insert(int index, uint value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
             => InsertSpanFormattable(index, value, format, provider);
 #else
@@ -3101,7 +3101,7 @@ namespace J2N.Text
         /// <para/>
         /// -or-
         /// <para/>
-        /// The current length of this <see cref="OpenStringBuilder"/> object plus the length of
+        /// The current length of this <see cref="MutableTextBuffer"/> object plus the length of
         /// <paramref name="value"/> exceeds <see cref="MaxCapacity"/>.
         /// </exception>
         /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
@@ -3110,7 +3110,7 @@ namespace J2N.Text
         /// </remarks>
         /// <seealso cref="ulong"/>
         [CLSCompliant(false)]
-        public OpenStringBuilder Insert(int index, ulong value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
+        public MutableTextBuffer Insert(int index, ulong value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
             => InsertSpanFormattable(index, value, format, provider);
 #else
@@ -3119,7 +3119,7 @@ namespace J2N.Text
 
         // J2N: Helper method for supported types so we don't need to duplicate all of this business logic
         // on every number type.
-        private OpenStringBuilder InsertNumberCore<T, TFormatter>(
+        private MutableTextBuffer InsertNumberCore<T, TFormatter>(
             int index, T value, ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
             where TFormatter : struct, INumberFormatter<T>
         {
@@ -3137,7 +3137,7 @@ namespace J2N.Text
                 while (!default(TFormatter).TryFormat(value, format, provider, buffer, out charsWritten))
                 {
                     // Check if the valueCount will put us over m_MaxCapacity.
-                    // Doing the check here prevents corruption of the OpenStringBuilder.
+                    // Doing the check here prevents corruption of the MutableTextBuffer.
                     int newLength = buffer.Length * 2;
                     if (newLength > m_MaxCapacity)
                     {
@@ -3172,14 +3172,14 @@ namespace J2N.Text
         /// <para/>
         /// -or-
         /// <para/>
-        /// The current length of this <see cref="OpenStringBuilder"/> object plus the length of
+        /// The current length of this <see cref="MutableTextBuffer"/> object plus the length of
         /// <paramref name="value"/> exceeds <see cref="MaxCapacity"/>.
         /// </exception>
         /// <remarks>
         /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
         /// </remarks>
         /// <seealso cref="char"/>
-        public OpenStringBuilder Insert(int index, char value)
+        public MutableTextBuffer Insert(int index, char value)
         {
             if ((uint)index > (uint)Length)
             {
@@ -3202,16 +3202,16 @@ namespace J2N.Text
         /// <para/>
         /// -or-
         /// <para/>
-        /// The current length of this <see cref="OpenStringBuilder"/> object plus the length of
+        /// The current length of this <see cref="MutableTextBuffer"/> object plus the length of
         /// <paramref name="value"/> exceeds <see cref="MaxCapacity"/>.
         /// </exception>
         /// <remarks>
         /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
         /// <para/>
-        /// If <paramref name="value"/> is <c>null</c>, the <see cref="OpenStringBuilder"/> is not changed.
+        /// If <paramref name="value"/> is <c>null</c>, the <see cref="MutableTextBuffer"/> is not changed.
         /// </remarks>
         /// <seealso cref="char"/>
-        public OpenStringBuilder Insert(int index, char[]? value)
+        public MutableTextBuffer Insert(int index, char[]? value)
         {
             if ((uint)index > (uint)Length)
             {
@@ -3259,7 +3259,7 @@ namespace J2N.Text
         /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
         /// </remarks>
         /// <seealso cref="char"/>
-        public OpenStringBuilder Insert(int index, char[]? value, int startIndex, int charCount)
+        public MutableTextBuffer Insert(int index, char[]? value, int startIndex, int charCount)
         {
             int currentLength = Length;
             if ((uint)index > (uint)currentLength)
@@ -3328,7 +3328,7 @@ namespace J2N.Text
         /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
         /// </remarks>
         /// <seealso cref="char"/>
-        public OpenStringBuilder Insert(int index, string? value, int startIndex, int count) // J2N: Added to cover the JDK better (rather than ICharSequence only)
+        public MutableTextBuffer Insert(int index, string? value, int startIndex, int count) // J2N: Added to cover the JDK better (rather than ICharSequence only)
         {
             int currentLength = Length;
             if ((uint)index > (uint)currentLength)
@@ -3385,10 +3385,10 @@ namespace J2N.Text
         /// <para/>
         /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
         /// <para/>
-        /// If <paramref name="value"/> is <c>null</c>, the <see cref="OpenStringBuilder"/> is not changed.
+        /// If <paramref name="value"/> is <c>null</c>, the <see cref="MutableTextBuffer"/> is not changed.
         /// </remarks>
         /// <seealso cref="object"/>
-        public OpenStringBuilder Insert(int index, object? value, string? format = null, IFormatProvider? provider = null)
+        public MutableTextBuffer Insert(int index, object? value, string? format = null, IFormatProvider? provider = null)
         {
             if (value is null)
                 return this; // no-op;
@@ -3418,7 +3418,7 @@ namespace J2N.Text
         /// <remarks>The existing characters are shifted to make room for the character sequence in the
         /// <paramref name="value"/> to insert it. The capacity is adjusted as needed.</remarks>
         /// <seealso cref="ReadOnlySpan{Char}"/>
-        public OpenStringBuilder Insert(int index, ReadOnlySpan<char> value) // J2N NOTE: Weird that upstream they made an overload of ReadOnlyMemory<char> for Append, but not Insert.
+        public MutableTextBuffer Insert(int index, ReadOnlySpan<char> value) // J2N NOTE: Weird that upstream they made an overload of ReadOnlyMemory<char> for Append, but not Insert.
         {
             if ((uint)index > (uint)Length)
             {
@@ -3433,7 +3433,7 @@ namespace J2N.Text
             return this;
         }
 
-        private OpenStringBuilder InsertSpanFormattable<T>(int index, T value, ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
+        private MutableTextBuffer InsertSpanFormattable<T>(int index, T value, ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
             where T : ISpanFormattable
 #else
@@ -3457,7 +3457,7 @@ namespace J2N.Text
                 while (!value.TryFormat(buffer, out charsWritten, format, provider))
                 {
                     // Check if the valueCount will put us over m_MaxCapacity.
-                    // Doing the check here prevents corruption of the OpenStringBuilder.
+                    // Doing the check here prevents corruption of the MutableTextBuffer.
                     int newLength = buffer.Length * 2;
                     if (newLength > m_MaxCapacity)
                     {
@@ -3504,7 +3504,7 @@ namespace J2N.Text
         /// <remarks>
         /// This method uses the <a href="https://learn.microsoft.com/en-us/dotnet/standard/base-types/composite-formatting">
         /// composite formatting feature</a> of the .NET Framework to convert the value of an object to its text
-        /// representation and embed that representation in the current <see cref="OpenStringBuilder"/> object.
+        /// representation and embed that representation in the current <see cref="MutableTextBuffer"/> object.
         /// <para/>
         /// The <paramref name="format"/> parameter consists of zero or more runs of text intermixed with
         /// zero or more indexed placeholders, called format items. The index of the format items must be 0,
@@ -3553,12 +3553,12 @@ namespace J2N.Text
         /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
-        /// When you instantiate an <see cref="OpenStringBuilder"/> object by calling the <see cref="OpenStringBuilder(int, int)"/>
-        /// constructor, both the length and the capacity of the <see cref="OpenStringBuilder"/> instance can grow beyond
+        /// When you instantiate an <see cref="MutableTextBuffer"/> object by calling the <see cref="MutableTextBuffer(int, int)"/>
+        /// constructor, both the length and the capacity of the <see cref="MutableTextBuffer"/> instance can grow beyond
         /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
         /// </remarks>
-        public OpenStringBuilder AppendFormat([StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, object? arg0)
+        public MutableTextBuffer AppendFormat([StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, object? arg0)
         {
 #if FEATURE_INLINEARRAYATTRIBUTE
             return AppendFormat(null, format, MemoryMarshal.CreateReadOnlySpan(ref arg0, 1));
@@ -3590,7 +3590,7 @@ namespace J2N.Text
         /// <remarks>
         /// This method uses the <a href="https://learn.microsoft.com/en-us/dotnet/standard/base-types/composite-formatting">
         /// composite formatting feature</a> of the .NET Framework to convert the value of an object to its text
-        /// representation and embed that representation in the current <see cref="OpenStringBuilder"/> object.
+        /// representation and embed that representation in the current <see cref="MutableTextBuffer"/> object.
         /// <para/>
         /// The <paramref name="format"/> parameter consists of zero or more runs of text intermixed with
         /// zero or more indexed placeholders, called format items, that correspond to <paramref name="arg0"/>
@@ -3639,12 +3639,12 @@ namespace J2N.Text
         /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
-        /// When you instantiate an <see cref="OpenStringBuilder"/> object by calling the <see cref="OpenStringBuilder(int, int)"/>
-        /// constructor, both the length and the capacity of the <see cref="OpenStringBuilder"/> instance can grow beyond
+        /// When you instantiate an <see cref="MutableTextBuffer"/> object by calling the <see cref="MutableTextBuffer(int, int)"/>
+        /// constructor, both the length and the capacity of the <see cref="MutableTextBuffer"/> instance can grow beyond
         /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
         /// </remarks>
-        public OpenStringBuilder AppendFormat([StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, object? arg0, object? arg1)
+        public MutableTextBuffer AppendFormat([StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, object? arg0, object? arg1)
         {
 #if FEATURE_INLINEARRAYATTRIBUTE
             TwoObjects two = new TwoObjects(arg0, arg1);
@@ -3678,7 +3678,7 @@ namespace J2N.Text
         /// <remarks>
         /// This method uses the <a href="https://learn.microsoft.com/en-us/dotnet/standard/base-types/composite-formatting">
         /// composite formatting feature</a> of the .NET Framework to convert the value of an object to its text
-        /// representation and embed that representation in the current <see cref="OpenStringBuilder"/> object.
+        /// representation and embed that representation in the current <see cref="MutableTextBuffer"/> object.
         /// <para/>
         /// The <paramref name="format"/> parameter consists of zero or more runs of text intermixed with
         /// zero or more indexed placeholders, called format items, that correspond to <paramref name="arg0"/>
@@ -3728,12 +3728,12 @@ namespace J2N.Text
         /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
-        /// When you instantiate an <see cref="OpenStringBuilder"/> object by calling the <see cref="OpenStringBuilder(int, int)"/>
-        /// constructor, both the length and the capacity of the <see cref="OpenStringBuilder"/> instance can grow beyond
+        /// When you instantiate an <see cref="MutableTextBuffer"/> object by calling the <see cref="MutableTextBuffer(int, int)"/>
+        /// constructor, both the length and the capacity of the <see cref="MutableTextBuffer"/> instance can grow beyond
         /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
         /// </remarks>
-        public OpenStringBuilder AppendFormat([StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, object? arg0, object? arg1, object? arg2)
+        public MutableTextBuffer AppendFormat([StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, object? arg0, object? arg1, object? arg2)
         {
 #if FEATURE_INLINEARRAYATTRIBUTE
             ThreeObjects three = new ThreeObjects(arg0, arg1, arg2);
@@ -3765,7 +3765,7 @@ namespace J2N.Text
         /// <remarks>
         /// This method uses the <a href="https://learn.microsoft.com/en-us/dotnet/standard/base-types/composite-formatting">
         /// composite formatting feature</a> of the .NET Framework to convert the value of an object to its text
-        /// representation and embed that representation in the current <see cref="OpenStringBuilder"/> object.
+        /// representation and embed that representation in the current <see cref="MutableTextBuffer"/> object.
         /// <para/>
         /// The <paramref name="format"/> parameter consists of zero or more runs of text intermixed with
         /// zero or more indexed placeholders, called format items.
@@ -3814,12 +3814,12 @@ namespace J2N.Text
         /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
-        /// When you instantiate an <see cref="OpenStringBuilder"/> object by calling the <see cref="OpenStringBuilder(int, int)"/>
-        /// constructor, both the length and the capacity of the <see cref="OpenStringBuilder"/> instance can grow beyond
+        /// When you instantiate an <see cref="MutableTextBuffer"/> object by calling the <see cref="MutableTextBuffer(int, int)"/>
+        /// constructor, both the length and the capacity of the <see cref="MutableTextBuffer"/> instance can grow beyond
         /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
         /// </remarks>
-        public OpenStringBuilder AppendFormat([StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, params object?[] args)
+        public MutableTextBuffer AppendFormat([StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, params object?[] args)
         {
             if (args is null)
             {
@@ -3853,7 +3853,7 @@ namespace J2N.Text
         /// <remarks>
         /// This method uses the <a href="https://learn.microsoft.com/en-us/dotnet/standard/base-types/composite-formatting">
         /// composite formatting feature</a> of the .NET Framework to convert the value of an object to its text
-        /// representation and embed that representation in the current <see cref="OpenStringBuilder"/> object.
+        /// representation and embed that representation in the current <see cref="MutableTextBuffer"/> object.
         /// <para/>
         /// The <paramref name="format"/> parameter consists of zero or more runs of text intermixed with
         /// zero or more indexed placeholders, called format items.
@@ -3902,12 +3902,12 @@ namespace J2N.Text
         /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
-        /// When you instantiate an <see cref="OpenStringBuilder"/> object by calling the <see cref="OpenStringBuilder(int, int)"/>
-        /// constructor, both the length and the capacity of the <see cref="OpenStringBuilder"/> instance can grow beyond
+        /// When you instantiate an <see cref="MutableTextBuffer"/> object by calling the <see cref="MutableTextBuffer(int, int)"/>
+        /// constructor, both the length and the capacity of the <see cref="MutableTextBuffer"/> instance can grow beyond
         /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
         /// </remarks>
-        public OpenStringBuilder AppendFormat([StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, params ReadOnlySpan<object?> args)
+        public MutableTextBuffer AppendFormat([StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, params ReadOnlySpan<object?> args)
         {
             return AppendFormat(null, format, args);
         }
@@ -3937,7 +3937,7 @@ namespace J2N.Text
         /// <remarks>
         /// This method uses the <a href="https://learn.microsoft.com/en-us/dotnet/standard/base-types/composite-formatting">
         /// composite formatting feature</a> of the .NET Framework to convert the value of an object to its text
-        /// representation and embed that representation in the current <see cref="OpenStringBuilder"/> object.
+        /// representation and embed that representation in the current <see cref="MutableTextBuffer"/> object.
         /// <para/>
         /// The <paramref name="format"/> parameter consists of zero or more runs of text intermixed with
         /// zero or more indexed placeholders, called format items. The index of the format items must be zero (0),
@@ -3999,12 +3999,12 @@ namespace J2N.Text
         /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
-        /// When you instantiate an <see cref="OpenStringBuilder"/> object by calling the <see cref="OpenStringBuilder(int, int)"/>
-        /// constructor, both the length and the capacity of the <see cref="OpenStringBuilder"/> instance can grow beyond
+        /// When you instantiate an <see cref="MutableTextBuffer"/> object by calling the <see cref="MutableTextBuffer(int, int)"/>
+        /// constructor, both the length and the capacity of the <see cref="MutableTextBuffer"/> instance can grow beyond
         /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
         /// </remarks>
-        public OpenStringBuilder AppendFormat(IFormatProvider? provider, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, object? arg0)
+        public MutableTextBuffer AppendFormat(IFormatProvider? provider, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, object? arg0)
         {
 #if FEATURE_INLINEARRAYATTRIBUTE
             return AppendFormat(provider, format, MemoryMarshal.CreateReadOnlySpan(ref arg0, 1));
@@ -4039,7 +4039,7 @@ namespace J2N.Text
         /// <remarks>
         /// This method uses the <a href="https://learn.microsoft.com/en-us/dotnet/standard/base-types/composite-formatting">
         /// composite formatting feature</a> of the .NET Framework to convert the value of an object to its text
-        /// representation and embed that representation in the current <see cref="OpenStringBuilder"/> object.
+        /// representation and embed that representation in the current <see cref="MutableTextBuffer"/> object.
         /// <para/>
         /// The <paramref name="format"/> parameter consists of zero or more runs of text intermixed with
         /// zero or more indexed placeholders, called format items, that correspond to objects in the parameter list of this method.
@@ -4100,12 +4100,12 @@ namespace J2N.Text
         /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
-        /// When you instantiate an <see cref="OpenStringBuilder"/> object by calling the <see cref="OpenStringBuilder(int, int)"/>
-        /// constructor, both the length and the capacity of the <see cref="OpenStringBuilder"/> instance can grow beyond
+        /// When you instantiate an <see cref="MutableTextBuffer"/> object by calling the <see cref="MutableTextBuffer(int, int)"/>
+        /// constructor, both the length and the capacity of the <see cref="MutableTextBuffer"/> instance can grow beyond
         /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
         /// </remarks>
-        public OpenStringBuilder AppendFormat(IFormatProvider? provider, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, object? arg0, object? arg1)
+        public MutableTextBuffer AppendFormat(IFormatProvider? provider, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, object? arg0, object? arg1)
         {
 #if FEATURE_INLINEARRAYATTRIBUTE
             TwoObjects two = new TwoObjects(arg0, arg1);
@@ -4142,7 +4142,7 @@ namespace J2N.Text
         /// <remarks>
         /// This method uses the <a href="https://learn.microsoft.com/en-us/dotnet/standard/base-types/composite-formatting">
         /// composite formatting feature</a> of the .NET Framework to convert the value of an object to its text
-        /// representation and embed that representation in the current <see cref="OpenStringBuilder"/> object.
+        /// representation and embed that representation in the current <see cref="MutableTextBuffer"/> object.
         /// <para/>
         /// The <paramref name="format"/> parameter consists of zero or more runs of text intermixed with
         /// zero or more indexed placeholders, called format items, that correspond to objects in the parameter list of this method.
@@ -4204,12 +4204,12 @@ namespace J2N.Text
         /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
-        /// When you instantiate an <see cref="OpenStringBuilder"/> object by calling the <see cref="OpenStringBuilder(int, int)"/>
-        /// constructor, both the length and the capacity of the <see cref="OpenStringBuilder"/> instance can grow beyond
+        /// When you instantiate an <see cref="MutableTextBuffer"/> object by calling the <see cref="MutableTextBuffer(int, int)"/>
+        /// constructor, both the length and the capacity of the <see cref="MutableTextBuffer"/> instance can grow beyond
         /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
         /// </remarks>
-        public OpenStringBuilder AppendFormat(IFormatProvider? provider, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, object? arg0, object? arg1, object? arg2)
+        public MutableTextBuffer AppendFormat(IFormatProvider? provider, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, object? arg0, object? arg1, object? arg2)
         {
 #if FEATURE_INLINEARRAYATTRIBUTE
             ThreeObjects three = new ThreeObjects(arg0, arg1, arg2);
@@ -4244,7 +4244,7 @@ namespace J2N.Text
         /// <remarks>
         /// This method uses the <a href="https://learn.microsoft.com/en-us/dotnet/standard/base-types/composite-formatting">
         /// composite formatting feature</a> of the .NET Framework to convert the value of an object to its text
-        /// representation and embed that representation in the current <see cref="OpenStringBuilder"/> object.
+        /// representation and embed that representation in the current <see cref="MutableTextBuffer"/> object.
         /// <para/>
         /// The <paramref name="format"/> parameter consists of zero or more runs of text intermixed with
         /// zero or more indexed placeholders, called format items, that correspond to objects in the parameter list of this method.
@@ -4306,12 +4306,12 @@ namespace J2N.Text
         /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
-        /// When you instantiate an <see cref="OpenStringBuilder"/> object by calling the <see cref="OpenStringBuilder(int, int)"/>
-        /// constructor, both the length and the capacity of the <see cref="OpenStringBuilder"/> instance can grow beyond
+        /// When you instantiate an <see cref="MutableTextBuffer"/> object by calling the <see cref="MutableTextBuffer(int, int)"/>
+        /// constructor, both the length and the capacity of the <see cref="MutableTextBuffer"/> instance can grow beyond
         /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
         /// </remarks>
-        public OpenStringBuilder AppendFormat(IFormatProvider? provider, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, params object?[] args)
+        public MutableTextBuffer AppendFormat(IFormatProvider? provider, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, params object?[] args)
         {
             if (args is null)
             {
@@ -4348,7 +4348,7 @@ namespace J2N.Text
         /// <remarks>
         /// This method uses the <a href="https://learn.microsoft.com/en-us/dotnet/standard/base-types/composite-formatting">
         /// composite formatting feature</a> of the .NET Framework to convert the value of an object to its text
-        /// representation and embed that representation in the current <see cref="OpenStringBuilder"/> object.
+        /// representation and embed that representation in the current <see cref="MutableTextBuffer"/> object.
         /// <para/>
         /// The <paramref name="format"/> parameter consists of zero or more runs of text intermixed with
         /// zero or more indexed placeholders, called format items, that correspond to objects in the parameter list of this method.
@@ -4410,12 +4410,12 @@ namespace J2N.Text
         /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
-        /// When you instantiate an <see cref="OpenStringBuilder"/> object by calling the <see cref="OpenStringBuilder(int, int)"/>
-        /// constructor, both the length and the capacity of the <see cref="OpenStringBuilder"/> instance can grow beyond
+        /// When you instantiate an <see cref="MutableTextBuffer"/> object by calling the <see cref="MutableTextBuffer(int, int)"/>
+        /// constructor, both the length and the capacity of the <see cref="MutableTextBuffer"/> instance can grow beyond
         /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
         /// </remarks>
-        public OpenStringBuilder AppendFormat(IFormatProvider? provider, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, params ReadOnlySpan<object?> args) // KEEP OVERLOADS FOR ReadOnlySpan<object?> and ParamsArray IN SYNC
+        public MutableTextBuffer AppendFormat(IFormatProvider? provider, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, params ReadOnlySpan<object?> args) // KEEP OVERLOADS FOR ReadOnlySpan<object?> and ParamsArray IN SYNC
         {
             if (format is null)
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.format);
@@ -4694,7 +4694,7 @@ namespace J2N.Text
         }
 
 #if !FEATURE_INLINEARRAYATTRIBUTE
-        private OpenStringBuilder AppendFormat(IFormatProvider? provider, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, ParamsArray args) // KEEP OVERLOADS FOR ReadOnlySpan<object?> and ParamsArray IN SYNC
+        private MutableTextBuffer AppendFormat(IFormatProvider? provider, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, ParamsArray args) // KEEP OVERLOADS FOR ReadOnlySpan<object?> and ParamsArray IN SYNC
         {
             if (format is null)
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.format);
@@ -4976,7 +4976,7 @@ namespace J2N.Text
         // J2N TODO: API - CompositeFormat overloads
 #if FEATURE_COMPOSITEFORMAT
 
-        public OpenStringBuilder AppendFormat<TArg0>(IFormatProvider? provider, CompositeFormat format, TArg0 arg0)
+        public MutableTextBuffer AppendFormat<TArg0>(IFormatProvider? provider, CompositeFormat format, TArg0 arg0)
         {
             if (format is null)
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.format);
@@ -4984,7 +4984,7 @@ namespace J2N.Text
             return AppendFormat(provider, format, arg0, 0, 0, default);
         }
 
-        public OpenStringBuilder AppendFormat<TArg0, TArg1>(IFormatProvider? provider, CompositeFormat format, TArg0 arg0, TArg1 arg1)
+        public MutableTextBuffer AppendFormat<TArg0, TArg1>(IFormatProvider? provider, CompositeFormat format, TArg0 arg0, TArg1 arg1)
         {
             if (format is null)
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.format);
@@ -4992,7 +4992,7 @@ namespace J2N.Text
             return AppendFormat(provider, format, arg0, arg1, 0, default);
         }
 
-        public OpenStringBuilder AppendFormat<TArg0, TArg1, TArg2>(IFormatProvider? provider, CompositeFormat format, TArg0 arg0, TArg1 arg1, TArg2 arg2)
+        public MutableTextBuffer AppendFormat<TArg0, TArg1, TArg2>(IFormatProvider? provider, CompositeFormat format, TArg0 arg0, TArg1 arg1, TArg2 arg2)
         {
             if (format is null)
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.format);
@@ -5000,7 +5000,7 @@ namespace J2N.Text
             return AppendFormat(provider, format, arg0, arg1, arg2, default);
         }
 
-        public OpenStringBuilder AppendFormat(IFormatProvider? provider, CompositeFormat format, params object?[] args)
+        public MutableTextBuffer AppendFormat(IFormatProvider? provider, CompositeFormat format, params object?[] args)
         {
             if (format is null)
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.format);
@@ -5009,7 +5009,7 @@ namespace J2N.Text
             return AppendFormat(provider, format, (ReadOnlySpan<object?>)args);
         }
 
-        public OpenStringBuilder AppendFormat(IFormatProvider? provider, CompositeFormat format, params ReadOnlySpan<object?> args)
+        public MutableTextBuffer AppendFormat(IFormatProvider? provider, CompositeFormat format, params ReadOnlySpan<object?> args)
         {
             //ArgumentNullException.ThrowIfNull(format);
             if (format is null)
@@ -5024,7 +5024,7 @@ namespace J2N.Text
             };
         }
 
-        private OpenStringBuilder AppendFormat<TArg0, TArg1, TArg2>(IFormatProvider? provider, CompositeFormat format, TArg0 arg0, TArg1 arg1, TArg2 arg2, ReadOnlySpan<object?> args)
+        private MutableTextBuffer AppendFormat<TArg0, TArg1, TArg2>(IFormatProvider? provider, CompositeFormat format, TArg0 arg0, TArg1 arg1, TArg2 arg2, ReadOnlySpan<object?> args)
         {
             // Create the interpolated string handler.
             var handler = new AppendInterpolatedStringHandler(format._literalLength, format._formattedCount, this, provider);
@@ -5088,7 +5088,7 @@ namespace J2N.Text
         /// <paramref name="oldValue"/> are removed.
         /// </remarks>
         /// <seealso cref="Remove(int, int)"/>
-        public OpenStringBuilder Replace(string oldValue, string? newValue) => Replace(oldValue, newValue, 0, Length);
+        public MutableTextBuffer Replace(string oldValue, string? newValue) => Replace(oldValue, newValue, 0, Length);
 
         /// <summary>
         /// Replaces all instances of one read-only character span with another in this builder.
@@ -5105,7 +5105,7 @@ namespace J2N.Text
         /// current instance. If <paramref name="newValue"/> is empty, all occurrences of <paramref name="oldValue"/> are removed.
         /// </remarks>
         /// <seealso cref="Remove(int, int)"/>
-        public OpenStringBuilder Replace(ReadOnlySpan<char> oldValue, ReadOnlySpan<char> newValue) => Replace(oldValue, newValue, 0, Length);
+        public MutableTextBuffer Replace(ReadOnlySpan<char> oldValue, ReadOnlySpan<char> newValue) => Replace(oldValue, newValue, 0, Length);
 
 
         #endregion Replace
@@ -5121,10 +5121,10 @@ namespace J2N.Text
         /// otherwise, <c>false</c>.</returns>
         /// <remarks>
         /// The current instance and <paramref name="sb"/> are equal if the strings assigned to both
-        /// <see cref="OpenStringBuilder"/> objects are the same. To determine equality, the
-        /// <see cref="Equals(OpenStringBuilder)"/> method uses ordinal comparison.
+        /// <see cref="MutableTextBuffer"/> objects are the same. To determine equality, the
+        /// <see cref="Equals(MutableTextBuffer)"/> method uses ordinal comparison.
         /// </remarks>
-        public bool Equals([NotNullWhen(true)] OpenStringBuilder? sb)
+        public bool Equals([NotNullWhen(true)] MutableTextBuffer? sb)
         {
             if (sb == null)
             {
@@ -5149,7 +5149,7 @@ namespace J2N.Text
         /// otherwise, <c>false</c>.</returns>
         /// <remarks>
         /// The current instance and <paramref name="sb"/> are equal if the strings assigned to both
-        /// objects are the same. To determine equality, the <see cref="Equals(OpenStringBuilder)"/>
+        /// objects are the same. To determine equality, the <see cref="Equals(MutableTextBuffer)"/>
         /// method uses ordinal comparison.
         /// </remarks>
         /// <remarks>
@@ -5209,7 +5209,7 @@ namespace J2N.Text
         /// <returns><c>true</c> if the characters in this instance and <paramref name="span"/> are the same;
         /// otherwise, <c>false</c>.</returns>
         /// <remarks>
-        /// The <see cref="Equals(OpenStringBuilder)"/> method performs an ordinal comparison to determine
+        /// The <see cref="Equals(MutableTextBuffer)"/> method performs an ordinal comparison to determine
         /// whether the characters in the current instance and span are equal.
         /// </remarks>
         public bool Equals(ReadOnlySpan<char> span)
@@ -5254,7 +5254,7 @@ namespace J2N.Text
         /// all occurrences of <paramref name="oldValue"/> in the specified range are removed.
         /// </remarks>
         /// <seealso cref="Remove(int, int)"/>
-        public OpenStringBuilder Replace(string oldValue, string? newValue, int startIndex, int count)
+        public MutableTextBuffer Replace(string oldValue, string? newValue, int startIndex, int count)
         {
             if (oldValue is null)
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.oldValue);
@@ -5288,7 +5288,7 @@ namespace J2N.Text
         /// in the specified range are removed.
         /// </remarks>
         /// <seealso cref="Remove(int, int)"/>
-        public OpenStringBuilder Replace(ReadOnlySpan<char> oldValue, ReadOnlySpan<char> newValue, int startIndex, int count)
+        public MutableTextBuffer Replace(ReadOnlySpan<char> oldValue, ReadOnlySpan<char> newValue, int startIndex, int count)
         {
             int currentLength = Length;
             if ((uint)startIndex > (uint)currentLength)
@@ -5415,9 +5415,9 @@ namespace J2N.Text
         /// <remarks>
         /// This method performs an ordinal, case-sensitive comparison to identify occurrences of
         /// <paramref name="oldChar"/> in the current instance. The size of the current
-        /// <see cref="OpenStringBuilder"/> instance is unchanged after the replacement.
+        /// <see cref="MutableTextBuffer"/> instance is unchanged after the replacement.
         /// </remarks>
-        public OpenStringBuilder Replace(char oldChar, char newChar)
+        public MutableTextBuffer Replace(char oldChar, char newChar)
         {
             return Replace(oldChar, newChar, 0, Length);
         }
@@ -5441,9 +5441,9 @@ namespace J2N.Text
         /// <remarks>
         /// This method performs an ordinal, case-sensitive comparison to identify occurrences of
         /// <paramref name="oldChar"/> in the current instance within the specified substring. The size of the current
-        /// <see cref="OpenStringBuilder"/> instance is unchanged after the replacement.
+        /// <see cref="MutableTextBuffer"/> instance is unchanged after the replacement.
         /// </remarks>
-        public OpenStringBuilder Replace(char oldChar, char newChar, int startIndex, int count)
+        public MutableTextBuffer Replace(char oldChar, char newChar, int startIndex, int count)
         {
             int currentLength = Length;
             if ((uint)startIndex > (uint)currentLength)
@@ -5491,7 +5491,7 @@ namespace J2N.Text
         /// <para/>
         /// <paramref name="startIndex"/> is greater than or equal to <see cref="Length"/>.
         /// </exception>
-        public OpenStringBuilder Replace(int startIndex, int count, string newValue)
+        public MutableTextBuffer Replace(int startIndex, int count, string newValue)
         {
             if (newValue is null)
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.newValue);
@@ -5529,7 +5529,7 @@ namespace J2N.Text
         /// <para/>
         /// <paramref name="startIndex"/> is greater than or equal to <see cref="Length"/>.
         /// </exception>
-        public OpenStringBuilder Replace(int startIndex, int count, ReadOnlySpan<char> newValue)
+        public MutableTextBuffer Replace(int startIndex, int count, ReadOnlySpan<char> newValue)
         {
             if ((uint)startIndex > (uint)m_Position)
                 ThrowHelper.ThrowStartIndexArgumentOutOfRange_ArgumentOutOfRange_IndexMustBeLessOrEqual(startIndex);
@@ -5707,19 +5707,19 @@ namespace J2N.Text
         /// <para/>
         /// The <see cref="Append(char*, int)"/> method modifies the existing instance of this class; it does
         /// not return a new class instance. Because of this, you can call a method or property on the existing
-        /// reference and you do not have to assign the return value to an <see cref="OpenStringBuilder"/> object.
+        /// reference and you do not have to assign the return value to an <see cref="MutableTextBuffer"/> object.
         /// <para/>
         /// The capacity of this instance is adjusted as needed.
         /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
-        /// When you instantiate an <see cref="OpenStringBuilder"/> object by calling the <see cref="OpenStringBuilder(int, int)"/>
-        /// constructor, both the length and the capacity of the <see cref="OpenStringBuilder"/> instance can grow beyond
+        /// When you instantiate an <see cref="MutableTextBuffer"/> object by calling the <see cref="MutableTextBuffer(int, int)"/>
+        /// constructor, both the length and the capacity of the <see cref="MutableTextBuffer"/> instance can grow beyond
         /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
         /// </remarks>
         [CLSCompliant(false)]
-        public unsafe OpenStringBuilder Append(char* value, int valueCount)
+        public unsafe MutableTextBuffer Append(char* value, int valueCount)
         {
             // We don't check null value as this case will throw null reference exception anyway
             if (valueCount < 0)
@@ -5769,7 +5769,7 @@ namespace J2N.Text
         private void AppendWithExpansion(ref char value, int valueCount)
         {
             // Check if the valueCount will put us over m_MaxCapacity.
-            // Doing the check here prevents corruption of the OpenStringBuilder.
+            // Doing the check here prevents corruption of the MutableTextBuffer.
             int newLength = Length + valueCount;
             if (newLength > m_MaxCapacity || newLength < valueCount)
             {
@@ -5829,7 +5829,7 @@ namespace J2N.Text
         /// Existing characters are shifted to make room for the new text. The capacity is adjusted as needed.
         /// </remarks>
         [CLSCompliant(false)]
-        public unsafe OpenStringBuilder Insert(int index, char* value, int valueCount)
+        public unsafe MutableTextBuffer Insert(int index, char* value, int valueCount)
         {
             // We don't check null value as this case will throw null reference exception anyway
             if ((uint)index > (uint)Length)
@@ -5841,7 +5841,7 @@ namespace J2N.Text
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(valueCount, ExceptionArgument.valueCount);
             }
             // Check if the valueCount will put us over m_MaxCapacity.
-            // Doing the check here prevents corruption of the OpenStringBuilder.
+            // Doing the check here prevents corruption of the MutableTextBuffer.
             int newLength = m_Position + valueCount;
             if (newLength > m_MaxCapacity || newLength < valueCount)
             {
@@ -5936,7 +5936,7 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// Allocates a new character buffer for use by <see cref="OpenStringBuilder"/> when the
+        /// Allocates a new character buffer for use by <see cref="MutableTextBuffer"/> when the
         /// existing buffer changes in size. This may happen when the buffer grows to accommodate
         /// more data or when calling <see cref="TrimExcess()"/> to shrink the buffer to fit its content.
         /// </summary>
@@ -5948,7 +5948,7 @@ namespace J2N.Text
         /// A new <see cref="char"/> array that will become the active buffer for this instance.
         /// </returns>
         /// <remarks>
-        /// This method is called internally whenever <see cref="OpenStringBuilder"/> needs to grow or
+        /// This method is called internally whenever <see cref="MutableTextBuffer"/> needs to grow or
         /// shrink its underlying storage. Subclasses may override this method to control how new buffers
         /// are allocated. For example, buffers may be rented from <see cref="System.Buffers.ArrayPool{T}"/> or
         /// another pooling mechanism.
@@ -5976,7 +5976,7 @@ namespace J2N.Text
         /// </param>
         /// <remarks>
         /// <para>
-        /// This method is called internally after <see cref="OpenStringBuilder"/> has finished copying
+        /// This method is called internally after <see cref="MutableTextBuffer"/> has finished copying
         /// all required data out of the previous buffer and replaced it with a new one.
         /// Subclasses may override this method to return buffers to a pool or perform other
         /// cleanup logic.
@@ -6016,15 +6016,15 @@ namespace J2N.Text
         /// </summary>
         /// <param name="startIndex">The start index.</param>
         /// <param name="count">The number of characters to delete.</param>
-        /// <returns>This <see cref="OpenStringBuilder"/>, for chaining.</returns>
+        /// <returns>This <see cref="MutableTextBuffer"/>, for chaining.</returns>
         /// <exception cref="ArgumentOutOfRangeException">
         /// <paramref name="startIndex"/> or <paramref name="count"/> is less than zero.
         /// <para/>
         /// -or-
         /// <para/>
-        /// <paramref name="startIndex"/> is greater than <see cref="OpenStringBuilder.Length"/>.
+        /// <paramref name="startIndex"/> is greater than <see cref="MutableTextBuffer.Length"/>.
         /// </exception>
-        public OpenStringBuilder Delete(int startIndex, int count) // Coverage for the JDK
+        public MutableTextBuffer Delete(int startIndex, int count) // Coverage for the JDK
         {
             if ((uint)startIndex > (uint)m_Position)
                 ThrowHelper.ThrowArgumentOutOfRange_ArgumentOutOfRange_IndexString(startIndex, ExceptionArgument.startIndex);
@@ -6046,7 +6046,7 @@ namespace J2N.Text
         /// reverse operation. Thus, the order of the high-low surrogates
         /// is never reversed.
         /// <para/>
-        /// IMPORTANT: This operation is done in-place. Although an <see cref="OpenStringBuilder"/>
+        /// IMPORTANT: This operation is done in-place. Although an <see cref="MutableTextBuffer"/>
         /// is returned, it is the SAME instance as the one that is passed in.
         /// <para/>
         /// Let <c>n</c> be the character length of this character sequence
@@ -6065,28 +6065,28 @@ namespace J2N.Text
         /// Usage Note: This is the same operation as Java's StringBuilder.reverse()
         /// method. However, J2N also provides <see cref="J2N.Text.StringExtensions.ReverseText(string)"/>
         /// and <see cref="J2N.MemoryExtensions.ReverseText(Span{char})"/> which
-        /// don't require an <see cref="OpenStringBuilder"/> instance.
+        /// don't require an <see cref="MutableTextBuffer"/> instance.
         /// </summary>
-        /// <returns>A reference to this <see cref="OpenStringBuilder"/>, for chaining.</returns>
+        /// <returns>A reference to this <see cref="MutableTextBuffer"/>, for chaining.</returns>
         /// <seealso cref="StringExtensions.ReverseText(string)"/>
         /// <seealso cref="MemoryExtensions.ReverseText(Span{char})"/>
         /// <seealso cref="StringBuilderExtensions.Reverse(StringBuilder)"/>
-        public OpenStringBuilder Reverse() // Coverage for the JDK
+        public MutableTextBuffer Reverse() // Coverage for the JDK
         {
             m_Chars.AsSpan(0, m_Position).ReverseText();
             return this;
         }
 
         /// <summary>
-        /// Sets the capacity of an <see cref="OpenStringBuilder"/> object to the actual number of characters
+        /// Sets the capacity of an <see cref="MutableTextBuffer"/> object to the actual number of characters
         /// it contains.
         /// </summary>
         /// <remarks>
         /// This method is similar to <c>trimToSize()</c> in the JDK.
         /// <para/>
-        /// You can use the <see cref="TrimExcess()"/> method to minimize an <see cref="OpenStringBuilder"/> object's
+        /// You can use the <see cref="TrimExcess()"/> method to minimize an <see cref="MutableTextBuffer"/> object's
         /// memory overhead once it is known that no new characters will be added. To completely clear an
-        /// <see cref="OpenStringBuilder"/> object and release all memory referenced by it, call this method
+        /// <see cref="MutableTextBuffer"/> object and release all memory referenced by it, call this method
         /// after calling the <see cref="Clear()"/> method or setting <see cref="Length"/> property to 0.
         /// <para/>
         /// If the capacity is already equal to the current length, this method has no effect.
@@ -6122,8 +6122,8 @@ namespace J2N.Text
         /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
-        /// When you instantiate an <see cref="OpenStringBuilder"/> object by calling the <see cref="OpenStringBuilder(int, int)"/>
-        /// constructor, both the length and the capacity of the <see cref="OpenStringBuilder"/> instance can grow beyond
+        /// When you instantiate an <see cref="MutableTextBuffer"/> object by calling the <see cref="MutableTextBuffer(int, int)"/>
+        /// constructor, both the length and the capacity of the <see cref="MutableTextBuffer"/> instance can grow beyond
         /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
         /// </remarks>

@@ -47,10 +47,10 @@ namespace J2N.Text
         [Test]
         public void Test_charAtIIOBE()
         {
-            OpenStringBuilder sb = OpenStringBuilderFactory("test");
+            MutableTextBuffer sb = OpenStringBuilderFactory("test");
             StringBuffer sbuf = new StringBuffer("test");
 
-            OpenStringBuilder sbUtf16 = OpenStringBuilderFactory("\uFF34est"); // Fullwidth Latin Capital Letter T
+            MutableTextBuffer sbUtf16 = OpenStringBuilderFactory("\uFF34est"); // Fullwidth Latin Capital Letter T
             StringBuffer sbufUtf16 = new StringBuffer("\uFF34est");
 
             List<Integer> outOfBoundsIndices = new() { int.MinValue, -2, -1, 4, 5, int.MaxValue };

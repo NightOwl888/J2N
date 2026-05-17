@@ -32,7 +32,7 @@ namespace J2N.Text
         public void Test_insertFalse()
         {
             // Caused an infinite loop before 4914802
-            OpenStringBuilder sb = OpenStringBuilderFactory();
+            MutableTextBuffer sb = OpenStringBuilderFactory();
             assertEquals("false", sb.Insert(0, false, BooleanFormat.Lowercase).ToString());
         }
 

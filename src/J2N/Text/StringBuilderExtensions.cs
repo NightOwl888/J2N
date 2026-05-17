@@ -2082,7 +2082,7 @@ namespace J2N.Text
         /// <param name="text">this <see cref="StringBuilder"/></param>
         /// <returns>A reference to this <see cref="StringBuilder"/>, for chaining.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="text"/> is <c>null</c>.</exception>
-        /// <seealso cref="J2N.Text.OpenStringBuilder.Reverse()"/>
+        /// <seealso cref="J2N.Text.MutableTextBuffer.Reverse()"/>
         /// <seealso cref="J2N.Text.StringExtensions.ReverseText(string)"/>
         /// <seealso cref="J2N.MemoryExtensions.ReverseText(Span{char})"/>
         public static StringBuilder Reverse(this StringBuilder text)

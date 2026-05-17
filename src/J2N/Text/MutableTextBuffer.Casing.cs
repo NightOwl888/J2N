@@ -22,7 +22,7 @@ using System.Globalization;
 
 namespace J2N.Text
 {
-    public partial class OpenStringBuilder
+    public partial class MutableTextBuffer
     {
         /// <summary>
         /// Appends the upper case string representation of a specified string
@@ -35,7 +35,7 @@ namespace J2N.Text
         /// <para/>
         /// If <paramref name="culture"/> is <c>null</c>, <see cref="CultureInfo.CurrentCulture"/> will be used.
         /// </remarks>
-        public OpenStringBuilder AppendUpper(string? value, CultureInfo? culture)
+        public MutableTextBuffer AppendUpper(string? value, CultureInfo? culture)
             => AppendUpper(value.AsSpan(), culture);
 
         /// <summary>
@@ -49,7 +49,7 @@ namespace J2N.Text
         /// <para/>
         /// If <paramref name="culture"/> is <c>null</c>, <see cref="CultureInfo.CurrentCulture"/> will be used.
         /// </remarks>
-        public OpenStringBuilder AppendUpper(ReadOnlySpan<char> value, CultureInfo? culture)
+        public MutableTextBuffer AppendUpper(ReadOnlySpan<char> value, CultureInfo? culture)
         {
             culture ??= CultureInfo.CurrentCulture;
 
@@ -84,7 +84,7 @@ namespace J2N.Text
         /// <para/>
         /// If <paramref name="culture"/> is <c>null</c>, <see cref="CultureInfo.CurrentCulture"/> will be used.
         /// </remarks>
-        public OpenStringBuilder AppendLower(string? value, CultureInfo? culture)
+        public MutableTextBuffer AppendLower(string? value, CultureInfo? culture)
             => AppendLower(value.AsSpan(), culture);
 
         /// <summary>
@@ -94,7 +94,7 @@ namespace J2N.Text
         /// <param name="value">The read-only character span to append.</param>
         /// <param name="culture">An object that supplies culture-specific casing rules.</param>
         /// <remarks>The capacity of this instance is adjusted as needed.</remarks>
-        public OpenStringBuilder AppendLower(ReadOnlySpan<char> value, CultureInfo? culture)
+        public MutableTextBuffer AppendLower(ReadOnlySpan<char> value, CultureInfo? culture)
         {
             culture ??= CultureInfo.CurrentCulture;
 
@@ -124,7 +124,7 @@ namespace J2N.Text
         /// </summary>
         /// <param name="value">The string to append.</param>
         /// <remarks>The capacity of this instance is adjusted as needed.</remarks>
-        public OpenStringBuilder AppendUpperInvariant(string? value)
+        public MutableTextBuffer AppendUpperInvariant(string? value)
             => AppendUpperInvariant(value.AsSpan());
 
         /// <summary>
@@ -133,7 +133,7 @@ namespace J2N.Text
         /// </summary>
         /// <param name="value">The read-only character span to append.</param>
         /// <remarks>The capacity of this instance is adjusted as needed.</remarks>
-        public OpenStringBuilder AppendUpperInvariant(ReadOnlySpan<char> value)
+        public MutableTextBuffer AppendUpperInvariant(ReadOnlySpan<char> value)
         {
             int valueLength = value.Length;
             if (valueLength == 0)
@@ -157,7 +157,7 @@ namespace J2N.Text
         /// </summary>
         /// <param name="value">The string to append.</param>
         /// <remarks>The capacity of this instance is adjusted as needed.</remarks>
-        public OpenStringBuilder AppendLowerInvariant(string? value)
+        public MutableTextBuffer AppendLowerInvariant(string? value)
             => AppendLowerInvariant(value.AsSpan());
 
         /// <summary>
@@ -166,7 +166,7 @@ namespace J2N.Text
         /// </summary>
         /// <param name="value">The read-only character span to append.</param>
         /// <remarks>The capacity of this instance is adjusted as needed.</remarks>
-        public OpenStringBuilder AppendLowerInvariant(ReadOnlySpan<char> value)
+        public MutableTextBuffer AppendLowerInvariant(ReadOnlySpan<char> value)
         {
             int valueLength = value.Length;
             if (valueLength == 0)

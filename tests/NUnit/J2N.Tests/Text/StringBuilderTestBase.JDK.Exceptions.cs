@@ -69,13 +69,13 @@ namespace J2N.Text
         [Test]
         public void Test_Exceptions()
         {
-            TestContext.WriteLine("OpenStringBuilder()");
+            TestContext.WriteLine("MutableTextBuffer()");
             TryPass("  no args", () =>
             {
                 _ = OpenStringBuilderFactory();
             });
 
-            TestContext.WriteLine("OpenStringBuilder(int capacity)");
+            TestContext.WriteLine("MutableTextBuffer(int capacity)");
             TryPass("  1", () =>
             {
                 _ = OpenStringBuilderFactory(1);
@@ -89,7 +89,7 @@ namespace J2N.Text
                     _ = OpenStringBuilderFactory(-1);
                 });
 
-            TestContext.WriteLine("OpenStringBuilder(string value)");
+            TestContext.WriteLine("MutableTextBuffer(string value)");
 
             // J2N: We are allowing null to be a no-op to match the BCL
             //TryCatch<ArgumentNullException>(
@@ -110,7 +110,7 @@ namespace J2N.Text
                 _ = OpenStringBuilderFactory("foo");
             });
 
-            TestContext.WriteLine("OpenStringBuilder.Replace(int startIndex, int count, string newValue)");
+            TestContext.WriteLine("MutableTextBuffer.Replace(int startIndex, int count, string newValue)");
 
             TryCatch<ArgumentOutOfRangeException>(
                 "  -1, 2 - -1, \" \"",

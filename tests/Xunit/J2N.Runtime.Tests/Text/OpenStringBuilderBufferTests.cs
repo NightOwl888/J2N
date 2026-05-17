@@ -12,7 +12,7 @@ namespace J2N.Text.Tests
         ///  • tracks which buffers were allocated
         ///  • tracks which buffers were released
         /// </summary>
-        private sealed class TestBufferBuilder : OpenStringBuilder
+        private sealed class TestBufferBuilder : MutableTextBuffer
         {
             private readonly HashSet<char[]> allocatedBuffers = new();
             private readonly HashSet<char[]> releasedBuffers = new();

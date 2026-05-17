@@ -53,7 +53,7 @@ namespace J2N.Text
         [TestCaseSource(nameof(singleChar))]
         public void Test_defaultCapacity(char ch)
         {
-            OpenStringBuilder sb = OpenStringBuilderFactory();
+            MutableTextBuffer sb = OpenStringBuilderFactory();
             assertEquals(sb.Capacity, DEFAULT_CAPACITY);
             for (int i = 0; i < DEFAULT_CAPACITY; i++)
             {
@@ -67,7 +67,7 @@ namespace J2N.Text
         [TestCaseSource(nameof(charCapacity))]
         public void Test_explicitCapacity(char ch, int initCapacity)
         {
-            OpenStringBuilder sb = OpenStringBuilderFactory(initCapacity);
+            MutableTextBuffer sb = OpenStringBuilderFactory(initCapacity);
             // J2N: Altered initial capacity logic to account for the fact that
             // zero indicates DEFAULT_CAPACITY in our implementation. However, smaller
             // than DEFAULT_CAPACITY can still be set explictily if greater than 0.
@@ -87,7 +87,7 @@ namespace J2N.Text
         {
             string s = "string " + ch;
             int expectedCapacity = s.Length + DEFAULT_CAPACITY;
-            OpenStringBuilder sb = OpenStringBuilderFactory(s);
+            MutableTextBuffer sb = OpenStringBuilderFactory(s);
             assertEquals(sb.Capacity, expectedCapacity);
             for (int i = 0; i < DEFAULT_CAPACITY; i++)
             {
@@ -103,7 +103,7 @@ namespace J2N.Text
         {
             ICharSequence cs = new MyCharSeq(("char seq " + ch).AsCharSequence());
             int expectedCapacity = cs.Length + DEFAULT_CAPACITY;
-            OpenStringBuilder sb = OpenStringBuilderFactory(cs);
+            MutableTextBuffer sb = OpenStringBuilderFactory(cs);
             assertEquals(sb.Capacity, expectedCapacity);
             for (int i = 0; i < DEFAULT_CAPACITY; i++)
             {
@@ -121,7 +121,7 @@ namespace J2N.Text
             // zero-length buffer makes the first hit allocate every time. This does
             // not bode well on the .NET platform.
 
-            OpenStringBuilder sb = OpenStringBuilderFactory(0);
+            MutableTextBuffer sb = OpenStringBuilderFactory(0);
             assertEquals(sb.Capacity, /*0*/ DEFAULT_CAPACITY); 
             sb.EnsureCapacity(cap); // only has effect if cap > 0
             //int newCap = (cap == 0) ? /*0*/ DEFAULT_CAPACITY : newCapacity(0, cap);
@@ -142,7 +142,7 @@ namespace J2N.Text
         [TestCaseSource(nameof(negativeCapacity))]
         public void Test_ensureNegativeCapacity(int negCap)
         {
-            OpenStringBuilder sb = OpenStringBuilderFactory();
+            MutableTextBuffer sb = OpenStringBuilderFactory();
 
             // J2N: Throwing in this case to match the BCL. Ignoring a negative value seems pointless and even dangerous.
             Assert.Throws<ArgumentOutOfRangeException>(() => sb.EnsureCapacity(negCap));
@@ -154,7 +154,7 @@ namespace J2N.Text
         [TestCaseSource(nameof(charCapacity))]
         public void Test_trimToSize(char ch, int cap)
         {
-            OpenStringBuilder sb = OpenStringBuilderFactory(cap);
+            MutableTextBuffer sb = OpenStringBuilderFactory(cap);
             int halfOfCap = cap / 2;
             for (int i = 0; i < halfOfCap; i++)
             {

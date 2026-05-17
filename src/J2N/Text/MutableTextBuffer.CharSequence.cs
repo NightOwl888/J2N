@@ -2,7 +2,7 @@
 
 namespace J2N.Text
 {
-    public partial class OpenStringBuilder
+    public partial class MutableTextBuffer
     {
         /// <summary>
         /// Retrieves a sub-sequence from this instance.

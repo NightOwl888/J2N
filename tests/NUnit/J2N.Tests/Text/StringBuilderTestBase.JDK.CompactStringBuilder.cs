@@ -379,7 +379,7 @@ namespace J2N.Text
         [Test]
         public void TestCompactStringForMaybeLatin1()
         {
-            OpenStringBuilder sb = OpenStringBuilderFactory("A\uDC01");
+            MutableTextBuffer sb = OpenStringBuilderFactory("A\uDC01");
 
             sb.Length = 0;      // maybeLatin1 become true
             check(sb, "");
@@ -481,7 +481,7 @@ namespace J2N.Text
                     orig.Substring(end, orig.Length - end); // J2N: Corrected 2nd argument
         }
 
-        private void checkGetChars(OpenStringBuilder sb, int srcBegin, int srcEnd,
+        private void checkGetChars(MutableTextBuffer sb, int srcBegin, int srcEnd,
                 char[] expected)
         {
             char[] dst = new char[srcEnd - srcBegin];
@@ -489,20 +489,20 @@ namespace J2N.Text
             assertTrue(Arrays.Equals(dst, expected));
         }
 
-        private void checkSetCharAt(OpenStringBuilder sb, int index, char ch,
+        private void checkSetCharAt(MutableTextBuffer sb, int index, char ch,
                 string expected)
         {
             sb[index] = ch;
             check(sb, expected);
         }
 
-        private void checkSetLength(OpenStringBuilder sb, int newLength, string expected)
+        private void checkSetLength(MutableTextBuffer sb, int newLength, string expected)
         {
             sb.Length = newLength;
             check(sb, expected);
         }
 
-        private void check(OpenStringBuilder sb, string expected)
+        private void check(MutableTextBuffer sb, string expected)
         {
             check(sb.AsSpan(), expected);
         }

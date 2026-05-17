@@ -18,12 +18,12 @@ using Xunit;
 namespace J2N.Text.Tests
 {
     /// <summary>
-    /// Contains tests that ensure the correctness (compliance with the BCL) of an <see cref="OpenStringBuilder"/> implementation
+    /// Contains tests that ensure the correctness (compliance with the BCL) of an <see cref="MutableTextBuffer"/> implementation
     /// including subclasses.
     /// </summary>
     /// <remarks>
     /// J2N: This class does not map exactly to the upstream code. It was refactored to be an abstract class that can be used for testing
-    /// multiple implementations of <see cref="OpenStringBuilder"/>. Each implementation is presumed to have the same behavior, but
+    /// multiple implementations of <see cref="MutableTextBuffer"/>. Each implementation is presumed to have the same behavior, but
     /// may have different internal implementations. For example, one implementation may use a buffer that is allocated on the heap,
     /// while another may use a buffer that is allocated from an array pool. The tests in this class are designed to ensure that all
     /// implementations behave correctly and consistently with the BCL.
@@ -35,88 +35,88 @@ namespace J2N.Text.Tests
         internal static readonly string s_chunkSplitSource = new string('a', 30);
         //internal static StringBuilder StringBuilderWithMultipleChunks() => new StringBuilder(20).Append(s_chunkSplitSource);
 
-        #region OpenStringBuilder Helper Methods
+        #region MutableTextBuffer Helper Methods
 
         /// <summary>
-        /// Creates an instance of an <see cref="OpenStringBuilder"/> that can be used for testing.
+        /// Creates an instance of an <see cref="MutableTextBuffer"/> that can be used for testing.
         /// </summary>
-        /// <returns>An instance of <see cref="OpenStringBuilder"/> that can be used for testing.</returns>
-        protected abstract OpenStringBuilder OpenStringBuilderFactory();
+        /// <returns>An instance of <see cref="MutableTextBuffer"/> that can be used for testing.</returns>
+        protected abstract MutableTextBuffer OpenStringBuilderFactory();
 
         /// <summary>
-        /// Creates an instance of an <see cref="OpenStringBuilder"/> that can be used for testing.
+        /// Creates an instance of an <see cref="MutableTextBuffer"/> that can be used for testing.
         /// </summary>
-        /// <returns>An instance of <see cref="OpenStringBuilder"/> that can be used for testing.</returns>
-        protected abstract OpenStringBuilder OpenStringBuilderFactory(int capacity);
+        /// <returns>An instance of <see cref="MutableTextBuffer"/> that can be used for testing.</returns>
+        protected abstract MutableTextBuffer OpenStringBuilderFactory(int capacity);
 
         /// <summary>
-        /// Creates an instance of an <see cref="OpenStringBuilder"/> that can be used for testing.
+        /// Creates an instance of an <see cref="MutableTextBuffer"/> that can be used for testing.
         /// </summary>
-        /// <returns>An instance of <see cref="OpenStringBuilder"/> that can be used for testing.</returns>
-        protected abstract OpenStringBuilder OpenStringBuilderFactory(int capacity, int maxCapacity);
+        /// <returns>An instance of <see cref="MutableTextBuffer"/> that can be used for testing.</returns>
+        protected abstract MutableTextBuffer OpenStringBuilderFactory(int capacity, int maxCapacity);
 
         /// <summary>
-        /// Creates an instance of an <see cref="OpenStringBuilder"/> that can be used for testing.
+        /// Creates an instance of an <see cref="MutableTextBuffer"/> that can be used for testing.
         /// </summary>
-        /// <returns>An instance of <see cref="OpenStringBuilder"/> that can be used for testing.</returns>
-        protected abstract OpenStringBuilder OpenStringBuilderFactory(string? value);
+        /// <returns>An instance of <see cref="MutableTextBuffer"/> that can be used for testing.</returns>
+        protected abstract MutableTextBuffer OpenStringBuilderFactory(string? value);
 
         /// <summary>
-        /// Creates an instance of an <see cref="OpenStringBuilder"/> that can be used for testing.
+        /// Creates an instance of an <see cref="MutableTextBuffer"/> that can be used for testing.
         /// </summary>
-        /// <returns>An instance of <see cref="OpenStringBuilder"/> that can be used for testing.</returns>
-        protected abstract OpenStringBuilder OpenStringBuilderFactory(string? value, int startIndex, int length, int capacity);
+        /// <returns>An instance of <see cref="MutableTextBuffer"/> that can be used for testing.</returns>
+        protected abstract MutableTextBuffer OpenStringBuilderFactory(string? value, int startIndex, int length, int capacity);
 
         /// <summary>
-        /// Creates an instance of an <see cref="OpenStringBuilder"/> that can be used for testing.
+        /// Creates an instance of an <see cref="MutableTextBuffer"/> that can be used for testing.
         /// </summary>
-        /// <returns>An instance of <see cref="OpenStringBuilder"/> that can be used for testing.</returns>
-        protected abstract OpenStringBuilder OpenStringBuilderFactory(string? value, int capacity);
+        /// <returns>An instance of <see cref="MutableTextBuffer"/> that can be used for testing.</returns>
+        protected abstract MutableTextBuffer OpenStringBuilderFactory(string? value, int capacity);
 
         /// <summary>
-        /// Creates an instance of an <see cref="OpenStringBuilder"/> that can be used for testing.
+        /// Creates an instance of an <see cref="MutableTextBuffer"/> that can be used for testing.
         /// </summary>
-        /// <returns>An instance of <see cref="OpenStringBuilder"/> that can be used for testing.</returns>
-        protected abstract OpenStringBuilder OpenStringBuilderFactory(ReadOnlySpan<char> value);
+        /// <returns>An instance of <see cref="MutableTextBuffer"/> that can be used for testing.</returns>
+        protected abstract MutableTextBuffer OpenStringBuilderFactory(ReadOnlySpan<char> value);
 
         /// <summary>
-        /// Creates an instance of an <see cref="OpenStringBuilder"/> that can be used for testing.
+        /// Creates an instance of an <see cref="MutableTextBuffer"/> that can be used for testing.
         /// </summary>
-        /// <returns>An instance of <see cref="OpenStringBuilder"/> that can be used for testing.</returns>
-        protected abstract OpenStringBuilder OpenStringBuilderFactory(ReadOnlySpan<char> value, int capacity);
+        /// <returns>An instance of <see cref="MutableTextBuffer"/> that can be used for testing.</returns>
+        protected abstract MutableTextBuffer OpenStringBuilderFactory(ReadOnlySpan<char> value, int capacity);
 
         /// <summary>
-        /// Creates an instance of an <see cref="OpenStringBuilder"/> that can be used for testing.
+        /// Creates an instance of an <see cref="MutableTextBuffer"/> that can be used for testing.
         /// </summary>
-        /// <returns>An instance of <see cref="OpenStringBuilder"/> that can be used for testing.</returns>
-        protected abstract OpenStringBuilder OpenStringBuilderFactory(StringBuilder? value);
+        /// <returns>An instance of <see cref="MutableTextBuffer"/> that can be used for testing.</returns>
+        protected abstract MutableTextBuffer OpenStringBuilderFactory(StringBuilder? value);
 
         /// <summary>
-        /// Creates an instance of an <see cref="OpenStringBuilder"/> that can be used for testing.
+        /// Creates an instance of an <see cref="MutableTextBuffer"/> that can be used for testing.
         /// </summary>
-        /// <returns>An instance of <see cref="OpenStringBuilder"/> that can be used for testing.</returns>
-        protected abstract OpenStringBuilder OpenStringBuilderFactory(StringBuilder? value, int capacity);
+        /// <returns>An instance of <see cref="MutableTextBuffer"/> that can be used for testing.</returns>
+        protected abstract MutableTextBuffer OpenStringBuilderFactory(StringBuilder? value, int capacity);
 
         /// <summary>
-        /// Creates an instance of an <see cref="OpenStringBuilder"/> that can be used for testing.
+        /// Creates an instance of an <see cref="MutableTextBuffer"/> that can be used for testing.
         /// </summary>
-        /// <returns>An instance of <see cref="OpenStringBuilder"/> that can be used for testing.</returns>
-        protected abstract OpenStringBuilder OpenStringBuilderFactory(StringBuilder? value, int startIndex, int length, int capacity);
+        /// <returns>An instance of <see cref="MutableTextBuffer"/> that can be used for testing.</returns>
+        protected abstract MutableTextBuffer OpenStringBuilderFactory(StringBuilder? value, int startIndex, int length, int capacity);
 
         /// <summary>
-        /// Creates an instance of an <see cref="OpenStringBuilder"/> that can be used for testing.
+        /// Creates an instance of an <see cref="MutableTextBuffer"/> that can be used for testing.
         /// </summary>
-        /// <returns>An instance of <see cref="OpenStringBuilder"/> that can be used for testing.</returns>
-        protected abstract OpenStringBuilder OpenStringBuilderFactory(ICharSequence? value);
+        /// <returns>An instance of <see cref="MutableTextBuffer"/> that can be used for testing.</returns>
+        protected abstract MutableTextBuffer OpenStringBuilderFactory(ICharSequence? value);
 
-        #endregion OpenStringBuilder Helper Methods
+        #endregion MutableTextBuffer Helper Methods
 
         #region Constructor Tests
 
         [Fact]
         public void Ctor_Empty()
         {
-            OpenStringBuilder builder = OpenStringBuilderFactory();
+            MutableTextBuffer builder = OpenStringBuilderFactory();
             Assert.Same(string.Empty, builder.ToString());
             Assert.Equal(string.Empty, builder.ToString(0, 0));
             Assert.Equal(0, builder.Length);
@@ -126,7 +126,7 @@ namespace J2N.Text.Tests
         [Fact]
         public void Ctor_Int()
         {
-            OpenStringBuilder builder = OpenStringBuilderFactory(42);
+            MutableTextBuffer builder = OpenStringBuilderFactory(42);
             Assert.Same(string.Empty, builder.ToString());
             Assert.Equal(0, builder.Length);
 
@@ -143,8 +143,8 @@ namespace J2N.Text.Tests
         [Fact]
         public void Ctor_Int_Int()
         {
-            // The second int parameter is MaxCapacity but in CLR4.0 and later, OpenStringBuilder isn't required to honor it.
-            OpenStringBuilder builder = OpenStringBuilderFactory(42, 50);
+            // The second int parameter is MaxCapacity but in CLR4.0 and later, MutableTextBuffer isn't required to honor it.
+            MutableTextBuffer builder = OpenStringBuilderFactory(42, 50);
             Assert.Equal("", builder.ToString());
             Assert.Equal(0, builder.Length);
 
@@ -167,7 +167,7 @@ namespace J2N.Text.Tests
         [InlineData(null)]
         public void Ctor_String(string? value)
         {
-            OpenStringBuilder builder = OpenStringBuilderFactory(value);
+            MutableTextBuffer builder = OpenStringBuilderFactory(value);
 
             string expected = value ?? "";
             Assert.Equal(expected, builder.ToString());
@@ -180,7 +180,7 @@ namespace J2N.Text.Tests
         [InlineData(null)]
         public void Ctor_String_Int(string? value)
         {
-            OpenStringBuilder builder = OpenStringBuilderFactory(value, 42);
+            MutableTextBuffer builder = OpenStringBuilderFactory(value, 42);
 
             string expected = value ?? "";
             Assert.Equal(expected, builder.ToString());
@@ -202,7 +202,7 @@ namespace J2N.Text.Tests
         [InlineData(null, 0, 0)]
         public void Ctor_String_Int_Int_Int(string? value, int startIndex, int length)
         {
-            OpenStringBuilder builder = OpenStringBuilderFactory(value, startIndex, length, 42);
+            MutableTextBuffer builder = OpenStringBuilderFactory(value, startIndex, length, 42);
 
             string expected = value?.Substring(startIndex, length) ?? "";
             Assert.Equal(expected, builder.ToString());
@@ -229,7 +229,7 @@ namespace J2N.Text.Tests
         [InlineData(null, 0, 0)]
         public void Ctor_ReadOnlySpan(string? value, int startIndex, int length)
         {
-            OpenStringBuilder builder = OpenStringBuilderFactory(value.AsSpan(startIndex, length));
+            MutableTextBuffer builder = OpenStringBuilderFactory(value.AsSpan(startIndex, length));
 
             string expected = value?.Substring(startIndex, length) ?? "";
             Assert.Equal(expected, builder.ToString());
@@ -244,7 +244,7 @@ namespace J2N.Text.Tests
         [InlineData(null, 0, 0)]
         public void Ctor_ReadOnlySpan_Int(string? value, int startIndex, int length)
         {
-            OpenStringBuilder builder = OpenStringBuilderFactory(value.AsSpan(startIndex, length), 42);
+            MutableTextBuffer builder = OpenStringBuilderFactory(value.AsSpan(startIndex, length), 42);
 
             string expected = value?.Substring(startIndex, length) ?? "";
             Assert.Equal(expected, builder.ToString());
@@ -267,7 +267,7 @@ namespace J2N.Text.Tests
         public void Ctor_StringBuilder(string? value)
         {
             var sb = value is not null ? new StringBuilder(value) : (StringBuilder?)null;
-            OpenStringBuilder builder = OpenStringBuilderFactory(sb);
+            MutableTextBuffer builder = OpenStringBuilderFactory(sb);
 
             string expected = value ?? "";
             Assert.Equal(expected, builder.ToString());
@@ -281,7 +281,7 @@ namespace J2N.Text.Tests
         public void Ctor_StringBuilder_Int(string? value)
         {
             var sb = value is not null ? new StringBuilder(value) : (StringBuilder?)null;
-            OpenStringBuilder builder = OpenStringBuilderFactory(sb, 42);
+            MutableTextBuffer builder = OpenStringBuilderFactory(sb, 42);
 
             string expected = value ?? "";
             Assert.Equal(expected, builder.ToString());
@@ -304,7 +304,7 @@ namespace J2N.Text.Tests
         public void Ctor_StringBuilder_Int_Int_Int(string? value, int startIndex, int length)
         {
             var sb = value is not null ? new StringBuilder(value) : (StringBuilder?)null;
-            OpenStringBuilder builder = OpenStringBuilderFactory(sb, startIndex, length, 42);
+            MutableTextBuffer builder = OpenStringBuilderFactory(sb, startIndex, length, 42);
 
             string expected = value?.Substring(startIndex, length) ?? "";
             Assert.Equal(expected, builder.ToString());
@@ -332,7 +332,7 @@ namespace J2N.Text.Tests
         public void Ctor_ICharSequence(string? value)
         {
             var sb = value is not null ? value.AsCharSequence() : (ICharSequence?)null;
-            OpenStringBuilder builder = OpenStringBuilderFactory(sb);
+            MutableTextBuffer builder = OpenStringBuilderFactory(sb);
 
             string expected = value ?? "";
             Assert.Equal(expected, builder.ToString());
@@ -767,7 +767,7 @@ namespace J2N.Text.Tests
         [InlineData("Hello", '\0', 0, "Hello")]
         public void Append_Char(string original, char value, int repeatCount, string expected)
         {
-            OpenStringBuilder builder;
+            MutableTextBuffer builder;
             if (repeatCount == 1)
             {
                 // Use Append(char)
@@ -859,7 +859,7 @@ namespace J2N.Text.Tests
         [InlineData("Hello", null, 0, 0, "Hello")]
         public void Append_String(string? original, string? value, int startIndex, int count, string expected)
         {
-            OpenStringBuilder builder;
+            MutableTextBuffer builder;
             if (startIndex == 0 && count == (value?.Length ?? 0))
             {
                 // Use Append(string)
@@ -919,7 +919,7 @@ namespace J2N.Text.Tests
         [InlineData("Hello", null, 0, 0, "Hello")]
         public void Append_CharArray(string? original, char[]? value, int startIndex, int charCount, string expected)
         {
-            OpenStringBuilder builder;
+            MutableTextBuffer builder;
             if (startIndex == 0 && charCount == (value?.Length ?? 0))
             {
                 // Use Append(char[])
@@ -1033,7 +1033,7 @@ namespace J2N.Text.Tests
         [MemberData(nameof(AppendFormat_TestData))]
         public void AppendFormat(string original, IFormatProvider provider, string format, object?[]? values, string expected)
         {
-            OpenStringBuilder builder;
+            MutableTextBuffer builder;
             if (values != null)
             {
                 if (values.Length == 1)
@@ -1287,7 +1287,7 @@ namespace J2N.Text.Tests
         [MemberData(nameof(AppendLine_TestData))]
         public void AppendLine_String(string? original, string? value, string expected)
         {
-            OpenStringBuilder builder;
+            MutableTextBuffer builder;
             if (string.IsNullOrEmpty(value))
             {
                 // Use AppendLine()
@@ -1315,7 +1315,7 @@ namespace J2N.Text.Tests
         [MemberData(nameof(AppendLine_TestData))]
         public void AppendLine_ReadOnlySpan(string? original, string? value, string expected)
         {
-            OpenStringBuilder builder;
+            MutableTextBuffer builder;
             if (string.IsNullOrEmpty(value))
             {
                 // Use AppendLine()
@@ -1398,7 +1398,7 @@ namespace J2N.Text.Tests
         //[Fact]
         //public void CopyTo_StringBuilderWithMultipleChunks()
         //{
-        //    OpenStringBuilder builder = StringBuilderWithMultipleChunks();
+        //    MutableTextBuffer builder = StringBuilderWithMultipleChunks();
         //    char[] destination = new char[builder.Length];
         //    builder.CopyTo(0, destination, 0, destination.Length);
         //    Assert.Equal(s_chunkSplitSource.ToCharArray(), destination);
@@ -1488,11 +1488,11 @@ namespace J2N.Text.Tests
         {
             foreach (var testData in Equals_TestData())
             {
-                EqualsTest((OpenStringBuilder)testData[0]!, (OpenStringBuilder?)testData[1], (bool)testData[2]!);
+                EqualsTest((MutableTextBuffer)testData[0]!, (MutableTextBuffer?)testData[1], (bool)testData[2]!);
             }
         }
 
-        private static void EqualsTest(OpenStringBuilder sb1, OpenStringBuilder? sb2, bool expected)
+        private static void EqualsTest(MutableTextBuffer sb1, MutableTextBuffer? sb2, bool expected)
         {
             Assert.Equal(expected, sb1.Equals(sb2));
         }
@@ -1955,7 +1955,7 @@ namespace J2N.Text.Tests
         [InlineData("Hello", 5, "def", 2, "Hellodefdef")]
         public void Insert_String_Count(string? original, int index, string? value, int count, string expected)
         {
-            OpenStringBuilder builder;
+            MutableTextBuffer builder;
             if (count == 1)
             {
                 // Use Insert(int, string)
@@ -2000,7 +2000,7 @@ namespace J2N.Text.Tests
         [InlineData("Hello", 5, "def", 2, "Hellodefdef")]
         public void Insert_ReadOnlySpan_Count(string? original, int index, string? value, int count, string expected)
         {
-            OpenStringBuilder builder;
+            MutableTextBuffer builder;
             if (count == 1)
             {
                 // Use Insert(int, ReadOnlySpan<char>)
@@ -2047,7 +2047,7 @@ namespace J2N.Text.Tests
         [InlineData("Hello", 3, new char[] { 'a', 'b', 'c' }, 0, 2, "Helablo")]
         public void Insert_CharArray(string? original, int index, char[]? value, int startIndex, int charCount, string expected)
         {
-            OpenStringBuilder builder;
+            MutableTextBuffer builder;
             if (startIndex == 0 && charCount == (value?.Length ?? 0))
             {
                 // Use Insert(int, char[])
@@ -2151,7 +2151,7 @@ namespace J2N.Text.Tests
         [InlineData("aaaabbbbccccdddd", 'e', '!', 0, 16, "aaaabbbbccccdddd")]
         public void Replace_Char(string value, char oldChar, char newChar, int startIndex, int count, string expected)
         {
-            OpenStringBuilder builder;
+            MutableTextBuffer builder;
             if (startIndex == 0 && count == value.Length)
             {
                 // Use Replace(char, char)
@@ -2309,7 +2309,7 @@ namespace J2N.Text.Tests
         }
 
 
-        private OpenStringBuilder CreateBuilderWithNoSpareCapacity()
+        private MutableTextBuffer CreateBuilderWithNoSpareCapacity()
         {
             return OpenStringBuilderFactory(0, 5).Append("Hello");
         }
@@ -2473,7 +2473,7 @@ namespace J2N.Text.Tests
         //[Fact]
         //public void CopyTo_CharSpan_StringBuilderWithMultipleChunks()
         //{
-        //    OpenStringBuilder builder = StringBuilderWithMultipleChunks();
+        //    MutableTextBuffer builder = StringBuilderWithMultipleChunks();
         //    char[] destination = new char[builder.Length];
         //    builder.CopyTo(0, new Span<char>(destination), destination.Length);
         //    Assert.Equal(s_chunkSplitSource.ToCharArray(), destination);
@@ -2552,11 +2552,11 @@ namespace J2N.Text.Tests
         {
             foreach (var testData in Append_StringBuilder_TestData())
             {
-                Append_StringBuilder((OpenStringBuilder)testData[0]!, (OpenStringBuilder?)testData[1], (string)testData[2]!);
+                Append_StringBuilder((MutableTextBuffer)testData[0]!, (MutableTextBuffer?)testData[1], (string)testData[2]!);
             }
         }
 
-        private static void Append_StringBuilder(OpenStringBuilder s1, OpenStringBuilder? s2, string s)
+        private static void Append_StringBuilder(MutableTextBuffer s1, MutableTextBuffer? s2, string s)
         {
             Assert.Equal(s, s1.Append(s2).ToString());
         }
@@ -2600,11 +2600,11 @@ namespace J2N.Text.Tests
         {
             foreach (var testData in Append_StringBuilder_Substring_TestData())
             {
-                Append_StringBuilder_Substring((OpenStringBuilder)testData[0]!, (OpenStringBuilder?)testData[1], (int)testData[2]!, (int)testData[3]!, (string)testData[4]!);
+                Append_StringBuilder_Substring((MutableTextBuffer)testData[0]!, (MutableTextBuffer?)testData[1], (int)testData[2]!, (int)testData[3]!, (string)testData[4]!);
             }
         }
 
-        public static void Append_StringBuilder_Substring(OpenStringBuilder s1, OpenStringBuilder? s2, int startIndex, int count, string s)
+        public static void Append_StringBuilder_Substring(MutableTextBuffer s1, MutableTextBuffer? s2, int startIndex, int count, string s)
         {
             Assert.Equal(s, s1.Append(s2, startIndex, count).ToString());
         }
@@ -2612,14 +2612,14 @@ namespace J2N.Text.Tests
         [Fact]
         public void Append_StringBuilder_InvalidInput()
         {
-            OpenStringBuilder sb = OpenStringBuilderFactory(5, 5).Append("Hello");
+            MutableTextBuffer sb = OpenStringBuilderFactory(5, 5).Append("Hello");
 
             Assert.Throws<ArgumentOutOfRangeException>(() => sb.Append(sb, -1, 0));
             Assert.Throws<ArgumentOutOfRangeException>(() => sb.Append(sb, 0, -1));
             Assert.Throws<ArgumentOutOfRangeException>(() => sb.Append(sb, 4, 5));
 
-            Assert.Throws<ArgumentNullException>(() => sb.Append((OpenStringBuilder?)null, 2, 2));
-            Assert.Throws<ArgumentNullException>(() => sb.Append((OpenStringBuilder?)null, 2, 3));
+            Assert.Throws<ArgumentNullException>(() => sb.Append((MutableTextBuffer?)null, 2, 2));
+            Assert.Throws<ArgumentNullException>(() => sb.Append((MutableTextBuffer?)null, 2, 3));
             Assert.Throws<ArgumentOutOfRangeException>(() => OpenStringBuilderFactory(3, 6).Append("Hello").Append(sb));
             Assert.Throws<ArgumentOutOfRangeException>(() => OpenStringBuilderFactory(3, 6).Append("Hello").Append("Hello"));
 
@@ -2658,11 +2658,11 @@ namespace J2N.Text.Tests
         {
             foreach (var testData in Equals_String_TestData())
             {
-                Equals_String((OpenStringBuilder)testData[0]!, (string)testData[1]!, (bool)testData[2]!);
+                Equals_String((MutableTextBuffer)testData[0]!, (string)testData[1]!, (bool)testData[2]!);
             }
         }
 
-        public static void Equals_String(OpenStringBuilder sb1, string value, bool expected)
+        public static void Equals_String(MutableTextBuffer sb1, string value, bool expected)
         {
             Assert.Equal(expected, sb1.Equals(value.AsSpan()));
         }
@@ -2674,7 +2674,7 @@ namespace J2N.Text.Tests
             // we start using a different technique for creating the ChunkEnumerator.   200 * 500 = 100K which hits this.
             for (int i = 0; i < 200; i++)
             {
-                OpenStringBuilder inBuilder = OpenStringBuilderFactory();
+                MutableTextBuffer inBuilder = OpenStringBuilderFactory();
                 for (int j = 0; j < i; j++)
                 {
                     // Make some unique strings that are at least 500 bytes long.
@@ -2686,12 +2686,12 @@ namespace J2N.Text.Tests
                     inBuilder.Append("_abcdefghijklmnopqrstuvwxyz01234567890__Abcdefghijklmnopqrstuvwxyz01234567890__ABcdefghijklmnopqrstuvwxyz01234567890_");
                 }
 
-                // Copy the string out (not using OpenStringBuilder).
+                // Copy the string out (not using MutableTextBuffer).
                 string outStr = "";
                 foreach (ReadOnlyMemory<char> chunk in inBuilder.GetChunks())
                     outStr += chunk.Span.ToString();
 
-                // The strings formed by concatenating the chunks should be the same as the value in the OpenStringBuilder.
+                // The strings formed by concatenating the chunks should be the same as the value in the MutableTextBuffer.
                 Assert.Equal(outStr, inBuilder.ToString());
             }
         }
@@ -2781,7 +2781,7 @@ namespace J2N.Text.Tests
         //    {
         //        AssertExtensions.ThrowsAny<ArgumentOutOfRangeException, OutOfMemoryException>(() =>
         //        {
-        //            OpenStringBuilder sb = OpenStringBuilderFactory();
+        //            MutableTextBuffer sb = OpenStringBuilderFactory();
         //            sb.Append(new char[2_000_000_000]);
         //            sb.Length--;
         //            string s = new string('x', 500_000_000);

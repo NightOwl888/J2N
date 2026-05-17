@@ -24,44 +24,44 @@ namespace J2N.Text
 {
     public abstract partial class OpenStringBuilderTestBase : TestCase
     {
-        #region OpenStringBuilder Helper Methods
+        #region MutableTextBuffer Helper Methods
 
         /// <summary>
-        /// Creates an instance of an <see cref="OpenStringBuilder"/> that can be used for testing.
+        /// Creates an instance of an <see cref="MutableTextBuffer"/> that can be used for testing.
         /// </summary>
-        /// <returns>An instance of <see cref="OpenStringBuilder"/> that can be used for testing.</returns>
-        protected abstract OpenStringBuilder OpenStringBuilderFactory();
+        /// <returns>An instance of <see cref="MutableTextBuffer"/> that can be used for testing.</returns>
+        protected abstract MutableTextBuffer OpenStringBuilderFactory();
 
         /// <summary>
-        /// Creates an instance of an <see cref="OpenStringBuilder"/> that can be used for testing.
+        /// Creates an instance of an <see cref="MutableTextBuffer"/> that can be used for testing.
         /// </summary>
-        /// <returns>An instance of <see cref="OpenStringBuilder"/> that can be used for testing.</returns>
-        protected abstract OpenStringBuilder OpenStringBuilderFactory(int capacity);
+        /// <returns>An instance of <see cref="MutableTextBuffer"/> that can be used for testing.</returns>
+        protected abstract MutableTextBuffer OpenStringBuilderFactory(int capacity);
 
         /// <summary>
-        /// Creates an instance of an <see cref="OpenStringBuilder"/> that can be used for testing.
+        /// Creates an instance of an <see cref="MutableTextBuffer"/> that can be used for testing.
         /// </summary>
-        /// <returns>An instance of <see cref="OpenStringBuilder"/> that can be used for testing.</returns>
-        protected abstract OpenStringBuilder OpenStringBuilderFactory(string? value);
+        /// <returns>An instance of <see cref="MutableTextBuffer"/> that can be used for testing.</returns>
+        protected abstract MutableTextBuffer OpenStringBuilderFactory(string? value);
 
         /// <summary>
-        /// Creates an instance of an <see cref="OpenStringBuilder"/> that can be used for testing.
+        /// Creates an instance of an <see cref="MutableTextBuffer"/> that can be used for testing.
         /// </summary>
-        /// <returns>An instance of <see cref="OpenStringBuilder"/> that can be used for testing.</returns>
-        protected abstract OpenStringBuilder OpenStringBuilderFactory(ReadOnlySpan<char> value);
+        /// <returns>An instance of <see cref="MutableTextBuffer"/> that can be used for testing.</returns>
+        protected abstract MutableTextBuffer OpenStringBuilderFactory(ReadOnlySpan<char> value);
 
         /// <summary>
-        /// Creates an instance of an <see cref="OpenStringBuilder"/> that can be used for testing.
+        /// Creates an instance of an <see cref="MutableTextBuffer"/> that can be used for testing.
         /// </summary>
-        /// <returns>An instance of <see cref="OpenStringBuilder"/> that can be used for testing.</returns>
-        protected abstract OpenStringBuilder OpenStringBuilderFactory(StringBuilder? value);
+        /// <returns>An instance of <see cref="MutableTextBuffer"/> that can be used for testing.</returns>
+        protected abstract MutableTextBuffer OpenStringBuilderFactory(StringBuilder? value);
 
         /// <summary>
-        /// Creates an instance of an <see cref="OpenStringBuilder"/> that can be used for testing.
+        /// Creates an instance of an <see cref="MutableTextBuffer"/> that can be used for testing.
         /// </summary>
-        /// <returns>An instance of <see cref="OpenStringBuilder"/> that can be used for testing.</returns>
-        protected abstract OpenStringBuilder OpenStringBuilderFactory(ICharSequence? value);
+        /// <returns>An instance of <see cref="MutableTextBuffer"/> that can be used for testing.</returns>
+        protected abstract MutableTextBuffer OpenStringBuilderFactory(ICharSequence? value);
 
-        #endregion OpenStringBuilder Helper Methods
+        #endregion MutableTextBuffer Helper Methods
     }
 }

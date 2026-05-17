@@ -62,7 +62,7 @@ namespace J2N.Text
         [Test]
         public void Test_indexOfString()
         {
-            OpenStringBuilder sb = OpenStringBuilderFactory();
+            MutableTextBuffer sb = OpenStringBuilderFactory();
             Assert.Throws<ArgumentNullException>(() => sb.IndexOf(null));
 
             sb = OpenStringBuilderFactory("xyz");
@@ -73,7 +73,7 @@ namespace J2N.Text
         [Test]
         public void Test_indexOfStringint()
         {
-            OpenStringBuilder sb = OpenStringBuilderFactory();
+            MutableTextBuffer sb = OpenStringBuilderFactory();
             Assert.Throws<ArgumentNullException>(() => sb.IndexOf(null, 1));
 
             sb = OpenStringBuilderFactory("xyyz");
@@ -86,7 +86,7 @@ namespace J2N.Text
         [Test]
         public void Test_indexOfStringIntNull()
         {
-            OpenStringBuilder sb = OpenStringBuilderFactory();
+            MutableTextBuffer sb = OpenStringBuilderFactory();
 
             Assert.Throws<ArgumentNullException>(() => sb.IndexOf(null, 1));
         }
@@ -94,7 +94,7 @@ namespace J2N.Text
         [Test]
         public void Test_indexOfStringNull()
         {
-            OpenStringBuilder sb = OpenStringBuilderFactory();
+            MutableTextBuffer sb = OpenStringBuilderFactory();
 
             Assert.Throws<ArgumentNullException>(() => sb.IndexOf(null));
         }
@@ -103,7 +103,7 @@ namespace J2N.Text
         public void Test_insertintboolean()
         {
             bool b = true;
-            OpenStringBuilder sb = OpenStringBuilderFactory("012345");
+            MutableTextBuffer sb = OpenStringBuilderFactory("012345");
             assertEquals(sb.Insert(2, b, BooleanFormat.Lowercase).ToString(), "01true2345");
         }
 
@@ -111,7 +111,7 @@ namespace J2N.Text
         public void Test_insertintchar()
         {
             char c = 'C';
-            OpenStringBuilder sb = OpenStringBuilderFactory("012345");
+            MutableTextBuffer sb = OpenStringBuilderFactory("012345");
             assertEquals(sb.Insert(2, c).ToString(), "01C2345");
         }
 
@@ -137,7 +137,7 @@ namespace J2N.Text
         public void Test_insertintdouble()
         {
             double d = 99d;
-            OpenStringBuilder sb = OpenStringBuilderFactory("012345");
+            MutableTextBuffer sb = OpenStringBuilderFactory("012345");
             assertEquals(sb.Insert(2, d).ToString(), "0199.02345");
         }
 
@@ -145,7 +145,7 @@ namespace J2N.Text
         public void Test_insertintfloat()
         {
             float f = 99.0f;
-            OpenStringBuilder sb = OpenStringBuilderFactory("012345");
+            MutableTextBuffer sb = OpenStringBuilderFactory("012345");
             assertEquals(sb.Insert(2, f).ToString(), "0199.02345");
         }
 
@@ -153,7 +153,7 @@ namespace J2N.Text
         public void Test_insertintint()
         {
             int i = 99;
-            OpenStringBuilder sb = OpenStringBuilderFactory("012345");
+            MutableTextBuffer sb = OpenStringBuilderFactory("012345");
             assertEquals(sb.Insert(2, i).ToString(), "01992345");
         }
 
@@ -161,14 +161,14 @@ namespace J2N.Text
         public void Test_insertintlong()
         {
             long l = 99;
-            OpenStringBuilder sb = OpenStringBuilderFactory("012345");
+            MutableTextBuffer sb = OpenStringBuilderFactory("012345");
             assertEquals(sb.Insert(2, l).ToString(), "01992345");
         }
 
         [Test]
         public void Test_insertintObject()
         {
-            OpenStringBuilder sb = OpenStringBuilderFactory("012345");
+            MutableTextBuffer sb = OpenStringBuilderFactory("012345");
             List<string> ls = new List<string>();
             ls.Add("A"); ls.Add("B");
             string lsString = ls.ToString();
@@ -182,7 +182,7 @@ namespace J2N.Text
         {
             string xyz = "xyz";
             string xyz3 = "xyzxyzxyz";
-            OpenStringBuilder sb = OpenStringBuilderFactory(xyz3);
+            MutableTextBuffer sb = OpenStringBuilderFactory(xyz3);
             int pos = sb.LastIndexOf("xyz");
             assertEquals(pos, 2 * xyz.Length);
         }
@@ -190,7 +190,7 @@ namespace J2N.Text
         [Test]
         public void Test_lastIndexOfStringint()
         {
-            OpenStringBuilder sb = OpenStringBuilderFactory("xyzxyzxyz");
+            MutableTextBuffer sb = OpenStringBuilderFactory("xyzxyzxyz");
             int pos = sb.LastIndexOf("xyz", 5);
             assertEquals(pos, 3);
             pos = sb.LastIndexOf("xyz", 6);

@@ -21,7 +21,7 @@ namespace J2N.MemoryTests
         [InlineData(10, 10)]
         public static void OpenStringBuilderAsMemoryWithStart(int length, int start)
         {
-            OpenStringBuilder a = new OpenStringBuilder(length);
+            MutableTextBuffer a = new MutableTextBuffer(length);
             a.Append('\0', length);
             ReadOnlyMemory<char> m = a.AsMemory(start);
             Assert.Equal(length - start, m.Length);
@@ -42,7 +42,7 @@ namespace J2N.MemoryTests
         [InlineData(10, 3, 2)]
         public static void OpenStringBuilderAsMemoryWithStartAndLength(int length, int start, int subLength)
         {
-            OpenStringBuilder a = new OpenStringBuilder(length);
+            MutableTextBuffer a = new MutableTextBuffer(length);
             a.Append('\0', length);
 
             ReadOnlyMemory<char> m = a.AsMemory(start, subLength);
@@ -60,7 +60,7 @@ namespace J2N.MemoryTests
         [InlineData(5, 6)]
         public static void OpenStringBuilderAsMemoryWithStartNegative(int length, int start)
         {
-            OpenStringBuilder a = new OpenStringBuilder(length);
+            MutableTextBuffer a = new MutableTextBuffer(length);
             Assert.Throws<ArgumentOutOfRangeException>(() => a.AsMemory(start));
         }
 
@@ -73,7 +73,7 @@ namespace J2N.MemoryTests
         [InlineData(5, 3, 3)]
         public static void ArrayAsMemoryWithStartAndLengthNegative(int length, int start, int subLength)
         {
-            OpenStringBuilder a = new OpenStringBuilder(length);
+            MutableTextBuffer a = new MutableTextBuffer(length);
             Assert.Throws<ArgumentOutOfRangeException>(() => a.AsMemory(start, subLength));
         }
     }

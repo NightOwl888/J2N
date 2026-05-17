@@ -4,7 +4,7 @@ using System.Globalization;
 
 namespace J2N.Text
 {
-    public partial class OpenStringBuilder
+    public partial class MutableTextBuffer
     {
         /// <summary>
         /// A flag indicating whether invariant defaults should be used rather than using
@@ -25,7 +25,7 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// Gets the default <see cref="CultureInfo"/> instance for the current <see cref="OpenStringBuilder"/>.
+        /// Gets the default <see cref="CultureInfo"/> instance for the current <see cref="MutableTextBuffer"/>.
         /// <para/>
         /// This value will be respected as the default setting when the caller does not provide a choice or
         /// is calling a culture-sensitve API without an option to override culture.
@@ -36,7 +36,7 @@ namespace J2N.Text
         public CultureInfo DefaultCulture => useInvariantDefaults ? CultureInfo.InvariantCulture : CultureInfo.CurrentCulture;
 
         /// <summary>
-        /// Gets the default <see cref="NumberFormatInfo"/> instance for the current <see cref="OpenStringBuilder"/>.
+        /// Gets the default <see cref="NumberFormatInfo"/> instance for the current <see cref="MutableTextBuffer"/>.
         /// <para/>
         /// This value will be respected as the default setting when the caller does not provide a choice or
         /// is calling a culture-sensitve API without an option to override culture.
@@ -47,7 +47,7 @@ namespace J2N.Text
         public NumberFormatInfo DefaultNumberFormatInfo => useInvariantDefaults ? NumberFormatInfo.InvariantInfo : NumberFormatInfo.CurrentInfo;
 
         /// <summary>
-        /// Gets the default <see cref="DateTimeFormatInfo"/> instance for the current <see cref="OpenStringBuilder"/>.
+        /// Gets the default <see cref="DateTimeFormatInfo"/> instance for the current <see cref="MutableTextBuffer"/>.
         /// <para/>
         /// This value will be respected as the default setting when the caller does not provide a choice or
         /// is calling a culture-sensitve API without an option to override culture.
@@ -58,7 +58,7 @@ namespace J2N.Text
         public DateTimeFormatInfo DefaultDateTimeFormatInfo => useInvariantDefaults ? DateTimeFormatInfo.InvariantInfo : DateTimeFormatInfo.CurrentInfo;
 
         /// <summary>
-        /// Gets the default <see cref="StringFormatter"/> instance for the current <see cref="OpenStringBuilder"/>.
+        /// Gets the default <see cref="StringFormatter"/> instance for the current <see cref="MutableTextBuffer"/>.
         /// <para/>
         /// This value will be respected as the default setting when the caller does not provide a choice or
         /// is calling a culture-sensitve API without an option to override culture.
@@ -69,7 +69,7 @@ namespace J2N.Text
         public StringFormatter DefaultStringFormatter => useInvariantDefaults ? StringFormatter.InvariantCulture : StringFormatter.CurrentCulture;
 
         /// <summary>
-        /// Gets the default <see cref="StringComparison"/> setting for the current <see cref="OpenStringBuilder"/>.
+        /// Gets the default <see cref="StringComparison"/> setting for the current <see cref="MutableTextBuffer"/>.
         /// <para/>
         /// This value will be respected as the default setting when the caller does not provide a choice or
         /// is calling a culture-sensitve API without an option to override culture.

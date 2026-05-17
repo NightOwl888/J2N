@@ -47,7 +47,7 @@
   <PropertyGroup Condition=" $(TargetFramework.StartsWith('net8.')) Or $(TargetFramework.StartsWith('net9.')) ">
 
     <DefineConstants>$(DefineConstants);FEATURE_BITOPERATIONS_UINTPTR</DefineConstants>
-    <!-- J2N TODO: Finish CompositeFormat support for OpenStringBuilder -->
+    <!-- J2N TODO: Finish CompositeFormat support for MutableTextBuffer -->
     <!--<DefineConstants>$(DefineConstants);FEATURE_COMPOSITEFORMAT</DefineConstants>-->
     <DefineConstants>$(DefineConstants);FEATURE_EXCEPTION_STATIC_GUARDCLAUSES</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_INLINEARRAYATTRIBUTE</DefineConstants>

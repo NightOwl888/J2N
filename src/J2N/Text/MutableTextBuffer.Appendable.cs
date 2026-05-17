@@ -3,21 +3,21 @@ using System.Text;
 
 namespace J2N.Text
 {
-    public partial class OpenStringBuilder
+    public partial class MutableTextBuffer
     {
         #region Append ICharSequence
 
         /// <summary>
         /// Appends the string representation of the Unicode characters in a specified sequence to this instance.
         /// <para/>
-        /// NOTE: Unlike the Java implementation, this method does not add the word <c>"null"</c> to the <see cref="OpenStringBuilder"/>
+        /// NOTE: Unlike the Java implementation, this method does not add the word <c>"null"</c> to the <see cref="MutableTextBuffer"/>
         /// if <paramref name="charSequence"/> is <c>null</c>. Instead, no operation is performed.
         /// </summary>
         /// <param name="charSequence">The sequence of characters to append.</param>
         /// <returns>A reference to this instance after the append operation has completed.</returns>
         /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.</exception>
         /// <seealso cref="ICharSequence"/>
-        public OpenStringBuilder Append(ICharSequence? charSequence) // J2N: Parameter named charSequence so it can be specified explicitly to differentiate from object
+        public MutableTextBuffer Append(ICharSequence? charSequence) // J2N: Parameter named charSequence so it can be specified explicitly to differentiate from object
         {
             if (charSequence is null || !charSequence.HasValue)
                 return this;
@@ -34,7 +34,7 @@ namespace J2N.Text
             {
                 return Append(sb.Value);
             }
-            else if (charSequence is OpenStringBuilder osb)
+            else if (charSequence is MutableTextBuffer osb)
             {
                 return Append(osb);
             }
@@ -94,7 +94,7 @@ namespace J2N.Text
         /// Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.
         /// </exception>
         /// <seealso cref="ICharSequence"/>
-        public OpenStringBuilder Append(ICharSequence? charSequence, int startIndex, int count)
+        public MutableTextBuffer Append(ICharSequence? charSequence, int startIndex, int count)
         {
             if (charSequence is StringCharSequence str)
             {
@@ -108,7 +108,7 @@ namespace J2N.Text
             {
                 return Append(sb.Value, startIndex, count);
             }
-            else if (charSequence is OpenStringBuilder osb)
+            else if (charSequence is MutableTextBuffer osb)
             {
                 return Append(osb, startIndex, count);
             }
@@ -182,7 +182,7 @@ namespace J2N.Text
         /// <para/>
         /// Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.
         /// </exception>
-        public OpenStringBuilder Insert(int index, ICharSequence? charSequence)
+        public MutableTextBuffer Insert(int index, ICharSequence? charSequence)
         {
             if (charSequence is null || !charSequence.HasValue || charSequence.Length == 0)
                 return this;
@@ -199,7 +199,7 @@ namespace J2N.Text
             {
                 return Insert(index, sbCharSequence.Value);
             }
-            else if (charSequence is OpenStringBuilder osb)
+            else if (charSequence is MutableTextBuffer osb)
             {
                 return Insert(index, osb.AsSpan());
             }
@@ -254,7 +254,7 @@ namespace J2N.Text
         /// <para/>
         /// Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.
         /// </exception>
-        public OpenStringBuilder Insert(int index, ICharSequence? charSequence, int startIndex, int count)
+        public MutableTextBuffer Insert(int index, ICharSequence? charSequence, int startIndex, int count)
         {
             int currentLength = Length;
             if ((uint)index > (uint)currentLength)
@@ -283,7 +283,7 @@ namespace J2N.Text
             {
                 return Insert(index, sbCharSequence.Value!.ToString(startIndex, count));
             }
-            else if (charSequence is OpenStringBuilder osb)
+            else if (charSequence is MutableTextBuffer osb)
             {
                 return Insert(index, osb.AsSpan(startIndex, count));
             }

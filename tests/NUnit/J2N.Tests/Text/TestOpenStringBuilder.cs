@@ -24,22 +24,22 @@ namespace J2N.Text
 {
     public class TestOpenStringBuilder : OpenStringBuilderTestBase
     {
-        protected override OpenStringBuilder OpenStringBuilderFactory()
-            => new OpenStringBuilder() { UseInvariantDefaults = true };
+        protected override MutableTextBuffer OpenStringBuilderFactory()
+            => new MutableTextBuffer() { UseInvariantDefaults = true };
 
-        protected override OpenStringBuilder OpenStringBuilderFactory(int capacity)
-            => new OpenStringBuilder(capacity) { UseInvariantDefaults = true };
+        protected override MutableTextBuffer OpenStringBuilderFactory(int capacity)
+            => new MutableTextBuffer(capacity) { UseInvariantDefaults = true };
 
-        protected override OpenStringBuilder OpenStringBuilderFactory(string? value)
-            => new OpenStringBuilder(value) { UseInvariantDefaults = true };
+        protected override MutableTextBuffer OpenStringBuilderFactory(string? value)
+            => new MutableTextBuffer(value) { UseInvariantDefaults = true };
 
-        protected override OpenStringBuilder OpenStringBuilderFactory(ReadOnlySpan<char> value)
-            => new OpenStringBuilder(value) { UseInvariantDefaults = true };
+        protected override MutableTextBuffer OpenStringBuilderFactory(ReadOnlySpan<char> value)
+            => new MutableTextBuffer(value) { UseInvariantDefaults = true };
 
-        protected override OpenStringBuilder OpenStringBuilderFactory(StringBuilder? value)
-            => new OpenStringBuilder(value) { UseInvariantDefaults = true };
+        protected override MutableTextBuffer OpenStringBuilderFactory(StringBuilder? value)
+            => new MutableTextBuffer(value) { UseInvariantDefaults = true };
 
-        protected override OpenStringBuilder OpenStringBuilderFactory(ICharSequence? value)
-            => new OpenStringBuilder(value) { UseInvariantDefaults = true };
+        protected override MutableTextBuffer OpenStringBuilderFactory(ICharSequence? value)
+            => new MutableTextBuffer(value) { UseInvariantDefaults = true };
     }
 }
