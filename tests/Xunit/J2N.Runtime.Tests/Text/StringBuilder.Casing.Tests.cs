@@ -52,7 +52,7 @@ namespace J2N.Text.Tests
         [MemberData(nameof(Append_LowerCase_TestData))]
         public void Test_AppendLower_ReadOnlySpan(string original, string input, string expected, CultureInfo culture)
         {
-            var sb = OpenStringBuilderFactory(original, 15);
+            var sb = MutableTextBufferFactory(original, 15);
             sb.AppendLower(input.AsSpan(), culture);
             Assert.Equal(expected, sb.ToString());
         }
@@ -61,7 +61,7 @@ namespace J2N.Text.Tests
         [MemberData(nameof(Append_LowerCase_TestData))]
         public void Test_AppendLower_String(string original, string input, string expected, CultureInfo culture)
         {
-            var sb = OpenStringBuilderFactory(original, 15);
+            var sb = MutableTextBufferFactory(original, 15);
             sb.AppendLower(input, culture);
             Assert.Equal(expected, sb.ToString());
         }
@@ -91,7 +91,7 @@ namespace J2N.Text.Tests
         [MemberData(nameof(Append_UpperCase_TestData))]
         public void Test_AppendUpper_ReadOnlySpan(string original, string input, string expected, CultureInfo culture)
         {
-            var sb = OpenStringBuilderFactory(original, 15);
+            var sb = MutableTextBufferFactory(original, 15);
             sb.AppendUpper(input.AsSpan(), culture);
             Assert.Equal(expected, sb.ToString());
         }
@@ -100,7 +100,7 @@ namespace J2N.Text.Tests
         [MemberData(nameof(Append_UpperCase_TestData))]
         public void Test_AppendUpper_String(string original, string input, string expected, CultureInfo culture)
         {
-            var sb = OpenStringBuilderFactory(original, 15);
+            var sb = MutableTextBufferFactory(original, 15);
             sb.AppendUpper(input, culture);
             Assert.Equal(expected, sb.ToString());
         }
@@ -120,7 +120,7 @@ namespace J2N.Text.Tests
         [MemberData(nameof(AppendInvariant_LowerCase_TestData))]
         public void Test_AppendLowerInvariant_ReadOnlySpan(string original, string input, string expected)
         {
-            var sb = OpenStringBuilderFactory(original, 15);
+            var sb = MutableTextBufferFactory(original, 15);
             sb.AppendLowerInvariant(input.AsSpan());
             Assert.Equal(expected, sb.ToString());
         }
@@ -129,7 +129,7 @@ namespace J2N.Text.Tests
         [MemberData(nameof(AppendInvariant_LowerCase_TestData))]
         public void Test_AppendLowerInvariant_String(string original, string input, string expected)
         {
-            var sb = OpenStringBuilderFactory(original, 15);
+            var sb = MutableTextBufferFactory(original, 15);
             sb.AppendLowerInvariant(input);
             Assert.Equal(expected, sb.ToString());
         }
@@ -149,7 +149,7 @@ namespace J2N.Text.Tests
         [MemberData(nameof(AppendInvariant_UpperCase_TestData))]
         public void Test_AppendUpperInvariant_ReadOnlySpan(string original, string input, string expected)
         {
-            var sb = OpenStringBuilderFactory(original, 15);
+            var sb = MutableTextBufferFactory(original, 15);
             sb.AppendUpperInvariant(input.AsSpan());
             Assert.Equal(expected, sb.ToString());
         }
@@ -158,7 +158,7 @@ namespace J2N.Text.Tests
         [MemberData(nameof(AppendInvariant_UpperCase_TestData))]
         public void Test_AppendUpperInvariant_String(string original, string input, string expected)
         {
-            var sb = OpenStringBuilderFactory(original, 15);
+            var sb = MutableTextBufferFactory(original, 15);
             sb.AppendUpperInvariant(input);
             Assert.Equal(expected, sb.ToString());
         }

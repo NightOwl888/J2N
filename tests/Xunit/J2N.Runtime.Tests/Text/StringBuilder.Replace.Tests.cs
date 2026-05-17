@@ -51,13 +51,13 @@ namespace J2N.Text.Tests
             if (startIndex == 0 && count == value.Length)
             {
                 // Use Replace(string, string)
-                builder = OpenStringBuilderFactory(value);
+                builder = MutableTextBufferFactory(value);
                 builder.Replace(oldValue, newValue);
                 Assert.Equal(expected, builder.ToString());
             }
 
             // Use Replace(string, string, int, int)
-            builder = OpenStringBuilderFactory(value);
+            builder = MutableTextBufferFactory(value);
             builder.Replace(oldValue, newValue, startIndex, count);
             Assert.Equal(expected, builder.ToString());
         }
@@ -70,13 +70,13 @@ namespace J2N.Text.Tests
             if (startIndex == 0 && count == value.Length)
             {
                 // Use Replace(ReadOnlySpan<char>, ReadOnlySpan<char>)
-                builder = OpenStringBuilderFactory(value);
+                builder = MutableTextBufferFactory(value);
                 builder.Replace(oldValue.AsSpan(), newValue.AsSpan());
                 Assert.Equal(expected, builder.ToString());
             }
 
             // Use Replace(ReadOnlySpan<char>, ReadOnlySpan<char>, int, int)
-            builder = OpenStringBuilderFactory(value);
+            builder = MutableTextBufferFactory(value);
             builder.Replace(oldValue.AsSpan(), newValue.AsSpan(), startIndex, count);
             Assert.Equal(expected, builder.ToString());
         }
@@ -93,7 +93,7 @@ namespace J2N.Text.Tests
         [Fact]
         public void Replace_String_Large()
         {
-            MutableTextBuffer builder = OpenStringBuilderFactory(s_chunkSplitSource);
+            MutableTextBuffer builder = MutableTextBufferFactory(s_chunkSplitSource);
             builder.Replace("a", "b", builder.Length - 10, 10);
             Assert.Equal(new string('a', builder.Length - 10) + new string('b', 10), builder.ToString());
         }
@@ -101,7 +101,7 @@ namespace J2N.Text.Tests
         [Fact]
         public void Replace_ReadOnlySpan_Large()
         {
-            MutableTextBuffer builder = OpenStringBuilderFactory(s_chunkSplitSource);
+            MutableTextBuffer builder = MutableTextBufferFactory(s_chunkSplitSource);
             builder.Replace("a".AsSpan(), "b".AsSpan(), builder.Length - 10, 10);
             Assert.Equal(new string('a', builder.Length - 10) + new string('b', 10), builder.ToString());
         }
@@ -118,7 +118,7 @@ namespace J2N.Text.Tests
         [Fact]
         public void Replace_String_WholeString()
         {
-            MutableTextBuffer builder = OpenStringBuilderFactory(s_chunkSplitSource);
+            MutableTextBuffer builder = MutableTextBufferFactory(s_chunkSplitSource);
             builder.Replace(builder.ToString(), "");
             Assert.Same(string.Empty, builder.ToString());
         }
@@ -126,7 +126,7 @@ namespace J2N.Text.Tests
         [Fact]
         public void Replace_ReadOnlySpan_WholeString()
         {
-            MutableTextBuffer builder = OpenStringBuilderFactory(s_chunkSplitSource);
+            MutableTextBuffer builder = MutableTextBufferFactory(s_chunkSplitSource);
             builder.Replace(builder.AsSpan(), "".AsSpan());
             Assert.Same(string.Empty, builder.ToString());
         }
@@ -143,7 +143,7 @@ namespace J2N.Text.Tests
         [Fact]
         public void Replace_String_LongString()
         {
-            MutableTextBuffer builder = OpenStringBuilderFactory(s_chunkSplitSource);
+            MutableTextBuffer builder = MutableTextBufferFactory(s_chunkSplitSource);
             builder.Replace(builder.ToString() + "b", "");
             Assert.Equal(s_chunkSplitSource, builder.ToString());
         }
@@ -151,7 +151,7 @@ namespace J2N.Text.Tests
         [Fact]
         public void Replace_ReadOnlySpan_LongString()
         {
-            MutableTextBuffer builder = OpenStringBuilderFactory(s_chunkSplitSource);
+            MutableTextBuffer builder = MutableTextBufferFactory(s_chunkSplitSource);
             string findString = builder.ToString() + "b";
             builder.Replace(findString.AsSpan(), "".AsSpan());
             Assert.Equal(s_chunkSplitSource, builder.ToString());
@@ -160,7 +160,7 @@ namespace J2N.Text.Tests
         [Fact]
         public void Replace_String_Invalid()
         {
-            var builder = OpenStringBuilderFactory(0, 5);
+            var builder = MutableTextBufferFactory(0, 5);
             builder.Append("Hello");
 
             AssertExtensions.Throws<ArgumentNullException>("oldValue", () => builder.Replace(null, "")); // Old value is null
@@ -183,7 +183,7 @@ namespace J2N.Text.Tests
         [Fact]
         public void Replace_ReadOnlySpan_Invalid()
         {
-            var builder = OpenStringBuilderFactory(0, 5);
+            var builder = MutableTextBufferFactory(0, 5);
             builder.Append("Hello");
 
             AssertExtensions.Throws<ArgumentException>("oldValue", () => builder.Replace("".AsSpan(), "a".AsSpan())); // Old value is empty

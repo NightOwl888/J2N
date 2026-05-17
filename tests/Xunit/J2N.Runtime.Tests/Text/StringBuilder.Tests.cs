@@ -41,73 +41,73 @@ namespace J2N.Text.Tests
         /// Creates an instance of an <see cref="MutableTextBuffer"/> that can be used for testing.
         /// </summary>
         /// <returns>An instance of <see cref="MutableTextBuffer"/> that can be used for testing.</returns>
-        protected abstract MutableTextBuffer OpenStringBuilderFactory();
+        protected abstract MutableTextBuffer MutableTextBufferFactory();
 
         /// <summary>
         /// Creates an instance of an <see cref="MutableTextBuffer"/> that can be used for testing.
         /// </summary>
         /// <returns>An instance of <see cref="MutableTextBuffer"/> that can be used for testing.</returns>
-        protected abstract MutableTextBuffer OpenStringBuilderFactory(int capacity);
+        protected abstract MutableTextBuffer MutableTextBufferFactory(int capacity);
 
         /// <summary>
         /// Creates an instance of an <see cref="MutableTextBuffer"/> that can be used for testing.
         /// </summary>
         /// <returns>An instance of <see cref="MutableTextBuffer"/> that can be used for testing.</returns>
-        protected abstract MutableTextBuffer OpenStringBuilderFactory(int capacity, int maxCapacity);
+        protected abstract MutableTextBuffer MutableTextBufferFactory(int capacity, int maxCapacity);
 
         /// <summary>
         /// Creates an instance of an <see cref="MutableTextBuffer"/> that can be used for testing.
         /// </summary>
         /// <returns>An instance of <see cref="MutableTextBuffer"/> that can be used for testing.</returns>
-        protected abstract MutableTextBuffer OpenStringBuilderFactory(string? value);
+        protected abstract MutableTextBuffer MutableTextBufferFactory(string? value);
 
         /// <summary>
         /// Creates an instance of an <see cref="MutableTextBuffer"/> that can be used for testing.
         /// </summary>
         /// <returns>An instance of <see cref="MutableTextBuffer"/> that can be used for testing.</returns>
-        protected abstract MutableTextBuffer OpenStringBuilderFactory(string? value, int startIndex, int length, int capacity);
+        protected abstract MutableTextBuffer MutableTextBufferFactory(string? value, int startIndex, int length, int capacity);
 
         /// <summary>
         /// Creates an instance of an <see cref="MutableTextBuffer"/> that can be used for testing.
         /// </summary>
         /// <returns>An instance of <see cref="MutableTextBuffer"/> that can be used for testing.</returns>
-        protected abstract MutableTextBuffer OpenStringBuilderFactory(string? value, int capacity);
+        protected abstract MutableTextBuffer MutableTextBufferFactory(string? value, int capacity);
 
         /// <summary>
         /// Creates an instance of an <see cref="MutableTextBuffer"/> that can be used for testing.
         /// </summary>
         /// <returns>An instance of <see cref="MutableTextBuffer"/> that can be used for testing.</returns>
-        protected abstract MutableTextBuffer OpenStringBuilderFactory(ReadOnlySpan<char> value);
+        protected abstract MutableTextBuffer MutableTextBufferFactory(ReadOnlySpan<char> value);
 
         /// <summary>
         /// Creates an instance of an <see cref="MutableTextBuffer"/> that can be used for testing.
         /// </summary>
         /// <returns>An instance of <see cref="MutableTextBuffer"/> that can be used for testing.</returns>
-        protected abstract MutableTextBuffer OpenStringBuilderFactory(ReadOnlySpan<char> value, int capacity);
+        protected abstract MutableTextBuffer MutableTextBufferFactory(ReadOnlySpan<char> value, int capacity);
 
         /// <summary>
         /// Creates an instance of an <see cref="MutableTextBuffer"/> that can be used for testing.
         /// </summary>
         /// <returns>An instance of <see cref="MutableTextBuffer"/> that can be used for testing.</returns>
-        protected abstract MutableTextBuffer OpenStringBuilderFactory(StringBuilder? value);
+        protected abstract MutableTextBuffer MutableTextBufferFactory(StringBuilder? value);
 
         /// <summary>
         /// Creates an instance of an <see cref="MutableTextBuffer"/> that can be used for testing.
         /// </summary>
         /// <returns>An instance of <see cref="MutableTextBuffer"/> that can be used for testing.</returns>
-        protected abstract MutableTextBuffer OpenStringBuilderFactory(StringBuilder? value, int capacity);
+        protected abstract MutableTextBuffer MutableTextBufferFactory(StringBuilder? value, int capacity);
 
         /// <summary>
         /// Creates an instance of an <see cref="MutableTextBuffer"/> that can be used for testing.
         /// </summary>
         /// <returns>An instance of <see cref="MutableTextBuffer"/> that can be used for testing.</returns>
-        protected abstract MutableTextBuffer OpenStringBuilderFactory(StringBuilder? value, int startIndex, int length, int capacity);
+        protected abstract MutableTextBuffer MutableTextBufferFactory(StringBuilder? value, int startIndex, int length, int capacity);
 
         /// <summary>
         /// Creates an instance of an <see cref="MutableTextBuffer"/> that can be used for testing.
         /// </summary>
         /// <returns>An instance of <see cref="MutableTextBuffer"/> that can be used for testing.</returns>
-        protected abstract MutableTextBuffer OpenStringBuilderFactory(ICharSequence? value);
+        protected abstract MutableTextBuffer MutableTextBufferFactory(ICharSequence? value);
 
         #endregion MutableTextBuffer Helper Methods
 
@@ -116,7 +116,7 @@ namespace J2N.Text.Tests
         [Fact]
         public void Ctor_Empty()
         {
-            MutableTextBuffer builder = OpenStringBuilderFactory();
+            MutableTextBuffer builder = MutableTextBufferFactory();
             Assert.Same(string.Empty, builder.ToString());
             Assert.Equal(string.Empty, builder.ToString(0, 0));
             Assert.Equal(0, builder.Length);
@@ -126,7 +126,7 @@ namespace J2N.Text.Tests
         [Fact]
         public void Ctor_Int()
         {
-            MutableTextBuffer builder = OpenStringBuilderFactory(42);
+            MutableTextBuffer builder = MutableTextBufferFactory(42);
             Assert.Same(string.Empty, builder.ToString());
             Assert.Equal(0, builder.Length);
 
@@ -137,14 +137,14 @@ namespace J2N.Text.Tests
         [Fact]
         public void Ctor_Int_NegativeCapacity_ThrowsArgumentOutOfRangeException()
         {
-            AssertExtensions.Throws<ArgumentOutOfRangeException>("capacity", () => OpenStringBuilderFactory(-1)); // Capacity < 0
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("capacity", () => MutableTextBufferFactory(-1)); // Capacity < 0
         }
 
         [Fact]
         public void Ctor_Int_Int()
         {
             // The second int parameter is MaxCapacity but in CLR4.0 and later, MutableTextBuffer isn't required to honor it.
-            MutableTextBuffer builder = OpenStringBuilderFactory(42, 50);
+            MutableTextBuffer builder = MutableTextBufferFactory(42, 50);
             Assert.Equal("", builder.ToString());
             Assert.Equal(0, builder.Length);
 
@@ -155,10 +155,10 @@ namespace J2N.Text.Tests
         [Fact]
         public void Ctor_Int_Int_Invalid()
         {
-            AssertExtensions.Throws<ArgumentOutOfRangeException>("capacity", () => OpenStringBuilderFactory(-1, 1)); // Capacity < 0
-            AssertExtensions.Throws<ArgumentOutOfRangeException>("maxCapacity", () => OpenStringBuilderFactory(0, 0)); // MaxCapacity < 1
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("capacity", () => MutableTextBufferFactory(-1, 1)); // Capacity < 0
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("maxCapacity", () => MutableTextBufferFactory(0, 0)); // MaxCapacity < 1
 
-            AssertExtensions.Throws<ArgumentOutOfRangeException>("capacity", () => OpenStringBuilderFactory(2, 1)); // Capacity > maxCapacity
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("capacity", () => MutableTextBufferFactory(2, 1)); // Capacity > maxCapacity
         }
 
         [Theory]
@@ -167,7 +167,7 @@ namespace J2N.Text.Tests
         [InlineData(null)]
         public void Ctor_String(string? value)
         {
-            MutableTextBuffer builder = OpenStringBuilderFactory(value);
+            MutableTextBuffer builder = MutableTextBufferFactory(value);
 
             string expected = value ?? "";
             Assert.Equal(expected, builder.ToString());
@@ -180,7 +180,7 @@ namespace J2N.Text.Tests
         [InlineData(null)]
         public void Ctor_String_Int(string? value)
         {
-            MutableTextBuffer builder = OpenStringBuilderFactory(value, 42);
+            MutableTextBuffer builder = MutableTextBufferFactory(value, 42);
 
             string expected = value ?? "";
             Assert.Equal(expected, builder.ToString());
@@ -192,7 +192,7 @@ namespace J2N.Text.Tests
         [Fact]
         public void Ctor_String_Int_NegativeCapacity_ThrowsArgumentOutOfRangeException()
         {
-            AssertExtensions.Throws<ArgumentOutOfRangeException>("capacity", () => OpenStringBuilderFactory("", -1)); // Capacity < 0
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("capacity", () => MutableTextBufferFactory("", -1)); // Capacity < 0
         }
 
         [Theory]
@@ -202,7 +202,7 @@ namespace J2N.Text.Tests
         [InlineData(null, 0, 0)]
         public void Ctor_String_Int_Int_Int(string? value, int startIndex, int length)
         {
-            MutableTextBuffer builder = OpenStringBuilderFactory(value, startIndex, length, 42);
+            MutableTextBuffer builder = MutableTextBufferFactory(value, startIndex, length, 42);
 
             string expected = value?.Substring(startIndex, length) ?? "";
             Assert.Equal(expected, builder.ToString());
@@ -215,11 +215,11 @@ namespace J2N.Text.Tests
         [Fact]
         public void Ctor_String_Int_Int_Int_Invalid()
         {
-            AssertExtensions.Throws<ArgumentOutOfRangeException>("startIndex", () => OpenStringBuilderFactory("foo", -1, 0, 0)); // Start index < 0
-            AssertExtensions.Throws<ArgumentOutOfRangeException>("length", () => OpenStringBuilderFactory("foo", 0, -1, 0)); // Length < 0
-            AssertExtensions.Throws<ArgumentOutOfRangeException>("capacity", () => OpenStringBuilderFactory("foo", 0, 0, -1)); // Capacity < 0
-            AssertExtensions.Throws<ArgumentOutOfRangeException>("length", () => OpenStringBuilderFactory("foo", 4, 0, 0)); // Start index + length > builder.Length
-            AssertExtensions.Throws<ArgumentOutOfRangeException>("length", () => OpenStringBuilderFactory("foo", 3, 1, 0)); // Start index + length > builder.Length
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("startIndex", () => MutableTextBufferFactory("foo", -1, 0, 0)); // Start index < 0
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("length", () => MutableTextBufferFactory("foo", 0, -1, 0)); // Length < 0
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("capacity", () => MutableTextBufferFactory("foo", 0, 0, -1)); // Capacity < 0
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("length", () => MutableTextBufferFactory("foo", 4, 0, 0)); // Start index + length > builder.Length
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("length", () => MutableTextBufferFactory("foo", 3, 1, 0)); // Start index + length > builder.Length
         }
 
         [Theory] // J2N specific
@@ -229,7 +229,7 @@ namespace J2N.Text.Tests
         [InlineData(null, 0, 0)]
         public void Ctor_ReadOnlySpan(string? value, int startIndex, int length)
         {
-            MutableTextBuffer builder = OpenStringBuilderFactory(value.AsSpan(startIndex, length));
+            MutableTextBuffer builder = MutableTextBufferFactory(value.AsSpan(startIndex, length));
 
             string expected = value?.Substring(startIndex, length) ?? "";
             Assert.Equal(expected, builder.ToString());
@@ -244,7 +244,7 @@ namespace J2N.Text.Tests
         [InlineData(null, 0, 0)]
         public void Ctor_ReadOnlySpan_Int(string? value, int startIndex, int length)
         {
-            MutableTextBuffer builder = OpenStringBuilderFactory(value.AsSpan(startIndex, length), 42);
+            MutableTextBuffer builder = MutableTextBufferFactory(value.AsSpan(startIndex, length), 42);
 
             string expected = value?.Substring(startIndex, length) ?? "";
             Assert.Equal(expected, builder.ToString());
@@ -257,7 +257,7 @@ namespace J2N.Text.Tests
         [Fact] // J2N specific
         public void Ctor_ReadOnlySpan_Int_Invalid()
         {
-            AssertExtensions.Throws<ArgumentOutOfRangeException>("capacity", () => OpenStringBuilderFactory("foo".AsSpan(0, 0), -1)); // Capacity < 0
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("capacity", () => MutableTextBufferFactory("foo".AsSpan(0, 0), -1)); // Capacity < 0
         }
 
         [Theory] // J2N specific
@@ -267,7 +267,7 @@ namespace J2N.Text.Tests
         public void Ctor_StringBuilder(string? value)
         {
             var sb = value is not null ? new StringBuilder(value) : (StringBuilder?)null;
-            MutableTextBuffer builder = OpenStringBuilderFactory(sb);
+            MutableTextBuffer builder = MutableTextBufferFactory(sb);
 
             string expected = value ?? "";
             Assert.Equal(expected, builder.ToString());
@@ -281,7 +281,7 @@ namespace J2N.Text.Tests
         public void Ctor_StringBuilder_Int(string? value)
         {
             var sb = value is not null ? new StringBuilder(value) : (StringBuilder?)null;
-            MutableTextBuffer builder = OpenStringBuilderFactory(sb, 42);
+            MutableTextBuffer builder = MutableTextBufferFactory(sb, 42);
 
             string expected = value ?? "";
             Assert.Equal(expected, builder.ToString());
@@ -293,7 +293,7 @@ namespace J2N.Text.Tests
         [Fact] // J2N specific
         public void Ctor_StringBuilder_Int_NegativeCapacity_ThrowsArgumentOutOfRangeException()
         {
-            AssertExtensions.Throws<ArgumentOutOfRangeException>("capacity", () => OpenStringBuilderFactory(new StringBuilder(""), -1)); // Capacity < 0
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("capacity", () => MutableTextBufferFactory(new StringBuilder(""), -1)); // Capacity < 0
         }
 
         [Theory] // J2N specific
@@ -304,7 +304,7 @@ namespace J2N.Text.Tests
         public void Ctor_StringBuilder_Int_Int_Int(string? value, int startIndex, int length)
         {
             var sb = value is not null ? new StringBuilder(value) : (StringBuilder?)null;
-            MutableTextBuffer builder = OpenStringBuilderFactory(sb, startIndex, length, 42);
+            MutableTextBuffer builder = MutableTextBufferFactory(sb, startIndex, length, 42);
 
             string expected = value?.Substring(startIndex, length) ?? "";
             Assert.Equal(expected, builder.ToString());
@@ -317,12 +317,12 @@ namespace J2N.Text.Tests
         [Fact] // J2N specific
         public void Ctor_StringBuilder_Int_Int_Int_Invalid()
         {
-            AssertExtensions.Throws<ArgumentOutOfRangeException>("startIndex", () => OpenStringBuilderFactory(new StringBuilder("foo"), -1, 0, 0)); // Start index < 0
-            AssertExtensions.Throws<ArgumentOutOfRangeException>("length", () => OpenStringBuilderFactory(new StringBuilder("foo"), 0, -1, 0)); // Length < 0
-            AssertExtensions.Throws<ArgumentOutOfRangeException>("capacity", () => OpenStringBuilderFactory(new StringBuilder("foo"), 0, 0, -1)); // Capacity < 0
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("startIndex", () => MutableTextBufferFactory(new StringBuilder("foo"), -1, 0, 0)); // Start index < 0
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("length", () => MutableTextBufferFactory(new StringBuilder("foo"), 0, -1, 0)); // Length < 0
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("capacity", () => MutableTextBufferFactory(new StringBuilder("foo"), 0, 0, -1)); // Capacity < 0
 
-            AssertExtensions.Throws<ArgumentOutOfRangeException>("length", () => OpenStringBuilderFactory(new StringBuilder("foo"), 4, 0, 0)); // Start index + length > builder.Length
-            AssertExtensions.Throws<ArgumentOutOfRangeException>("length", () => OpenStringBuilderFactory(new StringBuilder("foo"), 3, 1, 0)); // Start index + length > builder.Length
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("length", () => MutableTextBufferFactory(new StringBuilder("foo"), 4, 0, 0)); // Start index + length > builder.Length
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("length", () => MutableTextBufferFactory(new StringBuilder("foo"), 3, 1, 0)); // Start index + length > builder.Length
         }
 
         [Theory] // J2N specific
@@ -332,7 +332,7 @@ namespace J2N.Text.Tests
         public void Ctor_ICharSequence(string? value)
         {
             var sb = value is not null ? value.AsCharSequence() : (ICharSequence?)null;
-            MutableTextBuffer builder = OpenStringBuilderFactory(sb);
+            MutableTextBuffer builder = MutableTextBufferFactory(sb);
 
             string expected = value ?? "";
             Assert.Equal(expected, builder.ToString());
@@ -346,7 +346,7 @@ namespace J2N.Text.Tests
         public void Item_Get_Set()
         {
             string s = "Hello";
-            var builder = OpenStringBuilderFactory(s);
+            var builder = MutableTextBufferFactory(s);
 
             for (int i = 0; i < s.Length; i++)
             {
@@ -362,7 +362,7 @@ namespace J2N.Text.Tests
         [Fact]
         public void Item_Get_Set_InvalidIndex()
         {
-            var builder = OpenStringBuilderFactory("Hello");
+            var builder = MutableTextBufferFactory("Hello");
 
             Assert.Throws<IndexOutOfRangeException>(() => builder[-1]); // Index < 0
             Assert.Throws<IndexOutOfRangeException>(() => builder[5]); // Index >= string.Length
@@ -374,7 +374,7 @@ namespace J2N.Text.Tests
         [Fact]
         public void Capacity_Get_Set()
         {
-            var builder = OpenStringBuilderFactory("Hello");
+            var builder = MutableTextBufferFactory("Hello");
             Assert.True(builder.Capacity >= builder.Length);
 
             builder.Capacity = 10;
@@ -392,7 +392,7 @@ namespace J2N.Text.Tests
         [Fact]
         public void Capacity_Set_Invalid_ThrowsArgumentOutOfRangeException()
         {
-            var builder = OpenStringBuilderFactory(10, 10);
+            var builder = MutableTextBufferFactory(10, 10);
             builder.Append("Hello");
             AssertExtensions.Throws<ArgumentOutOfRangeException>("value", () => builder.Capacity = -1); // Capacity < 0
             AssertExtensions.Throws<ArgumentOutOfRangeException>("value", () => builder.Capacity = builder.MaxCapacity + 1); // Capacity > builder.MaxCapacity
@@ -402,7 +402,7 @@ namespace J2N.Text.Tests
         [Fact]
         public void Length_Get_Set()
         {
-            var builder = OpenStringBuilderFactory("Hello");
+            var builder = MutableTextBufferFactory("Hello");
 
             builder.Length = 2;
             Assert.Equal(2, builder.Length);
@@ -416,7 +416,7 @@ namespace J2N.Text.Tests
         [Fact]
         public void Length_Set_InvalidValue_ThrowsArgumentOutOfRangeException()
         {
-            var builder = OpenStringBuilderFactory(10, 10);
+            var builder = MutableTextBufferFactory(10, 10);
             builder.Append("Hello");
 
             AssertExtensions.Throws<ArgumentOutOfRangeException>("value", () => builder.Length = -1); // Value < 0
@@ -429,7 +429,7 @@ namespace J2N.Text.Tests
         [InlineData("", (ushort)456, "456")]
         public void Append_UShort(string? original, ushort value, string expected)
         {
-            var builder = OpenStringBuilderFactory(original);
+            var builder = MutableTextBufferFactory(original);
             builder.Append(value);
             Assert.Equal(expected, builder.ToString());
         }
@@ -437,7 +437,7 @@ namespace J2N.Text.Tests
         [Fact]
         public void Append_UShort_NoSpareCapacity_ThrowsArgumentOutOfRangeException()
         {
-            var builder = OpenStringBuilderFactory(0, 5);
+            var builder = MutableTextBufferFactory(0, 5);
             builder.Append("Hello");
 
             AssertExtensions.Throws<ArgumentOutOfRangeException>(s_noCapacityParamName, () => builder.Append((ushort)1));
@@ -476,7 +476,7 @@ namespace J2N.Text.Tests
 
         private void Append_Bool_Format(string original, bool value, BooleanFormat? format, string expected)
         {
-            var builder = OpenStringBuilderFactory(original);
+            var builder = MutableTextBufferFactory(original);
             if (format is null)
                 builder.Append(value);
             else
@@ -487,7 +487,7 @@ namespace J2N.Text.Tests
         [Fact]
         public void Append_Bool_NoSpareCapacity_ThrowsArgumentOutOfRangeException()
         {
-            var builder = OpenStringBuilderFactory(0, 5);
+            var builder = MutableTextBufferFactory(0, 5);
             builder.Append("Hello");
 
             AssertExtensions.Throws<ArgumentOutOfRangeException>(s_noCapacityParamName, () => builder.Append(true));
@@ -514,7 +514,7 @@ namespace J2N.Text.Tests
 
         private void Append_Decimal(string original, double doubleValue, string expected)
         {
-            var builder = OpenStringBuilderFactory(original);
+            var builder = MutableTextBufferFactory(original);
             builder.Append(new decimal(doubleValue));
             Assert.Equal(expected, builder.ToString());
         }
@@ -522,7 +522,7 @@ namespace J2N.Text.Tests
         [Fact]
         public void Append_Decimal_NoSpareCapacity_ThrowsArgumentOutOfRangeException()
         {
-            var builder = OpenStringBuilderFactory(0, 5);
+            var builder = MutableTextBufferFactory(0, 5);
             builder.Append("Hello");
 
             AssertExtensions.Throws<ArgumentOutOfRangeException>(s_noCapacityParamName, () => builder.Append((decimal)1));
@@ -548,7 +548,7 @@ namespace J2N.Text.Tests
 
         private void Append_Double(string original, double value, string expected)
         {
-            var builder = OpenStringBuilderFactory(original);
+            var builder = MutableTextBufferFactory(original);
             builder.Append(value);
             Assert.Equal(expected, builder.ToString());
         }
@@ -556,7 +556,7 @@ namespace J2N.Text.Tests
         [Fact]
         public void Append_Double_NoSpareCapacity_ThrowsArgumentOutOfRangeException()
         {
-            var builder = OpenStringBuilderFactory(0, 5);
+            var builder = MutableTextBufferFactory(0, 5);
             builder.Append("Hello");
 
             AssertExtensions.Throws<ArgumentOutOfRangeException>(s_noCapacityParamName, () => builder.Append((double)1));
@@ -568,7 +568,7 @@ namespace J2N.Text.Tests
         [InlineData("", (short)-456, "-456")]
         public void Append_Short(string? original, short value, string expected)
         {
-            var builder = OpenStringBuilderFactory(original);
+            var builder = MutableTextBufferFactory(original);
             builder.Append(value);
             Assert.Equal(expected, builder.ToString());
         }
@@ -576,7 +576,7 @@ namespace J2N.Text.Tests
         [Fact]
         public void Append_Short_NoSpareCapacity_ThrowsArgumentOutOfRangeException()
         {
-            var builder = OpenStringBuilderFactory(0, 5);
+            var builder = MutableTextBufferFactory(0, 5);
             builder.Append("Hello");
 
             AssertExtensions.Throws<ArgumentOutOfRangeException>(s_noCapacityParamName, () => builder.Append((short)1));
@@ -588,7 +588,7 @@ namespace J2N.Text.Tests
         [InlineData("", -456, "-456")]
         public void Append_Int(string? original, int value, string expected)
         {
-            var builder = OpenStringBuilderFactory(original);
+            var builder = MutableTextBufferFactory(original);
             builder.Append(value);
             Assert.Equal(expected, builder.ToString());
         }
@@ -596,7 +596,7 @@ namespace J2N.Text.Tests
         [Fact]
         public void Append_Int_NoSpareCapacity_ThrowsArgumentOutOfRangeException()
         {
-            var builder = OpenStringBuilderFactory(0, 5);
+            var builder = MutableTextBufferFactory(0, 5);
             builder.Append("Hello");
 
             AssertExtensions.Throws<ArgumentOutOfRangeException>(s_noCapacityParamName, () => builder.Append(1));
@@ -608,7 +608,7 @@ namespace J2N.Text.Tests
         [InlineData("", (long)-456, "-456")]
         public void Append_Long(string? original, long value, string expected)
         {
-            var builder = OpenStringBuilderFactory(original);
+            var builder = MutableTextBufferFactory(original);
             builder.Append(value);
             Assert.Equal(expected, builder.ToString());
         }
@@ -616,7 +616,7 @@ namespace J2N.Text.Tests
         [Fact]
         public void Append_Long_NoSpareCapacity_ThrowsArgumentOutOfRangeException()
         {
-            var builder = OpenStringBuilderFactory(0, 5);
+            var builder = MutableTextBufferFactory(0, 5);
             builder.Append("Hello");
 
             AssertExtensions.Throws<ArgumentOutOfRangeException>(s_noCapacityParamName, () => builder.Append((long)1));
@@ -630,7 +630,7 @@ namespace J2N.Text.Tests
         [InlineData("Hello", null, "Hello")]
         public void Append_Object(string? original, object? value, string expected)
         {
-            var builder = OpenStringBuilderFactory(original);
+            var builder = MutableTextBufferFactory(original);
             builder.Append(value);
             Assert.Equal(expected, builder.ToString());
         }
@@ -638,7 +638,7 @@ namespace J2N.Text.Tests
         [Fact]
         public void Append_Object_NoSpareCapacity_ThrowsArgumentOutOfRangeException()
         {
-            var builder = OpenStringBuilderFactory(0, 5);
+            var builder = MutableTextBufferFactory(0, 5);
             builder.Append("Hello");
 
             AssertExtensions.Throws<ArgumentOutOfRangeException>(s_noCapacityParamName, () => builder.Append(new object()));
@@ -650,7 +650,7 @@ namespace J2N.Text.Tests
         [InlineData("", (sbyte)-123, "-123")]
         public void Append_SByte(string original, sbyte value, string expected)
         {
-            var builder = OpenStringBuilderFactory(original);
+            var builder = MutableTextBufferFactory(original);
             builder.Append(value);
             Assert.Equal(expected, builder.ToString());
         }
@@ -658,7 +658,7 @@ namespace J2N.Text.Tests
         [Fact]
         public void Append_SByte_NoSpareCapacity_ThrowsArgumentOutOfRangeException()
         {
-            var builder = OpenStringBuilderFactory(0, 5);
+            var builder = MutableTextBufferFactory(0, 5);
             builder.Append("Hello");
 
             AssertExtensions.Throws<ArgumentOutOfRangeException>(s_noCapacityParamName, () => builder.Append((sbyte)1));
@@ -685,7 +685,7 @@ namespace J2N.Text.Tests
 
         private void Append_Float(string? original, float value, string expected)
         {
-            var builder = OpenStringBuilderFactory(original);
+            var builder = MutableTextBufferFactory(original);
             builder.Append(value);
             Assert.Equal(expected, builder.ToString());
         }
@@ -693,7 +693,7 @@ namespace J2N.Text.Tests
         [Fact]
         public void Append_Float_NoSpareCapacity_ThrowsArgumentOutOfRangeException()
         {
-            var builder = OpenStringBuilderFactory(0, 5);
+            var builder = MutableTextBufferFactory(0, 5);
             builder.Append("Hello");
 
             AssertExtensions.Throws<ArgumentOutOfRangeException>(s_noCapacityParamName, () => builder.Append((float)1));
@@ -705,7 +705,7 @@ namespace J2N.Text.Tests
         [InlineData("", (byte)123, "123")]
         public void Append_Byte(string? original, byte value, string expected)
         {
-            var builder = OpenStringBuilderFactory(original);
+            var builder = MutableTextBufferFactory(original);
             builder.Append(value);
             Assert.Equal(expected, builder.ToString());
         }
@@ -713,7 +713,7 @@ namespace J2N.Text.Tests
         [Fact]
         public void Append_Byte_NoSpareCapacity_ThrowsArgumentOutOfRangeException()
         {
-            var builder = OpenStringBuilderFactory(0, 5);
+            var builder = MutableTextBufferFactory(0, 5);
             builder.Append("Hello");
 
             AssertExtensions.Throws<ArgumentOutOfRangeException>(s_noCapacityParamName, () => builder.Append((byte)1));
@@ -725,7 +725,7 @@ namespace J2N.Text.Tests
         [InlineData("", (uint)456, "456")]
         public void Append_UInt(string original, uint value, string expected)
         {
-            var builder = OpenStringBuilderFactory(original);
+            var builder = MutableTextBufferFactory(original);
             builder.Append(value);
             Assert.Equal(expected, builder.ToString());
         }
@@ -733,7 +733,7 @@ namespace J2N.Text.Tests
         [Fact]
         public void Append_UInt_NoSpareCapacity_ThrowsArgumentOutOfRangeException()
         {
-            var builder = OpenStringBuilderFactory(0, 5);
+            var builder = MutableTextBufferFactory(0, 5);
             builder.Append("Hello");
 
             AssertExtensions.Throws<ArgumentOutOfRangeException>(s_noCapacityParamName, () => builder.Append((uint)1));
@@ -745,7 +745,7 @@ namespace J2N.Text.Tests
         [InlineData("", (ulong)456, "456")]
         public void Append_ULong(string original, ulong value, string expected)
         {
-            var builder = OpenStringBuilderFactory(original);
+            var builder = MutableTextBufferFactory(original);
             builder.Append(value);
             Assert.Equal(expected, builder.ToString());
         }
@@ -753,7 +753,7 @@ namespace J2N.Text.Tests
         [Fact]
         public void Append_ULong_NoSpareCapacity_ThrowsArgumentOutOfRangeException()
         {
-            var builder = OpenStringBuilderFactory(0, 5);
+            var builder = MutableTextBufferFactory(0, 5);
             builder.Append("Hello");
 
             AssertExtensions.Throws<ArgumentOutOfRangeException>(s_noCapacityParamName, () => builder.Append((ulong)1));
@@ -771,12 +771,12 @@ namespace J2N.Text.Tests
             if (repeatCount == 1)
             {
                 // Use Append(char)
-                builder = OpenStringBuilderFactory(original);
+                builder = MutableTextBufferFactory(original);
                 builder.Append(value);
                 Assert.Equal(expected, builder.ToString());
             }
             // Use Append(char, int)
-            builder = OpenStringBuilderFactory(original);
+            builder = MutableTextBufferFactory(original);
             builder.Append(value, repeatCount);
             Assert.Equal(expected, builder.ToString());
         }
@@ -784,14 +784,14 @@ namespace J2N.Text.Tests
         [Fact]
         public void Append_Char_NegativeRepeatCount_ThrowsArgumentOutOfRangeException()
         {
-            var builder = OpenStringBuilderFactory(0, 5);
+            var builder = MutableTextBufferFactory(0, 5);
             AssertExtensions.Throws<ArgumentOutOfRangeException>("repeatCount", () => builder.Append('a', -1));
         }
 
         [Fact]
         public void Append_Char_NoSpareCapacity_ThrowsArgumentOutOfRangeException()
         {
-            var builder = OpenStringBuilderFactory(0, 5);
+            var builder = MutableTextBufferFactory(0, 5);
             builder.Append("Hello");
 
             AssertExtensions.Throws<ArgumentOutOfRangeException>("requiredLength", () => builder.Append('a'));
@@ -811,7 +811,7 @@ namespace J2N.Text.Tests
             _ = charArray; // https://github.com/xunit/xunit/issues/1969
             fixed (char* value = charArray)
             {
-                var builder = OpenStringBuilderFactory(original);
+                var builder = MutableTextBufferFactory(original);
                 builder.Append(value, valueCount);
                 Assert.Equal(expected, builder.ToString());
             }
@@ -820,14 +820,14 @@ namespace J2N.Text.Tests
         [Fact]
         public unsafe void Append_CharPointer_Null_ThrowsNullReferenceException()
         {
-            var builder = OpenStringBuilderFactory();
+            var builder = MutableTextBufferFactory();
             Assert.Throws<NullReferenceException>(() => builder.Append(null, 2));
         }
 
         [Fact]
         public unsafe void Append_CharPointer_NegativeValueCount_ThrowsArgumentOutOfRangeException()
         {
-            var builder = OpenStringBuilderFactory(0, 5);
+            var builder = MutableTextBufferFactory(0, 5);
             builder.Append("Hello");
 
             AssertExtensions.Throws<ArgumentOutOfRangeException>("valueCount", () =>
@@ -839,7 +839,7 @@ namespace J2N.Text.Tests
         [Fact]
         public unsafe void Append_CharPointer_NoSpareCapacity_ThrowsArgumentOutOfRangeException()
         {
-            var builder = OpenStringBuilderFactory(0, 5);
+            var builder = MutableTextBufferFactory(0, 5);
             builder.Append("Hello");
 
             AssertExtensions.Throws<ArgumentOutOfRangeException>(s_noCapacityParamName, () =>
@@ -863,12 +863,12 @@ namespace J2N.Text.Tests
             if (startIndex == 0 && count == (value?.Length ?? 0))
             {
                 // Use Append(string)
-                builder = OpenStringBuilderFactory(original);
+                builder = MutableTextBufferFactory(original);
                 builder.Append(value);
                 Assert.Equal(expected, builder.ToString());
             }
             // Use Append(string, int, int)
-            builder = OpenStringBuilderFactory(original);
+            builder = MutableTextBufferFactory(original);
             builder.Append(value, startIndex, count);
             Assert.Equal(expected, builder.ToString());
         }
@@ -876,7 +876,7 @@ namespace J2N.Text.Tests
         [Fact]
         public void Append_String_NullValueNonZeroStartIndexCount_ThrowsArgumentNullException()
         {
-            var builder = OpenStringBuilderFactory();
+            var builder = MutableTextBufferFactory();
             AssertExtensions.Throws<ArgumentNullException>("value", () => builder.Append((string?)null, 1, 1));
         }
 
@@ -886,21 +886,21 @@ namespace J2N.Text.Tests
         [InlineData("hello", 4, 2)]
         public void Append_String_InvalidIndexPlusCount_ThrowsArgumentOutOfRangeException(string value, int startIndex, int count)
         {
-            var builder = OpenStringBuilderFactory();
+            var builder = MutableTextBufferFactory();
             AssertExtensions.Throws<ArgumentOutOfRangeException>("startIndex", () => builder.Append(value, startIndex, count));
         }
 
         [Fact]
         public void Append_String_NegativeCount_ThrowsArgumentOutOfRangeException()
         {
-            var builder = OpenStringBuilderFactory();
+            var builder = MutableTextBufferFactory();
             AssertExtensions.Throws<ArgumentOutOfRangeException>("count", () => builder.Append("", 0, -1));
         }
 
         [Fact]
         public void Append_String_NoSpareCapacity_ThrowsArgumentOutOfRangeException()
         {
-            var builder = OpenStringBuilderFactory(0, 5);
+            var builder = MutableTextBufferFactory(0, 5);
             builder.Append("Hello");
 
             AssertExtensions.Throws<ArgumentOutOfRangeException>(s_noCapacityParamName, () => builder.Append("a"));
@@ -923,12 +923,12 @@ namespace J2N.Text.Tests
             if (startIndex == 0 && charCount == (value?.Length ?? 0))
             {
                 // Use Append(char[])
-                builder = OpenStringBuilderFactory(original);
+                builder = MutableTextBufferFactory(original);
                 builder.Append(value);
                 Assert.Equal(expected, builder.ToString());
             }
             // Use Append(char[], int, int)
-            builder = OpenStringBuilderFactory(original);
+            builder = MutableTextBufferFactory(original);
             builder.Append(value, startIndex, charCount);
             Assert.Equal(expected, builder.ToString());
         }
@@ -936,7 +936,7 @@ namespace J2N.Text.Tests
         [Fact]
         public void Append_CharArray_Invalid()
         {
-            var builder = OpenStringBuilderFactory(0, 5);
+            var builder = MutableTextBufferFactory(0, 5);
             builder.Append("Hello");
 
             AssertExtensions.Throws<ArgumentNullException>("value", () => builder.Append((char[]?)null, 1, 1)); // Value is null, startIndex > 0 and count > 0
@@ -1042,12 +1042,12 @@ namespace J2N.Text.Tests
                     if (provider == null)
                     {
                         // Use AppendFormat(string, object)
-                        builder = OpenStringBuilderFactory(original);
+                        builder = MutableTextBufferFactory(original);
                         builder.AppendFormat(format, values[0]);
                         Assert.Equal(expected, builder.ToString());
                     }
                     // Use AppendFormat(IFormatProvider, string, object)
-                    builder = OpenStringBuilderFactory(original);
+                    builder = MutableTextBufferFactory(original);
                     builder.AppendFormat(provider, format, values[0]);
                     Assert.Equal(expected, builder.ToString());
                 }
@@ -1057,12 +1057,12 @@ namespace J2N.Text.Tests
                     if (provider == null)
                     {
                         // Use AppendFormat(string, object, object)
-                        builder = OpenStringBuilderFactory(original);
+                        builder = MutableTextBufferFactory(original);
                         builder.AppendFormat(format, values[0], values[1]);
                         Assert.Equal(expected, builder.ToString());
                     }
                     // Use AppendFormat(IFormatProvider, string, object, object)
-                    builder = OpenStringBuilderFactory(original);
+                    builder = MutableTextBufferFactory(original);
                     builder.AppendFormat(provider, format, values[0], values[1]);
                     Assert.Equal(expected, builder.ToString());
                 }
@@ -1072,12 +1072,12 @@ namespace J2N.Text.Tests
                     if (provider == null)
                     {
                         // Use AppendFormat(string, object, object, object)
-                        builder = OpenStringBuilderFactory(original);
+                        builder = MutableTextBufferFactory(original);
                         builder.AppendFormat(format, values[0], values[1], values[2]);
                         Assert.Equal(expected, builder.ToString());
                     }
                     // Use AppendFormat(IFormatProvider, string, object, object, object)
-                    builder = OpenStringBuilderFactory(original);
+                    builder = MutableTextBufferFactory(original);
                     builder.AppendFormat(provider, format, values[0], values[1], values[2]);
                     Assert.Equal(expected, builder.ToString());
                 }
@@ -1086,12 +1086,12 @@ namespace J2N.Text.Tests
             if (provider == null)
             {
                 // Use AppendFormat(string, object[])
-                builder = OpenStringBuilderFactory(original);
+                builder = MutableTextBufferFactory(original);
                 builder.AppendFormat(format, values!);
                 Assert.Equal(expected, builder.ToString());
             }
             // Use AppendFormat(IFormatProvider, string, object[])
-            builder = OpenStringBuilderFactory(original);
+            builder = MutableTextBufferFactory(original);
             builder.AppendFormat(provider, format, values!);
             Assert.Equal(expected, builder.ToString());
 
@@ -1099,12 +1099,12 @@ namespace J2N.Text.Tests
             if (provider == null)
             {
                 // Use AppendFormat(string, ReadOnlySpan<object>)
-                builder = OpenStringBuilderFactory(original);
+                builder = MutableTextBufferFactory(original);
                 builder.AppendFormat(format, (ReadOnlySpan<object?>)values);
                 Assert.Equal(expected, builder.ToString());
             }
             // Use AppendFormat(IFormatProvider, string, ReadOnlySpan<object>)
-            builder = OpenStringBuilderFactory(original);
+            builder = MutableTextBufferFactory(original);
             builder.AppendFormat(provider, format, (ReadOnlySpan<object?>)values);
             Assert.Equal(expected, builder.ToString());
         }
@@ -1114,7 +1114,7 @@ namespace J2N.Text.Tests
         [Fact]
         public void AppendFormat_Invalid()
         {
-            var builder = OpenStringBuilderFactory(0, 5);
+            var builder = MutableTextBufferFactory(0, 5);
             builder.Append("Hello");
 
             IFormatProvider formatter = null;
@@ -1249,7 +1249,7 @@ namespace J2N.Text.Tests
         public void AppendFormat_NoEscapedBracesInCustomFormatSpecifier()
         {
             // Tests new rule which does not allow escaped braces in the custom format specifier
-            var builder = OpenStringBuilderFactory();
+            var builder = MutableTextBufferFactory();
             builder.AppendFormat("{0:}}}", 0);
 
             // Previous behavior: first two closing braces would be escaped and passed in as the custom format specifier, thus result = "}"
@@ -1262,7 +1262,7 @@ namespace J2N.Text.Tests
         [Fact]
         public void AppendFormat_NewLengthGreaterThanBuilderLength_ThrowsArgumentOutOfRangeException()
         {
-            var builder = OpenStringBuilderFactory(0, 5);
+            var builder = MutableTextBufferFactory(0, 5);
             IFormatProvider? formatter = null;
             builder.Append("Hello");
 
@@ -1291,12 +1291,12 @@ namespace J2N.Text.Tests
             if (string.IsNullOrEmpty(value))
             {
                 // Use AppendLine()
-                builder = OpenStringBuilderFactory(original);
+                builder = MutableTextBufferFactory(original);
                 builder.AppendLine();
                 Assert.Equal(expected, builder.ToString());
             }
             // Use AppendLine(string)
-            builder = OpenStringBuilderFactory(original);
+            builder = MutableTextBufferFactory(original);
             builder.AppendLine(value);
             Assert.Equal(expected, builder.ToString());
         }
@@ -1304,7 +1304,7 @@ namespace J2N.Text.Tests
         [Fact]
         public void AppendLine_String_NoSpareCapacity_ThrowsArgumentOutOfRangeException()
         {
-            var builder = OpenStringBuilderFactory(0, 5);
+            var builder = MutableTextBufferFactory(0, 5);
             builder.Append("Hello");
 
             AssertExtensions.Throws<ArgumentOutOfRangeException>(s_noCapacityParamName, () => builder.AppendLine());
@@ -1319,12 +1319,12 @@ namespace J2N.Text.Tests
             if (string.IsNullOrEmpty(value))
             {
                 // Use AppendLine()
-                builder = OpenStringBuilderFactory(original);
+                builder = MutableTextBufferFactory(original);
                 builder.AppendLine();
                 Assert.Equal(expected, builder.ToString());
             }
             // Use AppendLine(ReadOnlySpan<char>)
-            builder = OpenStringBuilderFactory(original);
+            builder = MutableTextBufferFactory(original);
             builder.AppendLine(value.AsSpan());
             Assert.Equal(expected, builder.ToString());
         }
@@ -1332,7 +1332,7 @@ namespace J2N.Text.Tests
         [Fact]
         public void AppendLine_ReadOnlySpan_NoSpareCapacity_ThrowsArgumentOutOfRangeException()
         {
-            var builder = OpenStringBuilderFactory(0, 5);
+            var builder = MutableTextBufferFactory(0, 5);
             builder.Append("Hello");
 
             AssertExtensions.Throws<ArgumentOutOfRangeException>(s_noCapacityParamName, () => builder.AppendLine());
@@ -1342,7 +1342,7 @@ namespace J2N.Text.Tests
         [Fact]
         public void Clear()
         {
-            var builder = OpenStringBuilderFactory("Hello");
+            var builder = MutableTextBufferFactory("Hello");
             builder.Clear();
             Assert.Equal(0, builder.Length);
             Assert.Same(string.Empty, builder.ToString());
@@ -1351,7 +1351,7 @@ namespace J2N.Text.Tests
         [Fact]
         public void Clear_Empty_CapacityNotZero()
         {
-            var builder = OpenStringBuilderFactory();
+            var builder = MutableTextBufferFactory();
             builder.Clear();
             Assert.NotEqual(0, builder.Capacity);
         }
@@ -1359,7 +1359,7 @@ namespace J2N.Text.Tests
         [Fact]
         public void Clear_Empty_CapacityStaysUnchanged()
         {
-            var sb = OpenStringBuilderFactory(14);
+            var sb = MutableTextBufferFactory(14);
             sb.Clear();
             Assert.Equal(14, sb.Capacity);
         }
@@ -1367,7 +1367,7 @@ namespace J2N.Text.Tests
         [Fact]
         public void Clear_Full_CapacityStaysUnchanged()
         {
-            var sb = OpenStringBuilderFactory(14);
+            var sb = MutableTextBufferFactory(14);
             sb.Append("Hello World!!!");
             sb.Clear();
             Assert.Equal(14, sb.Capacity);
@@ -1376,7 +1376,7 @@ namespace J2N.Text.Tests
         [Fact]
         public void Clear_AtMaxCapacity_CapacityStaysUnchanged()
         {
-            var builder = OpenStringBuilderFactory(14, 14);
+            var builder = MutableTextBufferFactory(14, 14);
             builder.Append("Hello World!!!");
             builder.Clear();
             Assert.Equal(14, builder.Capacity);
@@ -1389,7 +1389,7 @@ namespace J2N.Text.Tests
         [InlineData("Hello", 1, new char[] { '\0', '\0', '\0', '\0', '\0', '\0', '\0' }, 2, 4, new char[] { '\0', '\0', 'e', 'l', 'l', 'o', '\0' })]
         public void CopyTo(string value, int sourceIndex, char[] destination, int destinationIndex, int count, char[] expected)
         {
-            var builder = OpenStringBuilderFactory(value);
+            var builder = MutableTextBufferFactory(value);
             builder.CopyTo(sourceIndex, destination, destinationIndex, count);
             Assert.Equal(expected, destination);
         }
@@ -1407,7 +1407,7 @@ namespace J2N.Text.Tests
         [Fact]
         public void CopyTo_Invalid()
         {
-            var builder = OpenStringBuilderFactory("Hello");
+            var builder = MutableTextBufferFactory("Hello");
             AssertExtensions.Throws<ArgumentNullException>("destination", () => builder.CopyTo(0, null!, 0, 0)); // Destination is null
 
             AssertExtensions.Throws<ArgumentOutOfRangeException>("sourceIndex", () => builder.CopyTo(-1, new char[10], 0, 0)); // Source index < 0
@@ -1426,7 +1426,7 @@ namespace J2N.Text.Tests
         [Fact]
         public void EnsureCapacity()
         {
-            var builder = OpenStringBuilderFactory(40);
+            var builder = MutableTextBufferFactory(40);
 
             builder.EnsureCapacity(20);
             Assert.True(builder.Capacity >= 20);
@@ -1443,23 +1443,23 @@ namespace J2N.Text.Tests
         [Fact]
         public void EnsureCapacity_InvalidCapacity_ThrowsArgumentOutOfRangeException()
         {
-            var builder = OpenStringBuilderFactory("Hello", 10);
+            var builder = MutableTextBufferFactory("Hello", 10);
             AssertExtensions.Throws<ArgumentOutOfRangeException>("capacity", () => builder.EnsureCapacity(-1)); // Capacity < 0
             AssertExtensions.Throws<ArgumentOutOfRangeException>("capacity", () => builder.EnsureCapacity(unchecked(builder.MaxCapacity + 1))); // Capacity > builder.MaxCapacity
         }
 
         public IEnumerable<object?[]> Equals_TestData()
         {
-            var sb1 = OpenStringBuilderFactory("Hello");
-            var sb2 = OpenStringBuilderFactory("Hello");
-            var sb3 = OpenStringBuilderFactory("HelloX");
+            var sb1 = MutableTextBufferFactory("Hello");
+            var sb2 = MutableTextBufferFactory("Hello");
+            var sb3 = MutableTextBufferFactory("HelloX");
 
-            var sb4 = OpenStringBuilderFactory(10, 20);
-            var sb5 = OpenStringBuilderFactory(10, 20);
+            var sb4 = MutableTextBufferFactory(10, 20);
+            var sb5 = MutableTextBufferFactory(10, 20);
 
-            var sb6 = OpenStringBuilderFactory(10, 20).Append("Hello");
-            var sb7 = OpenStringBuilderFactory(10, 20).Append("Hello");
-            var sb8 = OpenStringBuilderFactory(10, 20).Append("HelloX");
+            var sb6 = MutableTextBufferFactory(10, 20).Append("Hello");
+            var sb7 = MutableTextBufferFactory(10, 20).Append("Hello");
+            var sb8 = MutableTextBufferFactory(10, 20).Append("HelloX");
 
             yield return new object?[] { sb1, sb1, true };
             yield return new object?[] { sb1, sb2, true };
@@ -1479,8 +1479,8 @@ namespace J2N.Text.Tests
             //yield return new object?[] { chunkSplitBuilder, sb1, false };
             //yield return new object?[] { chunkSplitBuilder, StringBuilderWithMultipleChunks().Append("b"), false };
 
-            yield return new object?[] { OpenStringBuilderFactory(), OpenStringBuilderFactory(), true };
-            yield return new object?[] { OpenStringBuilderFactory(), OpenStringBuilderFactory().Clear(), true };
+            yield return new object?[] { MutableTextBufferFactory(), MutableTextBufferFactory(), true };
+            yield return new object?[] { MutableTextBufferFactory(), MutableTextBufferFactory().Clear(), true };
         }
 
         [Fact]
@@ -1503,7 +1503,7 @@ namespace J2N.Text.Tests
         [InlineData("Hello", 5, (uint)456, "Hello456")]
         public void Insert_UInt(string original, int index, uint value, string expected)
         {
-            var builder = OpenStringBuilderFactory(original);
+            var builder = MutableTextBufferFactory(original);
             builder.Insert(index, value);
             Assert.Equal(expected, builder.ToString());
         }
@@ -1511,7 +1511,7 @@ namespace J2N.Text.Tests
         [Fact]
         public void Insert_UInt_Invalid()
         {
-            var builder = OpenStringBuilderFactory(0, 5);
+            var builder = MutableTextBufferFactory(0, 5);
             builder.Append("Hello");
 
             AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => builder.Insert(-1, (uint)1)); // Index < 0
@@ -1552,7 +1552,7 @@ namespace J2N.Text.Tests
 
         private void Insert_Bool_Format(string original, int index, bool value, BooleanFormat? format, string expected)
         {
-            var builder = OpenStringBuilderFactory(original);
+            var builder = MutableTextBufferFactory(original);
             if (format is null)
                 builder.Insert(index, value);
             else
@@ -1563,7 +1563,7 @@ namespace J2N.Text.Tests
         [Fact]
         public void Insert_Bool_Invalid()
         {
-            var builder = OpenStringBuilderFactory(0, 5);
+            var builder = MutableTextBufferFactory(0, 5);
             builder.Append("Hello");
 
             AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => builder.Insert(-1, true)); // Index < 0
@@ -1577,7 +1577,7 @@ namespace J2N.Text.Tests
         [InlineData("Hello", 5, (byte)123, "Hello123")]
         public void Insert_Byte(string original, int index, byte value, string expected)
         {
-            var builder = OpenStringBuilderFactory(original);
+            var builder = MutableTextBufferFactory(original);
             builder.Insert(index, value);
             Assert.Equal(expected, builder.ToString());
         }
@@ -1585,7 +1585,7 @@ namespace J2N.Text.Tests
         [Fact]
         public void Insert_Byte_Invalid()
         {
-            var builder = OpenStringBuilderFactory(0, 5);
+            var builder = MutableTextBufferFactory(0, 5);
             builder.Append("Hello");
 
             AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => builder.Insert(-1, (byte)1)); // Index < 0
@@ -1599,7 +1599,7 @@ namespace J2N.Text.Tests
         [InlineData("Hello", 5, (ulong)456, "Hello456")]
         public void Insert_ULong(string original, int index, ulong value, string expected)
         {
-            var builder = OpenStringBuilderFactory(original);
+            var builder = MutableTextBufferFactory(original);
             builder.Insert(index, value);
             Assert.Equal(expected, builder.ToString());
         }
@@ -1607,7 +1607,7 @@ namespace J2N.Text.Tests
         [Fact]
         public void Insert_ULong_Invalid()
         {
-            var builder = OpenStringBuilderFactory(0, 5);
+            var builder = MutableTextBufferFactory(0, 5);
             builder.Append("Hello");
 
             AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => builder.Insert(-1, (ulong)1)); // Index < 0
@@ -1621,7 +1621,7 @@ namespace J2N.Text.Tests
         [InlineData("Hello", 5, (ushort)456, "Hello456")]
         public void Insert_UShort(string original, int index, ushort value, string expected)
         {
-            var builder = OpenStringBuilderFactory(original);
+            var builder = MutableTextBufferFactory(original);
             builder.Insert(index, value);
             Assert.Equal(expected, builder.ToString());
         }
@@ -1629,7 +1629,7 @@ namespace J2N.Text.Tests
         [Fact]
         public void Insert_UShort_Invalid()
         {
-            var builder = OpenStringBuilderFactory(0, 5);
+            var builder = MutableTextBufferFactory(0, 5);
             builder.Append("Hello");
 
             AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => builder.Insert(-1, (ushort)1)); // Index < 0
@@ -1643,7 +1643,7 @@ namespace J2N.Text.Tests
         [InlineData("Hello", 5, 'b', "Hellob")]
         public void Insert_Char(string original, int index, char value, string expected)
         {
-            var builder = OpenStringBuilderFactory(original);
+            var builder = MutableTextBufferFactory(original);
             builder.Insert(index, value);
             Assert.Equal(expected, builder.ToString());
         }
@@ -1651,7 +1651,7 @@ namespace J2N.Text.Tests
         [Fact]
         public void Insert_Char_Invalid()
         {
-            var builder = OpenStringBuilderFactory(0, 5);
+            var builder = MutableTextBufferFactory(0, 5);
             builder.Append("Hello");
 
             AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => builder.Insert(-1, '\0')); // Index < 0
@@ -1672,7 +1672,7 @@ namespace J2N.Text.Tests
             _ = charArray; // https://github.com/xunit/xunit/issues/1969
             fixed (char* value = charArray)
             {
-                var builder = OpenStringBuilderFactory(original);
+                var builder = MutableTextBufferFactory(original);
                 builder.Insert(index, value, valueCount);
                 Assert.Equal(expected, builder.ToString());
             }
@@ -1681,14 +1681,14 @@ namespace J2N.Text.Tests
         [Fact] // J2N specific
         public unsafe void Insert_CharPointer_Null_ThrowsNullReferenceException()
         {
-            var builder = OpenStringBuilderFactory();
+            var builder = MutableTextBufferFactory();
             Assert.Throws<NullReferenceException>(() => builder.Insert(0, (char*)null, 2));
         }
 
         [Fact] // J2N specific
         public unsafe void Insert_CharPointer_NegativeValueCount_ThrowsArgumentOutOfRangeException()
         {
-            var builder = OpenStringBuilderFactory(0, 5);
+            var builder = MutableTextBufferFactory(0, 5);
             builder.Append("Hello");
 
             AssertExtensions.Throws<ArgumentOutOfRangeException>("valueCount", () =>
@@ -1700,7 +1700,7 @@ namespace J2N.Text.Tests
         [Fact] // J2N specific
         public unsafe void Insert_CharPointer_NoSpareCapacity_ThrowsArgumentOutOfRangeException()
         {
-            var builder = OpenStringBuilderFactory(0, 5);
+            var builder = MutableTextBufferFactory(0, 5);
             builder.Append("Hello");
 
             AssertExtensions.Throws<ArgumentOutOfRangeException>(s_noCapacityParamName, () =>
@@ -1712,7 +1712,7 @@ namespace J2N.Text.Tests
         [Fact] // J2N specific
         public unsafe void Insert_CharPointer_NegativeIndex_ThrowsArgumentOutOfRangeException()
         {
-            var builder = OpenStringBuilderFactory(0, 5);
+            var builder = MutableTextBufferFactory(0, 5);
             builder.Append("Hello");
 
             AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () =>
@@ -1742,7 +1742,7 @@ namespace J2N.Text.Tests
 
         private void Insert_Float(string original, int index, float value, string expected)
         {
-            var builder = OpenStringBuilderFactory(original);
+            var builder = MutableTextBufferFactory(original);
             builder.Insert(index, value);
             Assert.Equal(expected, builder.ToString());
         }
@@ -1750,7 +1750,7 @@ namespace J2N.Text.Tests
         [Fact]
         public void Insert_Float_Invalid()
         {
-            var builder = OpenStringBuilderFactory(0, 5);
+            var builder = MutableTextBufferFactory(0, 5);
             builder.Append("Hello");
 
             AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => builder.Insert(-1, (float)1)); // Index < 0
@@ -1766,7 +1766,7 @@ namespace J2N.Text.Tests
         [InlineData("Hello", 0, null, "Hello")]
         public void Insert_Object(string? original, int index, object? value, string expected)
         {
-            var builder = OpenStringBuilderFactory(original);
+            var builder = MutableTextBufferFactory(original);
             builder.Insert(index, value);
             Assert.Equal(expected, builder.ToString());
         }
@@ -1774,7 +1774,7 @@ namespace J2N.Text.Tests
         [Fact]
         public void Insert_Object_Invalid()
         {
-            var builder = OpenStringBuilderFactory(0, 5);
+            var builder = MutableTextBufferFactory(0, 5);
             builder.Append("Hello");
 
             AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => builder.Insert(-1, new object())); // Index < 0
@@ -1788,7 +1788,7 @@ namespace J2N.Text.Tests
         [InlineData("Hello", 5, (long)-456, "Hello-456")]
         public void Insert_Long(string original, int index, long value, string expected)
         {
-            var builder = OpenStringBuilderFactory(original);
+            var builder = MutableTextBufferFactory(original);
             builder.Insert(index, value);
             Assert.Equal(expected, builder.ToString());
         }
@@ -1796,7 +1796,7 @@ namespace J2N.Text.Tests
         [Fact]
         public void Insert_Long_Invalid()
         {
-            var builder = OpenStringBuilderFactory(0, 5);
+            var builder = MutableTextBufferFactory(0, 5);
             builder.Append("Hello");
 
             AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => builder.Insert(-1, (long)1)); // Index < 0
@@ -1810,7 +1810,7 @@ namespace J2N.Text.Tests
         [InlineData("Hello", 5, -456, "Hello-456")]
         public void Insert_Int(string original, int index, int value, string expected)
         {
-            var builder = OpenStringBuilderFactory(original);
+            var builder = MutableTextBufferFactory(original);
             builder.Insert(index, value);
             Assert.Equal(expected, builder.ToString());
         }
@@ -1818,7 +1818,7 @@ namespace J2N.Text.Tests
         [Fact]
         public void Insert_Int_Invalid()
         {
-            var builder = OpenStringBuilderFactory(0, 5);
+            var builder = MutableTextBufferFactory(0, 5);
             builder.Append("Hello");
 
             AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => builder.Insert(-1, 1)); // Index < 0
@@ -1832,7 +1832,7 @@ namespace J2N.Text.Tests
         [InlineData("Hello", 5, (short)-456, "Hello-456")]
         public void Insert_Short(string original, int index, short value, string expected)
         {
-            var builder = OpenStringBuilderFactory(original);
+            var builder = MutableTextBufferFactory(original);
             builder.Insert(index, value);
             Assert.Equal(expected, builder.ToString());
         }
@@ -1840,7 +1840,7 @@ namespace J2N.Text.Tests
         [Fact]
         public void Insert_Short_Invalid()
         {
-            var builder = OpenStringBuilderFactory(0, 5);
+            var builder = MutableTextBufferFactory(0, 5);
             builder.Append("Hello");
 
             AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => builder.Insert(-1, (short)1)); // Index < 0
@@ -1869,7 +1869,7 @@ namespace J2N.Text.Tests
 
         private void Insert_Double(string original, int index, double value, string expected)
         {
-            var builder = OpenStringBuilderFactory(original);
+            var builder = MutableTextBufferFactory(original);
             builder.Insert(index, value);
             Assert.Equal(expected, builder.ToString());
         }
@@ -1877,7 +1877,7 @@ namespace J2N.Text.Tests
         [Fact]
         public void Insert_Double_Invalid()
         {
-            var builder = OpenStringBuilderFactory(0, 5);
+            var builder = MutableTextBufferFactory(0, 5);
             builder.Append("Hello");
 
             AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => builder.Insert(-1, (double)1)); // Index < 0
@@ -1906,7 +1906,7 @@ namespace J2N.Text.Tests
 
         private void Insert_Decimal(string original, int index, double doubleValue, string expected)
         {
-            var builder = OpenStringBuilderFactory(original);
+            var builder = MutableTextBufferFactory(original);
             builder.Insert(index, new decimal(doubleValue));
             Assert.Equal(expected, builder.ToString());
         }
@@ -1914,7 +1914,7 @@ namespace J2N.Text.Tests
         [Fact]
         public void Insert_Decimal_Invalid()
         {
-            var builder = OpenStringBuilderFactory(0, 5);
+            var builder = MutableTextBufferFactory(0, 5);
             builder.Append("Hello");
 
             AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => builder.Insert(-1, (decimal)1)); // Index < 0
@@ -1928,7 +1928,7 @@ namespace J2N.Text.Tests
         [InlineData("Hello", 5, (sbyte)-123, "Hello-123")]
         public void Insert_SByte(string original, int index, sbyte value, string expected)
         {
-            var builder = OpenStringBuilderFactory(original);
+            var builder = MutableTextBufferFactory(original);
             builder.Insert(index, value);
             Assert.Equal(expected, builder.ToString());
         }
@@ -1936,7 +1936,7 @@ namespace J2N.Text.Tests
         [Fact]
         public void Insert_SByte_Invalid()
         {
-            var builder = OpenStringBuilderFactory(0, 5);
+            var builder = MutableTextBufferFactory(0, 5);
             builder.Append("Hello");
 
             AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => builder.Insert(-1, (sbyte)1)); // Index < 0
@@ -1959,12 +1959,12 @@ namespace J2N.Text.Tests
             if (count == 1)
             {
                 // Use Insert(int, string)
-                builder = OpenStringBuilderFactory(original);
+                builder = MutableTextBufferFactory(original);
                 builder.Insert(index, value);
                 Assert.Equal(expected, builder.ToString());
             }
             // Use Insert(int, string, int)
-            builder = OpenStringBuilderFactory(original);
+            builder = MutableTextBufferFactory(original);
             builder.Insert(index, value, count);
             Assert.Equal(expected, builder.ToString());
         }
@@ -1972,7 +1972,7 @@ namespace J2N.Text.Tests
         [Fact]
         public void Insert_String_Count_Invalid()
         {
-            var builder = OpenStringBuilderFactory(0, 6);
+            var builder = MutableTextBufferFactory(0, 6);
             builder.Append("Hello");
 
             AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => builder.Insert(-1, "")); // Index < 0
@@ -2004,12 +2004,12 @@ namespace J2N.Text.Tests
             if (count == 1)
             {
                 // Use Insert(int, ReadOnlySpan<char>)
-                builder = OpenStringBuilderFactory(original);
+                builder = MutableTextBufferFactory(original);
                 builder.Insert(index, value.AsSpan());
                 Assert.Equal(expected, builder.ToString());
             }
             // Use Insert(int, ReadOnlySpan<char>, int)
-            builder = OpenStringBuilderFactory(original);
+            builder = MutableTextBufferFactory(original);
             builder.Insert(index, value.AsSpan(), count);
             Assert.Equal(expected, builder.ToString());
         }
@@ -2017,7 +2017,7 @@ namespace J2N.Text.Tests
         [Fact] // J2N specific
         public void Insert_ReadOnlySpan_Count_Invalid()
         {
-            var builder = OpenStringBuilderFactory(0, 6);
+            var builder = MutableTextBufferFactory(0, 6);
             builder.Append("Hello");
 
             AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => builder.Insert(-1, "".AsSpan())); // Index < 0
@@ -2051,12 +2051,12 @@ namespace J2N.Text.Tests
             if (startIndex == 0 && charCount == (value?.Length ?? 0))
             {
                 // Use Insert(int, char[])
-                builder = OpenStringBuilderFactory(original);
+                builder = MutableTextBufferFactory(original);
                 builder.Insert(index, value);
                 Assert.Equal(expected, builder.ToString());
             }
             // Use Insert(int, char[], int, int)
-            builder = OpenStringBuilderFactory(original);
+            builder = MutableTextBufferFactory(original);
             builder.Insert(index, value, startIndex, charCount);
             Assert.Equal(expected, builder.ToString());
         }
@@ -2064,7 +2064,7 @@ namespace J2N.Text.Tests
         [Fact]
         public void Insert_CharArray_Invalid()
         {
-            var builder = OpenStringBuilderFactory(0, 5);
+            var builder = MutableTextBufferFactory(0, 5);
             builder.Append("Hello");
 
             AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => builder.Insert(-1, new char[1])); // Index < 0
@@ -2087,7 +2087,7 @@ namespace J2N.Text.Tests
         [Fact]
         public void Insert_CharArray_InvalidCount()
         {
-            var builder = OpenStringBuilderFactory(0, 5);
+            var builder = MutableTextBufferFactory(0, 5);
             builder.Append("Hello");
             AssertExtensions.Throws<ArgumentOutOfRangeException>("charCount", () => builder.Insert(0, new char[0], 0, -1)); // Char count < 0
         }
@@ -2095,7 +2095,7 @@ namespace J2N.Text.Tests
         [Fact]
         public void Insert_CharArray_InvalidCharCount()
         {
-            var builder = OpenStringBuilderFactory(0, 5);
+            var builder = MutableTextBufferFactory(0, 5);
             builder.Append("Hello");
             AssertExtensions.Throws<ArgumentOutOfRangeException>("charCount", () => builder.Insert(0, new char[0], 0, -1)); // Char count < 0
         }
@@ -2111,7 +2111,7 @@ namespace J2N.Text.Tests
         [InlineData("HelloHello", 1, 2, "HloHello")]
         public void Remove(string value, int startIndex, int length, string expected)
         {
-            var builder = OpenStringBuilderFactory(value);
+            var builder = MutableTextBufferFactory(value);
             builder.Remove(startIndex, length);
             Assert.Equal(expected, builder.ToString());
         }
@@ -2132,7 +2132,7 @@ namespace J2N.Text.Tests
         [Fact]
         public void Remove_Invalid()
         {
-            var builder = OpenStringBuilderFactory("Hello");
+            var builder = MutableTextBufferFactory("Hello");
             AssertExtensions.Throws<ArgumentOutOfRangeException>("startIndex", () => builder.Remove(-1, 0)); // Start index < 0
             AssertExtensions.Throws<ArgumentOutOfRangeException>("length", () => builder.Remove(0, -1)); // Length < 0
             AssertExtensions.Throws<ArgumentOutOfRangeException>("length", () => builder.Remove(6, 0)); // Start index + length > 0
@@ -2155,12 +2155,12 @@ namespace J2N.Text.Tests
             if (startIndex == 0 && count == value.Length)
             {
                 // Use Replace(char, char)
-                builder = OpenStringBuilderFactory(value);
+                builder = MutableTextBufferFactory(value);
                 builder.Replace(oldChar, newChar);
                 Assert.Equal(expected, builder.ToString());
             }
             // Use Replace(char, char, int, int)
-            builder = OpenStringBuilderFactory(value);
+            builder = MutableTextBufferFactory(value);
             builder.Replace(oldChar, newChar, startIndex, count);
             Assert.Equal(expected, builder.ToString());
         }
@@ -2177,7 +2177,7 @@ namespace J2N.Text.Tests
         [Fact]
         public void Replace_Char_Invalid()
         {
-            var builder = OpenStringBuilderFactory("Hello");
+            var builder = MutableTextBufferFactory("Hello");
             AssertExtensions.Throws<ArgumentOutOfRangeException>("startIndex", () => builder.Replace('a', 'b', -1, 0)); // Start index < 0
             AssertExtensions.Throws<ArgumentOutOfRangeException>("count", () => builder.Replace('a', 'b', 0, -1)); // Count < 0
 
@@ -2196,7 +2196,7 @@ namespace J2N.Text.Tests
         [InlineData("", 0, 0, "")]
         public void ToStringTest(string value, int startIndex, int length, string expected)
         {
-            var builder = OpenStringBuilderFactory(value);
+            var builder = MutableTextBufferFactory(value);
             if (startIndex == 0 && length == value.Length)
             {
                 Assert.Equal(expected, builder.ToString());
@@ -2218,7 +2218,7 @@ namespace J2N.Text.Tests
         [Fact]
         public void ToString_Invalid()
         {
-            var builder = OpenStringBuilderFactory("Hello");
+            var builder = MutableTextBufferFactory("Hello");
             AssertExtensions.Throws<ArgumentOutOfRangeException>("startIndex", () => builder.ToString(-1, 0)); // Start index < 0
             AssertExtensions.Throws<ArgumentOutOfRangeException>("length", () => builder.ToString(0, -1)); // Length < 0
 
@@ -2236,12 +2236,12 @@ namespace J2N.Text.Tests
         [Fact]
         public void AppendJoin_NullValues_ThrowsArgumentNullException()
         {
-            AssertExtensions.Throws<ArgumentNullException>("values", () => OpenStringBuilderFactory().AppendJoin('|', (object?[])null!));
-            AssertExtensions.Throws<ArgumentNullException>("values", () => OpenStringBuilderFactory().AppendJoin('|', (IEnumerable<object?>)null!));
-            AssertExtensions.Throws<ArgumentNullException>("values", () => OpenStringBuilderFactory().AppendJoin('|', (string?[])null!));
-            AssertExtensions.Throws<ArgumentNullException>("values", () => OpenStringBuilderFactory().AppendJoin("|", (object?[])null!));
-            AssertExtensions.Throws<ArgumentNullException>("values", () => OpenStringBuilderFactory().AppendJoin("|", (IEnumerable<object?>)null!));
-            AssertExtensions.Throws<ArgumentNullException>("values", () => OpenStringBuilderFactory().AppendJoin("|", (string?[])null!));
+            AssertExtensions.Throws<ArgumentNullException>("values", () => MutableTextBufferFactory().AppendJoin('|', (object?[])null!));
+            AssertExtensions.Throws<ArgumentNullException>("values", () => MutableTextBufferFactory().AppendJoin('|', (IEnumerable<object?>)null!));
+            AssertExtensions.Throws<ArgumentNullException>("values", () => MutableTextBufferFactory().AppendJoin('|', (string?[])null!));
+            AssertExtensions.Throws<ArgumentNullException>("values", () => MutableTextBufferFactory().AppendJoin("|", (object?[])null!));
+            AssertExtensions.Throws<ArgumentNullException>("values", () => MutableTextBufferFactory().AppendJoin("|", (IEnumerable<object?>)null!));
+            AssertExtensions.Throws<ArgumentNullException>("values", () => MutableTextBufferFactory().AppendJoin("|", (string?[])null!));
         }
 
         [Theory]
@@ -2267,16 +2267,16 @@ namespace J2N.Text.Tests
             var stringValues = Array.ConvertAll(values, _ => _?.ToString());
             var enumerable = values.Select(_ => _);
 
-            Assert.Equal(expected, OpenStringBuilderFactory().AppendJoin('|', values).ToString());
-            Assert.Equal(expected, OpenStringBuilderFactory().AppendJoin('|', (ReadOnlySpan<object?>)values).ToString());
-            Assert.Equal(expected, OpenStringBuilderFactory().AppendJoin('|', enumerable).ToString());
-            Assert.Equal(expected, OpenStringBuilderFactory().AppendJoin('|', stringValues).ToString());
-            Assert.Equal(expected, OpenStringBuilderFactory().AppendJoin('|', (ReadOnlySpan<string?>)stringValues).ToString());
-            Assert.Equal(expected, OpenStringBuilderFactory().AppendJoin("|", values).ToString());
-            Assert.Equal(expected, OpenStringBuilderFactory().AppendJoin("|", (ReadOnlySpan<object?>)values).ToString());
-            Assert.Equal(expected, OpenStringBuilderFactory().AppendJoin("|", enumerable).ToString());
-            Assert.Equal(expected, OpenStringBuilderFactory().AppendJoin("|", stringValues).ToString());
-            Assert.Equal(expected, OpenStringBuilderFactory().AppendJoin("|", (ReadOnlySpan<string?>)stringValues).ToString());
+            Assert.Equal(expected, MutableTextBufferFactory().AppendJoin('|', values).ToString());
+            Assert.Equal(expected, MutableTextBufferFactory().AppendJoin('|', (ReadOnlySpan<object?>)values).ToString());
+            Assert.Equal(expected, MutableTextBufferFactory().AppendJoin('|', enumerable).ToString());
+            Assert.Equal(expected, MutableTextBufferFactory().AppendJoin('|', stringValues).ToString());
+            Assert.Equal(expected, MutableTextBufferFactory().AppendJoin('|', (ReadOnlySpan<string?>)stringValues).ToString());
+            Assert.Equal(expected, MutableTextBufferFactory().AppendJoin("|", values).ToString());
+            Assert.Equal(expected, MutableTextBufferFactory().AppendJoin("|", (ReadOnlySpan<object?>)values).ToString());
+            Assert.Equal(expected, MutableTextBufferFactory().AppendJoin("|", enumerable).ToString());
+            Assert.Equal(expected, MutableTextBufferFactory().AppendJoin("|", stringValues).ToString());
+            Assert.Equal(expected, MutableTextBufferFactory().AppendJoin("|", (ReadOnlySpan<string?>)stringValues).ToString());
         }
 
         [Fact]
@@ -2301,17 +2301,17 @@ namespace J2N.Text.Tests
             var values = new object?[] { 1, 2, 3 };
             var stringValues = new string?[] { "1", "2", "3" };
 
-            Assert.Equal(expected, OpenStringBuilderFactory().AppendJoin(separator, values).ToString());
-            Assert.Equal(expected, OpenStringBuilderFactory().AppendJoin(separator, (ReadOnlySpan<object?>)values).ToString());
-            Assert.Equal(expected, OpenStringBuilderFactory().AppendJoin(separator, Enumerable.Range(1, 3)).ToString());
-            Assert.Equal(expected, OpenStringBuilderFactory().AppendJoin(separator, stringValues).ToString());
-            Assert.Equal(expected, OpenStringBuilderFactory().AppendJoin(separator, (ReadOnlySpan<string?>)stringValues).ToString());
+            Assert.Equal(expected, MutableTextBufferFactory().AppendJoin(separator, values).ToString());
+            Assert.Equal(expected, MutableTextBufferFactory().AppendJoin(separator, (ReadOnlySpan<object?>)values).ToString());
+            Assert.Equal(expected, MutableTextBufferFactory().AppendJoin(separator, Enumerable.Range(1, 3)).ToString());
+            Assert.Equal(expected, MutableTextBufferFactory().AppendJoin(separator, stringValues).ToString());
+            Assert.Equal(expected, MutableTextBufferFactory().AppendJoin(separator, (ReadOnlySpan<string?>)stringValues).ToString());
         }
 
 
         private MutableTextBuffer CreateBuilderWithNoSpareCapacity()
         {
-            return OpenStringBuilderFactory(0, 5).Append("Hello");
+            return MutableTextBufferFactory(0, 5).Append("Hello");
         }
 
         [Theory]
@@ -2347,7 +2347,7 @@ namespace J2N.Text.Tests
         public void AppendJoin_NoSpareCapacity_ThrowsArgumentOutOfRangeException(string? separator, object?[] values)
         {
             // J2N: Stray code from upstream - not used in below test
-            //var builder = OpenStringBuilderFactory(0, 5);
+            //var builder = MutableTextBufferFactory(0, 5);
             //builder.Append("Hello");
 
             var stringValues = Array.ConvertAll(values, _ => _?.ToString());
@@ -2376,7 +2376,7 @@ namespace J2N.Text.Tests
         [InlineData("Hello", new char[0], "Hello")]
         public void Append_CharSpan(string? original, char[]? value, string expected)
         {
-            var builder = OpenStringBuilderFactory(original);
+            var builder = MutableTextBufferFactory(original);
             builder.Append(new ReadOnlySpan<char>(value));
             Assert.Equal(expected, builder.ToString());
         }
@@ -2389,7 +2389,7 @@ namespace J2N.Text.Tests
         [InlineData("Hello", new char[0], "Hello")]
         public void Append_CharMemory(string? original, char[]? value, string expected)
         {
-            var builder = OpenStringBuilderFactory(original);
+            var builder = MutableTextBufferFactory(original);
             builder.Append(value.AsMemory());
             Assert.Equal(expected, builder.ToString());
         }
@@ -2400,7 +2400,7 @@ namespace J2N.Text.Tests
         //[InlineData(10000)]
         //public void Clear_AppendAndInsertBeforeClearManyTimes_CapacityStaysWithinRange(int times)
         //{
-        //    var builder = OpenStringBuilderFactory();
+        //    var builder = MutableTextBufferFactory();
         //    var originalCapacity = builder.Capacity;
         //    var s = new string(' ', 10);
         //    int oldLength = 0;
@@ -2422,7 +2422,7 @@ namespace J2N.Text.Tests
         //[Fact]
         //public void Clear_InitialCapacityMuchLargerThanLength_CapacityReducedToInitialCapacity()
         //{
-        //    var builder = OpenStringBuilderFactory(100);
+        //    var builder = MutableTextBufferFactory(100);
         //    var initialCapacity = builder.Capacity;
         //    builder.Append(new string('a', 40));
         //    builder.Insert(0, new string('a', 10));
@@ -2441,7 +2441,7 @@ namespace J2N.Text.Tests
         //[Fact]
         //public void Clear_StringBuilderHasTwoChunks_OneChunkIsEmpty_ClearReducesCapacity()
         //{
-        //    var sb = OpenStringBuilderFactory(string.Empty);
+        //    var sb = MutableTextBufferFactory(string.Empty);
         //    int initialCapacity = sb.Capacity;
         //    for (int i = 0; i < initialCapacity; i++)
         //    {
@@ -2464,7 +2464,7 @@ namespace J2N.Text.Tests
         [InlineData("Hello", 1, new char[] { '\0', '\0', '\0', '\0', '\0' }, 4, new char[] { 'e', 'l', 'l', 'o', '\0' })]
         public void CopyTo_CharSpan(string value, int sourceIndex, char[] destination, int count, char[] expected)
         {
-            var builder = OpenStringBuilderFactory(value);
+            var builder = MutableTextBufferFactory(value);
             builder.CopyTo(sourceIndex, new Span<char>(destination), count);
             Assert.Equal(expected, destination);
         }
@@ -2482,7 +2482,7 @@ namespace J2N.Text.Tests
         [Fact]
         public void CopyTo_CharSpan_Invalid()
         {
-            var builder = OpenStringBuilderFactory("Hello");
+            var builder = MutableTextBufferFactory("Hello");
 
             AssertExtensions.Throws<ArgumentOutOfRangeException>("sourceIndex", () => builder.CopyTo(-1, new Span<char>(new char[10]), 0)); // Source index < 0
             AssertExtensions.Throws<ArgumentOutOfRangeException>("sourceIndex", () => builder.CopyTo(6, new Span<char>(new char[10]), 0)); // Source index > builder.Length
@@ -2502,7 +2502,7 @@ namespace J2N.Text.Tests
         [InlineData("Hello", 0, new char[0], "Hello")]
         public void Insert_CharSpan(string original, int index, char[] value, string expected)
         {
-            var builder = OpenStringBuilderFactory(original);
+            var builder = MutableTextBufferFactory(original);
             builder.Insert(index, new ReadOnlySpan<char>(value));
             Assert.Equal(expected, builder.ToString());
         }
@@ -2510,7 +2510,7 @@ namespace J2N.Text.Tests
         [Fact]
         public void Insert_CharSpan_Invalid()
         {
-            var builder = OpenStringBuilderFactory(0, 5);
+            var builder = MutableTextBufferFactory(0, 5);
             builder.Append("Hello");
 
             AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => builder.Insert(-1, new ReadOnlySpan<char>(new char[0]))); // Index < 0
@@ -2523,25 +2523,25 @@ namespace J2N.Text.Tests
             string mediumString = new string('a', 30);
             string largeString = new string('b', 1000);
 
-            var sb1 = OpenStringBuilderFactory("Hello");
-            var sb2 = OpenStringBuilderFactory("one");
-            var sb3 = OpenStringBuilderFactory(20).Append(mediumString);
+            var sb1 = MutableTextBufferFactory("Hello");
+            var sb2 = MutableTextBufferFactory("one");
+            var sb3 = MutableTextBufferFactory(20).Append(mediumString);
 
-            yield return new object?[] { OpenStringBuilderFactory("Hello"), sb1, "HelloHello" };
-            yield return new object?[] { OpenStringBuilderFactory("Hello"), sb2, "Helloone" };
-            yield return new object?[] { OpenStringBuilderFactory("Hello"), OpenStringBuilderFactory(), "Hello" };
+            yield return new object?[] { MutableTextBufferFactory("Hello"), sb1, "HelloHello" };
+            yield return new object?[] { MutableTextBufferFactory("Hello"), sb2, "Helloone" };
+            yield return new object?[] { MutableTextBufferFactory("Hello"), MutableTextBufferFactory(), "Hello" };
 
-            yield return new object?[] { OpenStringBuilderFactory("one"), sb3, "one" + mediumString };
+            yield return new object?[] { MutableTextBufferFactory("one"), sb3, "one" + mediumString };
 
-            yield return new object?[] { OpenStringBuilderFactory(20).Append(mediumString), sb3, mediumString + mediumString };
-            yield return new object?[] { OpenStringBuilderFactory(10).Append(mediumString), sb3, mediumString + mediumString };
+            yield return new object?[] { MutableTextBufferFactory(20).Append(mediumString), sb3, mediumString + mediumString };
+            yield return new object?[] { MutableTextBufferFactory(10).Append(mediumString), sb3, mediumString + mediumString };
 
-            yield return new object?[] { OpenStringBuilderFactory(20).Append(largeString), sb3, largeString + mediumString };
-            yield return new object?[] { OpenStringBuilderFactory(10).Append(largeString), sb3, largeString + mediumString };
+            yield return new object?[] { MutableTextBufferFactory(20).Append(largeString), sb3, largeString + mediumString };
+            yield return new object?[] { MutableTextBufferFactory(10).Append(largeString), sb3, largeString + mediumString };
 
-            yield return new object?[] { OpenStringBuilderFactory(10), sb3, mediumString };
-            yield return new object?[] { OpenStringBuilderFactory(30), sb3, mediumString };
-            yield return new object?[] { OpenStringBuilderFactory(10), OpenStringBuilderFactory(20), string.Empty };
+            yield return new object?[] { MutableTextBufferFactory(10), sb3, mediumString };
+            yield return new object?[] { MutableTextBufferFactory(30), sb3, mediumString };
+            yield return new object?[] { MutableTextBufferFactory(10), MutableTextBufferFactory(20), string.Empty };
 
             yield return new object?[] { sb1, null, "Hello" };
             yield return new object?[] { sb1, sb1, "HelloHello" };
@@ -2566,30 +2566,30 @@ namespace J2N.Text.Tests
             string mediumString = new string('a', 30);
             string largeString = new string('b', 1000);
 
-            var sb1 = OpenStringBuilderFactory("Hello");
-            var sb2 = OpenStringBuilderFactory("one");
-            var sb3 = OpenStringBuilderFactory(20).Append(mediumString);
+            var sb1 = MutableTextBufferFactory("Hello");
+            var sb2 = MutableTextBufferFactory("one");
+            var sb3 = MutableTextBufferFactory(20).Append(mediumString);
 
-            yield return new object?[] { OpenStringBuilderFactory("Hello"), sb1, 0, 5, "HelloHello" };
-            yield return new object?[] { OpenStringBuilderFactory("Hello"), sb1, 0, 0, "Hello" };
-            yield return new object?[] { OpenStringBuilderFactory("Hello"), sb1, 2, 3, "Hellollo" };
-            yield return new object?[] { OpenStringBuilderFactory("Hello"), sb1, 2, 2, "Helloll" };
-            yield return new object?[] { OpenStringBuilderFactory("Hello"), sb1, 2, 0, "Hello" };
-            yield return new object?[] { OpenStringBuilderFactory("Hello"), OpenStringBuilderFactory(), 0, 0, "Hello" };
-            yield return new object?[] { OpenStringBuilderFactory("Hello"), null, 0, 0, "Hello" };
-            yield return new object?[] { OpenStringBuilderFactory(), OpenStringBuilderFactory("Hello"), 2, 3, "llo" };
-            yield return new object?[] { OpenStringBuilderFactory("Hello"), sb2, 0, 3, "Helloone" };
+            yield return new object?[] { MutableTextBufferFactory("Hello"), sb1, 0, 5, "HelloHello" };
+            yield return new object?[] { MutableTextBufferFactory("Hello"), sb1, 0, 0, "Hello" };
+            yield return new object?[] { MutableTextBufferFactory("Hello"), sb1, 2, 3, "Hellollo" };
+            yield return new object?[] { MutableTextBufferFactory("Hello"), sb1, 2, 2, "Helloll" };
+            yield return new object?[] { MutableTextBufferFactory("Hello"), sb1, 2, 0, "Hello" };
+            yield return new object?[] { MutableTextBufferFactory("Hello"), MutableTextBufferFactory(), 0, 0, "Hello" };
+            yield return new object?[] { MutableTextBufferFactory("Hello"), null, 0, 0, "Hello" };
+            yield return new object?[] { MutableTextBufferFactory(), MutableTextBufferFactory("Hello"), 2, 3, "llo" };
+            yield return new object?[] { MutableTextBufferFactory("Hello"), sb2, 0, 3, "Helloone" };
 
-            yield return new object?[] { OpenStringBuilderFactory("one"), sb3, 5, 25, "one" + new string('a', 25) };
-            yield return new object?[] { OpenStringBuilderFactory("one"), sb3, 5, 20, "one" + new string('a', 20) };
-            yield return new object?[] { OpenStringBuilderFactory("one"), sb3, 10, 10, "one" + new string('a', 10) };
+            yield return new object?[] { MutableTextBufferFactory("one"), sb3, 5, 25, "one" + new string('a', 25) };
+            yield return new object?[] { MutableTextBufferFactory("one"), sb3, 5, 20, "one" + new string('a', 20) };
+            yield return new object?[] { MutableTextBufferFactory("one"), sb3, 10, 10, "one" + new string('a', 10) };
 
-            yield return new object?[] { OpenStringBuilderFactory(20).Append(mediumString), sb3, 20, 10, new string('a', 40) };
-            yield return new object?[] { OpenStringBuilderFactory(10).Append(mediumString), sb3, 10, 10, new string('a', 40) };
+            yield return new object?[] { MutableTextBufferFactory(20).Append(mediumString), sb3, 20, 10, new string('a', 40) };
+            yield return new object?[] { MutableTextBufferFactory(10).Append(mediumString), sb3, 10, 10, new string('a', 40) };
 
-            yield return new object?[] { OpenStringBuilderFactory(20).Append(largeString), OpenStringBuilderFactory(20).Append(largeString), 100, 50, largeString + new string('b', 50) };
-            yield return new object?[] { OpenStringBuilderFactory(10).Append(mediumString), OpenStringBuilderFactory(20).Append(largeString), 20, 10, mediumString + new string('b', 10) };
-            yield return new object?[] { OpenStringBuilderFactory(10).Append(mediumString), OpenStringBuilderFactory(20).Append(largeString), 100, 50, mediumString + new string('b', 50) };
+            yield return new object?[] { MutableTextBufferFactory(20).Append(largeString), MutableTextBufferFactory(20).Append(largeString), 100, 50, largeString + new string('b', 50) };
+            yield return new object?[] { MutableTextBufferFactory(10).Append(mediumString), MutableTextBufferFactory(20).Append(largeString), 20, 10, mediumString + new string('b', 10) };
+            yield return new object?[] { MutableTextBufferFactory(10).Append(mediumString), MutableTextBufferFactory(20).Append(largeString), 100, 50, mediumString + new string('b', 50) };
 
             yield return new object?[] { sb1, sb1, 2, 3, "Hellollo" };
             yield return new object?[] { sb2, sb2, 2, 0, "one" };
@@ -2612,7 +2612,7 @@ namespace J2N.Text.Tests
         [Fact]
         public void Append_StringBuilder_InvalidInput()
         {
-            MutableTextBuffer sb = OpenStringBuilderFactory(5, 5).Append("Hello");
+            MutableTextBuffer sb = MutableTextBufferFactory(5, 5).Append("Hello");
 
             Assert.Throws<ArgumentOutOfRangeException>(() => sb.Append(sb, -1, 0));
             Assert.Throws<ArgumentOutOfRangeException>(() => sb.Append(sb, 0, -1));
@@ -2620,8 +2620,8 @@ namespace J2N.Text.Tests
 
             Assert.Throws<ArgumentNullException>(() => sb.Append((MutableTextBuffer?)null, 2, 2));
             Assert.Throws<ArgumentNullException>(() => sb.Append((MutableTextBuffer?)null, 2, 3));
-            Assert.Throws<ArgumentOutOfRangeException>(() => OpenStringBuilderFactory(3, 6).Append("Hello").Append(sb));
-            Assert.Throws<ArgumentOutOfRangeException>(() => OpenStringBuilderFactory(3, 6).Append("Hello").Append("Hello"));
+            Assert.Throws<ArgumentOutOfRangeException>(() => MutableTextBufferFactory(3, 6).Append("Hello").Append(sb));
+            Assert.Throws<ArgumentOutOfRangeException>(() => MutableTextBufferFactory(3, 6).Append("Hello").Append("Hello"));
 
             Assert.Throws<ArgumentOutOfRangeException>(() => sb.Append(sb));
         }
@@ -2632,18 +2632,18 @@ namespace J2N.Text.Tests
             string largeString = new string('a', 1000);
             string extraLargeString = new string('a', 41000); // 8000 is the maximum chunk size
 
-            var sb1 = OpenStringBuilderFactory("Hello");
-            var sb2 = OpenStringBuilderFactory(20).Append(mediumString);
-            var sb3 = OpenStringBuilderFactory(20).Append(largeString);
-            var sb4 = OpenStringBuilderFactory(20).Append(extraLargeString);
+            var sb1 = MutableTextBufferFactory("Hello");
+            var sb2 = MutableTextBufferFactory(20).Append(mediumString);
+            var sb3 = MutableTextBufferFactory(20).Append(largeString);
+            var sb4 = MutableTextBufferFactory(20).Append(extraLargeString);
 
             yield return new object[] { sb1, "Hello", true };
             yield return new object[] { sb1, "Hel", false };
             yield return new object[] { sb1, "Hellz", false };
             yield return new object[] { sb1, "Helloz", false };
             yield return new object[] { sb1, "", false };
-            yield return new object[] { OpenStringBuilderFactory(), "", true };
-            yield return new object[] { OpenStringBuilderFactory(), "Hello", false };
+            yield return new object[] { MutableTextBufferFactory(), "", true };
+            yield return new object[] { MutableTextBufferFactory(), "Hello", false };
             yield return new object[] { sb2, mediumString, true };
             yield return new object[] { sb2, "H", false };
             yield return new object[] { sb3, largeString, true };
@@ -2674,7 +2674,7 @@ namespace J2N.Text.Tests
             // we start using a different technique for creating the ChunkEnumerator.   200 * 500 = 100K which hits this.
             for (int i = 0; i < 200; i++)
             {
-                MutableTextBuffer inBuilder = OpenStringBuilderFactory();
+                MutableTextBuffer inBuilder = MutableTextBufferFactory();
                 for (int j = 0; j < i; j++)
                 {
                     // Make some unique strings that are at least 500 bytes long.
@@ -2699,7 +2699,7 @@ namespace J2N.Text.Tests
         [Fact] // J2N specific
         public void Equals_StringBuilder_IgnoresCapacity()
         {
-            var sb1 = OpenStringBuilderFactory(5);
+            var sb1 = MutableTextBufferFactory(5);
             var sb2 = new StringBuilder(10);
 
             Assert.True(sb1.Equals(sb2));
@@ -2713,8 +2713,8 @@ namespace J2N.Text.Tests
         [Fact]
         public void Equals_OpenStringBuilder_IgnoresCapacity()
         {
-            var sb1 = OpenStringBuilderFactory(5);
-            var sb2 = OpenStringBuilderFactory(10);
+            var sb1 = MutableTextBufferFactory(5);
+            var sb2 = MutableTextBufferFactory(10);
 
             Assert.True(sb1.Equals(sb2));
 
@@ -2727,7 +2727,7 @@ namespace J2N.Text.Tests
         [Fact] // J2N specific
         public void Equals_StringBuilder_IgnoresMaxCapacity()
         {
-            var sb1 = OpenStringBuilderFactory(5, 5);
+            var sb1 = MutableTextBufferFactory(5, 5);
             var sb2 = new StringBuilder(5, 10);
 
             Assert.True(sb1.Equals(sb2));
@@ -2741,8 +2741,8 @@ namespace J2N.Text.Tests
         [Fact]
         public void Equals_OpenStringBuilder_IgnoresMaxCapacity()
         {
-            var sb1 = OpenStringBuilderFactory(5, 5);
-            var sb2 = OpenStringBuilderFactory(5, 10);
+            var sb1 = MutableTextBufferFactory(5, 5);
+            var sb2 = MutableTextBufferFactory(5, 10);
 
             Assert.True(sb1.Equals(sb2));
 
@@ -2755,7 +2755,7 @@ namespace J2N.Text.Tests
         [Fact] // J2N specific
         public void Equals_StringBuilder_MultipleChunks()
         {
-            var sb1 = OpenStringBuilderFactory(5);
+            var sb1 = MutableTextBufferFactory(5);
             var sb2 = new StringBuilder(5);
 
             Assert.True(sb1.Equals(sb2));
@@ -2781,7 +2781,7 @@ namespace J2N.Text.Tests
         //    {
         //        AssertExtensions.ThrowsAny<ArgumentOutOfRangeException, OutOfMemoryException>(() =>
         //        {
-        //            MutableTextBuffer sb = OpenStringBuilderFactory();
+        //            MutableTextBuffer sb = MutableTextBufferFactory();
         //            sb.Append(new char[2_000_000_000]);
         //            sb.Length--;
         //            string s = new string('x', 500_000_000);
@@ -2795,7 +2795,7 @@ namespace J2N.Text.Tests
         public void AppendSpan_DataAppendedCorrectly()
         {
             var sb = new StringBuilder();
-            var osb = OpenStringBuilderFactory();
+            var osb = MutableTextBufferFactory();
 
             for (int i = 1; i <= 1000; i++)
             {
@@ -2816,7 +2816,7 @@ namespace J2N.Text.Tests
         [Fact] // J2N specific
         public void AppendSpan_ZerosBuffer()
         {
-            var builder = OpenStringBuilderFactory();
+            var builder = MutableTextBufferFactory();
             builder.Append("Hello");
             builder.Length = 0;
 
@@ -2827,7 +2827,7 @@ namespace J2N.Text.Tests
         [Fact] // J2N specific
         public void AppendSpan_Invalid()
         {
-            var builder = OpenStringBuilderFactory(0, 5);
+            var builder = MutableTextBufferFactory(0, 5);
             builder.Append("Hello");
 
             AssertExtensions.Throws<ArgumentOutOfRangeException>("length", () => builder.AppendSpan(-1)); // length < 0
