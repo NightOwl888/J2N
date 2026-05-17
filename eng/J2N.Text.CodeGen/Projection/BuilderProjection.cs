@@ -18,7 +18,7 @@ namespace J2N.Text.CodeGen.Projection
 
             foreach (MethodModel method in source.Methods)
             {
-                projected.Methods.Add(ProjectMethod(method, facadeName));
+                projected.Methods.Add(ProjectMethod(method, source.SourceType, facadeName));
             }
 
             foreach (PropertyModel property in source.Properties)
@@ -31,15 +31,17 @@ namespace J2N.Text.CodeGen.Projection
 
         private static MethodModel ProjectMethod(
             MethodModel method,
+            string sourceType,
             string facadeName)
         {
             return new MethodModel
             {
                 Name = method.Name,
-                ReturnType =
-                    method.IsBuilderMethod
-                        ? facadeName
-                        : method.ReturnType,
+
+                ReturnType = RewriteType(
+                    method.ReturnType,
+                    sourceType: sourceType,
+                    facadeName),
 
                 ReturnsSelf = method.ReturnsSelf,
                 IsBuilderMethod = method.IsBuilderMethod,
@@ -49,7 +51,11 @@ namespace J2N.Text.CodeGen.Projection
                         .Select(p => new ParameterModel
                         {
                             Name = p.Name,
-                            TypeName = p.TypeName
+
+                            TypeName = RewriteType(
+                                p.TypeName,
+                                sourceType,
+                                facadeName)
                         })
                         .ToList()
             };
@@ -75,6 +81,14 @@ namespace J2N.Text.CodeGen.Projection
                         })
                         .ToList()
             };
+        }
+
+        private static string RewriteType(
+            string typeName,
+            string sourceType,
+            string facadeName)
+        {
+            return typeName.Replace(sourceType, facadeName);
         }
     }
 }
