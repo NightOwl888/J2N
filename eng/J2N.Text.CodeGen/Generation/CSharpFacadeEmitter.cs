@@ -72,7 +72,8 @@ namespace J2N.Text.CodeGen.Generation
                     ? facadeName
                     : method.ReturnType;
 
-            sb.AppendLine($"        public {returnType} {method.Name}({parameterList})");
+            string unsafeModifier = method.IsUnsafe ? " unsafe" : "";
+            sb.AppendLine($"        public{unsafeModifier} {returnType} {method.Name}({parameterList})");
             sb.AppendLine("        {");
 
             if (method.IsBuilderMethod && method.ReturnsSelf)
@@ -98,9 +99,11 @@ namespace J2N.Text.CodeGen.Generation
             PropertyModel property,
             string backingFieldName)
         {
+            string unsafeModifier = property.IsUnsafe ? " unsafe" : "";
+
             if (!property.IsIndexer)
             {
-                sb.AppendLine($"        public {property.TypeName} {property.Name}");
+                sb.AppendLine($"        public{unsafeModifier} {property.TypeName} {property.Name}");
                 sb.AppendLine("        {");
 
                 if (property.HasGetter)
@@ -127,7 +130,7 @@ namespace J2N.Text.CodeGen.Generation
                 string.Join(", ",
                     property.IndexParameters.Select(p => p.Name));
 
-            sb.AppendLine($"        public {property.TypeName} this[{indexParams}]");
+            sb.AppendLine($"        public{unsafeModifier} {property.TypeName} this[{indexParams}]");
             sb.AppendLine("        {");
 
             if (property.HasGetter)

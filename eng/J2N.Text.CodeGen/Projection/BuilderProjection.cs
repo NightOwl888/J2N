@@ -46,6 +46,7 @@ namespace J2N.Text.CodeGen.Projection
 
                 ReturnsSelf = method.ReturnsSelf,
                 IsBuilderMethod = method.IsBuilderMethod,
+                IsUnsafe = method.IsUnsafe,
 
                 Parameters =
                     method.Parameters
@@ -76,6 +77,7 @@ namespace J2N.Text.CodeGen.Projection
                 HasGetter = property.HasGetter,
                 HasSetter = property.HasSetter,
                 IsIndexer = property.IsIndexer,
+                IsUnsafe = property.IsUnsafe,
 
                 IndexParameters =
                     property.IndexParameters

@@ -69,35 +69,42 @@ namespace J2N.Text.CodeGen.Roslyn
 
         private static MethodModel ExtractMethod(MethodDeclarationSyntax method)
         {
+            string? returnType = method.ReturnType.ToString();
+            var parameters = method.ParameterList.Parameters
+                .Select(p => new ParameterModel
+                {
+                    Name = p.Identifier.Text,
+                    TypeName = p.Type?.ToString() ?? "object",
+                    Documentation =
+                        ExtractParamDocumentation(
+                            method,
+                            p.Identifier.Text)
+                })
+                .ToList();
+
             return new MethodModel
             {
                 Name = method.Identifier.Text,
-                ReturnType = method.ReturnType.ToString(),
+                ReturnType = returnType,
                 ReturnsSelf = false,
                 IsBuilderMethod = false,
+                IsUnsafe =
+                    IsUnsafeType(returnType)
+                    || parameters.Any(p => IsUnsafeType(p.TypeName)),
                 Documentation = ExtractDocumentation(method),
-                Parameters =
-                    method.ParameterList.Parameters
-                        .Select(p => new ParameterModel
-                        {
-                            Name = p.Identifier.Text,
-                            TypeName = p.Type?.ToString() ?? "object",
-                            Documentation =
-                                ExtractParamDocumentation(
-                                    method,
-                                    p.Identifier.Text)
-                        })
-                        .ToList(),
+                Parameters = parameters,
                 Attributes = ExtractAttributes(method.AttributeLists),
             };
         }
 
         private static PropertyModel ExtractProperty(PropertyDeclarationSyntax property)
         {
+            string? typeName = property.Type.ToString();
+
             return new PropertyModel
             {
                 Name = property.Identifier.Text,
-                TypeName = property.Type.ToString(),
+                TypeName = typeName,
                 HasGetter =
                     property.AccessorList?.Accessors
                         .Any(a => a.Kind() == SyntaxKind.GetAccessorDeclaration)
@@ -107,6 +114,7 @@ namespace J2N.Text.CodeGen.Roslyn
                         .Any(a => a.Kind() == SyntaxKind.SetAccessorDeclaration)
                     ?? false,
                 IsIndexer = false,
+                IsUnsafe = IsUnsafeType(typeName),
                 Documentation = ExtractDocumentation(property),
                 Attributes = ExtractAttributes(property.AttributeLists),
             };
@@ -114,10 +122,19 @@ namespace J2N.Text.CodeGen.Roslyn
 
         private static PropertyModel ExtractIndexer(IndexerDeclarationSyntax indexer)
         {
+            string? typeName = indexer.Type.ToString();
+            var parameters = indexer.ParameterList.Parameters
+                .Select(p => new ParameterModel
+                {
+                    Name = p.Identifier.Text,
+                    TypeName = p.Type?.ToString() ?? "object"
+                })
+                .ToList();
+
             return new PropertyModel
             {
                 Name = "this",
-                TypeName = indexer.Type.ToString(),
+                TypeName = typeName,
                 HasGetter =
                     indexer.AccessorList?.Accessors
                         .Any(a => a.Kind() == SyntaxKind.GetAccessorDeclaration) ?? false,
@@ -125,15 +142,11 @@ namespace J2N.Text.CodeGen.Roslyn
                     indexer.AccessorList?.Accessors
                         .Any(a => a.Kind() == SyntaxKind.SetAccessorDeclaration) ?? false,
                 IsIndexer = true,
+                IsUnsafe =
+                    IsUnsafeType(typeName)
+                    || parameters.Any(p => IsUnsafeType(p.TypeName)),
                 Documentation = ExtractDocumentation(indexer),
-                IndexParameters =
-                    indexer.ParameterList.Parameters
-                        .Select(p => new ParameterModel
-                        {
-                            Name = p.Identifier.Text,
-                            TypeName = p.Type?.ToString() ?? "object"
-                        })
-                        .ToList(),
+                IndexParameters = parameters,
                 Attributes = ExtractAttributes(indexer.AttributeLists),
             };
         }
@@ -249,6 +262,11 @@ namespace J2N.Text.CodeGen.Roslyn
                 Environment.NewLine,
                 text.Split('\n')
                     .Select(x => x.Trim()));
+        }
+
+        private static bool IsUnsafeType(string typeName)
+        {
+            return typeName.Contains('*');
         }
     }
 }
