@@ -100,23 +100,43 @@ namespace J2N.Text.CodeGen.Roslyn
 
         private static PropertyModel ExtractProperty(PropertyDeclarationSyntax property)
         {
-            string? typeName = property.Type.ToString();
+            string typeName = property.Type.ToString();
+
+            bool hasGetter = false;
+            bool hasSetter = false;
+
+            if (property.ExpressionBody is not null)
+            {
+                hasGetter = true;
+            }
+            else if (property.AccessorList is not null)
+            {
+                foreach (AccessorDeclarationSyntax accessor in property.AccessorList.Accessors)
+                {
+                    switch (accessor.Kind())
+                    {
+                        case SyntaxKind.GetAccessorDeclaration:
+                            hasGetter = true;
+                            break;
+
+                        case SyntaxKind.SetAccessorDeclaration:
+                            hasSetter = true;
+                            break;
+                    }
+                }
+            }
 
             return new PropertyModel
             {
                 Name = property.Identifier.Text,
                 TypeName = typeName,
-                HasGetter =
-                    property.AccessorList?.Accessors
-                        .Any(a => a.Kind() == SyntaxKind.GetAccessorDeclaration)
-                    ?? false,
-                HasSetter =
-                    property.AccessorList?.Accessors
-                        .Any(a => a.Kind() == SyntaxKind.SetAccessorDeclaration)
-                    ?? false,
+                HasGetter = hasGetter,
+                HasSetter = hasSetter,
                 IsIndexer = false,
                 IsUnsafe = IsUnsafeType(typeName),
+
                 Documentation = ExtractDocumentation(property),
+
                 Attributes = ExtractAttributes(property.AttributeLists),
             };
         }
