@@ -55,8 +55,10 @@ namespace J2N.Text.CodeGen.Projection
                         sourceType,
                         facadeName),
 
-                ReturnsSelf = method.ReturnsSelf,
-                IsBuilderMethod = method.IsBuilderMethod,
+                ReturnsSelf =
+                    method.ReturnType == sourceType,
+                IsBuilderMethod =
+                    method.ReturnType == sourceType,
                 IsUnsafe = method.IsUnsafe,
 
                 Parameters =
