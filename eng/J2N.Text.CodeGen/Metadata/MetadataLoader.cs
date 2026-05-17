@@ -8,7 +8,7 @@ namespace J2N.Text.CodeGen.Metadata
         {
             string json = File.ReadAllText(path);
 
-            TypeModel? model =
+            var model =
                 JsonSerializer.Deserialize<TypeModel>(
                     json,
                     new JsonSerializerOptions
@@ -17,10 +17,10 @@ namespace J2N.Text.CodeGen.Metadata
                     });
 
             if (model is null)
-            {
-                throw new InvalidOperationException(
-                    $"Failed to deserialize metadata file '{path}'.");
-            }
+                throw new InvalidOperationException("Failed to deserialize metadata JSON.");
+
+            // validate immediately after deserialization
+            TypeModelValidator.Validate(model);
 
             return model;
         }
