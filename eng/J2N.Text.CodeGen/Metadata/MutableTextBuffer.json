@@ -1,0 +1,62 @@
+﻿{
+  "namespace": "J2N.Text",
+  "name": "TextBuilder",
+  "sourceType": "MutableTextBuffer",
+
+  "methods": [
+    {
+      "name": "Append",
+      "returnType": "MutableTextBuffer",
+      "returnsSelf": true,
+      "parameters": [
+        {
+          "name": "value",
+          "typeName": "string?"
+        }
+      ]
+    },
+    {
+      "name": "Clear",
+      "returnType": "void",
+      "returnsSelf": false,
+      "parameters": []
+    },
+    {
+      "name": "Insert",
+      "returnType": "MutableTextBuffer",
+      "returnsSelf": true,
+      "parameters": [
+        {
+          "name": "index",
+          "typeName": "int"
+        },
+        {
+          "name": "value",
+          "typeName": "string?"
+        }
+      ]
+    }
+  ],
+
+  "properties": [
+    {
+      "name": "Length",
+      "typeName": "int",
+      "hasGetter": true,
+      "hasSetter": true
+    },
+    {
+      "name": "Item",
+      "typeName": "char",
+      "hasGetter": true,
+      "hasSetter": true,
+      "isIndexer": true,
+      "indexParameters": [
+        {
+          "name": "index",
+          "typeName": "int"
+        }
+      ]
+    }
+  ]
+}

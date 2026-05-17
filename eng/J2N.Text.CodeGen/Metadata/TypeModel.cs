@@ -1,13 +1,12 @@
-﻿namespace J2N.Text.CodeGen.Metadata
+﻿using J2N.Text.CodeGen.Metadata;
+
+public sealed class TypeModel
 {
-    public sealed class TypeModel
-    {
-        public required string Namespace { get; init; }
+    public string Namespace { get; set; } = "";
+    public string Name { get; set; } = "";
 
-        public required string Name { get; init; }
+    public string SourceType { get; set; } = "";
 
-        public required List<MethodModel> Methods { get; init; }
-
-        public required List<PropertyModel> Properties { get; init; }
-    }
+    public List<MethodModel> Methods { get; set; } = [];
+    public List<PropertyModel> Properties { get; set; } = [];
 }

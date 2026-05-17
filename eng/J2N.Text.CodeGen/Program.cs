@@ -1,26 +1,27 @@
 ﻿using J2N.Text.CodeGen.Generation;
 using J2N.Text.CodeGen.Metadata;
 
-ApiModel api = MutableTextBufferApi.Create();
-
-TypeModel mutableTextBuffer =
-    api.Types.Single(t => t.Name == "MutableTextBuffer");
+TypeModel model =
+    MetadataLoader.Load(
+        Path.Combine(
+            AppContext.BaseDirectory,
+            "Metadata",
+            "MutableTextBuffer.json"));
 
 var emitter = new CSharpFacadeEmitter();
 
-string code =
+string output =
     emitter.EmitFacade(
-        mutableTextBuffer,
+        model,
         "J2N.Text",
         "TextBuilder",
         "buffer");
 
 string outputPath =
     Path.Combine(
-        AppContext.BaseDirectory,
+        Environment.CurrentDirectory,
         "TextBuilder.g.cs");
 
-File.WriteAllText(outputPath, code);
+File.WriteAllText(outputPath, output);
 
-Console.WriteLine("Generated:");
-Console.WriteLine(outputPath);
+Console.WriteLine($"Generated: {outputPath}");

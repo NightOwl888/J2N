@@ -2,8 +2,7 @@
 {
     public sealed class ParameterModel
     {
-        public required string TypeName { get; init; }
-
-        public required string Name { get; init; }
+        public string Name { get; set; } = "";
+        public string TypeName { get; set; } = "";
     }
 }
