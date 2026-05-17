@@ -196,16 +196,29 @@ namespace J2N.Text.CodeGen.Generation
 
             foreach (ParameterModel parameter in parameters)
             {
-                if (!string.IsNullOrWhiteSpace(parameter.Documentation))
-                {
-                    sb.AppendLine(
-                        $"        /// <param name=\"{parameter.Name}\">{parameter.Documentation}</param>");
-                }
+                EmitParamDocumentation(sb, parameter);
             }
 
             EmitXmlElement(sb, "returns", docs?.ReturnsXml);
 
             EmitXmlElement(sb, "remarks", docs?.RemarksXml);
+        }
+
+        private static void EmitParamDocumentation(
+            StringBuilder sb,
+            ParameterModel parameter)
+        {
+            if (string.IsNullOrWhiteSpace(parameter.Documentation))
+                return;
+
+            sb.AppendLine($"        /// <param name=\"{parameter.Name}\">");
+
+            foreach (string line in parameter.Documentation.Split('\n'))
+            {
+                sb.AppendLine($"        /// {line.TrimEnd()}");
+            }
+
+            sb.AppendLine("        /// </param>");
         }
 
         private static void EmitXmlElement(
