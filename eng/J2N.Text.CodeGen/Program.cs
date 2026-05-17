@@ -1,27 +1,26 @@
-﻿using J2N.Text.CodeGen.Generation;
-using J2N.Text.CodeGen.Metadata;
+﻿using J2N.Text.CodeGen.Metadata;
+using J2N.Text.CodeGen.Generation;
+using J2N.Text.CodeGen.Projection;
 
 TypeModel model =
-    MetadataLoader.Load(
-        Path.Combine(
-            AppContext.BaseDirectory,
-            "Metadata",
-            "MutableTextBuffer.json"));
+    MetadataLoader.Load("Metadata/MutableTextBuffer.json");
+
+var profile = new ProjectionProfile
+{
+    Name = "TextBuilder",
+    ExcludedMembers = new HashSet<string>()
+};
+
+ProjectedTypeModel projected =
+    ProjectionEngine.Project(model, profile);
 
 var emitter = new CSharpFacadeEmitter();
 
 string output =
     emitter.EmitFacade(
-        model,
-        "J2N.Text",
-        "TextBuilder",
+        projected,
         "buffer");
 
-string outputPath =
-    Path.Combine(
-        Environment.CurrentDirectory,
-        "TextBuilder.g.cs");
+File.WriteAllText("TextBuilder.g.cs", output);
 
-File.WriteAllText(outputPath, output);
-
-Console.WriteLine($"Generated: {outputPath}");
+Console.WriteLine("Generated TextBuilder.g.cs");
