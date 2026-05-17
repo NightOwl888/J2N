@@ -91,6 +91,7 @@
     <DefineConstants>$(DefineConstants);FEATURE_CULTUREINFO_PREDEFINEDONLY</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_GC_ALLOCATEUNINITIALIZEDARRAY</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_HALF</DefineConstants>
+    <DefineConstants>$(DefineConstants);FEATURE_ISEXTERNALINIT</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_MEMORYMARSHAL_GETARRAYDATAREFERENCE</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_UNCONDITIONALSUPPRESSMESSAGEATTRIBUTE</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_UNICODE_DEFINED_0x30000</DefineConstants>

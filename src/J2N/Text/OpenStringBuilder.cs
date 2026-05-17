@@ -67,6 +67,8 @@ namespace J2N.Text
 
         #region BCL Constructors
 
+        // IMPORTANT: Constructor signatures should be aligned to match factory method signatures in OpenStringBuilder.DefaultCulture.cs
+
         /// <summary>
         /// Initializes a new instance of the <see cref="OpenStringBuilder"/> class.
         /// </summary>
@@ -489,6 +491,8 @@ namespace J2N.Text
             m_Position = length;
         }
 
+        // IMPORTANT: Constructor signatures should be aligned to match factory method signatures in OpenStringBuilder.DefaultCulture.cs
+
         /// <summary>
         /// Initializes a new instance of the <see cref="OpenStringBuilder"/> class using the specified
         /// initial character buffer.
@@ -544,6 +548,8 @@ namespace J2N.Text
             m_Position = initialLength;
             m_MaxCapacity = int.MaxValue;
         }
+
+        // IMPORTANT: Constructor signatures should be aligned to match factory method signatures in OpenStringBuilder.DefaultCulture.cs
 
         #endregion J2N Constructors
 
