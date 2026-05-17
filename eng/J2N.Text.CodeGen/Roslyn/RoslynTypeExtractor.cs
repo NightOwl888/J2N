@@ -87,7 +87,8 @@ namespace J2N.Text.CodeGen.Roslyn
                                     method,
                                     p.Identifier.Text)
                         })
-                        .ToList()
+                        .ToList(),
+                Attributes = ExtractAttributes(method.AttributeLists),
             };
         }
 
@@ -106,7 +107,8 @@ namespace J2N.Text.CodeGen.Roslyn
                         .Any(a => a.Kind() == SyntaxKind.SetAccessorDeclaration)
                     ?? false,
                 IsIndexer = false,
-                Documentation = ExtractDocumentation(property)
+                Documentation = ExtractDocumentation(property),
+                Attributes = ExtractAttributes(property.AttributeLists),
             };
         }
 
@@ -131,8 +133,37 @@ namespace J2N.Text.CodeGen.Roslyn
                             Name = p.Identifier.Text,
                             TypeName = p.Type?.ToString() ?? "object"
                         })
-                        .ToList()
+                        .ToList(),
+                Attributes = ExtractAttributes(indexer.AttributeLists),
             };
+        }
+
+        private static List<AttributeModel> ExtractAttributes(SyntaxList<AttributeListSyntax> attributeLists)
+        {
+            var result = new List<AttributeModel>();
+
+            foreach (AttributeListSyntax list in attributeLists)
+            {
+                foreach (AttributeSyntax attribute in list.Attributes)
+                {
+                    var model = new AttributeModel
+                    {
+                        Name = attribute.Name.ToString()
+                    };
+
+                    if (attribute.ArgumentList is not null)
+                    {
+                        foreach (AttributeArgumentSyntax arg in attribute.ArgumentList.Arguments)
+                        {
+                            model.Arguments.Add(arg.ToString());
+                        }
+                    }
+
+                    result.Add(model);
+                }
+            }
+
+            return result;
         }
 
         private static DocumentationModel? ExtractDocumentation(MemberDeclarationSyntax member)

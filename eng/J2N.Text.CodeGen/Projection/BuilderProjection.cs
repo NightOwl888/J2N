@@ -1,4 +1,5 @@
 ﻿using J2N.Text.CodeGen.Metadata;
+using System.ComponentModel.DataAnnotations;
 
 namespace J2N.Text.CodeGen.Projection
 {
@@ -57,7 +58,11 @@ namespace J2N.Text.CodeGen.Projection
                                 sourceType,
                                 facadeName)
                         })
-                        .ToList()
+                        .ToList(),
+
+                Attributes = method.Attributes
+                    .Select(CloneAttribute)
+                    .ToList(),
             };
         }
 
@@ -79,7 +84,11 @@ namespace J2N.Text.CodeGen.Projection
                             Name = p.Name,
                             TypeName = p.TypeName
                         })
-                        .ToList()
+                        .ToList(),
+
+                Attributes = property.Attributes
+                    .Select(CloneAttribute)
+                    .ToList(),
             };
         }
 
@@ -89,6 +98,15 @@ namespace J2N.Text.CodeGen.Projection
             string facadeName)
         {
             return typeName.Replace(sourceType, facadeName);
+        }
+
+        private static AttributeModel CloneAttribute(AttributeModel attribute)
+        {
+            return new AttributeModel
+            {
+                Name = attribute.Name,
+                Arguments = attribute.Arguments.ToList()
+            };
         }
     }
 }

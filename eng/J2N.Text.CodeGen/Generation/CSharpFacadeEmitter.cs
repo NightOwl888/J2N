@@ -34,12 +34,14 @@ namespace J2N.Text.CodeGen.Generation
             foreach (PropertyModel property in model.Properties)
             {
                 EmitDocumentation(sb, property.Documentation, property.IndexParameters);
+                EmitAttributes(sb, property.Attributes, "        ");
                 EmitProperty(sb, property, backingFieldName);
             }
 
             foreach (MethodModel method in model.Methods)
             {
                 EmitDocumentation(sb, method.Documentation, method.Parameters);
+                EmitAttributes(sb, method.Attributes, "        ");
                 EmitMethod(sb, method, model.Name, backingFieldName);
             }
 
@@ -140,6 +142,26 @@ namespace J2N.Text.CodeGen.Generation
 
             sb.AppendLine("        }");
             sb.AppendLine();
+        }
+
+        private static void EmitAttributes(
+            StringBuilder sb,
+            IEnumerable<AttributeModel> attributes,
+            string indent)
+        {
+            foreach (AttributeModel attribute in attributes)
+            {
+                if (attribute.Arguments.Count == 0)
+                {
+                    sb.AppendLine($"{indent}[{attribute.Name}]");
+                }
+                else
+                {
+                    string args = string.Join(", ", attribute.Arguments);
+
+                    sb.AppendLine($"{indent}[{attribute.Name}({args})]");
+                }
+            }
         }
 
         private static void EmitDocumentation(

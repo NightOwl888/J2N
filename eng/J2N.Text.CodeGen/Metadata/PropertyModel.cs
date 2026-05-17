@@ -14,6 +14,8 @@
 
         public DocumentationModel? Documentation { get; init; }
 
-        public List<ParameterModel> IndexParameters { get; init; } = new();
+        public List<ParameterModel> IndexParameters { get; init; } = [];
+
+        public List<AttributeModel> Attributes { get; init; } = [];
     }
 }
