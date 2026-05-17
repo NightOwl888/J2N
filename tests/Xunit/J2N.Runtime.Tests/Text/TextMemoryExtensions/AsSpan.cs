@@ -7,9 +7,8 @@ using System.Runtime.InteropServices;
 using System;
 using Xunit;
 using J2N.TestUtilities.Xunit;
-using J2N.Text;
 
-namespace J2N.SpanTests
+namespace J2N.Text.Tests
 {
     public static partial class ReadOnlySpanTests
     {

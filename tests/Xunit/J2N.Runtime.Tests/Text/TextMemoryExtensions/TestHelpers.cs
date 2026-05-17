@@ -11,7 +11,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using Xunit;
 
-namespace J2N
+namespace J2N.Text.Tests
 {
     public static class TestHelpers
     {
