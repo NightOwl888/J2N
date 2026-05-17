@@ -117,11 +117,11 @@ namespace J2N.Text.CodeGen.Roslyn
                 Name = "this",
                 TypeName = indexer.Type.ToString(),
                 HasGetter =
-                    indexer.AccessorList.Accessors
-                        .Any(a => a.Kind() == SyntaxKind.GetAccessorDeclaration),
+                    indexer.AccessorList?.Accessors
+                        .Any(a => a.Kind() == SyntaxKind.GetAccessorDeclaration) ?? false,
                 HasSetter =
-                    indexer.AccessorList.Accessors
-                        .Any(a => a.Kind() == SyntaxKind.SetAccessorDeclaration),
+                    indexer.AccessorList?.Accessors
+                        .Any(a => a.Kind() == SyntaxKind.SetAccessorDeclaration) ?? false,
                 IsIndexer = true,
                 Documentation = ExtractDocumentation(indexer),
                 IndexParameters =
