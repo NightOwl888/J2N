@@ -2,6 +2,8 @@
 {
     public sealed class TypeModel
     {
+        public List<string> Usings { get; set; } = [];
+
         public string Namespace { get; set; } = "";
         public string Name { get; set; } = "";
 

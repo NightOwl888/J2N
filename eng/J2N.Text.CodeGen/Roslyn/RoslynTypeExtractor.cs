@@ -35,6 +35,11 @@ namespace J2N.Text.CodeGen.Roslyn
                 SourceType = classNode.Identifier.Text
             };
 
+            foreach (UsingDirectiveSyntax usingDirective in root.Usings)
+            {
+                model.Usings.Add(usingDirective.Name!.ToString());
+            }
+
             foreach (MethodDeclarationSyntax method in classNode.Members.OfType<MethodDeclarationSyntax>())
             {
                 if (!method.Modifiers.Any(SyntaxKind.PublicKeyword))
