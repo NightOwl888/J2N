@@ -78,6 +78,8 @@ namespace J2N.Text.CodeGen.Projection
                                     sourceType,
                                     facadeName),
 
+                            SourceTypeName = p.SourceTypeName,
+
                             Documentation =
                                 RewriteDocumentation(
                                     p.Documentation,
@@ -154,6 +156,8 @@ namespace J2N.Text.CodeGen.Projection
                                     p.TypeName,
                                     sourceType,
                                     facadeName),
+
+                            SourceTypeName = p.SourceTypeName,
 
                             Documentation =
                                 RewriteDocumentation(

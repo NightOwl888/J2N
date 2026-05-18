@@ -1,6 +1,5 @@
 ﻿using J2N.Text.CodeGen.Metadata;
 using J2N.Text.CodeGen.Projection;
-using System.Linq;
 using System.Text;
 
 namespace J2N.Text.CodeGen.Generation
@@ -42,7 +41,7 @@ namespace J2N.Text.CodeGen.Generation
             {
                 EmitDocumentation(sb, method.Documentation, method.Parameters);
                 EmitAttributes(sb, method.Attributes, "        ");
-                EmitMethod(sb, method, model.Name, backingFieldName);
+                EmitMethod(sb, method, model.Name, model.Source.SourceType, backingFieldName);
             }
 
             sb.AppendLine("    }");
@@ -55,6 +54,7 @@ namespace J2N.Text.CodeGen.Generation
             StringBuilder sb,
             MethodModel method,
             string facadeName,
+            string sourceType,
             string backingFieldName)
         {
             string parameterList =
@@ -70,7 +70,11 @@ namespace J2N.Text.CodeGen.Generation
             string argumentList =
                 string.Join(
                     ", ",
-                    method.Parameters.Select(p => p.Name));
+                    method.Parameters.Select(
+                        p => GetArgumentExpression(
+                            p,
+                            sourceType,
+                            backingFieldName)));
 
             string returnType =
                 method.ReturnsSelf
@@ -262,6 +266,24 @@ namespace J2N.Text.CodeGen.Generation
             }
 
             return false;
+        }
+
+        private static string GetArgumentExpression(
+            ParameterModel parameter,
+            string sourceType,
+            string backingFieldName)
+        {
+            if (parameter.SourceTypeName == sourceType + "?")
+            {
+                return $"{parameter.Name}?.{backingFieldName}";
+            }
+
+            if (parameter.SourceTypeName == sourceType)
+            {
+                return $"{parameter.Name}.{backingFieldName}";
+            }
+
+            return parameter.Name;
         }
     }
 }

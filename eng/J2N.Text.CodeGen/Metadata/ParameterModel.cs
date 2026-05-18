@@ -6,6 +6,8 @@
 
         public required string TypeName { get; init; }
 
+        public string? SourceTypeName { get; init; }
+
         public string? Documentation { get; init; }
     }
 }

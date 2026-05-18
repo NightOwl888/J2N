@@ -106,81 +106,28 @@ namespace J2N.Text.CodeGen.Roslyn
             }
         }
 
-        //public TypeModel Extract(
-        //    IEnumerable<string> sourceTexts,
-        //    string fullTypeName)
-        //{
-        //    SyntaxTree tree =
-        //        CSharpSyntaxTree.ParseText(sourceText);
-
-        //    CompilationUnitSyntax root =
-        //        tree.GetCompilationUnitRoot();
-
-        //    ClassDeclarationSyntax classNode =
-        //        root.DescendantNodes()
-        //            .OfType<ClassDeclarationSyntax>()
-        //            .First();
-
-        //    string ns =
-        //        root.DescendantNodes()
-        //            .OfType<NamespaceDeclarationSyntax>()
-        //            .First()
-        //            .Name
-        //            .ToString();
-
-        //    var model = new TypeModel
-        //    {
-        //        Namespace = ns,
-        //        Name = classNode.Identifier.Text,
-        //        SourceType = classNode.Identifier.Text
-        //    };
-
-        //    foreach (UsingDirectiveSyntax usingDirective in root.Usings)
-        //    {
-        //        model.Usings.Add(usingDirective.Name!.ToString());
-        //    }
-
-        //    foreach (MethodDeclarationSyntax method in classNode.Members.OfType<MethodDeclarationSyntax>())
-        //    {
-        //        if (!method.Modifiers.Any(SyntaxKind.PublicKeyword))
-        //            continue;
-
-        //        model.Methods.Add(ExtractMethod(method));
-        //    }
-
-        //    foreach (PropertyDeclarationSyntax property in classNode.Members.OfType<PropertyDeclarationSyntax>())
-        //    {
-        //        if (!property.Modifiers.Any(SyntaxKind.PublicKeyword))
-        //            continue;
-
-        //        model.Properties.Add(ExtractProperty(property));
-        //    }
-
-        //    foreach (IndexerDeclarationSyntax indexer in classNode.Members.OfType<IndexerDeclarationSyntax>())
-        //    {
-        //        if (!indexer.Modifiers.Any(SyntaxKind.PublicKeyword))
-        //            continue;
-
-        //        model.Properties.Add(ExtractIndexer(indexer));
-        //    }
-
-        //    return model;
-        //}
-
         private static MethodModel ExtractMethod(MethodDeclarationSyntax method)
         {
             string? returnType = method.ReturnType.ToString();
             var parameters = method.ParameterList.Parameters
-                .Select(p => new ParameterModel
+                .Select(p =>
                 {
-                    Name = p.Identifier.Text,
-                    TypeName = p.Type?.ToString() ?? "object",
-                    Documentation =
-                        ExtractParamDocumentation(
-                            method,
-                            p.Identifier.Text)
-                })
-                .ToList();
+                    string parameterType =
+                        p.Type?.ToString() ?? "object";
+
+                    return new ParameterModel
+                    {
+                        Name = p.Identifier.Text,
+
+                        TypeName = parameterType,
+                        SourceTypeName = parameterType,
+
+                        Documentation =
+                            ExtractParamDocumentation(
+                                method,
+                                p.Identifier.Text)
+                    };
+                }).ToList();
 
             return new MethodModel
             {
@@ -245,12 +192,24 @@ namespace J2N.Text.CodeGen.Roslyn
         {
             string? typeName = indexer.Type.ToString();
             var parameters = indexer.ParameterList.Parameters
-                .Select(p => new ParameterModel
+                .Select(p =>
                 {
-                    Name = p.Identifier.Text,
-                    TypeName = p.Type?.ToString() ?? "object"
-                })
-                .ToList();
+                    string parameterType =
+                        p.Type?.ToString() ?? "object";
+
+                    return new ParameterModel
+                    {
+                        Name = p.Identifier.Text,
+
+                        TypeName = parameterType,
+                        SourceTypeName = parameterType,
+
+                        Documentation =
+                            ExtractParamDocumentation(
+                                indexer,
+                                p.Identifier.Text)
+                    };
+                }).ToList();
 
             return new PropertyModel
             {
