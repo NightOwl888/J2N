@@ -40,7 +40,7 @@ namespace J2N.Text.CodeGen.Projection
             string sourceType,
             string facadeType)
         {
-            return new MethodModel
+            var methodModel =  new MethodModel
             {
                 Name = method.Name,
 
@@ -120,6 +120,14 @@ namespace J2N.Text.CodeGen.Projection
                         sourceType,
                         facadeType)
             };
+
+            methodModel.ConditionalCompilationSymbol =
+                methodModel.Parameters.Any(p =>
+                    p.TypeName is "Index" or "Range")
+                        ? "FEATURE_INDEX_RANGE"
+                        : null;
+
+            return methodModel;
         }
 
         private static bool TargetsMutableTextBuffer(

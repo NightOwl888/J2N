@@ -12,9 +12,19 @@ namespace J2N.Text.CodeGen.Roslyn
             IEnumerable<string> sourceTexts,
             string fullTypeName)
         {
+            var parseOptions =
+                new CSharpParseOptions(
+                    preprocessorSymbols:
+                    [
+                        "FEATURE_INDEX_RANGE",
+                        "FEATURE_MEMORYMARSHAL_CREATEREADONLYSPAN",
+                        "FEATURE_MEMORYMARSHAL_GETARRAYDATAREFERENCE"
+                    ]);
+
+
             List<SyntaxTree> trees =
                 sourceTexts
-                    .Select(text => CSharpSyntaxTree.ParseText(text))
+                    .Select(text => CSharpSyntaxTree.ParseText(text, parseOptions))
                     .Cast<SyntaxTree>()
                     .ToList();
 

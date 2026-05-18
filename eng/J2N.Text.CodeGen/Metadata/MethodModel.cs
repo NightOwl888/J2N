@@ -25,5 +25,7 @@
         public List<GenericParameterModel> GenericParameters { get; set; } = [];
 
         public List<AttributeModel> Attributes { get; init; } = [];
+
+        public string? ConditionalCompilationSymbol { get; set; }
     }
 }

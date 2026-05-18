@@ -24,9 +24,35 @@ namespace J2N.Text.CodeGen.Generation
             sb.AppendLine($"    public static partial class {model.Name}");
             sb.AppendLine("    {");
 
+            string? activeConditional = null;
+
             foreach (MethodModel method in model.Methods)
             {
+                if (method.ConditionalCompilationSymbol
+                    != activeConditional)
+                {
+                    if (activeConditional is not null)
+                    {
+                        sb.AppendLine("#endif");
+                        sb.AppendLine();
+                    }
+
+                    activeConditional =
+                        method.ConditionalCompilationSymbol;
+
+                    if (activeConditional is not null)
+                    {
+                        sb.AppendLine($"#if {activeConditional}");
+                    }
+                }
+
                 EmitMethod(sb, method);
+            }
+
+            if (activeConditional is not null)
+            {
+                sb.AppendLine("#endif");
+                sb.AppendLine();
             }
 
             sb.AppendLine("    }");
