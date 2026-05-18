@@ -82,33 +82,32 @@ namespace J2N.Text.CodeGen.Generation
                 method.GenericParameters);
 
             //
-            // BodyText already contains:
-            //
-            // {
-            // }
-            //
-            // OR =>
+            // BodyText already contains properly formatted code.
+            // Just emit it exactly as-is, preserving indentation.
             //
 
             if (!string.IsNullOrWhiteSpace(method.BodyText))
             {
                 string normalized =
-                    method.BodyText.Replace("\r\n", "\n");
+                    method.BodyText.Replace("\r\n", "\n")
+                                   .Replace('\r', '\n');
 
                 string[] lines =
                     normalized.Split('\n');
 
-                foreach (string line in lines)
+                // Remove leading/trailing blank lines
+                int start = 0;
+                int end = lines.Length - 1;
+
+                while (start <= end && string.IsNullOrWhiteSpace(lines[start]))
+                    start++;
+
+                while (end >= start && string.IsNullOrWhiteSpace(lines[end]))
+                    end--;
+
+                for (int i = start; i <= end; i++)
                 {
-                    if (line.Length == 0)
-                    {
-                        sb.AppendLine();
-                    }
-                    else
-                    {
-                        sb.Append("        ");
-                        sb.AppendLine(line);
-                    }
+                    sb.AppendLine(lines[i]);
                 }
             }
             else
@@ -230,12 +229,16 @@ namespace J2N.Text.CodeGen.Generation
 
         private static IEnumerable<string> NormalizeLines(string text)
         {
-            string normalized =
-                text.Replace("\r\n", "\n")
-                    .Replace('\r', '\n');
-
-            return normalized
-                .Split('\n')
+            return text
+                .Split(
+                    new[]
+                    {
+                        Environment.NewLine,
+                        "\r\n",
+                        "\n",
+                        "\r"
+                    },
+                    StringSplitOptions.None)
                 .Select(l =>
                 {
                     string line = l.TrimEnd();
