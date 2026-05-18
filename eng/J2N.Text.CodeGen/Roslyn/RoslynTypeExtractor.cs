@@ -8,39 +8,65 @@ namespace J2N.Text.CodeGen.Roslyn
 {
     public sealed class RoslynTypeExtractor
     {
-        public TypeModel Extract(string sourceText)
+        public TypeModel Extract(
+            IEnumerable<string> sourceTexts,
+            string fullTypeName)
         {
-            SyntaxTree tree =
-                CSharpSyntaxTree.ParseText(sourceText);
+            List<SyntaxTree> trees =
+                sourceTexts
+                    .Select(text => CSharpSyntaxTree.ParseText(text))
+                    .Cast<SyntaxTree>()
+                    .ToList();
 
-            CompilationUnitSyntax root =
-                tree.GetCompilationUnitRoot();
+            var compilation =
+                CSharpCompilation.Create(
+                    assemblyName: "CodeGen",
+                    syntaxTrees: trees);
 
-            ClassDeclarationSyntax classNode =
-                root.DescendantNodes()
-                    .OfType<ClassDeclarationSyntax>()
-                    .First();
+            INamedTypeSymbol? typeSymbol =
+                compilation.GlobalNamespace
+                    .GetNamespaceMembers()
+                    .SelectMany(GetAllNamespaces)
+                    .SelectMany(n => n.GetTypeMembers())
+                    .FirstOrDefault(t =>
+                        t.ToDisplayString() == fullTypeName);
 
-            string ns =
-                root.DescendantNodes()
-                    .OfType<NamespaceDeclarationSyntax>()
-                    .First()
-                    .Name
-                    .ToString();
+            if (typeSymbol is null)
+            {
+                throw new InvalidOperationException(
+                    $"Type '{fullTypeName}' not found.");
+            }
 
             var model = new TypeModel
             {
-                Namespace = ns,
-                Name = classNode.Identifier.Text,
-                SourceType = classNode.Identifier.Text
+                Namespace = typeSymbol.ContainingNamespace.ToDisplayString(),
+                Name = typeSymbol.Name,
+                SourceType = typeSymbol.Name
             };
 
-            foreach (UsingDirectiveSyntax usingDirective in root.Usings)
+            foreach (SyntaxTree tree in trees)
             {
-                model.Usings.Add(usingDirective.Name!.ToString());
+                CompilationUnitSyntax root =
+                    tree.GetCompilationUnitRoot();
+
+                foreach (UsingDirectiveSyntax usingDirective in root.Usings)
+                {
+                    string ns = usingDirective.Name?.ToString() ?? "";
+
+                    if (!string.IsNullOrWhiteSpace(ns))
+                    {
+                        model.Usings.Add(ns);
+                    }
+                }
             }
 
-            foreach (MethodDeclarationSyntax method in classNode.Members.OfType<MethodDeclarationSyntax>())
+            IEnumerable<MemberDeclarationSyntax> members =
+                typeSymbol.DeclaringSyntaxReferences
+                    .Select(r => r.GetSyntax())
+                    .OfType<ClassDeclarationSyntax>()
+                    .SelectMany(c => c.Members);
+
+            foreach (MethodDeclarationSyntax method in members.OfType<MethodDeclarationSyntax>())
             {
                 if (!method.Modifiers.Any(SyntaxKind.PublicKeyword))
                     continue;
@@ -48,7 +74,7 @@ namespace J2N.Text.CodeGen.Roslyn
                 model.Methods.Add(ExtractMethod(method));
             }
 
-            foreach (PropertyDeclarationSyntax property in classNode.Members.OfType<PropertyDeclarationSyntax>())
+            foreach (PropertyDeclarationSyntax property in members.OfType<PropertyDeclarationSyntax>())
             {
                 if (!property.Modifiers.Any(SyntaxKind.PublicKeyword))
                     continue;
@@ -56,7 +82,7 @@ namespace J2N.Text.CodeGen.Roslyn
                 model.Properties.Add(ExtractProperty(property));
             }
 
-            foreach (IndexerDeclarationSyntax indexer in classNode.Members.OfType<IndexerDeclarationSyntax>())
+            foreach (IndexerDeclarationSyntax indexer in members.OfType<IndexerDeclarationSyntax>())
             {
                 if (!indexer.Modifiers.Any(SyntaxKind.PublicKeyword))
                     continue;
@@ -66,6 +92,80 @@ namespace J2N.Text.CodeGen.Roslyn
 
             return model;
         }
+
+        private static IEnumerable<INamespaceSymbol> GetAllNamespaces(INamespaceSymbol root)
+        {
+            yield return root;
+
+            foreach (INamespaceSymbol child in root.GetNamespaceMembers())
+            {
+                foreach (INamespaceSymbol descendant in GetAllNamespaces(child))
+                {
+                    yield return descendant;
+                }
+            }
+        }
+
+        //public TypeModel Extract(
+        //    IEnumerable<string> sourceTexts,
+        //    string fullTypeName)
+        //{
+        //    SyntaxTree tree =
+        //        CSharpSyntaxTree.ParseText(sourceText);
+
+        //    CompilationUnitSyntax root =
+        //        tree.GetCompilationUnitRoot();
+
+        //    ClassDeclarationSyntax classNode =
+        //        root.DescendantNodes()
+        //            .OfType<ClassDeclarationSyntax>()
+        //            .First();
+
+        //    string ns =
+        //        root.DescendantNodes()
+        //            .OfType<NamespaceDeclarationSyntax>()
+        //            .First()
+        //            .Name
+        //            .ToString();
+
+        //    var model = new TypeModel
+        //    {
+        //        Namespace = ns,
+        //        Name = classNode.Identifier.Text,
+        //        SourceType = classNode.Identifier.Text
+        //    };
+
+        //    foreach (UsingDirectiveSyntax usingDirective in root.Usings)
+        //    {
+        //        model.Usings.Add(usingDirective.Name!.ToString());
+        //    }
+
+        //    foreach (MethodDeclarationSyntax method in classNode.Members.OfType<MethodDeclarationSyntax>())
+        //    {
+        //        if (!method.Modifiers.Any(SyntaxKind.PublicKeyword))
+        //            continue;
+
+        //        model.Methods.Add(ExtractMethod(method));
+        //    }
+
+        //    foreach (PropertyDeclarationSyntax property in classNode.Members.OfType<PropertyDeclarationSyntax>())
+        //    {
+        //        if (!property.Modifiers.Any(SyntaxKind.PublicKeyword))
+        //            continue;
+
+        //        model.Properties.Add(ExtractProperty(property));
+        //    }
+
+        //    foreach (IndexerDeclarationSyntax indexer in classNode.Members.OfType<IndexerDeclarationSyntax>())
+        //    {
+        //        if (!indexer.Modifiers.Any(SyntaxKind.PublicKeyword))
+        //            continue;
+
+        //        model.Properties.Add(ExtractIndexer(indexer));
+        //    }
+
+        //    return model;
+        //}
 
         private static MethodModel ExtractMethod(MethodDeclarationSyntax method)
         {

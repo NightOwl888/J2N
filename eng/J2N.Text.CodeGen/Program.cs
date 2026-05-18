@@ -1,14 +1,23 @@
 ﻿using J2N.Text.CodeGen.Generation;
+using J2N.Text.CodeGen.Metadata;
 using J2N.Text.CodeGen.Projection;
 using J2N.Text.CodeGen.Roslyn;
 
-string source =
-    File.ReadAllText(
-        @"F:\Projects\J2N\src\J2N\Text\MutableTextBuffer.cs");
+string sourceDirectory =
+    @"F:\Projects\J2N\src\J2N\Text";
+
+List<string> sourceTexts =
+    Directory.GetFiles(sourceDirectory, "MutableTextBuffer*.cs")
+        .Select(File.ReadAllText)
+        .ToList();
 
 var extractor = new RoslynTypeExtractor();
 
-var model = extractor.Extract(source);
+TypeModel model =
+    extractor.Extract(
+        sourceTexts,
+        "J2N.Text.MutableTextBuffer");
+
 
 var projection = new BuilderProjection();
 
@@ -30,30 +39,3 @@ File.WriteAllText(
     code);
 
 Console.WriteLine("Generation complete.");
-
-//using J2N.Text.CodeGen.Metadata;
-//using J2N.Text.CodeGen.Generation;
-//using J2N.Text.CodeGen.Projection;
-
-//TypeModel model =
-//    MetadataLoader.Load("Metadata/MutableTextBuffer.json");
-
-//var profile = new ProjectionProfile
-//{
-//    Name = "TextBuilder",
-//    ExcludedMembers = new HashSet<string>()
-//};
-
-//ProjectedTypeModel projected =
-//    ProjectionEngine.Project(model, profile);
-
-//var emitter = new CSharpFacadeEmitter();
-
-//string output =
-//    emitter.EmitFacade(
-//        projected,
-//        "buffer");
-
-//File.WriteAllText("TextBuilder.g.cs", output);
-
-//Console.WriteLine("Generated TextBuilder.g.cs");
