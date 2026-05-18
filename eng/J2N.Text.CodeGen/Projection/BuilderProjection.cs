@@ -18,6 +18,11 @@ namespace J2N.Text.CodeGen.Projection
 
             foreach (MethodModel method in source.Methods)
             {
+                if (!ShouldIncludeMethod(method))
+                {
+                    continue;
+                }
+
                 projected.Methods.Add(
                     ProjectMethod(
                         method,
@@ -226,6 +231,16 @@ namespace J2N.Text.CodeGen.Projection
                 Name = parameter.Name,
                 Constraints = parameter.Constraints.ToList()
             };
+        }
+
+        private static bool ShouldIncludeMethod(MethodModel method)
+        {
+            if (method.Name == "GetChunks")
+            {
+                return false;
+            }
+
+            return true;
         }
     }
 }
