@@ -125,7 +125,15 @@ namespace J2N.Text.CodeGen.Roslyn
                         Documentation =
                             ExtractParamDocumentation(
                                 method,
-                                p.Identifier.Text)
+                                p.Identifier.Text),
+
+                        Modifier =
+                            string.Join(
+                                " ",
+                                p.Modifiers.Select(m => m.Text)),
+
+                        IsThis =
+                            p.Modifiers.Any(SyntaxKind.ThisKeyword),
                     };
                 }).ToList();
 
@@ -135,9 +143,17 @@ namespace J2N.Text.CodeGen.Roslyn
                 ReturnType = returnType,
                 ReturnsSelf = false,
                 IsBuilderMethod = false,
+                IsExtensionMethod =
+                    method.ParameterList.Parameters.FirstOrDefault()?
+                        .Modifiers.Any(SyntaxKind.ThisKeyword)
+                    ?? false,
+                IsStatic =
+                    method.Modifiers.Any(SyntaxKind.StaticKeyword),
                 IsUnsafe =
                     IsUnsafeType(returnType)
                     || parameters.Any(p => IsUnsafeType(p.TypeName)),
+                BodyText = method.Body?.ToFullString()
+                    ?? method.ExpressionBody?.ToFullString(),
                 Documentation = ExtractDocumentation(method),
                 Parameters = parameters,
                 GenericParameters = ExtractGenericParameters(method),
@@ -180,6 +196,8 @@ namespace J2N.Text.CodeGen.Roslyn
                 HasGetter = hasGetter,
                 HasSetter = hasSetter,
                 IsIndexer = false,
+                IsStatic =
+                    property.Modifiers.Any(SyntaxKind.StaticKeyword),
                 IsUnsafe = IsUnsafeType(typeName),
 
                 Documentation = ExtractDocumentation(property),
@@ -207,7 +225,15 @@ namespace J2N.Text.CodeGen.Roslyn
                         Documentation =
                             ExtractParamDocumentation(
                                 indexer,
-                                p.Identifier.Text)
+                                p.Identifier.Text),
+
+                        Modifier =
+                            string.Join(
+                                " ",
+                                p.Modifiers.Select(m => m.Text)),
+
+                        IsThis =
+                            p.Modifiers.Any(SyntaxKind.ThisKeyword),
                     };
                 }).ToList();
 
@@ -294,39 +320,34 @@ namespace J2N.Text.CodeGen.Roslyn
             return result;
         }
 
-        private static DocumentationModel? ExtractDocumentation(MemberDeclarationSyntax member)
+        private static DocumentationCommentTriviaSyntax? GetDocumentationTrivia(
+            MemberDeclarationSyntax member)
         {
-            string xml =
-                string.Concat(
-                    member.GetLeadingTrivia()
-                        .Select(t => t.ToFullString())
-                        .Where(s => s.TrimStart().StartsWith("///")));
+            return member.GetLeadingTrivia()
+                .Select(t => t.GetStructure())
+                .OfType<DocumentationCommentTriviaSyntax>()
+                .FirstOrDefault();
+        }
 
-            if (string.IsNullOrWhiteSpace(xml))
+        private static DocumentationModel? ExtractDocumentation(
+            MemberDeclarationSyntax member)
+        {
+            DocumentationCommentTriviaSyntax? docs =
+                GetDocumentationTrivia(member);
+
+            if (docs is null)
                 return null;
-
-            string normalized =
-                string.Join(
-                    Environment.NewLine,
-                    xml.Split(Environment.NewLine)
-                        .Select(l =>
-                        {
-                            string trimmed = l.TrimStart();
-
-                            if (trimmed.StartsWith("///"))
-                                return trimmed.Substring(3);
-
-                            return trimmed;
-                        }));
-
-            XElement root =
-                XElement.Parse("<root>" + normalized + "</root>");
 
             return new DocumentationModel
             {
-                SummaryXml = GetInnerXml(root.Element("summary")),
-                RemarksXml = GetInnerXml(root.Element("remarks")),
-                ReturnsXml = GetInnerXml(root.Element("returns"))
+                SummaryXml =
+                    GetXmlElementInnerText(docs, "summary"),
+
+                RemarksXml =
+                    GetXmlElementInnerText(docs, "remarks"),
+
+                ReturnsXml =
+                    GetXmlElementInnerText(docs, "returns")
             };
         }
 
@@ -334,64 +355,63 @@ namespace J2N.Text.CodeGen.Roslyn
             MemberDeclarationSyntax member,
             string paramName)
         {
-            string xml =
-                string.Concat(
-                    member.GetLeadingTrivia()
-                        .Select(t => t.ToFullString())
-                        .Where(s => s.TrimStart().StartsWith("///")));
+            DocumentationCommentTriviaSyntax? docs =
+                GetDocumentationTrivia(member);
 
-            if (string.IsNullOrWhiteSpace(xml))
+            if (docs is null)
                 return null;
 
-            string normalized =
-                string.Join(
-                    Environment.NewLine,
-                    xml.Split(Environment.NewLine)
-                        .Select(l =>
-                        {
-                            string trimmed = l.TrimStart();
+            XmlElementSyntax? paramElement =
+                docs.Content
+                    .OfType<XmlElementSyntax>()
+                    .FirstOrDefault(e =>
+                        e.StartTag?.Name.LocalName.Text == "param"
+                        && e.StartTag.Attributes
+                            .OfType<XmlNameAttributeSyntax>()
+                            .Any(a =>
+                                a.Name?.LocalName.Text == "name"
+                                && a.Identifier?.Identifier.ValueText == paramName));
 
-                            if (trimmed.StartsWith("///"))
-                                return trimmed.Substring(3);
+            if (paramElement is null)
+                return null;
 
-                            return trimmed;
-                        }));
-
-            XElement root =
-                XElement.Parse("<root>" + normalized + "</root>");
-
-            XElement? param =
-                root.Elements("param")
-                    .FirstOrDefault(x =>
-                        x.Attribute("name")?.Value == paramName);
-
-            return param is null
-                ? null
-                : NormalizeXml(param.Nodes());
+            return NormalizeDocumentationContent(
+                paramElement.Content);
         }
 
-        private static string NormalizeXml(IEnumerable<XNode> nodes)
+        private static string? GetXmlElementInnerText(
+            DocumentationCommentTriviaSyntax docs,
+            string elementName)
+        {
+            XmlElementSyntax? element =
+                docs.Content
+                    .OfType<XmlElementSyntax>()
+                    .FirstOrDefault(e =>
+                        e.StartTag?.Name.LocalName.Text == elementName);
+
+            if (element is null)
+                return null;
+
+            return NormalizeDocumentationContent(
+                element.Content);
+        }
+
+        private static string NormalizeDocumentationContent(
+            SyntaxList<XmlNodeSyntax> content)
         {
             string raw =
-                string.Concat(nodes.Select(n => n.ToString()));
+                string.Concat(content.Select(c => c.ToString()));
+
+            string normalized =
+                raw.Replace("\r\n", "\n")
+                   .Replace('\r', '\n');
 
             string[] lines =
-                raw.Replace("\r\n", "\n")
-                    .Split('\n');
+                normalized.Split('\n');
 
             return string.Join(
                 Environment.NewLine,
                 lines.Select(l => l.TrimEnd()));
-        }
-
-        private static string? GetInnerXml(XElement? element)
-        {
-            if (element is null)
-                return null;
-
-            return string.Concat(
-                element.Nodes()
-                    .Select(n => n.ToString()));
         }
 
         private static bool IsUnsafeType(string typeName)

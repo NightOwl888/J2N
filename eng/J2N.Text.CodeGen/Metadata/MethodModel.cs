@@ -10,7 +10,13 @@
 
         public bool IsBuilderMethod { get; init; }
 
+        public bool IsStatic { get; init; }
+
+        public bool IsExtensionMethod { get; init; }
+
         public bool IsUnsafe { get; init; }
+
+        public string? BodyText { get; init; }
 
         public DocumentationModel? Documentation { get; init; }
 

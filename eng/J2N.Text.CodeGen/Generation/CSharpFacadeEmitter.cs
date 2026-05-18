@@ -93,7 +93,7 @@ namespace J2N.Text.CodeGen.Generation
             string parameterList =
                 string.Join(
                     ", ",
-                    method.Parameters.Select(p => $"{p.TypeName} {p.Name}"));
+                    method.Parameters.Select(FormatParameter));
 
             string genericParameterList =
                 method.GenericParameters.Count == 0
@@ -252,7 +252,7 @@ namespace J2N.Text.CodeGen.Generation
 
             sb.AppendLine($"        /// <param name=\"{parameter.Name}\">");
 
-            foreach (string line in parameter.Documentation.Split('\n'))
+            foreach (string line in NormalizeLines(parameter.Documentation))
             {
                 sb.AppendLine($"        /// {line.TrimEnd()}");
             }
@@ -270,7 +270,7 @@ namespace J2N.Text.CodeGen.Generation
 
             sb.AppendLine($"        /// <{elementName}>");
 
-            foreach (string line in content.Split('\n'))
+            foreach (string line in NormalizeLines(content))
             {
                 sb.AppendLine($"        /// {line.TrimEnd()}");
             }
@@ -335,6 +335,47 @@ namespace J2N.Text.CodeGen.Generation
             }
 
             return parameter.Name;
+        }
+
+        private static string FormatParameter(ParameterModel parameter)
+        {
+            string modifier =
+                string.IsNullOrWhiteSpace(parameter.Modifier)
+                    ? ""
+                    : parameter.Modifier + " ";
+
+            return
+                $"{modifier}{parameter.TypeName} {parameter.Name}";
+        }
+
+        private static IEnumerable<string> NormalizeLines(string text)
+        {
+            string normalized =
+                text.Replace("\r\n", "\n")
+                    .Replace('\r', '\n');
+
+            return normalized
+                .Split('\n')
+                .Select(l =>
+                {
+                    string line = l.TrimEnd();
+
+                    string trimmed = line.TrimStart();
+
+                    if (trimmed.StartsWith("///"))
+                    {
+                        trimmed = trimmed.Substring(3);
+
+                        if (trimmed.StartsWith(" "))
+                        {
+                            trimmed = trimmed.Substring(1);
+                        }
+
+                        return trimmed;
+                    }
+
+                    return line;
+                });
         }
     }
 }

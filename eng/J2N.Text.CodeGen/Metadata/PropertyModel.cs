@@ -14,6 +14,8 @@
 
         public bool IsUnsafe { get; init; }
 
+        public bool IsStatic { get; init; }
+
         public DocumentationModel? Documentation { get; init; }
 
         public List<ParameterModel> IndexParameters { get; init; } = [];

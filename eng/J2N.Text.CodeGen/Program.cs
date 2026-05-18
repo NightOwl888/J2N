@@ -6,6 +6,10 @@ using J2N.Text.CodeGen.Roslyn;
 string sourceDirectory =
     @"F:\Projects\J2N\src\J2N\Text";
 
+// ---------------------------------------------------------------------
+// MutableTextBuffer
+// ---------------------------------------------------------------------
+
 List<string> sourceTexts =
     Directory.GetFiles(sourceDirectory, "MutableTextBuffer*.cs")
         .Select(File.ReadAllText)
@@ -18,6 +22,23 @@ TypeModel model =
         sourceTexts,
         "J2N.Text.MutableTextBuffer");
 
+// ---------------------------------------------------------------------
+// TextMemoryExtensions
+// ---------------------------------------------------------------------
+
+List<string> extensionSourceTexts =
+    Directory.GetFiles(sourceDirectory, "TextMemoryExtensions*.cs")
+        .Select(File.ReadAllText)
+        .ToList();
+
+TypeModel extensionModel =
+    extractor.Extract(
+        extensionSourceTexts,
+        "J2N.Text.TextMemoryExtensions");
+
+// ---------------------------------------------------------------------
+// Generate TextBuilder
+// ---------------------------------------------------------------------
 
 var projection = new BuilderProjection();
 
@@ -27,20 +48,43 @@ ProjectedTypeModel projected =
         facadeNamespace: "J2N.Text",
         facadeName: "TextBuilder");
 
-var emitter = new CSharpFacadeEmitter();
+var facadeEmitter = new CSharpFacadeEmitter();
 
-string code =
-    emitter.EmitFacade(
+string builderCode =
+    facadeEmitter.EmitFacade(
         projected,
         backingFieldName: "buffer",
         options: new FacadeEmitterOptions
         {
-            // J2N TODO: remove this once we have all of the docs
+            // J2N TODO: remove this once docs are complete
             SuppressMissingDocumentationWarnings = true,
         });
 
 File.WriteAllText(
-    @"F:\Projects\J2N\src\J2N\Text\TextBuilder.g.cs",
-    code);
+    Path.Combine(sourceDirectory, "TextBuilder.g.cs"),
+    builderCode);
+
+// ---------------------------------------------------------------------
+// Generate TextMemoryExtensions.TextBuilder.g.cs
+// ---------------------------------------------------------------------
+
+var extensionProjection = new ExtensionMethodProjection();
+
+ProjectedTypeModel projectedExtensions =
+    extensionProjection.Project(
+        extensionModel,
+        "MutableTextBuffer",
+        facadeNamespace: "J2N.Text",
+        facadeType: "TextBuilder");
+
+var extensionEmitter = new CSharpExtensionEmitter();
+
+string extensionCode =
+    extensionEmitter.Emit(
+        projectedExtensions);
+
+File.WriteAllText(
+    Path.Combine(sourceDirectory, "TextMemoryExtensions.TextBuilder.g.cs"),
+    extensionCode);
 
 Console.WriteLine("Generation complete.");

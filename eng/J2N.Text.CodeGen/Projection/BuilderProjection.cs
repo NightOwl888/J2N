@@ -65,6 +65,8 @@ namespace J2N.Text.CodeGen.Projection
                 IsBuilderMethod =
                     method.ReturnType == sourceType,
                 IsUnsafe = method.IsUnsafe,
+                IsStatic = method.IsStatic,
+                IsExtensionMethod = method.IsExtensionMethod,
 
                 Parameters =
                     method.Parameters
@@ -84,7 +86,10 @@ namespace J2N.Text.CodeGen.Projection
                                 RewriteDocumentation(
                                     p.Documentation,
                                     source.Name,
-                                    facadeName)
+                                    facadeName),
+
+                            Modifier = p.Modifier,
+                            IsThis = p.IsThis,
                         })
                         .ToList(),
 
@@ -144,6 +149,7 @@ namespace J2N.Text.CodeGen.Projection
                 HasSetter = property.HasSetter,
                 IsIndexer = property.IsIndexer,
                 IsUnsafe = property.IsUnsafe,
+                IsStatic = property.IsStatic,
 
                 IndexParameters =
                     property.IndexParameters
@@ -163,7 +169,10 @@ namespace J2N.Text.CodeGen.Projection
                                 RewriteDocumentation(
                                     p.Documentation,
                                     source.Name,
-                                    facadeName)
+                                    facadeName),
+
+                            Modifier = p.Modifier,
+                            IsThis = p.IsThis,
                         })
                         .ToList(),
 
