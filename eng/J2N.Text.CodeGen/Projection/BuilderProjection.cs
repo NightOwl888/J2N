@@ -1,4 +1,5 @@
 ﻿using J2N.Text.CodeGen.Metadata;
+using System.Text.RegularExpressions;
 
 namespace J2N.Text.CodeGen.Projection
 {
@@ -223,7 +224,40 @@ namespace J2N.Text.CodeGen.Projection
             if (string.IsNullOrWhiteSpace(xml))
                 return xml;
 
-            return xml.Replace(sourceType, facadeType);
+            string result =
+                Regex.Replace(
+                    xml,
+                    @"cref\s*=\s*""([^""]+)""",
+                    match =>
+                    {
+                        string cref =
+                            match.Groups[1].Value;
+
+                        string rewritten =
+                            RewriteCrefTarget(
+                                cref,
+                                facadeType);
+
+                        return $"cref=\"{rewritten}\"";
+                    });
+
+            result = result.Replace(sourceType, facadeType);
+
+            return result;
+        }
+
+        private static string RewriteCrefTarget(
+            string cref,
+            string facadeType)
+        {
+            const string initializePrefix = "Initialize(";
+
+            if (cref.StartsWith(initializePrefix, StringComparison.Ordinal))
+            {
+                return facadeType + cref.Substring("Initialize".Length);
+            }
+
+            return cref;
         }
 
         private static AttributeModel CloneAttribute(
