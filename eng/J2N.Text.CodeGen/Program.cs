@@ -32,7 +32,12 @@ var emitter = new CSharpFacadeEmitter();
 string code =
     emitter.EmitFacade(
         projected,
-        backingFieldName: "buffer");
+        backingFieldName: "buffer",
+        options: new FacadeEmitterOptions
+        {
+            // J2N TODO: remove this once we have all of the docs
+            SuppressMissingDocumentationWarnings = true,
+        });
 
 File.WriteAllText(
     @"F:\Projects\J2N\src\J2N\Text\TextBuilder.g.cs",
