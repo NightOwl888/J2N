@@ -108,31 +108,10 @@ namespace J2N.Text.CodeGen.Projection
                         .ToList(),
 
                 Documentation =
-                    method.Documentation is null
-                        ? null
-                        : new DocumentationModel
-                        {
-                            SummaryXml =
-                                RewriteDocumentation(
-                                    method.Documentation.SummaryXml,
-                                    source,
-                                    source.Name,
-                                    facadeName),
-
-                            RemarksXml =
-                                RewriteDocumentation(
-                                    method.Documentation.RemarksXml,
-                                    source,
-                                    source.Name,
-                                    facadeName),
-
-                            ReturnsXml =
-                                RewriteDocumentation(
-                                    method.Documentation.ReturnsXml,
-                                    source,
-                                    source.Name,
-                                    facadeName)
-                        },
+                    CreateProjectedDocumentation(
+                        method,
+                        source,
+                        facadeName),
 
                 //
                 // NEW:
@@ -290,6 +269,68 @@ namespace J2N.Text.CodeGen.Projection
             }
 
             return cref;
+        }
+
+        private static DocumentationModel? CreateProjectedDocumentation(
+            MethodModel method,
+            TypeModel source,
+            string facadeName)
+        {
+            DocumentationModel? docs = method.Documentation;
+
+            //
+            // If there was no documentation at all,
+            // but this is a builder-returning API,
+            // synthesize the minimum required docs.
+            //
+            if (docs is null)
+            {
+                if (!method.ReturnsSelf)
+                {
+                    return null;
+                }
+
+                return new DocumentationModel
+                {
+                    ReturnsXml =
+                        "A reference to this instance after the operation has completed."
+                };
+            }
+
+            string? returnsXml =
+                RewriteDocumentation(
+                    docs.ReturnsXml,
+                    source,
+                    source.Name,
+                    facadeName);
+
+            //
+            // Builder methods always get standardized return docs.
+            //
+            if (method.ReturnsSelf)
+            {
+                returnsXml =
+                    "A reference to this instance after the operation has completed.";
+            }
+
+            return new DocumentationModel
+            {
+                SummaryXml =
+                    RewriteDocumentation(
+                        docs.SummaryXml,
+                        source,
+                        source.Name,
+                        facadeName),
+
+                RemarksXml =
+                    RewriteDocumentation(
+                        docs.RemarksXml,
+                        source,
+                        source.Name,
+                        facadeName),
+
+                ReturnsXml = returnsXml
+            };
         }
 
         private static AttributeModel CloneAttribute(
