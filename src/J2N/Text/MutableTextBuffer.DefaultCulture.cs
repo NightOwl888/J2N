@@ -34,6 +34,7 @@ namespace J2N.Text
         /// <remarks>
         /// Subclasses may honor this setting or ignore it.
         /// </remarks>
+        [CodeGenerationIgnore]
         public CultureInfo DefaultCulture => useInvariantDefaults ? CultureInfo.InvariantCulture : CultureInfo.CurrentCulture;
 
         /// <summary>
@@ -45,6 +46,7 @@ namespace J2N.Text
         /// <remarks>
         /// Subclasses may honor this setting or ignore it.
         /// </remarks>
+        [CodeGenerationIgnore]
         public NumberFormatInfo DefaultNumberFormatInfo => useInvariantDefaults ? NumberFormatInfo.InvariantInfo : NumberFormatInfo.CurrentInfo;
 
         /// <summary>
@@ -56,6 +58,7 @@ namespace J2N.Text
         /// <remarks>
         /// Subclasses may honor this setting or ignore it.
         /// </remarks>
+        [CodeGenerationIgnore]
         public DateTimeFormatInfo DefaultDateTimeFormatInfo => useInvariantDefaults ? DateTimeFormatInfo.InvariantInfo : DateTimeFormatInfo.CurrentInfo;
 
         /// <summary>
@@ -67,6 +70,7 @@ namespace J2N.Text
         /// <remarks>
         /// Subclasses may honor this setting or ignore it.
         /// </remarks>
+        [CodeGenerationIgnore]
         public StringFormatter DefaultStringFormatter => useInvariantDefaults ? StringFormatter.InvariantCulture : StringFormatter.CurrentCulture;
 
         /// <summary>
@@ -78,6 +82,7 @@ namespace J2N.Text
         /// <remarks>
         /// Subclasses may honor this setting or ignore it.
         /// </remarks>
+        [CodeGenerationIgnore]
         public StringComparison DefaultStringComparison => useInvariantDefaults ? StringComparison.Ordinal : StringComparison.CurrentCulture;
     }
 }

@@ -45,7 +45,7 @@ namespace J2N.Text
     ///     </description></item>
     /// </list>
     /// </remarks>
-    public partial class MutableTextBuffer : IAppendable, ISpanAppendable, ICharSequence
+    public partial class MutableTextBuffer : IAppendable, ISpanAppendable, ICharSequence, IDisposable
         //, IEnumerable<char> // ICU4N TODO: Implement?
     {
         private const int CharStackBufferSize = 32;
@@ -156,6 +156,7 @@ namespace J2N.Text
         /// This property does not clear the underlying storage, but returns the raw unfiltered bytes
         /// in writable form.
         /// </remarks>
+        [CodeGenerationIgnore]
         public Span<char> RawChars => m_Chars;
 
         /// <summary>
@@ -5574,6 +5575,75 @@ namespace J2N.Text
             oldBuffer.AsSpan(0, m_Position).CopyTo(newBuffer);
             allocator.Return(oldBuffer);
             m_Chars = newBuffer;
+        }
+
+        /// <summary>
+        /// Releases ownership of the underlying character buffer back to the
+        /// <see cref="IArrayAllocator{T}"/> provided to this instance.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// Once this method has been called, the current instance no longer owns
+        /// the underlying buffer and further use of the instance is unsupported.
+        /// </para>
+        /// <para>
+        /// Depending on the allocator implementation, the underlying array may be:
+        /// </para>
+        /// <list type="bullet">
+        ///     <item>
+        ///         <description>Returned to an array pool for reuse.</description>
+        ///     </item>
+        ///     <item>
+        ///         <description>Cleared before reuse.</description>
+        ///     </item>
+        ///     <item>
+        ///         <description>Left uncleared for performance reasons.</description>
+        ///     </item>
+        ///     <item>
+        ///         <description>Ignored entirely for non-pooled allocators.</description>
+        ///     </item>
+        /// </list>
+        /// <para>
+        /// This method may be called multiple times safely.
+        /// </para>
+        /// </remarks>
+        [CodeGenerationIgnore]
+        public void Dispose()
+        {
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// Releases resources owned by the current instance.
+        /// </summary>
+        /// <param name="disposing">
+        /// <c>true</c> to release managed resources; otherwise, <c>false</c>.
+        /// </param>
+        /// <remarks>
+        /// <para>
+        /// Derived classes overriding this method should release any managed state
+        /// when <paramref name="disposing"/> is <c>true</c>, and then call the base
+        /// implementation.
+        /// </para>
+        /// <para>
+        /// This implementation releases ownership of the underlying character buffer
+        /// back to the configured <see cref="IArrayAllocator{T}"/>.
+        /// </para>
+        /// </remarks>
+        [CodeGenerationIgnore]
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                char[]? array = m_Chars;
+
+                if (array.Length != 0)
+                {
+                    m_Chars = Arrays.Empty<char>();
+                    allocator.Return(array);
+                }
+            }
         }
 
         // J2N-specific methods
