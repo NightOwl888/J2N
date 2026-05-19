@@ -7,12 +7,11 @@ namespace J2N.Text
     public partial class MutableTextBuffer
     {
         /// <summary>
-        /// A flag indicating whether invariant defaults should be used rather than using
         /// culture-aware default behavior. Particularly useful on APIs that do not
         /// accept <see cref="IFormatProvider"/>, <see cref="StringComparison"/> or other
         /// culture-aware settings.
         /// </summary>
-        private bool useInvariantDefaults = false;
+        internal bool useInvariantDefaults = false;
 
         /// <summary>
         /// Gets or sets a flag indicating to use invariant default settings when not otherwise specified by the user.
