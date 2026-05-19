@@ -20,7 +20,7 @@ namespace J2N.Text.Tests
         [InlineData(10, 10)]
         public static void MutableTextBufferAsMemoryWithStart(int length, int start)
         {
-            MutableTextBuffer a = new MutableTextBuffer(length);
+            MutableTextBuffer a = new MutableTextBuffer().Initialize(length);
             a.Append('\0', length);
             ReadOnlyMemory<char> m = a.AsMemory(start);
             Assert.Equal(length - start, m.Length);
@@ -41,7 +41,7 @@ namespace J2N.Text.Tests
         [InlineData(10, 3, 2)]
         public static void MutableTextBufferAsMemoryWithStartAndLength(int length, int start, int subLength)
         {
-            MutableTextBuffer a = new MutableTextBuffer(length);
+            MutableTextBuffer a = new MutableTextBuffer().Initialize(length);
             a.Append('\0', length);
 
             ReadOnlyMemory<char> m = a.AsMemory(start, subLength);
@@ -59,7 +59,7 @@ namespace J2N.Text.Tests
         [InlineData(5, 6)]
         public static void MutableTextBufferAsMemoryWithStartNegative(int length, int start)
         {
-            MutableTextBuffer a = new MutableTextBuffer(length);
+            MutableTextBuffer a = new MutableTextBuffer().Initialize(length);
             Assert.Throws<ArgumentOutOfRangeException>(() => a.AsMemory(start));
         }
 
@@ -72,7 +72,7 @@ namespace J2N.Text.Tests
         [InlineData(5, 3, 3)]
         public static void MutableTextBufferAsMemoryWithStartAndLengthNegative(int length, int start, int subLength)
         {
-            MutableTextBuffer a = new MutableTextBuffer(length);
+            MutableTextBuffer a = new MutableTextBuffer().Initialize(length);
             Assert.Throws<ArgumentOutOfRangeException>(() => a.AsMemory(start, subLength));
         }
     }
