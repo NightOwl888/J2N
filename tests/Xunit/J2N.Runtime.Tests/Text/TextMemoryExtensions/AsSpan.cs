@@ -2,11 +2,12 @@
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+using J2N.Buffers;
+using J2N.TestUtilities.Xunit;
+using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using System;
 using Xunit;
-using J2N.TestUtilities.Xunit;
 
 namespace J2N.Text.Tests
 {
@@ -15,7 +16,7 @@ namespace J2N.Text.Tests
         [Fact]
         public static void MutableTextBufferAsSpanNullary()
         {
-            MutableTextBuffer s = new MutableTextBuffer().Initialize("Hello");
+            MutableTextBuffer s = new MutableTextBuffer(UninitializedArrayAllocator<char>.Default).Initialize("Hello");
             ReadOnlySpan<char> span = s.AsSpan();
             char[] expected = s.ToCharArray();
             span.Validate(expected);
@@ -24,7 +25,7 @@ namespace J2N.Text.Tests
         [Fact]
         public static void MutableTextBufferAsSpanEmptyString()
         {
-            MutableTextBuffer s = new MutableTextBuffer().Initialize();
+            MutableTextBuffer s = new MutableTextBuffer(UninitializedArrayAllocator<char>.Default).Initialize();
             ReadOnlySpan<char> span = s.AsSpan();
             span.ValidateNonNullEmpty();
         }
@@ -76,7 +77,7 @@ namespace J2N.Text.Tests
         [MemberData(nameof(TestHelpers.StringSliceTestData), MemberType = typeof(TestHelpers))]
         public static void AsSpan_StartAndLength(string textStr, int start, int length)
         {
-            MutableTextBuffer text = new MutableTextBuffer().Initialize(textStr);
+            MutableTextBuffer text = new MutableTextBuffer(UninitializedArrayAllocator<char>.Default).Initialize(textStr);
 
             if (start == -1)
             {
@@ -119,7 +120,7 @@ namespace J2N.Text.Tests
         [MemberData(nameof(TestHelpers.StringSlice2ArgTestOutOfRangeData), MemberType = typeof(TestHelpers))]
         public static unsafe void AsSpan_2Arg_OutOfRange(string textStr, int start)
         {
-            MutableTextBuffer text = new MutableTextBuffer().Initialize(textStr);
+            MutableTextBuffer text = new MutableTextBuffer(UninitializedArrayAllocator<char>.Default).Initialize(textStr);
 
             AssertExtensions.Throws<ArgumentOutOfRangeException>("start", () => text.AsSpan(start).DontBox());
 #if FEATURE_INDEX_RANGE
@@ -135,7 +136,7 @@ namespace J2N.Text.Tests
         [MemberData(nameof(TestHelpers.StringSlice3ArgTestOutOfRangeData), MemberType = typeof(TestHelpers))]
         public static unsafe void AsSpan_3Arg_OutOfRange(string textStr, int start, int length)
         {
-            MutableTextBuffer text = new MutableTextBuffer().Initialize(textStr);
+            MutableTextBuffer text = new MutableTextBuffer(UninitializedArrayAllocator<char>.Default).Initialize(textStr);
 
             AssertExtensions.Throws<ArgumentOutOfRangeException>("start", () => text.AsSpan(start, length).DontBox());
 #if FEATURE_INDEX_RANGE

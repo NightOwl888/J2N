@@ -1046,6 +1046,8 @@ namespace J2N
             {
                 case ExceptionArgument.action:
                     return "action";
+                case ExceptionArgument.allocator:
+                    return "allocator";
                 case ExceptionArgument.allocSize:
                     return "allocSize";
                 case ExceptionArgument.appendable:
@@ -1649,6 +1651,7 @@ namespace J2N
     internal enum ExceptionArgument
     {
         action,
+        allocator,
         allocSize,
         appendable,
         args,

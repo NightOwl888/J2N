@@ -16,6 +16,7 @@
  */
 #endregion
 
+using J2N.Buffers;
 using System;
 using System.Text;
 #nullable enable
@@ -25,21 +26,21 @@ namespace J2N.Text
     public class TestOpenStringBuilder : StringBuilderTestBase
     {
         protected override MutableTextBuffer OpenStringBuilderFactory()
-            => new MutableTextBuffer() { UseInvariantDefaults = true }.Initialize();
+            => new MutableTextBuffer(UninitializedArrayAllocator<char>.Default) { UseInvariantDefaults = true }.Initialize();
 
         protected override MutableTextBuffer OpenStringBuilderFactory(int capacity)
-            => new MutableTextBuffer() { UseInvariantDefaults = true }.Initialize(capacity);
+            => new MutableTextBuffer(UninitializedArrayAllocator<char>.Default) { UseInvariantDefaults = true }.Initialize(capacity);
 
         protected override MutableTextBuffer OpenStringBuilderFactory(string? value)
-            => new MutableTextBuffer() { UseInvariantDefaults = true }.Initialize(value);
+            => new MutableTextBuffer(UninitializedArrayAllocator<char>.Default) { UseInvariantDefaults = true }.Initialize(value);
 
         protected override MutableTextBuffer OpenStringBuilderFactory(ReadOnlySpan<char> value)
-            => new MutableTextBuffer() { UseInvariantDefaults = true }.Initialize(value);
+            => new MutableTextBuffer(UninitializedArrayAllocator<char>.Default) { UseInvariantDefaults = true }.Initialize(value);
 
         protected override MutableTextBuffer OpenStringBuilderFactory(StringBuilder? value)
-            => new MutableTextBuffer() { UseInvariantDefaults = true }.Initialize(value);
+            => new MutableTextBuffer(UninitializedArrayAllocator<char>.Default) { UseInvariantDefaults = true }.Initialize(value);
 
         protected override MutableTextBuffer OpenStringBuilderFactory(ICharSequence? value)
-            => new MutableTextBuffer() { UseInvariantDefaults = true }.Initialize(value);
+            => new MutableTextBuffer(UninitializedArrayAllocator<char>.Default) { UseInvariantDefaults = true }.Initialize(value);
     }
 }

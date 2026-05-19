@@ -50,6 +50,8 @@ namespace J2N.Text
     {
         private const int CharStackBufferSize = 32;
 
+        private readonly IArrayAllocator<char> allocator;
+
         /// <summary>
         /// The character buffer.
         /// </summary>
@@ -77,8 +79,11 @@ namespace J2N.Text
         /// The string value of this instance is set to <see cref="string.Empty"/>, and the capacity is set to
         /// the implementation-specific default capacity.
         /// </remarks>
-        public MutableTextBuffer()
+        public MutableTextBuffer(IArrayAllocator<char> allocator)
         {
+            if (allocator is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.allocator);
+            this.allocator = allocator;
             // J2N: We rely on Initialize() to properly set up the state, but it is considered
             // an optional operation.
             m_MaxCapacity = int.MaxValue;
@@ -114,7 +119,7 @@ namespace J2N.Text
             }
 
             // Allocate the new array
-            char[] newArray = AllocateBuffer(CalculateNewArrayLength(count));
+            char[] newArray = allocator.Allocate(CalculateNewArrayLength(count));
 
 
             if (m_Position > 0)
@@ -135,7 +140,7 @@ namespace J2N.Text
             }
 
             // We are done with the old array
-            ReleaseBuffer(m_Chars);
+            allocator.Return(m_Chars);
 
             // Wire in the new array
             m_Chars = newArray;
@@ -143,6 +148,15 @@ namespace J2N.Text
 
             //AssertInvariants();
         }
+
+        /// <summary>
+        /// Gets the underlying storage of the builder.
+        /// </summary>
+        /// <remarks>
+        /// This property does not clear the underlying storage, but returns the raw unfiltered bytes
+        /// in writable form.
+        /// </remarks>
+        public Span<char> RawChars => m_Chars;
 
         /// <summary>
         /// Gets or sets the maximum number of characters that can be contained in the memory allocated by the current instance.
@@ -1426,7 +1440,7 @@ namespace J2N.Text
                 int endIndex = startIndex + length;
                 m_Chars.AsSpan(endIndex).CopyTo(m_Chars.AsSpan(startIndex));
                 m_Position -= length;
-                if (zeroBeyondPosition)
+                if (zeroBeyondPosition && !allocator.GuaranteesClearedArrays)
                 {
                     m_Chars.AsSpan(m_Position).Fill('\0'); // Zero out the remaining chars
                 }
@@ -5556,70 +5570,10 @@ namespace J2N.Text
 
             // Make sure to let the array allocation throw an exception if the caller has a bug and the desired capacity is negative.
             // This could also go negative if the actual required length wraps around.
-            char[] newBuffer = AllocateBuffer(newCapacity);
+            char[] newBuffer = allocator.Allocate(newCapacity);
             oldBuffer.AsSpan(0, m_Position).CopyTo(newBuffer);
-            ReleaseBuffer(oldBuffer);
+            allocator.Return(oldBuffer);
             m_Chars = newBuffer;
-        }
-
-        /// <summary>
-        /// Allocates a new character buffer for use by <see cref="MutableTextBuffer"/> when the
-        /// existing buffer changes in size. This may happen when the buffer grows to accommodate
-        /// more data or when calling <see cref="TrimExcess()"/> to shrink the buffer to fit its content.
-        /// </summary>
-        /// <param name="minimumLength">
-        /// The minimum required length of the returned buffer. The returned array MUST have a
-        /// length greater than or equal to this value.
-        /// </param>
-        /// <returns>
-        /// A new <see cref="char"/> array that will become the active buffer for this instance.
-        /// </returns>
-        /// <remarks>
-        /// This method is called internally whenever <see cref="MutableTextBuffer"/> needs to grow or
-        /// shrink its underlying storage. Subclasses may override this method to control how new buffers
-        /// are allocated. For example, buffers may be rented from <see cref="System.Buffers.ArrayPool{T}"/> or
-        /// another pooling mechanism.
-        /// <para/>
-        /// Implementations must <em>not</em> perform any data copying. The base class is solely
-        /// responsible for transferring existing content into the new buffer before it becomes active.
-        /// <para/>
-        /// The returned buffer should be considered newly allocated and uninitialized; the base
-        /// class will overwrite the portion it requires.
-        /// </remarks>
-        protected virtual char[] AllocateBuffer(int minimumLength)
-        {
-#if FEATURE_GC_ALLOCATEUNINITIALIZEDARRAY
-            return GC.AllocateUninitializedArray<char>(minimumLength); // J2N NOTE: If we decide to expose the actual array, we must use new char[] here.
-#else
-            return new char[minimumLength];
-#endif
-        }
-
-        /// <summary>
-        /// Releases a previously-used character buffer.
-        /// </summary>
-        /// <param name="buffer">
-        /// The buffer that is no longer used by this instance.
-        /// </param>
-        /// <remarks>
-        /// <para>
-        /// This method is called internally after <see cref="MutableTextBuffer"/> has finished copying
-        /// all required data out of the previous buffer and replaced it with a new one.
-        /// Subclasses may override this method to return buffers to a pool or perform other
-        /// cleanup logic.
-        /// </para>
-        /// <para>
-        /// The default implementation does nothing.
-        /// </para>
-        /// <para>
-        /// Implementations must assume that <paramref name="buffer"/> may contain arbitrary
-        /// application data. It is the subclass's responsibility to avoid leaking sensitive
-        /// information when using pooled or shared buffers.
-        /// </para>
-        /// </remarks>
-        protected virtual void ReleaseBuffer(char[] buffer)
-        {
-            // By default, do nothing. Derived classes can override to return to pool, etc.
         }
 
         // J2N-specific methods
@@ -5768,7 +5722,10 @@ namespace J2N.Text
                 Grow(length);
             }
             Span<char> buffer = m_Chars.AsSpan(pos, length);
-            buffer.Fill('\0'); // Ensure the buffer doesn't contain any sensitive data before providing it to the user
+            if (!allocator.GuaranteesClearedArrays)
+            {
+                buffer.Fill('\0'); // Ensure the buffer doesn't contain any sensitive data before providing it to the user
+            }
             m_Position += length;
             return buffer;
         }

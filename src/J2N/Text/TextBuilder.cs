@@ -1,6 +1,8 @@
-﻿using System;
+﻿using J2N.Buffers;
+using System;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace J2N.Text
@@ -35,6 +37,9 @@ namespace J2N.Text
     {
         internal readonly MutableTextBuffer buffer;
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static MutableTextBuffer CreateMutableTextBuffer() => new(UninitializedArrayAllocator<char>.Default);
+
         #region BCL Constructors
 
         /// <summary>
@@ -46,7 +51,7 @@ namespace J2N.Text
         /// </remarks>
         public TextBuilder()
         {
-            buffer = new MutableTextBuffer().Initialize();
+            buffer = CreateMutableTextBuffer().Initialize();
         }
 
         /// <summary>
@@ -64,7 +69,7 @@ namespace J2N.Text
         /// <seealso cref="Capacity"/>
         public TextBuilder(int capacity)
         {
-            buffer = new MutableTextBuffer().Initialize(capacity);
+            buffer = CreateMutableTextBuffer().Initialize(capacity);
         }
 
         /// <summary>
@@ -77,7 +82,7 @@ namespace J2N.Text
         /// contain the empty string (that is, it contains <see cref="string.Empty"/>).</remarks>
         public TextBuilder(string? value)
         {
-            buffer = new MutableTextBuffer().Initialize(value);
+            buffer = CreateMutableTextBuffer().Initialize(value);
         }
 
         /// <summary>
@@ -99,7 +104,7 @@ namespace J2N.Text
         /// <seealso cref="Capacity"/>
         public TextBuilder(string? value, int capacity)
         {
-            buffer = new MutableTextBuffer().Initialize(value, capacity);
+            buffer = CreateMutableTextBuffer().Initialize(value, capacity);
         }
 
         /// <summary>
@@ -130,7 +135,7 @@ namespace J2N.Text
         /// <seealso cref="Capacity"/>
         public TextBuilder(string? value, int startIndex, int length, int capacity)
         {
-            buffer = new MutableTextBuffer().Initialize(value, startIndex, length, capacity);
+            buffer = CreateMutableTextBuffer().Initialize(value, startIndex, length, capacity);
         }
 
         /// <summary>
@@ -167,7 +172,7 @@ namespace J2N.Text
         /// <seealso cref="MaxCapacity"/>
         public TextBuilder(int capacity, int maxCapacity)
         {
-            buffer = new MutableTextBuffer().Initialize(capacity, maxCapacity);
+            buffer = CreateMutableTextBuffer().Initialize(capacity, maxCapacity);
         }
 
         #endregion BCL Constructors
@@ -181,7 +186,7 @@ namespace J2N.Text
         /// <remarks>The characters from the span are copied to the heap memory of this instance.</remarks>
         public TextBuilder(ReadOnlySpan<char> value)
         {
-            buffer = new MutableTextBuffer().Initialize(value);
+            buffer = CreateMutableTextBuffer().Initialize(value);
         }
 
         /// <summary>
@@ -200,7 +205,7 @@ namespace J2N.Text
         /// <seealso cref="Capacity"/>
         public TextBuilder(ReadOnlySpan<char> value, int capacity)
         {
-            buffer = new MutableTextBuffer().Initialize(value, capacity);
+            buffer = CreateMutableTextBuffer().Initialize(value, capacity);
         }
 
         /// <summary>
@@ -217,7 +222,7 @@ namespace J2N.Text
         /// </remarks>
         public TextBuilder(StringBuilder? value)
         {
-            buffer = new MutableTextBuffer().Initialize(value);
+            buffer = CreateMutableTextBuffer().Initialize(value);
         }
 
         /// <summary>
@@ -239,7 +244,7 @@ namespace J2N.Text
         /// <seealso cref="Capacity"/>
         public TextBuilder(StringBuilder? value, int capacity)
         {
-            buffer = new MutableTextBuffer().Initialize(value, capacity);
+            buffer = CreateMutableTextBuffer().Initialize(value, capacity);
         }
 
         /// <summary>
@@ -270,7 +275,7 @@ namespace J2N.Text
         /// <seealso cref="Capacity"/>
         public TextBuilder(StringBuilder? value, int startIndex, int length, int capacity)
         {
-            buffer = new MutableTextBuffer().Initialize(value, startIndex, length, capacity);
+            buffer = CreateMutableTextBuffer().Initialize(value, startIndex, length, capacity);
         }
 
         /// <summary>
@@ -283,7 +288,7 @@ namespace J2N.Text
         /// contain the empty string (that is, it contains <see cref="string.Empty"/>).</remarks>
         public TextBuilder(ICharSequence? value) // Coverage for the JDK // J2N TODO: Add overloads to slice the ICharsequence and set capacity?
         {
-            buffer = new MutableTextBuffer().Initialize(value);
+            buffer = CreateMutableTextBuffer().Initialize(value);
         }
 
         #endregion J2N Constructors
