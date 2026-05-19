@@ -5,6 +5,8 @@ using J2N.Text.CodeGen.Roslyn;
 
 string sourceDirectory =
     @"F:\Projects\J2N\src\J2N\Text";
+string infrastructureDirectory =
+    @"F:\Projects\J2N\src\J2N\CodeGeneration";
 
 // ---------------------------------------------------------------------
 // MutableTextBuffer
@@ -15,11 +17,17 @@ List<string> sourceTexts =
         .Select(File.ReadAllText)
         .ToList();
 
+List<string> infrastructureTexts =
+    Directory.GetFiles(infrastructureDirectory, "*.cs")
+        .Select(File.ReadAllText)
+        .ToList();
+
 var extractor = new RoslynTypeExtractor();
 
 TypeModel model =
     extractor.Extract(
         sourceTexts,
+        infrastructureTexts,
         "J2N.Text.MutableTextBuffer");
 
 // ---------------------------------------------------------------------
@@ -34,6 +42,7 @@ List<string> extensionSourceTexts =
 TypeModel extensionModel =
     extractor.Extract(
         extensionSourceTexts,
+        infrastructureTexts,
         "J2N.Text.TextMemoryExtensions");
 
 // ---------------------------------------------------------------------

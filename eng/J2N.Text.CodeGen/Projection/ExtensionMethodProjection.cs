@@ -17,7 +17,7 @@ namespace J2N.Text.CodeGen.Projection
                 Name = extensionSource.Name
             };
 
-            foreach (MethodModel method in extensionSource.Methods)
+            foreach (MethodModel method in extensionSource.Methods.Where(x => !x.Ignore))
             {
                 if (!method.IsExtensionMethod)
                     continue;

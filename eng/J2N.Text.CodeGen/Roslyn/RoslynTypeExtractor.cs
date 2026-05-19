@@ -10,6 +10,7 @@ namespace J2N.Text.CodeGen.Roslyn
     {
         public TypeModel Extract(
             IEnumerable<string> sourceTexts,
+            IEnumerable<string> infrastructureSourceTexts,
             string fullTypeName)
         {
             var parseOptions =
@@ -22,16 +23,35 @@ namespace J2N.Text.CodeGen.Roslyn
                     ]);
 
 
+            IEnumerable<string> allSources =
+                sourceTexts.Concat(infrastructureSourceTexts);
+
             List<SyntaxTree> trees =
-                sourceTexts
-                    .Select(text => CSharpSyntaxTree.ParseText(text, parseOptions))
+                allSources
+                    .Select(text =>
+                        CSharpSyntaxTree.ParseText(
+                            text,
+                            parseOptions))
                     .Cast<SyntaxTree>()
                     .ToList();
+
+            var references = new[]
+            {
+                MetadataReference.CreateFromFile(typeof(object).Assembly.Location),
+                MetadataReference.CreateFromFile(typeof(Enumerable).Assembly.Location),
+                MetadataReference.CreateFromFile(typeof(System.Runtime.GCSettings).Assembly.Location),
+            };
 
             var compilation =
                 CSharpCompilation.Create(
                     assemblyName: "CodeGen",
-                    syntaxTrees: trees);
+                    syntaxTrees: trees,
+                    references: references);
+
+            Dictionary<SyntaxTree, SemanticModel> semanticModels =
+                trees.ToDictionary(
+                    t => t,
+                    t => compilation.GetSemanticModel(t));
 
             INamedTypeSymbol? typeSymbol =
                 compilation.GlobalNamespace
@@ -81,7 +101,13 @@ namespace J2N.Text.CodeGen.Roslyn
                 if (!method.Modifiers.Any(SyntaxKind.PublicKeyword))
                     continue;
 
-                model.Methods.Add(ExtractMethod(method));
+                SemanticModel semanticModel =
+                    semanticModels[method.SyntaxTree];
+
+                model.Methods.Add(
+                    ExtractMethod(
+                        method,
+                        semanticModel));
             }
 
             foreach (PropertyDeclarationSyntax property in members.OfType<PropertyDeclarationSyntax>())
@@ -89,7 +115,13 @@ namespace J2N.Text.CodeGen.Roslyn
                 if (!property.Modifiers.Any(SyntaxKind.PublicKeyword))
                     continue;
 
-                model.Properties.Add(ExtractProperty(property));
+                SemanticModel semanticModel =
+                    semanticModels[property.SyntaxTree];
+
+                model.Properties.Add(
+                    ExtractProperty(
+                        property,
+                        semanticModel));
             }
 
             foreach (IndexerDeclarationSyntax indexer in members.OfType<IndexerDeclarationSyntax>())
@@ -97,7 +129,13 @@ namespace J2N.Text.CodeGen.Roslyn
                 if (!indexer.Modifiers.Any(SyntaxKind.PublicKeyword))
                     continue;
 
-                model.Properties.Add(ExtractIndexer(indexer));
+                SemanticModel semanticModel =
+                    semanticModels[indexer.SyntaxTree];
+
+                model.Properties.Add(
+                    ExtractIndexer(
+                        indexer,
+                        semanticModel));
             }
 
             return model;
@@ -116,8 +154,16 @@ namespace J2N.Text.CodeGen.Roslyn
             }
         }
 
-        private static MethodModel ExtractMethod(MethodDeclarationSyntax method)
+        private static MethodModel ExtractMethod(MethodDeclarationSyntax method, SemanticModel model)
         {
+            IMethodSymbol? methodSymbol = model.GetDeclaredSymbol(method);
+
+            if (methodSymbol is null)
+            {
+                throw new InvalidOperationException(
+                    $"Unable to resolve symbol for method '{method.Identifier.Text}'.");
+            }
+
             string? returnType = method.ReturnType.ToString();
             var parameters = method.ParameterList.Parameters
                 .Select(p =>
@@ -151,12 +197,19 @@ namespace J2N.Text.CodeGen.Roslyn
             {
                 Name = method.Identifier.Text,
                 ReturnType = returnType,
-                ReturnsSelf = false,
+                ReturnsSelf =
+                    methodSymbol.HasAttribute(CodeGenerationAttributeNames.ReturnsSelf),
+                Ignore =
+                    methodSymbol.HasAttribute(
+                        CodeGenerationAttributeNames.Ignore),
                 IsBuilderMethod = false,
                 IsExtensionMethod =
                     method.ParameterList.Parameters.FirstOrDefault()?
                         .Modifiers.Any(SyntaxKind.ThisKeyword)
                     ?? false,
+                IsConstructorProjection =
+                    methodSymbol.HasAttribute(
+                        CodeGenerationAttributeNames.Constructor),
                 IsStatic =
                     method.Modifiers.Any(SyntaxKind.StaticKeyword),
                 IsUnsafe =
@@ -171,8 +224,16 @@ namespace J2N.Text.CodeGen.Roslyn
             };
         }
 
-        private static PropertyModel ExtractProperty(PropertyDeclarationSyntax property)
+        private static PropertyModel ExtractProperty(PropertyDeclarationSyntax property, SemanticModel model)
         {
+            IPropertySymbol? propertySymbol = model.GetDeclaredSymbol(property);
+
+            if (propertySymbol is null)
+            {
+                throw new InvalidOperationException(
+                    $"Unable to resolve symbol for property '{property.Identifier.Text}'.");
+            }
+
             string typeName = property.Type.ToString();
 
             bool hasGetter = false;
@@ -213,12 +274,25 @@ namespace J2N.Text.CodeGen.Roslyn
                 Documentation = ExtractDocumentation(property),
 
                 Attributes = ExtractAttributes(property.AttributeLists),
+
+                Ignore =
+                    propertySymbol.HasAttribute(
+                        CodeGenerationAttributeNames.Ignore),
             };
         }
 
-        private static PropertyModel ExtractIndexer(IndexerDeclarationSyntax indexer)
+        private static PropertyModel ExtractIndexer(IndexerDeclarationSyntax indexer, SemanticModel model)
         {
             string? typeName = indexer.Type.ToString();
+
+            IPropertySymbol? indexerSymbol = model.GetDeclaredSymbol(indexer);
+
+            if (indexerSymbol is null)
+            {
+                throw new InvalidOperationException(
+                    $"Unable to resolve symbol for indexer '{typeName}'.");
+            }
+
             var parameters = indexer.ParameterList.Parameters
                 .Select(p =>
                 {
@@ -264,6 +338,9 @@ namespace J2N.Text.CodeGen.Roslyn
                 Documentation = ExtractDocumentation(indexer),
                 IndexParameters = parameters,
                 Attributes = ExtractAttributes(indexer.AttributeLists),
+                Ignore =
+                    indexerSymbol.HasAttribute(
+                        CodeGenerationAttributeNames.Ignore),
             };
         }
 

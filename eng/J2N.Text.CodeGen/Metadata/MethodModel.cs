@@ -14,6 +14,8 @@
 
         public bool IsExtensionMethod { get; init; }
 
+        public bool IsConstructorProjection { get; set; }
+
         public bool IsUnsafe { get; init; }
 
         public string? BodyText { get; init; }
@@ -27,5 +29,7 @@
         public List<AttributeModel> Attributes { get; init; } = [];
 
         public string? ConditionalCompilationSymbol { get; set; }
+
+        public bool Ignore { get; init; }
     }
 }

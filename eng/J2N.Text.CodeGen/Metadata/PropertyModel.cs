@@ -21,5 +21,7 @@
         public List<ParameterModel> IndexParameters { get; init; } = [];
 
         public List<AttributeModel> Attributes { get; init; } = [];
+
+        public bool Ignore { get; init; }
     }
 }

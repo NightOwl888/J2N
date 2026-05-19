@@ -1,4 +1,5 @@
 ﻿using J2N.Text.CodeGen.Metadata;
+using Microsoft.CodeAnalysis;
 using System.Text.RegularExpressions;
 
 namespace J2N.Text.CodeGen.Projection
@@ -17,13 +18,8 @@ namespace J2N.Text.CodeGen.Projection
                 Name = facadeName
             };
 
-            foreach (MethodModel method in source.Methods)
+            foreach (MethodModel method in source.Methods.Where(x => !x.Ignore))
             {
-                if (!ShouldIncludeMethod(method))
-                {
-                    continue;
-                }
-
                 projected.Methods.Add(
                     ProjectMethod(
                         method,
@@ -32,7 +28,7 @@ namespace J2N.Text.CodeGen.Projection
                         facadeName));
             }
 
-            foreach (PropertyModel property in source.Properties)
+            foreach (PropertyModel property in source.Properties.Where(x => !x.Ignore))
             {
                 projected.Properties.Add(
                     ProjectProperty(
@@ -56,15 +52,21 @@ namespace J2N.Text.CodeGen.Projection
                 Name = method.Name,
 
                 ReturnType =
-                    RewriteType(
-                        method.ReturnType,
-                        sourceType,
-                        facadeName),
+                    method.ReturnsSelf
+                        ? facadeName
+                        : RewriteType(
+                            method.ReturnType,
+                            sourceType,
+                            facadeName),
 
-                ReturnsSelf =
-                    method.ReturnType == sourceType,
-                IsBuilderMethod =
-                    method.ReturnType == sourceType,
+                ReturnsSelf = method.ReturnsSelf,
+
+                //
+                // Builder methods are ONLY methods explicitly marked
+                // with [CodeGenerationReturnsSelf]
+                //
+                IsBuilderMethod = method.ReturnsSelf,
+
                 IsUnsafe = method.IsUnsafe,
                 IsStatic = method.IsStatic,
                 IsExtensionMethod = method.IsExtensionMethod,
@@ -86,6 +88,7 @@ namespace J2N.Text.CodeGen.Projection
                             Documentation =
                                 RewriteDocumentation(
                                     p.Documentation,
+                                    source,
                                     source.Name,
                                     facadeName),
 
@@ -112,21 +115,33 @@ namespace J2N.Text.CodeGen.Projection
                             SummaryXml =
                                 RewriteDocumentation(
                                     method.Documentation.SummaryXml,
+                                    source,
                                     source.Name,
                                     facadeName),
 
                             RemarksXml =
                                 RewriteDocumentation(
                                     method.Documentation.RemarksXml,
+                                    source,
                                     source.Name,
                                     facadeName),
 
                             ReturnsXml =
                                 RewriteDocumentation(
                                     method.Documentation.ReturnsXml,
+                                    source,
                                     source.Name,
                                     facadeName)
                         },
+
+                //
+                // NEW:
+                //
+                ConditionalCompilationSymbol =
+                    method.Parameters.Any(p =>
+                        p.TypeName is "Index" or "Range")
+                            ? "FEATURE_INDEX_RANGE"
+                            : null
             };
         }
 
@@ -169,6 +184,7 @@ namespace J2N.Text.CodeGen.Projection
                             Documentation =
                                 RewriteDocumentation(
                                     p.Documentation,
+                                    source,
                                     source.Name,
                                     facadeName),
 
@@ -190,18 +206,21 @@ namespace J2N.Text.CodeGen.Projection
                             SummaryXml =
                                 RewriteDocumentation(
                                     property.Documentation.SummaryXml,
+                                    source,
                                     source.Name,
                                     facadeName),
 
                             RemarksXml =
                                 RewriteDocumentation(
                                     property.Documentation.RemarksXml,
+                                    source,
                                     source.Name,
                                     facadeName),
 
                             ReturnsXml =
                                 RewriteDocumentation(
                                     property.Documentation.ReturnsXml,
+                                    source,
                                     source.Name,
                                     facadeName)
                         },
@@ -218,6 +237,7 @@ namespace J2N.Text.CodeGen.Projection
 
         private static string? RewriteDocumentation(
             string? xml,
+            TypeModel source,
             string sourceType,
             string facadeType)
         {
@@ -236,6 +256,7 @@ namespace J2N.Text.CodeGen.Projection
                         string rewritten =
                             RewriteCrefTarget(
                                 cref,
+                                source,
                                 facadeType);
 
                         return $"cref=\"{rewritten}\"";
@@ -248,13 +269,24 @@ namespace J2N.Text.CodeGen.Projection
 
         private static string RewriteCrefTarget(
             string cref,
+            TypeModel source,
             string facadeType)
         {
-            const string initializePrefix = "Initialize(";
-
-            if (cref.StartsWith(initializePrefix, StringComparison.Ordinal))
+            foreach (MethodModel method in source.Methods)
             {
-                return facadeType + cref.Substring("Initialize".Length);
+                if (!method.IsConstructorProjection)
+                    continue;
+
+                string methodPrefix =
+                    method.Name + "(";
+
+                if (cref.StartsWith(
+                    methodPrefix,
+                    StringComparison.Ordinal))
+                {
+                    return facadeType
+                        + cref.Substring(method.Name.Length);
+                }
             }
 
             return cref;
@@ -278,16 +310,6 @@ namespace J2N.Text.CodeGen.Projection
                 Name = parameter.Name,
                 Constraints = parameter.Constraints.ToList()
             };
-        }
-
-        private static bool ShouldIncludeMethod(MethodModel method)
-        {
-            if (method.Name == "GetChunks")
-            {
-                return false;
-            }
-
-            return true;
         }
     }
 }

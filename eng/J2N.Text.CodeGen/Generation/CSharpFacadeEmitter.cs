@@ -55,26 +55,71 @@ namespace J2N.Text.CodeGen.Generation
                 }
             }
 
+            string? activeConditional = null;
+
             foreach (MethodModel method in model.Methods)
             {
+                if (method.ConditionalCompilationSymbol
+                    != activeConditional)
+                {
+                    if (activeConditional is not null)
+                    {
+                        sb.AppendLine("#endif");
+                        sb.AppendLine();
+                    }
+
+                    activeConditional =
+                        method.ConditionalCompilationSymbol;
+
+                    if (activeConditional is not null)
+                    {
+                        sb.AppendLine(
+                            $"#if {activeConditional}");
+                    }
+                }
+
                 bool suppressDocs =
                     options.SuppressMissingDocumentationWarnings
-                    && !HasDocumentation(method.Documentation, method.Parameters);
+                    && !HasDocumentation(
+                        method.Documentation,
+                        method.Parameters);
 
                 if (suppressDocs)
                 {
-                    sb.AppendLine("#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member");
+                    sb.AppendLine(
+                        "#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member");
                 }
 
-                EmitDocumentation(sb, method.Documentation, method.Parameters);
-                EmitAttributes(sb, method.Attributes, "        ");
-                EmitMethod(sb, method, model.Name, model.Source.SourceType, backingFieldName);
+                EmitDocumentation(
+                    sb,
+                    method.Documentation,
+                    method.Parameters);
+
+                EmitAttributes(
+                    sb,
+                    method.Attributes,
+                    "        ");
+
+                EmitMethod(
+                    sb,
+                    method,
+                    model.Name,
+                    model.Source.SourceType,
+                    backingFieldName);
 
                 if (suppressDocs)
                 {
-                    sb.AppendLine("#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member");
+                    sb.AppendLine(
+                        "#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member");
+
                     sb.AppendLine();
                 }
+            }
+
+            if (activeConditional is not null)
+            {
+                sb.AppendLine("#endif");
+                sb.AppendLine();
             }
 
             sb.AppendLine("    }");
@@ -208,7 +253,10 @@ namespace J2N.Text.CodeGen.Generation
             IEnumerable<AttributeModel> attributes,
             string indent)
         {
-            foreach (AttributeModel attribute in attributes)
+            foreach (AttributeModel attribute in attributes
+                .Where(a =>
+                    a.Name != "CodeGenerationIgnore"
+                    && a.Name != "CodeGenerationReturnsSelf"))
             {
                 if (attribute.Arguments.Count == 0)
                 {
