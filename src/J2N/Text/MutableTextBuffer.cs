@@ -33,10 +33,14 @@ namespace J2N.Text
     ///         Memory is directly accessible using <see cref="TextMemoryExtensions.AsSpan(MutableTextBuffer)"/> and
     ///         <see cref="TextMemoryExtensions.AsMemory(MutableTextBuffer)"/> overloads including the ability to slice.
     ///         So, there is no need to allocate memory to call methods that require System.Memory types, such as
-    ///         <see cref="ReadOnlySpan{T}"/>.
+    ///         <see cref="ReadOnlySpan{T}"/>. So, no allocation is necessary to read the results.
     ///     </description></item>
     ///     <item><description>
     ///         Indexing through <see cref="this[int]"/> is significantly faster than with <see cref="StringBuilder"/>.
+    ///     </description></item>
+    ///     <item><description>
+    ///         Rather than optimizing for operations that require moving or copying characters,
+    ///         this implementation optimizes for memory reuse, reducing array allocations.
     ///     </description></item>
     /// </list>
     /// </remarks>
