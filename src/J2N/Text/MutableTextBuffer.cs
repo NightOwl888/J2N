@@ -334,6 +334,7 @@ namespace J2N.Text
         /// <returns>An object whose <see cref="Length"/> is 0 (zero).</returns>
         /// <remarks><see cref="Clear"/> is a convenience method that is equivalent to setting
         /// the <see cref="Length"/> property of the current instance to 0 (zero).</remarks>
+        [CodeGenerationReturnsSelf]
         public MutableTextBuffer Clear()
         {
             this.Length = 0;
@@ -591,6 +592,7 @@ namespace J2N.Text
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
         /// </remarks>
         /// <seealso cref="char"/>
+        [CodeGenerationReturnsSelf]
         public MutableTextBuffer Append(char value, int repeatCount)
         {
             if (repeatCount < 0)
@@ -694,6 +696,7 @@ namespace J2N.Text
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
         /// </remarks>
         /// <seealso cref="char"/>
+        [CodeGenerationReturnsSelf]
         public MutableTextBuffer Append(char[]? value, int startIndex, int charCount)
         {
             if (startIndex < 0)
@@ -756,6 +759,7 @@ namespace J2N.Text
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
         /// </remarks>
         /// <seealso cref="string"/>
+        [CodeGenerationReturnsSelf]
         public MutableTextBuffer Append(string? value)
         {
             if (value is not null)
@@ -828,6 +832,7 @@ namespace J2N.Text
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
         /// </remarks>
         /// <seealso cref="string"/>
+        [CodeGenerationReturnsSelf]
         public MutableTextBuffer Append(string? value, int startIndex, int count)
         {
             if (startIndex < 0)
@@ -883,6 +888,7 @@ namespace J2N.Text
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
         /// </remarks>
         /// <seealso cref="StringBuilder"/>
+        [CodeGenerationReturnsSelf]
         public MutableTextBuffer Append(StringBuilder? value)
         {
             if (value != null && value.Length != 0)
@@ -955,6 +961,7 @@ namespace J2N.Text
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
         /// </remarks>
         /// <seealso cref="StringBuilder"/>
+        [CodeGenerationReturnsSelf]
         public MutableTextBuffer Append(StringBuilder? value, int startIndex, int count)
         {
             if (startIndex < 0)
@@ -1007,6 +1014,7 @@ namespace J2N.Text
 
         #region Custom Append
 
+        [CodeGenerationReturnsSelf]
         public MutableTextBuffer Append(MutableTextBuffer? value)
         {
             if (value != null && value.Length != 0)
@@ -1016,6 +1024,7 @@ namespace J2N.Text
             return this;
         }
 
+        [CodeGenerationReturnsSelf]
         public MutableTextBuffer Append(MutableTextBuffer? value, int startIndex, int count)
         {
             if (startIndex < 0)
@@ -1091,6 +1100,7 @@ namespace J2N.Text
         /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
         /// </remarks>
+        [CodeGenerationReturnsSelf]
         public MutableTextBuffer AppendLine() => Append(Environment.NewLine);
 
         /// <summary>
@@ -1114,6 +1124,7 @@ namespace J2N.Text
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
         /// </remarks>
         /// <seealso cref="string"/>
+        [CodeGenerationReturnsSelf]
         public MutableTextBuffer AppendLine(string? value)
         {
             Append(value);
@@ -1141,6 +1152,7 @@ namespace J2N.Text
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
         /// </remarks>
         /// <seealso cref="ReadOnlySpan{Char}"/>
+        [CodeGenerationReturnsSelf]
         public MutableTextBuffer AppendLine(ReadOnlySpan<char> value)
         {
             Append(value);
@@ -1268,6 +1280,7 @@ namespace J2N.Text
         /// This <see cref="MutableTextBuffer"/> object is not changed if <paramref name="value"/> is <c>null</c>, 
         /// <paramref name="value"/> is not <c>null</c> but its length is zero, or <paramref name="count"/> is zero.
         /// </remarks>
+        [CodeGenerationReturnsSelf]
         public MutableTextBuffer Insert(int index, string? value, int count) => Insert(index, value.AsSpan(), count);
 
         /// <summary>
@@ -1294,6 +1307,7 @@ namespace J2N.Text
         /// This <see cref="MutableTextBuffer"/> object is not changed if the length of <paramref name="value"/> is zero or
         /// <paramref name="count"/> is zero.
         /// </remarks>
+        [CodeGenerationReturnsSelf]
         public MutableTextBuffer Insert(int index, ReadOnlySpan<char> value, int count) // J2N: Made public to match ValueStringBuilder API
         {
             if (count < 0)
@@ -1347,6 +1361,7 @@ namespace J2N.Text
         /// the string value of the current instance is shortened by <paramref name="length"/>. The capacity of the
         /// current instance is unaffected.
         /// </remarks>
+        [CodeGenerationReturnsSelf]
         public MutableTextBuffer Remove(int startIndex, int length)
         {
             if (length < 0)
@@ -1377,6 +1392,7 @@ namespace J2N.Text
         /// the string value of the current instance is shortened by 1. The capacity of the
         /// current instance is unaffected.
         /// </remarks>
+        [CodeGenerationReturnsSelf]
         public MutableTextBuffer RemoveAt(int index) // Coverage for the JDK (deleteCharAt)
         {
             if (index < 0)
@@ -1430,6 +1446,7 @@ namespace J2N.Text
         /// The capacity of this instance is adjusted as needed.
         /// </remarks>
         /// <seealso cref="bool"/>
+        [CodeGenerationReturnsSelf]
         public MutableTextBuffer Append(bool value) => Append(value, format: BooleanFormat.Lowercase);
 
         /// <summary>
@@ -1443,6 +1460,7 @@ namespace J2N.Text
         /// <remarks>The capacity of this instance is adjusted as needed. </remarks>
         /// <seealso cref="bool"/>
         /// <seealso cref="BooleanFormat"/>
+        [CodeGenerationReturnsSelf]
         public MutableTextBuffer Append(bool value, BooleanFormat format)
         {
             string text = FormatBoolean(value, format);
@@ -1482,6 +1500,7 @@ namespace J2N.Text
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
         /// </remarks>
         /// <seealso cref="char"/>
+        [CodeGenerationReturnsSelf]
         public MutableTextBuffer Append(char value)
         {
             int pos = m_Position;
@@ -1527,6 +1546,7 @@ namespace J2N.Text
         /// </remarks>
         /// <seealso cref="sbyte"/>
         [CLSCompliant(false)]
+        [CodeGenerationReturnsSelf]
         public MutableTextBuffer Append(sbyte value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
             => AppendSpanFormattable(value, format, provider);
@@ -1560,6 +1580,7 @@ namespace J2N.Text
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
         /// </remarks>
         /// <seealso cref="byte"/>
+        [CodeGenerationReturnsSelf]
         public MutableTextBuffer Append(byte value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
             => AppendSpanFormattable(value, format, provider);
@@ -1593,6 +1614,7 @@ namespace J2N.Text
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
         /// </remarks>
         /// <seealso cref="short"/>
+        [CodeGenerationReturnsSelf]
         public MutableTextBuffer Append(short value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
             => AppendSpanFormattable(value, format, provider);
@@ -1626,6 +1648,7 @@ namespace J2N.Text
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
         /// </remarks>
         /// <seealso cref="int"/>
+        [CodeGenerationReturnsSelf]
         public MutableTextBuffer Append(int value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
             => AppendSpanFormattable(value, format, provider);
@@ -1659,6 +1682,7 @@ namespace J2N.Text
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
         /// </remarks>
         /// <seealso cref="long"/>
+        [CodeGenerationReturnsSelf]
         public MutableTextBuffer Append(long value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
             => AppendSpanFormattable(value, format, provider);
@@ -1691,6 +1715,7 @@ namespace J2N.Text
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
         /// </remarks>
         /// <seealso cref="float"/>
+        [CodeGenerationReturnsSelf]
         public MutableTextBuffer Append(float value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
             => AppendNumberCore<float, SingleFormatter>(6, value, format.AsSpan(), provider);
 
@@ -1720,6 +1745,7 @@ namespace J2N.Text
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
         /// </remarks>
         /// <seealso cref="double"/>
+        [CodeGenerationReturnsSelf]
         public MutableTextBuffer Append(double value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
             => AppendNumberCore<double, DoubleFormatter>(14, value, format.AsSpan(), provider);
 
@@ -1750,6 +1776,7 @@ namespace J2N.Text
         /// </remarks>
         /// <seealso cref="decimal"/>
         // J2N TODO: Since BigDecimal in Java doesn't use the same default format as this, we will need to change the default before this can be made public
+        [CodeGenerationReturnsSelf]
         internal MutableTextBuffer Append(decimal value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
             => AppendSpanFormattable(value, format, provider);
@@ -1784,6 +1811,7 @@ namespace J2N.Text
         /// </remarks>
         /// <seealso cref="ushort"/>
         [CLSCompliant(false)]
+        [CodeGenerationReturnsSelf]
         public MutableTextBuffer Append(ushort value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
             => AppendSpanFormattable(value, format, provider);
@@ -1817,6 +1845,7 @@ namespace J2N.Text
         /// </remarks>
         /// <seealso cref="uint"/>
         [CLSCompliant(false)]
+        [CodeGenerationReturnsSelf]
         public MutableTextBuffer Append(uint value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
             => AppendSpanFormattable(value, format, provider);
@@ -1851,6 +1880,7 @@ namespace J2N.Text
         /// </remarks>
         /// <seealso cref="ulong"/>
         [CLSCompliant(false)]
+        [CodeGenerationReturnsSelf]
         public MutableTextBuffer Append(ulong value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
             => AppendSpanFormattable(value, format, provider);
@@ -1958,6 +1988,7 @@ namespace J2N.Text
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
         /// </remarks>
         /// <seealso cref="object"/>
+        [CodeGenerationReturnsSelf]
         public MutableTextBuffer Append(object? value, string? format = null, IFormatProvider? provider = null)
         {
             if (value is null)
@@ -2012,6 +2043,7 @@ namespace J2N.Text
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
         /// </remarks>
         /// <seealso cref="char"/>
+        [CodeGenerationReturnsSelf]
         public MutableTextBuffer Append(char[]? value)
         {
             if (value is not null)
@@ -2032,6 +2064,7 @@ namespace J2N.Text
         /// <param name="value">The read-only character span to append.</param>
         /// <returns>A reference to this instance after the append operation is completed.</returns>
         /// <seealso cref="ReadOnlySpan{Char}"/>
+        [CodeGenerationReturnsSelf]
         public MutableTextBuffer Append(ReadOnlySpan<char> value)
         {
             Append(ref MemoryMarshal.GetReference(value), value.Length);
@@ -2044,6 +2077,7 @@ namespace J2N.Text
         /// <param name="value">The read-only character memory region to append.</param>
         /// <returns>A reference to this instance after the append operation is completed.</returns>
         /// <seealso cref="ReadOnlyMemory{Char}"/>
+        [CodeGenerationReturnsSelf]
         public MutableTextBuffer Append(ReadOnlyMemory<char> value) => Append(value.Span);
 
         // J2N TODO: API - String interpolation for J2N formatters
@@ -2051,27 +2085,32 @@ namespace J2N.Text
         ///// <summary>Appends the specified interpolated string to this instance.</summary>
         ///// <param name="handler">The interpolated string to append.</param>
         ///// <returns>A reference to this instance after the append operation has completed.</returns>
+        //[CodeGenerationReturnsSelf]
         //public MutableTextBuffer Append([InterpolatedStringHandlerArgument("")] ref AppendInterpolatedStringHandler handler) => this;
 
         ///// <summary>Appends the specified interpolated string to this instance.</summary>
         ///// <param name="provider">An object that supplies culture-specific formatting information.</param>
         ///// <param name="handler">The interpolated string to append.</param>
         ///// <returns>A reference to this instance after the append operation has completed.</returns>
+        //[CodeGenerationReturnsSelf]
         //public MutableTextBuffer Append(IFormatProvider? provider, [InterpolatedStringHandlerArgument("", nameof(provider))] ref AppendInterpolatedStringHandler handler) => this;
 
         ///// <summary>Appends the specified interpolated string followed by the default line terminator to the end of the current MutableTextBuffer object.</summary>
         ///// <param name="handler">The interpolated string to append.</param>
         ///// <returns>A reference to this instance after the append operation has completed.</returns>
+        //[CodeGenerationReturnsSelf]
         //public MutableTextBuffer AppendLine([InterpolatedStringHandlerArgument("")] ref AppendInterpolatedStringHandler handler) => AppendLine();
 
         ///// <summary>Appends the specified interpolated string followed by the default line terminator to the end of the current MutableTextBuffer object.</summary>
         ///// <param name="provider">An object that supplies culture-specific formatting information.</param>
         ///// <param name="handler">The interpolated string to append.</param>
         ///// <returns>A reference to this instance after the append operation has completed.</returns>
+        //[CodeGenerationReturnsSelf]
         //public MutableTextBuffer AppendLine(IFormatProvider? provider, [InterpolatedStringHandlerArgument("", nameof(provider))] ref AppendInterpolatedStringHandler handler) => AppendLine();
 
         #region AppendJoin
 
+        [CodeGenerationReturnsSelf]
         public MutableTextBuffer AppendJoin(string? separator, params object?[] values)
         {
             if (values is null)
@@ -2083,12 +2122,14 @@ namespace J2N.Text
             return AppendJoinCore(ref MemoryMarshal.GetReference(separator.AsSpan()), separator.Length, values);
         }
 
+        [CodeGenerationReturnsSelf]
         public MutableTextBuffer AppendJoin(string? separator, params ReadOnlySpan<object?> values)
         {
             separator ??= string.Empty;
             return AppendJoinCore(ref MemoryMarshal.GetReference(separator.AsSpan()), separator.Length, values);
         }
 
+        [CodeGenerationReturnsSelf]
         public MutableTextBuffer AppendJoin<T>(string? separator, IEnumerable<T> values)
         {
             if (values is null)
@@ -2100,6 +2141,7 @@ namespace J2N.Text
             return AppendJoinCore(ref MemoryMarshal.GetReference(separator.AsSpan()), separator.Length, values);
         }
 
+        [CodeGenerationReturnsSelf]
         public MutableTextBuffer AppendJoin(string? separator, params string?[] values)
         {
             if (values is null)
@@ -2111,12 +2153,14 @@ namespace J2N.Text
             return AppendJoinCore(ref MemoryMarshal.GetReference(separator.AsSpan()), separator.Length, values);
         }
 
+        [CodeGenerationReturnsSelf]
         public MutableTextBuffer AppendJoin(string? separator, params ReadOnlySpan<string?> values)
         {
             separator ??= string.Empty;
             return AppendJoinCore(ref MemoryMarshal.GetReference(separator.AsSpan()), separator.Length, values);
         }
 
+        [CodeGenerationReturnsSelf]
         public MutableTextBuffer AppendJoin(char separator, params object?[] values)
         {
             if (values is null)
@@ -2127,9 +2171,11 @@ namespace J2N.Text
             return AppendJoinCore(ref separator, 1, values);
         }
 
+        [CodeGenerationReturnsSelf]
         public MutableTextBuffer AppendJoin(char separator, params ReadOnlySpan<object?> values) =>
             AppendJoinCore(ref separator, 1, values);
 
+        [CodeGenerationReturnsSelf]
         public MutableTextBuffer AppendJoin<T>(char separator, IEnumerable<T> values)
         {
             if (values is null)
@@ -2140,6 +2186,7 @@ namespace J2N.Text
             return AppendJoinCore(ref separator, 1, values);
         }
 
+        [CodeGenerationReturnsSelf]
         public MutableTextBuffer AppendJoin(char separator, params string?[] values)
         {
             if (values is null)
@@ -2150,6 +2197,7 @@ namespace J2N.Text
             return AppendJoinCore(ref separator, 1, values);
         }
 
+        [CodeGenerationReturnsSelf]
         public MutableTextBuffer AppendJoin(char separator, params ReadOnlySpan<string?> values) =>
             AppendJoinCore(ref separator, 1, values);
 
@@ -2230,6 +2278,7 @@ namespace J2N.Text
         /// This instance of <see cref="MutableTextBuffer"/> is not changed if <paramref name="value"/> is <c>null</c>,
         /// or <paramref name="value"/> is not <c>null</c> but its length is zero.
         /// </remarks>
+        [CodeGenerationReturnsSelf]
         public MutableTextBuffer Insert(int index, string? value)
         {
             if ((uint)index > (uint)Length)
@@ -2267,6 +2316,7 @@ namespace J2N.Text
         /// Existing characters are shifted to make room for the new text. The capacity is adjusted as needed.
         /// </remarks>
         /// <seealso cref="bool"/>
+        [CodeGenerationReturnsSelf]
         public MutableTextBuffer Insert(int index, bool value) => Insert(index, value, BooleanFormat.Lowercase);
 
         /// <summary>
@@ -2291,6 +2341,7 @@ namespace J2N.Text
         /// </remarks>
         /// <seealso cref="bool"/>
         /// <seealso cref="BooleanFormat"/>
+        [CodeGenerationReturnsSelf]
         public MutableTextBuffer Insert(int index, bool value, BooleanFormat format)
         {
             string text = FormatBoolean(value, format);
@@ -2328,6 +2379,7 @@ namespace J2N.Text
         /// </remarks>
         /// <seealso cref="sbyte"/>
         [CLSCompliant(false)]
+        [CodeGenerationReturnsSelf]
         public MutableTextBuffer Insert(int index, sbyte value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
             => InsertSpanFormattable(index, value, format.AsSpan(), provider);
@@ -2360,6 +2412,7 @@ namespace J2N.Text
         /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
         /// </remarks>
         /// <seealso cref="byte"/>
+        [CodeGenerationReturnsSelf]
         public MutableTextBuffer Insert(int index, byte value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
             => InsertSpanFormattable(index, value, format, provider);
@@ -2392,6 +2445,7 @@ namespace J2N.Text
         /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
         /// </remarks>
         /// <seealso cref="short"/>
+        [CodeGenerationReturnsSelf]
         public MutableTextBuffer Insert(int index, short value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
             => InsertSpanFormattable(index, value, format, provider);
@@ -2424,6 +2478,7 @@ namespace J2N.Text
         /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
         /// </remarks>
         /// <seealso cref="int"/>
+        [CodeGenerationReturnsSelf]
         public MutableTextBuffer Insert(int index, int value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
             => InsertSpanFormattable(index, value, format, provider);
@@ -2456,6 +2511,7 @@ namespace J2N.Text
         /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
         /// </remarks>
         /// <seealso cref="long"/>
+        [CodeGenerationReturnsSelf]
         public MutableTextBuffer Insert(int index, long value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
             => InsertSpanFormattable(index, value, format, provider);
@@ -2488,6 +2544,7 @@ namespace J2N.Text
         /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
         /// </remarks>
         /// <seealso cref="float"/>
+        [CodeGenerationReturnsSelf]
         public MutableTextBuffer Insert(int index, float value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
             => InsertNumberCore<float, SingleFormatter>(index, value, format.AsSpan(), provider);
 
@@ -2516,6 +2573,7 @@ namespace J2N.Text
         /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
         /// </remarks>
         /// <seealso cref="double"/>
+        [CodeGenerationReturnsSelf]
         public MutableTextBuffer Insert(int index, double value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
             => InsertNumberCore<double, DoubleFormatter>(index, value, format.AsSpan(), provider);
 
@@ -2545,6 +2603,7 @@ namespace J2N.Text
         /// </remarks>
         /// <seealso cref="decimal"/>
         // J2N TODO: Since BigDecimal in Java doesn't use the same default format as this, we will need to change the default before this can be made public
+        [CodeGenerationReturnsSelf]
         internal MutableTextBuffer Insert(int index, decimal value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
             => InsertSpanFormattable(index, value, format, provider);
@@ -2578,6 +2637,7 @@ namespace J2N.Text
         /// </remarks>
         /// <seealso cref="ushort"/>
         [CLSCompliant(false)]
+        [CodeGenerationReturnsSelf]
         public MutableTextBuffer Insert(int index, ushort value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
             => InsertSpanFormattable(index, value, format, provider);
@@ -2611,6 +2671,7 @@ namespace J2N.Text
         /// </remarks>
         /// <seealso cref="uint"/>
         [CLSCompliant(false)]
+        [CodeGenerationReturnsSelf]
         public MutableTextBuffer Insert(int index, uint value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
             => InsertSpanFormattable(index, value, format, provider);
@@ -2644,6 +2705,7 @@ namespace J2N.Text
         /// </remarks>
         /// <seealso cref="ulong"/>
         [CLSCompliant(false)]
+        [CodeGenerationReturnsSelf]
         public MutableTextBuffer Insert(int index, ulong value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
             => InsertSpanFormattable(index, value, format, provider);
@@ -2713,6 +2775,7 @@ namespace J2N.Text
         /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
         /// </remarks>
         /// <seealso cref="char"/>
+        [CodeGenerationReturnsSelf]
         public MutableTextBuffer Insert(int index, char value)
         {
             if ((uint)index > (uint)Length)
@@ -2745,6 +2808,7 @@ namespace J2N.Text
         /// If <paramref name="value"/> is <c>null</c>, the <see cref="MutableTextBuffer"/> is not changed.
         /// </remarks>
         /// <seealso cref="char"/>
+        [CodeGenerationReturnsSelf]
         public MutableTextBuffer Insert(int index, char[]? value)
         {
             if ((uint)index > (uint)Length)
@@ -2793,6 +2857,7 @@ namespace J2N.Text
         /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
         /// </remarks>
         /// <seealso cref="char"/>
+        [CodeGenerationReturnsSelf]
         public MutableTextBuffer Insert(int index, char[]? value, int startIndex, int charCount)
         {
             int currentLength = Length;
@@ -2862,6 +2927,7 @@ namespace J2N.Text
         /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
         /// </remarks>
         /// <seealso cref="char"/>
+        [CodeGenerationReturnsSelf]
         public MutableTextBuffer Insert(int index, string? value, int startIndex, int count) // J2N: Added to cover the JDK better (rather than ICharSequence only)
         {
             int currentLength = Length;
@@ -2922,6 +2988,7 @@ namespace J2N.Text
         /// If <paramref name="value"/> is <c>null</c>, the <see cref="MutableTextBuffer"/> is not changed.
         /// </remarks>
         /// <seealso cref="object"/>
+        [CodeGenerationReturnsSelf]
         public MutableTextBuffer Insert(int index, object? value, string? format = null, IFormatProvider? provider = null)
         {
             if (value is null)
@@ -2952,6 +3019,7 @@ namespace J2N.Text
         /// <remarks>The existing characters are shifted to make room for the character sequence in the
         /// <paramref name="value"/> to insert it. The capacity is adjusted as needed.</remarks>
         /// <seealso cref="ReadOnlySpan{Char}"/>
+        [CodeGenerationReturnsSelf]
         public MutableTextBuffer Insert(int index, ReadOnlySpan<char> value) // J2N NOTE: Weird that upstream they made an overload of ReadOnlyMemory<char> for Append, but not Insert.
         {
             if ((uint)index > (uint)Length)
@@ -3092,6 +3160,7 @@ namespace J2N.Text
         /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
         /// </remarks>
+        [CodeGenerationReturnsSelf]
         public MutableTextBuffer AppendFormat([StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, object? arg0)
         {
 #if FEATURE_INLINEARRAYATTRIBUTE
@@ -3178,6 +3247,7 @@ namespace J2N.Text
         /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
         /// </remarks>
+        [CodeGenerationReturnsSelf]
         public MutableTextBuffer AppendFormat([StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, object? arg0, object? arg1)
         {
 #if FEATURE_INLINEARRAYATTRIBUTE
@@ -3267,6 +3337,7 @@ namespace J2N.Text
         /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
         /// </remarks>
+        [CodeGenerationReturnsSelf]
         public MutableTextBuffer AppendFormat([StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, object? arg0, object? arg1, object? arg2)
         {
 #if FEATURE_INLINEARRAYATTRIBUTE
@@ -3353,6 +3424,7 @@ namespace J2N.Text
         /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
         /// </remarks>
+        [CodeGenerationReturnsSelf]
         public MutableTextBuffer AppendFormat([StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, params object?[] args)
         {
             if (args is null)
@@ -3441,6 +3513,7 @@ namespace J2N.Text
         /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
         /// </remarks>
+        [CodeGenerationReturnsSelf]
         public MutableTextBuffer AppendFormat([StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, params ReadOnlySpan<object?> args)
         {
             return AppendFormat(null, format, args);
@@ -3538,6 +3611,7 @@ namespace J2N.Text
         /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
         /// </remarks>
+        [CodeGenerationReturnsSelf]
         public MutableTextBuffer AppendFormat(IFormatProvider? provider, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, object? arg0)
         {
 #if FEATURE_INLINEARRAYATTRIBUTE
@@ -3639,6 +3713,7 @@ namespace J2N.Text
         /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
         /// </remarks>
+        [CodeGenerationReturnsSelf]
         public MutableTextBuffer AppendFormat(IFormatProvider? provider, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, object? arg0, object? arg1)
         {
 #if FEATURE_INLINEARRAYATTRIBUTE
@@ -3743,6 +3818,7 @@ namespace J2N.Text
         /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
         /// </remarks>
+        [CodeGenerationReturnsSelf]
         public MutableTextBuffer AppendFormat(IFormatProvider? provider, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, object? arg0, object? arg1, object? arg2)
         {
 #if FEATURE_INLINEARRAYATTRIBUTE
@@ -3845,6 +3921,7 @@ namespace J2N.Text
         /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
         /// </remarks>
+        [CodeGenerationReturnsSelf]
         public MutableTextBuffer AppendFormat(IFormatProvider? provider, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, params object?[] args)
         {
             if (args is null)
@@ -3949,6 +4026,7 @@ namespace J2N.Text
         /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
         /// </remarks>
+        [CodeGenerationReturnsSelf]
         public MutableTextBuffer AppendFormat(IFormatProvider? provider, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, params ReadOnlySpan<object?> args) // KEEP OVERLOADS FOR ReadOnlySpan<object?> and ParamsArray IN SYNC
         {
             if (format is null)
@@ -4510,6 +4588,7 @@ namespace J2N.Text
         // J2N TODO: API - CompositeFormat overloads
 #if FEATURE_COMPOSITEFORMAT
 
+        [CodeGenerationReturnsSelf]
         public MutableTextBuffer AppendFormat<TArg0>(IFormatProvider? provider, CompositeFormat format, TArg0 arg0)
         {
             if (format is null)
@@ -4518,6 +4597,7 @@ namespace J2N.Text
             return AppendFormat(provider, format, arg0, 0, 0, default);
         }
 
+        [CodeGenerationReturnsSelf]
         public MutableTextBuffer AppendFormat<TArg0, TArg1>(IFormatProvider? provider, CompositeFormat format, TArg0 arg0, TArg1 arg1)
         {
             if (format is null)
@@ -4526,6 +4606,7 @@ namespace J2N.Text
             return AppendFormat(provider, format, arg0, arg1, 0, default);
         }
 
+        [CodeGenerationReturnsSelf]
         public MutableTextBuffer AppendFormat<TArg0, TArg1, TArg2>(IFormatProvider? provider, CompositeFormat format, TArg0 arg0, TArg1 arg1, TArg2 arg2)
         {
             if (format is null)
@@ -4534,6 +4615,7 @@ namespace J2N.Text
             return AppendFormat(provider, format, arg0, arg1, arg2, default);
         }
 
+        [CodeGenerationReturnsSelf]
         public MutableTextBuffer AppendFormat(IFormatProvider? provider, CompositeFormat format, params object?[] args)
         {
             if (format is null)
@@ -4543,6 +4625,7 @@ namespace J2N.Text
             return AppendFormat(provider, format, (ReadOnlySpan<object?>)args);
         }
 
+        [CodeGenerationReturnsSelf]
         public MutableTextBuffer AppendFormat(IFormatProvider? provider, CompositeFormat format, params ReadOnlySpan<object?> args)
         {
             //ArgumentNullException.ThrowIfNull(format);
@@ -4622,6 +4705,7 @@ namespace J2N.Text
         /// <paramref name="oldValue"/> are removed.
         /// </remarks>
         /// <seealso cref="Remove(int, int)"/>
+        [CodeGenerationReturnsSelf]
         public MutableTextBuffer Replace(string oldValue, string? newValue) => Replace(oldValue, newValue, 0, Length);
 
         /// <summary>
@@ -4639,6 +4723,7 @@ namespace J2N.Text
         /// current instance. If <paramref name="newValue"/> is empty, all occurrences of <paramref name="oldValue"/> are removed.
         /// </remarks>
         /// <seealso cref="Remove(int, int)"/>
+        [CodeGenerationReturnsSelf]
         public MutableTextBuffer Replace(ReadOnlySpan<char> oldValue, ReadOnlySpan<char> newValue) => Replace(oldValue, newValue, 0, Length);
 
 
@@ -4788,6 +4873,7 @@ namespace J2N.Text
         /// all occurrences of <paramref name="oldValue"/> in the specified range are removed.
         /// </remarks>
         /// <seealso cref="Remove(int, int)"/>
+        [CodeGenerationReturnsSelf]
         public MutableTextBuffer Replace(string oldValue, string? newValue, int startIndex, int count)
         {
             if (oldValue is null)
@@ -4822,6 +4908,7 @@ namespace J2N.Text
         /// in the specified range are removed.
         /// </remarks>
         /// <seealso cref="Remove(int, int)"/>
+        [CodeGenerationReturnsSelf]
         public MutableTextBuffer Replace(ReadOnlySpan<char> oldValue, ReadOnlySpan<char> newValue, int startIndex, int count)
         {
             int currentLength = Length;
@@ -4951,6 +5038,7 @@ namespace J2N.Text
         /// <paramref name="oldChar"/> in the current instance. The size of the current
         /// <see cref="MutableTextBuffer"/> instance is unchanged after the replacement.
         /// </remarks>
+        [CodeGenerationReturnsSelf]
         public MutableTextBuffer Replace(char oldChar, char newChar)
         {
             return Replace(oldChar, newChar, 0, Length);
@@ -4977,6 +5065,7 @@ namespace J2N.Text
         /// <paramref name="oldChar"/> in the current instance within the specified substring. The size of the current
         /// <see cref="MutableTextBuffer"/> instance is unchanged after the replacement.
         /// </remarks>
+        [CodeGenerationReturnsSelf]
         public MutableTextBuffer Replace(char oldChar, char newChar, int startIndex, int count)
         {
             int currentLength = Length;
@@ -5025,6 +5114,7 @@ namespace J2N.Text
         /// <para/>
         /// <paramref name="startIndex"/> is greater than or equal to <see cref="Length"/>.
         /// </exception>
+        [CodeGenerationReturnsSelf]
         public MutableTextBuffer Replace(int startIndex, int count, string newValue)
         {
             if (newValue is null)
@@ -5063,6 +5153,7 @@ namespace J2N.Text
         /// <para/>
         /// <paramref name="startIndex"/> is greater than or equal to <see cref="Length"/>.
         /// </exception>
+        [CodeGenerationReturnsSelf]
         public MutableTextBuffer Replace(int startIndex, int count, ReadOnlySpan<char> newValue)
         {
             if ((uint)startIndex > (uint)m_Position)
@@ -5253,6 +5344,7 @@ namespace J2N.Text
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
         /// </remarks>
         [CLSCompliant(false)]
+        [CodeGenerationReturnsSelf]
         public unsafe MutableTextBuffer Append(char* value, int valueCount)
         {
             // We don't check null value as this case will throw null reference exception anyway
@@ -5363,6 +5455,7 @@ namespace J2N.Text
         /// Existing characters are shifted to make room for the new text. The capacity is adjusted as needed.
         /// </remarks>
         [CLSCompliant(false)]
+        [CodeGenerationReturnsSelf]
         public unsafe MutableTextBuffer Insert(int index, char* value, int valueCount)
         {
             // We don't check null value as this case will throw null reference exception anyway
@@ -5558,8 +5651,10 @@ namespace J2N.Text
         /// <para/>
         /// <paramref name="startIndex"/> is greater than <see cref="MutableTextBuffer.Length"/>.
         /// </exception>
+        [CodeGenerationReturnsSelf]
         public MutableTextBuffer Delete(int startIndex, int count) // Coverage for the JDK
         {
+            // J2N TODO: This should clamp, not throw
             if ((uint)startIndex > (uint)m_Position)
                 ThrowHelper.ThrowArgumentOutOfRange_ArgumentOutOfRange_IndexString(startIndex, ExceptionArgument.startIndex);
             if (count < 0)
@@ -5605,6 +5700,7 @@ namespace J2N.Text
         /// <seealso cref="StringExtensions.ReverseText(string)"/>
         /// <seealso cref="MemoryExtensions.ReverseText(Span{char})"/>
         /// <seealso cref="StringBuilderExtensions.Reverse(StringBuilder)"/>
+        [CodeGenerationReturnsSelf]
         public MutableTextBuffer Reverse() // Coverage for the JDK
         {
             m_Chars.AsSpan(0, m_Position).ReverseText();

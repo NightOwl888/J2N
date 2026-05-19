@@ -1,4 +1,5 @@
-﻿using System;
+﻿using J2N.CodeGeneration;
+using System;
 using System.Text;
 
 namespace J2N.Text
@@ -17,6 +18,7 @@ namespace J2N.Text
         /// <returns>A reference to this instance after the append operation has completed.</returns>
         /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.</exception>
         /// <seealso cref="ICharSequence"/>
+        [CodeGenerationReturnsSelf]
         public MutableTextBuffer Append(ICharSequence? charSequence) // J2N: Parameter named charSequence so it can be specified explicitly to differentiate from object
         {
             if (charSequence is null || !charSequence.HasValue)
@@ -94,6 +96,7 @@ namespace J2N.Text
         /// Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.
         /// </exception>
         /// <seealso cref="ICharSequence"/>
+        [CodeGenerationReturnsSelf]
         public MutableTextBuffer Append(ICharSequence? charSequence, int startIndex, int count)
         {
             if (charSequence is StringCharSequence str)
@@ -182,6 +185,7 @@ namespace J2N.Text
         /// <para/>
         /// Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.
         /// </exception>
+        [CodeGenerationReturnsSelf]
         public MutableTextBuffer Insert(int index, ICharSequence? charSequence)
         {
             if (charSequence is null || !charSequence.HasValue || charSequence.Length == 0)
@@ -254,6 +258,7 @@ namespace J2N.Text
         /// <para/>
         /// Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.
         /// </exception>
+        [CodeGenerationReturnsSelf]
         public MutableTextBuffer Insert(int index, ICharSequence? charSequence, int startIndex, int count)
         {
             int currentLength = Length;

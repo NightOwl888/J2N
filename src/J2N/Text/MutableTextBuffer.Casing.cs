@@ -16,6 +16,7 @@
  */
 #endregion
 
+using J2N.CodeGeneration;
 using System;
 using System.Diagnostics;
 using System.Globalization;
@@ -35,6 +36,7 @@ namespace J2N.Text
         /// <para/>
         /// If <paramref name="culture"/> is <c>null</c>, <see cref="CultureInfo.CurrentCulture"/> will be used.
         /// </remarks>
+        [CodeGenerationReturnsSelf]
         public MutableTextBuffer AppendUpper(string? value, CultureInfo? culture)
             => AppendUpper(value.AsSpan(), culture);
 
@@ -49,6 +51,7 @@ namespace J2N.Text
         /// <para/>
         /// If <paramref name="culture"/> is <c>null</c>, <see cref="CultureInfo.CurrentCulture"/> will be used.
         /// </remarks>
+        [CodeGenerationReturnsSelf]
         public MutableTextBuffer AppendUpper(ReadOnlySpan<char> value, CultureInfo? culture)
         {
             culture ??= CultureInfo.CurrentCulture;
@@ -84,6 +87,7 @@ namespace J2N.Text
         /// <para/>
         /// If <paramref name="culture"/> is <c>null</c>, <see cref="CultureInfo.CurrentCulture"/> will be used.
         /// </remarks>
+        [CodeGenerationReturnsSelf]
         public MutableTextBuffer AppendLower(string? value, CultureInfo? culture)
             => AppendLower(value.AsSpan(), culture);
 
@@ -94,6 +98,7 @@ namespace J2N.Text
         /// <param name="value">The read-only character span to append.</param>
         /// <param name="culture">An object that supplies culture-specific casing rules.</param>
         /// <remarks>The capacity of this instance is adjusted as needed.</remarks>
+        [CodeGenerationReturnsSelf]
         public MutableTextBuffer AppendLower(ReadOnlySpan<char> value, CultureInfo? culture)
         {
             culture ??= CultureInfo.CurrentCulture;
@@ -124,6 +129,7 @@ namespace J2N.Text
         /// </summary>
         /// <param name="value">The string to append.</param>
         /// <remarks>The capacity of this instance is adjusted as needed.</remarks>
+        [CodeGenerationReturnsSelf]
         public MutableTextBuffer AppendUpperInvariant(string? value)
             => AppendUpperInvariant(value.AsSpan());
 
@@ -133,6 +139,7 @@ namespace J2N.Text
         /// </summary>
         /// <param name="value">The read-only character span to append.</param>
         /// <remarks>The capacity of this instance is adjusted as needed.</remarks>
+        [CodeGenerationReturnsSelf]
         public MutableTextBuffer AppendUpperInvariant(ReadOnlySpan<char> value)
         {
             int valueLength = value.Length;
@@ -157,6 +164,7 @@ namespace J2N.Text
         /// </summary>
         /// <param name="value">The string to append.</param>
         /// <remarks>The capacity of this instance is adjusted as needed.</remarks>
+        [CodeGenerationReturnsSelf]
         public MutableTextBuffer AppendLowerInvariant(string? value)
             => AppendLowerInvariant(value.AsSpan());
 
@@ -166,6 +174,7 @@ namespace J2N.Text
         /// </summary>
         /// <param name="value">The read-only character span to append.</param>
         /// <remarks>The capacity of this instance is adjusted as needed.</remarks>
+        [CodeGenerationReturnsSelf]
         public MutableTextBuffer AppendLowerInvariant(ReadOnlySpan<char> value)
         {
             int valueLength = value.Length;

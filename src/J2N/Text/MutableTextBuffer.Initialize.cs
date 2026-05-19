@@ -16,11 +16,10 @@ namespace J2N.Text
         /// the implementation-specific default capacity.
         /// </remarks>
         [CodeGenerationIgnore]
+        [CodeGenerationConstructor]
         public MutableTextBuffer Initialize()
         {
             m_MaxCapacity = int.MaxValue;
-            // J2N: We assume that subclasses will not expose or call this constructor if they want
-            // full control over how the buffer is allocated.
             m_Chars = new char[DefaultCapacity];
             return this;
         }
@@ -39,6 +38,7 @@ namespace J2N.Text
         /// implementation-specific default capacity is used.</remarks>
         /// <seealso cref="Capacity"/>
         [CodeGenerationIgnore]
+        [CodeGenerationConstructor]
         public MutableTextBuffer Initialize(int capacity)
             => Initialize(capacity, int.MaxValue);
 
@@ -51,6 +51,7 @@ namespace J2N.Text
         /// <remarks>If <paramref name="value"/> is <c>null</c>, the new <see cref="MutableTextBuffer"/> will
         /// contain the empty string (that is, it contains <see cref="string.Empty"/>).</remarks>
         [CodeGenerationIgnore]
+        [CodeGenerationConstructor]
         public MutableTextBuffer Initialize(string? value)
             => Initialize(value, DefaultCapacity);
 
@@ -72,6 +73,7 @@ namespace J2N.Text
         /// </remarks>
         /// <seealso cref="Capacity"/>
         [CodeGenerationIgnore]
+        [CodeGenerationConstructor]
         public MutableTextBuffer Initialize(string? value, int capacity)
             => Initialize(value, 0, value?.Length ?? 0, capacity);
 
@@ -102,6 +104,7 @@ namespace J2N.Text
         /// </remarks>
         /// <seealso cref="Capacity"/>
         [CodeGenerationIgnore]
+        [CodeGenerationConstructor]
         public MutableTextBuffer Initialize(string? value, int startIndex, int length, int capacity)
         {
             if (capacity < 0)
@@ -170,6 +173,7 @@ namespace J2N.Text
         /// <seealso cref="Capacity"/>
         /// <seealso cref="MaxCapacity"/>
         [CodeGenerationIgnore]
+        [CodeGenerationConstructor]
         public MutableTextBuffer Initialize(int capacity, int maxCapacity)
         {
             if (capacity > maxCapacity)
@@ -205,6 +209,7 @@ namespace J2N.Text
         /// <param name="value">The characters used to initialize this instance.</param>
         /// <remarks>The characters from the span are copied to the heap memory of this instance.</remarks>
         [CodeGenerationIgnore]
+        [CodeGenerationConstructor]
         public MutableTextBuffer Initialize(ReadOnlySpan<char> value)
             => Initialize(value, DefaultCapacity);
 
@@ -223,6 +228,7 @@ namespace J2N.Text
         /// </remarks>
         /// <seealso cref="Capacity"/>
         [CodeGenerationIgnore]
+        [CodeGenerationConstructor]
         public MutableTextBuffer Initialize(ReadOnlySpan<char> value, int capacity)
         {
             if (capacity < 0)
@@ -262,6 +268,7 @@ namespace J2N.Text
         /// If value is non-<c>null</c>, <see cref="Capacity"/> is set using the <see cref="StringBuilder.Capacity"/>.
         /// </remarks>
         [CodeGenerationIgnore]
+        [CodeGenerationConstructor]
         public MutableTextBuffer Initialize(StringBuilder? value)
         {
             m_MaxCapacity = int.MaxValue;
@@ -306,6 +313,7 @@ namespace J2N.Text
         /// </remarks>
         /// <seealso cref="Capacity"/>
         [CodeGenerationIgnore]
+        [CodeGenerationConstructor]
         public MutableTextBuffer Initialize(StringBuilder? value, int capacity)
             => Initialize(value, 0, value?.Length ?? 0, capacity);
 
@@ -336,6 +344,7 @@ namespace J2N.Text
         /// </remarks>
         /// <seealso cref="Capacity"/>
         [CodeGenerationIgnore]
+        [CodeGenerationConstructor]
         public MutableTextBuffer Initialize(StringBuilder? value, int startIndex, int length, int capacity)
         {
             if (capacity < 0)
@@ -384,6 +393,7 @@ namespace J2N.Text
         /// <remarks>If <paramref name="value"/> is <c>null</c>, the new <see cref="MutableTextBuffer"/> will
         /// contain the empty string (that is, it contains <see cref="string.Empty"/>).</remarks>
         [CodeGenerationIgnore]
+        [CodeGenerationConstructor]
         public MutableTextBuffer Initialize(ICharSequence? value) // Coverage for the JDK // J2N TODO: Add overloads to slice the ICharsequence and set capacity?
         {
             m_MaxCapacity = int.MaxValue;

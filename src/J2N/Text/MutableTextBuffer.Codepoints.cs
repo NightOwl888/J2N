@@ -1,4 +1,5 @@
-﻿using System;
+﻿using J2N.CodeGeneration;
+using System;
 
 namespace J2N.Text
 {
@@ -22,6 +23,7 @@ namespace J2N.Text
         /// <param name="codePoint">A Unicode code point.</param>
         /// <returns>This <see cref="MutableTextBuffer"/>, for chaining.</returns>
         /// <exception cref="ArgumentException"><paramref name="codePoint"/> is not a valid Unicode code point.</exception>
+        [CodeGenerationReturnsSelf]
         public MutableTextBuffer AppendCodePoint(int codePoint) // Coverage for the JDK
         {
             int count = Character.ToChars(codePoint, out char high, out char low);
@@ -68,6 +70,7 @@ namespace J2N.Text
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> is less than zero or greater
         /// than the length of this instance.</exception>
         /// <exception cref="ArgumentException"><paramref name="codePoint"/> is not a valid Unicode code point.</exception>
+        [CodeGenerationReturnsSelf]
         public MutableTextBuffer InsertCodePoint(int index, int codePoint)
         {
             if ((uint)index > Length)
