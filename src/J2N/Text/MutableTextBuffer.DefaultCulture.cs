@@ -1,4 +1,5 @@
-﻿using System;
+﻿using J2N.CodeGeneration;
+using System;
 using System.ComponentModel;
 using System.Globalization;
 
@@ -17,6 +18,7 @@ namespace J2N.Text
         /// Gets or sets a flag indicating to use invariant default settings when not otherwise specified by the user.
         /// This setting affects culture-aware features such as formatting and comparing.
         /// </summary>
+        [CodeGenerationIgnore]
         public bool UseInvariantDefaults
         {
             get => useInvariantDefaults;

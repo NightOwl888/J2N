@@ -1,4 +1,5 @@
-﻿using System;
+﻿using J2N.CodeGeneration;
+using System;
 using System.Text;
 
 namespace J2N.Text
@@ -14,6 +15,7 @@ namespace J2N.Text
         /// The string value of this instance is set to <see cref="string.Empty"/>, and the capacity is set to
         /// the implementation-specific default capacity.
         /// </remarks>
+        [CodeGenerationIgnore]
         public MutableTextBuffer Initialize()
         {
             m_MaxCapacity = int.MaxValue;
@@ -36,6 +38,7 @@ namespace J2N.Text
         /// The string value of this instance is set to <see cref="string.Empty"/>. If capacity is zero, the
         /// implementation-specific default capacity is used.</remarks>
         /// <seealso cref="Capacity"/>
+        [CodeGenerationIgnore]
         public MutableTextBuffer Initialize(int capacity)
             => Initialize(capacity, int.MaxValue);
 
@@ -47,6 +50,7 @@ namespace J2N.Text
         /// contains <see cref="string.Empty"/>).</param>
         /// <remarks>If <paramref name="value"/> is <c>null</c>, the new <see cref="MutableTextBuffer"/> will
         /// contain the empty string (that is, it contains <see cref="string.Empty"/>).</remarks>
+        [CodeGenerationIgnore]
         public MutableTextBuffer Initialize(string? value)
             => Initialize(value, DefaultCapacity);
 
@@ -67,6 +71,7 @@ namespace J2N.Text
         /// If <paramref name="capacity"/> is zero, the implementation-specific default capacity is used.
         /// </remarks>
         /// <seealso cref="Capacity"/>
+        [CodeGenerationIgnore]
         public MutableTextBuffer Initialize(string? value, int capacity)
             => Initialize(value, 0, value?.Length ?? 0, capacity);
 
@@ -96,6 +101,7 @@ namespace J2N.Text
         /// If <paramref name="capacity"/> is zero, the implementation-specific default capacity is used.
         /// </remarks>
         /// <seealso cref="Capacity"/>
+        [CodeGenerationIgnore]
         public MutableTextBuffer Initialize(string? value, int startIndex, int length, int capacity)
         {
             if (capacity < 0)
@@ -163,6 +169,7 @@ namespace J2N.Text
         /// </remarks>
         /// <seealso cref="Capacity"/>
         /// <seealso cref="MaxCapacity"/>
+        [CodeGenerationIgnore]
         public MutableTextBuffer Initialize(int capacity, int maxCapacity)
         {
             if (capacity > maxCapacity)
@@ -197,6 +204,7 @@ namespace J2N.Text
         /// </summary>
         /// <param name="value">The characters used to initialize this instance.</param>
         /// <remarks>The characters from the span are copied to the heap memory of this instance.</remarks>
+        [CodeGenerationIgnore]
         public MutableTextBuffer Initialize(ReadOnlySpan<char> value)
             => Initialize(value, DefaultCapacity);
 
@@ -214,6 +222,7 @@ namespace J2N.Text
         /// If <paramref name="capacity"/> is zero, the implementation-specific default capacity is used.
         /// </remarks>
         /// <seealso cref="Capacity"/>
+        [CodeGenerationIgnore]
         public MutableTextBuffer Initialize(ReadOnlySpan<char> value, int capacity)
         {
             if (capacity < 0)
@@ -252,6 +261,7 @@ namespace J2N.Text
         /// <para/>
         /// If value is non-<c>null</c>, <see cref="Capacity"/> is set using the <see cref="StringBuilder.Capacity"/>.
         /// </remarks>
+        [CodeGenerationIgnore]
         public MutableTextBuffer Initialize(StringBuilder? value)
         {
             m_MaxCapacity = int.MaxValue;
@@ -295,6 +305,7 @@ namespace J2N.Text
         /// If <paramref name="capacity"/> is zero, the implementation-specific default capacity is used.
         /// </remarks>
         /// <seealso cref="Capacity"/>
+        [CodeGenerationIgnore]
         public MutableTextBuffer Initialize(StringBuilder? value, int capacity)
             => Initialize(value, 0, value?.Length ?? 0, capacity);
 
@@ -324,6 +335,7 @@ namespace J2N.Text
         /// If <paramref name="capacity"/> is zero, the implementation-specific default capacity is used.
         /// </remarks>
         /// <seealso cref="Capacity"/>
+        [CodeGenerationIgnore]
         public MutableTextBuffer Initialize(StringBuilder? value, int startIndex, int length, int capacity)
         {
             if (capacity < 0)
@@ -371,6 +383,7 @@ namespace J2N.Text
         /// the empty string (that is, it contains <see cref="string.Empty"/>).</param>
         /// <remarks>If <paramref name="value"/> is <c>null</c>, the new <see cref="MutableTextBuffer"/> will
         /// contain the empty string (that is, it contains <see cref="string.Empty"/>).</remarks>
+        [CodeGenerationIgnore]
         public MutableTextBuffer Initialize(ICharSequence? value) // Coverage for the JDK // J2N TODO: Add overloads to slice the ICharsequence and set capacity?
         {
             m_MaxCapacity = int.MaxValue;

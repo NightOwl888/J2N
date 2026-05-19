@@ -1,4 +1,5 @@
 ﻿using J2N.Buffers;
+using J2N.CodeGeneration;
 using J2N.Collections;
 using J2N.Collections.Generic;
 using J2N.Numerics;
@@ -478,6 +479,7 @@ namespace J2N.Text
         /// <see cref="MutableTextBuffer"/> will never have more than a single chunk of memory so it is generally more efficient
         /// to use <see cref="TextMemoryExtensions.AsSpan(MutableTextBuffer)"/> or
         /// <see cref="TextMemoryExtensions.AsMemory(MutableTextBuffer)"/> when you need to access the underlying memory.</remarks>
+        [CodeGenerationIgnore]
         public ChunkEnumerator GetChunks() => new ChunkEnumerator(this);
 
 
