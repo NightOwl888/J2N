@@ -19,7 +19,12 @@ namespace J2N.Text
         /// </summary>
         /// <param name="text">The target string.</param>
         /// <returns>The read-only span representation of the string.</returns>
-        /// <remarks>Returns <c>default</c> when <paramref name="text"/> is <c>null</c>.</remarks>
+        /// <remarks>
+        /// Returns <see langword="default"/> when <paramref name="text"/> is <see langword="null"/>.
+        /// <para/>
+        /// The returned span is only valid while the underlying <see cref="MutableTextBuffer"/> remains unchanged.
+        /// Concurrent mutation invalidates the span contents.
+        /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ReadOnlySpan<char> AsSpan(this MutableTextBuffer? text)
         {
@@ -46,6 +51,12 @@ namespace J2N.Text
         /// <paramref name="start"/> is less than 0 or greater than <c>text.Length</c>.
         /// </exception>
         /// <exception cref="ArgumentNullException"><paramref name="text"/> is <c>null</c>.</exception>
+        /// <remarks>
+        /// Returns <see langword="default"/> when <paramref name="text"/> is <see langword="null"/>.
+        /// <para/>
+        /// The returned span is only valid while the underlying <see cref="MutableTextBuffer"/> remains unchanged.
+        /// Concurrent mutation invalidates the span contents.
+        /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ReadOnlySpan<char> AsSpan(this MutableTextBuffer? text, int start)
         {
@@ -82,6 +93,12 @@ namespace J2N.Text
         /// <paramref name="start"/> + <paramref name="length"/> is not
         /// in the range of <paramref name="text"/>.
         /// </exception>
+        /// <remarks>
+        /// Returns <see langword="default"/> when <paramref name="text"/> is <see langword="null"/>.
+        /// <para/>
+        /// The returned span is only valid while the underlying <see cref="MutableTextBuffer"/> remains unchanged.
+        /// Concurrent mutation invalidates the span contents.
+        /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ReadOnlySpan<char> AsSpan(this MutableTextBuffer? text, int start, int length)
         {
@@ -126,6 +143,12 @@ namespace J2N.Text
         /// <exception cref="ArgumentNullException"><paramref name="text"/> is <c>null</c>.</exception>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="startIndex"/> is less
         /// than 0 or greater than <c>text.Length</c>.</exception>
+        /// <remarks>
+        /// Returns <see langword="default"/> when <paramref name="text"/> is <see langword="null"/>.
+        /// <para/>
+        /// The returned span is only valid while the underlying <see cref="MutableTextBuffer"/> remains unchanged.
+        /// Concurrent mutation invalidates the span contents.
+        /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ReadOnlySpan<char> AsSpan(this MutableTextBuffer? text, Index startIndex)
         {
@@ -168,6 +191,12 @@ namespace J2N.Text
         /// -or-
         /// <paramref name="range"/>'s start index is greater than its end index.
         /// </exception>
+        /// <remarks>
+        /// Returns <see langword="default"/> when <paramref name="text"/> is <see langword="null"/>.
+        /// <para/>
+        /// The returned span is only valid while the underlying <see cref="MutableTextBuffer"/> remains unchanged.
+        /// Concurrent mutation invalidates the span contents.
+        /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ReadOnlySpan<char> AsSpan(this MutableTextBuffer? text, Range range)
         {
@@ -206,7 +235,12 @@ namespace J2N.Text
         /// <param name="text">The target string.</param>
         /// <returns>The read-only character memory representation of the string, or <c>default</c> if
         /// <paramref name="text"/> is <c>null</c>.</returns>
-        /// <remarks>Returns default when <paramref name="text"/> is <c>null</c>.</remarks>
+        /// <remarks>
+        /// Returns <see langword="default"/> when <paramref name="text"/> is <see langword="null"/>.
+        /// <para/>
+        /// The returned memory is only valid while the underlying <see cref="MutableTextBuffer"/> remains unchanged.
+        /// Concurrent mutation invalidates the memory contents.
+        /// </remarks>
         public static ReadOnlyMemory<char> AsMemory(this MutableTextBuffer? text)
         {
             if (text is null)
@@ -225,7 +259,12 @@ namespace J2N.Text
         /// <paramref name="start"/> is not in range of <paramref name="text"/>
         /// (<paramref name="start"/> is &lt;0 or &gt;<c>text.Length</c>).
         /// </exception>
-        /// <remarks>Returns default when <paramref name="text"/> is <c>null</c>.</remarks>
+        /// <remarks>
+        /// Returns <see langword="default"/> when <paramref name="text"/> is <see langword="null"/>.
+        /// <para/>
+        /// The returned memory is only valid while the underlying <see cref="MutableTextBuffer"/> remains unchanged.
+        /// Concurrent mutation invalidates the memory contents.
+        /// </remarks>
         public static ReadOnlyMemory<char> AsMemory(this MutableTextBuffer? text, int start)
         {
             if (text == null)
@@ -251,7 +290,12 @@ namespace J2N.Text
         /// if <paramref name="text"/> is <c>null</c>.</returns>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="start"/>, <paramref name="length"/>,
         /// or <paramref name="start"/> + <paramref name="length"/> is not in the range of <paramref name="text"/>.</exception>
-        /// <remarks>Returns <c>default</c> when <paramref name="text"/> is <c>null</c>.</remarks>
+        /// <remarks>
+        /// Returns <see langword="default"/> when <paramref name="text"/> is <see langword="null"/>.
+        /// <para/>
+        /// The returned memory is only valid while the underlying <see cref="MutableTextBuffer"/> remains unchanged.
+        /// Concurrent mutation invalidates the memory contents.
+        /// </remarks>
         public static ReadOnlyMemory<char> AsMemory(this MutableTextBuffer? text, int start, int length)
         {
             if (text == null)
@@ -286,6 +330,12 @@ namespace J2N.Text
         /// <exception cref="ArgumentNullException"><paramref name="text"/> is <c>null</c>.</exception>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="startIndex"/> is less
         /// than 0 or greater than <c>text.Length</c>.</exception>
+        /// <remarks>
+        /// Returns <see langword="default"/> when <paramref name="text"/> is <see langword="null"/>.
+        /// <para/>
+        /// The returned memory is only valid while the underlying <see cref="MutableTextBuffer"/> remains unchanged.
+        /// Concurrent mutation invalidates the memory contents.
+        /// </remarks>
         public static ReadOnlyMemory<char> AsMemory(this MutableTextBuffer? text, Index startIndex)
         {
             if (text == null)
@@ -312,9 +362,17 @@ namespace J2N.Text
         /// <exception cref="ArgumentNullException"><paramref name="text"/> is <c>null</c>.</exception>
         /// <exception cref="ArgumentOutOfRangeException">
         /// <paramref name="range"/>'s start or end index is not within the bounds of the string.
+        /// <para/>
         /// -or-
+        /// <para/>
         /// <paramref name="range"/>'s start index is greater than its end index.
         /// </exception>
+        /// <remarks>
+        /// Returns <see langword="default"/> when <paramref name="text"/> is <see langword="null"/>.
+        /// <para/>
+        /// The returned memory is only valid while the underlying <see cref="MutableTextBuffer"/> remains unchanged.
+        /// Concurrent mutation invalidates the memory contents.
+        /// </remarks>
         public static ReadOnlyMemory<char> AsMemory(this MutableTextBuffer? text, Range range)
         {
             if (text == null)
