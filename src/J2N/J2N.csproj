@@ -149,15 +149,12 @@
              Text="Running J2N.Text.CodeGen..." />
 
     <MSBuild Projects="$(CodeGenProject)"
-             Targets="GetTargetPath"
-             RemoveProperties="TargetFramework;TargetFrameworks"
-             Properties="Configuration=$(Configuration)">
-      <Output TaskParameter="TargetOutputs"
-              ItemName="CodeGenTargetPath" />
-    </MSBuild>
+         Targets="Build"
+         RemoveProperties="TargetFramework;TargetFrameworks"
+         Properties="Configuration=$(Configuration)" />
 
-    <Exec Command='dotnet &quot;@(CodeGenTargetPath)&quot; --source-directory &quot;$(MSBuildProjectDirectory)\Text&quot; --infrastructure-directory &quot;$(MSBuildProjectDirectory)\CodeGeneration&quot;' />
-
+    <Exec Command='dotnet &quot;$(CodeGenAssembly)&quot; --source-directory &quot;$(MSBuildProjectDirectory)\Text&quot; --infrastructure-directory &quot;$(MSBuildProjectDirectory)\CodeGeneration&quot;' />
+    
     <Touch Files="$(CodeGenOutputStamp)"
            AlwaysCreate="true" />
   
