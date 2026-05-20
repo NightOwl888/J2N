@@ -94,8 +94,76 @@
     <InternalsVisibleTo Include="J2N.Collections.Generic.SortedDictionary.Tests" />
     <InternalsVisibleTo Include="J2N.Collections.Generic.SortedDictionary.TreeSubSet.Tests" />
     <InternalsVisibleTo Include="J2N.Collections.Generic.SortedSet.Tests" />
-    <InternalsVisibleTo Include="J2N.Collections.Generic.SortedSet.TreeSubSet.Tests"/>
+    <InternalsVisibleTo Include="J2N.Collections.Generic.SortedSet.TreeSubSet.Tests" />
     <InternalsVisibleTo Include="J2N.Runtime.Tests" />
   </ItemGroup>
+
+  <!-- Builder code generation -->
+
+  <PropertyGroup>
+    <CodeGenProject>$(MSBuildThisFileDirectory)..\..\eng\J2N.Text.CodeGen\J2N.Text.CodeGen.csproj</CodeGenProject>
+    <CodeGenAssembly>$(MSBuildThisFileDirectory)..\..\eng\J2N.Text.CodeGen\bin\$(Configuration)\net10.0\J2N.Text.CodeGen.dll</CodeGenAssembly>
+    <BaseIntermediateOutputPath>obj\</BaseIntermediateOutputPath>
+    <CodeGenOutputStamp>$(BaseIntermediateOutputPath)J2N.Text.CodeGen.stamp</CodeGenOutputStamp>
+    <CodeGenMissing>false</CodeGenMissing>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <CodeGenInputs Include="$(MSBuildProjectDirectory)\Text\MutableTextBuffer*.cs" />
+    <CodeGenInputs Include="$(MSBuildProjectDirectory)\Text\TextMemoryExtensions*.cs" />
+    <CodeGenInputs Include="$(MSBuildProjectDirectory)\CodeGeneration\**\*.cs" />
+    <CodeGenInputs Include="$(MSBuildThisFileDirectory)..\..\eng\J2N.Text.CodeGen\**\*.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <CodeGenExpectedOutputs Include="$(MSBuildProjectDirectory)\Text\TextBuilder.generated.cs" />
+    <CodeGenExpectedOutputs Include="$(MSBuildProjectDirectory)\Text\PooledTextBuilder.generated.cs" />
+    <CodeGenExpectedOutputs Include="$(MSBuildProjectDirectory)\Text\SynchronizedTextBuilder.generated.cs" />
+
+    <CodeGenExpectedOutputs Include="$(MSBuildProjectDirectory)\Text\TextMemoryExtensions.TextBuilder.generated.cs" />
+    <CodeGenExpectedOutputs Include="$(MSBuildProjectDirectory)\Text\TextMemoryExtensions.PooledTextBuilder.generated.cs" />
+  </ItemGroup>
+
+  <Target Name="ForceCodeGenIfOutputsMissing"
+        BeforeTargets="RunTextCodeGen"
+        Condition="'$(IsCrossTargetingBuild)' == 'true'">
+
+    <ItemGroup>
+      <MissingCodeGenOutputs
+        Include="@(CodeGenExpectedOutputs)"
+        Condition="!Exists('%(Identity)')" />
+    </ItemGroup>
+
+    <Delete Files="$(CodeGenOutputStamp)"
+            Condition="'@(MissingCodeGenOutputs)' != ''" />
+
+  </Target>
+
+  <Target Name="RunTextCodeGen"
+          BeforeTargets="DispatchToInnerBuilds"
+          Inputs="@(CodeGenInputs)"
+          Outputs="$(CodeGenOutputStamp)"
+          Condition="'$(IsCrossTargetingBuild)' == 'true'">
+
+    <Message Importance="high"
+             Text="Running J2N.Text.CodeGen..." />
+
+    <MSBuild Projects="$(CodeGenProject)"
+             Targets="GetTargetPath"
+             RemoveProperties="TargetFramework;TargetFrameworks"
+             Properties="Configuration=$(Configuration)">
+      <Output TaskParameter="TargetOutputs"
+              ItemName="CodeGenTargetPath" />
+    </MSBuild>
+
+    <Exec Command='dotnet &quot;@(CodeGenTargetPath)&quot; &quot;$(MSBuildProjectDirectory)\Text&quot; &quot;$(MSBuildProjectDirectory)\CodeGeneration&quot;' />
+
+    <Touch Files="$(CodeGenOutputStamp)"
+           AlwaysCreate="true" />
+  
+    <ItemGroup>
+      <Compile Include="Text\*.generated.cs" />
+    </ItemGroup>
+  </Target>
 
 </Project>
