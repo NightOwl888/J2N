@@ -10,16 +10,38 @@ namespace J2N.Text.CodGen
     {
         static int Main(string[] args)
         {
-            if (args.Length != 2)
+            string? sourceDirectory = null;
+            string? infrastructureDirectory = null;
+
+            for (int i = 0; i < args.Length; i++)
+            {
+                switch (args[i])
+                {
+                    case "--source-directory":
+                        sourceDirectory = args[++i];
+                        break;
+
+                    case "--infrastructure-directory":
+                        infrastructureDirectory = args[++i];
+                        break;
+                }
+            }
+
+            if (sourceDirectory is null || infrastructureDirectory is null)
             {
                 Console.Error.WriteLine(
-                    "Usage: J2N.Text.CodeGen <SourceDirectory> <InfrastructureDirectory>");
+                    "Usage: J2N.Text.CodeGen " +
+                    "--source-directory <path> " +
+                    "--infrastructure-directory <path>");
 
                 return 1;
             }
 
-            string sourceDirectory = Path.GetFullPath(args[0]);
-            string infrastructureDirectory = Path.GetFullPath(args[1]);
+            sourceDirectory =
+                Path.GetFullPath(sourceDirectory);
+
+            infrastructureDirectory =
+                Path.GetFullPath(infrastructureDirectory);
 
             Console.WriteLine($"Source directory: {sourceDirectory}");
             Console.WriteLine($"Infrastructure directory: {infrastructureDirectory}");
