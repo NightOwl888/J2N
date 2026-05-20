@@ -5582,13 +5582,10 @@ namespace J2N.Text
         /// <see cref="IArrayAllocator{T}"/> provided to this instance.
         /// </summary>
         /// <remarks>
-        /// <para>
         /// Once this method has been called, the current instance no longer owns
         /// the underlying buffer and further use of the instance is unsupported.
-        /// </para>
-        /// <para>
+        /// <para/>
         /// Depending on the allocator implementation, the underlying array may be:
-        /// </para>
         /// <list type="bullet">
         ///     <item>
         ///         <description>Returned to an array pool for reuse.</description>
@@ -5603,9 +5600,8 @@ namespace J2N.Text
         ///         <description>Ignored entirely for non-pooled allocators.</description>
         ///     </item>
         /// </list>
-        /// <para>
+        /// <para/>
         /// This method may be called multiple times safely.
-        /// </para>
         /// </remarks>
         [CodeGenerationIgnore]
         public void Dispose()
@@ -5621,15 +5617,12 @@ namespace J2N.Text
         /// <c>true</c> to release managed resources; otherwise, <c>false</c>.
         /// </param>
         /// <remarks>
-        /// <para>
         /// Derived classes overriding this method should release any managed state
         /// when <paramref name="disposing"/> is <c>true</c>, and then call the base
         /// implementation.
-        /// </para>
-        /// <para>
+        /// <para/>
         /// This implementation releases ownership of the underlying character buffer
         /// back to the configured <see cref="IArrayAllocator{T}"/>.
-        /// </para>
         /// </remarks>
         [CodeGenerationIgnore]
         protected virtual void Dispose(bool disposing)
