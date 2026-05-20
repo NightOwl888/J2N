@@ -2,176 +2,176 @@
 using J2N.Text.CodeGen.Metadata;
 using J2N.Text.CodeGen.Projection;
 using J2N.Text.CodeGen.Roslyn;
+using Microsoft.CodeAnalysis;
 
-string sourceDirectory =
-    @"F:\Projects\J2N\src\J2N\Text";
-string infrastructureDirectory =
-    @"F:\Projects\J2N\src\J2N\CodeGeneration";
-
-// ---------------------------------------------------------------------
-// MutableTextBuffer
-// ---------------------------------------------------------------------
-
-List<string> sourceTexts =
-    Directory.GetFiles(sourceDirectory, "MutableTextBuffer*.cs")
-        .Select(File.ReadAllText)
-        .ToList();
-
-List<string> infrastructureTexts =
-    Directory.GetFiles(infrastructureDirectory, "*.cs")
-        .Select(File.ReadAllText)
-        .ToList();
-
-var extractor = new RoslynTypeExtractor();
-
-TypeModel model =
-    extractor.Extract(
-        sourceTexts,
-        infrastructureTexts,
-        "J2N.Text.MutableTextBuffer");
-
-// ---------------------------------------------------------------------
-// TextMemoryExtensions
-// ---------------------------------------------------------------------
-
-List<string> extensionSourceTexts =
-    Directory.GetFiles(sourceDirectory, "TextMemoryExtensions*.cs")
-        .Select(File.ReadAllText)
-        .ToList();
-
-TypeModel extensionModel =
-    extractor.Extract(
-        extensionSourceTexts,
-        infrastructureTexts,
-        "J2N.Text.TextMemoryExtensions");
-
-// ---------------------------------------------------------------------
-// Generate TextBuilder
-// ---------------------------------------------------------------------
-
-var projection = new BuilderProjection();
-
-ProjectedTypeModel projected =
-    projection.Project(
-        model,
-        facadeNamespace: "J2N.Text",
-        facadeName: "TextBuilder");
-
-var facadeEmitter = new CSharpFacadeEmitter();
-
-string builderCode =
-    facadeEmitter.EmitFacade(
-        projected,
-        backingFieldName: "buffer",
-        options: new FacadeEmitterOptions
+namespace J2N.Text.CodGen
+{
+    internal class Program
+    {
+        static int Main(string[] args)
         {
-            // J2N TODO: remove this once docs are complete
-            SuppressMissingDocumentationWarnings = true,
-        });
+            if (args.Length != 2)
+            {
+                Console.Error.WriteLine(
+                    "Usage: J2N.Text.CodeGen <SourceDirectory> <InfrastructureDirectory>");
 
-File.WriteAllText(
-    Path.Combine(sourceDirectory, "TextBuilder.g.cs"),
-    builderCode);
+                return 1;
+            }
 
-// ---------------------------------------------------------------------
-// Generate TextMemoryExtensions.TextBuilder.g.cs
-// ---------------------------------------------------------------------
+            string sourceDirectory = Path.GetFullPath(args[0]);
+            string infrastructureDirectory = Path.GetFullPath(args[1]);
 
-var extensionProjection = new ExtensionMethodProjection();
+            Console.WriteLine($"Source directory: {sourceDirectory}");
+            Console.WriteLine($"Infrastructure directory: {infrastructureDirectory}");
 
-ProjectedTypeModel projectedExtensions =
-    extensionProjection.Project(
-        extensionModel,
-        "MutableTextBuffer",
-        facadeNamespace: "J2N.Text",
-        facadeType: "TextBuilder");
+            List<string> sourceTexts =
+                Directory.GetFiles(sourceDirectory, "MutableTextBuffer*.cs")
+                    .Where(f => !f.EndsWith(".generated.cs", StringComparison.OrdinalIgnoreCase))
+                    .Select(File.ReadAllText)
+                    .ToList();
 
-var extensionEmitter = new CSharpExtensionEmitter();
+            List<string> infrastructureTexts =
+                Directory.GetFiles(infrastructureDirectory, "*.cs")
+                    .Select(File.ReadAllText)
+                    .ToList();
 
-string extensionCode =
-    extensionEmitter.Emit(
-        projectedExtensions);
+            var extractor = new RoslynTypeExtractor();
 
-File.WriteAllText(
-    Path.Combine(sourceDirectory, "TextMemoryExtensions.TextBuilder.g.cs"),
-    extensionCode);
+            TypeModel model =
+                extractor.Extract(
+                    sourceTexts,
+                    infrastructureTexts,
+                    "J2N.Text.MutableTextBuffer");
 
-// ---------------------------------------------------------------------
-// Generate PooledTextBuilder
-// ---------------------------------------------------------------------
+            // ---------------------------------------------------------------------
+            // TextMemoryExtensions
+            // ---------------------------------------------------------------------
 
-projected =
-    projection.Project(
-        model,
-        facadeNamespace: "J2N.Text",
-        facadeName: "PooledTextBuilder");
+            List<string> extensionSourceTexts =
+                Directory.GetFiles(sourceDirectory, "TextMemoryExtensions*.cs")
+                    .Where(f => !f.EndsWith(".generated.cs", StringComparison.OrdinalIgnoreCase))
+                    .Select(File.ReadAllText)
+                    .ToList();
 
-facadeEmitter = new CSharpFacadeEmitter();
+            TypeModel extensionModel =
+                extractor.Extract(
+                    extensionSourceTexts,
+                    infrastructureTexts,
+                    "J2N.Text.TextMemoryExtensions");
 
-builderCode =
-    facadeEmitter.EmitFacade(
-        projected,
-        backingFieldName: "buffer",
-        options: new FacadeEmitterOptions
+            // ---------------------------------------------------------------------
+            // Generate TextBuilder
+            // ---------------------------------------------------------------------
+
+            GenerateFacade(
+                sourceDirectory,
+                facadeName: "TextBuilder",
+                synchronized: false,
+                model);
+
+            GenerateExtensions(
+                sourceDirectory,
+                facadeName: "TextBuilder",
+                extensionModel);
+
+            // ---------------------------------------------------------------------
+            // Generate PooledTextBuilder
+            // ---------------------------------------------------------------------
+
+            GenerateFacade(
+                sourceDirectory,
+                facadeName: "PooledTextBuilder",
+                synchronized: false,
+                model);
+
+            GenerateExtensions(
+                sourceDirectory,
+                facadeName: "PooledTextBuilder",
+                extensionModel);
+
+            // ---------------------------------------------------------------------
+            // Generate SynchronizedTextBuilder
+            // ---------------------------------------------------------------------
+
+            GenerateFacade(
+                sourceDirectory,
+                facadeName: "SynchronizedTextBuilder",
+                synchronized: true,
+                model);
+
+            // ---------------------------------------------------------------------
+            // Report completion
+            // ---------------------------------------------------------------------
+
+            Console.WriteLine("Generation complete.");
+
+            return 0;
+        }
+
+        static void GenerateFacade(
+            string sourceDirectory,
+            string facadeName,
+            bool synchronized,
+            TypeModel model)
         {
-            // J2N TODO: remove this once docs are complete
-            SuppressMissingDocumentationWarnings = true,
-        });
+            var projection = new BuilderProjection();
+            var facadeEmitter = new CSharpFacadeEmitter();
 
-File.WriteAllText(
-    Path.Combine(sourceDirectory, "PooledTextBuilder.g.cs"),
-    builderCode);
+            ProjectedTypeModel projected =
+                projection.Project(
+                    model,
+                    facadeNamespace: "J2N.Text",
+                    facadeName: facadeName);
 
-// ---------------------------------------------------------------------
-// Generate TextMemoryExtensions.PooledTextBuilder.g.cs
-// ---------------------------------------------------------------------
+            string facadeCode =
+                facadeEmitter.EmitFacade(
+                    projected,
+                    backingFieldName: "buffer",
+                    options: new FacadeEmitterOptions
+                    {
+                        SuppressMissingDocumentationWarnings = true,
+                        WrapMembersInLock = synchronized
+                    });
 
-extensionProjection = new ExtensionMethodProjection();
+            string facadePath =
+                Path.Combine(
+                    sourceDirectory,
+                    $"{facadeName}.generated.cs");
 
-projectedExtensions =
-    extensionProjection.Project(
-        extensionModel,
-        "MutableTextBuffer",
-        facadeNamespace: "J2N.Text",
-        facadeType: "PooledTextBuilder");
+            File.WriteAllText(
+                facadePath,
+                facadeCode);
 
-extensionEmitter = new CSharpExtensionEmitter();
 
-extensionCode =
-    extensionEmitter.Emit(
-        projectedExtensions);
+        }
 
-File.WriteAllText(
-    Path.Combine(sourceDirectory, "TextMemoryExtensions.PooledTextBuilder.g.cs"),
-    extensionCode);
-
-// ---------------------------------------------------------------------
-// Generate SynchronizedTextBuilder
-// ---------------------------------------------------------------------
-
-projected =
-    projection.Project(
-        model,
-        facadeNamespace: "J2N.Text",
-        facadeName: "SynchronizedTextBuilder");
-
-facadeEmitter = new CSharpFacadeEmitter();
-
-builderCode =
-    facadeEmitter.EmitFacade(
-        projected,
-        backingFieldName: "buffer",
-        options: new FacadeEmitterOptions
+        static void GenerateExtensions(
+            string sourceDirectory,
+            string facadeName,
+            TypeModel extensionModel)
         {
-            // J2N TODO: remove this once docs are complete
-            SuppressMissingDocumentationWarnings = true,
-            WrapMembersInLock = true
-        });
+            var extensionProjection = new ExtensionMethodProjection();
+            var extensionEmitter = new CSharpExtensionEmitter();
 
-File.WriteAllText(
-    Path.Combine(sourceDirectory, "SynchronizedTextBuilder.g.cs"),
-    builderCode);
+            ProjectedTypeModel projectedExtensions =
+                extensionProjection.Project(
+                    extensionModel,
+                    "MutableTextBuffer",
+                    facadeNamespace: "J2N.Text",
+                    facadeType: facadeName);
 
-// J2N: SynchronizedTextBuilder extension methods generated by hand because of diverging docs
+            string extensionCode =
+                extensionEmitter.Emit(projectedExtensions);
 
-Console.WriteLine("Generation complete.");
+            string extensionPath =
+                Path.Combine(
+                    sourceDirectory,
+                    $"TextMemoryExtensions.{facadeName}.generated.cs");
+
+            File.WriteAllText(
+                extensionPath,
+                extensionCode);
+        }
+    }
+}
+
