@@ -39,7 +39,7 @@ namespace J2N.Text
         [Test]
         public void Test_Constructor()
         {
-            MutableTextBuffer sb = OpenStringBuilderFactory();
+            TextBuilder sb = StringBuilderFactory();
             assertNotNull(sb);
             assertEquals(16, sb.Capacity);
         }
@@ -50,7 +50,7 @@ namespace J2N.Text
         [Test]
         public void Test_ConstructorI()
         {
-            MutableTextBuffer sb = OpenStringBuilderFactory(24);
+            TextBuilder sb = StringBuilderFactory(24);
             assertNotNull(sb);
             assertEquals(24, sb.Capacity);
 
@@ -64,7 +64,7 @@ namespace J2N.Text
                 // Expected
             }
 
-            assertNotNull(OpenStringBuilderFactory(0));
+            assertNotNull(StringBuilderFactory(0));
         }
 
         /**
@@ -74,16 +74,16 @@ namespace J2N.Text
         [Test]
         public void Test_ConstructorLjava_lang_CharSequence()
         {
-            MutableTextBuffer sb = OpenStringBuilderFactory("fixture".AsCharSequence());
+            TextBuilder sb = StringBuilderFactory("fixture".AsCharSequence());
             assertEquals("fixture", sb.ToString());
             assertEquals("fixture".Length + 16, sb.Capacity);
 
-            sb = OpenStringBuilderFactory((ICharSequence)new StringBuffer("fixture"));
+            sb = StringBuilderFactory((ICharSequence)new StringBuffer("fixture"));
             assertEquals("fixture", sb.ToString());
             assertEquals("fixture".Length + 16, sb.Capacity);
 
             // J2N: Changed behavior to match .NET string overload to allow null
-            sb = OpenStringBuilderFactory((ICharSequence)null);
+            sb = StringBuilderFactory((ICharSequence)null);
             assertEquals("", sb.ToString());
             //try
             //{
@@ -102,12 +102,12 @@ namespace J2N.Text
         [Test]
         public void Test_ConstructorLjava_lang_String()
         {
-            MutableTextBuffer sb = OpenStringBuilderFactory("fixture");
+            TextBuilder sb = StringBuilderFactory("fixture");
             assertEquals("fixture", sb.ToString());
             assertEquals("fixture".Length + 16, sb.Capacity);
 
             // J2N: Changed behavior to match .NET string overload to allow null
-            sb = OpenStringBuilderFactory((string)null);
+            sb = StringBuilderFactory((string)null);
             assertEquals("", sb.ToString());
             //try
             //{
@@ -125,12 +125,12 @@ namespace J2N.Text
         [Test]
         public void Test_ConstructorLjava_lang_ReadOnlySpan()
         {
-            MutableTextBuffer sb = OpenStringBuilderFactory("fixture".AsSpan());
+            TextBuilder sb = StringBuilderFactory("fixture".AsSpan());
             assertEquals("fixture", sb.ToString());
             assertEquals("fixture".Length + 16, sb.Capacity);
 
             // J2N: Changed behavior to match .NET string overload to allow null
-            sb = OpenStringBuilderFactory(ReadOnlySpan<char>.Empty);
+            sb = StringBuilderFactory(ReadOnlySpan<char>.Empty);
             assertEquals("", sb.ToString());
             assertTrue(sb.AsSpan().IsEmpty);
             //try
@@ -149,7 +149,7 @@ namespace J2N.Text
         [Test]
         public void Test_appendZ()
         {
-            MutableTextBuffer sb = OpenStringBuilderFactory();
+            TextBuilder sb = StringBuilderFactory();
             assertSame(sb, sb.Append(true));
             assertEquals("true", sb.ToString());
             sb.Length = (0);
@@ -163,7 +163,7 @@ namespace J2N.Text
         [Test]
         public void Test_appendC()
         {
-            MutableTextBuffer sb = OpenStringBuilderFactory();
+            TextBuilder sb = StringBuilderFactory();
             assertSame(sb, sb.Append('a'));
             assertEquals("a", sb.ToString());
             sb.Length = (0);
@@ -177,7 +177,7 @@ namespace J2N.Text
         [Test]
         public void Test_append_C()
         {
-            MutableTextBuffer sb = OpenStringBuilderFactory();
+            TextBuilder sb = StringBuilderFactory();
             assertSame(sb, sb.Append(new char[] { 'a', 'b' }));
             assertEquals("ab", sb.ToString());
             sb.Length = (0);
@@ -205,7 +205,7 @@ namespace J2N.Text
         [Test]
         public void Test_append_CII()
         {
-            MutableTextBuffer sb = OpenStringBuilderFactory();
+            TextBuilder sb = StringBuilderFactory();
             assertSame(sb, sb.Append(new char[] { 'a', 'b' }, 0, 2));
             assertEquals("ab", sb.ToString());
             sb.Length = (0);
@@ -271,7 +271,7 @@ namespace J2N.Text
         [Test]
         public void Test_appendLjava_lang_CharSequence()
         {
-            MutableTextBuffer sb = OpenStringBuilderFactory();
+            TextBuilder sb = StringBuilderFactory();
             assertSame(sb, sb.Append((ICharSequence)"ab".AsCharSequence()));
             assertEquals("ab", sb.ToString());
             sb.Length = (0);
@@ -290,7 +290,7 @@ namespace J2N.Text
         [Test]
         public void Test_appendLjava_lang_CharSequenceII()
         {
-            MutableTextBuffer sb = OpenStringBuilderFactory();
+            TextBuilder sb = StringBuilderFactory();
             assertSame(sb, sb.Append((ICharSequence)"ab".AsCharSequence(), 0, 2 - 0)); // J2N: Corrected 3rd parameter
             assertEquals("ab", sb.ToString());
             sb.Length = (0);
@@ -323,7 +323,7 @@ namespace J2N.Text
         [Test]
         public void Test_appendD() // J2N TODO: Invariant
         {
-            MutableTextBuffer sb = OpenStringBuilderFactory();
+            TextBuilder sb = StringBuilderFactory();
             assertSame(sb, sb.Append(1D));
             assertEquals(Double.ToString(1D), sb.ToString());
             sb.Length = (0);
@@ -355,7 +355,7 @@ namespace J2N.Text
         [Test]
         public void Test_appendF() // J2N TODO: Invariant
         {
-            MutableTextBuffer sb = OpenStringBuilderFactory();
+            TextBuilder sb = StringBuilderFactory();
             assertSame(sb, sb.Append(1F));
             assertEquals(Float.ToString(1F), sb.ToString());
             sb.Length = (0);
@@ -387,7 +387,7 @@ namespace J2N.Text
         [Test]
         public void Test_appendI() // J2N TODO: Invariant
         {
-            MutableTextBuffer sb = OpenStringBuilderFactory();
+            TextBuilder sb = StringBuilderFactory();
             assertSame(sb, sb.Append(1));
             assertEquals(Integer.ToString(1), sb.ToString());
             sb.Length = (0);
@@ -410,7 +410,7 @@ namespace J2N.Text
         [Test]
         public void Test_appendL() // J2N TODO: Invariant
         {
-            MutableTextBuffer sb = OpenStringBuilderFactory();
+            TextBuilder sb = StringBuilderFactory();
             assertSame(sb, sb.Append(1L));
             assertEquals(Long.ToString(1L), sb.ToString());
             sb.Length = (0);
@@ -433,7 +433,7 @@ namespace J2N.Text
         [Test]
         public void Test_appendLjava_lang_Object()
         {
-            MutableTextBuffer sb = OpenStringBuilderFactory();
+            TextBuilder sb = StringBuilderFactory();
             assertSame(sb, sb.Append(Fixture.INSTANCE));
             assertEquals(Fixture.INSTANCE.ToString(), sb.ToString());
 
@@ -449,7 +449,7 @@ namespace J2N.Text
         [Test]
         public void Test_appendLjava_lang_String()
         {
-            MutableTextBuffer sb = OpenStringBuilderFactory();
+            TextBuilder sb = StringBuilderFactory();
             assertSame(sb, sb.Append("ab"));
             assertEquals("ab", sb.ToString());
             sb.Length = (0);
@@ -467,7 +467,7 @@ namespace J2N.Text
         [Test]
         public void Test_appendLjava_lang_StringBuffer()
         {
-            MutableTextBuffer sb = OpenStringBuilderFactory();
+            TextBuilder sb = StringBuilderFactory();
             assertSame(sb, sb.Append(new StringBuffer("ab")));
             assertEquals("ab", sb.ToString());
             sb.Length = (0);
@@ -485,7 +485,7 @@ namespace J2N.Text
         [Test]
         public void Test_appendCodePointI()
         {
-            MutableTextBuffer sb = OpenStringBuilderFactory();
+            TextBuilder sb = StringBuilderFactory();
             sb.AppendCodePoint(0x10000);
             assertEquals("\uD800\uDC00", sb.ToString());
             sb.Append("fixture");
@@ -500,7 +500,7 @@ namespace J2N.Text
         [Test]
         public void Test_capacity()
         {
-            MutableTextBuffer sb = OpenStringBuilderFactory();
+            TextBuilder sb = StringBuilderFactory();
             assertEquals(16, sb.Capacity);
             sb.Append("0123456789ABCDEF0123456789ABCDEF");
             assertTrue(sb.Capacity > 16);
@@ -513,7 +513,7 @@ namespace J2N.Text
         public void Test_charAtI()
         {
             const string fixture = "0123456789";
-            MutableTextBuffer sb = OpenStringBuilderFactory(fixture);
+            TextBuilder sb = StringBuilderFactory(fixture);
             for (int i = 0; i < fixture.Length; i++)
             {
                 assertEquals((char)('0' + i), sb[i]);
@@ -554,16 +554,16 @@ namespace J2N.Text
         [Test]
         public void Test_codePointAtI()
         {
-            MutableTextBuffer sb = OpenStringBuilderFactory("abc");
+            TextBuilder sb = StringBuilderFactory("abc");
             assertEquals('a', sb.CodePointAt(0));
             assertEquals('b', sb.CodePointAt(1));
             assertEquals('c', sb.CodePointAt(2));
 
-            sb = OpenStringBuilderFactory("\uD800\uDC00");
+            sb = StringBuilderFactory("\uD800\uDC00");
             assertEquals(0x10000, sb.CodePointAt(0));
             assertEquals('\uDC00', sb.CodePointAt(1));
 
-            sb = OpenStringBuilderFactory();
+            sb = StringBuilderFactory();
             sb.Append("abc");
             try
             {
@@ -602,16 +602,16 @@ namespace J2N.Text
         [Test]
         public void Test_codePointBeforeI()
         {
-            MutableTextBuffer sb = OpenStringBuilderFactory("abc");
+            TextBuilder sb = StringBuilderFactory("abc");
             assertEquals('a', sb.CodePointBefore(1));
             assertEquals('b', sb.CodePointBefore(2));
             assertEquals('c', sb.CodePointBefore(3));
 
-            sb = OpenStringBuilderFactory("\uD800\uDC00");
+            sb = StringBuilderFactory("\uD800\uDC00");
             assertEquals(0x10000, sb.CodePointBefore(2));
             assertEquals('\uD800', sb.CodePointBefore(1));
 
-            sb = OpenStringBuilderFactory();
+            sb = StringBuilderFactory();
             sb.Append("abc");
 
             try
@@ -651,15 +651,15 @@ namespace J2N.Text
         [Test]
         public void Test_codePointCountII()
         {
-            assertEquals(1, OpenStringBuilderFactory("\uD800\uDC00").CodePointCount(0, 2 - 0));
-            assertEquals(1, OpenStringBuilderFactory("\uD800\uDC01").CodePointCount(0, 2 - 0));
-            assertEquals(1, OpenStringBuilderFactory("\uD801\uDC01").CodePointCount(0, 2 - 0));
-            assertEquals(1, OpenStringBuilderFactory("\uDBFF\uDFFF").CodePointCount(0, 2 - 0));
+            assertEquals(1, StringBuilderFactory("\uD800\uDC00").CodePointCount(0, 2 - 0));
+            assertEquals(1, StringBuilderFactory("\uD800\uDC01").CodePointCount(0, 2 - 0));
+            assertEquals(1, StringBuilderFactory("\uD801\uDC01").CodePointCount(0, 2 - 0));
+            assertEquals(1, StringBuilderFactory("\uDBFF\uDFFF").CodePointCount(0, 2 - 0));
 
-            assertEquals(3, OpenStringBuilderFactory("a\uD800\uDC00b").CodePointCount(0, 4 - 0));
-            assertEquals(4, OpenStringBuilderFactory("a\uD800\uDC00b\uD800").CodePointCount(0, 5 - 0));
+            assertEquals(3, StringBuilderFactory("a\uD800\uDC00b").CodePointCount(0, 4 - 0));
+            assertEquals(4, StringBuilderFactory("a\uD800\uDC00b\uD800").CodePointCount(0, 5 - 0));
 
-            MutableTextBuffer sb = OpenStringBuilderFactory();
+            TextBuilder sb = StringBuilderFactory();
             sb.Append("abc");
             try
             {
@@ -699,7 +699,7 @@ namespace J2N.Text
         public void Test_deleteII()
         {
             const string fixture = "0123456789";
-            MutableTextBuffer sb = OpenStringBuilderFactory(fixture);
+            TextBuilder sb = StringBuilderFactory(fixture);
             assertSame(sb, sb.Delete(0, 0 - 0));
             assertEquals(fixture, sb.ToString());
             assertSame(sb, sb.Delete(5, 5 - 5));
@@ -711,14 +711,14 @@ namespace J2N.Text
             assertEquals("", sb.ToString());
             assertEquals(0, sb.Length);
 
-            sb = OpenStringBuilderFactory(fixture);
+            sb = StringBuilderFactory(fixture);
             assertSame(sb, sb.Delete(0, 11 - 0));
             assertEquals("", sb.ToString());
             assertEquals(0, sb.Length - 0);
 
             try
             {
-                OpenStringBuilderFactory(fixture).Delete(-1, 2 - -1);
+                StringBuilderFactory(fixture).Delete(-1, 2 - -1);
                 fail("no SIOOBE, negative start");
             }
             catch (ArgumentOutOfRangeException) // StringIndexOutOfBoundsException
@@ -728,7 +728,7 @@ namespace J2N.Text
 
             try
             {
-                OpenStringBuilderFactory(fixture).Delete(11, 12 - 11);
+                StringBuilderFactory(fixture).Delete(11, 12 - 11);
                 fail("no SIOOBE, start too far");
             }
             catch (ArgumentOutOfRangeException) // StringIndexOutOfBoundsException
@@ -738,7 +738,7 @@ namespace J2N.Text
 
             try
             {
-                OpenStringBuilderFactory(fixture).Delete(13, 12 - 13);
+                StringBuilderFactory(fixture).Delete(13, 12 - 13);
                 fail("no SIOOBE, start larger than end (negative length)");
             }
             catch (ArgumentOutOfRangeException) // StringIndexOutOfBoundsException
@@ -747,7 +747,7 @@ namespace J2N.Text
             }
 
             // HARMONY 6212
-            sb = OpenStringBuilderFactory();
+            sb = StringBuilderFactory();
             sb.Append("abcde");
             String str = sb.ToString();
             sb.Delete(0, sb.Length - 0);
@@ -763,17 +763,17 @@ namespace J2N.Text
         public void Test_deleteCharAtI()
         {
             const string fixture = "0123456789";
-            MutableTextBuffer sb = OpenStringBuilderFactory(fixture);
+            TextBuilder sb = StringBuilderFactory(fixture);
             //assertSame(sb, sb.deleteCharAt(0));
             assertSame(sb, sb.Remove(0, 1));
             assertEquals("123456789", sb.ToString());
             assertEquals(9, sb.Length);
-            sb = OpenStringBuilderFactory(fixture);
+            sb = StringBuilderFactory(fixture);
             //assertSame(sb, sb.deleteCharAt(5));
             assertSame(sb, sb.Remove(5, 1));
             assertEquals("012346789", sb.ToString());
             assertEquals(9, sb.Length);
-            sb = OpenStringBuilderFactory(fixture);
+            sb = StringBuilderFactory(fixture);
             //assertSame(sb, sb.deleteCharAt(9));
             assertSame(sb, sb.Remove(9, 1));
             assertEquals("012345678", sb.ToString());
@@ -782,7 +782,7 @@ namespace J2N.Text
             try
             {
                 //OpenStringBuilderFactory(fixture).deleteCharAt(-1);
-                OpenStringBuilderFactory(fixture).Remove(-1, 1);
+                StringBuilderFactory(fixture).Remove(-1, 1);
                 fail("no SIOOBE, negative index");
             }
             catch (ArgumentOutOfRangeException) // StringIndexOutOfBoundsException
@@ -793,7 +793,7 @@ namespace J2N.Text
             try
             {
                 //OpenStringBuilderFactory(fixture).deleteCharAt(fixture.Length);
-                OpenStringBuilderFactory(fixture).Remove(fixture.Length, 1);
+                StringBuilderFactory(fixture).Remove(fixture.Length, 1);
                 fail("no SIOOBE, index equals length");
             }
             catch (ArgumentOutOfRangeException) // StringIndexOutOfBoundsException
@@ -804,7 +804,7 @@ namespace J2N.Text
             try
             {
                 //OpenStringBuilderFactory(fixture).deleteCharAt(fixture.Length + 1);
-                OpenStringBuilderFactory(fixture).Remove(fixture.Length + 1, 1);
+                StringBuilderFactory(fixture).Remove(fixture.Length + 1, 1);
                 fail("no SIOOBE, index exceeds length");
             }
             catch (ArgumentOutOfRangeException) // StringIndexOutOfBoundsException
@@ -819,7 +819,7 @@ namespace J2N.Text
         [Test]
         public void Test_ensureCapacityI()
         {
-            MutableTextBuffer sb = OpenStringBuilderFactory(5);
+            TextBuilder sb = StringBuilderFactory(5);
             assertEquals(5, sb.Capacity);
             sb.EnsureCapacity(10);
             assertEquals(12, sb.Capacity);
@@ -836,7 +836,7 @@ namespace J2N.Text
         public void Test_getCharsII_CI()
         {
             const string fixture = "0123456789";
-            MutableTextBuffer sb = OpenStringBuilderFactory(fixture);
+            TextBuilder sb = StringBuilderFactory(fixture);
             char[] dst = new char[10];
             //sb.getChars(0, 10, dst, 0);
             sb.CopyTo(0, dst, 0, 10 - 0);
@@ -940,7 +940,7 @@ namespace J2N.Text
         public void Test_indexOfLjava_lang_String()
         {
             const string fixture = "0123456789";
-            MutableTextBuffer sb = OpenStringBuilderFactory(fixture);
+            TextBuilder sb = StringBuilderFactory(fixture);
             assertEquals(0, sb.IndexOf("0", StringComparison.Ordinal));
             assertEquals(0, sb.IndexOf("012", StringComparison.Ordinal));
             assertEquals(-1, sb.IndexOf("02", StringComparison.Ordinal));
@@ -964,7 +964,7 @@ namespace J2N.Text
         public void Test_IndexOfStringInt()
         {
             const string fixture = "0123456789";
-            MutableTextBuffer sb = OpenStringBuilderFactory(fixture);
+            TextBuilder sb = StringBuilderFactory(fixture);
             assertEquals(0, sb.IndexOf("0", StringComparison.Ordinal));
             assertEquals(0, sb.IndexOf("012", StringComparison.Ordinal));
             assertEquals(-1, sb.IndexOf("02", StringComparison.Ordinal));
@@ -998,29 +998,29 @@ namespace J2N.Text
         public void Test_insertIZ()
         {
             const string fixture = "0000";
-            MutableTextBuffer sb = OpenStringBuilderFactory(fixture);
+            TextBuilder sb = StringBuilderFactory(fixture);
             assertSame(sb, sb.Insert(0, true));
             assertEquals("true0000", sb.ToString());
             assertEquals(8, sb.Length);
 
-            sb = OpenStringBuilderFactory(fixture);
+            sb = StringBuilderFactory(fixture);
             assertSame(sb, sb.Insert(0, false));
             assertEquals("false0000", sb.ToString());
             assertEquals(9, sb.Length);
 
-            sb = OpenStringBuilderFactory(fixture);
+            sb = StringBuilderFactory(fixture);
             assertSame(sb, sb.Insert(2, false));
             assertEquals("00false00", sb.ToString());
             assertEquals(9, sb.Length);
 
-            sb = OpenStringBuilderFactory(fixture);
+            sb = StringBuilderFactory(fixture);
             assertSame(sb, sb.Insert(4, false));
             assertEquals("0000false", sb.ToString());
             assertEquals(9, sb.Length);
 
             try
             {
-                sb = OpenStringBuilderFactory(fixture);
+                sb = StringBuilderFactory(fixture);
                 sb.Insert(-1, false);
                 fail("no SIOOBE, negative index");
             }
@@ -1031,7 +1031,7 @@ namespace J2N.Text
 
             try
             {
-                sb = OpenStringBuilderFactory(fixture);
+                sb = StringBuilderFactory(fixture);
                 sb.Insert(5, false);
                 fail("no SIOOBE, index too large index");
             }
@@ -1048,22 +1048,22 @@ namespace J2N.Text
         public void Test_insertIC()
         {
             const string fixture = "0000";
-            MutableTextBuffer sb = OpenStringBuilderFactory(fixture);
+            TextBuilder sb = StringBuilderFactory(fixture);
             assertSame(sb, sb.Insert(0, 'a'));
             assertEquals("a0000", sb.ToString());
             assertEquals(5, sb.Length);
 
-            sb = OpenStringBuilderFactory(fixture);
+            sb = StringBuilderFactory(fixture);
             assertSame(sb, sb.Insert(0, 'b'));
             assertEquals("b0000", sb.ToString());
             assertEquals(5, sb.Length);
 
-            sb = OpenStringBuilderFactory(fixture);
+            sb = StringBuilderFactory(fixture);
             assertSame(sb, sb.Insert(2, 'b'));
             assertEquals("00b00", sb.ToString());
             assertEquals(5, sb.Length);
 
-            sb = OpenStringBuilderFactory(fixture);
+            sb = StringBuilderFactory(fixture);
             assertSame(sb, sb.Insert(4, 'b'));
             assertEquals("0000b", sb.ToString());
             assertEquals(5, sb.Length);
@@ -1096,7 +1096,7 @@ namespace J2N.Text
         [Test]
         public void Test_insertIC_2()
         {
-            MutableTextBuffer obj = OpenStringBuilderFactory();
+            TextBuilder obj = StringBuilderFactory();
             try
             {
                 obj.Insert(-1, '?');
@@ -1115,17 +1115,17 @@ namespace J2N.Text
         public void Test_insertI_C()
         {
             const string fixture = "0000";
-            MutableTextBuffer sb = OpenStringBuilderFactory(fixture);
+            TextBuilder sb = StringBuilderFactory(fixture);
             assertSame(sb, sb.Insert(0, new char[] { 'a', 'b' }));
             assertEquals("ab0000", sb.ToString());
             assertEquals(6, sb.Length);
 
-            sb = OpenStringBuilderFactory(fixture);
+            sb = StringBuilderFactory(fixture);
             assertSame(sb, sb.Insert(2, new char[] { 'a', 'b' }));
             assertEquals("00ab00", sb.ToString());
             assertEquals(6, sb.Length);
 
-            sb = OpenStringBuilderFactory(fixture);
+            sb = StringBuilderFactory(fixture);
             assertSame(sb, sb.Insert(4, new char[] { 'a', 'b' }));
             assertEquals("0000ab", sb.ToString());
             assertEquals(6, sb.Length);
@@ -1138,7 +1138,7 @@ namespace J2N.Text
              */
 
             // J2N: Changed behavior of null to a no-op to match .NET
-            sb = OpenStringBuilderFactory(fixture);
+            sb = StringBuilderFactory(fixture);
             assertSame(sb, sb.Insert(0, (char[])null));
             assertEquals("0000", sb.ToString());
 
@@ -1154,7 +1154,7 @@ namespace J2N.Text
 
             try
             {
-                sb = OpenStringBuilderFactory(fixture);
+                sb = StringBuilderFactory(fixture);
                 sb.Insert(-1, new char[] { 'a', 'b' });
                 fail("no SIOOBE, negative index");
             }
@@ -1165,7 +1165,7 @@ namespace J2N.Text
 
             try
             {
-                sb = OpenStringBuilderFactory(fixture);
+                sb = StringBuilderFactory(fixture);
                 sb.Insert(5, new char[] { 'a', 'b' });
                 fail("no SIOOBE, index too large index");
             }
@@ -1182,32 +1182,32 @@ namespace J2N.Text
         public void Test_insertI_CII()
         {
             const string fixture = "0000";
-            MutableTextBuffer sb = OpenStringBuilderFactory(fixture);
+            TextBuilder sb = StringBuilderFactory(fixture);
             assertSame(sb, sb.Insert(0, new char[] { 'a', 'b' }, 0, 2));
             assertEquals("ab0000", sb.ToString());
             assertEquals(6, sb.Length);
 
-            sb = OpenStringBuilderFactory(fixture);
+            sb = StringBuilderFactory(fixture);
             assertSame(sb, sb.Insert(0, new char[] { 'a', 'b' }, 0, 1));
             assertEquals("a0000", sb.ToString());
             assertEquals(5, sb.Length);
 
-            sb = OpenStringBuilderFactory(fixture);
+            sb = StringBuilderFactory(fixture);
             assertSame(sb, sb.Insert(2, new char[] { 'a', 'b' }, 0, 2));
             assertEquals("00ab00", sb.ToString());
             assertEquals(6, sb.Length);
 
-            sb = OpenStringBuilderFactory(fixture);
+            sb = StringBuilderFactory(fixture);
             assertSame(sb, sb.Insert(2, new char[] { 'a', 'b' }, 0, 1));
             assertEquals("00a00", sb.ToString());
             assertEquals(5, sb.Length);
 
-            sb = OpenStringBuilderFactory(fixture);
+            sb = StringBuilderFactory(fixture);
             assertSame(sb, sb.Insert(4, new char[] { 'a', 'b' }, 0, 2));
             assertEquals("0000ab", sb.ToString());
             assertEquals(6, sb.Length);
 
-            sb = OpenStringBuilderFactory(fixture);
+            sb = StringBuilderFactory(fixture);
             assertSame(sb, sb.Insert(4, new char[] { 'a', 'b' }, 0, 1));
             assertEquals("0000a", sb.ToString());
             assertEquals(5, sb.Length);
@@ -1231,7 +1231,7 @@ namespace J2N.Text
 
             try
             {
-                sb = OpenStringBuilderFactory(fixture);
+                sb = StringBuilderFactory(fixture);
                 sb.Insert(-1, new char[] { 'a', 'b' }, 0, 2);
                 fail("no SIOOBE, negative index");
             }
@@ -1242,7 +1242,7 @@ namespace J2N.Text
 
             try
             {
-                sb = OpenStringBuilderFactory(fixture);
+                sb = StringBuilderFactory(fixture);
                 sb.Insert(5, new char[] { 'a', 'b' }, 0, 2);
                 fail("no SIOOBE, index too large index");
             }
@@ -1253,7 +1253,7 @@ namespace J2N.Text
 
             try
             {
-                sb = OpenStringBuilderFactory(fixture);
+                sb = StringBuilderFactory(fixture);
                 sb.Insert(5, new char[] { 'a', 'b' }, -1, 2);
                 fail("no SIOOBE, negative offset");
             }
@@ -1264,7 +1264,7 @@ namespace J2N.Text
 
             try
             {
-                sb = OpenStringBuilderFactory(fixture);
+                sb = StringBuilderFactory(fixture);
                 sb.Insert(5, new char[] { 'a', 'b' }, 0, -1);
                 fail("no SIOOBE, negative length");
             }
@@ -1275,7 +1275,7 @@ namespace J2N.Text
 
             try
             {
-                sb = OpenStringBuilderFactory(fixture);
+                sb = StringBuilderFactory(fixture);
                 sb.Insert(5, new char[] { 'a', 'b' }, 0, 3);
                 fail("no SIOOBE, too long");
             }
@@ -1292,22 +1292,22 @@ namespace J2N.Text
         public void Test_insertILjava_lang_CharSequence()
         {
             const string fixture = "0000";
-            MutableTextBuffer sb = OpenStringBuilderFactory(fixture);
+            TextBuilder sb = StringBuilderFactory(fixture);
             assertSame(sb, sb.Insert(0, (ICharSequence)"ab".AsCharSequence()));
             assertEquals("ab0000", sb.ToString());
             assertEquals(6, sb.Length);
 
-            sb = OpenStringBuilderFactory(fixture);
+            sb = StringBuilderFactory(fixture);
             assertSame(sb, sb.Insert(2, (ICharSequence)"ab".AsCharSequence()));
             assertEquals("00ab00", sb.ToString());
             assertEquals(6, sb.Length);
 
-            sb = OpenStringBuilderFactory(fixture);
+            sb = StringBuilderFactory(fixture);
             assertSame(sb, sb.Insert(4, (ICharSequence)"ab".AsCharSequence()));
             assertEquals("0000ab", sb.ToString());
             assertEquals(6, sb.Length);
 
-            sb = OpenStringBuilderFactory(fixture);
+            sb = StringBuilderFactory(fixture);
             assertSame(sb, sb.Insert(4, (ICharSequence)null));
             //assertEquals("0000null", sb.ToString());
             //assertEquals(8, sb.Length);
@@ -1316,7 +1316,7 @@ namespace J2N.Text
 
             try
             {
-                sb = OpenStringBuilderFactory(fixture);
+                sb = StringBuilderFactory(fixture);
                 sb.Insert(-1, (ICharSequence)"ab".AsCharSequence());
                 fail("no IOOBE, negative index");
             }
@@ -1327,7 +1327,7 @@ namespace J2N.Text
 
             try
             {
-                sb = OpenStringBuilderFactory(fixture);
+                sb = StringBuilderFactory(fixture);
                 sb.Insert(5, (ICharSequence)"ab".AsCharSequence());
                 fail("no IOOBE, index too large index");
             }
@@ -1345,32 +1345,32 @@ namespace J2N.Text
         public void Test_insertILjava_lang_CharSequenceII()
         {
             const string fixture = "0000";
-            MutableTextBuffer sb = OpenStringBuilderFactory(fixture);
+            TextBuilder sb = StringBuilderFactory(fixture);
             assertSame(sb, sb.Insert(0, (ICharSequence)"ab".AsCharSequence(), 0, 2 - 0));
             assertEquals("ab0000", sb.ToString());
             assertEquals(6, sb.Length);
 
-            sb = OpenStringBuilderFactory(fixture);
+            sb = StringBuilderFactory(fixture);
             assertSame(sb, sb.Insert(0, (ICharSequence)"ab".AsCharSequence(), 0, 1 - 0));
             assertEquals("a0000", sb.ToString());
             assertEquals(5, sb.Length);
 
-            sb = OpenStringBuilderFactory(fixture);
+            sb = StringBuilderFactory(fixture);
             assertSame(sb, sb.Insert(2, (ICharSequence)"ab".AsCharSequence(), 0, 2 - 0));
             assertEquals("00ab00", sb.ToString());
             assertEquals(6, sb.Length);
 
-            sb = OpenStringBuilderFactory(fixture);
+            sb = StringBuilderFactory(fixture);
             assertSame(sb, sb.Insert(2, (ICharSequence)"ab".AsCharSequence(), 0, 1 - 0));
             assertEquals("00a00", sb.ToString());
             assertEquals(5, sb.Length);
 
-            sb = OpenStringBuilderFactory(fixture);
+            sb = StringBuilderFactory(fixture);
             assertSame(sb, sb.Insert(4, (ICharSequence)"ab".AsCharSequence(), 0, 2 - 0));
             assertEquals("0000ab", sb.ToString());
             assertEquals(6, sb.Length);
 
-            sb = OpenStringBuilderFactory(fixture);
+            sb = StringBuilderFactory(fixture);
             assertSame(sb, sb.Insert(4, (ICharSequence)"ab".AsCharSequence(), 0, 1 - 0));
             assertEquals("0000a", sb.ToString());
             assertEquals(5, sb.Length);
@@ -1383,7 +1383,7 @@ namespace J2N.Text
 
             try
             {
-                sb = OpenStringBuilderFactory(fixture);
+                sb = StringBuilderFactory(fixture);
                 sb.Insert(4, (ICharSequence)null, 0, 2 - 0);
                 fail("no ArgumentNullException when length is set");
             }
@@ -1394,7 +1394,7 @@ namespace J2N.Text
 
             try
             {
-                sb = OpenStringBuilderFactory(fixture);
+                sb = StringBuilderFactory(fixture);
                 sb.Insert(4, (ICharSequence)null, 2, 0 - 2);
                 fail("no ArgumentNullException when startIndex is set");
             }
@@ -1405,7 +1405,7 @@ namespace J2N.Text
 
             try
             {
-                sb = OpenStringBuilderFactory(fixture);
+                sb = StringBuilderFactory(fixture);
                 sb.Insert(-1, (ICharSequence)"ab".AsCharSequence(), 0, 2 - 0);
                 fail("no IOOBE, negative index");
             }
@@ -1416,7 +1416,7 @@ namespace J2N.Text
 
             try
             {
-                sb = OpenStringBuilderFactory(fixture);
+                sb = StringBuilderFactory(fixture);
                 sb.Insert(5, (ICharSequence)"ab".AsCharSequence(), 0, 2 - 0);
                 fail("no IOOBE, index too large index");
             }
@@ -1427,7 +1427,7 @@ namespace J2N.Text
 
             try
             {
-                sb = OpenStringBuilderFactory(fixture);
+                sb = StringBuilderFactory(fixture);
                 sb.Insert(5, (ICharSequence)"ab".AsCharSequence(), -1, 2 - -1);
                 fail("no IOOBE, negative offset");
             }
@@ -1438,7 +1438,7 @@ namespace J2N.Text
 
             try
             {
-                sb = OpenStringBuilderFactory(fixture);
+                sb = StringBuilderFactory(fixture);
                 sb.Insert(5, new char[] { 'a', 'b' }, 0, -1 - 0);
                 fail("no IOOBE, negative length");
             }
@@ -1449,7 +1449,7 @@ namespace J2N.Text
 
             try
             {
-                sb = OpenStringBuilderFactory(fixture);
+                sb = StringBuilderFactory(fixture);
                 sb.Insert(5, new char[] { 'a', 'b' }, 0, 3 - 0);
                 fail("no IOOBE, too long");
             }
@@ -1466,29 +1466,29 @@ namespace J2N.Text
         public void Test_insertID()
         {
             const string fixture = "0000";
-            MutableTextBuffer sb = OpenStringBuilderFactory(fixture);
+            TextBuilder sb = StringBuilderFactory(fixture);
             assertSame(sb, sb.Insert(0, -1D));
             assertEquals("-1.00000", sb.ToString());
             assertEquals(8, sb.Length);
 
-            sb = OpenStringBuilderFactory(fixture);
+            sb = StringBuilderFactory(fixture);
             assertSame(sb, sb.Insert(0, 0D));
             assertEquals("0.00000", sb.ToString());
             assertEquals(7, sb.Length);
 
-            sb = OpenStringBuilderFactory(fixture);
+            sb = StringBuilderFactory(fixture);
             assertSame(sb, sb.Insert(2, 1D));
             assertEquals("001.000", sb.ToString());
             assertEquals(7, sb.Length);
 
-            sb = OpenStringBuilderFactory(fixture);
+            sb = StringBuilderFactory(fixture);
             assertSame(sb, sb.Insert(4, 2D));
             assertEquals("00002.0", sb.ToString());
             assertEquals(7, sb.Length);
 
             try
             {
-                sb = OpenStringBuilderFactory(fixture);
+                sb = StringBuilderFactory(fixture);
                 sb.Insert(-1, 1D);
                 fail("no IOOBE, negative index");
             }
@@ -1499,7 +1499,7 @@ namespace J2N.Text
 
             try
             {
-                sb = OpenStringBuilderFactory(fixture);
+                sb = StringBuilderFactory(fixture);
                 sb.Insert(5, 1D);
                 fail("no IOOBE, index too large index");
             }
@@ -1516,29 +1516,29 @@ namespace J2N.Text
         public void Test_insertIF()
         {
             const string fixture = "0000";
-            MutableTextBuffer sb = OpenStringBuilderFactory(fixture);
+            TextBuilder sb = StringBuilderFactory(fixture);
             assertSame(sb, sb.Insert(0, -1F));
             assertEquals("-1.00000", sb.ToString());
             assertEquals(8, sb.Length);
 
-            sb = OpenStringBuilderFactory(fixture);
+            sb = StringBuilderFactory(fixture);
             assertSame(sb, sb.Insert(0, 0F));
             assertEquals("0.00000", sb.ToString());
             assertEquals(7, sb.Length);
 
-            sb = OpenStringBuilderFactory(fixture);
+            sb = StringBuilderFactory(fixture);
             assertSame(sb, sb.Insert(2, 1F));
             assertEquals("001.000", sb.ToString());
             assertEquals(7, sb.Length);
 
-            sb = OpenStringBuilderFactory(fixture);
+            sb = StringBuilderFactory(fixture);
             assertSame(sb, sb.Insert(4, 2F));
             assertEquals("00002.0", sb.ToString());
             assertEquals(7, sb.Length);
 
             try
             {
-                sb = OpenStringBuilderFactory(fixture);
+                sb = StringBuilderFactory(fixture);
                 sb.Insert(-1, 1F);
                 fail("no IOOBE, negative index");
             }
@@ -1549,7 +1549,7 @@ namespace J2N.Text
 
             try
             {
-                sb = OpenStringBuilderFactory(fixture);
+                sb = StringBuilderFactory(fixture);
                 sb.Insert(5, 1F);
                 fail("no IOOBE, index too large index");
             }
@@ -1566,29 +1566,29 @@ namespace J2N.Text
         public void Test_insertII()
         {
             const string fixture = "0000";
-            MutableTextBuffer sb = OpenStringBuilderFactory(fixture);
+            TextBuilder sb = StringBuilderFactory(fixture);
             assertSame(sb, sb.Insert(0, -1));
             assertEquals("-10000", sb.ToString());
             assertEquals(6, sb.Length);
 
-            sb = OpenStringBuilderFactory(fixture);
+            sb = StringBuilderFactory(fixture);
             assertSame(sb, sb.Insert(0, 0));
             assertEquals("00000", sb.ToString());
             assertEquals(5, sb.Length);
 
-            sb = OpenStringBuilderFactory(fixture);
+            sb = StringBuilderFactory(fixture);
             assertSame(sb, sb.Insert(2, 1));
             assertEquals("00100", sb.ToString());
             assertEquals(5, sb.Length);
 
-            sb = OpenStringBuilderFactory(fixture);
+            sb = StringBuilderFactory(fixture);
             assertSame(sb, sb.Insert(4, 2));
             assertEquals("00002", sb.ToString());
             assertEquals(5, sb.Length);
 
             try
             {
-                sb = OpenStringBuilderFactory(fixture);
+                sb = StringBuilderFactory(fixture);
                 sb.Insert(-1, 1);
                 fail("no IOOBE, negative index");
             }
@@ -1599,7 +1599,7 @@ namespace J2N.Text
 
             try
             {
-                sb = OpenStringBuilderFactory(fixture);
+                sb = StringBuilderFactory(fixture);
                 sb.Insert(5, 1);
                 fail("no IOOBE, index too large index");
             }
@@ -1616,29 +1616,29 @@ namespace J2N.Text
         public void Test_insertIJ()
         {
             const string fixture = "0000";
-            MutableTextBuffer sb = OpenStringBuilderFactory(fixture);
+            TextBuilder sb = StringBuilderFactory(fixture);
             assertSame(sb, sb.Insert(0, -1L));
             assertEquals("-10000", sb.ToString());
             assertEquals(6, sb.Length);
 
-            sb = OpenStringBuilderFactory(fixture);
+            sb = StringBuilderFactory(fixture);
             assertSame(sb, sb.Insert(0, 0L));
             assertEquals("00000", sb.ToString());
             assertEquals(5, sb.Length);
 
-            sb = OpenStringBuilderFactory(fixture);
+            sb = StringBuilderFactory(fixture);
             assertSame(sb, sb.Insert(2, 1L));
             assertEquals("00100", sb.ToString());
             assertEquals(5, sb.Length);
 
-            sb = OpenStringBuilderFactory(fixture);
+            sb = StringBuilderFactory(fixture);
             assertSame(sb, sb.Insert(4, 2L));
             assertEquals("00002", sb.ToString());
             assertEquals(5, sb.Length);
 
             try
             {
-                sb = OpenStringBuilderFactory(fixture);
+                sb = StringBuilderFactory(fixture);
                 sb.Insert(-1, 1L);
                 fail("no IOOBE, negative index");
             }
@@ -1649,7 +1649,7 @@ namespace J2N.Text
 
             try
             {
-                sb = OpenStringBuilderFactory(fixture);
+                sb = StringBuilderFactory(fixture);
                 sb.Insert(5, 1L);
                 fail("no IOOBE, index too large index");
             }
@@ -1666,22 +1666,22 @@ namespace J2N.Text
         public void Test_insertILjava_lang_Object()
         {
             const string fixture = "0000";
-            MutableTextBuffer sb = OpenStringBuilderFactory(fixture);
+            TextBuilder sb = StringBuilderFactory(fixture);
             assertSame(sb, sb.Insert(0, Fixture.INSTANCE));
             assertEquals("fixture0000", sb.ToString());
             assertEquals(11, sb.Length);
 
-            sb = OpenStringBuilderFactory(fixture);
+            sb = StringBuilderFactory(fixture);
             assertSame(sb, sb.Insert(2, Fixture.INSTANCE));
             assertEquals("00fixture00", sb.ToString());
             assertEquals(11, sb.Length);
 
-            sb = OpenStringBuilderFactory(fixture);
+            sb = StringBuilderFactory(fixture);
             assertSame(sb, sb.Insert(4, Fixture.INSTANCE));
             assertEquals("0000fixture", sb.ToString());
             assertEquals(11, sb.Length);
 
-            sb = OpenStringBuilderFactory(fixture);
+            sb = StringBuilderFactory(fixture);
             assertSame(sb, sb.Insert(4, (Object)null));
             //assertEquals("0000null", sb.ToString());
             //assertEquals(8, sb.Length);
@@ -1690,7 +1690,7 @@ namespace J2N.Text
 
             try
             {
-                sb = OpenStringBuilderFactory(fixture);
+                sb = StringBuilderFactory(fixture);
                 sb.Insert(-1, Fixture.INSTANCE);
                 fail("no IOOBE, negative index");
             }
@@ -1701,7 +1701,7 @@ namespace J2N.Text
 
             try
             {
-                sb = OpenStringBuilderFactory(fixture);
+                sb = StringBuilderFactory(fixture);
                 sb.Insert(5, Fixture.INSTANCE);
                 fail("no IOOBE, index too large index");
             }
@@ -1718,22 +1718,22 @@ namespace J2N.Text
         public void Test_insertILjava_lang_String()
         {
             const string fixture = "0000";
-            MutableTextBuffer sb = OpenStringBuilderFactory(fixture);
+            TextBuilder sb = StringBuilderFactory(fixture);
             assertSame(sb, sb.Insert(0, "fixture"));
             assertEquals("fixture0000", sb.ToString());
             assertEquals(11, sb.Length);
 
-            sb = OpenStringBuilderFactory(fixture);
+            sb = StringBuilderFactory(fixture);
             assertSame(sb, sb.Insert(2, "fixture"));
             assertEquals("00fixture00", sb.ToString());
             assertEquals(11, sb.Length);
 
-            sb = OpenStringBuilderFactory(fixture);
+            sb = StringBuilderFactory(fixture);
             assertSame(sb, sb.Insert(4, "fixture"));
             assertEquals("0000fixture", sb.ToString());
             assertEquals(11, sb.Length);
 
-            sb = OpenStringBuilderFactory(fixture);
+            sb = StringBuilderFactory(fixture);
             assertSame(sb, sb.Insert(4, (Object)null));
             //assertEquals("0000null", sb.ToString());
             //assertEquals(8, sb.Length);
@@ -1742,7 +1742,7 @@ namespace J2N.Text
 
             try
             {
-                sb = OpenStringBuilderFactory(fixture);
+                sb = StringBuilderFactory(fixture);
                 sb.Insert(-1, "fixture");
                 fail("no IOOBE, negative index");
             }
@@ -1753,7 +1753,7 @@ namespace J2N.Text
 
             try
             {
-                sb = OpenStringBuilderFactory(fixture);
+                sb = StringBuilderFactory(fixture);
                 sb.Insert(5, "fixture");
                 fail("no IOOBE, index too large index");
             }
@@ -1770,7 +1770,7 @@ namespace J2N.Text
         public void Test_lastIndexOfLjava_lang_String()
         {
             const string fixture = "0123456789";
-            MutableTextBuffer sb = OpenStringBuilderFactory(fixture);
+            TextBuilder sb = StringBuilderFactory(fixture);
             assertEquals(0, sb.LastIndexOf("0", StringComparison.Ordinal));
             assertEquals(0, sb.LastIndexOf("012", StringComparison.Ordinal));
             assertEquals(-1, sb.LastIndexOf("02", StringComparison.Ordinal));
@@ -1794,7 +1794,7 @@ namespace J2N.Text
         public void Test_lastIndexOfLjava_lang_StringI()
         {
             const string fixture = "0123456789";
-            MutableTextBuffer sb = OpenStringBuilderFactory(fixture);
+            TextBuilder sb = StringBuilderFactory(fixture);
             assertEquals(0, sb.LastIndexOf("0", StringComparison.Ordinal));
             assertEquals(0, sb.LastIndexOf("012", StringComparison.Ordinal));
             assertEquals(-1, sb.LastIndexOf("02", StringComparison.Ordinal));
@@ -1827,7 +1827,7 @@ namespace J2N.Text
         [Test]
         public void Test_length()
         {
-            MutableTextBuffer sb = OpenStringBuilderFactory();
+            TextBuilder sb = StringBuilderFactory();
             assertEquals(0, sb.Length);
             sb.Append("0000");
             assertEquals(4, sb.Length);
@@ -1839,31 +1839,31 @@ namespace J2N.Text
         [Test]
         public void Test_offsetByCodePointsII()
         {
-            int result = OpenStringBuilderFactory("a\uD800\uDC00b").OffsetByCodePoints(0, 2);
+            int result = StringBuilderFactory("a\uD800\uDC00b").OffsetByCodePoints(0, 2);
             assertEquals(3, result);
 
-            result = OpenStringBuilderFactory("abcd").OffsetByCodePoints(3, -1);
+            result = StringBuilderFactory("abcd").OffsetByCodePoints(3, -1);
             assertEquals(2, result);
 
-            result = OpenStringBuilderFactory("a\uD800\uDC00b").OffsetByCodePoints(0, 3);
+            result = StringBuilderFactory("a\uD800\uDC00b").OffsetByCodePoints(0, 3);
             assertEquals(4, result);
 
-            result = OpenStringBuilderFactory("a\uD800\uDC00b").OffsetByCodePoints(3, -1);
+            result = StringBuilderFactory("a\uD800\uDC00b").OffsetByCodePoints(3, -1);
             assertEquals(1, result);
 
-            result = OpenStringBuilderFactory("a\uD800\uDC00b").OffsetByCodePoints(3, 0);
+            result = StringBuilderFactory("a\uD800\uDC00b").OffsetByCodePoints(3, 0);
             assertEquals(3, result);
 
-            result = OpenStringBuilderFactory("\uD800\uDC00bc").OffsetByCodePoints(3, 0);
+            result = StringBuilderFactory("\uD800\uDC00bc").OffsetByCodePoints(3, 0);
             assertEquals(3, result);
 
-            result = OpenStringBuilderFactory("a\uDC00bc").OffsetByCodePoints(3, -1);
+            result = StringBuilderFactory("a\uDC00bc").OffsetByCodePoints(3, -1);
             assertEquals(2, result);
 
-            result = OpenStringBuilderFactory("a\uD800bc").OffsetByCodePoints(3, -1);
+            result = StringBuilderFactory("a\uD800bc").OffsetByCodePoints(3, -1);
             assertEquals(2, result);
 
-            MutableTextBuffer sb = OpenStringBuilderFactory();
+            TextBuilder sb = StringBuilderFactory();
             sb.Append("abc");
             try
             {
@@ -1923,22 +1923,22 @@ namespace J2N.Text
         public void Test_replaceIILjava_lang_String()
         {
             const string fixture = "0000";
-            MutableTextBuffer sb = OpenStringBuilderFactory(fixture);
+            TextBuilder sb = StringBuilderFactory(fixture);
             assertSame(sb, sb.Replace(1, 3 - 1, "11")); // J2N: Corrected 2nd parameter
             assertEquals("0110", sb.ToString());
             assertEquals(4, sb.Length);
 
-            sb = OpenStringBuilderFactory(fixture);
+            sb = StringBuilderFactory(fixture);
             assertSame(sb, sb.Replace(1, 2 - 1, "11")); // J2N: Corrected 2nd parameter
             assertEquals("01100", sb.ToString());
             assertEquals(5, sb.Length);
 
-            sb = OpenStringBuilderFactory(fixture);
+            sb = StringBuilderFactory(fixture);
             assertSame(sb, sb.Replace(4, 5 - 4, "11")); // J2N: Corrected 2nd parameter
             assertEquals("000011", sb.ToString());
             assertEquals(6, sb.Length);
 
-            sb = OpenStringBuilderFactory(fixture);
+            sb = StringBuilderFactory(fixture);
             assertSame(sb, sb.Replace(4, 6 - 4, "11")); // J2N: Corrected 2nd parameter
             assertEquals("000011", sb.ToString());
             assertEquals(6, sb.Length);
@@ -1956,7 +1956,7 @@ namespace J2N.Text
 
             try
             {
-                sb = OpenStringBuilderFactory(fixture);
+                sb = StringBuilderFactory(fixture);
                 sb.Replace(-1, 2 - -1, "11"); // J2N: Corrected 2nd parameter
                 fail("No SIOOBE, negative start");
             }
@@ -1967,7 +1967,7 @@ namespace J2N.Text
 
             try
             {
-                sb = OpenStringBuilderFactory(fixture);
+                sb = StringBuilderFactory(fixture);
                 sb.Replace(5, 2 - 5, "11"); // J2N: Corrected 2nd parameter
                 fail("No SIOOBE, start > length");
             }
@@ -1978,7 +1978,7 @@ namespace J2N.Text
 
             try
             {
-                sb = OpenStringBuilderFactory(fixture);
+                sb = StringBuilderFactory(fixture);
                 sb.Replace(3, 2 - 3, "11"); // J2N: Corrected 2nd parameter
                 fail("No SIOOBE, start > end");
             }
@@ -1988,7 +1988,7 @@ namespace J2N.Text
             }
 
             // Regression for HARMONY-348
-            MutableTextBuffer buffer = OpenStringBuilderFactory("1234567");
+            TextBuilder buffer = StringBuilderFactory("1234567");
             buffer.Replace(2, 6 - 2, "XXX"); // J2N: Corrected 2nd parameter
             assertEquals("12XXX7", buffer.ToString());
         }
@@ -2000,22 +2000,22 @@ namespace J2N.Text
         public void Test_replaceIILjava_lang_ReadOnlySpan()
         {
             const string fixture = "0000";
-            MutableTextBuffer sb = OpenStringBuilderFactory(fixture);
+            TextBuilder sb = StringBuilderFactory(fixture);
             assertSame(sb, sb.Replace(1, 3 - 1, "11".AsSpan())); // J2N: Corrected 2nd parameter
             assertEquals("0110", sb.ToString());
             assertEquals(4, sb.Length);
 
-            sb = OpenStringBuilderFactory(fixture);
+            sb = StringBuilderFactory(fixture);
             assertSame(sb, sb.Replace(1, 2 - 1, "11".AsSpan())); // J2N: Corrected 2nd parameter
             assertEquals("01100", sb.ToString());
             assertEquals(5, sb.Length);
 
-            sb = OpenStringBuilderFactory(fixture);
+            sb = StringBuilderFactory(fixture);
             assertSame(sb, sb.Replace(4, 5 - 4, "11".AsSpan())); // J2N: Corrected 2nd parameter
             assertEquals("000011", sb.ToString());
             assertEquals(6, sb.Length);
 
-            sb = OpenStringBuilderFactory(fixture);
+            sb = StringBuilderFactory(fixture);
             assertSame(sb, sb.Replace(4, 6 - 4, "11".AsSpan())); // J2N: Corrected 2nd parameter
             assertEquals("000011", sb.ToString());
             assertEquals(6, sb.Length);
@@ -2035,7 +2035,7 @@ namespace J2N.Text
 
             try
             {
-                sb = OpenStringBuilderFactory(fixture);
+                sb = StringBuilderFactory(fixture);
                 sb.Replace(-1, 2 - -1, "11".AsSpan()); // J2N: Corrected 2nd parameter
                 fail("No SIOOBE, negative start");
             }
@@ -2046,7 +2046,7 @@ namespace J2N.Text
 
             try
             {
-                sb = OpenStringBuilderFactory(fixture);
+                sb = StringBuilderFactory(fixture);
                 sb.Replace(5, 2 - 5, "11".AsSpan()); // J2N: Corrected 2nd parameter
                 fail("No SIOOBE, start > length");
             }
@@ -2057,7 +2057,7 @@ namespace J2N.Text
 
             try
             {
-                sb = OpenStringBuilderFactory(fixture);
+                sb = StringBuilderFactory(fixture);
                 sb.Replace(3, 2 - 3, "11".AsSpan()); // J2N: Corrected 2nd parameter
                 fail("No SIOOBE, start > end");
             }
@@ -2067,7 +2067,7 @@ namespace J2N.Text
             }
 
             // Regression for HARMONY-348
-            MutableTextBuffer buffer = OpenStringBuilderFactory("1234567");
+            TextBuilder buffer = StringBuilderFactory("1234567");
             buffer.Replace(2, 6 - 2, "XXX".AsSpan()); // J2N: Corrected 2nd parameter
             assertEquals("12XXX7", buffer.ToString());
         }
@@ -2075,24 +2075,24 @@ namespace J2N.Text
         private void reverseTest(String org, String rev, String back)
         {
             // create non-shared StringBuilder
-            MutableTextBuffer sb = OpenStringBuilderFactory(org);
+            TextBuilder sb = StringBuilderFactory(org);
             sb.Reverse();
             String reversed = sb.ToString();
             assertEquals(rev, reversed);
             // create non-shared StringBuilder
-            sb = OpenStringBuilderFactory(reversed);
+            sb = StringBuilderFactory(reversed);
             sb.Reverse();
             reversed = sb.ToString();
             assertEquals(back, reversed);
 
             // test algorithm when StringBuilder is shared
-            sb = OpenStringBuilderFactory(org);
+            sb = StringBuilderFactory(org);
             String copy = sb.ToString();
             assertEquals(org, copy);
             sb.Reverse();
             reversed = sb.ToString();
             assertEquals(rev, reversed);
-            sb = OpenStringBuilderFactory(reversed);
+            sb = StringBuilderFactory(reversed);
             copy = sb.ToString();
             assertEquals(rev, copy);
             sb.Reverse();
@@ -2107,11 +2107,11 @@ namespace J2N.Text
         public void Test_reverse()
         {
             const string fixture = "0123456789";
-            MutableTextBuffer sb = OpenStringBuilderFactory(fixture);
+            TextBuilder sb = StringBuilderFactory(fixture);
             assertSame(sb, sb.Reverse());
             assertEquals("9876543210", sb.ToString());
 
-            sb = OpenStringBuilderFactory("012345678");
+            sb = StringBuilderFactory("012345678");
             assertSame(sb, sb.Reverse());
             assertEquals("876543210", sb.ToString());
 
@@ -2195,7 +2195,7 @@ namespace J2N.Text
         public void Test_setCharAtIC()
         {
             const string fixture = "0000";
-            MutableTextBuffer sb = OpenStringBuilderFactory(fixture);
+            TextBuilder sb = StringBuilderFactory(fixture);
             sb[0] = 'A';
             assertEquals("A000", sb.ToString());
             sb[1] = 'B';
@@ -2243,7 +2243,7 @@ namespace J2N.Text
         public void Test_setLengthI()
         {
             const string fixture = "0123456789";
-            MutableTextBuffer sb = OpenStringBuilderFactory(fixture);
+            TextBuilder sb = StringBuilderFactory(fixture);
             sb.Length = (5);
             assertEquals(5, sb.Length);
             assertEquals("01234", sb.ToString());
@@ -2264,18 +2264,18 @@ namespace J2N.Text
                 // Expected
             }
 
-            sb = OpenStringBuilderFactory("abcde");
+            sb = StringBuilderFactory("abcde");
             assertEquals("abcde", sb.ToString());
             sb.Length = (1);
             sb.Append('g');
             assertEquals("ag", sb.ToString());
 
-            sb = OpenStringBuilderFactory("abcde");
+            sb = StringBuilderFactory("abcde");
             sb.Length = (3);
             sb.Append('g');
             assertEquals("abcg", sb.ToString());
 
-            sb = OpenStringBuilderFactory("abcde");
+            sb = StringBuilderFactory("abcde");
             sb.Length = (2);
             try
             {
@@ -2287,7 +2287,7 @@ namespace J2N.Text
                 // Expected
             }
 
-            sb = OpenStringBuilderFactory();
+            sb = StringBuilderFactory();
             sb.Append("abcdefg");
             sb.Length = (2);
             sb.Length = (5);
@@ -2296,7 +2296,7 @@ namespace J2N.Text
                 assertEquals(0, sb[i]);
             }
 
-            sb = OpenStringBuilderFactory();
+            sb = StringBuilderFactory();
             sb.Append("abcdefg");
             sb.Delete(2, 4 - 2); // J2N: Corrected 2nd parameter
             sb.Length = (7);
@@ -2310,7 +2310,7 @@ namespace J2N.Text
                 assertEquals(0, sb[i]);
             }
 
-            sb = OpenStringBuilderFactory();
+            sb = StringBuilderFactory();
             sb.Append("abcdefg");
             sb.Replace(2, 5 - 2, "z"); // J2N: Corrected 2nd parameter
             sb.Length = (7);
@@ -2327,7 +2327,7 @@ namespace J2N.Text
         public void Test_subSequenceII()
         {
             const string fixture = "0123456789";
-            MutableTextBuffer sb = OpenStringBuilderFactory(fixture);
+            TextBuilder sb = StringBuilderFactory(fixture);
             ICharSequence ss = sb.Subsequence(0, 5);
             assertEquals("01234", ss.ToString());
 
@@ -2382,7 +2382,7 @@ namespace J2N.Text
         public void Test_substringI()
         {
             const string fixture = "0123456789";
-            MutableTextBuffer sb = OpenStringBuilderFactory(fixture);
+            TextBuilder sb = StringBuilderFactory(fixture);
             String ss = sb.ToString(0);
             assertEquals(fixture, ss);
 
@@ -2427,7 +2427,7 @@ namespace J2N.Text
         public void Test_substringII()
         {
             const string fixture = "0123456789";
-            MutableTextBuffer sb = OpenStringBuilderFactory(fixture);
+            TextBuilder sb = StringBuilderFactory(fixture);
             String ss = sb.ToString(0, 5 - 0);
             assertEquals("01234", ss);
 
@@ -2482,7 +2482,7 @@ namespace J2N.Text
         public void Test_toString()
         {
             const string fixture = "0123456789";
-            MutableTextBuffer sb = OpenStringBuilderFactory(fixture);
+            TextBuilder sb = StringBuilderFactory(fixture);
             assertEquals(fixture, sb.ToString());
 
             sb.Length = (0);
@@ -2507,7 +2507,7 @@ namespace J2N.Text
         public void Test_trimToSize()
         {
             const string fixture = "0123456789";
-            MutableTextBuffer sb = OpenStringBuilderFactory(fixture);
+            TextBuilder sb = StringBuilderFactory(fixture);
             assertTrue(sb.Capacity > fixture.Length);
             assertEquals(fixture.Length, sb.Length);
             assertEquals(fixture, sb.ToString());

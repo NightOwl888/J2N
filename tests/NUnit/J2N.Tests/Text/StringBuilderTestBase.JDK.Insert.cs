@@ -32,7 +32,7 @@ namespace J2N.Text
         public void Test_insertFalse()
         {
             // Caused an infinite loop before 4914802
-            MutableTextBuffer sb = OpenStringBuilderFactory();
+            TextBuilder sb = StringBuilderFactory();
             assertEquals("false", sb.Insert(0, false, BooleanFormat.Lowercase).ToString());
         }
 
@@ -40,13 +40,13 @@ namespace J2N.Text
         public void Test_insertOffset()
         {
             // 8254082 made the String variant cause an AIOOBE, fixed in 8257511
-            assertEquals("efabc", OpenStringBuilderFactory("abc").Insert(0, "def", 1, 3 - 1).ToString()); // J2N: Corrected 2nd parameter
-            assertEquals("efabc", OpenStringBuilderFactory("abc".AsCharSequence()).Insert(0, "def".AsCharSequence(), 1, 3 - 1).ToString()); // J2N: Corrected 2nd parameter
-            assertEquals("efabc", OpenStringBuilderFactory("abc").Insert(0, OpenStringBuilderFactory("def"), 1, 3 - 1).ToString()); // J2N: Corrected 4th parameter
-            assertEquals("efabc", OpenStringBuilderFactory("abc".AsCharSequence()).Insert(0, OpenStringBuilderFactory("def".AsCharSequence()), 1, 3 - 1).ToString()); // J2N: Corrected 4th parameter
+            assertEquals("efabc", StringBuilderFactory("abc").Insert(0, "def", 1, 3 - 1).ToString()); // J2N: Corrected 2nd parameter
+            assertEquals("efabc", StringBuilderFactory("abc".AsCharSequence()).Insert(0, "def".AsCharSequence(), 1, 3 - 1).ToString()); // J2N: Corrected 2nd parameter
+            assertEquals("efabc", StringBuilderFactory("abc").Insert(0, StringBuilderFactory("def"), 1, 3 - 1).ToString()); // J2N: Corrected 4th parameter
+            assertEquals("efabc", StringBuilderFactory("abc".AsCharSequence()).Insert(0, StringBuilderFactory("def".AsCharSequence()), 1, 3 - 1).ToString()); // J2N: Corrected 4th parameter
             // insert(I[CII) and insert(ILjava/lang/CharSequence;II) are inconsistently specified
-            assertEquals("efabc", OpenStringBuilderFactory("abc").Insert(0, new char[] { 'd', 'e', 'f' }, 1, 2).ToString()); // J2N: Checked 4th parameter
-            assertEquals("efabc", OpenStringBuilderFactory("abc".AsCharSequence()).Insert(0, new char[] { 'd', 'e', 'f' }.AsCharSequence(), 1, 2).ToString()); // J2N: Checked 4th parameter
+            assertEquals("efabc", StringBuilderFactory("abc").Insert(0, new char[] { 'd', 'e', 'f' }, 1, 2).ToString()); // J2N: Checked 4th parameter
+            assertEquals("efabc", StringBuilderFactory("abc".AsCharSequence()).Insert(0, new char[] { 'd', 'e', 'f' }.AsCharSequence(), 1, 2).ToString()); // J2N: Checked 4th parameter
         }
     }
 }

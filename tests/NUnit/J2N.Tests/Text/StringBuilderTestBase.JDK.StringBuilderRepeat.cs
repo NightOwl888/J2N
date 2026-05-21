@@ -56,7 +56,7 @@ namespace J2N.Text
         {
             MyChars MYCHARS = new();
 
-            MutableTextBuffer sb = OpenStringBuilderFactory();
+            TextBuilder sb = StringBuilderFactory();
 
             // prime the StringBuilder
             sb.Append("repeat");
@@ -150,7 +150,7 @@ namespace J2N.Text
         {
             MyChars MYCHARS = new();
 
-            MutableTextBuffer sb = OpenStringBuilderFactory();
+            TextBuilder sb = StringBuilderFactory();
 
             Assert.Throws<OutOfMemoryException>(() =>
             {

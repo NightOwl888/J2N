@@ -24,44 +24,44 @@ namespace J2N.Text
 {
     public abstract partial class StringBuilderTestBase : TestCase
     {
-        #region MutableTextBuffer Helper Methods
+        #region TextBuilder Helper Methods
 
         /// <summary>
-        /// Creates an instance of an <see cref="MutableTextBuffer"/> that can be used for testing.
+        /// Creates an instance of an <see cref="TextBuilder"/> that can be used for testing.
         /// </summary>
-        /// <returns>An instance of <see cref="MutableTextBuffer"/> that can be used for testing.</returns>
-        protected abstract MutableTextBuffer OpenStringBuilderFactory();
+        /// <returns>An instance of <see cref="TextBuilder"/> that can be used for testing.</returns>
+        protected abstract TextBuilder StringBuilderFactory();
 
         /// <summary>
-        /// Creates an instance of an <see cref="MutableTextBuffer"/> that can be used for testing.
+        /// Creates an instance of an <see cref="TextBuilder"/> that can be used for testing.
         /// </summary>
-        /// <returns>An instance of <see cref="MutableTextBuffer"/> that can be used for testing.</returns>
-        protected abstract MutableTextBuffer OpenStringBuilderFactory(int capacity);
+        /// <returns>An instance of <see cref="TextBuilder"/> that can be used for testing.</returns>
+        protected abstract TextBuilder StringBuilderFactory(int capacity);
 
         /// <summary>
-        /// Creates an instance of an <see cref="MutableTextBuffer"/> that can be used for testing.
+        /// Creates an instance of an <see cref="TextBuilder"/> that can be used for testing.
         /// </summary>
-        /// <returns>An instance of <see cref="MutableTextBuffer"/> that can be used for testing.</returns>
-        protected abstract MutableTextBuffer OpenStringBuilderFactory(string? value);
+        /// <returns>An instance of <see cref="TextBuilder"/> that can be used for testing.</returns>
+        protected abstract TextBuilder StringBuilderFactory(string? value);
 
         /// <summary>
-        /// Creates an instance of an <see cref="MutableTextBuffer"/> that can be used for testing.
+        /// Creates an instance of an <see cref="TextBuilder"/> that can be used for testing.
         /// </summary>
-        /// <returns>An instance of <see cref="MutableTextBuffer"/> that can be used for testing.</returns>
-        protected abstract MutableTextBuffer OpenStringBuilderFactory(ReadOnlySpan<char> value);
+        /// <returns>An instance of <see cref="TextBuilder"/> that can be used for testing.</returns>
+        protected abstract TextBuilder StringBuilderFactory(ReadOnlySpan<char> value);
 
         /// <summary>
-        /// Creates an instance of an <see cref="MutableTextBuffer"/> that can be used for testing.
+        /// Creates an instance of an <see cref="TextBuilder"/> that can be used for testing.
         /// </summary>
-        /// <returns>An instance of <see cref="MutableTextBuffer"/> that can be used for testing.</returns>
-        protected abstract MutableTextBuffer OpenStringBuilderFactory(StringBuilder? value);
+        /// <returns>An instance of <see cref="TextBuilder"/> that can be used for testing.</returns>
+        protected abstract TextBuilder StringBuilderFactory(StringBuilder? value);
 
         /// <summary>
-        /// Creates an instance of an <see cref="MutableTextBuffer"/> that can be used for testing.
+        /// Creates an instance of an <see cref="TextBuilder"/> that can be used for testing.
         /// </summary>
-        /// <returns>An instance of <see cref="MutableTextBuffer"/> that can be used for testing.</returns>
-        protected abstract MutableTextBuffer OpenStringBuilderFactory(ICharSequence? value);
+        /// <returns>An instance of <see cref="TextBuilder"/> that can be used for testing.</returns>
+        protected abstract TextBuilder StringBuilderFactory(ICharSequence? value);
 
-        #endregion MutableTextBuffer Helper Methods
+        #endregion TextBuilder Helper Methods
     }
 }

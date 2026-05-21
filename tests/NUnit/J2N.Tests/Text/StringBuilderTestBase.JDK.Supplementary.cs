@@ -85,7 +85,7 @@ namespace J2N.Text
         {
             for (int i = 0; i < input.Length; i++)
             {
-                MutableTextBuffer sb = OpenStringBuilderFactory(input[i]);
+                TextBuilder sb = StringBuilderFactory(input[i]);
 
                 /*
                  * Normal case
@@ -125,7 +125,7 @@ namespace J2N.Text
         {
             for (int i = 0; i < input.Length; i++)
             {
-                MutableTextBuffer sb = OpenStringBuilderFactory(input[i]);
+                TextBuilder sb = StringBuilderFactory(input[i]);
 
                 /*
                  * Normal case
@@ -183,7 +183,7 @@ namespace J2N.Text
         {
             for (int i = 0; i < input.Length; i++)
             {
-                MutableTextBuffer sb = OpenStringBuilderFactory(input[i]).Reverse();
+                TextBuilder sb = StringBuilderFactory(input[i]).Reverse();
 
                 check(!golden3[i].Equals(sb.ToString(), StringComparison.Ordinal),
                      "reverse() for <" + toHexString(input[i]) + ">",
@@ -192,7 +192,7 @@ namespace J2N.Text
 
             for (int i = 0; i < testdata1.Length; i++)
             {
-                MutableTextBuffer sb = OpenStringBuilderFactory(testdata1[i][0]).Reverse();
+                TextBuilder sb = StringBuilderFactory(testdata1[i][0]).Reverse();
 
                 check(!testdata1[i][1].Equals(sb.ToString(), StringComparison.Ordinal),
                      "reverse() for <" + toHexString(testdata1[i][0]) + ">",
@@ -209,12 +209,12 @@ namespace J2N.Text
             for (int i = 0; i < input.Length; i++)
             {
                 string s = input[i];
-                MutableTextBuffer sb = OpenStringBuilderFactory();
+                TextBuilder sb = StringBuilderFactory();
                 int c;
                 for (int j = 0; j < s.Length; j += Character.CharCount(c))
                 {
                     c = s.CodePointAt(j);
-                    MutableTextBuffer rsb = sb.AppendCodePoint(c);
+                    TextBuilder rsb = sb.AppendCodePoint(c);
                     check(sb != rsb, "appendCodePoint returned a wrong object");
                     int sbc = sb.CodePointAt(j);
                     check(sbc != c, "appendCodePoint(" + j + ") != c", sbc, c);
@@ -241,7 +241,7 @@ namespace J2N.Text
             for (int i = 0; i < input.Length; i++)
             {
                 string s = input[i];
-                MutableTextBuffer sb = OpenStringBuilderFactory(s);
+                TextBuilder sb = StringBuilderFactory(s);
                 int length = sb.Length;
 
                 for (int j = 0; j <= length; j++)
@@ -285,7 +285,7 @@ namespace J2N.Text
             for (int i = 0; i < input.Length; i++)
             {
                 string s = input[i];
-                MutableTextBuffer sb = OpenStringBuilderFactory(s);
+                TextBuilder sb = StringBuilderFactory(s);
                 int length = s.Length;
 
                 for (int j = 0; j <= length; j++)
@@ -357,7 +357,7 @@ namespace J2N.Text
         [Test]
         public void Test_testDontReadOutOfBoundsTrailingSurrogate()
         {
-            MutableTextBuffer sb = OpenStringBuilderFactory();
+            TextBuilder sb = StringBuilderFactory();
 
             int suppl = Character.MinSupplementaryCodePoint;
             sb.AppendCodePoint(suppl);
@@ -381,7 +381,7 @@ namespace J2N.Text
 
         static readonly bool At = true, Before = false;
 
-        static void testCodePoint(bool isAt, MutableTextBuffer sb, int index, int expected)
+        static void testCodePoint(bool isAt, TextBuilder sb, int index, int expected)
         {
             int c = isAt ? sb.CodePointAt(index) : sb.CodePointBefore(index);
 
@@ -390,7 +390,7 @@ namespace J2N.Text
                   + sb + ">", c, expected);
         }
 
-        static void testCodePoint(bool isAt, MutableTextBuffer sb, int index)
+        static void testCodePoint(bool isAt, TextBuilder sb, int index)
         {
             if (isAt)
             {
@@ -406,11 +406,11 @@ namespace J2N.Text
         {
             Assert.Throws(expectedException, () =>
             {
-                OpenStringBuilderFactory().AppendCodePoint(codePoint);
+                StringBuilderFactory().AppendCodePoint(codePoint);
             });
         }
 
-        static void testCodePointCount(MutableTextBuffer sb, int beginIndex, int endIndex,
+        static void testCodePointCount(TextBuilder sb, int beginIndex, int endIndex,
             Type expectedException)
         {
             Assert.Throws(expectedException, () =>
@@ -419,7 +419,7 @@ namespace J2N.Text
             });
         }
 
-        static void testOffsetByCodePoints(MutableTextBuffer sb, int index, int offset,
+        static void testOffsetByCodePoints(TextBuilder sb, int index, int offset,
             Type expectedException)
         {
             Assert.Throws(expectedException, () =>
@@ -448,7 +448,7 @@ namespace J2N.Text
             }
         }
 
-        static void check(bool err, string s, MutableTextBuffer got, string expected)
+        static void check(bool err, string s, TextBuilder got, string expected)
         {
             if (err)
             {

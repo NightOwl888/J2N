@@ -69,16 +69,16 @@ namespace J2N.Text
         [Test]
         public void Test_Exceptions()
         {
-            TestContext.WriteLine("MutableTextBuffer()");
+            TestContext.WriteLine("TextBuilder()");
             TryPass("  no args", () =>
             {
-                _ = OpenStringBuilderFactory();
+                _ = StringBuilderFactory();
             });
 
-            TestContext.WriteLine("MutableTextBuffer(int capacity)");
+            TestContext.WriteLine("TextBuilder(int capacity)");
             TryPass("  1", () =>
             {
-                _ = OpenStringBuilderFactory(1);
+                _ = StringBuilderFactory(1);
             });
 
             TryCatch<ArgumentOutOfRangeException>(
@@ -86,10 +86,10 @@ namespace J2N.Text
                 null, // BCL/J2N messages vary by framework/runtime
                 () =>
                 {
-                    _ = OpenStringBuilderFactory(-1);
+                    _ = StringBuilderFactory(-1);
                 });
 
-            TestContext.WriteLine("MutableTextBuffer(string value)");
+            TestContext.WriteLine("TextBuilder(string value)");
 
             // J2N: We are allowing null to be a no-op to match the BCL
             //TryCatch<ArgumentNullException>(
@@ -102,22 +102,22 @@ namespace J2N.Text
 
             TryPass("  null", () =>
             {
-                _ = OpenStringBuilderFactory((string)null);
+                _ = StringBuilderFactory((string)null);
             });
 
             TryPass("  foo", () =>
             {
-                _ = OpenStringBuilderFactory("foo");
+                _ = StringBuilderFactory("foo");
             });
 
-            TestContext.WriteLine("MutableTextBuffer.Replace(int startIndex, int count, string newValue)");
+            TestContext.WriteLine("TextBuilder.Replace(int startIndex, int count, string newValue)");
 
             TryCatch<ArgumentOutOfRangeException>(
                 "  -1, 2 - -1, \" \"",
                 null,
                 () =>
                 {
-                    var sb = OpenStringBuilderFactory("hilbert");
+                    var sb = StringBuilderFactory("hilbert");
                     sb.Replace(-1, 2 - -1, " "); // J2N: Corrected 2nd argument
                 });
 
@@ -126,7 +126,7 @@ namespace J2N.Text
                 null,
                 () =>
                 {
-                    var sb = OpenStringBuilderFactory("banach");
+                    var sb = StringBuilderFactory("banach");
                     sb.Replace(7, 8 - 7, " "); // J2N: Corrected 2nd argument
                 });
 
@@ -135,7 +135,7 @@ namespace J2N.Text
                 null,
                 () =>
                 {
-                    var sb = OpenStringBuilderFactory("riemann");
+                    var sb = StringBuilderFactory("riemann");
                     sb.Replace(2, 1 - 2, " "); // J2N: Corrected 2nd argument
                 });
         }

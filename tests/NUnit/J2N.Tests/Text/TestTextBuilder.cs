@@ -16,31 +16,30 @@
  */
 #endregion
 
-using J2N.Buffers;
 using System;
 using System.Text;
 #nullable enable
 
 namespace J2N.Text
 {
-    public class TestOpenStringBuilder : StringBuilderTestBase
+    public class TestTextBuilder : StringBuilderTestBase
     {
-        protected override MutableTextBuffer OpenStringBuilderFactory()
-            => new MutableTextBuffer(UninitializedArrayAllocator<char>.Default) { UseInvariantDefaults = true }.Initialize();
+        protected override TextBuilder StringBuilderFactory()
+            => new TextBuilder() { UseInvariantDefaults = true };
 
-        protected override MutableTextBuffer OpenStringBuilderFactory(int capacity)
-            => new MutableTextBuffer(UninitializedArrayAllocator<char>.Default) { UseInvariantDefaults = true }.Initialize(capacity);
+        protected override TextBuilder StringBuilderFactory(int capacity)
+            => new TextBuilder(capacity) { UseInvariantDefaults = true };
 
-        protected override MutableTextBuffer OpenStringBuilderFactory(string? value)
-            => new MutableTextBuffer(UninitializedArrayAllocator<char>.Default) { UseInvariantDefaults = true }.Initialize(value);
+        protected override TextBuilder StringBuilderFactory(string? value)
+            => new TextBuilder(value) { UseInvariantDefaults = true };
 
-        protected override MutableTextBuffer OpenStringBuilderFactory(ReadOnlySpan<char> value)
-            => new MutableTextBuffer(UninitializedArrayAllocator<char>.Default) { UseInvariantDefaults = true }.Initialize(value);
+        protected override TextBuilder StringBuilderFactory(ReadOnlySpan<char> value)
+            => new TextBuilder(value) { UseInvariantDefaults = true };
 
-        protected override MutableTextBuffer OpenStringBuilderFactory(StringBuilder? value)
-            => new MutableTextBuffer(UninitializedArrayAllocator<char>.Default) { UseInvariantDefaults = true }.Initialize(value);
+        protected override TextBuilder StringBuilderFactory(StringBuilder? value)
+            => new TextBuilder(value) { UseInvariantDefaults = true };
 
-        protected override MutableTextBuffer OpenStringBuilderFactory(ICharSequence? value)
-            => new MutableTextBuffer(UninitializedArrayAllocator<char>.Default) { UseInvariantDefaults = true }.Initialize(value);
+        protected override TextBuilder StringBuilderFactory(ICharSequence? value)
+            => new TextBuilder(value) { UseInvariantDefaults = true };
     }
 }
