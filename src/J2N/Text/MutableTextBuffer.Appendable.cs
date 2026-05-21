@@ -227,7 +227,6 @@ namespace J2N.Text
             {
                 m_Chars[index++] = charSequence[i];
             }
-            m_Position += count;
             
             return this;
         }
@@ -322,7 +321,6 @@ namespace J2N.Text
                 {
                     m_Chars[index++] = charSequence[i + startIndex];
                 }
-                m_Position += count;
             }
 
             return this;
