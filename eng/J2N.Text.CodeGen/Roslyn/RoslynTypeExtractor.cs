@@ -190,6 +190,9 @@ namespace J2N.Text.CodeGen.Roslyn
 
                         IsThis =
                             p.Modifiers.Any(SyntaxKind.ThisKeyword),
+
+                        DefaultValueExpression =
+                            p.Default?.Value.ToString(),
                     };
                 }).ToList();
 
@@ -318,6 +321,9 @@ namespace J2N.Text.CodeGen.Roslyn
 
                         IsThis =
                             p.Modifiers.Any(SyntaxKind.ThisKeyword),
+
+                        DefaultValueExpression =
+                            p.Default?.Value.ToString(),
                     };
                 }).ToList();
 

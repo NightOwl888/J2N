@@ -498,8 +498,13 @@ namespace J2N.Text.CodeGen.Generation
                     ? ""
                     : parameter.Modifier + " ";
 
+            string defaultValue =
+                parameter.DefaultValueExpression is null
+                    ? ""
+                    : $" = {parameter.DefaultValueExpression}";
+
             return
-                $"{modifier}{parameter.TypeName} {parameter.Name}";
+                $"{modifier}{parameter.TypeName} {parameter.Name}{defaultValue}";
         }
 
         private static IEnumerable<string> NormalizeLines(string text)

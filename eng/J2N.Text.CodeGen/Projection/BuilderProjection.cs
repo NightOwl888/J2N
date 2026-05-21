@@ -94,6 +94,7 @@ namespace J2N.Text.CodeGen.Projection
 
                             Modifier = p.Modifier,
                             IsThis = p.IsThis,
+                            DefaultValueExpression = p.DefaultValueExpression,
                         })
                         .ToList(),
 
@@ -169,6 +170,7 @@ namespace J2N.Text.CodeGen.Projection
 
                             Modifier = p.Modifier,
                             IsThis = p.IsThis,
+                            DefaultValueExpression = p.DefaultValueExpression,
                         })
                         .ToList(),
 

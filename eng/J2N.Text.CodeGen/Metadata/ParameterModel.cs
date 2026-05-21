@@ -13,5 +13,7 @@
         public bool IsThis { get; init; }
 
         public string? Modifier { get; init; }
+
+        public string? DefaultValueExpression { get; init; }
     }
 }
