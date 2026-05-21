@@ -1497,7 +1497,7 @@ namespace J2N.Text
         /// 
         /// </remarks>
         [CLSCompliant(false)]
-        public PooledTextBuilder Append(sbyte value, string? format, IFormatProvider? provider)
+        public PooledTextBuilder Append(sbyte value, string? format = null, IFormatProvider? provider = null)
         {
             buffer.Append(value, format, provider);
             return this;
@@ -1539,7 +1539,7 @@ namespace J2N.Text
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
         /// 
         /// </remarks>
-        public PooledTextBuilder Append(byte value, string? format, IFormatProvider? provider)
+        public PooledTextBuilder Append(byte value, string? format = null, IFormatProvider? provider = null)
         {
             buffer.Append(value, format, provider);
             return this;
@@ -1581,7 +1581,7 @@ namespace J2N.Text
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
         /// 
         /// </remarks>
-        public PooledTextBuilder Append(short value, string? format, IFormatProvider? provider)
+        public PooledTextBuilder Append(short value, string? format = null, IFormatProvider? provider = null)
         {
             buffer.Append(value, format, provider);
             return this;
@@ -1623,7 +1623,7 @@ namespace J2N.Text
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
         /// 
         /// </remarks>
-        public PooledTextBuilder Append(int value, string? format, IFormatProvider? provider)
+        public PooledTextBuilder Append(int value, string? format = null, IFormatProvider? provider = null)
         {
             buffer.Append(value, format, provider);
             return this;
@@ -1665,7 +1665,7 @@ namespace J2N.Text
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
         /// 
         /// </remarks>
-        public PooledTextBuilder Append(long value, string? format, IFormatProvider? provider)
+        public PooledTextBuilder Append(long value, string? format = null, IFormatProvider? provider = null)
         {
             buffer.Append(value, format, provider);
             return this;
@@ -1707,7 +1707,7 @@ namespace J2N.Text
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
         /// 
         /// </remarks>
-        public PooledTextBuilder Append(float value, string? format, IFormatProvider? provider)
+        public PooledTextBuilder Append(float value, string? format = null, IFormatProvider? provider = null)
         {
             buffer.Append(value, format, provider);
             return this;
@@ -1749,7 +1749,7 @@ namespace J2N.Text
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
         /// 
         /// </remarks>
-        public PooledTextBuilder Append(double value, string? format, IFormatProvider? provider)
+        public PooledTextBuilder Append(double value, string? format = null, IFormatProvider? provider = null)
         {
             buffer.Append(value, format, provider);
             return this;
@@ -1792,7 +1792,7 @@ namespace J2N.Text
         /// 
         /// </remarks>
         [CLSCompliant(false)]
-        public PooledTextBuilder Append(ushort value, string? format, IFormatProvider? provider)
+        public PooledTextBuilder Append(ushort value, string? format = null, IFormatProvider? provider = null)
         {
             buffer.Append(value, format, provider);
             return this;
@@ -1835,7 +1835,7 @@ namespace J2N.Text
         /// 
         /// </remarks>
         [CLSCompliant(false)]
-        public PooledTextBuilder Append(uint value, string? format, IFormatProvider? provider)
+        public PooledTextBuilder Append(uint value, string? format = null, IFormatProvider? provider = null)
         {
             buffer.Append(value, format, provider);
             return this;
@@ -1878,7 +1878,7 @@ namespace J2N.Text
         /// 
         /// </remarks>
         [CLSCompliant(false)]
-        public PooledTextBuilder Append(ulong value, string? format, IFormatProvider? provider)
+        public PooledTextBuilder Append(ulong value, string? format = null, IFormatProvider? provider = null)
         {
             buffer.Append(value, format, provider);
             return this;
@@ -1917,7 +1917,7 @@ namespace J2N.Text
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
         /// 
         /// </remarks>
-        public PooledTextBuilder Append(object? value, string? format, IFormatProvider? provider)
+        public PooledTextBuilder Append(object? value, string? format = null, IFormatProvider? provider = null)
         {
             buffer.Append(value, format, provider);
             return this;
@@ -2209,7 +2209,7 @@ namespace J2N.Text
         /// 
         /// </remarks>
         [CLSCompliant(false)]
-        public PooledTextBuilder Insert(int index, sbyte value, string? format, IFormatProvider? provider)
+        public PooledTextBuilder Insert(int index, sbyte value, string? format = null, IFormatProvider? provider = null)
         {
             buffer.Insert(index, value, format, provider);
             return this;
@@ -2244,7 +2244,7 @@ namespace J2N.Text
         /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
         /// 
         /// </remarks>
-        public PooledTextBuilder Insert(int index, byte value, string? format, IFormatProvider? provider)
+        public PooledTextBuilder Insert(int index, byte value, string? format = null, IFormatProvider? provider = null)
         {
             buffer.Insert(index, value, format, provider);
             return this;
@@ -2279,7 +2279,7 @@ namespace J2N.Text
         /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
         /// 
         /// </remarks>
-        public PooledTextBuilder Insert(int index, short value, string? format, IFormatProvider? provider)
+        public PooledTextBuilder Insert(int index, short value, string? format = null, IFormatProvider? provider = null)
         {
             buffer.Insert(index, value, format, provider);
             return this;
@@ -2314,7 +2314,7 @@ namespace J2N.Text
         /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
         /// 
         /// </remarks>
-        public PooledTextBuilder Insert(int index, int value, string? format, IFormatProvider? provider)
+        public PooledTextBuilder Insert(int index, int value, string? format = null, IFormatProvider? provider = null)
         {
             buffer.Insert(index, value, format, provider);
             return this;
@@ -2349,7 +2349,7 @@ namespace J2N.Text
         /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
         /// 
         /// </remarks>
-        public PooledTextBuilder Insert(int index, long value, string? format, IFormatProvider? provider)
+        public PooledTextBuilder Insert(int index, long value, string? format = null, IFormatProvider? provider = null)
         {
             buffer.Insert(index, value, format, provider);
             return this;
@@ -2384,7 +2384,7 @@ namespace J2N.Text
         /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
         /// 
         /// </remarks>
-        public PooledTextBuilder Insert(int index, float value, string? format, IFormatProvider? provider)
+        public PooledTextBuilder Insert(int index, float value, string? format = null, IFormatProvider? provider = null)
         {
             buffer.Insert(index, value, format, provider);
             return this;
@@ -2419,7 +2419,7 @@ namespace J2N.Text
         /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
         /// 
         /// </remarks>
-        public PooledTextBuilder Insert(int index, double value, string? format, IFormatProvider? provider)
+        public PooledTextBuilder Insert(int index, double value, string? format = null, IFormatProvider? provider = null)
         {
             buffer.Insert(index, value, format, provider);
             return this;
@@ -2455,7 +2455,7 @@ namespace J2N.Text
         /// 
         /// </remarks>
         [CLSCompliant(false)]
-        public PooledTextBuilder Insert(int index, ushort value, string? format, IFormatProvider? provider)
+        public PooledTextBuilder Insert(int index, ushort value, string? format = null, IFormatProvider? provider = null)
         {
             buffer.Insert(index, value, format, provider);
             return this;
@@ -2491,7 +2491,7 @@ namespace J2N.Text
         /// 
         /// </remarks>
         [CLSCompliant(false)]
-        public PooledTextBuilder Insert(int index, uint value, string? format, IFormatProvider? provider)
+        public PooledTextBuilder Insert(int index, uint value, string? format = null, IFormatProvider? provider = null)
         {
             buffer.Insert(index, value, format, provider);
             return this;
@@ -2527,7 +2527,7 @@ namespace J2N.Text
         /// 
         /// </remarks>
         [CLSCompliant(false)]
-        public PooledTextBuilder Insert(int index, ulong value, string? format, IFormatProvider? provider)
+        public PooledTextBuilder Insert(int index, ulong value, string? format = null, IFormatProvider? provider = null)
         {
             buffer.Insert(index, value, format, provider);
             return this;
@@ -2680,7 +2680,7 @@ namespace J2N.Text
         /// If <paramref name="value"/> is <c>null</c>, the <see cref="PooledTextBuilder"/> is not changed.
         /// 
         /// </remarks>
-        public PooledTextBuilder Insert(int index, object? value, string? format, IFormatProvider? provider)
+        public PooledTextBuilder Insert(int index, object? value, string? format = null, IFormatProvider? provider = null)
         {
             buffer.Insert(index, value, format, provider);
             return this;

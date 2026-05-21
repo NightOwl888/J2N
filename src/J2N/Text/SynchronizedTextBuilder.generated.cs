@@ -1671,7 +1671,7 @@ namespace J2N.Text
         /// 
         /// </remarks>
         [CLSCompliant(false)]
-        public SynchronizedTextBuilder Append(sbyte value, string? format, IFormatProvider? provider)
+        public SynchronizedTextBuilder Append(sbyte value, string? format = null, IFormatProvider? provider = null)
         {
             lock (syncRoot)
             {
@@ -1716,7 +1716,7 @@ namespace J2N.Text
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
         /// 
         /// </remarks>
-        public SynchronizedTextBuilder Append(byte value, string? format, IFormatProvider? provider)
+        public SynchronizedTextBuilder Append(byte value, string? format = null, IFormatProvider? provider = null)
         {
             lock (syncRoot)
             {
@@ -1761,7 +1761,7 @@ namespace J2N.Text
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
         /// 
         /// </remarks>
-        public SynchronizedTextBuilder Append(short value, string? format, IFormatProvider? provider)
+        public SynchronizedTextBuilder Append(short value, string? format = null, IFormatProvider? provider = null)
         {
             lock (syncRoot)
             {
@@ -1806,7 +1806,7 @@ namespace J2N.Text
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
         /// 
         /// </remarks>
-        public SynchronizedTextBuilder Append(int value, string? format, IFormatProvider? provider)
+        public SynchronizedTextBuilder Append(int value, string? format = null, IFormatProvider? provider = null)
         {
             lock (syncRoot)
             {
@@ -1851,7 +1851,7 @@ namespace J2N.Text
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
         /// 
         /// </remarks>
-        public SynchronizedTextBuilder Append(long value, string? format, IFormatProvider? provider)
+        public SynchronizedTextBuilder Append(long value, string? format = null, IFormatProvider? provider = null)
         {
             lock (syncRoot)
             {
@@ -1896,7 +1896,7 @@ namespace J2N.Text
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
         /// 
         /// </remarks>
-        public SynchronizedTextBuilder Append(float value, string? format, IFormatProvider? provider)
+        public SynchronizedTextBuilder Append(float value, string? format = null, IFormatProvider? provider = null)
         {
             lock (syncRoot)
             {
@@ -1941,7 +1941,7 @@ namespace J2N.Text
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
         /// 
         /// </remarks>
-        public SynchronizedTextBuilder Append(double value, string? format, IFormatProvider? provider)
+        public SynchronizedTextBuilder Append(double value, string? format = null, IFormatProvider? provider = null)
         {
             lock (syncRoot)
             {
@@ -1987,7 +1987,7 @@ namespace J2N.Text
         /// 
         /// </remarks>
         [CLSCompliant(false)]
-        public SynchronizedTextBuilder Append(ushort value, string? format, IFormatProvider? provider)
+        public SynchronizedTextBuilder Append(ushort value, string? format = null, IFormatProvider? provider = null)
         {
             lock (syncRoot)
             {
@@ -2033,7 +2033,7 @@ namespace J2N.Text
         /// 
         /// </remarks>
         [CLSCompliant(false)]
-        public SynchronizedTextBuilder Append(uint value, string? format, IFormatProvider? provider)
+        public SynchronizedTextBuilder Append(uint value, string? format = null, IFormatProvider? provider = null)
         {
             lock (syncRoot)
             {
@@ -2079,7 +2079,7 @@ namespace J2N.Text
         /// 
         /// </remarks>
         [CLSCompliant(false)]
-        public SynchronizedTextBuilder Append(ulong value, string? format, IFormatProvider? provider)
+        public SynchronizedTextBuilder Append(ulong value, string? format = null, IFormatProvider? provider = null)
         {
             lock (syncRoot)
             {
@@ -2121,7 +2121,7 @@ namespace J2N.Text
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
         /// 
         /// </remarks>
-        public SynchronizedTextBuilder Append(object? value, string? format, IFormatProvider? provider)
+        public SynchronizedTextBuilder Append(object? value, string? format = null, IFormatProvider? provider = null)
         {
             lock (syncRoot)
             {
@@ -2464,7 +2464,7 @@ namespace J2N.Text
         /// 
         /// </remarks>
         [CLSCompliant(false)]
-        public SynchronizedTextBuilder Insert(int index, sbyte value, string? format, IFormatProvider? provider)
+        public SynchronizedTextBuilder Insert(int index, sbyte value, string? format = null, IFormatProvider? provider = null)
         {
             lock (syncRoot)
             {
@@ -2502,7 +2502,7 @@ namespace J2N.Text
         /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
         /// 
         /// </remarks>
-        public SynchronizedTextBuilder Insert(int index, byte value, string? format, IFormatProvider? provider)
+        public SynchronizedTextBuilder Insert(int index, byte value, string? format = null, IFormatProvider? provider = null)
         {
             lock (syncRoot)
             {
@@ -2540,7 +2540,7 @@ namespace J2N.Text
         /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
         /// 
         /// </remarks>
-        public SynchronizedTextBuilder Insert(int index, short value, string? format, IFormatProvider? provider)
+        public SynchronizedTextBuilder Insert(int index, short value, string? format = null, IFormatProvider? provider = null)
         {
             lock (syncRoot)
             {
@@ -2578,7 +2578,7 @@ namespace J2N.Text
         /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
         /// 
         /// </remarks>
-        public SynchronizedTextBuilder Insert(int index, int value, string? format, IFormatProvider? provider)
+        public SynchronizedTextBuilder Insert(int index, int value, string? format = null, IFormatProvider? provider = null)
         {
             lock (syncRoot)
             {
@@ -2616,7 +2616,7 @@ namespace J2N.Text
         /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
         /// 
         /// </remarks>
-        public SynchronizedTextBuilder Insert(int index, long value, string? format, IFormatProvider? provider)
+        public SynchronizedTextBuilder Insert(int index, long value, string? format = null, IFormatProvider? provider = null)
         {
             lock (syncRoot)
             {
@@ -2654,7 +2654,7 @@ namespace J2N.Text
         /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
         /// 
         /// </remarks>
-        public SynchronizedTextBuilder Insert(int index, float value, string? format, IFormatProvider? provider)
+        public SynchronizedTextBuilder Insert(int index, float value, string? format = null, IFormatProvider? provider = null)
         {
             lock (syncRoot)
             {
@@ -2692,7 +2692,7 @@ namespace J2N.Text
         /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
         /// 
         /// </remarks>
-        public SynchronizedTextBuilder Insert(int index, double value, string? format, IFormatProvider? provider)
+        public SynchronizedTextBuilder Insert(int index, double value, string? format = null, IFormatProvider? provider = null)
         {
             lock (syncRoot)
             {
@@ -2731,7 +2731,7 @@ namespace J2N.Text
         /// 
         /// </remarks>
         [CLSCompliant(false)]
-        public SynchronizedTextBuilder Insert(int index, ushort value, string? format, IFormatProvider? provider)
+        public SynchronizedTextBuilder Insert(int index, ushort value, string? format = null, IFormatProvider? provider = null)
         {
             lock (syncRoot)
             {
@@ -2770,7 +2770,7 @@ namespace J2N.Text
         /// 
         /// </remarks>
         [CLSCompliant(false)]
-        public SynchronizedTextBuilder Insert(int index, uint value, string? format, IFormatProvider? provider)
+        public SynchronizedTextBuilder Insert(int index, uint value, string? format = null, IFormatProvider? provider = null)
         {
             lock (syncRoot)
             {
@@ -2809,7 +2809,7 @@ namespace J2N.Text
         /// 
         /// </remarks>
         [CLSCompliant(false)]
-        public SynchronizedTextBuilder Insert(int index, ulong value, string? format, IFormatProvider? provider)
+        public SynchronizedTextBuilder Insert(int index, ulong value, string? format = null, IFormatProvider? provider = null)
         {
             lock (syncRoot)
             {
@@ -2977,7 +2977,7 @@ namespace J2N.Text
         /// If <paramref name="value"/> is <c>null</c>, the <see cref="SynchronizedTextBuilder"/> is not changed.
         /// 
         /// </remarks>
-        public SynchronizedTextBuilder Insert(int index, object? value, string? format, IFormatProvider? provider)
+        public SynchronizedTextBuilder Insert(int index, object? value, string? format = null, IFormatProvider? provider = null)
         {
             lock (syncRoot)
             {
