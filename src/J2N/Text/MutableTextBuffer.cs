@@ -1441,7 +1441,7 @@ namespace J2N.Text
                 int endIndex = startIndex + length;
                 m_Chars.AsSpan(endIndex).CopyTo(m_Chars.AsSpan(startIndex));
                 m_Position -= length;
-                if (zeroBeyondPosition && !allocator.GuaranteesClearedArrays)
+                if (zeroBeyondPosition)
                 {
                     m_Chars.AsSpan(m_Position).Fill('\0'); // Zero out the remaining chars
                 }
@@ -5785,10 +5785,7 @@ namespace J2N.Text
                 Grow(length);
             }
             Span<char> buffer = m_Chars.AsSpan(pos, length);
-            if (!allocator.GuaranteesClearedArrays)
-            {
-                buffer.Fill('\0'); // Ensure the buffer doesn't contain any sensitive data before providing it to the user
-            }
+            buffer.Fill('\0'); // Ensure the buffer doesn't contain any sensitive data before providing it to the user
             m_Position += length;
             return buffer;
         }
