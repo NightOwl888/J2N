@@ -16,6 +16,7 @@
  */
 #endregion
 
+using NUnit.Framework;
 using System;
 using System.Text;
 #nullable enable
@@ -41,5 +42,21 @@ namespace J2N.Text
 
         protected override TextBuilder StringBuilderFactory(ICharSequence? value)
             => new TextBuilder(value) { UseInvariantDefaults = true };
+
+        // Regression for overflow check bug in StringExtensions
+        [Test]
+        public void TextBuilder_Delete_WhenCountOverflows_ShouldClampToEnd()
+        {
+            // Arrange
+            var text = StringBuilderFactory("abcdef");
+
+            // Act + Assert
+            Assert.DoesNotThrow(() =>
+            {
+                text.Delete(1, int.MaxValue);
+            });
+
+            Assert.That(text.ToString(), Is.EqualTo("a"));
+        }
     }
 }

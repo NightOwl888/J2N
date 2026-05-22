@@ -5771,14 +5771,13 @@ namespace J2N.Text
         [CodeGenerationReturnsSelf]
         public MutableTextBuffer Delete(int startIndex, int count) // Coverage for the JDK
         {
-            // J2N TODO: This should clamp, not throw
             if ((uint)startIndex > (uint)m_Position)
                 ThrowHelper.ThrowArgumentOutOfRange_ArgumentOutOfRange_IndexString(startIndex, ExceptionArgument.startIndex);
             if (count < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(count, ExceptionArgument.count);
 
             int pos = m_Position;
-            if (startIndex + count > pos)
+            if ((uint)startIndex + (uint)count > pos)
                 count = pos - startIndex;
             if (count > 0)
                 RemoveCore(startIndex, count, zeroBeyondPosition: true);
