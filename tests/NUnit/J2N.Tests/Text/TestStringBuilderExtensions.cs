@@ -309,6 +309,22 @@ namespace J2N.Text
             assertEquals("YY", sb.ToString());
         }
 
+        // J2N: Regression for overflow bug in clamping logic
+        [Test]
+        public void StringBuilder_Delete_WhenCountOverflows_ShouldClampToEnd()
+        {
+            // Arrange
+            var text = new StringBuilder("abcdef");
+
+            // Act + Assert
+            Assert.DoesNotThrow(() =>
+            {
+                text.Delete(1, int.MaxValue);
+            });
+
+            Assert.That(text.ToString(), Is.EqualTo("a"));
+        }
+
         /**
          * @tests java.lang.StringBuilder.replace(int, int, String)'
          */

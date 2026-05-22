@@ -858,7 +858,7 @@ namespace J2N.Text
             if (count < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(count, ExceptionArgument.count);
 
-            if (startIndex + count > text.Length)
+            if ((uint)startIndex + (uint)count > text.Length)
                 count = text.Length - startIndex;
             if (count > 0)
                 text.Remove(startIndex, count);
