@@ -764,25 +764,21 @@ namespace J2N.Text
         {
             const string fixture = "0123456789";
             TextBuilder sb = StringBuilderFactory(fixture);
-            //assertSame(sb, sb.deleteCharAt(0));
-            assertSame(sb, sb.Remove(0, 1));
+            assertSame(sb, sb.RemoveAt(0));
             assertEquals("123456789", sb.ToString());
             assertEquals(9, sb.Length);
             sb = StringBuilderFactory(fixture);
-            //assertSame(sb, sb.deleteCharAt(5));
-            assertSame(sb, sb.Remove(5, 1));
+            assertSame(sb, sb.RemoveAt(5));
             assertEquals("012346789", sb.ToString());
             assertEquals(9, sb.Length);
             sb = StringBuilderFactory(fixture);
-            //assertSame(sb, sb.deleteCharAt(9));
-            assertSame(sb, sb.Remove(9, 1));
+            assertSame(sb, sb.RemoveAt(9));
             assertEquals("012345678", sb.ToString());
             assertEquals(9, sb.Length);
 
             try
             {
-                //OpenStringBuilderFactory(fixture).deleteCharAt(-1);
-                StringBuilderFactory(fixture).Remove(-1, 1);
+                StringBuilderFactory(fixture).RemoveAt(-1);
                 fail("no SIOOBE, negative index");
             }
             catch (ArgumentOutOfRangeException) // StringIndexOutOfBoundsException
@@ -792,8 +788,7 @@ namespace J2N.Text
 
             try
             {
-                //OpenStringBuilderFactory(fixture).deleteCharAt(fixture.Length);
-                StringBuilderFactory(fixture).Remove(fixture.Length, 1);
+                StringBuilderFactory(fixture).RemoveAt(fixture.Length);
                 fail("no SIOOBE, index equals length");
             }
             catch (ArgumentOutOfRangeException) // StringIndexOutOfBoundsException
@@ -803,8 +798,7 @@ namespace J2N.Text
 
             try
             {
-                //OpenStringBuilderFactory(fixture).deleteCharAt(fixture.Length + 1);
-                StringBuilderFactory(fixture).Remove(fixture.Length + 1, 1);
+                StringBuilderFactory(fixture).RemoveAt(fixture.Length + 1);
                 fail("no SIOOBE, index exceeds length");
             }
             catch (ArgumentOutOfRangeException) // StringIndexOutOfBoundsException

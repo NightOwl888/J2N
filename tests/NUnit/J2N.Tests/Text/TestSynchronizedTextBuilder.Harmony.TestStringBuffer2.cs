@@ -323,18 +323,18 @@ namespace J2N.Text
                         "more stuff", testBuffer.ToString());
             }
 
-            /////**
-            //// * @tests java.lang.SynchronizedTextBuilder#deleteCharAt(int)
-            //// */
-            ////[Test]
-            ////public void Test_deleteCharAtI()
-            ////{
-            ////    // Test for method java.lang.SynchronizedTextBuilder
-            ////    // java.lang.SynchronizedTextBuilder.deleteCharAt(int)
-            ////    testBuffer.deleteCharAt(3);
-            ////    assertEquals("Deleted incorrect char",
-            ////            "Thi is a test buffer", testBuffer.ToString());
-            ////}
+            /**
+             * @tests java.lang.SynchronizedTextBuilder#deleteCharAt(int)
+             */
+            [Test]
+            public void Test_deleteCharAtI()
+            {
+                // Test for method java.lang.SynchronizedTextBuilder
+                // java.lang.SynchronizedTextBuilder.deleteCharAt(int)
+                testBuffer.RemoveAt(3);
+                assertEquals("Deleted incorrect char",
+                        "Thi is a test buffer", testBuffer.ToString());
+            }
 
             /**
              * @tests java.lang.SynchronizedTextBuilder#ensureCapacity(int)

@@ -1400,7 +1400,7 @@ namespace J2N.Text
         /// <param name="index">The zero-based position in this instance of the character to remove.</param>
         /// <returns>A reference to this instance after the excise operation has completed.</returns>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> is less than zero or
-        /// greater than the length of this instance.</exception>
+        /// greater than or equal to the length of this instance.</exception>
         /// <remarks>
         /// The current method removes the specified character from the current instance. The characters at
         /// (<paramref name="index"/> + 1) are moved to <paramref name="index"/>, and
@@ -1414,9 +1414,9 @@ namespace J2N.Text
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(index, ExceptionArgument.index);
 
             int currentLength = Length;
-            if ((uint)index > (uint)currentLength)
+            if ((uint)index >= (uint)currentLength)
             {
-                ThrowHelper.ThrowArgumentOutOfRange_IndexMustBeLessOrEqualException(index, ExceptionArgument.index);
+                ThrowHelper.ThrowArgumentOutOfRange_IndexMustBeLessException(index, ExceptionArgument.index);
             }
 
             RemoveCore(index, 1, zeroBeyondPosition: true);
