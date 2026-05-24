@@ -1586,7 +1586,7 @@ namespace J2N.Text
 #if FEATURE_SPANFORMATTABLE
             => AppendSpanFormattable(value, format, provider);
 #else
-            => AppendNumberCore<sbyte, SByteFormatter>(3, value, format.AsSpan(), provider);
+            => AppendNumberCore<sbyte, SByteFormatter>(3, value, format, provider);
 #endif
 
         /// <summary>
@@ -1620,7 +1620,7 @@ namespace J2N.Text
 #if FEATURE_SPANFORMATTABLE
             => AppendSpanFormattable(value, format, provider);
 #else
-            => AppendNumberCore<byte, ByteFormatter>(4, value, format.AsSpan(), provider);
+            => AppendNumberCore<byte, ByteFormatter>(4, value, format, provider);
 #endif
 
         /// <summary>
@@ -1654,7 +1654,7 @@ namespace J2N.Text
 #if FEATURE_SPANFORMATTABLE
             => AppendSpanFormattable(value, format, provider);
 #else
-            => AppendNumberCore<short, Int16Formatter>(4, value, format.AsSpan(), provider);
+            => AppendNumberCore<short, Int16Formatter>(4, value, format, provider);
 #endif
 
         /// <summary>
@@ -1688,7 +1688,7 @@ namespace J2N.Text
 #if FEATURE_SPANFORMATTABLE
             => AppendSpanFormattable(value, format, provider);
 #else
-            => AppendNumberCore<int, Int32Formatter>(6, value, format.AsSpan(), provider);
+            => AppendNumberCore<int, Int32Formatter>(6, value, format, provider);
 #endif
 
         /// <summary>
@@ -1722,7 +1722,7 @@ namespace J2N.Text
 #if FEATURE_SPANFORMATTABLE
             => AppendSpanFormattable(value, format, provider);
 #else
-            => AppendNumberCore<long, Int64Formatter>(10, value, format.AsSpan(), provider);
+            => AppendNumberCore<long, Int64Formatter>(10, value, format, provider);
 #endif
         /// <summary>
         /// Appends the string representation of a specified single-precision floating-point number to this instance
@@ -1752,7 +1752,7 @@ namespace J2N.Text
         /// <seealso cref="float"/>
         [CodeGenerationReturnsSelf]
         public MutableTextBuffer Append(float value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
-            => AppendNumberCore<float, SingleFormatter>(6, value, format.AsSpan(), provider);
+            => AppendNumberCore<float, SingleFormatter>(6, value, format, provider);
 
         /// <summary>
         /// Appends the string representation of a specified double-precision floating-point number to this instance
@@ -1782,7 +1782,7 @@ namespace J2N.Text
         /// <seealso cref="double"/>
         [CodeGenerationReturnsSelf]
         public MutableTextBuffer Append(double value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
-            => AppendNumberCore<double, DoubleFormatter>(14, value, format.AsSpan(), provider);
+            => AppendNumberCore<double, DoubleFormatter>(14, value, format, provider);
 
         /// <summary>
         /// Appends the string representation of a specified decimal to this instance
@@ -1851,7 +1851,7 @@ namespace J2N.Text
 #if FEATURE_SPANFORMATTABLE
             => AppendSpanFormattable(value, format, provider);
 #else
-            => AppendNumberCore<ushort, UInt16Formatter>(4, value, format.AsSpan(), provider);
+            => AppendNumberCore<ushort, UInt16Formatter>(4, value, format, provider);
 #endif
         /// <summary>
         /// Appends the string representation of a specified 32-bit unsigned integer to this instance
@@ -1885,7 +1885,7 @@ namespace J2N.Text
 #if FEATURE_SPANFORMATTABLE
             => AppendSpanFormattable(value, format, provider);
 #else
-            => AppendNumberCore<uint, UInt32Formatter>(6, value, format.AsSpan(), provider);
+            => AppendNumberCore<uint, UInt32Formatter>(6, value, format, provider);
 #endif
 
         /// <summary>
@@ -1920,7 +1920,7 @@ namespace J2N.Text
 #if FEATURE_SPANFORMATTABLE
             => AppendSpanFormattable(value, format, provider);
 #else
-            => AppendNumberCore<ulong, UInt64Formatter>(10, value, format.AsSpan(), provider);
+            => AppendNumberCore<ulong, UInt64Formatter>(10, value, format, provider);
 #endif
 
         // J2N: Helper method for supported types so we don't need to duplicate all of this business logic
@@ -2033,7 +2033,7 @@ namespace J2N.Text
                 return AppendSpanFormattable(spanFormattable, format, provider);
 #else
             else if (value is Number number) // J2N: Check for Number-derived reference types, as this will improve performance.
-                return AppendSpanFormattable(number, format.AsSpan(), provider);
+                return AppendSpanFormattable(number, format, provider);
 #endif
             else if (value is IStructuralFormattable structuralFormattable)
                 return Append(structuralFormattable.ToString(format, provider));
@@ -2086,7 +2086,7 @@ namespace J2N.Text
 #if FEATURE_MEMORYMARSHAL_GETARRAYDATAREFERENCE
                 Append(ref MemoryMarshal.GetArrayDataReference(value), value.Length);
 #else
-                Append(ref MemoryMarshal.GetReference(value.AsSpan()), value.Length);
+                Append(ref MemoryMarshal.GetReference(value), value.Length);
 #endif
             }
 
@@ -2517,9 +2517,9 @@ namespace J2N.Text
         [CodeGenerationReturnsSelf]
         public MutableTextBuffer Insert(int index, sbyte value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
-            => InsertSpanFormattable(index, value, format.AsSpan(), provider);
+            => InsertSpanFormattable(index, value, format, provider);
 #else
-            => InsertNumberCore<sbyte, SByteFormatter>(index, value, format.AsSpan(), provider);
+            => InsertNumberCore<sbyte, SByteFormatter>(index, value, format, provider);
 #endif
 
         /// <summary>
@@ -2552,7 +2552,7 @@ namespace J2N.Text
 #if FEATURE_SPANFORMATTABLE
             => InsertSpanFormattable(index, value, format, provider);
 #else
-            => InsertNumberCore<byte, ByteFormatter>(index, value, format.AsSpan(), provider);
+            => InsertNumberCore<byte, ByteFormatter>(index, value, format, provider);
 #endif
 
         /// <summary>
@@ -2585,7 +2585,7 @@ namespace J2N.Text
 #if FEATURE_SPANFORMATTABLE
             => InsertSpanFormattable(index, value, format, provider);
 #else
-            => InsertNumberCore<short, Int16Formatter>(index, value, format.AsSpan(), provider);
+            => InsertNumberCore<short, Int16Formatter>(index, value, format, provider);
 #endif
 
         /// <summary>
@@ -2618,7 +2618,7 @@ namespace J2N.Text
 #if FEATURE_SPANFORMATTABLE
             => InsertSpanFormattable(index, value, format, provider);
 #else
-            => InsertNumberCore<int, Int32Formatter>(index, value, format.AsSpan(), provider);
+            => InsertNumberCore<int, Int32Formatter>(index, value, format, provider);
 #endif
 
         /// <summary>
@@ -2651,7 +2651,7 @@ namespace J2N.Text
 #if FEATURE_SPANFORMATTABLE
             => InsertSpanFormattable(index, value, format, provider);
 #else
-            => InsertNumberCore<long, Int64Formatter>(index, value, format.AsSpan(), provider);
+            => InsertNumberCore<long, Int64Formatter>(index, value, format, provider);
 #endif
 
         /// <summary>
@@ -2681,7 +2681,7 @@ namespace J2N.Text
         /// <seealso cref="float"/>
         [CodeGenerationReturnsSelf]
         public MutableTextBuffer Insert(int index, float value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
-            => InsertNumberCore<float, SingleFormatter>(index, value, format.AsSpan(), provider);
+            => InsertNumberCore<float, SingleFormatter>(index, value, format, provider);
 
         /// <summary>
         /// Inserts the string representation of a specified double-precision floating-point number to this instance
@@ -2710,7 +2710,7 @@ namespace J2N.Text
         /// <seealso cref="double"/>
         [CodeGenerationReturnsSelf]
         public MutableTextBuffer Insert(int index, double value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
-            => InsertNumberCore<double, DoubleFormatter>(index, value, format.AsSpan(), provider);
+            => InsertNumberCore<double, DoubleFormatter>(index, value, format, provider);
 
         /// <summary>
         /// Inserts the string representation of a specified decimal to this instance
@@ -2777,7 +2777,7 @@ namespace J2N.Text
 #if FEATURE_SPANFORMATTABLE
             => InsertSpanFormattable(index, value, format, provider);
 #else
-            => InsertNumberCore<ushort, UInt16Formatter>(index, value, format.AsSpan(), provider);
+            => InsertNumberCore<ushort, UInt16Formatter>(index, value, format, provider);
 #endif
 
         /// <summary>
@@ -2811,7 +2811,7 @@ namespace J2N.Text
 #if FEATURE_SPANFORMATTABLE
             => InsertSpanFormattable(index, value, format, provider);
 #else
-            => InsertNumberCore<uint, UInt32Formatter>(index, value, format.AsSpan(), provider);
+            => InsertNumberCore<uint, UInt32Formatter>(index, value, format, provider);
 #endif
 
         /// <summary>
@@ -2845,7 +2845,7 @@ namespace J2N.Text
 #if FEATURE_SPANFORMATTABLE
             => InsertSpanFormattable(index, value, format, provider);
 #else
-            => InsertNumberCore<ulong, UInt64Formatter>(index, value, format.AsSpan(), provider);
+            => InsertNumberCore<ulong, UInt64Formatter>(index, value, format, provider);
 #endif
 
         // J2N: Helper method for supported types so we don't need to duplicate all of this business logic
@@ -2956,7 +2956,7 @@ namespace J2N.Text
 #if FEATURE_MEMORYMARSHAL_GETARRAYDATAREFERENCE
                 Insert(index, ref MemoryMarshal.GetArrayDataReference(value), value.Length);
 #else
-                Insert(index, ref MemoryMarshal.GetReference(value.AsSpan()), value.Length);
+                Insert(index, ref MemoryMarshal.GetReference(value), value.Length);
 #endif
             }
             return this;
@@ -3133,7 +3133,7 @@ namespace J2N.Text
                 return InsertSpanFormattable(index, spanFormattable, format, provider);
 #else
             else if (value is Number number) // J2N: Check for Number-derived reference types, as this will improve performance.
-                return InsertSpanFormattable(index, number, format.AsSpan(), provider);
+                return InsertSpanFormattable(index, number, format, provider);
 #endif
             else if (value is IStructuralFormattable structuralFormattable)
                 return Insert(index, structuralFormattable.ToString(format, provider), 1);
@@ -5259,7 +5259,7 @@ namespace J2N.Text
             if (count < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(count, ExceptionArgument.count);
 
-            ReplaceCore(startIndex, count, newValue.AsSpan());
+            ReplaceCore(startIndex, count, newValue);
             return this;
         }
 
@@ -5324,7 +5324,6 @@ namespace J2N.Text
                     MakeRoom(startIndex, -diff);
                 }
                 // copy the chars based on the new length
-                //newValue.CopyTo(m_Chars.AsSpan(startIndex, stringLength));
                 int index = startIndex; // Need a copy in case it is modified so it doesn't affect the below insert.
                 ReplaceInPlace(ref index, ref MemoryMarshal.GetReference(newValue), stringLength);
             }
@@ -5503,7 +5502,7 @@ namespace J2N.Text
 #if FEATURE_MEMORYMARSHAL_GETARRAYDATAREFERENCE
                     ref char destination = ref Unsafe.Add(ref MemoryMarshal.GetArrayDataReference(chars), pos);
 #else
-                    ref char destination = ref Unsafe.Add(ref MemoryMarshal.GetReference(chars.AsSpan()), pos);
+                    ref char destination = ref Unsafe.Add(ref MemoryMarshal.GetReference(chars), pos);
 #endif
                     if (valueCount <= 2)
                     {
@@ -5545,7 +5544,7 @@ namespace J2N.Text
 #if FEATURE_MEMORYMARSHAL_GETARRAYDATAREFERENCE
             ref char destination = ref Unsafe.Add(ref MemoryMarshal.GetArrayDataReference(chars), pos);
 #else
-            ref char destination = ref Unsafe.Add(ref MemoryMarshal.GetReference(chars.AsSpan()), pos);
+            ref char destination = ref Unsafe.Add(ref MemoryMarshal.GetReference(chars), pos);
 #endif
             if (valueCount <= 2)
             {
@@ -6015,7 +6014,7 @@ namespace J2N.Text
 #if FEATURE_MEMORYMARSHAL_GETARRAYDATAREFERENCE
             ref char chars = ref MemoryMarshal.GetArrayDataReference(m_Chars);
 #else
-            ref char chars = ref MemoryMarshal.GetReference(m_Chars.AsSpan());
+            ref char chars = ref MemoryMarshal.GetReference(m_Chars);
 #endif
 
             int tailCount = pos - index;
