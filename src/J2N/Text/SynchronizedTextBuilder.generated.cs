@@ -4642,36 +4642,30 @@ namespace J2N.Text
 #if FEATURE_INDEX_RANGE
         /// <summary>
         /// 
-        /// Duplicates a range of characters within the buffer by inserting
-        /// a copy of the specified range at the specified destination index.
-        /// <para/>
-        /// This operation supports overlapping source and destination ranges.
+        /// Inserts a copy of the specified range from this buffer at the specified index.
         /// 
         /// </summary>
-        /// <param name="range">
-        /// 
-        /// The range of characters to duplicate.
-        /// 
+        /// <param name="index">
+        /// The index at which the copied range will be inserted.
         /// </param>
-        /// <param name="destinationIndex">
-        /// 
-        /// The index at which the duplicated range will be inserted.
-        /// 
+        /// <param name="range">
+        /// The range of characters to copy and insert.
         /// </param>
         /// <returns>
         /// A reference to this instance after the operation has completed.
         /// </returns>
         /// <remarks>
         /// 
-        /// <paramref name="destinationIndex"/> refers to the original buffer
-        /// before duplication takes place.
+        /// This operation supports overlapping source and destination ranges.
+        /// <para/>
+        /// <paramref name="index"/> refers to the original buffer before insertion takes place.
         /// 
         /// </remarks>
-        public SynchronizedTextBuilder DuplicateRange(Range range, int destinationIndex)
+        public SynchronizedTextBuilder InsertSelf(int index, Range range)
         {
             lock (syncRoot)
             {
-                buffer.DuplicateRange(range, destinationIndex);
+                buffer.InsertSelf(index, range);
                 return this;
             }
         }
@@ -4680,36 +4674,36 @@ namespace J2N.Text
 
         /// <summary>
         /// 
-        /// Duplicates a range of characters within the buffer by insserting a copy
-        /// from the specified <paramref name="startIndex"/> and <paramref name="count"/>
-        /// to the specified <paramref name="destinationIndex"/>, expanding the <see cref="Length"/> of the
-        /// buffer by <paramref name="count"/>.
-        /// <para/>
-        /// This operation supports overlapping source and destination ranges.
+        /// Inserts a copy of a range of characters from this buffer
+        /// at the specified index, expanding the <see cref="Length"/> by
+        /// <paramref name="count"/>.
         /// 
         /// </summary>
+        /// <param name="index">
+        /// The index at which the copied range will be inserted.
+        /// </param>
         /// <param name="startIndex">
-        /// The starting index of the source segment to copy.
+        /// The starting index of the source range to copy.
         /// </param>
         /// <param name="count">
         /// The number of characters to copy.
-        /// </param>
-        /// <param name="destinationIndex">
-        /// The index at which the duplicated range will be inserted.
         /// </param>
         /// <returns>
         /// A reference to this instance after the operation has completed.
         /// </returns>
         /// <remarks>
         /// 
-        /// <paramref name="destinationIndex"/> refers to the original buffer before duplication takes place.
+        /// This operation supports overlapping source and destination ranges.
+        /// <para/>
+        /// <paramref name="index"/> refers to the original buffer before insertion
+        /// takes place.
         /// 
         /// </remarks>
-        public SynchronizedTextBuilder DuplicateRange(int startIndex, int count, int destinationIndex)
+        public SynchronizedTextBuilder InsertSelf(int index, int startIndex, int count)
         {
             lock (syncRoot)
             {
-                buffer.DuplicateRange(startIndex, count, destinationIndex);
+                buffer.InsertSelf(index, startIndex, count);
                 return this;
             }
         }

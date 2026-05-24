@@ -5923,77 +5923,75 @@ namespace J2N.Text
 
 #if FEATURE_INDEX_RANGE
         /// <summary>
-        /// Duplicates a range of characters within the buffer by inserting
-        /// a copy of the specified range at the specified destination index.
-        /// <para/>
-        /// This operation supports overlapping source and destination ranges.
+        /// Inserts a copy of the specified range from this buffer at the specified index.
         /// </summary>
-        /// <param name="range">
-        /// The range of characters to duplicate.
-        /// </param>
-        /// <param name="destinationIndex">
-        /// The index at which the duplicated range will be inserted.
-        /// </param>
+        /// <param name="index">The index at which the copied range will be inserted.</param>
+        /// <param name="range">The range of characters to copy and insert.</param>
         /// <exception cref="ArgumentOutOfRangeException">
-        /// <paramref name="destinationIndex"/> is less than zero.
+        /// <paramref name="index"/> is less than zero.
         /// <para/>
         /// -or-
         /// <para/>
-        /// <paramref name="destinationIndex"/> is greater than <see cref="Length"/>.
+        /// <paramref name="index"/> is greater than <see cref="Length"/>.
         /// </exception>
         /// <exception cref="ArgumentException">
         /// The specified <paramref name="range"/> extends beyond the bounds
         /// of the buffer.
         /// </exception>
         /// <remarks>
-        /// <paramref name="destinationIndex"/> refers to the original buffer
-        /// before duplication takes place.
+        /// This operation supports overlapping source and destination ranges.
+        /// <para/>
+        /// <paramref name="index"/> refers to the original buffer before insertion takes place.
         /// </remarks>
         [CodeGenerationReturnsSelf]
-        public void DuplicateRange(Range range, int destinationIndex)
+        public void InsertSelf(int index, Range range)
         {
             var (startIndex, count) = range.GetOffsetAndLength(Length);
-            DuplicateRange(startIndex, count, destinationIndex);
+            InsertSelf(index, startIndex, count);
         }
 #endif
 
         /// <summary>
-        /// Duplicates a range of characters within the buffer by insserting a copy
-        /// from the specified <paramref name="startIndex"/> and <paramref name="count"/>
-        /// to the specified <paramref name="destinationIndex"/>, expanding the <see cref="Length"/> of the
-        /// buffer by <paramref name="count"/>.
-        /// <para/>
-        /// This operation supports overlapping source and destination ranges.
+        /// Inserts a copy of a range of characters from this buffer
+        /// at the specified index, expanding the <see cref="Length"/> by
+        /// <paramref name="count"/>.
         /// </summary>
-        /// <param name="startIndex">The starting index of the source segment to copy.</param>
+        /// <param name="index">The index at which the copied range will be inserted.</param>
+        /// <param name="startIndex">The starting index of the source range to copy.</param>
         /// <param name="count">The number of characters to copy.</param>
-        /// <param name="destinationIndex">The index at which the duplicated range will be inserted.</param>
         /// <exception cref="ArgumentOutOfRangeException">
-        /// <paramref name="startIndex"/>, <paramref name="count"/>, or <paramref name="destinationIndex"/> is less than zero.
+        /// <paramref name="index"/>, <paramref name="startIndex"/>, or <paramref name="count"/> is less than zero.
         /// <para/>
         /// -or-
         /// <para/>
-        /// <paramref name="startIndex"/> or <paramref name="destinationIndex"/> is greater than <see cref="Length"/>.
+        /// <paramref name="index"/> or <paramref name="startIndex"/> is greater
+        /// than <see cref="Length"/>.
         /// </exception>
-        /// <exception cref="ArgumentException"><paramref name="startIndex"/> + <paramref name="count"/> is greater than <see cref="Length"/>.</exception>
+        /// <exception cref="ArgumentException">
+        /// <paramref name="startIndex"/> + <paramref name="count"/> is greater
+        /// than <see cref="Length"/>.
+        /// </exception>
         /// <remarks>
-        /// <paramref name="destinationIndex"/> refers to the original buffer before duplication takes place.
+        /// This operation supports overlapping source and destination ranges.
+        /// <para/>
+        /// <paramref name="index"/> refers to the original buffer before insertion
+        /// takes place.
         /// </remarks>
         // J2N: This idea was borrowed from the ReplaceableString in ICU4N. We do a copy operation within the current buffer
         // using low-level operations rather than relying on the high-level Replace and CopyTo() operations to do it.
         // This allows us to optimize ReplaceableString (thus Transliterator) in ICU4N much better.
         [CodeGenerationReturnsSelf]
-        public void DuplicateRange(int startIndex, int count, int destinationIndex)
+        public void InsertSelf(int index, int startIndex, int count)
         {
             if (count < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(count, ExceptionArgument.count);
 
             int pos = m_Position;
 
+            if ((uint)index > (uint)pos)
+                ThrowHelper.ThrowArgumentOutOfRange_IndexMustBeLessOrEqualException(index, ExceptionArgument.index);
             if ((uint)startIndex > (uint)pos)
                 ThrowHelper.ThrowArgumentOutOfRange_IndexMustBeLessOrEqualException(startIndex, ExceptionArgument.startIndex);
-            if ((uint)destinationIndex > (uint)pos)
-                ThrowHelper.ThrowArgumentOutOfRange_IndexMustBeLessOrEqualException(destinationIndex, ExceptionArgument.destinationIndex);
 
             // Combination validation
             if (count > pos - startIndex)
@@ -6014,7 +6012,7 @@ namespace J2N.Text
             ref char chars = ref MemoryMarshal.GetReference(m_Chars.AsSpan());
 #endif
 
-            int tailCount = pos - destinationIndex;
+            int tailCount = pos - index;
 
             //
             // STEP 1:
@@ -6024,12 +6022,12 @@ namespace J2N.Text
             if (tailCount > 0)
             {
 #if FEATURE_MEMORYMARSHAL_CREATEREADONLYSPAN
-                MemoryMarshal.CreateReadOnlySpan(ref Unsafe.Add(ref chars, destinationIndex), tailCount)
-                    .CopyTo(MemoryMarshal.CreateSpan(ref Unsafe.Add(ref chars, destinationIndex + count), tailCount));
+                MemoryMarshal.CreateReadOnlySpan(ref Unsafe.Add(ref chars, index), tailCount)
+                    .CopyTo(MemoryMarshal.CreateSpan(ref Unsafe.Add(ref chars, index + count), tailCount));
 #else
                 BufferHelper.Memmove(
-                    ref Unsafe.Add(ref chars, destinationIndex + count),
-                    ref Unsafe.Add(ref chars, destinationIndex),
+                    ref Unsafe.Add(ref chars, index + count),
+                    ref Unsafe.Add(ref chars, index),
                     (nuint)tailCount);
 #endif
             }
@@ -6039,7 +6037,7 @@ namespace J2N.Text
             // Source shifts if insertion before source.
             //
 
-            if (destinationIndex < startIndex)
+            if (index < startIndex)
             {
                 startIndex += count;
             }
@@ -6051,10 +6049,10 @@ namespace J2N.Text
 
 #if FEATURE_MEMORYMARSHAL_CREATEREADONLYSPAN
             MemoryMarshal.CreateReadOnlySpan(ref Unsafe.Add(ref chars, startIndex), count)
-                .CopyTo(MemoryMarshal.CreateSpan(ref Unsafe.Add(ref chars, destinationIndex), count));
+                .CopyTo(MemoryMarshal.CreateSpan(ref Unsafe.Add(ref chars, index), count));
 #else
             BufferHelper.Memmove(
-                ref Unsafe.Add(ref chars, destinationIndex),
+                ref Unsafe.Add(ref chars, index),
                 ref Unsafe.Add(ref chars, startIndex),
                 (nuint)count);
 #endif

@@ -2835,142 +2835,166 @@ namespace J2N.Text.Tests
         }
 
 
-        #region DuplicateRange Tests
+        #region InsertSelf Tests
 
         [Fact]
-        public void DuplicateRange_AppendsRange()
+        public void InsertSelf_AppendsRange()
         {
             var buffer = MutableTextBufferFactory("abcdef");
 
-            buffer.DuplicateRange(1, 3, 6);
+            buffer.InsertSelf(6, 1, 3);
 
             Assert.Equal("abcdefbcd", buffer.ToString());
         }
 
         [Fact]
-        public void DuplicateRange_InsertAtBeginning()
+        public void InsertSelf_InsertAtBeginning()
         {
             var buffer = MutableTextBufferFactory("abcdef");
 
-            buffer.DuplicateRange(2, 2, 0);
+            buffer.InsertSelf(0, 2, 2);
 
             Assert.Equal("cdabcdef", buffer.ToString());
         }
 
         [Fact]
-        public void DuplicateRange_InsertInMiddle()
+        public void InsertSelf_InsertInMiddle()
         {
             var buffer = MutableTextBufferFactory("abcdef");
 
-            buffer.DuplicateRange(1, 2, 3);
+            buffer.InsertSelf(3, 1, 2);
 
             Assert.Equal("abcbcdef", buffer.ToString());
         }
 
         [Fact]
-        public void DuplicateRange_OverlappingForward()
+        public void InsertSelf_OverlappingForward()
         {
             var buffer = MutableTextBufferFactory("abcdef");
 
-            buffer.DuplicateRange(1, 3, 2);
+            buffer.InsertSelf(2, 1, 3);
 
             Assert.Equal("abbcdcdef", buffer.ToString());
         }
 
         [Fact]
-        public void DuplicateRange_OverlappingBackward()
+        public void InsertSelf_OverlappingBackward()
         {
             var buffer = MutableTextBufferFactory("abcdef");
 
-            buffer.DuplicateRange(2, 3, 1);
+            buffer.InsertSelf(1, 2, 3);
 
             Assert.Equal("acdebcdef", buffer.ToString());
         }
 
         [Fact]
-        public void DuplicateRange_ZeroCount_NoChange()
+        public void InsertSelf_ZeroCount_NoChange()
         {
             var buffer = MutableTextBufferFactory("abcdef");
 
-            buffer.DuplicateRange(3, 0, 2);
+            buffer.InsertSelf(2, 3, 0);
 
             Assert.Equal("abcdef", buffer.ToString());
         }
 
         [Fact]
-        public void DuplicateRange_StartAtLength_WithZeroCount_IsValid()
+        public void InsertSelf_StartAtLength_WithZeroCount_IsValid()
         {
             var buffer = MutableTextBufferFactory("abc");
 
-            buffer.DuplicateRange(3, 0, 0);
+            buffer.InsertSelf(0, 3, 0);
 
             Assert.Equal("abc", buffer.ToString());
         }
 
         [Fact]
-        public void DuplicateRange_DestinationAtLength_Appends()
+        public void InsertSelf_IndexAtLength_Appends()
         {
             var buffer = MutableTextBufferFactory("abc");
 
-            buffer.DuplicateRange(0, 2, 3);
+            buffer.InsertSelf(3, 0, 2);
 
             Assert.Equal("abcab", buffer.ToString());
         }
 
+        //[Fact]
+        //public void InsertSelf_InsertEntireBuffer()
+        //{
+        //    var buffer = MutableTextBufferFactory("abc");
+
+        //    buffer.InsertSelf(1);
+
+        //    Assert.Equal("aabcbc", buffer.ToString());
+        //}
+
         [Fact]
-        public void DuplicateRange_NegativeStart_Throws()
+        public void InsertSelf_NegativeStart_Throws()
         {
             var buffer = MutableTextBufferFactory("abc");
 
             Assert.Throws<ArgumentOutOfRangeException>(
-                () => buffer.DuplicateRange(-1, 1, 0));
+                () => buffer.InsertSelf(0, -1, 1));
         }
 
         [Fact]
-        public void DuplicateRange_NegativeCount_Throws()
+        public void InsertSelf_NegativeCount_Throws()
         {
             var buffer = MutableTextBufferFactory("abc");
 
             Assert.Throws<ArgumentOutOfRangeException>(
-                () => buffer.DuplicateRange(0, -1, 0));
+                () => buffer.InsertSelf(0, 0, -1));
         }
 
         [Fact]
-        public void DuplicateRange_NegativeDestination_Throws()
+        public void InsertSelf_NegativeIndex_Throws()
         {
             var buffer = MutableTextBufferFactory("abc");
 
             Assert.Throws<ArgumentOutOfRangeException>(
-                () => buffer.DuplicateRange(0, 1, -1));
+                () => buffer.InsertSelf(-1, 0, 1));
         }
 
         [Fact]
-        public void DuplicateRange_StartPastLength_Throws()
+        public void InsertSelf_StartPastLength_Throws()
         {
             var buffer = MutableTextBufferFactory("abc");
 
             Assert.Throws<ArgumentOutOfRangeException>(
-                () => buffer.DuplicateRange(4, 0, 0));
+                () => buffer.InsertSelf(0, 4, 0));
         }
 
         [Fact]
-        public void DuplicateRange_DestinationPastLength_Throws()
+        public void InsertSelf_IndexPastLength_Throws()
         {
             var buffer = MutableTextBufferFactory("abc");
 
             Assert.Throws<ArgumentOutOfRangeException>(
-                () => buffer.DuplicateRange(0, 1, 4));
+                () => buffer.InsertSelf(4, 0, 1));
         }
 
         [Fact]
-        public void DuplicateRange_CountTooLarge_Throws()
+        public void InsertSelf_CountTooLarge_Throws()
         {
             var buffer = MutableTextBufferFactory("abc");
 
             Assert.Throws<ArgumentException>(
-                () => buffer.DuplicateRange(1, 3, 0));
+                () => buffer.InsertSelf(0, 1, 3));
         }
 
-        #endregion DuplicateRange Tests
+#if FEATURE_INDEX_RANGE
+
+        [Fact]
+        public void InsertSelf_Range_Overload_Works()
+        {
+            var buffer = MutableTextBufferFactory("abcdef");
+
+            buffer.InsertSelf(6, 1..4);
+
+            Assert.Equal("abcdefbcd", buffer.ToString());
+        }
+
+#endif
+
+        #endregion InsertSelf Tests
     }
 }
