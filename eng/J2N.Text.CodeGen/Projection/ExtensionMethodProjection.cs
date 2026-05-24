@@ -8,8 +8,11 @@ namespace J2N.Text.CodeGen.Projection
             TypeModel extensionSource,
             string targetSourceType,
             string facadeNamespace,
-            string facadeType)
+            string facadeType,
+            ProjectionOptions? options = null)
         {
+            options ??= new ProjectionOptions();
+
             var projected = new ProjectedTypeModel
             {
                 Source = extensionSource,
@@ -29,7 +32,8 @@ namespace J2N.Text.CodeGen.Projection
                     ProjectMethod(
                         method,
                         targetSourceType,
-                        facadeType));
+                        facadeType,
+                        options));
             }
 
             return projected;
@@ -38,7 +42,8 @@ namespace J2N.Text.CodeGen.Projection
         private static MethodModel ProjectMethod(
             MethodModel method,
             string sourceType,
-            string facadeType)
+            string facadeType,
+            ProjectionOptions options)
         {
             var methodModel =  new MethodModel
             {
@@ -119,7 +124,8 @@ namespace J2N.Text.CodeGen.Projection
                                         method.Documentation.SynchronizationNoteXml,
                                         sourceType,
                                         facadeType)
-                            }),
+                            },
+                            includeSynchronizationNote: options.EmitSynchronizationNotes && method.SkipSynchronization),
 
                 BodyText =
                     RewriteBody(
@@ -171,14 +177,15 @@ namespace J2N.Text.CodeGen.Projection
             return xml.Replace(sourceType, facadeType);
         }
 
-        private static DocumentationModel? MergeSynchronizationDocumentation(DocumentationModel? docs)
+        private static DocumentationModel? MergeSynchronizationDocumentation(DocumentationModel? docs, bool includeSynchronizationNote)
         {
             if (docs is null)
                 return null;
 
             string? remarksXml = docs.RemarksXml;
 
-            if (!string.IsNullOrWhiteSpace(docs.SynchronizationNoteXml))
+            if (includeSynchronizationNote
+                && !string.IsNullOrWhiteSpace(docs.SynchronizationNoteXml))
             {
                 if (string.IsNullOrWhiteSpace(remarksXml))
                 {

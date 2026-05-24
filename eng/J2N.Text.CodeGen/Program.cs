@@ -95,6 +95,7 @@ namespace J2N.Text.CodGen
             GenerateExtensions(
                 sourceDirectory,
                 facadeName: "TextBuilder",
+                emitSynchronizationNotes: false,
                 extensionModel);
 
             // ---------------------------------------------------------------------
@@ -111,6 +112,7 @@ namespace J2N.Text.CodGen
             GenerateExtensions(
                 sourceDirectory,
                 facadeName: "PooledTextBuilder",
+                emitSynchronizationNotes: false,
                 extensionModel);
 
             // ---------------------------------------------------------------------
@@ -127,6 +129,7 @@ namespace J2N.Text.CodGen
             GenerateExtensions(
                 sourceDirectory,
                 facadeName: "SynchronizedTextBuilder",
+                emitSynchronizationNotes: true,
                 extensionModel);
 
             // ---------------------------------------------------------------------
@@ -152,7 +155,11 @@ namespace J2N.Text.CodGen
                 projection.Project(
                     model,
                     facadeNamespace: "J2N.Text",
-                    facadeName: facadeName);
+                    facadeName: facadeName,
+                    options: new ProjectionOptions
+                    {
+                        EmitSynchronizationNotes = emitSynchronizationNotes,
+                    });
 
             string facadeCode =
                 facadeEmitter.EmitFacade(
@@ -178,6 +185,7 @@ namespace J2N.Text.CodGen
         static void GenerateExtensions(
             string sourceDirectory,
             string facadeName,
+            bool emitSynchronizationNotes,
             TypeModel extensionModel)
         {
             var extensionProjection = new ExtensionMethodProjection();
@@ -188,7 +196,11 @@ namespace J2N.Text.CodGen
                     extensionModel,
                     "MutableTextBuffer",
                     facadeNamespace: "J2N.Text",
-                    facadeType: facadeName);
+                    facadeType: facadeName,
+                    options: new ProjectionOptions
+                    {
+                        EmitSynchronizationNotes = emitSynchronizationNotes,
+                    });
 
             string extensionCode =
                 extensionEmitter.Emit(projectedExtensions);

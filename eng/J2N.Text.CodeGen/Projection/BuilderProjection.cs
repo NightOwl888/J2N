@@ -9,8 +9,11 @@ namespace J2N.Text.CodeGen.Projection
         public ProjectedTypeModel Project(
             TypeModel source,
             string facadeNamespace,
-            string facadeName)
+            string facadeName,
+            ProjectionOptions? options = null)
         {
+            options ??= new ProjectionOptions();
+
             var projected = new ProjectedTypeModel
             {
                 Source = source,
@@ -25,7 +28,8 @@ namespace J2N.Text.CodeGen.Projection
                         method,
                         source,
                         source.SourceType,
-                        facadeName));
+                        facadeName,
+                        options));
             }
 
             foreach (PropertyModel property in source.Properties.Where(x => !x.Ignore))
@@ -35,7 +39,8 @@ namespace J2N.Text.CodeGen.Projection
                         property,
                         source,
                         source.SourceType,
-                        facadeName));
+                        facadeName,
+                        options));
             }
 
             return projected;
@@ -45,7 +50,8 @@ namespace J2N.Text.CodeGen.Projection
             MethodModel method,
             TypeModel source,
             string sourceType,
-            string facadeName)
+            string facadeName,
+            ProjectionOptions options)
         {
             return new MethodModel
             {
@@ -112,7 +118,8 @@ namespace J2N.Text.CodeGen.Projection
                     CreateProjectedDocumentation(
                         method,
                         source,
-                        facadeName),
+                        facadeName,
+                        options),
 
                 //
                 // NEW:
@@ -132,7 +139,8 @@ namespace J2N.Text.CodeGen.Projection
             PropertyModel property,
             TypeModel source,
             string sourceType,
-            string facadeName)
+            string facadeName,
+            ProjectionOptions options)
         {
             DocumentationModel? rewrittenDocs = property.Documentation is null
                 ? null
@@ -218,7 +226,7 @@ namespace J2N.Text.CodeGen.Projection
                 Documentation =
                     MergeSynchronizationDocumentation(
                         rewrittenDocs,
-                        includeSynchronizationNote: facadeName == "SynchronizedTextBuilder" &&
+                        includeSynchronizationNote: options.EmitSynchronizationNotes &&
                             (property.SkipGetterSynchronization || property.SkipSetterSynchronization)),
 
 
@@ -299,7 +307,8 @@ namespace J2N.Text.CodeGen.Projection
         private static DocumentationModel? CreateProjectedDocumentation(
             MethodModel method,
             TypeModel source,
-            string facadeName)
+            string facadeName,
+            ProjectionOptions options)
         {
             DocumentationModel? docs = method.Documentation;
 
@@ -364,7 +373,7 @@ namespace J2N.Text.CodeGen.Projection
                             source.Name,
                             facadeName),
                 },
-                includeSynchronizationNote: facadeName == "SynchronizedTextBuilder" && method.SkipSynchronization);
+                includeSynchronizationNote: options.EmitSynchronizationNotes && method.SkipSynchronization);
         }
 
         private static DocumentationModel? MergeSynchronizationDocumentation(
