@@ -14,6 +14,7 @@
 using J2N.CodeGeneration;
 using System;
 using System.Text;
+using System.Runtime.CompilerServices;
 using System.Diagnostics;
 using System.Globalization;
 using J2N.Buffers;
@@ -25,7 +26,6 @@ using System.Buffers;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace J2N.Text
@@ -264,6 +264,69 @@ namespace J2N.Text
         {
             buffer.Insert(index, charSequence, startIndex, count);
             return this;
+        }
+
+        /// <summary>
+        /// 
+        /// Returns a <see cref="Span{Char}"/> to write to that is at least the requested size
+        /// (specified by <paramref name="sizeHint"/>).
+        /// 
+        /// </summary>
+        /// <param name="sizeHint">
+        /// The minimum length of the returned <see cref="Span{Char}"/>.
+        /// If 0, a non-empty buffer is returned.
+        /// </param>
+        /// <returns>
+        /// A <see cref="Span{Char}"/> of at least the size <paramref name="sizeHint"/>.
+        /// If <paramref name="sizeHint"/> is 0, returns a non-empty buffer.
+        /// </returns>
+        /// <remarks>
+        /// This method never returns <see cref="Span{Char}.Empty"/>.
+        /// </remarks>
+        public Span<char> GetSpan(int sizeHint = 0)
+        {
+            return buffer.GetSpan(sizeHint);
+        }
+
+        /// <summary>
+        /// 
+        /// Returns a <see cref="Memory{Char}"/> to write to that is at least the length
+        /// specified by <paramref name="sizeHint"/>.
+        /// 
+        /// </summary>
+        /// <param name="sizeHint">
+        /// The minimum requested length of the <see cref="Memory{Char}"/>.
+        /// If 0, a non-empty buffer is returned.
+        /// </param>
+        /// <returns>
+        /// A <see cref="Memory{Char}"/> whose length is at least <paramref name="sizeHint"/>.
+        /// If <paramref name="sizeHint"/> is not provided or is equal to 0, some non-empty buffer is returned.
+        /// </returns>
+        /// <remarks>
+        /// This method never returns <see cref="Memory{Char}.Empty"/>.
+        /// </remarks>
+        public Memory<char> GetMemory(int sizeHint = 0)
+        {
+            return buffer.GetMemory(sizeHint);
+        }
+
+        /// <summary>
+        /// 
+        /// Notifies the <see cref="PooledTextBuilder"/> that <paramref name="count"/> items were
+        /// written to the output <see cref="Span{Char}"/> or <see cref="Memory{Char}"/>.
+        /// 
+        /// </summary>
+        /// <param name="count">
+        /// The number of items written.
+        /// </param>
+        /// <remarks>
+        /// You must request a new buffer after calling <see cref="Advance(int)"/> to continue writing more data
+        /// and cannot write to a previously acquired buffer.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void Advance(int count)
+        {
+            buffer.Advance(count);
         }
 
         /// <summary>

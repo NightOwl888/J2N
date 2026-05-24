@@ -1210,6 +1210,8 @@ namespace J2N
                     return "seq";
                 case ExceptionArgument.set:
                     return "set";
+                case ExceptionArgument.sizeHint:
+                    return "sizeHint";
                 case ExceptionArgument.source:
                     return "source";
                 case ExceptionArgument.sourceBytesToCopy:
@@ -1733,6 +1735,7 @@ namespace J2N
         s,
         seq,
         set,
+        sizeHint,
         source,
         sourceBytesToCopy,
         sourceIndex,

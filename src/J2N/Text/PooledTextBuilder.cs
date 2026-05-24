@@ -1,5 +1,6 @@
 ﻿using J2N.Buffers;
 using System;
+using System.Buffers;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
@@ -38,12 +39,15 @@ namespace J2N.Text
     ///     </description></item>
     /// </list>
     /// </remarks>
-    public sealed partial class PooledTextBuilder : IAppendable, ISpanAppendable, ICharSequence, IDisposable
+    public sealed partial class PooledTextBuilder : IAppendable, ISpanAppendable, ICharSequence, IBufferWriter<char>, IDisposable
     {
         internal readonly MutableTextBuffer buffer;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static MutableTextBuffer CreateBuffer() => new(PooledArrayAllocator<char>.Uncleared);
+        private static MutableTextBuffer CreateBuffer() => new(PooledArrayAllocator<char>.Uncleared)
+        {
+            ClearExposedBuffers = true
+        };
 
         #region BCL Constructors
 

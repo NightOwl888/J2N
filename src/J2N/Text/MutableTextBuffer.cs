@@ -45,7 +45,7 @@ namespace J2N.Text
     ///     </description></item>
     /// </list>
     /// </remarks>
-    public partial class MutableTextBuffer : IAppendable, ISpanAppendable, ICharSequence, IDisposable
+    public partial class MutableTextBuffer : IAppendable, ISpanAppendable, ICharSequence, IBufferWriter<char>, IDisposable
         //, IEnumerable<char> // ICU4N TODO: Implement?
     {
         private const int CharStackBufferSize = 32;
@@ -73,6 +73,11 @@ namespace J2N.Text
         internal const int DefaultCapacity = 16;
 
         /// <summary>
+        /// Whether to clear unwritten buffers before returning them to the user.
+        /// </summary>
+        private bool clearExposedBuffers = false;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="MutableTextBuffer"/> class.
         /// </summary>
         /// <remarks>
@@ -90,6 +95,17 @@ namespace J2N.Text
             m_Chars = Arrays.Empty<char>();
         }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether the buffers that are returned with unwritten
+        /// chars beyond <see cref="Length"/> are cleared of potentially sensitive data.
+        /// The default value is <see langword="false"/>.
+        /// </summary>
+        [CodeGenerationIgnore]
+        public bool ClearExposedBuffers
+        {
+            get => clearExposedBuffers;
+            init => clearExposedBuffers = value;
+        }
 
         private void MakeRoom(int index, int count/*, out Span<char> chunk, out int indexInChunk,bool doNotMoveFollowingChars*/)
         {
@@ -1389,7 +1405,7 @@ namespace J2N.Text
                 ThrowHelper.ThrowArgumentOutOfRange_IndexMustBeLessOrEqualException(length, ExceptionArgument.length);
             }
 
-            RemoveCore(startIndex, length, zeroBeyondPosition: true);
+            RemoveCore(startIndex, length);
 
             return this;
         }
@@ -1419,12 +1435,12 @@ namespace J2N.Text
                 ThrowHelper.ThrowArgumentOutOfRange_IndexMustBeLessException(index, ExceptionArgument.index);
             }
 
-            RemoveCore(index, 1, zeroBeyondPosition: true);
+            RemoveCore(index, 1);
 
             return this;
         }
 
-        private void RemoveCore(int startIndex, int length, bool zeroBeyondPosition)
+        private void RemoveCore(int startIndex, int length)
         {
             Debug.Assert(length >= 0);
             Debug.Assert(startIndex >= 0);
@@ -1441,11 +1457,15 @@ namespace J2N.Text
                 int endIndex = startIndex + length;
                 m_Chars.AsSpan(endIndex).CopyTo(m_Chars.AsSpan(startIndex));
                 m_Position -= length;
-                if (zeroBeyondPosition)
-                {
-                    m_Chars.AsSpan(m_Position).Fill('\0'); // Zero out the remaining chars
-                }
             }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private Span<char> GetClearedWritableSpan(int start, int length)
+        {
+            Span<char> span = m_Chars.AsSpan(start, length);
+            span.Fill('\0');
+            return span;
         }
 
         /// <summary>
@@ -5296,7 +5316,7 @@ namespace J2N.Text
                 int diff = end - startIndex - stringLength;
                 if (diff > 0)
                 { // replacing with fewer characters
-                    RemoveCore(startIndex, diff, zeroBeyondPosition: false);
+                    RemoveCore(startIndex, diff);
                 }
                 else if (diff < 0)
                 {
@@ -5367,7 +5387,7 @@ namespace J2N.Text
             // Remove extra space if necessary.
             if (delta < 0)
             {
-                RemoveCore(targetIndex, -delta, zeroBeyondPosition: false);
+                RemoveCore(targetIndex, -delta);
             }
         }
 
@@ -5780,7 +5800,7 @@ namespace J2N.Text
             if ((uint)startIndex + (uint)count > pos)
                 count = pos - startIndex;
             if (count > 0)
-                RemoveCore(startIndex, count, zeroBeyondPosition: true);
+                RemoveCore(startIndex, count);
             return this;
         }
 
@@ -5883,8 +5903,17 @@ namespace J2N.Text
             {
                 Grow(length);
             }
-            Span<char> buffer = m_Chars.AsSpan(pos, length);
-            buffer.Fill('\0'); // Ensure the buffer doesn't contain any sensitive data before providing it to the user
+            Span<char> buffer;
+
+            if (!clearExposedBuffers)
+            {
+                buffer = m_Chars.AsSpan(pos, length);
+            }
+            else
+            {
+                // Ensure the buffer doesn't contain any sensitive data before providing it to the user
+                buffer = GetClearedWritableSpan(pos, length);
+            }
             m_Position += length;
             return buffer;
         }
