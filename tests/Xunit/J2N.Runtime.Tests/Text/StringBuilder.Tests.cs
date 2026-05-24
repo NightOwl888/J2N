@@ -2814,14 +2814,14 @@ namespace J2N.Text.Tests
         }
 
         [Fact] // J2N specific
-        public void AppendSpan_ZerosBuffer()
+        public void AppendSpan_DoesNotZeroBuffer()
         {
             var builder = MutableTextBufferFactory();
             builder.Append("Hello");
             builder.Length = 0;
 
             Span<char> span = builder.AppendSpan(5);
-            Assert.Equal("\0\0\0\0\0", span.ToString());
+            Assert.Equal("Hello", span.ToString());
         }
 
         [Fact] // J2N specific
@@ -2833,5 +2833,144 @@ namespace J2N.Text.Tests
             AssertExtensions.Throws<ArgumentOutOfRangeException>("length", () => builder.AppendSpan(-1)); // length < 0
             AssertExtensions.Throws<ArgumentOutOfRangeException>("requiredLength", () => builder.AppendSpan(builder.Length)); // New length > builder.MaxCapacity
         }
+
+
+        #region DuplicateRange Tests
+
+        [Fact]
+        public void DuplicateRange_AppendsRange()
+        {
+            var buffer = MutableTextBufferFactory("abcdef");
+
+            buffer.DuplicateRange(1, 3, 6);
+
+            Assert.Equal("abcdefbcd", buffer.ToString());
+        }
+
+        [Fact]
+        public void DuplicateRange_InsertAtBeginning()
+        {
+            var buffer = MutableTextBufferFactory("abcdef");
+
+            buffer.DuplicateRange(2, 2, 0);
+
+            Assert.Equal("cdabcdef", buffer.ToString());
+        }
+
+        [Fact]
+        public void DuplicateRange_InsertInMiddle()
+        {
+            var buffer = MutableTextBufferFactory("abcdef");
+
+            buffer.DuplicateRange(1, 2, 3);
+
+            Assert.Equal("abcbcdef", buffer.ToString());
+        }
+
+        [Fact]
+        public void DuplicateRange_OverlappingForward()
+        {
+            var buffer = MutableTextBufferFactory("abcdef");
+
+            buffer.DuplicateRange(1, 3, 2);
+
+            Assert.Equal("abbcdcdef", buffer.ToString());
+        }
+
+        [Fact]
+        public void DuplicateRange_OverlappingBackward()
+        {
+            var buffer = MutableTextBufferFactory("abcdef");
+
+            buffer.DuplicateRange(2, 3, 1);
+
+            Assert.Equal("acdebcdef", buffer.ToString());
+        }
+
+        [Fact]
+        public void DuplicateRange_ZeroCount_NoChange()
+        {
+            var buffer = MutableTextBufferFactory("abcdef");
+
+            buffer.DuplicateRange(3, 0, 2);
+
+            Assert.Equal("abcdef", buffer.ToString());
+        }
+
+        [Fact]
+        public void DuplicateRange_StartAtLength_WithZeroCount_IsValid()
+        {
+            var buffer = MutableTextBufferFactory("abc");
+
+            buffer.DuplicateRange(3, 0, 0);
+
+            Assert.Equal("abc", buffer.ToString());
+        }
+
+        [Fact]
+        public void DuplicateRange_DestinationAtLength_Appends()
+        {
+            var buffer = MutableTextBufferFactory("abc");
+
+            buffer.DuplicateRange(0, 2, 3);
+
+            Assert.Equal("abcab", buffer.ToString());
+        }
+
+        [Fact]
+        public void DuplicateRange_NegativeStart_Throws()
+        {
+            var buffer = MutableTextBufferFactory("abc");
+
+            Assert.Throws<ArgumentOutOfRangeException>(
+                () => buffer.DuplicateRange(-1, 1, 0));
+        }
+
+        [Fact]
+        public void DuplicateRange_NegativeCount_Throws()
+        {
+            var buffer = MutableTextBufferFactory("abc");
+
+            Assert.Throws<ArgumentOutOfRangeException>(
+                () => buffer.DuplicateRange(0, -1, 0));
+        }
+
+        [Fact]
+        public void DuplicateRange_NegativeDestination_Throws()
+        {
+            var buffer = MutableTextBufferFactory("abc");
+
+            Assert.Throws<ArgumentOutOfRangeException>(
+                () => buffer.DuplicateRange(0, 1, -1));
+        }
+
+        [Fact]
+        public void DuplicateRange_StartPastLength_Throws()
+        {
+            var buffer = MutableTextBufferFactory("abc");
+
+            Assert.Throws<ArgumentOutOfRangeException>(
+                () => buffer.DuplicateRange(4, 0, 0));
+        }
+
+        [Fact]
+        public void DuplicateRange_DestinationPastLength_Throws()
+        {
+            var buffer = MutableTextBufferFactory("abc");
+
+            Assert.Throws<ArgumentOutOfRangeException>(
+                () => buffer.DuplicateRange(0, 1, 4));
+        }
+
+        [Fact]
+        public void DuplicateRange_CountTooLarge_Throws()
+        {
+            var buffer = MutableTextBufferFactory("abc");
+
+            Assert.Throws<ArgumentException>(
+                () => buffer.DuplicateRange(1, 3, 0));
+        }
+
+        #endregion DuplicateRange Tests
     }
 }

@@ -137,22 +137,16 @@ namespace J2N
 
         internal static unsafe void Memmove<T>(ref T destination, ref T source, nuint elementCount) where T : unmanaged
         {
-            if (Unsafe.AreSame(ref destination, ref source))
+            if (elementCount == 0 || Unsafe.AreSame(ref destination, ref source))
+            {
                 return;
-
-            if ((byte*)Unsafe.AsPointer(ref destination) < (byte*)Unsafe.AsPointer(ref source))
-            {
-                for (nuint i = 0; i < elementCount; i++)
-                {
-                    Unsafe.Add(ref destination, (int)i) = Unsafe.Add(ref source, (int)i);
-                }
             }
-            else
+
+            fixed (T* pDest = &destination)
+            fixed (T* pSource = &source)
             {
-                for (nuint i = elementCount; i > 0; i--)
-                {
-                    Unsafe.Add(ref destination, (int)(i - 1)) = Unsafe.Add(ref source, (int)(i - 1));
-                }
+                ulong byteCount = (ulong)(elementCount * (nuint)sizeof(T));
+                MemoryCopy(pSource, pDest, byteCount, byteCount);
             }
         }
 

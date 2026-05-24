@@ -14,6 +14,7 @@
 using J2N.CodeGeneration;
 using System;
 using System.Text;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Diagnostics;
 using System.Globalization;
@@ -25,7 +26,6 @@ using J2N.Numerics.Formatters;
 using System.Buffers;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 
 namespace J2N.Text
@@ -4636,6 +4636,81 @@ namespace J2N.Text
             lock (syncRoot)
             {
                 return buffer.AppendSpan(length);
+            }
+        }
+
+#if FEATURE_INDEX_RANGE
+        /// <summary>
+        /// 
+        /// Duplicates a range of characters within the buffer by inserting
+        /// a copy of the specified range at the specified destination index.
+        /// <para/>
+        /// This operation supports overlapping source and destination ranges.
+        /// 
+        /// </summary>
+        /// <param name="range">
+        /// 
+        /// The range of characters to duplicate.
+        /// 
+        /// </param>
+        /// <param name="destinationIndex">
+        /// 
+        /// The index at which the duplicated range will be inserted.
+        /// 
+        /// </param>
+        /// <returns>
+        /// A reference to this instance after the operation has completed.
+        /// </returns>
+        /// <remarks>
+        /// 
+        /// <paramref name="destinationIndex"/> refers to the original buffer
+        /// before duplication takes place.
+        /// 
+        /// </remarks>
+        public SynchronizedTextBuilder DuplicateRange(Range range, int destinationIndex)
+        {
+            lock (syncRoot)
+            {
+                buffer.DuplicateRange(range, destinationIndex);
+                return this;
+            }
+        }
+
+#endif
+
+        /// <summary>
+        /// 
+        /// Duplicates a range of characters within the buffer by insserting a copy
+        /// from the specified <paramref name="startIndex"/> and <paramref name="count"/>
+        /// to the specified <paramref name="destinationIndex"/>, expanding the <see cref="Length"/> of the
+        /// buffer by <paramref name="count"/>.
+        /// <para/>
+        /// This operation supports overlapping source and destination ranges.
+        /// 
+        /// </summary>
+        /// <param name="startIndex">
+        /// The starting index of the source segment to copy.
+        /// </param>
+        /// <param name="count">
+        /// The number of characters to copy.
+        /// </param>
+        /// <param name="destinationIndex">
+        /// The index at which the duplicated range will be inserted.
+        /// </param>
+        /// <returns>
+        /// A reference to this instance after the operation has completed.
+        /// </returns>
+        /// <remarks>
+        /// 
+        /// <paramref name="destinationIndex"/> refers to the original buffer before duplication takes place.
+        /// 
+        /// </remarks>
+        public SynchronizedTextBuilder DuplicateRange(int startIndex, int count, int destinationIndex)
+        {
+            lock (syncRoot)
+            {
+                buffer.DuplicateRange(startIndex, count, destinationIndex);
+                return this;
             }
         }
 

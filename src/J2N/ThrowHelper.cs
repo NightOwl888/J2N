@@ -1639,6 +1639,8 @@ namespace J2N
                     return SR.PlatformNotSupported_DynamicCode;
                 case ExceptionResource.PlatformNotSupported_NoAggressiveMode:
                     return SR.PlatformNotSupported_NoAggressiveMode;
+                case ExceptionResource.Arg_LongerThanSrcString:
+                    return SR.Arg_LongerThanSrcString;
 
                 default:
                     Debug.Fail("The enum value is not defined, please check the ExceptionResource Enum.");
@@ -1966,5 +1968,6 @@ namespace J2N
         Serialization_InvalidOnDeser,
         PlatformNotSupported_DynamicCode,
         PlatformNotSupported_NoAggressiveMode,
+        Arg_LongerThanSrcString,
     }
 }
