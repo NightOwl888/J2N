@@ -37,10 +37,6 @@ namespace J2N.Text
         /// <para/>
         /// The returned span is only valid while the underlying <see cref="TextBuilder"/> remains unchanged.
         /// Concurrent mutation invalidates the span contents.
-        /// <para/>
-        /// The returned span provides direct access to the underlying memory of the <see cref="SynchronizedTextBuilder"/>.
-        /// Callers must synchronize externally using <see cref = "SynchronizedTextBuilder.SyncRoot" /> property for the
-        /// entire duration of span usage if concurrent mutation is possible.
         /// 
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -79,10 +75,6 @@ namespace J2N.Text
         /// <para/>
         /// The returned span is only valid while the underlying <see cref="TextBuilder"/> remains unchanged.
         /// Concurrent mutation invalidates the span contents.
-        /// <para/>
-        /// The returned span provides direct access to the underlying memory of the <see cref="SynchronizedTextBuilder"/>.
-        /// Callers must synchronize externally using <see cref = "SynchronizedTextBuilder.SyncRoot" /> property for the
-        /// entire duration of span usage if concurrent mutation is possible.
         /// 
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -132,10 +124,6 @@ namespace J2N.Text
         /// <para/>
         /// The returned span is only valid while the underlying <see cref="TextBuilder"/> remains unchanged.
         /// Concurrent mutation invalidates the span contents.
-        /// <para/>
-        /// The returned span provides direct access to the underlying memory of the <see cref="SynchronizedTextBuilder"/>.
-        /// Callers must synchronize externally using <see cref = "SynchronizedTextBuilder.SyncRoot" /> property for the
-        /// entire duration of span usage if concurrent mutation is possible.
         /// 
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -192,10 +180,6 @@ namespace J2N.Text
         /// <para/>
         /// The returned span is only valid while the underlying <see cref="TextBuilder"/> remains unchanged.
         /// Concurrent mutation invalidates the span contents.
-        /// <para/>
-        /// The returned span provides direct access to the underlying memory of the <see cref="SynchronizedTextBuilder"/>.
-        /// Callers must synchronize externally using <see cref = "SynchronizedTextBuilder.SyncRoot" /> property for the
-        /// entire duration of span usage if concurrent mutation is possible.
         /// 
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -248,10 +232,6 @@ namespace J2N.Text
         /// <para/>
         /// The returned span is only valid while the underlying <see cref="TextBuilder"/> remains unchanged.
         /// Concurrent mutation invalidates the span contents.
-        /// <para/>
-        /// The returned span provides direct access to the underlying memory of the <see cref="SynchronizedTextBuilder"/>.
-        /// Callers must synchronize externally using <see cref = "SynchronizedTextBuilder.SyncRoot" /> property for the
-        /// entire duration of span usage if concurrent mutation is possible.
         /// 
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -302,10 +282,6 @@ namespace J2N.Text
         /// <para/>
         /// The returned memory is only valid while the underlying <see cref="TextBuilder"/> remains unchanged.
         /// Concurrent mutation invalidates the memory contents.
-        /// <para/>
-        /// The returned memory provides direct access to the underlying memory of the <see cref="SynchronizedTextBuilder"/>.
-        /// Callers must synchronize externally using <see cref = "SynchronizedTextBuilder.SyncRoot" /> property for the
-        /// entire duration of memory usage if concurrent mutation is possible.
         /// 
         /// </remarks>
         public static ReadOnlyMemory<char> AsMemory(this TextBuilder? text)
@@ -336,10 +312,6 @@ namespace J2N.Text
         /// <para/>
         /// The returned memory is only valid while the underlying <see cref="TextBuilder"/> remains unchanged.
         /// Concurrent mutation invalidates the memory contents.
-        /// <para/>
-        /// The returned memory provides direct access to the underlying memory of the <see cref="SynchronizedTextBuilder"/>.
-        /// Callers must synchronize externally using <see cref = "SynchronizedTextBuilder.SyncRoot" /> property for the
-        /// entire duration of memory usage if concurrent mutation is possible.
         /// 
         /// </remarks>
         public static ReadOnlyMemory<char> AsMemory(this TextBuilder? text, int start)
@@ -381,10 +353,6 @@ namespace J2N.Text
         /// <para/>
         /// The returned memory is only valid while the underlying <see cref="TextBuilder"/> remains unchanged.
         /// Concurrent mutation invalidates the memory contents.
-        /// <para/>
-        /// The returned memory provides direct access to the underlying memory of the <see cref="SynchronizedTextBuilder"/>.
-        /// Callers must synchronize externally using <see cref = "SynchronizedTextBuilder.SyncRoot" /> property for the
-        /// entire duration of memory usage if concurrent mutation is possible.
         /// 
         /// </remarks>
         public static ReadOnlyMemory<char> AsMemory(this TextBuilder? text, int start, int length)
@@ -432,10 +400,6 @@ namespace J2N.Text
         /// <para/>
         /// The returned memory is only valid while the underlying <see cref="TextBuilder"/> remains unchanged.
         /// Concurrent mutation invalidates the memory contents.
-        /// <para/>
-        /// The returned memory provides direct access to the underlying memory of the <see cref="SynchronizedTextBuilder"/>.
-        /// Callers must synchronize externally using <see cref = "SynchronizedTextBuilder.SyncRoot" /> property for the
-        /// entire duration of memory usage if concurrent mutation is possible.
         /// 
         /// </remarks>
         public static ReadOnlyMemory<char> AsMemory(this TextBuilder? text, Index startIndex)
@@ -475,10 +439,6 @@ namespace J2N.Text
         /// <para/>
         /// The returned memory is only valid while the underlying <see cref="TextBuilder"/> remains unchanged.
         /// Concurrent mutation invalidates the memory contents.
-        /// <para/>
-        /// The returned memory provides direct access to the underlying memory of the <see cref="SynchronizedTextBuilder"/>.
-        /// Callers must synchronize externally using <see cref = "SynchronizedTextBuilder.SyncRoot" /> property for the
-        /// entire duration of memory usage if concurrent mutation is possible.
         /// 
         /// </remarks>
         public static ReadOnlyMemory<char> AsMemory(this TextBuilder? text, Range range)
