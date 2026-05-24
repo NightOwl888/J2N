@@ -5893,9 +5893,15 @@ namespace J2N.Text
         /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
         /// </remarks>
+        /// <synchronizationNote>
+        /// The returned span provides direct access to the underlying memory of the <see cref="SynchronizedTextBuilder"/>.
+        /// Callers must synchronize externally using <see cref="SynchronizedTextBuilder.SyncRoot"/> for the duration of the
+        /// span usage if concurrent mutation is possible.
+        /// </synchronizationNote>
         // J2N TODO: This idea was borrowed from ValueStringBuilder, but is effectively the same operation as IBufferWriter<T>.GetSpan(int).
         // There is a slight difference in that GetSpan() allows passing 0 to get a "default" buffer length and it does not move the m_Position -
         // it reserves that operation for the Advance(int) method after the writes are completed.
+        [CodeGenerationSkipSynchronization]
         public Span<char> AppendSpan(int length)
         {
             if (length < 0)

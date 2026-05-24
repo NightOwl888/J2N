@@ -335,14 +335,15 @@ namespace J2N.Text
         /// If <paramref name="sizeHint"/> is 0, returns a non-empty buffer.
         /// </returns>
         /// <remarks>
-        /// This method never returns <see cref="Span{Char}.Empty"/>.
+        /// This method never returns <see cref="Span{Char}.Empty"/>.<para/>
+        /// The returned span provides direct access to the underlying memory of the <see cref="SynchronizedTextBuilder"/>.
+        /// Callers must synchronize externally using <see cref="SynchronizedTextBuilder.SyncRoot"/> for the duration of the
+        /// span usage if concurrent mutation is possible.
+        /// 
         /// </remarks>
         public Span<char> GetSpan(int sizeHint = 0)
         {
-            lock (syncRoot)
-            {
-                return buffer.GetSpan(sizeHint);
-            }
+            return buffer.GetSpan(sizeHint);
         }
 
         /// <summary>
@@ -360,14 +361,15 @@ namespace J2N.Text
         /// If <paramref name="sizeHint"/> is not provided or is equal to 0, some non-empty buffer is returned.
         /// </returns>
         /// <remarks>
-        /// This method never returns <see cref="Memory{Char}.Empty"/>.
+        /// This method never returns <see cref="Memory{Char}.Empty"/>.<para/>
+        /// The returned memory provides direct access to the underlying memory of the <see cref="SynchronizedTextBuilder"/>.
+        /// Callers must synchronize externally using <see cref="SynchronizedTextBuilder.SyncRoot"/> for the duration of the
+        /// span usage if concurrent mutation is possible.
+        /// 
         /// </remarks>
         public Memory<char> GetMemory(int sizeHint = 0)
         {
-            lock (syncRoot)
-            {
-                return buffer.GetMemory(sizeHint);
-            }
+            return buffer.GetMemory(sizeHint);
         }
 
         /// <summary>
@@ -381,15 +383,16 @@ namespace J2N.Text
         /// </param>
         /// <remarks>
         /// You must request a new buffer after calling <see cref="Advance(int)"/> to continue writing more data
-        /// and cannot write to a previously acquired buffer.
+        /// and cannot write to a previously acquired buffer.<para/>
+        /// This method is intended to be used in conjunction with either <see cref="GetSpan(int)"/> or <see cref="GetMemory(int)"/>.
+        /// If concurrent mutation is possible, this method should be synchronized externally by the caller with either of those two
+        /// methods using <see cref="SynchronizedTextBuilder.SyncRoot"/> for the duration of the memory usage.
+        /// 
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Advance(int count)
         {
-            lock (syncRoot)
-            {
-                buffer.Advance(count);
-            }
+            buffer.Advance(count);
         }
 
         /// <summary>
@@ -4629,14 +4632,15 @@ namespace J2N.Text
         /// both the length and the capacity of the <see cref="SynchronizedTextBuilder"/> instance can grow beyond
         /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
+        /// <para/>
+        /// The returned span provides direct access to the underlying memory of the <see cref="SynchronizedTextBuilder"/>.
+        /// Callers must synchronize externally using <see cref="SynchronizedTextBuilder.SyncRoot"/> for the duration of the
+        /// span usage if concurrent mutation is possible.
         /// 
         /// </remarks>
         public Span<char> AppendSpan(int length)
         {
-            lock (syncRoot)
-            {
-                return buffer.AppendSpan(length);
-            }
+            return buffer.AppendSpan(length);
         }
 
 #if FEATURE_INDEX_RANGE

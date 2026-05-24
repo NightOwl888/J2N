@@ -1,4 +1,5 @@
-﻿using System;
+﻿using J2N.CodeGeneration;
+using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 
@@ -18,6 +19,12 @@ namespace J2N.Text
         /// If <paramref name="sizeHint"/> is 0, returns a non-empty buffer.</returns>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="sizeHint"/> is less than zero.</exception>
         /// <remarks>This method never returns <see cref="Span{Char}.Empty"/>.</remarks>
+        /// <synchronizationNote>
+        /// The returned span provides direct access to the underlying memory of the <see cref="SynchronizedTextBuilder"/>.
+        /// Callers must synchronize externally using <see cref="SynchronizedTextBuilder.SyncRoot"/> for the duration of the
+        /// span usage if concurrent mutation is possible.
+        /// </synchronizationNote>
+        [CodeGenerationSkipSynchronization]
         public Span<char> GetSpan(int sizeHint = 0)
         {
             if (sizeHint < 0)
@@ -52,6 +59,12 @@ namespace J2N.Text
         /// If <paramref name="sizeHint"/> is not provided or is equal to 0, some non-empty buffer is returned.</returns>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="sizeHint"/> is less than zero.</exception>
         /// <remarks>This method never returns <see cref="Memory{Char}.Empty"/>.</remarks>
+        /// <synchronizationNote>
+        /// The returned memory provides direct access to the underlying memory of the <see cref="SynchronizedTextBuilder"/>.
+        /// Callers must synchronize externally using <see cref="SynchronizedTextBuilder.SyncRoot"/> for the duration of the
+        /// span usage if concurrent mutation is possible.
+        /// </synchronizationNote>
+        [CodeGenerationSkipSynchronization]
         public Memory<char> GetMemory(int sizeHint = 0)
         {
             if (sizeHint < 0)
@@ -87,7 +100,13 @@ namespace J2N.Text
         /// beyond <see cref="Length"/>.</exception>
         /// <remarks>You must request a new buffer after calling <see cref="Advance(int)"/> to continue writing more data
         /// and cannot write to a previously acquired buffer.</remarks>
+        /// <synchronizationNote>
+        /// This method is intended to be used in conjunction with either <see cref="GetSpan(int)"/> or <see cref="GetMemory(int)"/>.
+        /// If concurrent mutation is possible, this method should be synchronized externally by the caller with either of those two
+        /// methods using <see cref="SynchronizedTextBuilder.SyncRoot"/> for the duration of the memory usage.
+        /// </synchronizationNote>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [CodeGenerationSkipSynchronization]
         public void Advance(int count)
         {
             if (count < 0)
