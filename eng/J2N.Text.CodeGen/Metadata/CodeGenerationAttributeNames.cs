@@ -10,5 +10,8 @@
 
         public const string ReturnsSelf =
             "J2N.CodeGeneration.CodeGenerationReturnsSelfAttribute";
+
+        public const string SkipSynchronization =
+            "J2N.CodeGeneration.CodeGenerationSkipSynchronizationAttribute";
     }
 }

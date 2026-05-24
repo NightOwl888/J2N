@@ -164,6 +164,8 @@ namespace J2N.Text.CodeGen.Roslyn
                     $"Unable to resolve symbol for method '{method.Identifier.Text}'.");
             }
 
+            DocumentationModel? docs = ExtractDocumentation(method);
+
             string? returnType = method.ReturnType.ToString();
             var parameters = method.ParameterList.Parameters
                 .Select(p =>
@@ -220,10 +222,13 @@ namespace J2N.Text.CodeGen.Roslyn
                     || parameters.Any(p => IsUnsafeType(p.TypeName)),
                 BodyText = method.Body?.ToFullString()
                     ?? method.ExpressionBody?.ToFullString(),
-                Documentation = ExtractDocumentation(method),
+                Documentation = docs,
                 Parameters = parameters,
                 GenericParameters = ExtractGenericParameters(method),
                 Attributes = ExtractAttributes(method.AttributeLists),
+                SkipSynchronization =
+                    methodSymbol.HasAttribute(
+                        CodeGenerationAttributeNames.SkipSynchronization),
             };
         }
 
@@ -263,6 +268,18 @@ namespace J2N.Text.CodeGen.Roslyn
                 }
             }
 
+            bool skipGetterSynchronization =
+                propertySymbol.GetMethod?
+                    .HasAttribute(
+                        CodeGenerationAttributeNames.SkipSynchronization)
+                ?? false;
+
+            bool skipSetterSynchronization =
+                propertySymbol.SetMethod?
+                    .HasAttribute(
+                        CodeGenerationAttributeNames.SkipSynchronization)
+                ?? false;
+
             return new PropertyModel
             {
                 Name = property.Identifier.Text,
@@ -281,6 +298,12 @@ namespace J2N.Text.CodeGen.Roslyn
                 Ignore =
                     propertySymbol.HasAttribute(
                         CodeGenerationAttributeNames.Ignore),
+
+                SkipGetterSynchronization =
+                    skipGetterSynchronization,
+
+                SkipSetterSynchronization =
+                    skipSetterSynchronization,
             };
         }
 
@@ -440,7 +463,10 @@ namespace J2N.Text.CodeGen.Roslyn
                     GetXmlElementInnerText(docs, "remarks"),
 
                 ReturnsXml =
-                    GetXmlElementInnerText(docs, "returns")
+                    GetXmlElementInnerText(docs, "returns"),
+
+                SynchronizationNoteXml =
+                    GetXmlElementInnerText(docs, "synchronizationNote")
             };
         }
 

@@ -31,5 +31,7 @@
         public string? ConditionalCompilationSymbol { get; set; }
 
         public bool Ignore { get; init; }
+
+        public bool SkipSynchronization { get; init; }
     }
 }

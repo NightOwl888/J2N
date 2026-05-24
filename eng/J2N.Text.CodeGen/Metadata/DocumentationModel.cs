@@ -7,5 +7,7 @@
         public string? RemarksXml { get; init; }
 
         public string? ReturnsXml { get; init; }
+
+        public string? SynchronizationNoteXml { get; set; }
     }
 }

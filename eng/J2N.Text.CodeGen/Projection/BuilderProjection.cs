@@ -121,7 +121,10 @@ namespace J2N.Text.CodeGen.Projection
                     method.Parameters.Any(p =>
                         p.TypeName is "Index" or "Range")
                             ? "FEATURE_INDEX_RANGE"
-                            : null
+                            : null,
+
+                SkipSynchronization =
+                    method.SkipSynchronization,
             };
         }
 
@@ -205,6 +208,12 @@ namespace J2N.Text.CodeGen.Projection
                                     source.Name,
                                     facadeName)
                         },
+
+                SkipGetterSynchronization =
+                    property.SkipGetterSynchronization,
+
+                SkipSetterSynchronization =
+                    property.SkipSetterSynchronization,
             };
         }
 
@@ -315,6 +324,41 @@ namespace J2N.Text.CodeGen.Projection
                     "A reference to this instance after the operation has completed.";
             }
 
+            string? remarksXml =
+                RewriteDocumentation(
+                    docs.RemarksXml,
+                    source,
+                    source.Name,
+                    facadeName);
+
+            string? synchronizationNoteXml =
+                RewriteDocumentation(
+                    docs.SynchronizationNoteXml,
+                    source,
+                    source.Name,
+                    facadeName);
+
+            //
+            // Merge synchronization note into remarks
+            // ONLY for SynchronizedTextBuilder
+            // AND ONLY when synchronization is skipped
+            //
+            if (facadeName == "SynchronizedTextBuilder"
+                && method.SkipSynchronization
+                && !string.IsNullOrWhiteSpace(synchronizationNoteXml))
+            {
+                if (string.IsNullOrWhiteSpace(remarksXml))
+                {
+                    remarksXml = synchronizationNoteXml;
+                }
+                else
+                {
+                    remarksXml +=
+                        "<para/>"
+                        + synchronizationNoteXml;
+                }
+            }
+
             return new DocumentationModel
             {
                 SummaryXml =
@@ -324,12 +368,7 @@ namespace J2N.Text.CodeGen.Projection
                         source.Name,
                         facadeName),
 
-                RemarksXml =
-                    RewriteDocumentation(
-                        docs.RemarksXml,
-                        source,
-                        source.Name,
-                        facadeName),
+                RemarksXml = remarksXml,
 
                 ReturnsXml = returnsXml
             };

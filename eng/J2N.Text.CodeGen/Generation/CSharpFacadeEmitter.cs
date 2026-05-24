@@ -183,6 +183,10 @@ namespace J2N.Text.CodeGen.Generation
             string unsafeModifier = method.IsUnsafe ? " unsafe" : "";
             string modifier = IsObjectMethod(method) ? " override" : "";
 
+            bool shouldWrapInLock =
+                wrapMembersInLock
+                && !method.SkipSynchronization;
+
             sb.AppendLine($"        public{modifier}{unsafeModifier} {returnType} {method.Name}{genericParameterList}({parameterList})");
             foreach (GenericParameterModel parameter in method.GenericParameters)
             {
@@ -198,7 +202,7 @@ namespace J2N.Text.CodeGen.Generation
             }
             sb.AppendLine("        {");
 
-            if (wrapMembersInLock)
+            if (shouldWrapInLock)
             {
                 sb.AppendLine("            lock (syncRoot)");
                 sb.AppendLine("            {");
@@ -247,6 +251,12 @@ namespace J2N.Text.CodeGen.Generation
             bool wrapMembersInLock)
         {
             string unsafeModifier = property.IsUnsafe ? " unsafe" : "";
+            bool wrapGetter =
+                wrapMembersInLock
+                && !property.SkipGetterSynchronization;
+            bool wrapSetter =
+                wrapMembersInLock
+                && !property.SkipSetterSynchronization;
 
             if (!property.IsIndexer)
             {
@@ -255,7 +265,7 @@ namespace J2N.Text.CodeGen.Generation
 
                 if (property.HasGetter)
                 {
-                    if (wrapMembersInLock)
+                    if (wrapGetter)
                     {
                         sb.AppendLine("            get");
                         sb.AppendLine("            {");
@@ -275,7 +285,7 @@ namespace J2N.Text.CodeGen.Generation
 
                 if (property.HasSetter)
                 {
-                    if (wrapMembersInLock)
+                    if (wrapSetter)
                     {
                         sb.AppendLine("            set");
                         sb.AppendLine("            {");
@@ -312,7 +322,7 @@ namespace J2N.Text.CodeGen.Generation
 
             if (property.HasGetter)
             {
-                if (wrapMembersInLock)
+                if (wrapGetter)
                 {
                     sb.AppendLine("            get");
                     sb.AppendLine("            {");
@@ -332,7 +342,7 @@ namespace J2N.Text.CodeGen.Generation
 
             if (property.HasSetter)
             {
-                if (wrapMembersInLock)
+                if (wrapSetter)
                 {
                     sb.AppendLine("            set");
                     sb.AppendLine("            {");
@@ -361,8 +371,7 @@ namespace J2N.Text.CodeGen.Generation
         {
             foreach (AttributeModel attribute in attributes
                 .Where(a =>
-                    a.Name != "CodeGenerationIgnore"
-                    && a.Name != "CodeGenerationReturnsSelf"))
+                    !a.Name.StartsWith("CodeGeneration", StringComparison.Ordinal)))
             {
                 if (attribute.Arguments.Count == 0)
                 {

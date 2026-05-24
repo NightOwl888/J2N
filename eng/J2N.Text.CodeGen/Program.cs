@@ -89,6 +89,7 @@ namespace J2N.Text.CodGen
                 sourceDirectory,
                 facadeName: "TextBuilder",
                 synchronized: false,
+                emitSynchronizationNotes: false,
                 model);
 
             GenerateExtensions(
@@ -104,6 +105,7 @@ namespace J2N.Text.CodGen
                 sourceDirectory,
                 facadeName: "PooledTextBuilder",
                 synchronized: false,
+                emitSynchronizationNotes: false,
                 model);
 
             GenerateExtensions(
@@ -119,6 +121,7 @@ namespace J2N.Text.CodGen
                 sourceDirectory,
                 facadeName: "SynchronizedTextBuilder",
                 synchronized: true,
+                emitSynchronizationNotes: true,
                 model);
 
             // ---------------------------------------------------------------------
@@ -134,6 +137,7 @@ namespace J2N.Text.CodGen
             string sourceDirectory,
             string facadeName,
             bool synchronized,
+            bool emitSynchronizationNotes,
             TypeModel model)
         {
             var projection = new BuilderProjection();
@@ -152,7 +156,8 @@ namespace J2N.Text.CodGen
                     options: new FacadeEmitterOptions
                     {
                         SuppressMissingDocumentationWarnings = true,
-                        WrapMembersInLock = synchronized
+                        WrapMembersInLock = synchronized,
+                        EmitSynchronizationNotes = emitSynchronizationNotes,
                     });
 
             string facadePath =
@@ -163,8 +168,6 @@ namespace J2N.Text.CodGen
             File.WriteAllText(
                 facadePath,
                 facadeCode);
-
-
         }
 
         static void GenerateExtensions(
