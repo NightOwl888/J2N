@@ -1,6 +1,7 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+using J2N.CodeGeneration;
 using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -25,6 +26,12 @@ namespace J2N.Text
         /// The returned span is only valid while the underlying <see cref="MutableTextBuffer"/> remains unchanged.
         /// Concurrent mutation invalidates the span contents.
         /// </remarks>
+        /// <synchronizationNote>
+        /// The returned span provides direct access to the underlying memory of the <see cref="SynchronizedTextBuilder"/>.
+        /// Callers must synchronize externally using <see cref = "SynchronizedTextBuilder.SyncRoot" /> property for the
+        /// entire duration of span usage if concurrent mutation is possible.
+        /// </synchronizationNote>
+        [CodeGenerationSkipSynchronization]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ReadOnlySpan<char> AsSpan(this MutableTextBuffer? text)
         {
@@ -57,6 +64,12 @@ namespace J2N.Text
         /// The returned span is only valid while the underlying <see cref="MutableTextBuffer"/> remains unchanged.
         /// Concurrent mutation invalidates the span contents.
         /// </remarks>
+        /// <synchronizationNote>
+        /// The returned span provides direct access to the underlying memory of the <see cref="SynchronizedTextBuilder"/>.
+        /// Callers must synchronize externally using <see cref = "SynchronizedTextBuilder.SyncRoot" /> property for the
+        /// entire duration of span usage if concurrent mutation is possible.
+        /// </synchronizationNote>
+        [CodeGenerationSkipSynchronization]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ReadOnlySpan<char> AsSpan(this MutableTextBuffer? text, int start)
         {
@@ -99,6 +112,12 @@ namespace J2N.Text
         /// The returned span is only valid while the underlying <see cref="MutableTextBuffer"/> remains unchanged.
         /// Concurrent mutation invalidates the span contents.
         /// </remarks>
+        /// <synchronizationNote>
+        /// The returned span provides direct access to the underlying memory of the <see cref="SynchronizedTextBuilder"/>.
+        /// Callers must synchronize externally using <see cref = "SynchronizedTextBuilder.SyncRoot" /> property for the
+        /// entire duration of span usage if concurrent mutation is possible.
+        /// </synchronizationNote>
+        [CodeGenerationSkipSynchronization]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ReadOnlySpan<char> AsSpan(this MutableTextBuffer? text, int start, int length)
         {
@@ -149,6 +168,12 @@ namespace J2N.Text
         /// The returned span is only valid while the underlying <see cref="MutableTextBuffer"/> remains unchanged.
         /// Concurrent mutation invalidates the span contents.
         /// </remarks>
+        /// <synchronizationNote>
+        /// The returned span provides direct access to the underlying memory of the <see cref="SynchronizedTextBuilder"/>.
+        /// Callers must synchronize externally using <see cref = "SynchronizedTextBuilder.SyncRoot" /> property for the
+        /// entire duration of span usage if concurrent mutation is possible.
+        /// </synchronizationNote>
+        [CodeGenerationSkipSynchronization]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ReadOnlySpan<char> AsSpan(this MutableTextBuffer? text, Index startIndex)
         {
@@ -197,6 +222,12 @@ namespace J2N.Text
         /// The returned span is only valid while the underlying <see cref="MutableTextBuffer"/> remains unchanged.
         /// Concurrent mutation invalidates the span contents.
         /// </remarks>
+        /// <synchronizationNote>
+        /// The returned span provides direct access to the underlying memory of the <see cref="SynchronizedTextBuilder"/>.
+        /// Callers must synchronize externally using <see cref = "SynchronizedTextBuilder.SyncRoot" /> property for the
+        /// entire duration of span usage if concurrent mutation is possible.
+        /// </synchronizationNote>
+        [CodeGenerationSkipSynchronization]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ReadOnlySpan<char> AsSpan(this MutableTextBuffer? text, Range range)
         {
@@ -241,6 +272,12 @@ namespace J2N.Text
         /// The returned memory is only valid while the underlying <see cref="MutableTextBuffer"/> remains unchanged.
         /// Concurrent mutation invalidates the memory contents.
         /// </remarks>
+        /// <synchronizationNote>
+        /// The returned memory provides direct access to the underlying memory of the <see cref="SynchronizedTextBuilder"/>.
+        /// Callers must synchronize externally using <see cref = "SynchronizedTextBuilder.SyncRoot" /> property for the
+        /// entire duration of memory usage if concurrent mutation is possible.
+        /// </synchronizationNote>
+        [CodeGenerationSkipSynchronization]
         public static ReadOnlyMemory<char> AsMemory(this MutableTextBuffer? text)
         {
             if (text is null)
@@ -265,6 +302,12 @@ namespace J2N.Text
         /// The returned memory is only valid while the underlying <see cref="MutableTextBuffer"/> remains unchanged.
         /// Concurrent mutation invalidates the memory contents.
         /// </remarks>
+        /// <synchronizationNote>
+        /// The returned memory provides direct access to the underlying memory of the <see cref="SynchronizedTextBuilder"/>.
+        /// Callers must synchronize externally using <see cref = "SynchronizedTextBuilder.SyncRoot" /> property for the
+        /// entire duration of memory usage if concurrent mutation is possible.
+        /// </synchronizationNote>
+        [CodeGenerationSkipSynchronization]
         public static ReadOnlyMemory<char> AsMemory(this MutableTextBuffer? text, int start)
         {
             if (text == null)
@@ -296,6 +339,12 @@ namespace J2N.Text
         /// The returned memory is only valid while the underlying <see cref="MutableTextBuffer"/> remains unchanged.
         /// Concurrent mutation invalidates the memory contents.
         /// </remarks>
+        /// <synchronizationNote>
+        /// The returned memory provides direct access to the underlying memory of the <see cref="SynchronizedTextBuilder"/>.
+        /// Callers must synchronize externally using <see cref = "SynchronizedTextBuilder.SyncRoot" /> property for the
+        /// entire duration of memory usage if concurrent mutation is possible.
+        /// </synchronizationNote>
+        [CodeGenerationSkipSynchronization]
         public static ReadOnlyMemory<char> AsMemory(this MutableTextBuffer? text, int start, int length)
         {
             if (text == null)
@@ -336,6 +385,12 @@ namespace J2N.Text
         /// The returned memory is only valid while the underlying <see cref="MutableTextBuffer"/> remains unchanged.
         /// Concurrent mutation invalidates the memory contents.
         /// </remarks>
+        /// <synchronizationNote>
+        /// The returned memory provides direct access to the underlying memory of the <see cref="SynchronizedTextBuilder"/>.
+        /// Callers must synchronize externally using <see cref = "SynchronizedTextBuilder.SyncRoot" /> property for the
+        /// entire duration of memory usage if concurrent mutation is possible.
+        /// </synchronizationNote>
+        [CodeGenerationSkipSynchronization]
         public static ReadOnlyMemory<char> AsMemory(this MutableTextBuffer? text, Index startIndex)
         {
             if (text == null)
@@ -373,6 +428,12 @@ namespace J2N.Text
         /// The returned memory is only valid while the underlying <see cref="MutableTextBuffer"/> remains unchanged.
         /// Concurrent mutation invalidates the memory contents.
         /// </remarks>
+        /// <synchronizationNote>
+        /// The returned memory provides direct access to the underlying memory of the <see cref="SynchronizedTextBuilder"/>.
+        /// Callers must synchronize externally using <see cref = "SynchronizedTextBuilder.SyncRoot" /> property for the
+        /// entire duration of memory usage if concurrent mutation is possible.
+        /// </synchronizationNote>
+        [CodeGenerationSkipSynchronization]
         public static ReadOnlyMemory<char> AsMemory(this MutableTextBuffer? text, Range range)
         {
             if (text == null)
