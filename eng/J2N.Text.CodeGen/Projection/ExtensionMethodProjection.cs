@@ -91,28 +91,35 @@ namespace J2N.Text.CodeGen.Projection
                         .ToList(),
 
                 Documentation =
-                    method.Documentation is null
-                        ? null
-                        : new DocumentationModel
-                        {
-                            SummaryXml =
-                                RewriteDocumentation(
-                                    method.Documentation.SummaryXml,
-                                    sourceType,
-                                    facadeType),
+                    MergeSynchronizationDocumentation(
+                        method.Documentation is null
+                            ? null
+                            : new DocumentationModel
+                            {
+                                SummaryXml =
+                                    RewriteDocumentation(
+                                        method.Documentation.SummaryXml,
+                                        sourceType,
+                                        facadeType),
 
-                            RemarksXml =
-                                RewriteDocumentation(
-                                    method.Documentation.RemarksXml,
-                                    sourceType,
-                                    facadeType),
+                                RemarksXml =
+                                    RewriteDocumentation(
+                                        method.Documentation.RemarksXml,
+                                        sourceType,
+                                        facadeType),
 
-                            ReturnsXml =
-                                RewriteDocumentation(
-                                    method.Documentation.ReturnsXml,
-                                    sourceType,
-                                    facadeType)
-                        },
+                                ReturnsXml =
+                                    RewriteDocumentation(
+                                        method.Documentation.ReturnsXml,
+                                        sourceType,
+                                        facadeType),
+
+                                SynchronizationNoteXml =
+                                    RewriteDocumentation(
+                                        method.Documentation.SynchronizationNoteXml,
+                                        sourceType,
+                                        facadeType)
+                            }),
 
                 BodyText =
                     RewriteBody(
@@ -162,6 +169,35 @@ namespace J2N.Text.CodeGen.Projection
                 return xml;
 
             return xml.Replace(sourceType, facadeType);
+        }
+
+        private static DocumentationModel? MergeSynchronizationDocumentation(DocumentationModel? docs)
+        {
+            if (docs is null)
+                return null;
+
+            string? remarksXml = docs.RemarksXml;
+
+            if (!string.IsNullOrWhiteSpace(docs.SynchronizationNoteXml))
+            {
+                if (string.IsNullOrWhiteSpace(remarksXml))
+                {
+                    remarksXml = docs.SynchronizationNoteXml;
+                }
+                else
+                {
+                    remarksXml +=
+                        "<para/>"
+                        + docs.SynchronizationNoteXml;
+                }
+            }
+
+            return new DocumentationModel
+            {
+                SummaryXml = docs.SummaryXml,
+                RemarksXml = remarksXml,
+                ReturnsXml = docs.ReturnsXml
+            };
         }
 
         private static string? RewriteBody(

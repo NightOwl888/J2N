@@ -124,6 +124,11 @@ namespace J2N.Text.CodGen
                 emitSynchronizationNotes: true,
                 model);
 
+            GenerateExtensions(
+                sourceDirectory,
+                facadeName: "SynchronizedTextBuilder",
+                extensionModel);
+
             // ---------------------------------------------------------------------
             // Report completion
             // ---------------------------------------------------------------------

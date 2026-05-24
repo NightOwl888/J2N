@@ -134,6 +134,39 @@ namespace J2N.Text.CodeGen.Projection
             string sourceType,
             string facadeName)
         {
+            DocumentationModel? rewrittenDocs = property.Documentation is null
+                ? null
+                : new DocumentationModel
+                {
+                    SummaryXml =
+                        RewriteDocumentation(
+                            property.Documentation.SummaryXml,
+                            source,
+                            source.Name,
+                            facadeName),
+
+                    RemarksXml =
+                        RewriteDocumentation(
+                            property.Documentation.RemarksXml,
+                            source,
+                            source.Name,
+                            facadeName),
+
+                    ReturnsXml =
+                        RewriteDocumentation(
+                            property.Documentation.ReturnsXml,
+                            source,
+                            source.Name,
+                            facadeName),
+
+                    SynchronizationNoteXml =
+                        RewriteDocumentation(
+                            property.Documentation.SynchronizationNoteXml,
+                            source,
+                            source.Name,
+                            facadeName)
+                };
+
             return new PropertyModel
             {
                 Name = property.Name,
@@ -183,31 +216,12 @@ namespace J2N.Text.CodeGen.Projection
                         .ToList(),
 
                 Documentation =
-                    property.Documentation is null
-                        ? null
-                        : new DocumentationModel
-                        {
-                            SummaryXml =
-                                RewriteDocumentation(
-                                    property.Documentation.SummaryXml,
-                                    source,
-                                    source.Name,
-                                    facadeName),
+                    MergeSynchronizationDocumentation(
+                        rewrittenDocs,
+                        includeSynchronizationNote: facadeName == "SynchronizedTextBuilder" &&
+                            (property.SkipGetterSynchronization || property.SkipSetterSynchronization)),
 
-                            RemarksXml =
-                                RewriteDocumentation(
-                                    property.Documentation.RemarksXml,
-                                    source,
-                                    source.Name,
-                                    facadeName),
 
-                            ReturnsXml =
-                                RewriteDocumentation(
-                                    property.Documentation.ReturnsXml,
-                                    source,
-                                    source.Name,
-                                    facadeName)
-                        },
 
                 SkipGetterSynchronization =
                     property.SkipGetterSynchronization,
@@ -324,53 +338,64 @@ namespace J2N.Text.CodeGen.Projection
                     "A reference to this instance after the operation has completed.";
             }
 
-            string? remarksXml =
-                RewriteDocumentation(
-                    docs.RemarksXml,
-                    source,
-                    source.Name,
-                    facadeName);
+            return MergeSynchronizationDocumentation(
+                new DocumentationModel
+                {
+                    SummaryXml =
+                        RewriteDocumentation(
+                            docs.SummaryXml,
+                            source,
+                            source.Name,
+                            facadeName),
 
-            string? synchronizationNoteXml =
-                RewriteDocumentation(
-                    docs.SynchronizationNoteXml,
-                    source,
-                    source.Name,
-                    facadeName);
+                    RemarksXml =
+                        RewriteDocumentation(
+                            docs.RemarksXml,
+                            source,
+                            source.Name,
+                            facadeName),
 
-            //
-            // Merge synchronization note into remarks
-            // ONLY for SynchronizedTextBuilder
-            // AND ONLY when synchronization is skipped
-            //
-            if (facadeName == "SynchronizedTextBuilder"
-                && method.SkipSynchronization
-                && !string.IsNullOrWhiteSpace(synchronizationNoteXml))
+                    ReturnsXml = returnsXml,
+
+                    SynchronizationNoteXml =
+                        RewriteDocumentation(
+                            docs.SynchronizationNoteXml,
+                            source,
+                            source.Name,
+                            facadeName),
+                },
+                includeSynchronizationNote: facadeName == "SynchronizedTextBuilder" && method.SkipSynchronization);
+        }
+
+        private static DocumentationModel? MergeSynchronizationDocumentation(
+            DocumentationModel? docs,
+            bool includeSynchronizationNote)
+        {
+            if (docs is null)
+                return null;
+
+            string? remarksXml = docs.RemarksXml;
+
+            if (includeSynchronizationNote
+                && !string.IsNullOrWhiteSpace(docs.SynchronizationNoteXml))
             {
                 if (string.IsNullOrWhiteSpace(remarksXml))
                 {
-                    remarksXml = synchronizationNoteXml;
+                    remarksXml = docs.SynchronizationNoteXml;
                 }
                 else
                 {
                     remarksXml +=
                         "<para/>"
-                        + synchronizationNoteXml;
+                        + docs.SynchronizationNoteXml;
                 }
             }
 
             return new DocumentationModel
             {
-                SummaryXml =
-                    RewriteDocumentation(
-                        docs.SummaryXml,
-                        source,
-                        source.Name,
-                        facadeName),
-
+                SummaryXml = docs.SummaryXml,
                 RemarksXml = remarksXml,
-
-                ReturnsXml = returnsXml
+                ReturnsXml = docs.ReturnsXml
             };
         }
 

@@ -191,19 +191,22 @@ namespace J2N.Text.CodeGen.Generation
 
         private static void EmitAttributes(
             StringBuilder sb,
-            IEnumerable<AttributeModel> attributes)
+            IEnumerable<AttributeModel> attributes,
+            string indent = "        ")
         {
-            foreach (AttributeModel attribute in attributes)
+            foreach (AttributeModel attribute in attributes
+                .Where(a =>
+                    !a.Name.StartsWith("CodeGeneration", StringComparison.Ordinal)))
             {
                 if (attribute.Arguments.Count == 0)
                 {
-                    sb.AppendLine(
-                        $"        [{attribute.Name}]");
+                    sb.AppendLine($"{indent}[{attribute.Name}]");
                 }
                 else
                 {
-                    sb.AppendLine(
-                        $"        [{attribute.Name}({string.Join(", ", attribute.Arguments)})]");
+                    string args = string.Join(", ", attribute.Arguments);
+
+                    sb.AppendLine($"{indent}[{attribute.Name}({args})]");
                 }
             }
         }

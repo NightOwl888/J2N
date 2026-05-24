@@ -27,9 +27,5 @@
         public bool SkipGetterSynchronization { get; init; }
 
         public bool SkipSetterSynchronization { get; init; }
-
-        public string? GetterSynchronizationNoteXml { get; init; }
-
-        public string? SetterSynchronizationNoteXml { get; init; }
     }
 }
