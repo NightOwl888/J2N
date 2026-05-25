@@ -37,7 +37,7 @@ namespace J2N.Text
         /// If <paramref name="culture"/> is <c>null</c>, <see cref="CultureInfo.CurrentCulture"/> will be used.
         /// </remarks>
         [CodeGenerationReturnsSelf]
-        public MutableTextBuffer AppendUpper(string? value, CultureInfo? culture)
+        public void AppendUpper(string? value, CultureInfo? culture)
             => AppendUpper(value.AsSpan(), culture);
 
         /// <summary>
@@ -52,13 +52,13 @@ namespace J2N.Text
         /// If <paramref name="culture"/> is <c>null</c>, <see cref="CultureInfo.CurrentCulture"/> will be used.
         /// </remarks>
         [CodeGenerationReturnsSelf]
-        public MutableTextBuffer AppendUpper(ReadOnlySpan<char> value, CultureInfo? culture)
+        public void AppendUpper(ReadOnlySpan<char> value, CultureInfo? culture)
         {
             culture ??= CultureInfo.CurrentCulture;
 
             int valueLength = value.Length;
             if (valueLength == 0)
-                return this;
+                return;
 
             int pos = m_Position;
             if (pos > m_Chars.Length - valueLength)
@@ -73,7 +73,6 @@ namespace J2N.Text
                 length = value.ToUpper(m_Chars.AsSpan(m_Position), culture);
             }
             m_Position += length;
-            return this;
         }
 
         /// <summary>
@@ -88,7 +87,7 @@ namespace J2N.Text
         /// If <paramref name="culture"/> is <c>null</c>, <see cref="CultureInfo.CurrentCulture"/> will be used.
         /// </remarks>
         [CodeGenerationReturnsSelf]
-        public MutableTextBuffer AppendLower(string? value, CultureInfo? culture)
+        public void AppendLower(string? value, CultureInfo? culture)
             => AppendLower(value.AsSpan(), culture);
 
         /// <summary>
@@ -99,13 +98,13 @@ namespace J2N.Text
         /// <param name="culture">An object that supplies culture-specific casing rules.</param>
         /// <remarks>The capacity of this instance is adjusted as needed.</remarks>
         [CodeGenerationReturnsSelf]
-        public MutableTextBuffer AppendLower(ReadOnlySpan<char> value, CultureInfo? culture)
+        public void AppendLower(ReadOnlySpan<char> value, CultureInfo? culture)
         {
             culture ??= CultureInfo.CurrentCulture;
 
             int valueLength = value.Length;
             if (valueLength == 0)
-                return this;
+                return;
 
             int pos = m_Position;
             if (pos > m_Chars.Length - valueLength)
@@ -120,7 +119,6 @@ namespace J2N.Text
                 length = value.ToLower(m_Chars.AsSpan(m_Position), culture);
             }
             m_Position += length;
-            return this;
         }
 
         /// <summary>
@@ -130,7 +128,7 @@ namespace J2N.Text
         /// <param name="value">The string to append.</param>
         /// <remarks>The capacity of this instance is adjusted as needed.</remarks>
         [CodeGenerationReturnsSelf]
-        public MutableTextBuffer AppendUpperInvariant(string? value)
+        public void AppendUpperInvariant(string? value)
             => AppendUpperInvariant(value.AsSpan());
 
         /// <summary>
@@ -140,11 +138,11 @@ namespace J2N.Text
         /// <param name="value">The read-only character span to append.</param>
         /// <remarks>The capacity of this instance is adjusted as needed.</remarks>
         [CodeGenerationReturnsSelf]
-        public MutableTextBuffer AppendUpperInvariant(ReadOnlySpan<char> value)
+        public void AppendUpperInvariant(ReadOnlySpan<char> value)
         {
             int valueLength = value.Length;
             if (valueLength == 0)
-                return this;
+                return;
 
             int pos = m_Position;
             if (pos > m_Chars.Length - valueLength)
@@ -155,7 +153,6 @@ namespace J2N.Text
             int length = value.ToUpperInvariant(m_Chars.AsSpan(m_Position));
             Debug.Assert(length >= 0, "The invariant culture should never require expanding the buffer to more characters than the original value");
             m_Position += length;
-            return this;
         }
 
         /// <summary>
@@ -165,7 +162,7 @@ namespace J2N.Text
         /// <param name="value">The string to append.</param>
         /// <remarks>The capacity of this instance is adjusted as needed.</remarks>
         [CodeGenerationReturnsSelf]
-        public MutableTextBuffer AppendLowerInvariant(string? value)
+        public void AppendLowerInvariant(string? value)
             => AppendLowerInvariant(value.AsSpan());
 
         /// <summary>
@@ -175,11 +172,11 @@ namespace J2N.Text
         /// <param name="value">The read-only character span to append.</param>
         /// <remarks>The capacity of this instance is adjusted as needed.</remarks>
         [CodeGenerationReturnsSelf]
-        public MutableTextBuffer AppendLowerInvariant(ReadOnlySpan<char> value)
+        public void AppendLowerInvariant(ReadOnlySpan<char> value)
         {
             int valueLength = value.Length;
             if (valueLength == 0)
-                return this;
+                return;
 
             int pos = m_Position;
             if (pos > m_Chars.Length - valueLength)
@@ -190,7 +187,6 @@ namespace J2N.Text
             int length = value.ToLowerInvariant(m_Chars.AsSpan(m_Position));
             Debug.Assert(length >= 0, "The invariant culture should never require expanding the buffer to more characters than the original value");
             m_Position += length;
-            return this;
         }
     }
 }

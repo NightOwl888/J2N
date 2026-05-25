@@ -19,32 +19,37 @@ namespace J2N.Text
         /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.</exception>
         /// <seealso cref="ICharSequence"/>
         [CodeGenerationReturnsSelf]
-        public MutableTextBuffer Append(ICharSequence? charSequence) // J2N: Parameter named charSequence so it can be specified explicitly to differentiate from object
+        public void Append(ICharSequence? charSequence) // J2N: Parameter named charSequence so it can be specified explicitly to differentiate from object
         {
             if (charSequence is null || !charSequence.HasValue)
-                return this;
+                return;
 
             if (charSequence is StringCharSequence str)
             {
-                return Append(str.Value);
+                Append(str.Value);
+                return;
             }
             else if (charSequence is CharArrayCharSequence chars)
             {
-                return Append(chars.Value);
+                Append(chars.Value);
+                return;
             }
             else if (charSequence is StringBuilderCharSequence sb)
             {
-                return Append(sb.Value);
+                Append(sb.Value);
+                return;
             }
             else if (charSequence is MutableTextBuffer osb)
             {
-                return Append(osb);
+                Append(osb);
+                return;
             }
             else if (charSequence is StringBuffer buffer)
             {
                 lock (buffer.SyncRoot)
                 {
-                    return Append(buffer.builder);
+                    Append(buffer.builder);
+                    return;
                 }
             }
 
@@ -68,7 +73,6 @@ namespace J2N.Text
                 m_Chars[pos++] = charSequence[i];
             }
             m_Position += count;
-            return this;
         }
 
         /// <summary>
@@ -97,29 +101,34 @@ namespace J2N.Text
         /// </exception>
         /// <seealso cref="ICharSequence"/>
         [CodeGenerationReturnsSelf]
-        public MutableTextBuffer Append(ICharSequence? charSequence, int startIndex, int count)
+        public void Append(ICharSequence? charSequence, int startIndex, int count)
         {
             if (charSequence is StringCharSequence str)
             {
-                return Append(str.Value, startIndex, count);
+                Append(str.Value, startIndex, count);
+                return;
             }
             else if (charSequence is CharArrayCharSequence chars)
             {
-                return Append(chars.Value, startIndex, count);
+                Append(chars.Value, startIndex, count);
+                return;
             }
             else if (charSequence is StringBuilderCharSequence sb)
             {
-                return Append(sb.Value, startIndex, count);
+                Append(sb.Value, startIndex, count);
+                return;
             }
             else if (charSequence is MutableTextBuffer osb)
             {
-                return Append(osb, startIndex, count);
+                Append(osb, startIndex, count);
+                return;
             }
             else if (charSequence is StringBuffer buffer)
             {
                 lock (buffer.SyncRoot)
                 {
-                    return Append(buffer.builder, startIndex, count);
+                    Append(buffer.builder, startIndex, count);
+                    return;
                 }
             }
 
@@ -132,7 +141,7 @@ namespace J2N.Text
             {
                 if (startIndex == 0 && count == 0)
                 {
-                    return this;
+                    return;
                 }
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.charSequence);
             }
@@ -164,8 +173,6 @@ namespace J2N.Text
                 }
                 m_Position += count;
             }
-
-            return this;
         }
 
         #endregion Append ICharSequence 
@@ -186,32 +193,37 @@ namespace J2N.Text
         /// Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.
         /// </exception>
         [CodeGenerationReturnsSelf]
-        public MutableTextBuffer Insert(int index, ICharSequence? charSequence)
+        public void Insert(int index, ICharSequence? charSequence)
         {
             if (charSequence is null || !charSequence.HasValue || charSequence.Length == 0)
-                return this;
+                return;
 
             if (charSequence is StringCharSequence stringCharSequence)
             {
-                return Insert(index, stringCharSequence?.Value);
+                Insert(index, stringCharSequence?.Value);
+                return;
             }
             else if (charSequence is CharArrayCharSequence chars)
             {
-                return Insert(index, chars.Value);
+                Insert(index, chars.Value);
+                return;
             }
             else if (charSequence is StringBuilderCharSequence sbCharSequence)
             {
-                return Insert(index, sbCharSequence.Value);
+                Insert(index, sbCharSequence.Value);
+                return;
             }
             else if (charSequence is MutableTextBuffer osb)
             {
-                return Insert(index, osb.AsSpan());
+                Insert(index, osb.AsSpan());
+                return;
             }
             else if (charSequence is StringBuffer sBuffer)
             {
                 lock (sBuffer.SyncRoot)
                 {
-                    return Insert(index, sBuffer.builder);
+                    Insert(index, sBuffer.builder);
+                    return;
                 }
             }
 
@@ -227,8 +239,6 @@ namespace J2N.Text
             {
                 m_Chars[index++] = charSequence[i];
             }
-            
-            return this;
         }
 
         /// <summary>
@@ -258,7 +268,7 @@ namespace J2N.Text
         /// Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.
         /// </exception>
         [CodeGenerationReturnsSelf]
-        public MutableTextBuffer Insert(int index, ICharSequence? charSequence, int startIndex, int count)
+        public void Insert(int index, ICharSequence? charSequence, int startIndex, int count)
         {
             int currentLength = Length;
             if ((uint)index > (uint)currentLength)
@@ -270,32 +280,37 @@ namespace J2N.Text
             {
                 if (startIndex == 0 && count == 0)
                 {
-                    return this;
+                    return;
                 }
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.value);
             }
 
             if (charSequence is StringCharSequence stringCharSequence)
             {
-                return Insert(index, stringCharSequence.Value.AsSpan(startIndex, count));
+                Insert(index, stringCharSequence.Value.AsSpan(startIndex, count));
+                return;
             }
             else if (charSequence is CharArrayCharSequence chars)
             {
-                return Insert(index, chars.Value, startIndex, count);
+                Insert(index, chars.Value, startIndex, count);
+                return;
             }
             else if (charSequence is StringBuilderCharSequence sbCharSequence)
             {
-                return Insert(index, sbCharSequence.Value!.ToString(startIndex, count));
+                Insert(index, sbCharSequence.Value!.ToString(startIndex, count));
+                return;
             }
             else if (charSequence is MutableTextBuffer osb)
             {
-                return Insert(index, osb.AsSpan(startIndex, count));
+                Insert(index, osb.AsSpan(startIndex, count));
+                return;
             }
             else if (charSequence is StringBuffer sBuffer)
             {
                 lock (sBuffer.SyncRoot)
                 {
-                    return Insert(index, sBuffer.builder.ToString(startIndex, count));
+                    Insert(index, sBuffer.builder.ToString(startIndex, count));
+                    return;
                 }
             }
 
@@ -322,36 +337,74 @@ namespace J2N.Text
                     m_Chars[index++] = charSequence[i + startIndex];
                 }
             }
-
-            return this;
         }
 
         #endregion Insert ICharSequence
 
         #region ISpanAppendable Members
 
-        ISpanAppendable ISpanAppendable.Append(ReadOnlySpan<char> value) => Append(value);
+        ISpanAppendable ISpanAppendable.Append(ReadOnlySpan<char> value)
+        {
+            Append(value);
+            return this;
+        }
 
         #endregion ISpanAppendable Members
 
         #region IAppendable Members
-        IAppendable IAppendable.Append(char value) => Append(value);
+        IAppendable IAppendable.Append(char value)
+        {
+            Append(value);
+            return this;
+        }
 
-        IAppendable IAppendable.Append(string? value) => Append(value);
+        IAppendable IAppendable.Append(string? value)
+        {
+            Append(value);
+            return this;
+        }
 
-        IAppendable IAppendable.Append(string? value, int startIndex, int count) => Append(value, startIndex, count);
+        IAppendable IAppendable.Append(string? value, int startIndex, int count)
+        {
+            Append(value, startIndex, count);
+            return this;
+        }
 
-        IAppendable IAppendable.Append(StringBuilder? value) => Append(value);
+        IAppendable IAppendable.Append(StringBuilder? value)
+        {
+            Append(value);
+            return this;
+        }
 
-        IAppendable IAppendable.Append(StringBuilder? value, int startIndex, int count) => Append(value, startIndex, count);
+        IAppendable IAppendable.Append(StringBuilder? value, int startIndex, int count)
+        {
+            Append(value, startIndex, count);
+            return this;
+        }
 
-        IAppendable IAppendable.Append(char[]? value) => Append(value);
+        IAppendable IAppendable.Append(char[]? value)
+        {
+            Append(value);
+            return this;
+        }
 
-        IAppendable IAppendable.Append(char[]? value, int startIndex, int count) => Append(value, startIndex, count);
+        IAppendable IAppendable.Append(char[]? value, int startIndex, int count)
+        {
+            Append(value, startIndex, count);
+            return this;
+        }
 
-        IAppendable IAppendable.Append(ICharSequence? value) => Append(value);
+        IAppendable IAppendable.Append(ICharSequence? value)
+        {
+            Append(value);
+            return this;
+        }
 
-        IAppendable IAppendable.Append(ICharSequence? value, int startIndex, int count) => Append(value, startIndex, count);
+        IAppendable IAppendable.Append(ICharSequence? value, int startIndex, int count)
+        {
+            Append(value, startIndex, count);
+            return this;
+        }
 
         #endregion IAppendable Members
     }

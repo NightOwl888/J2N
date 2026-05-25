@@ -366,10 +366,9 @@ namespace J2N.Text
         /// <remarks><see cref="Clear"/> is a convenience method that is equivalent to setting
         /// the <see cref="Length"/> property of the current instance to 0 (zero).</remarks>
         [CodeGenerationReturnsSelf]
-        public MutableTextBuffer Clear()
+        public void Clear()
         {
             this.Length = 0;
-            return this;
         }
 
         /// <summary>
@@ -624,14 +623,14 @@ namespace J2N.Text
         /// </remarks>
         /// <seealso cref="char"/>
         [CodeGenerationReturnsSelf]
-        public MutableTextBuffer Append(char value, int repeatCount)
+        public void Append(char value, int repeatCount)
         {
             if (repeatCount < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(repeatCount, ExceptionArgument.repeatCount);
 
             if (repeatCount == 0)
             {
-                return this;
+                return;
             }
 
             char[] chars = m_Chars;
@@ -651,7 +650,6 @@ namespace J2N.Text
             }
 
             //AssertInvariants();
-            return this;
         }
 
         private void AppendWithExpansion(char value, int repeatCount)
@@ -728,7 +726,7 @@ namespace J2N.Text
         /// </remarks>
         /// <seealso cref="char"/>
         [CodeGenerationReturnsSelf]
-        public MutableTextBuffer Append(char[]? value, int startIndex, int charCount)
+        public void Append(char[]? value, int startIndex, int charCount)
         {
             if (startIndex < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(startIndex, ExceptionArgument.startIndex);
@@ -739,7 +737,7 @@ namespace J2N.Text
             {
                 if (startIndex == 0 && charCount == 0)
                 {
-                    return this;
+                    return;
                 }
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.value);
             }
@@ -752,8 +750,6 @@ namespace J2N.Text
             {
                 Append(ref value[startIndex], charCount);
             }
-
-            return this;
         }
 
         /// <summary>
@@ -791,14 +787,12 @@ namespace J2N.Text
         /// </remarks>
         /// <seealso cref="string"/>
         [CodeGenerationReturnsSelf]
-        public MutableTextBuffer Append(string? value)
+        public void Append(string? value)
         {
             if (value is not null)
             {
                 Append(ref MemoryMarshal.GetReference(value.AsSpan()), value.Length);
             }
-
-            return this;
         }
 
         /// <summary>
@@ -864,7 +858,7 @@ namespace J2N.Text
         /// </remarks>
         /// <seealso cref="string"/>
         [CodeGenerationReturnsSelf]
-        public MutableTextBuffer Append(string? value, int startIndex, int count)
+        public void Append(string? value, int startIndex, int count)
         {
             if (startIndex < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(startIndex, ExceptionArgument.startIndex);
@@ -875,7 +869,7 @@ namespace J2N.Text
             {
                 if (startIndex == 0 && count == 0)
                 {
-                    return this;
+                    return;
                 }
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.value);
             }
@@ -889,8 +883,6 @@ namespace J2N.Text
 
                 Append(ref MemoryMarshal.GetReference(value.AsSpan(startIndex)), count);
             }
-
-            return this;
         }
 
         /// <summary>
@@ -920,13 +912,12 @@ namespace J2N.Text
         /// </remarks>
         /// <seealso cref="StringBuilder"/>
         [CodeGenerationReturnsSelf]
-        public MutableTextBuffer Append(StringBuilder? value)
+        public void Append(StringBuilder? value)
         {
             if (value != null && value.Length != 0)
             {
-                return AppendCore(value, 0, value.Length);
+                AppendCore(value, 0, value.Length);
             }
-            return this;
         }
 
         /// <summary>
@@ -993,7 +984,7 @@ namespace J2N.Text
         /// </remarks>
         /// <seealso cref="StringBuilder"/>
         [CodeGenerationReturnsSelf]
-        public MutableTextBuffer Append(StringBuilder? value, int startIndex, int count)
+        public void Append(StringBuilder? value, int startIndex, int count)
         {
             if (startIndex < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(startIndex, ExceptionArgument.startIndex);
@@ -1004,14 +995,14 @@ namespace J2N.Text
             {
                 if (startIndex == 0 && count == 0)
                 {
-                    return this;
+                    return;
                 }
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.value);
             }
 
             if (count == 0)
             {
-                return this;
+                return;
             }
 
             if (count > value.Length - startIndex)
@@ -1019,10 +1010,10 @@ namespace J2N.Text
                 ThrowHelper.ThrowArgumentOutOfRange_IndexMustBeLessOrEqualException(startIndex, ExceptionArgument.startIndex);
             }
 
-            return AppendCore(value, startIndex, count);
+            AppendCore(value, startIndex, count);
         }
 
-        private MutableTextBuffer AppendCore(StringBuilder value, int startIndex, int count)
+        private void AppendCore(StringBuilder value, int startIndex, int count)
         {
             int newLength = Length + count;
 
@@ -1039,24 +1030,21 @@ namespace J2N.Text
 
             value.CopyTo(startIndex, m_Chars, m_Position, count);
             m_Position += count;
-
-            return this;
         }
 
         #region Custom Append
 
         [CodeGenerationReturnsSelf]
-        public MutableTextBuffer Append(MutableTextBuffer? value)
+        public void Append(MutableTextBuffer? value)
         {
             if (value != null && value.Length != 0)
             {
-                return AppendCore(value, 0, value.Length);
+                AppendCore(value, 0, value.Length);
             }
-            return this;
         }
 
         [CodeGenerationReturnsSelf]
-        public MutableTextBuffer Append(MutableTextBuffer? value, int startIndex, int count)
+        public void Append(MutableTextBuffer? value, int startIndex, int count)
         {
             if (startIndex < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(startIndex, ExceptionArgument.startIndex);
@@ -1067,14 +1055,14 @@ namespace J2N.Text
             {
                 if (startIndex == 0 && count == 0)
                 {
-                    return this;
+                    return;
                 }
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.value);
             }
 
             if (count == 0)
             {
-                return this;
+                return;
             }
 
             if (count > value.Length - startIndex)
@@ -1082,14 +1070,15 @@ namespace J2N.Text
                 ThrowHelper.ThrowArgumentOutOfRange_IndexMustBeLessOrEqualException(startIndex, ExceptionArgument.startIndex);
             }
 
-            return AppendCore(value, startIndex, count);
+            AppendCore(value, startIndex, count);
         }
 
-        private MutableTextBuffer AppendCore(MutableTextBuffer value, int startIndex, int count)
+        private void AppendCore(MutableTextBuffer value, int startIndex, int count)
         {
             if (value == this)
             {
-                return Append(value.AsSpan(startIndex, count));
+                Append(value.AsSpan(startIndex, count));
+                return;
             }
 
             int newLength = Length + count;
@@ -1107,8 +1096,6 @@ namespace J2N.Text
 
             value.CopyTo(startIndex, m_Chars, m_Position, count);
             m_Position += count;
-
-            return this;
         }
 
         #endregion Custom Append
@@ -1132,7 +1119,7 @@ namespace J2N.Text
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
         /// </remarks>
         [CodeGenerationReturnsSelf]
-        public MutableTextBuffer AppendLine() => Append(Environment.NewLine);
+        public void AppendLine() => Append(Environment.NewLine);
 
         /// <summary>
         /// Appends a copy of the specified string followed by the default line terminator to the end of the
@@ -1156,10 +1143,10 @@ namespace J2N.Text
         /// </remarks>
         /// <seealso cref="string"/>
         [CodeGenerationReturnsSelf]
-        public MutableTextBuffer AppendLine(string? value)
+        public void AppendLine(string? value)
         {
             Append(value);
-            return Append(Environment.NewLine);
+            Append(Environment.NewLine);
         }
 
         /// <summary>
@@ -1184,10 +1171,10 @@ namespace J2N.Text
         /// </remarks>
         /// <seealso cref="ReadOnlySpan{Char}"/>
         [CodeGenerationReturnsSelf]
-        public MutableTextBuffer AppendLine(ReadOnlySpan<char> value)
+        public void AppendLine(ReadOnlySpan<char> value)
         {
             Append(value);
-            return Append(Environment.NewLine);
+            Append(Environment.NewLine);
         }
 
         /// <summary>
@@ -1312,7 +1299,7 @@ namespace J2N.Text
         /// <paramref name="value"/> is not <c>null</c> but its length is zero, or <paramref name="count"/> is zero.
         /// </remarks>
         [CodeGenerationReturnsSelf]
-        public MutableTextBuffer Insert(int index, string? value, int count) => Insert(index, value.AsSpan(), count);
+        public void Insert(int index, string? value, int count) => Insert(index, value.AsSpan(), count);
 
         /// <summary>
         /// Inserts one or more copies of a specified sequence of characters into this instance at the specified character position.
@@ -1339,7 +1326,7 @@ namespace J2N.Text
         /// <paramref name="count"/> is zero.
         /// </remarks>
         [CodeGenerationReturnsSelf]
-        public MutableTextBuffer Insert(int index, ReadOnlySpan<char> value, int count) // J2N: Made public to match ValueStringBuilder API
+        public void Insert(int index, ReadOnlySpan<char> value, int count) // J2N: Made public to match ValueStringBuilder API
         {
             if (count < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(count, ExceptionArgument.count);
@@ -1352,7 +1339,7 @@ namespace J2N.Text
 
             if (value.IsEmpty || count == 0)
             {
-                return this;
+                return;
             }
 
             // Ensure we don't insert more chars than we can hold, and we don't
@@ -1372,8 +1359,6 @@ namespace J2N.Text
                 ReplaceInPlace(ref index, ref MemoryMarshal.GetReference(value), valueLength);
                 --count;
             }
-
-            return this;
         }
 
         /// <summary>
@@ -1393,7 +1378,7 @@ namespace J2N.Text
         /// current instance is unaffected.
         /// </remarks>
         [CodeGenerationReturnsSelf]
-        public MutableTextBuffer Remove(int startIndex, int length)
+        public void Remove(int startIndex, int length)
         {
             if (length < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(length, ExceptionArgument.length);
@@ -1406,8 +1391,6 @@ namespace J2N.Text
             }
 
             RemoveCore(startIndex, length);
-
-            return this;
         }
 
         /// <summary>
@@ -1424,7 +1407,7 @@ namespace J2N.Text
         /// current instance is unaffected.
         /// </remarks>
         [CodeGenerationReturnsSelf]
-        public MutableTextBuffer RemoveAt(int index) // Coverage for the JDK (deleteCharAt)
+        public void RemoveAt(int index) // Coverage for the JDK (deleteCharAt)
         {
             if (index < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(index, ExceptionArgument.index);
@@ -1436,8 +1419,6 @@ namespace J2N.Text
             }
 
             RemoveCore(index, 1);
-
-            return this;
         }
 
         private void RemoveCore(int startIndex, int length)
@@ -1482,7 +1463,7 @@ namespace J2N.Text
         /// </remarks>
         /// <seealso cref="bool"/>
         [CodeGenerationReturnsSelf]
-        public MutableTextBuffer Append(bool value) => Append(value, format: BooleanFormat.Lowercase);
+        public void Append(bool value) => Append(value, format: BooleanFormat.Lowercase);
 
         /// <summary>
         /// Appends the string representation of a specified Boolean value to this instance
@@ -1496,11 +1477,10 @@ namespace J2N.Text
         /// <seealso cref="bool"/>
         /// <seealso cref="BooleanFormat"/>
         [CodeGenerationReturnsSelf]
-        public MutableTextBuffer Append(bool value, BooleanFormat format)
+        public void Append(bool value, BooleanFormat format)
         {
             string text = FormatBoolean(value, format);
             Append(ref MemoryMarshal.GetReference(text.AsSpan()), text.Length);
-            return this;
         }
 
         /// <summary>
@@ -1536,7 +1516,7 @@ namespace J2N.Text
         /// </remarks>
         /// <seealso cref="char"/>
         [CodeGenerationReturnsSelf]
-        public MutableTextBuffer Append(char value)
+        public void Append(char value)
         {
             int pos = m_Position;
             if ((uint)pos < (uint)m_Chars.Length)
@@ -1548,8 +1528,6 @@ namespace J2N.Text
             {
                 AppendWithExpansion(value);
             }
-
-            return this;
         }
 
         #region Append Number
@@ -1582,7 +1560,7 @@ namespace J2N.Text
         /// <seealso cref="sbyte"/>
         [CLSCompliant(false)]
         [CodeGenerationReturnsSelf]
-        public MutableTextBuffer Append(sbyte value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
+        public void Append(sbyte value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
             => AppendSpanFormattable(value, format, provider);
 #else
@@ -1616,7 +1594,7 @@ namespace J2N.Text
         /// </remarks>
         /// <seealso cref="byte"/>
         [CodeGenerationReturnsSelf]
-        public MutableTextBuffer Append(byte value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
+        public void Append(byte value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
             => AppendSpanFormattable(value, format, provider);
 #else
@@ -1650,7 +1628,7 @@ namespace J2N.Text
         /// </remarks>
         /// <seealso cref="short"/>
         [CodeGenerationReturnsSelf]
-        public MutableTextBuffer Append(short value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
+        public void Append(short value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
             => AppendSpanFormattable(value, format, provider);
 #else
@@ -1684,7 +1662,7 @@ namespace J2N.Text
         /// </remarks>
         /// <seealso cref="int"/>
         [CodeGenerationReturnsSelf]
-        public MutableTextBuffer Append(int value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
+        public void Append(int value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
             => AppendSpanFormattable(value, format, provider);
 #else
@@ -1718,7 +1696,7 @@ namespace J2N.Text
         /// </remarks>
         /// <seealso cref="long"/>
         [CodeGenerationReturnsSelf]
-        public MutableTextBuffer Append(long value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
+        public void Append(long value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
             => AppendSpanFormattable(value, format, provider);
 #else
@@ -1751,7 +1729,7 @@ namespace J2N.Text
         /// </remarks>
         /// <seealso cref="float"/>
         [CodeGenerationReturnsSelf]
-        public MutableTextBuffer Append(float value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
+        public void Append(float value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
             => AppendNumberCore<float, SingleFormatter>(6, value, format, provider);
 
         /// <summary>
@@ -1781,7 +1759,7 @@ namespace J2N.Text
         /// </remarks>
         /// <seealso cref="double"/>
         [CodeGenerationReturnsSelf]
-        public MutableTextBuffer Append(double value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
+        public void Append(double value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
             => AppendNumberCore<double, DoubleFormatter>(14, value, format, provider);
 
         /// <summary>
@@ -1812,7 +1790,7 @@ namespace J2N.Text
         /// <seealso cref="decimal"/>
         // J2N TODO: Since BigDecimal in Java doesn't use the same default format as this, we will need to change the default before this can be made public
         [CodeGenerationReturnsSelf]
-        internal MutableTextBuffer Append(decimal value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
+        internal void Append(decimal value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
             => AppendSpanFormattable(value, format, provider);
 #else
@@ -1847,7 +1825,7 @@ namespace J2N.Text
         /// <seealso cref="ushort"/>
         [CLSCompliant(false)]
         [CodeGenerationReturnsSelf]
-        public MutableTextBuffer Append(ushort value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
+        public void Append(ushort value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
             => AppendSpanFormattable(value, format, provider);
 #else
@@ -1881,7 +1859,7 @@ namespace J2N.Text
         /// <seealso cref="uint"/>
         [CLSCompliant(false)]
         [CodeGenerationReturnsSelf]
-        public MutableTextBuffer Append(uint value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
+        public void Append(uint value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
             => AppendSpanFormattable(value, format, provider);
 #else
@@ -1916,7 +1894,7 @@ namespace J2N.Text
         /// <seealso cref="ulong"/>
         [CLSCompliant(false)]
         [CodeGenerationReturnsSelf]
-        public MutableTextBuffer Append(ulong value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
+        public void Append(ulong value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
             => AppendSpanFormattable(value, format, provider);
 #else
@@ -1926,7 +1904,7 @@ namespace J2N.Text
         // J2N: Helper method for supported types so we don't need to duplicate all of this business logic
         // on every number type.
 
-        private MutableTextBuffer AppendNumberCore<T, TFormatter>(
+        private void AppendNumberCore<T, TFormatter>(
             int ensureAdditionalCapacityBeyondPos, T value, ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
             where TFormatter : struct, INumberFormatter<T>
         {
@@ -1961,14 +1939,12 @@ namespace J2N.Text
             }
 
             m_Position += charsWritten;
-
-            return this;
         }
 
         #endregion Append Number
 
 
-        private MutableTextBuffer AppendSpanFormattable<T>(T value, ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
+        private void AppendSpanFormattable<T>(T value, ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
             where T : ISpanFormattable
 #else
@@ -1996,8 +1972,6 @@ namespace J2N.Text
             }
 
             m_Position += charsWritten;
-
-            return this;
         }
 
         /// <summary>
@@ -2024,25 +1998,25 @@ namespace J2N.Text
         /// </remarks>
         /// <seealso cref="object"/>
         [CodeGenerationReturnsSelf]
-        public MutableTextBuffer Append(object? value, string? format = null, IFormatProvider? provider = null)
+        public void Append(object? value, string? format = null, IFormatProvider? provider = null)
         {
             if (value is null)
-                return this; // no-op
+                return; // no-op
 #if FEATURE_SPANFORMATTABLE
             else if (value is ISpanFormattable spanFormattable) // J2N: Check for ISpanFormattable reference types, as this will improve performance.
-                return AppendSpanFormattable(spanFormattable, format, provider);
+                AppendSpanFormattable(spanFormattable, format, provider);
 #else
             else if (value is Number number) // J2N: Check for Number-derived reference types, as this will improve performance.
-                return AppendSpanFormattable(number, format, provider);
+                AppendSpanFormattable(number, format, provider);
 #endif
             else if (value is IStructuralFormattable structuralFormattable)
-                return Append(structuralFormattable.ToString(format, provider));
+                Append(structuralFormattable.ToString(format, provider));
             else if (value is IFormattable formattable)
-                return Append(formattable.ToString(format, provider));
+                Append(formattable.ToString(format, provider));
             else if (value is ICharSequence csq)
-                return Append(csq); // doesn't support format providers
+                Append(csq); // doesn't support format providers
             else
-                return Append(value.ToString());
+                Append(value.ToString());
         }
 
         /// <summary>
@@ -2079,7 +2053,7 @@ namespace J2N.Text
         /// </remarks>
         /// <seealso cref="char"/>
         [CodeGenerationReturnsSelf]
-        public MutableTextBuffer Append(char[]? value)
+        public void Append(char[]? value)
         {
             if (value is not null)
             {
@@ -2089,8 +2063,6 @@ namespace J2N.Text
                 Append(ref MemoryMarshal.GetReference(value), value.Length);
 #endif
             }
-
-            return this;
         }
 
         /// <summary>
@@ -2100,10 +2072,9 @@ namespace J2N.Text
         /// <returns>A reference to this instance after the append operation is completed.</returns>
         /// <seealso cref="ReadOnlySpan{Char}"/>
         [CodeGenerationReturnsSelf]
-        public MutableTextBuffer Append(ReadOnlySpan<char> value)
+        public void Append(ReadOnlySpan<char> value)
         {
             Append(ref MemoryMarshal.GetReference(value), value.Length);
-            return this;
         }
 
         /// <summary>
@@ -2113,7 +2084,7 @@ namespace J2N.Text
         /// <returns>A reference to this instance after the append operation is completed.</returns>
         /// <seealso cref="ReadOnlyMemory{Char}"/>
         [CodeGenerationReturnsSelf]
-        public MutableTextBuffer Append(ReadOnlyMemory<char> value) => Append(value.Span);
+        public void Append(ReadOnlyMemory<char> value) => Append(value.Span);
 
         // J2N TODO: API - String interpolation for J2N formatters
 
@@ -2121,32 +2092,32 @@ namespace J2N.Text
         ///// <param name="handler">The interpolated string to append.</param>
         ///// <returns>A reference to this instance after the append operation has completed.</returns>
         //[CodeGenerationReturnsSelf]
-        //public MutableTextBuffer Append([InterpolatedStringHandlerArgument("")] ref AppendInterpolatedStringHandler handler) => this;
+        //public void Append([InterpolatedStringHandlerArgument("")] ref AppendInterpolatedStringHandler handler) => this;
 
         ///// <summary>Appends the specified interpolated string to this instance.</summary>
         ///// <param name="provider">An object that supplies culture-specific formatting information.</param>
         ///// <param name="handler">The interpolated string to append.</param>
         ///// <returns>A reference to this instance after the append operation has completed.</returns>
         //[CodeGenerationReturnsSelf]
-        //public MutableTextBuffer Append(IFormatProvider? provider, [InterpolatedStringHandlerArgument("", nameof(provider))] ref AppendInterpolatedStringHandler handler) => this;
+        //public void Append(IFormatProvider? provider, [InterpolatedStringHandlerArgument("", nameof(provider))] ref AppendInterpolatedStringHandler handler) => this;
 
         ///// <summary>Appends the specified interpolated string followed by the default line terminator to the end of the current MutableTextBuffer object.</summary>
         ///// <param name="handler">The interpolated string to append.</param>
         ///// <returns>A reference to this instance after the append operation has completed.</returns>
         //[CodeGenerationReturnsSelf]
-        //public MutableTextBuffer AppendLine([InterpolatedStringHandlerArgument("")] ref AppendInterpolatedStringHandler handler) => AppendLine();
+        //public void AppendLine([InterpolatedStringHandlerArgument("")] ref AppendInterpolatedStringHandler handler) => AppendLine();
 
         ///// <summary>Appends the specified interpolated string followed by the default line terminator to the end of the current MutableTextBuffer object.</summary>
         ///// <param name="provider">An object that supplies culture-specific formatting information.</param>
         ///// <param name="handler">The interpolated string to append.</param>
         ///// <returns>A reference to this instance after the append operation has completed.</returns>
         //[CodeGenerationReturnsSelf]
-        //public MutableTextBuffer AppendLine(IFormatProvider? provider, [InterpolatedStringHandlerArgument("", nameof(provider))] ref AppendInterpolatedStringHandler handler) => AppendLine();
+        //public void AppendLine(IFormatProvider? provider, [InterpolatedStringHandlerArgument("", nameof(provider))] ref AppendInterpolatedStringHandler handler) => AppendLine();
 
         #region AppendJoin
 
         [CodeGenerationReturnsSelf]
-        public MutableTextBuffer AppendJoin(string? separator, params object?[] values)
+        public void AppendJoin(string? separator, params object?[] values)
         {
             if (values is null)
             {
@@ -2154,18 +2125,18 @@ namespace J2N.Text
             }
 
             separator ??= string.Empty;
-            return AppendJoinCore(ref MemoryMarshal.GetReference(separator.AsSpan()), separator.Length, values);
+            AppendJoinCore(ref MemoryMarshal.GetReference(separator.AsSpan()), separator.Length, values);
         }
 
         [CodeGenerationReturnsSelf]
-        public MutableTextBuffer AppendJoin(string? separator, params ReadOnlySpan<object?> values)
+        public void AppendJoin(string? separator, params ReadOnlySpan<object?> values)
         {
             separator ??= string.Empty;
-            return AppendJoinCore(ref MemoryMarshal.GetReference(separator.AsSpan()), separator.Length, values);
+            AppendJoinCore(ref MemoryMarshal.GetReference(separator.AsSpan()), separator.Length, values);
         }
 
         [CodeGenerationReturnsSelf]
-        public MutableTextBuffer AppendJoin<T>(string? separator, IEnumerable<T> values)
+        public void AppendJoin<T>(string? separator, IEnumerable<T> values)
         {
             if (values is null)
             {
@@ -2173,11 +2144,11 @@ namespace J2N.Text
             }
 
             separator ??= string.Empty;
-            return AppendJoinCore(ref MemoryMarshal.GetReference(separator.AsSpan()), separator.Length, values);
+            AppendJoinCore(ref MemoryMarshal.GetReference(separator.AsSpan()), separator.Length, values);
         }
 
         [CodeGenerationReturnsSelf]
-        public MutableTextBuffer AppendJoin(string? separator, params string?[] values)
+        public void AppendJoin(string? separator, params string?[] values)
         {
             if (values is null)
             {
@@ -2185,58 +2156,58 @@ namespace J2N.Text
             }
 
             separator ??= string.Empty;
-            return AppendJoinCore(ref MemoryMarshal.GetReference(separator.AsSpan()), separator.Length, values);
+            AppendJoinCore(ref MemoryMarshal.GetReference(separator.AsSpan()), separator.Length, values);
         }
 
         [CodeGenerationReturnsSelf]
-        public MutableTextBuffer AppendJoin(string? separator, params ReadOnlySpan<string?> values)
+        public void AppendJoin(string? separator, params ReadOnlySpan<string?> values)
         {
             separator ??= string.Empty;
-            return AppendJoinCore(ref MemoryMarshal.GetReference(separator.AsSpan()), separator.Length, values);
+            AppendJoinCore(ref MemoryMarshal.GetReference(separator.AsSpan()), separator.Length, values);
         }
 
         [CodeGenerationReturnsSelf]
-        public MutableTextBuffer AppendJoin(char separator, params object?[] values)
+        public void AppendJoin(char separator, params object?[] values)
         {
             if (values is null)
             {
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.values);
             }
 
-            return AppendJoinCore(ref separator, 1, values);
+            AppendJoinCore(ref separator, 1, values);
         }
 
         [CodeGenerationReturnsSelf]
-        public MutableTextBuffer AppendJoin(char separator, params ReadOnlySpan<object?> values) =>
+        public void AppendJoin(char separator, params ReadOnlySpan<object?> values) =>
             AppendJoinCore(ref separator, 1, values);
 
         [CodeGenerationReturnsSelf]
-        public MutableTextBuffer AppendJoin<T>(char separator, IEnumerable<T> values)
+        public void AppendJoin<T>(char separator, IEnumerable<T> values)
         {
             if (values is null)
             {
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.values);
             }
 
-            return AppendJoinCore(ref separator, 1, values);
+            AppendJoinCore(ref separator, 1, values);
         }
 
         [CodeGenerationReturnsSelf]
-        public MutableTextBuffer AppendJoin(char separator, params string?[] values)
+        public void AppendJoin(char separator, params string?[] values)
         {
             if (values is null)
             {
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.values);
             }
 
-            return AppendJoinCore(ref separator, 1, values);
+            AppendJoinCore(ref separator, 1, values);
         }
 
         [CodeGenerationReturnsSelf]
-        public MutableTextBuffer AppendJoin(char separator, params ReadOnlySpan<string?> values) =>
+        public void AppendJoin(char separator, params ReadOnlySpan<string?> values) =>
             AppendJoinCore(ref separator, 1, values);
 
-        private MutableTextBuffer AppendJoinCore<T>(ref char separator, int separatorLength, IEnumerable<T> values)
+        private void AppendJoinCore<T>(ref char separator, int separatorLength, IEnumerable<T> values)
         {
             Debug.Assert(values != null);
             Debug.Assert(!Unsafe.IsNullRef(ref separator));
@@ -2246,7 +2217,7 @@ namespace J2N.Text
             {
                 if (!en.MoveNext())
                 {
-                    return this;
+                    return;
                 }
 
                 T value = en.Current;
@@ -2265,14 +2236,13 @@ namespace J2N.Text
                     }
                 }
             }
-            return this;
         }
 
-        private MutableTextBuffer AppendJoinCore<T>(ref char separator, int separatorLength, ReadOnlySpan<T> values)
+        private void AppendJoinCore<T>(ref char separator, int separatorLength, ReadOnlySpan<T> values)
         {
             if (values.IsEmpty)
             {
-                return this;
+                return;
             }
 
             if (values[0] != null)
@@ -2288,7 +2258,6 @@ namespace J2N.Text
                     Append(values[i]!.ToString()); // J2N TODO: ISpanFormattable, IFormattable to override culture?
                 }
             }
-            return this;
         }
 
         #endregion AppendJoin
@@ -2314,7 +2283,7 @@ namespace J2N.Text
         /// or <paramref name="value"/> is not <c>null</c> but its length is zero.
         /// </remarks>
         [CodeGenerationReturnsSelf]
-        public MutableTextBuffer Insert(int index, string? value)
+        public void Insert(int index, string? value)
         {
             if ((uint)index > (uint)Length)
             {
@@ -2325,8 +2294,6 @@ namespace J2N.Text
             {
                 Insert(index, ref MemoryMarshal.GetReference(value.AsSpan()), value.Length);
             }
-
-            return this;
         }
 
         /// <summary>
@@ -2343,10 +2310,10 @@ namespace J2N.Text
         /// Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.
         /// </exception>
         [CodeGenerationReturnsSelf]
-        public MutableTextBuffer Insert(int index, StringBuilder? value)
+        public void Insert(int index, StringBuilder? value)
         {
             if (value is null || value.Length == 0)
-                return this;
+                return;
 
             if ((uint)index > (uint)Length)
             {
@@ -2357,8 +2324,6 @@ namespace J2N.Text
             MakeRoom(index, count);
 
             value.CopyTo(0, m_Chars, index, count);
-
-            return this;
         }
 
         /// <summary>
@@ -2388,7 +2353,7 @@ namespace J2N.Text
         /// Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.
         /// </exception>
         [CodeGenerationReturnsSelf]
-        public MutableTextBuffer Insert(int index, StringBuilder? value, int startIndex, int count)
+        public void Insert(int index, StringBuilder? value, int startIndex, int count)
         {
             int currentLength = Length;
             if ((uint)index > (uint)currentLength)
@@ -2400,7 +2365,7 @@ namespace J2N.Text
             {
                 if (startIndex == 0 && count == 0)
                 {
-                    return this;
+                    return;
                 }
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.value);
             }
@@ -2425,8 +2390,6 @@ namespace J2N.Text
                 MakeRoom(index, count);
                 value.CopyTo(startIndex, m_Chars, index, count);
             }
-
-            return this;
         }
 
         /// <summary>
@@ -2452,7 +2415,7 @@ namespace J2N.Text
         /// </remarks>
         /// <seealso cref="bool"/>
         [CodeGenerationReturnsSelf]
-        public MutableTextBuffer Insert(int index, bool value) => Insert(index, value, BooleanFormat.Lowercase);
+        public void Insert(int index, bool value) => Insert(index, value, BooleanFormat.Lowercase);
 
         /// <summary>
         /// Inserts the string representation of a specified Boolean value to this instance
@@ -2477,13 +2440,12 @@ namespace J2N.Text
         /// <seealso cref="bool"/>
         /// <seealso cref="BooleanFormat"/>
         [CodeGenerationReturnsSelf]
-        public MutableTextBuffer Insert(int index, bool value, BooleanFormat format)
+        public void Insert(int index, bool value, BooleanFormat format)
         {
             string text = FormatBoolean(value, format);
             // We don't use Insert(int, ReadOnlySpan<char>) for exception compatibility;
             // we want exceeding the maximum capacity to throw an OutOfMemoryException.
             Insert(index, text.AsSpan(), 1);
-            return this;
         }
 
         #region Insert Number
@@ -2515,7 +2477,7 @@ namespace J2N.Text
         /// <seealso cref="sbyte"/>
         [CLSCompliant(false)]
         [CodeGenerationReturnsSelf]
-        public MutableTextBuffer Insert(int index, sbyte value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
+        public void Insert(int index, sbyte value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
             => InsertSpanFormattable(index, value, format, provider);
 #else
@@ -2548,7 +2510,7 @@ namespace J2N.Text
         /// </remarks>
         /// <seealso cref="byte"/>
         [CodeGenerationReturnsSelf]
-        public MutableTextBuffer Insert(int index, byte value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
+        public void Insert(int index, byte value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
             => InsertSpanFormattable(index, value, format, provider);
 #else
@@ -2581,7 +2543,7 @@ namespace J2N.Text
         /// </remarks>
         /// <seealso cref="short"/>
         [CodeGenerationReturnsSelf]
-        public MutableTextBuffer Insert(int index, short value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
+        public void Insert(int index, short value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
             => InsertSpanFormattable(index, value, format, provider);
 #else
@@ -2614,7 +2576,7 @@ namespace J2N.Text
         /// </remarks>
         /// <seealso cref="int"/>
         [CodeGenerationReturnsSelf]
-        public MutableTextBuffer Insert(int index, int value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
+        public void Insert(int index, int value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
             => InsertSpanFormattable(index, value, format, provider);
 #else
@@ -2647,7 +2609,7 @@ namespace J2N.Text
         /// </remarks>
         /// <seealso cref="long"/>
         [CodeGenerationReturnsSelf]
-        public MutableTextBuffer Insert(int index, long value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
+        public void Insert(int index, long value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
             => InsertSpanFormattable(index, value, format, provider);
 #else
@@ -2680,7 +2642,7 @@ namespace J2N.Text
         /// </remarks>
         /// <seealso cref="float"/>
         [CodeGenerationReturnsSelf]
-        public MutableTextBuffer Insert(int index, float value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
+        public void Insert(int index, float value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
             => InsertNumberCore<float, SingleFormatter>(index, value, format, provider);
 
         /// <summary>
@@ -2709,7 +2671,7 @@ namespace J2N.Text
         /// </remarks>
         /// <seealso cref="double"/>
         [CodeGenerationReturnsSelf]
-        public MutableTextBuffer Insert(int index, double value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
+        public void Insert(int index, double value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
             => InsertNumberCore<double, DoubleFormatter>(index, value, format, provider);
 
         /// <summary>
@@ -2739,7 +2701,7 @@ namespace J2N.Text
         /// <seealso cref="decimal"/>
         // J2N TODO: Since BigDecimal in Java doesn't use the same default format as this, we will need to change the default before this can be made public
         [CodeGenerationReturnsSelf]
-        internal MutableTextBuffer Insert(int index, decimal value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
+        internal void Insert(int index, decimal value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
             => InsertSpanFormattable(index, value, format, provider);
 #else
@@ -2773,7 +2735,7 @@ namespace J2N.Text
         /// <seealso cref="ushort"/>
         [CLSCompliant(false)]
         [CodeGenerationReturnsSelf]
-        public MutableTextBuffer Insert(int index, ushort value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
+        public void Insert(int index, ushort value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
             => InsertSpanFormattable(index, value, format, provider);
 #else
@@ -2807,7 +2769,7 @@ namespace J2N.Text
         /// <seealso cref="uint"/>
         [CLSCompliant(false)]
         [CodeGenerationReturnsSelf]
-        public MutableTextBuffer Insert(int index, uint value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
+        public void Insert(int index, uint value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
             => InsertSpanFormattable(index, value, format, provider);
 #else
@@ -2841,7 +2803,7 @@ namespace J2N.Text
         /// <seealso cref="ulong"/>
         [CLSCompliant(false)]
         [CodeGenerationReturnsSelf]
-        public MutableTextBuffer Insert(int index, ulong value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
+        public void Insert(int index, ulong value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
             => InsertSpanFormattable(index, value, format, provider);
 #else
@@ -2850,7 +2812,7 @@ namespace J2N.Text
 
         // J2N: Helper method for supported types so we don't need to duplicate all of this business logic
         // on every number type.
-        private MutableTextBuffer InsertNumberCore<T, TFormatter>(
+        private void InsertNumberCore<T, TFormatter>(
             int index, T value, ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
             where TFormatter : struct, INumberFormatter<T>
         {
@@ -2886,8 +2848,6 @@ namespace J2N.Text
                 if (arrayToReturnToPool != null)
                     ArrayPool<char>.Shared.Return(arrayToReturnToPool);
             }
-
-            return this;
         }
 
         #endregion Insert Number
@@ -2911,7 +2871,7 @@ namespace J2N.Text
         /// </remarks>
         /// <seealso cref="char"/>
         [CodeGenerationReturnsSelf]
-        public MutableTextBuffer Insert(int index, char value)
+        public void Insert(int index, char value)
         {
             if ((uint)index > (uint)Length)
             {
@@ -2919,7 +2879,6 @@ namespace J2N.Text
             }
 
             Insert(index, ref value, 1);
-            return this;
         }
 
         /// <summary>
@@ -2944,7 +2903,7 @@ namespace J2N.Text
         /// </remarks>
         /// <seealso cref="char"/>
         [CodeGenerationReturnsSelf]
-        public MutableTextBuffer Insert(int index, char[]? value)
+        public void Insert(int index, char[]? value)
         {
             if ((uint)index > (uint)Length)
             {
@@ -2959,7 +2918,6 @@ namespace J2N.Text
                 Insert(index, ref MemoryMarshal.GetReference(value), value.Length);
 #endif
             }
-            return this;
         }
 
         /// <summary>
@@ -2993,7 +2951,7 @@ namespace J2N.Text
         /// </remarks>
         /// <seealso cref="char"/>
         [CodeGenerationReturnsSelf]
-        public MutableTextBuffer Insert(int index, char[]? value, int startIndex, int charCount)
+        public void Insert(int index, char[]? value, int startIndex, int charCount)
         {
             int currentLength = Length;
             if ((uint)index > (uint)currentLength)
@@ -3005,7 +2963,7 @@ namespace J2N.Text
             {
                 if (startIndex == 0 && charCount == 0)
                 {
-                    return this;
+                    return;
                 }
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.value);
             }
@@ -3029,7 +2987,6 @@ namespace J2N.Text
             {
                 Insert(index, ref value[startIndex], charCount);
             }
-            return this;
         }
 
         /// <summary>
@@ -3063,7 +3020,7 @@ namespace J2N.Text
         /// </remarks>
         /// <seealso cref="char"/>
         [CodeGenerationReturnsSelf]
-        public MutableTextBuffer Insert(int index, string? value, int startIndex, int count) // J2N: Added to cover the JDK better (rather than ICharSequence only)
+        public void Insert(int index, string? value, int startIndex, int count) // J2N: Added to cover the JDK better (rather than ICharSequence only)
         {
             int currentLength = Length;
             if ((uint)index > (uint)currentLength)
@@ -3075,7 +3032,7 @@ namespace J2N.Text
             {
                 if (startIndex == 0 && count == 0)
                 {
-                    return this;
+                    return;
                 }
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.value);
             }
@@ -3099,7 +3056,6 @@ namespace J2N.Text
             {
                 Insert(index, ref MemoryMarshal.GetReference(value.AsSpan(startIndex)), count);
             }
-            return this;
         }
 
         /// <summary>
@@ -3124,25 +3080,25 @@ namespace J2N.Text
         /// </remarks>
         /// <seealso cref="object"/>
         [CodeGenerationReturnsSelf]
-        public MutableTextBuffer Insert(int index, object? value, string? format = null, IFormatProvider? provider = null)
+        public void Insert(int index, object? value, string? format = null, IFormatProvider? provider = null)
         {
             if (value is null)
-                return this; // no-op;
+                return; // no-op;
 #if FEATURE_SPANFORMATTABLE
             else if (value is ISpanFormattable spanFormattable) // J2N: Check for ISpanFormattable reference types, as this will improve performance.
-                return InsertSpanFormattable(index, spanFormattable, format, provider);
+                InsertSpanFormattable(index, spanFormattable, format, provider);
 #else
             else if (value is Number number) // J2N: Check for Number-derived reference types, as this will improve performance.
-                return InsertSpanFormattable(index, number, format, provider);
+                InsertSpanFormattable(index, number, format, provider);
 #endif
             else if (value is IStructuralFormattable structuralFormattable)
-                return Insert(index, structuralFormattable.ToString(format, provider), 1);
+                Insert(index, structuralFormattable.ToString(format, provider), 1);
             else if (value is IFormattable formattable)
-                return Insert(index, formattable.ToString(format, provider), 1);
+                Insert(index, formattable.ToString(format, provider), 1);
             else if (value is ICharSequence csq)
-                return Insert(index, csq); // doesn't support format providers
+                Insert(index, csq); // doesn't support format providers
             else
-                return Insert(index, value.ToString(), 1);
+                Insert(index, value.ToString(), 1);
         }
 
         /// <summary>
@@ -3155,7 +3111,7 @@ namespace J2N.Text
         /// <paramref name="value"/> to insert it. The capacity is adjusted as needed.</remarks>
         /// <seealso cref="ReadOnlySpan{Char}"/>
         [CodeGenerationReturnsSelf]
-        public MutableTextBuffer Insert(int index, ReadOnlySpan<char> value) // J2N NOTE: Weird that upstream they made an overload of ReadOnlyMemory<char> for Append, but not Insert.
+        public void Insert(int index, ReadOnlySpan<char> value) // J2N NOTE: Weird that upstream they made an overload of ReadOnlyMemory<char> for Append, but not Insert.
         {
             if ((uint)index > (uint)Length)
             {
@@ -3166,11 +3122,9 @@ namespace J2N.Text
             {
                 Insert(index, ref MemoryMarshal.GetReference(value), value.Length);
             }
-
-            return this;
         }
 
-        private MutableTextBuffer InsertSpanFormattable<T>(int index, T value, ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
+        private void InsertSpanFormattable<T>(int index, T value, ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
             where T : ISpanFormattable
 #else
@@ -3213,8 +3167,6 @@ namespace J2N.Text
                 if (arrayToReturnToPool != null)
                     ArrayPool<char>.Shared.Return(arrayToReturnToPool);
             }
-
-            return this;
         }
 
         #region AppendFormat
@@ -3296,12 +3248,12 @@ namespace J2N.Text
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
         /// </remarks>
         [CodeGenerationReturnsSelf]
-        public MutableTextBuffer AppendFormat([StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, object? arg0)
+        public void AppendFormat([StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, object? arg0)
         {
 #if FEATURE_INLINEARRAYATTRIBUTE
-            return AppendFormat(null, format, MemoryMarshal.CreateReadOnlySpan(ref arg0, 1));
+            AppendFormat(null, format, MemoryMarshal.CreateReadOnlySpan(ref arg0, 1));
 #else
-            return AppendFormat(null, format, new ParamsArray(arg0));
+            AppendFormat(null, format, new ParamsArray(arg0));
 #endif
         }
 
@@ -3383,13 +3335,13 @@ namespace J2N.Text
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
         /// </remarks>
         [CodeGenerationReturnsSelf]
-        public MutableTextBuffer AppendFormat([StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, object? arg0, object? arg1)
+        public void AppendFormat([StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, object? arg0, object? arg1)
         {
 #if FEATURE_INLINEARRAYATTRIBUTE
             TwoObjects two = new TwoObjects(arg0, arg1);
-            return AppendFormat(null, format, (ReadOnlySpan<object?>)two);
+            AppendFormat(null, format, (ReadOnlySpan<object?>)two);
 #else
-            return AppendFormat(null, format, new ParamsArray(arg0, arg1));
+            AppendFormat(null, format, new ParamsArray(arg0, arg1));
 #endif
         }
 
@@ -3473,13 +3425,13 @@ namespace J2N.Text
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
         /// </remarks>
         [CodeGenerationReturnsSelf]
-        public MutableTextBuffer AppendFormat([StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, object? arg0, object? arg1, object? arg2)
+        public void AppendFormat([StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, object? arg0, object? arg1, object? arg2)
         {
 #if FEATURE_INLINEARRAYATTRIBUTE
             ThreeObjects three = new ThreeObjects(arg0, arg1, arg2);
-            return AppendFormat(null, format, (ReadOnlySpan<object?>)three);
+            AppendFormat(null, format, (ReadOnlySpan<object?>)three);
 #else
-            return AppendFormat(null, format, new ParamsArray(arg0, arg1, arg2));
+            AppendFormat(null, format, new ParamsArray(arg0, arg1, arg2));
 #endif
         }
 
@@ -3560,7 +3512,7 @@ namespace J2N.Text
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
         /// </remarks>
         [CodeGenerationReturnsSelf]
-        public MutableTextBuffer AppendFormat([StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, params object?[] args)
+        public void AppendFormat([StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, params object?[] args)
         {
             if (args is null)
             {
@@ -3569,7 +3521,7 @@ namespace J2N.Text
                 ThrowHelper.ThrowArgumentNullException(format is null ? ExceptionArgument.format : ExceptionArgument.args);
             }
 
-            return AppendFormat(null, format, args);
+            AppendFormat(null, format, args);
         }
 
         /// <summary>
@@ -3649,9 +3601,9 @@ namespace J2N.Text
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
         /// </remarks>
         [CodeGenerationReturnsSelf]
-        public MutableTextBuffer AppendFormat([StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, params ReadOnlySpan<object?> args)
+        public void AppendFormat([StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, params ReadOnlySpan<object?> args)
         {
-            return AppendFormat(null, format, args);
+            AppendFormat(null, format, args);
         }
 
         /// <summary>
@@ -3747,12 +3699,12 @@ namespace J2N.Text
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
         /// </remarks>
         [CodeGenerationReturnsSelf]
-        public MutableTextBuffer AppendFormat(IFormatProvider? provider, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, object? arg0)
+        public void AppendFormat(IFormatProvider? provider, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, object? arg0)
         {
 #if FEATURE_INLINEARRAYATTRIBUTE
-            return AppendFormat(provider, format, MemoryMarshal.CreateReadOnlySpan(ref arg0, 1));
+            AppendFormat(provider, format, MemoryMarshal.CreateReadOnlySpan(ref arg0, 1));
 #else
-            return AppendFormat(provider, format, new ParamsArray(arg0));
+            AppendFormat(provider, format, new ParamsArray(arg0));
 #endif
         }
 
@@ -3849,13 +3801,13 @@ namespace J2N.Text
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
         /// </remarks>
         [CodeGenerationReturnsSelf]
-        public MutableTextBuffer AppendFormat(IFormatProvider? provider, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, object? arg0, object? arg1)
+        public void AppendFormat(IFormatProvider? provider, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, object? arg0, object? arg1)
         {
 #if FEATURE_INLINEARRAYATTRIBUTE
             TwoObjects two = new TwoObjects(arg0, arg1);
-            return AppendFormat(provider, format, (ReadOnlySpan<object?>)two);
+            AppendFormat(provider, format, (ReadOnlySpan<object?>)two);
 #else
-            return AppendFormat(provider, format, new ParamsArray(arg0, arg1));
+            AppendFormat(provider, format, new ParamsArray(arg0, arg1));
 #endif
         }
 
@@ -3954,13 +3906,13 @@ namespace J2N.Text
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
         /// </remarks>
         [CodeGenerationReturnsSelf]
-        public MutableTextBuffer AppendFormat(IFormatProvider? provider, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, object? arg0, object? arg1, object? arg2)
+        public void AppendFormat(IFormatProvider? provider, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, object? arg0, object? arg1, object? arg2)
         {
 #if FEATURE_INLINEARRAYATTRIBUTE
             ThreeObjects three = new ThreeObjects(arg0, arg1, arg2);
-            return AppendFormat(provider, format, (ReadOnlySpan<object?>)three);
+            AppendFormat(provider, format, (ReadOnlySpan<object?>)three);
 #else
-            return AppendFormat(provider, format, new ParamsArray(arg0, arg1, arg2));
+            AppendFormat(provider, format, new ParamsArray(arg0, arg1, arg2));
 #endif
         }
 
@@ -4057,7 +4009,7 @@ namespace J2N.Text
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
         /// </remarks>
         [CodeGenerationReturnsSelf]
-        public MutableTextBuffer AppendFormat(IFormatProvider? provider, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, params object?[] args)
+        public void AppendFormat(IFormatProvider? provider, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, params object?[] args)
         {
             if (args is null)
             {
@@ -4066,7 +4018,7 @@ namespace J2N.Text
                 ThrowHelper.ThrowArgumentNullException(format is null ? ExceptionArgument.format : ExceptionArgument.args);
             }
 
-            return AppendFormat(provider, format, (ReadOnlySpan<object?>)args);
+            AppendFormat(provider, format, (ReadOnlySpan<object?>)args);
         }
 
         /// <summary>
@@ -4162,7 +4114,7 @@ namespace J2N.Text
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
         /// </remarks>
         [CodeGenerationReturnsSelf]
-        public MutableTextBuffer AppendFormat(IFormatProvider? provider, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, params ReadOnlySpan<object?> args) // KEEP OVERLOADS FOR ReadOnlySpan<object?> and ParamsArray IN SYNC
+        public void AppendFormat(IFormatProvider? provider, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, params ReadOnlySpan<object?> args) // KEEP OVERLOADS FOR ReadOnlySpan<object?> and ParamsArray IN SYNC
         {
             if (format is null)
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.format);
@@ -4187,7 +4139,7 @@ namespace J2N.Text
                     // Find the next brace.  If there isn't one, the remainder of the input is text to be appended, and we're done.
                     if ((uint)pos >= (uint)format.Length)
                     {
-                        return this;
+                        return;
                     }
 
                     ReadOnlySpan<char> remainder = format.AsSpan(pos);
@@ -4195,7 +4147,7 @@ namespace J2N.Text
                     if (countUntilNextBrace < 0)
                     {
                         Append(remainder);
-                        return this;
+                        return;
                     }
 
                     // Append the text until the brace.
@@ -4441,7 +4393,7 @@ namespace J2N.Text
         }
 
 #if !FEATURE_INLINEARRAYATTRIBUTE
-        private MutableTextBuffer AppendFormat(IFormatProvider? provider, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, ParamsArray args) // KEEP OVERLOADS FOR ReadOnlySpan<object?> and ParamsArray IN SYNC
+        private void AppendFormat(IFormatProvider? provider, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, ParamsArray args) // KEEP OVERLOADS FOR ReadOnlySpan<object?> and ParamsArray IN SYNC
         {
             if (format is null)
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.format);
@@ -4466,7 +4418,7 @@ namespace J2N.Text
                     // Find the next brace.  If there isn't one, the remainder of the input is text to be appended, and we're done.
                     if ((uint)pos >= (uint)format.Length)
                     {
-                        return this;
+                        return;
                     }
 
                     ReadOnlySpan<char> remainder = format.AsSpan(pos);
@@ -4474,7 +4426,7 @@ namespace J2N.Text
                     if (countUntilNextBrace < 0)
                     {
                         Append(remainder);
-                        return this;
+                        return;
                     }
 
                     // Append the text until the brace.
@@ -4724,50 +4676,50 @@ namespace J2N.Text
 #if FEATURE_COMPOSITEFORMAT
 
         [CodeGenerationReturnsSelf]
-        public MutableTextBuffer AppendFormat<TArg0>(IFormatProvider? provider, CompositeFormat format, TArg0 arg0)
+        public void AppendFormat<TArg0>(IFormatProvider? provider, CompositeFormat format, TArg0 arg0)
         {
             if (format is null)
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.format);
             format.ValidateNumberOfArgs(1);
-            return AppendFormat(provider, format, arg0, 0, 0, default);
+            AppendFormat(provider, format, arg0, 0, 0, default);
         }
 
         [CodeGenerationReturnsSelf]
-        public MutableTextBuffer AppendFormat<TArg0, TArg1>(IFormatProvider? provider, CompositeFormat format, TArg0 arg0, TArg1 arg1)
+        public void AppendFormat<TArg0, TArg1>(IFormatProvider? provider, CompositeFormat format, TArg0 arg0, TArg1 arg1)
         {
             if (format is null)
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.format);
             format.ValidateNumberOfArgs(2);
-            return AppendFormat(provider, format, arg0, arg1, 0, default);
+            AppendFormat(provider, format, arg0, arg1, 0, default);
         }
 
         [CodeGenerationReturnsSelf]
-        public MutableTextBuffer AppendFormat<TArg0, TArg1, TArg2>(IFormatProvider? provider, CompositeFormat format, TArg0 arg0, TArg1 arg1, TArg2 arg2)
+        public void AppendFormat<TArg0, TArg1, TArg2>(IFormatProvider? provider, CompositeFormat format, TArg0 arg0, TArg1 arg1, TArg2 arg2)
         {
             if (format is null)
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.format);
             format.ValidateNumberOfArgs(3);
-            return AppendFormat(provider, format, arg0, arg1, arg2, default);
+            AppendFormat(provider, format, arg0, arg1, arg2, default);
         }
 
         [CodeGenerationReturnsSelf]
-        public MutableTextBuffer AppendFormat(IFormatProvider? provider, CompositeFormat format, params object?[] args)
+        public void AppendFormat(IFormatProvider? provider, CompositeFormat format, params object?[] args)
         {
             if (format is null)
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.format);
             if (args is null)
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.args);
-            return AppendFormat(provider, format, (ReadOnlySpan<object?>)args);
+            AppendFormat(provider, format, (ReadOnlySpan<object?>)args);
         }
 
         [CodeGenerationReturnsSelf]
-        public MutableTextBuffer AppendFormat(IFormatProvider? provider, CompositeFormat format, params ReadOnlySpan<object?> args)
+        public void AppendFormat(IFormatProvider? provider, CompositeFormat format, params ReadOnlySpan<object?> args)
         {
             //ArgumentNullException.ThrowIfNull(format);
             if (format is null)
                 throw new ArgumentNullException(nameof(format));
             format.ValidateNumberOfArgs(args.Length);
-            return args.Length switch
+            args.Length switch
             {
                 0 => AppendFormat(provider, format, 0, 0, 0, args),
                 1 => AppendFormat(provider, format, args[0], 0, 0, args),
@@ -4776,7 +4728,7 @@ namespace J2N.Text
             };
         }
 
-        private MutableTextBuffer AppendFormat<TArg0, TArg1, TArg2>(IFormatProvider? provider, CompositeFormat format, TArg0 arg0, TArg1 arg1, TArg2 arg2, ReadOnlySpan<object?> args)
+        private void AppendFormat<TArg0, TArg1, TArg2>(IFormatProvider? provider, CompositeFormat format, TArg0 arg0, TArg1 arg1, TArg2 arg2, ReadOnlySpan<object?> args)
         {
             // Create the interpolated string handler.
             var handler = new AppendInterpolatedStringHandler(format._literalLength, format._formattedCount, this, provider);
@@ -4814,7 +4766,7 @@ namespace J2N.Text
             }
 
             // Complete the operation.
-            return Append(ref handler);
+            Append(ref handler);
         }
 
 #endif
@@ -4841,7 +4793,7 @@ namespace J2N.Text
         /// </remarks>
         /// <seealso cref="Remove(int, int)"/>
         [CodeGenerationReturnsSelf]
-        public MutableTextBuffer Replace(string oldValue, string? newValue) => Replace(oldValue, newValue, 0, Length);
+        public void Replace(string oldValue, string? newValue) => Replace(oldValue, newValue, 0, Length);
 
         /// <summary>
         /// Replaces all instances of one read-only character span with another in this builder.
@@ -4859,7 +4811,7 @@ namespace J2N.Text
         /// </remarks>
         /// <seealso cref="Remove(int, int)"/>
         [CodeGenerationReturnsSelf]
-        public MutableTextBuffer Replace(ReadOnlySpan<char> oldValue, ReadOnlySpan<char> newValue) => Replace(oldValue, newValue, 0, Length);
+        public void Replace(ReadOnlySpan<char> oldValue, ReadOnlySpan<char> newValue) => Replace(oldValue, newValue, 0, Length);
 
 
         #endregion Replace
@@ -5009,11 +4961,11 @@ namespace J2N.Text
         /// </remarks>
         /// <seealso cref="Remove(int, int)"/>
         [CodeGenerationReturnsSelf]
-        public MutableTextBuffer Replace(string oldValue, string? newValue, int startIndex, int count)
+        public void Replace(string oldValue, string? newValue, int startIndex, int count)
         {
             if (oldValue is null)
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.oldValue);
-            return Replace(oldValue.AsSpan(), newValue.AsSpan(), startIndex, count);
+            Replace(oldValue.AsSpan(), newValue.AsSpan(), startIndex, count);
         }
 
         /// <summary>
@@ -5044,7 +4996,7 @@ namespace J2N.Text
         /// </remarks>
         /// <seealso cref="Remove(int, int)"/>
         [CodeGenerationReturnsSelf]
-        public MutableTextBuffer Replace(ReadOnlySpan<char> oldValue, ReadOnlySpan<char> newValue, int startIndex, int count)
+        public void Replace(ReadOnlySpan<char> oldValue, ReadOnlySpan<char> newValue, int startIndex, int count)
         {
             int currentLength = Length;
             if ((uint)startIndex > (uint)currentLength)
@@ -5158,7 +5110,6 @@ namespace J2N.Text
             }
 
             //AssertInvariants();
-            return this;
         }
 
         /// <summary>
@@ -5174,9 +5125,9 @@ namespace J2N.Text
         /// <see cref="MutableTextBuffer"/> instance is unchanged after the replacement.
         /// </remarks>
         [CodeGenerationReturnsSelf]
-        public MutableTextBuffer Replace(char oldChar, char newChar)
+        public void Replace(char oldChar, char newChar)
         {
-            return Replace(oldChar, newChar, 0, Length);
+            Replace(oldChar, newChar, 0, Length);
         }
 
         /// <summary>
@@ -5201,7 +5152,7 @@ namespace J2N.Text
         /// <see cref="MutableTextBuffer"/> instance is unchanged after the replacement.
         /// </remarks>
         [CodeGenerationReturnsSelf]
-        public MutableTextBuffer Replace(char oldChar, char newChar, int startIndex, int count)
+        public void Replace(char oldChar, char newChar, int startIndex, int count)
         {
             int currentLength = Length;
             if ((uint)startIndex > (uint)currentLength)
@@ -5218,7 +5169,6 @@ namespace J2N.Text
             span.Replace(oldChar, newChar);
 
             //AssertInvariants();
-            return this;
         }
 
         // JDK overloads
@@ -5250,7 +5200,7 @@ namespace J2N.Text
         /// <paramref name="startIndex"/> is greater than or equal to <see cref="Length"/>.
         /// </exception>
         [CodeGenerationReturnsSelf]
-        public MutableTextBuffer Replace(int startIndex, int count, string newValue)
+        public void Replace(int startIndex, int count, string newValue)
         {
             if (newValue is null)
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.newValue);
@@ -5260,7 +5210,6 @@ namespace J2N.Text
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(count, ExceptionArgument.count);
 
             ReplaceCore(startIndex, count, newValue);
-            return this;
         }
 
         /// <summary>
@@ -5289,7 +5238,7 @@ namespace J2N.Text
         /// <paramref name="startIndex"/> is greater than or equal to <see cref="Length"/>.
         /// </exception>
         [CodeGenerationReturnsSelf]
-        public MutableTextBuffer Replace(int startIndex, int count, ReadOnlySpan<char> newValue)
+        public void Replace(int startIndex, int count, ReadOnlySpan<char> newValue)
         {
             if ((uint)startIndex > (uint)m_Position)
                 ThrowHelper.ThrowStartIndexArgumentOutOfRange_ArgumentOutOfRange_IndexMustBeLessOrEqual(startIndex);
@@ -5297,7 +5246,6 @@ namespace J2N.Text
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(count, ExceptionArgument.count);
 
             ReplaceCore(startIndex, count, newValue);
-            return this;
         }
 
         private void ReplaceCore(int startIndex, int count, ReadOnlySpan<char> newValue)
@@ -5479,14 +5427,13 @@ namespace J2N.Text
         /// </remarks>
         [CLSCompliant(false)]
         [CodeGenerationReturnsSelf]
-        public unsafe MutableTextBuffer Append(char* value, int valueCount)
+        public unsafe void Append(char* value, int valueCount)
         {
             // We don't check null value as this case will throw null reference exception anyway
             if (valueCount < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(valueCount, ExceptionArgument.valueCount);
 
             Append(ref *value, valueCount);
-            return this;
         }
 
         /// <summary>Appends a specified number of chars starting from the specified reference.</summary>
@@ -5590,7 +5537,7 @@ namespace J2N.Text
         /// </remarks>
         [CLSCompliant(false)]
         [CodeGenerationReturnsSelf]
-        public unsafe MutableTextBuffer Insert(int index, char* value, int valueCount)
+        public unsafe void Insert(int index, char* value, int valueCount)
         {
             // We don't check null value as this case will throw null reference exception anyway
             if ((uint)index > (uint)Length)
@@ -5610,7 +5557,6 @@ namespace J2N.Text
             }
 
             Insert(index, ref *value, valueCount);
-            return this;
         }
 
         /// <summary>
@@ -5788,7 +5734,7 @@ namespace J2N.Text
         /// <paramref name="startIndex"/> is greater than <see cref="MutableTextBuffer.Length"/>.
         /// </exception>
         [CodeGenerationReturnsSelf]
-        public MutableTextBuffer Delete(int startIndex, int count) // Coverage for the JDK
+        public void Delete(int startIndex, int count) // Coverage for the JDK
         {
             if ((uint)startIndex > (uint)m_Position)
                 ThrowHelper.ThrowArgumentOutOfRange_ArgumentOutOfRange_IndexString(startIndex, ExceptionArgument.startIndex);
@@ -5800,7 +5746,6 @@ namespace J2N.Text
                 count = pos - startIndex;
             if (count > 0)
                 RemoveCore(startIndex, count);
-            return this;
         }
 
         /// <summary>
@@ -5836,10 +5781,9 @@ namespace J2N.Text
         /// <seealso cref="MemoryExtensions.ReverseText(Span{char})"/>
         /// <seealso cref="StringBuilderExtensions.Reverse(StringBuilder)"/>
         [CodeGenerationReturnsSelf]
-        public MutableTextBuffer Reverse() // Coverage for the JDK
+        public void Reverse() // Coverage for the JDK
         {
             m_Chars.AsSpan(0, m_Position).ReverseText();
-            return this;
         }
 
         /// <summary>

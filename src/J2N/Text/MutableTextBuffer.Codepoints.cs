@@ -24,7 +24,7 @@ namespace J2N.Text
         /// <returns>This <see cref="MutableTextBuffer"/>, for chaining.</returns>
         /// <exception cref="ArgumentException"><paramref name="codePoint"/> is not a valid Unicode code point.</exception>
         [CodeGenerationReturnsSelf]
-        public MutableTextBuffer AppendCodePoint(int codePoint) // Coverage for the JDK
+        public void AppendCodePoint(int codePoint) // Coverage for the JDK
         {
             int count = Character.ToChars(codePoint, out char high, out char low);
 
@@ -46,7 +46,6 @@ namespace J2N.Text
             if (count == 2)
                 m_Chars[pos++] = low;
             m_Position += count;
-            return this;
         }
 
         /// <summary>
@@ -71,7 +70,7 @@ namespace J2N.Text
         /// than the length of this instance.</exception>
         /// <exception cref="ArgumentException"><paramref name="codePoint"/> is not a valid Unicode code point.</exception>
         [CodeGenerationReturnsSelf]
-        public MutableTextBuffer InsertCodePoint(int index, int codePoint)
+        public void InsertCodePoint(int index, int codePoint)
         {
             if ((uint)index > Length)
                 ThrowHelper.ThrowArgumentOutOfRange_ArgumentOutOfRange_IndexString(index, ExceptionArgument.index);
@@ -91,8 +90,6 @@ namespace J2N.Text
             m_Chars[index] = high;
             if (count == 2)
                 m_Chars[index + 1] = low;
-
-            return this;
         }
 
         /// <summary>
