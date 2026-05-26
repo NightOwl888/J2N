@@ -935,7 +935,7 @@ namespace J2N.Text
 
             if ((uint)newLength > (uint)m_MaxCapacity)
             {
-                throw new ArgumentOutOfRangeException(nameof(Capacity), SR.ArgumentOutOfRange_Capacity);
+                ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.Capacity, ExceptionResource.ArgumentOutOfRange_Capacity);
             }
 
             int pos = m_Position;
@@ -1001,7 +1001,7 @@ namespace J2N.Text
 
             if ((uint)newLength > (uint)m_MaxCapacity)
             {
-                throw new ArgumentOutOfRangeException(nameof(Capacity), SR.ArgumentOutOfRange_Capacity);
+                ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.Capacity, ExceptionResource.ArgumentOutOfRange_Capacity);
             }
 
             int pos = m_Position;

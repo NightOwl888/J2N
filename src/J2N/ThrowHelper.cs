@@ -1064,6 +1064,8 @@ namespace J2N
                     return "bitSet";
                 case ExceptionArgument.buffer:
                     return "buffer";
+                case ExceptionArgument.Capacity:
+                    return "Capacity";
                 case ExceptionArgument.capacity:
                     return "capacity";
                 case ExceptionArgument.characterSequence:
@@ -1664,6 +1666,7 @@ namespace J2N
         assembly,
         bitSet,
         buffer,
+        Capacity,
         capacity,
         characterSequence,
         charCount,
