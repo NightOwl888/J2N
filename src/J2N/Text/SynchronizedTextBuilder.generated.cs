@@ -22,11 +22,11 @@ using J2N.Buffers;
 using J2N.Collections;
 using J2N.Collections.Generic;
 using J2N.Numerics;
-using J2N.Numerics.Formatters;
 using System.Buffers;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
+using J2N.Numerics.Formatters;
 
 namespace J2N.Text
 {
@@ -1711,460 +1711,6 @@ namespace J2N.Text
 
         /// <summary>
         /// 
-        /// Appends the string representation of a specified 8-bit signed integer to this instance
-        /// with the specified numeric format and culture-specific format information.
-        /// <para/>
-        /// Unless otherwise specified, formatting is performed in the invariant culture, which
-        /// is similar to how the JDK formats numbers.
-        /// 
-        /// </summary>
-        /// <param name="value">
-        /// The value to format and append.
-        /// </param>
-        /// <param name="format">
-        /// A standard or custom numeric format string.
-        /// </param>
-        /// <param name="provider">
-        /// An object that supplies culture-specific formatting information.
-        /// </param>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
-        /// <remarks>
-        /// 
-        /// This method allows similar options as the <c>AppendFormat</c> methods, but has better performance because
-        /// the value being formatted is not boxed.
-        /// <para/>
-        /// The capacity of this instance is adjusted as needed.
-        /// <para/>
-        /// <b>Notes to Callers</b>
-        /// <para/>
-        /// When you instantiate an <see cref="SynchronizedTextBuilder"/> object by calling <see cref="SynchronizedTextBuilder(int, int)"/>,
-        /// both the length and the capacity of the <see cref="SynchronizedTextBuilder"/> instance can grow beyond
-        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
-        /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
-        /// 
-        /// </remarks>
-        [CLSCompliant(false)]
-        public SynchronizedTextBuilder Append(sbyte value, string? format = null, IFormatProvider? provider = null)
-        {
-            lock (syncRoot)
-            {
-                buffer.Append(value, format, provider);
-                return this;
-            }
-        }
-
-        /// <summary>
-        /// 
-        /// Appends the string representation of a specified 8-bit unsigned integer to this instance
-        /// with the specified numeric format and culture-specific format information.
-        /// <para/>
-        /// Unless otherwise specified, formatting is performed in the invariant culture, which
-        /// is similar to how the JDK formats numbers.
-        /// 
-        /// </summary>
-        /// <param name="value">
-        /// The value to format and append.
-        /// </param>
-        /// <param name="format">
-        /// A standard or custom numeric format string.
-        /// </param>
-        /// <param name="provider">
-        /// An object that supplies culture-specific formatting information.
-        /// </param>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
-        /// <remarks>
-        /// 
-        /// This method allows similar options as the <c>AppendFormat</c> methods, but has better performance because
-        /// the value being formatted is not boxed.
-        /// <para/>
-        /// The capacity of this instance is adjusted as needed.
-        /// <para/>
-        /// <b>Notes to Callers</b>
-        /// <para/>
-        /// When you instantiate an <see cref="SynchronizedTextBuilder"/> object by calling <see cref="SynchronizedTextBuilder(int, int)"/>,
-        /// both the length and the capacity of the <see cref="SynchronizedTextBuilder"/> instance can grow beyond
-        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
-        /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
-        /// 
-        /// </remarks>
-        public SynchronizedTextBuilder Append(byte value, string? format = null, IFormatProvider? provider = null)
-        {
-            lock (syncRoot)
-            {
-                buffer.Append(value, format, provider);
-                return this;
-            }
-        }
-
-        /// <summary>
-        /// 
-        /// Appends the string representation of a specified 16-bit signed integer to this instance
-        /// with the specified numeric format and culture-specific format information.
-        /// <para/>
-        /// Unless otherwise specified, formatting is performed in the invariant culture, which
-        /// is similar to how the JDK formats numbers.
-        /// 
-        /// </summary>
-        /// <param name="value">
-        /// The value to format and append.
-        /// </param>
-        /// <param name="format">
-        /// A standard or custom numeric format string.
-        /// </param>
-        /// <param name="provider">
-        /// An object that supplies culture-specific formatting information.
-        /// </param>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
-        /// <remarks>
-        /// 
-        /// This method allows similar options as the <c>AppendFormat</c> methods, but has better performance because
-        /// the value being formatted is not boxed.
-        /// <para/>
-        /// The capacity of this instance is adjusted as needed.
-        /// <para/>
-        /// <b>Notes to Callers</b>
-        /// <para/>
-        /// When you instantiate an <see cref="SynchronizedTextBuilder"/> object by calling <see cref="SynchronizedTextBuilder(int, int)"/>,
-        /// both the length and the capacity of the <see cref="SynchronizedTextBuilder"/> instance can grow beyond
-        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
-        /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
-        /// 
-        /// </remarks>
-        public SynchronizedTextBuilder Append(short value, string? format = null, IFormatProvider? provider = null)
-        {
-            lock (syncRoot)
-            {
-                buffer.Append(value, format, provider);
-                return this;
-            }
-        }
-
-        /// <summary>
-        /// 
-        /// Appends the string representation of a specified 32-bit signed integer to this instance
-        /// with the specified numeric format and culture-specific format information.
-        /// <para/>
-        /// Unless otherwise specified, formatting is performed in the invariant culture, which
-        /// is similar to how the JDK formats numbers.
-        /// 
-        /// </summary>
-        /// <param name="value">
-        /// The value to format and append.
-        /// </param>
-        /// <param name="format">
-        /// A standard or custom numeric format string.
-        /// </param>
-        /// <param name="provider">
-        /// An object that supplies culture-specific formatting information.
-        /// </param>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
-        /// <remarks>
-        /// 
-        /// This method allows similar options as the <c>AppendFormat</c> methods, but has better performance because
-        /// the value being formatted is not boxed.
-        /// <para/>
-        /// The capacity of this instance is adjusted as needed.
-        /// <para/>
-        /// <b>Notes to Callers</b>
-        /// <para/>
-        /// When you instantiate an <see cref="SynchronizedTextBuilder"/> object by calling <see cref="SynchronizedTextBuilder(int, int)"/>,
-        /// both the length and the capacity of the <see cref="SynchronizedTextBuilder"/> instance can grow beyond
-        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
-        /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
-        /// 
-        /// </remarks>
-        public SynchronizedTextBuilder Append(int value, string? format = null, IFormatProvider? provider = null)
-        {
-            lock (syncRoot)
-            {
-                buffer.Append(value, format, provider);
-                return this;
-            }
-        }
-
-        /// <summary>
-        /// 
-        /// Appends the string representation of a specified 64-bit signed integer to this instance
-        /// with the specified numeric format and culture-specific format information.
-        /// <para/>
-        /// Unless otherwise specified, formatting is performed in the invariant culture, which
-        /// is similar to how the JDK formats numbers.
-        /// 
-        /// </summary>
-        /// <param name="value">
-        /// The value to format and append.
-        /// </param>
-        /// <param name="format">
-        /// A standard or custom numeric format string.
-        /// </param>
-        /// <param name="provider">
-        /// An object that supplies culture-specific formatting information.
-        /// </param>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
-        /// <remarks>
-        /// 
-        /// This method allows similar options as the <c>AppendFormat</c> methods, but has better performance because
-        /// the value being formatted is not boxed.
-        /// <para/>
-        /// The capacity of this instance is adjusted as needed.
-        /// <para/>
-        /// <b>Notes to Callers</b>
-        /// <para/>
-        /// When you instantiate an <see cref="SynchronizedTextBuilder"/> object by calling <see cref="SynchronizedTextBuilder(int, int)"/>,
-        /// both the length and the capacity of the <see cref="SynchronizedTextBuilder"/> instance can grow beyond
-        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
-        /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
-        /// 
-        /// </remarks>
-        public SynchronizedTextBuilder Append(long value, string? format = null, IFormatProvider? provider = null)
-        {
-            lock (syncRoot)
-            {
-                buffer.Append(value, format, provider);
-                return this;
-            }
-        }
-
-        /// <summary>
-        /// 
-        /// Appends the string representation of a specified single-precision floating-point number to this instance
-        /// with the specified numeric format and culture-specific format information.
-        /// <para/>
-        /// Unless otherwise specified, formatting is performed in the invariant culture using the "J" format, which
-        /// is similar to how the JDK formats numbers.
-        /// 
-        /// </summary>
-        /// <param name="value">
-        /// The value to format and append.
-        /// </param>
-        /// <param name="format">
-        /// A standard or custom numeric format string.
-        /// </param>
-        /// <param name="provider">
-        /// An object that supplies culture-specific formatting information.
-        /// </param>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
-        /// <remarks>
-        /// 
-        /// This method allows similar options as the <c>AppendFormat</c> methods, but has better performance because
-        /// the value being formatted is not boxed.
-        /// <para/>
-        /// The capacity of this instance is adjusted as needed.
-        /// <para/>
-        /// <b>Notes to Callers</b>
-        /// <para/>
-        /// When you instantiate an <see cref="SynchronizedTextBuilder"/> object by calling <see cref="SynchronizedTextBuilder(int, int)"/>,
-        /// both the length and the capacity of the <see cref="SynchronizedTextBuilder"/> instance can grow beyond
-        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
-        /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
-        /// 
-        /// </remarks>
-        public SynchronizedTextBuilder Append(float value, string? format = null, IFormatProvider? provider = null)
-        {
-            lock (syncRoot)
-            {
-                buffer.Append(value, format, provider);
-                return this;
-            }
-        }
-
-        /// <summary>
-        /// 
-        /// Appends the string representation of a specified double-precision floating-point number to this instance
-        /// with the specified numeric format and culture-specific format information.
-        /// <para/>
-        /// Unless otherwise specified, formatting is performed in the invariant culture using the "J" format, which
-        /// is similar to how the JDK formats numbers.
-        /// 
-        /// </summary>
-        /// <param name="value">
-        /// The value to format and append.
-        /// </param>
-        /// <param name="format">
-        /// A standard or custom numeric format string.
-        /// </param>
-        /// <param name="provider">
-        /// An object that supplies culture-specific formatting information.
-        /// </param>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
-        /// <remarks>
-        /// 
-        /// This method allows similar options as the <c>AppendFormat</c> methods, but has better performance because
-        /// the value being formatted is not boxed.
-        /// <para/>
-        /// The capacity of this instance is adjusted as needed.
-        /// <para/>
-        /// <b>Notes to Callers</b>
-        /// <para/>
-        /// When you instantiate an <see cref="SynchronizedTextBuilder"/> object by calling <see cref="SynchronizedTextBuilder(int, int)"/>,
-        /// both the length and the capacity of the <see cref="SynchronizedTextBuilder"/> instance can grow beyond
-        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
-        /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
-        /// 
-        /// </remarks>
-        public SynchronizedTextBuilder Append(double value, string? format = null, IFormatProvider? provider = null)
-        {
-            lock (syncRoot)
-            {
-                buffer.Append(value, format, provider);
-                return this;
-            }
-        }
-
-        /// <summary>
-        /// 
-        /// Appends the string representation of a specified 16-bit unsigned integer to this instance
-        /// with the specified numeric format and culture-specific format information.
-        /// <para/>
-        /// Unless otherwise specified, formatting is performed in the invariant culture, which
-        /// is similar to how the JDK formats numbers.
-        /// 
-        /// </summary>
-        /// <param name="value">
-        /// The value to format and append.
-        /// </param>
-        /// <param name="format">
-        /// A standard or custom numeric format string.
-        /// </param>
-        /// <param name="provider">
-        /// An object that supplies culture-specific formatting information.
-        /// </param>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
-        /// <remarks>
-        /// 
-        /// This method allows similar options as the <c>AppendFormat</c> methods, but has better performance because
-        /// the value being formatted is not boxed.
-        /// <para/>
-        /// The capacity of this instance is adjusted as needed.
-        /// <para/>
-        /// <b>Notes to Callers</b>
-        /// <para/>
-        /// When you instantiate an <see cref="SynchronizedTextBuilder"/> object by calling <see cref="SynchronizedTextBuilder(int, int)"/>,
-        /// both the length and the capacity of the <see cref="SynchronizedTextBuilder"/> instance can grow beyond
-        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
-        /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
-        /// 
-        /// </remarks>
-        [CLSCompliant(false)]
-        public SynchronizedTextBuilder Append(ushort value, string? format = null, IFormatProvider? provider = null)
-        {
-            lock (syncRoot)
-            {
-                buffer.Append(value, format, provider);
-                return this;
-            }
-        }
-
-        /// <summary>
-        /// 
-        /// Appends the string representation of a specified 32-bit unsigned integer to this instance
-        /// with the specified numeric format and culture-specific format information.
-        /// <para/>
-        /// Unless otherwise specified, formatting is performed in the invariant culture, which
-        /// is similar to how the JDK formats numbers.
-        /// 
-        /// </summary>
-        /// <param name="value">
-        /// The value to format and append.
-        /// </param>
-        /// <param name="format">
-        /// A standard or custom numeric format string.
-        /// </param>
-        /// <param name="provider">
-        /// An object that supplies culture-specific formatting information.
-        /// </param>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
-        /// <remarks>
-        /// 
-        /// This method allows similar options as the <c>AppendFormat</c> methods, but has better performance because
-        /// the value being formatted is not boxed.
-        /// <para/>
-        /// The capacity of this instance is adjusted as needed.
-        /// <para/>
-        /// <b>Notes to Callers</b>
-        /// <para/>
-        /// When you instantiate an <see cref="SynchronizedTextBuilder"/> object by calling <see cref="SynchronizedTextBuilder(int, int)"/>,
-        /// both the length and the capacity of the <see cref="SynchronizedTextBuilder"/> instance can grow beyond
-        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
-        /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
-        /// 
-        /// </remarks>
-        [CLSCompliant(false)]
-        public SynchronizedTextBuilder Append(uint value, string? format = null, IFormatProvider? provider = null)
-        {
-            lock (syncRoot)
-            {
-                buffer.Append(value, format, provider);
-                return this;
-            }
-        }
-
-        /// <summary>
-        /// 
-        /// Appends the string representation of a specified 64-bit unsigned integer to this instance
-        /// with the specified numeric format and culture-specific format information.
-        /// <para/>
-        /// Unless otherwise specified, formatting is performed in the invariant culture, which
-        /// is similar to how the JDK formats numbers.
-        /// 
-        /// </summary>
-        /// <param name="value">
-        /// The value to format and append.
-        /// </param>
-        /// <param name="format">
-        /// A standard or custom numeric format string.
-        /// </param>
-        /// <param name="provider">
-        /// An object that supplies culture-specific formatting information.
-        /// </param>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
-        /// <remarks>
-        /// 
-        /// This method allows similar options as the <c>AppendFormat</c> methods, but has better performance because
-        /// the value being formatted is not boxed.
-        /// <para/>
-        /// The capacity of this instance is adjusted as needed.
-        /// <para/>
-        /// <b>Notes to Callers</b>
-        /// <para/>
-        /// When you instantiate an <see cref="SynchronizedTextBuilder"/> object by calling <see cref="SynchronizedTextBuilder(int, int)"/>,
-        /// both the length and the capacity of the <see cref="SynchronizedTextBuilder"/> instance can grow beyond
-        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
-        /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
-        /// 
-        /// </remarks>
-        [CLSCompliant(false)]
-        public SynchronizedTextBuilder Append(ulong value, string? format = null, IFormatProvider? provider = null)
-        {
-            lock (syncRoot)
-            {
-                buffer.Append(value, format, provider);
-                return this;
-            }
-        }
-
-        /// <summary>
-        /// 
         /// Appends the string representation of a specified object to this instance using the specified format
         /// and culture-specific format information.
         /// 
@@ -2560,390 +2106,6 @@ namespace J2N.Text
             lock (syncRoot)
             {
                 buffer.Insert(index, value, format);
-                return this;
-            }
-        }
-
-        /// <summary>
-        /// 
-        /// Inserts the string representation of a specified 8-bit signed integer to this instance
-        /// with the specified numeric format and culture-specific format information.
-        /// <para/>
-        /// Unless otherwise specified, formatting is performed in the invariant culture, which
-        /// is similar to how the JDK formats numbers.
-        /// 
-        /// </summary>
-        /// <param name="index">
-        /// The position in this instance where insertion begins.
-        /// </param>
-        /// <param name="value">
-        /// The value to format and append.
-        /// </param>
-        /// <param name="format">
-        /// A standard or custom numeric format string.
-        /// </param>
-        /// <param name="provider">
-        /// An object that supplies culture-specific formatting information.
-        /// </param>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
-        /// <remarks>
-        /// 
-        /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
-        /// 
-        /// </remarks>
-        [CLSCompliant(false)]
-        public SynchronizedTextBuilder Insert(int index, sbyte value, string? format = null, IFormatProvider? provider = null)
-        {
-            lock (syncRoot)
-            {
-                buffer.Insert(index, value, format, provider);
-                return this;
-            }
-        }
-
-        /// <summary>
-        /// 
-        /// Inserts the string representation of a specified 8-bit unsigned integer to this instance
-        /// with the specified numeric format and culture-specific format information.
-        /// <para/>
-        /// Unless otherwise specified, formatting is performed in the invariant culture, which
-        /// is similar to how the JDK formats numbers.
-        /// 
-        /// </summary>
-        /// <param name="index">
-        /// The position in this instance where insertion begins.
-        /// </param>
-        /// <param name="value">
-        /// The value to format and append.
-        /// </param>
-        /// <param name="format">
-        /// A standard or custom numeric format string.
-        /// </param>
-        /// <param name="provider">
-        /// An object that supplies culture-specific formatting information.
-        /// </param>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
-        /// <remarks>
-        /// 
-        /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
-        /// 
-        /// </remarks>
-        public SynchronizedTextBuilder Insert(int index, byte value, string? format = null, IFormatProvider? provider = null)
-        {
-            lock (syncRoot)
-            {
-                buffer.Insert(index, value, format, provider);
-                return this;
-            }
-        }
-
-        /// <summary>
-        /// 
-        /// Inserts the string representation of a specified 16-bit signed integer to this instance
-        /// with the specified numeric format and culture-specific format information.
-        /// <para/>
-        /// Unless otherwise specified, formatting is performed in the invariant culture, which
-        /// is similar to how the JDK formats numbers.
-        /// 
-        /// </summary>
-        /// <param name="index">
-        /// The position in this instance where insertion begins.
-        /// </param>
-        /// <param name="value">
-        /// The value to format and append.
-        /// </param>
-        /// <param name="format">
-        /// A standard or custom numeric format string.
-        /// </param>
-        /// <param name="provider">
-        /// An object that supplies culture-specific formatting information.
-        /// </param>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
-        /// <remarks>
-        /// 
-        /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
-        /// 
-        /// </remarks>
-        public SynchronizedTextBuilder Insert(int index, short value, string? format = null, IFormatProvider? provider = null)
-        {
-            lock (syncRoot)
-            {
-                buffer.Insert(index, value, format, provider);
-                return this;
-            }
-        }
-
-        /// <summary>
-        /// 
-        /// Inserts the string representation of a specified 32-bit signed integer to this instance
-        /// with the specified numeric format and culture-specific format information.
-        /// <para/>
-        /// Unless otherwise specified, formatting is performed in the invariant culture, which
-        /// is similar to how the JDK formats numbers.
-        /// 
-        /// </summary>
-        /// <param name="index">
-        /// The position in this instance where insertion begins.
-        /// </param>
-        /// <param name="value">
-        /// The value to format and append.
-        /// </param>
-        /// <param name="format">
-        /// A standard or custom numeric format string.
-        /// </param>
-        /// <param name="provider">
-        /// An object that supplies culture-specific formatting information.
-        /// </param>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
-        /// <remarks>
-        /// 
-        /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
-        /// 
-        /// </remarks>
-        public SynchronizedTextBuilder Insert(int index, int value, string? format = null, IFormatProvider? provider = null)
-        {
-            lock (syncRoot)
-            {
-                buffer.Insert(index, value, format, provider);
-                return this;
-            }
-        }
-
-        /// <summary>
-        /// 
-        /// Inserts the string representation of a specified 64-bit signed integer to this instance
-        /// with the specified numeric format and culture-specific format information.
-        /// <para/>
-        /// Unless otherwise specified, formatting is performed in the invariant culture, which
-        /// is similar to how the JDK formats numbers.
-        /// 
-        /// </summary>
-        /// <param name="index">
-        /// The position in this instance where insertion begins.
-        /// </param>
-        /// <param name="value">
-        /// The value to format and append.
-        /// </param>
-        /// <param name="format">
-        /// A standard or custom numeric format string.
-        /// </param>
-        /// <param name="provider">
-        /// An object that supplies culture-specific formatting information.
-        /// </param>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
-        /// <remarks>
-        /// 
-        /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
-        /// 
-        /// </remarks>
-        public SynchronizedTextBuilder Insert(int index, long value, string? format = null, IFormatProvider? provider = null)
-        {
-            lock (syncRoot)
-            {
-                buffer.Insert(index, value, format, provider);
-                return this;
-            }
-        }
-
-        /// <summary>
-        /// 
-        /// Inserts the string representation of a specified single-precision floating-point number to this instance
-        /// with the specified numeric format and culture-specific format information.
-        /// <para/>
-        /// Unless otherwise specified, formatting is performed in the invariant culture using the "J" format, which
-        /// is similar to how the JDK formats numbers.
-        /// 
-        /// </summary>
-        /// <param name="index">
-        /// The position in this instance where insertion begins.
-        /// </param>
-        /// <param name="value">
-        /// The value to format and append.
-        /// </param>
-        /// <param name="format">
-        /// A standard or custom numeric format string.
-        /// </param>
-        /// <param name="provider">
-        /// An object that supplies culture-specific formatting information.
-        /// </param>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
-        /// <remarks>
-        /// 
-        /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
-        /// 
-        /// </remarks>
-        public SynchronizedTextBuilder Insert(int index, float value, string? format = null, IFormatProvider? provider = null)
-        {
-            lock (syncRoot)
-            {
-                buffer.Insert(index, value, format, provider);
-                return this;
-            }
-        }
-
-        /// <summary>
-        /// 
-        /// Inserts the string representation of a specified double-precision floating-point number to this instance
-        /// with the specified numeric format and culture-specific format information.
-        /// <para/>
-        /// Unless otherwise specified, formatting is performed in the invariant culture using the "J" format, which
-        /// is similar to how the JDK formats numbers.
-        /// 
-        /// </summary>
-        /// <param name="index">
-        /// The position in this instance where insertion begins.
-        /// </param>
-        /// <param name="value">
-        /// The value to format and append.
-        /// </param>
-        /// <param name="format">
-        /// A standard or custom numeric format string.
-        /// </param>
-        /// <param name="provider">
-        /// An object that supplies culture-specific formatting information.
-        /// </param>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
-        /// <remarks>
-        /// 
-        /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
-        /// 
-        /// </remarks>
-        public SynchronizedTextBuilder Insert(int index, double value, string? format = null, IFormatProvider? provider = null)
-        {
-            lock (syncRoot)
-            {
-                buffer.Insert(index, value, format, provider);
-                return this;
-            }
-        }
-
-        /// <summary>
-        /// 
-        /// Inserts the string representation of a specified 16-bit unsigned integer to this instance
-        /// with the specified numeric format and culture-specific format information.
-        /// <para/>
-        /// Unless otherwise specified, formatting is performed in the invariant culture, which
-        /// is similar to how the JDK formats numbers.
-        /// 
-        /// </summary>
-        /// <param name="index">
-        /// The position in this instance where insertion begins.
-        /// </param>
-        /// <param name="value">
-        /// The value to format and append.
-        /// </param>
-        /// <param name="format">
-        /// A standard or custom numeric format string.
-        /// </param>
-        /// <param name="provider">
-        /// An object that supplies culture-specific formatting information.
-        /// </param>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
-        /// <remarks>
-        /// 
-        /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
-        /// 
-        /// </remarks>
-        [CLSCompliant(false)]
-        public SynchronizedTextBuilder Insert(int index, ushort value, string? format = null, IFormatProvider? provider = null)
-        {
-            lock (syncRoot)
-            {
-                buffer.Insert(index, value, format, provider);
-                return this;
-            }
-        }
-
-        /// <summary>
-        /// 
-        /// Inserts the string representation of a specified 32-bit unsigned integer to this instance
-        /// with the specified numeric format and culture-specific format information.
-        /// <para/>
-        /// Unless otherwise specified, formatting is performed in the invariant culture, which
-        /// is similar to how the JDK formats numbers.
-        /// 
-        /// </summary>
-        /// <param name="index">
-        /// The position in this instance where insertion begins.
-        /// </param>
-        /// <param name="value">
-        /// The value to format and append.
-        /// </param>
-        /// <param name="format">
-        /// A standard or custom numeric format string.
-        /// </param>
-        /// <param name="provider">
-        /// An object that supplies culture-specific formatting information.
-        /// </param>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
-        /// <remarks>
-        /// 
-        /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
-        /// 
-        /// </remarks>
-        [CLSCompliant(false)]
-        public SynchronizedTextBuilder Insert(int index, uint value, string? format = null, IFormatProvider? provider = null)
-        {
-            lock (syncRoot)
-            {
-                buffer.Insert(index, value, format, provider);
-                return this;
-            }
-        }
-
-        /// <summary>
-        /// 
-        /// Inserts the string representation of a specified 64-bit unsigned integer to this instance
-        /// with the specified numeric format and culture-specific format information.
-        /// <para/>
-        /// Unless otherwise specified, formatting is performed in the invariant culture, which
-        /// is similar to how the JDK formats numbers.
-        /// 
-        /// </summary>
-        /// <param name="index">
-        /// The position in this instance where insertion begins.
-        /// </param>
-        /// <param name="value">
-        /// The value to format and append.
-        /// </param>
-        /// <param name="format">
-        /// A standard or custom numeric format string.
-        /// </param>
-        /// <param name="provider">
-        /// An object that supplies culture-specific formatting information.
-        /// </param>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
-        /// <remarks>
-        /// 
-        /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
-        /// 
-        /// </remarks>
-        [CLSCompliant(false)]
-        public SynchronizedTextBuilder Insert(int index, ulong value, string? format = null, IFormatProvider? provider = null)
-        {
-            lock (syncRoot)
-            {
-                buffer.Insert(index, value, format, provider);
                 return this;
             }
         }
@@ -5508,6 +4670,844 @@ namespace J2N.Text
             lock (syncRoot)
             {
                 return buffer.LastIndexOf(value, startIndex, comparisonType);
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// Appends the string representation of a specified 8-bit signed integer to this instance
+        /// with the specified numeric format and culture-specific format information.
+        /// <para/>
+        /// Unless otherwise specified, formatting is performed in the invariant culture, which
+        /// is similar to how the JDK formats numbers.
+        /// 
+        /// </summary>
+        /// <param name="value">
+        /// The value to format and append.
+        /// </param>
+        /// <param name="format">
+        /// A standard or custom numeric format string.
+        /// </param>
+        /// <param name="provider">
+        /// An object that supplies culture-specific formatting information.
+        /// </param>
+        /// <returns>
+        /// A reference to this instance after the operation has completed.
+        /// </returns>
+        /// <remarks>
+        /// 
+        /// This method allows similar options as the <c>AppendFormat</c> methods, but has better performance because
+        /// the value being formatted is not boxed.
+        /// <para/>
+        /// The capacity of this instance is adjusted as needed.
+        /// <para/>
+        /// <b>Notes to Callers</b>
+        /// <para/>
+        /// When you instantiate an <see cref="SynchronizedTextBuilder"/> object by calling <see cref="SynchronizedTextBuilder(int, int)"/>,
+        /// both the length and the capacity of the <see cref="SynchronizedTextBuilder"/> instance can grow beyond
+        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
+        /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
+        /// 
+        /// </remarks>
+        [CLSCompliant(false)]
+        public SynchronizedTextBuilder Append(sbyte value, string? format = null, IFormatProvider? provider = null)
+        {
+            lock (syncRoot)
+            {
+                buffer.Append(value, format, provider);
+                return this;
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// Appends the string representation of a specified 8-bit unsigned integer to this instance
+        /// with the specified numeric format and culture-specific format information.
+        /// <para/>
+        /// Unless otherwise specified, formatting is performed in the invariant culture, which
+        /// is similar to how the JDK formats numbers.
+        /// 
+        /// </summary>
+        /// <param name="value">
+        /// The value to format and append.
+        /// </param>
+        /// <param name="format">
+        /// A standard or custom numeric format string.
+        /// </param>
+        /// <param name="provider">
+        /// An object that supplies culture-specific formatting information.
+        /// </param>
+        /// <returns>
+        /// A reference to this instance after the operation has completed.
+        /// </returns>
+        /// <remarks>
+        /// 
+        /// This method allows similar options as the <c>AppendFormat</c> methods, but has better performance because
+        /// the value being formatted is not boxed.
+        /// <para/>
+        /// The capacity of this instance is adjusted as needed.
+        /// <para/>
+        /// <b>Notes to Callers</b>
+        /// <para/>
+        /// When you instantiate an <see cref="SynchronizedTextBuilder"/> object by calling <see cref="SynchronizedTextBuilder(int, int)"/>,
+        /// both the length and the capacity of the <see cref="SynchronizedTextBuilder"/> instance can grow beyond
+        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
+        /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
+        /// 
+        /// </remarks>
+        public SynchronizedTextBuilder Append(byte value, string? format = null, IFormatProvider? provider = null)
+        {
+            lock (syncRoot)
+            {
+                buffer.Append(value, format, provider);
+                return this;
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// Appends the string representation of a specified 16-bit signed integer to this instance
+        /// with the specified numeric format and culture-specific format information.
+        /// <para/>
+        /// Unless otherwise specified, formatting is performed in the invariant culture, which
+        /// is similar to how the JDK formats numbers.
+        /// 
+        /// </summary>
+        /// <param name="value">
+        /// The value to format and append.
+        /// </param>
+        /// <param name="format">
+        /// A standard or custom numeric format string.
+        /// </param>
+        /// <param name="provider">
+        /// An object that supplies culture-specific formatting information.
+        /// </param>
+        /// <returns>
+        /// A reference to this instance after the operation has completed.
+        /// </returns>
+        /// <remarks>
+        /// 
+        /// This method allows similar options as the <c>AppendFormat</c> methods, but has better performance because
+        /// the value being formatted is not boxed.
+        /// <para/>
+        /// The capacity of this instance is adjusted as needed.
+        /// <para/>
+        /// <b>Notes to Callers</b>
+        /// <para/>
+        /// When you instantiate an <see cref="SynchronizedTextBuilder"/> object by calling <see cref="SynchronizedTextBuilder(int, int)"/>,
+        /// both the length and the capacity of the <see cref="SynchronizedTextBuilder"/> instance can grow beyond
+        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
+        /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
+        /// 
+        /// </remarks>
+        public SynchronizedTextBuilder Append(short value, string? format = null, IFormatProvider? provider = null)
+        {
+            lock (syncRoot)
+            {
+                buffer.Append(value, format, provider);
+                return this;
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// Appends the string representation of a specified 32-bit signed integer to this instance
+        /// with the specified numeric format and culture-specific format information.
+        /// <para/>
+        /// Unless otherwise specified, formatting is performed in the invariant culture, which
+        /// is similar to how the JDK formats numbers.
+        /// 
+        /// </summary>
+        /// <param name="value">
+        /// The value to format and append.
+        /// </param>
+        /// <param name="format">
+        /// A standard or custom numeric format string.
+        /// </param>
+        /// <param name="provider">
+        /// An object that supplies culture-specific formatting information.
+        /// </param>
+        /// <returns>
+        /// A reference to this instance after the operation has completed.
+        /// </returns>
+        /// <remarks>
+        /// 
+        /// This method allows similar options as the <c>AppendFormat</c> methods, but has better performance because
+        /// the value being formatted is not boxed.
+        /// <para/>
+        /// The capacity of this instance is adjusted as needed.
+        /// <para/>
+        /// <b>Notes to Callers</b>
+        /// <para/>
+        /// When you instantiate an <see cref="SynchronizedTextBuilder"/> object by calling <see cref="SynchronizedTextBuilder(int, int)"/>,
+        /// both the length and the capacity of the <see cref="SynchronizedTextBuilder"/> instance can grow beyond
+        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
+        /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
+        /// 
+        /// </remarks>
+        public SynchronizedTextBuilder Append(int value, string? format = null, IFormatProvider? provider = null)
+        {
+            lock (syncRoot)
+            {
+                buffer.Append(value, format, provider);
+                return this;
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// Appends the string representation of a specified 64-bit signed integer to this instance
+        /// with the specified numeric format and culture-specific format information.
+        /// <para/>
+        /// Unless otherwise specified, formatting is performed in the invariant culture, which
+        /// is similar to how the JDK formats numbers.
+        /// 
+        /// </summary>
+        /// <param name="value">
+        /// The value to format and append.
+        /// </param>
+        /// <param name="format">
+        /// A standard or custom numeric format string.
+        /// </param>
+        /// <param name="provider">
+        /// An object that supplies culture-specific formatting information.
+        /// </param>
+        /// <returns>
+        /// A reference to this instance after the operation has completed.
+        /// </returns>
+        /// <remarks>
+        /// 
+        /// This method allows similar options as the <c>AppendFormat</c> methods, but has better performance because
+        /// the value being formatted is not boxed.
+        /// <para/>
+        /// The capacity of this instance is adjusted as needed.
+        /// <para/>
+        /// <b>Notes to Callers</b>
+        /// <para/>
+        /// When you instantiate an <see cref="SynchronizedTextBuilder"/> object by calling <see cref="SynchronizedTextBuilder(int, int)"/>,
+        /// both the length and the capacity of the <see cref="SynchronizedTextBuilder"/> instance can grow beyond
+        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
+        /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
+        /// 
+        /// </remarks>
+        public SynchronizedTextBuilder Append(long value, string? format = null, IFormatProvider? provider = null)
+        {
+            lock (syncRoot)
+            {
+                buffer.Append(value, format, provider);
+                return this;
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// Appends the string representation of a specified single-precision floating-point number to this instance
+        /// with the specified numeric format and culture-specific format information.
+        /// <para/>
+        /// Unless otherwise specified, formatting is performed in the invariant culture using the "J" format, which
+        /// is similar to how the JDK formats numbers.
+        /// 
+        /// </summary>
+        /// <param name="value">
+        /// The value to format and append.
+        /// </param>
+        /// <param name="format">
+        /// A standard or custom numeric format string.
+        /// </param>
+        /// <param name="provider">
+        /// An object that supplies culture-specific formatting information.
+        /// </param>
+        /// <returns>
+        /// A reference to this instance after the operation has completed.
+        /// </returns>
+        /// <remarks>
+        /// 
+        /// This method allows similar options as the <c>AppendFormat</c> methods, but has better performance because
+        /// the value being formatted is not boxed.
+        /// <para/>
+        /// The capacity of this instance is adjusted as needed.
+        /// <para/>
+        /// <b>Notes to Callers</b>
+        /// <para/>
+        /// When you instantiate an <see cref="SynchronizedTextBuilder"/> object by calling <see cref="SynchronizedTextBuilder(int, int)"/>,
+        /// both the length and the capacity of the <see cref="SynchronizedTextBuilder"/> instance can grow beyond
+        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
+        /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
+        /// 
+        /// </remarks>
+        public SynchronizedTextBuilder Append(float value, string? format = null, IFormatProvider? provider = null)
+        {
+            lock (syncRoot)
+            {
+                buffer.Append(value, format, provider);
+                return this;
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// Appends the string representation of a specified double-precision floating-point number to this instance
+        /// with the specified numeric format and culture-specific format information.
+        /// <para/>
+        /// Unless otherwise specified, formatting is performed in the invariant culture using the "J" format, which
+        /// is similar to how the JDK formats numbers.
+        /// 
+        /// </summary>
+        /// <param name="value">
+        /// The value to format and append.
+        /// </param>
+        /// <param name="format">
+        /// A standard or custom numeric format string.
+        /// </param>
+        /// <param name="provider">
+        /// An object that supplies culture-specific formatting information.
+        /// </param>
+        /// <returns>
+        /// A reference to this instance after the operation has completed.
+        /// </returns>
+        /// <remarks>
+        /// 
+        /// This method allows similar options as the <c>AppendFormat</c> methods, but has better performance because
+        /// the value being formatted is not boxed.
+        /// <para/>
+        /// The capacity of this instance is adjusted as needed.
+        /// <para/>
+        /// <b>Notes to Callers</b>
+        /// <para/>
+        /// When you instantiate an <see cref="SynchronizedTextBuilder"/> object by calling <see cref="SynchronizedTextBuilder(int, int)"/>,
+        /// both the length and the capacity of the <see cref="SynchronizedTextBuilder"/> instance can grow beyond
+        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
+        /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
+        /// 
+        /// </remarks>
+        public SynchronizedTextBuilder Append(double value, string? format = null, IFormatProvider? provider = null)
+        {
+            lock (syncRoot)
+            {
+                buffer.Append(value, format, provider);
+                return this;
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// Appends the string representation of a specified 16-bit unsigned integer to this instance
+        /// with the specified numeric format and culture-specific format information.
+        /// <para/>
+        /// Unless otherwise specified, formatting is performed in the invariant culture, which
+        /// is similar to how the JDK formats numbers.
+        /// 
+        /// </summary>
+        /// <param name="value">
+        /// The value to format and append.
+        /// </param>
+        /// <param name="format">
+        /// A standard or custom numeric format string.
+        /// </param>
+        /// <param name="provider">
+        /// An object that supplies culture-specific formatting information.
+        /// </param>
+        /// <returns>
+        /// A reference to this instance after the operation has completed.
+        /// </returns>
+        /// <remarks>
+        /// 
+        /// This method allows similar options as the <c>AppendFormat</c> methods, but has better performance because
+        /// the value being formatted is not boxed.
+        /// <para/>
+        /// The capacity of this instance is adjusted as needed.
+        /// <para/>
+        /// <b>Notes to Callers</b>
+        /// <para/>
+        /// When you instantiate an <see cref="SynchronizedTextBuilder"/> object by calling <see cref="SynchronizedTextBuilder(int, int)"/>,
+        /// both the length and the capacity of the <see cref="SynchronizedTextBuilder"/> instance can grow beyond
+        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
+        /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
+        /// 
+        /// </remarks>
+        [CLSCompliant(false)]
+        public SynchronizedTextBuilder Append(ushort value, string? format = null, IFormatProvider? provider = null)
+        {
+            lock (syncRoot)
+            {
+                buffer.Append(value, format, provider);
+                return this;
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// Appends the string representation of a specified 32-bit unsigned integer to this instance
+        /// with the specified numeric format and culture-specific format information.
+        /// <para/>
+        /// Unless otherwise specified, formatting is performed in the invariant culture, which
+        /// is similar to how the JDK formats numbers.
+        /// 
+        /// </summary>
+        /// <param name="value">
+        /// The value to format and append.
+        /// </param>
+        /// <param name="format">
+        /// A standard or custom numeric format string.
+        /// </param>
+        /// <param name="provider">
+        /// An object that supplies culture-specific formatting information.
+        /// </param>
+        /// <returns>
+        /// A reference to this instance after the operation has completed.
+        /// </returns>
+        /// <remarks>
+        /// 
+        /// This method allows similar options as the <c>AppendFormat</c> methods, but has better performance because
+        /// the value being formatted is not boxed.
+        /// <para/>
+        /// The capacity of this instance is adjusted as needed.
+        /// <para/>
+        /// <b>Notes to Callers</b>
+        /// <para/>
+        /// When you instantiate an <see cref="SynchronizedTextBuilder"/> object by calling <see cref="SynchronizedTextBuilder(int, int)"/>,
+        /// both the length and the capacity of the <see cref="SynchronizedTextBuilder"/> instance can grow beyond
+        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
+        /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
+        /// 
+        /// </remarks>
+        [CLSCompliant(false)]
+        public SynchronizedTextBuilder Append(uint value, string? format = null, IFormatProvider? provider = null)
+        {
+            lock (syncRoot)
+            {
+                buffer.Append(value, format, provider);
+                return this;
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// Appends the string representation of a specified 64-bit unsigned integer to this instance
+        /// with the specified numeric format and culture-specific format information.
+        /// <para/>
+        /// Unless otherwise specified, formatting is performed in the invariant culture, which
+        /// is similar to how the JDK formats numbers.
+        /// 
+        /// </summary>
+        /// <param name="value">
+        /// The value to format and append.
+        /// </param>
+        /// <param name="format">
+        /// A standard or custom numeric format string.
+        /// </param>
+        /// <param name="provider">
+        /// An object that supplies culture-specific formatting information.
+        /// </param>
+        /// <returns>
+        /// A reference to this instance after the operation has completed.
+        /// </returns>
+        /// <remarks>
+        /// 
+        /// This method allows similar options as the <c>AppendFormat</c> methods, but has better performance because
+        /// the value being formatted is not boxed.
+        /// <para/>
+        /// The capacity of this instance is adjusted as needed.
+        /// <para/>
+        /// <b>Notes to Callers</b>
+        /// <para/>
+        /// When you instantiate an <see cref="SynchronizedTextBuilder"/> object by calling <see cref="SynchronizedTextBuilder(int, int)"/>,
+        /// both the length and the capacity of the <see cref="SynchronizedTextBuilder"/> instance can grow beyond
+        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
+        /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
+        /// 
+        /// </remarks>
+        [CLSCompliant(false)]
+        public SynchronizedTextBuilder Append(ulong value, string? format = null, IFormatProvider? provider = null)
+        {
+            lock (syncRoot)
+            {
+                buffer.Append(value, format, provider);
+                return this;
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// Inserts the string representation of a specified 8-bit signed integer to this instance
+        /// with the specified numeric format and culture-specific format information.
+        /// <para/>
+        /// Unless otherwise specified, formatting is performed in the invariant culture, which
+        /// is similar to how the JDK formats numbers.
+        /// 
+        /// </summary>
+        /// <param name="index">
+        /// The position in this instance where insertion begins.
+        /// </param>
+        /// <param name="value">
+        /// The value to format and append.
+        /// </param>
+        /// <param name="format">
+        /// A standard or custom numeric format string.
+        /// </param>
+        /// <param name="provider">
+        /// An object that supplies culture-specific formatting information.
+        /// </param>
+        /// <returns>
+        /// A reference to this instance after the operation has completed.
+        /// </returns>
+        /// <remarks>
+        /// 
+        /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
+        /// 
+        /// </remarks>
+        [CLSCompliant(false)]
+        public SynchronizedTextBuilder Insert(int index, sbyte value, string? format = null, IFormatProvider? provider = null)
+        {
+            lock (syncRoot)
+            {
+                buffer.Insert(index, value, format, provider);
+                return this;
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// Inserts the string representation of a specified 8-bit unsigned integer to this instance
+        /// with the specified numeric format and culture-specific format information.
+        /// <para/>
+        /// Unless otherwise specified, formatting is performed in the invariant culture, which
+        /// is similar to how the JDK formats numbers.
+        /// 
+        /// </summary>
+        /// <param name="index">
+        /// The position in this instance where insertion begins.
+        /// </param>
+        /// <param name="value">
+        /// The value to format and append.
+        /// </param>
+        /// <param name="format">
+        /// A standard or custom numeric format string.
+        /// </param>
+        /// <param name="provider">
+        /// An object that supplies culture-specific formatting information.
+        /// </param>
+        /// <returns>
+        /// A reference to this instance after the operation has completed.
+        /// </returns>
+        /// <remarks>
+        /// 
+        /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
+        /// 
+        /// </remarks>
+        public SynchronizedTextBuilder Insert(int index, byte value, string? format = null, IFormatProvider? provider = null)
+        {
+            lock (syncRoot)
+            {
+                buffer.Insert(index, value, format, provider);
+                return this;
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// Inserts the string representation of a specified 16-bit signed integer to this instance
+        /// with the specified numeric format and culture-specific format information.
+        /// <para/>
+        /// Unless otherwise specified, formatting is performed in the invariant culture, which
+        /// is similar to how the JDK formats numbers.
+        /// 
+        /// </summary>
+        /// <param name="index">
+        /// The position in this instance where insertion begins.
+        /// </param>
+        /// <param name="value">
+        /// The value to format and append.
+        /// </param>
+        /// <param name="format">
+        /// A standard or custom numeric format string.
+        /// </param>
+        /// <param name="provider">
+        /// An object that supplies culture-specific formatting information.
+        /// </param>
+        /// <returns>
+        /// A reference to this instance after the operation has completed.
+        /// </returns>
+        /// <remarks>
+        /// 
+        /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
+        /// 
+        /// </remarks>
+        public SynchronizedTextBuilder Insert(int index, short value, string? format = null, IFormatProvider? provider = null)
+        {
+            lock (syncRoot)
+            {
+                buffer.Insert(index, value, format, provider);
+                return this;
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// Inserts the string representation of a specified 32-bit signed integer to this instance
+        /// with the specified numeric format and culture-specific format information.
+        /// <para/>
+        /// Unless otherwise specified, formatting is performed in the invariant culture, which
+        /// is similar to how the JDK formats numbers.
+        /// 
+        /// </summary>
+        /// <param name="index">
+        /// The position in this instance where insertion begins.
+        /// </param>
+        /// <param name="value">
+        /// The value to format and append.
+        /// </param>
+        /// <param name="format">
+        /// A standard or custom numeric format string.
+        /// </param>
+        /// <param name="provider">
+        /// An object that supplies culture-specific formatting information.
+        /// </param>
+        /// <returns>
+        /// A reference to this instance after the operation has completed.
+        /// </returns>
+        /// <remarks>
+        /// 
+        /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
+        /// 
+        /// </remarks>
+        public SynchronizedTextBuilder Insert(int index, int value, string? format = null, IFormatProvider? provider = null)
+        {
+            lock (syncRoot)
+            {
+                buffer.Insert(index, value, format, provider);
+                return this;
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// Inserts the string representation of a specified 64-bit signed integer to this instance
+        /// with the specified numeric format and culture-specific format information.
+        /// <para/>
+        /// Unless otherwise specified, formatting is performed in the invariant culture, which
+        /// is similar to how the JDK formats numbers.
+        /// 
+        /// </summary>
+        /// <param name="index">
+        /// The position in this instance where insertion begins.
+        /// </param>
+        /// <param name="value">
+        /// The value to format and append.
+        /// </param>
+        /// <param name="format">
+        /// A standard or custom numeric format string.
+        /// </param>
+        /// <param name="provider">
+        /// An object that supplies culture-specific formatting information.
+        /// </param>
+        /// <returns>
+        /// A reference to this instance after the operation has completed.
+        /// </returns>
+        /// <remarks>
+        /// 
+        /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
+        /// 
+        /// </remarks>
+        public SynchronizedTextBuilder Insert(int index, long value, string? format = null, IFormatProvider? provider = null)
+        {
+            lock (syncRoot)
+            {
+                buffer.Insert(index, value, format, provider);
+                return this;
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// Inserts the string representation of a specified single-precision floating-point number to this instance
+        /// with the specified numeric format and culture-specific format information.
+        /// <para/>
+        /// Unless otherwise specified, formatting is performed in the invariant culture using the "J" format, which
+        /// is similar to how the JDK formats numbers.
+        /// 
+        /// </summary>
+        /// <param name="index">
+        /// The position in this instance where insertion begins.
+        /// </param>
+        /// <param name="value">
+        /// The value to format and append.
+        /// </param>
+        /// <param name="format">
+        /// A standard or custom numeric format string.
+        /// </param>
+        /// <param name="provider">
+        /// An object that supplies culture-specific formatting information.
+        /// </param>
+        /// <returns>
+        /// A reference to this instance after the operation has completed.
+        /// </returns>
+        /// <remarks>
+        /// 
+        /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
+        /// 
+        /// </remarks>
+        public SynchronizedTextBuilder Insert(int index, float value, string? format = null, IFormatProvider? provider = null)
+        {
+            lock (syncRoot)
+            {
+                buffer.Insert(index, value, format, provider);
+                return this;
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// Inserts the string representation of a specified double-precision floating-point number to this instance
+        /// with the specified numeric format and culture-specific format information.
+        /// <para/>
+        /// Unless otherwise specified, formatting is performed in the invariant culture using the "J" format, which
+        /// is similar to how the JDK formats numbers.
+        /// 
+        /// </summary>
+        /// <param name="index">
+        /// The position in this instance where insertion begins.
+        /// </param>
+        /// <param name="value">
+        /// The value to format and append.
+        /// </param>
+        /// <param name="format">
+        /// A standard or custom numeric format string.
+        /// </param>
+        /// <param name="provider">
+        /// An object that supplies culture-specific formatting information.
+        /// </param>
+        /// <returns>
+        /// A reference to this instance after the operation has completed.
+        /// </returns>
+        /// <remarks>
+        /// 
+        /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
+        /// 
+        /// </remarks>
+        public SynchronizedTextBuilder Insert(int index, double value, string? format = null, IFormatProvider? provider = null)
+        {
+            lock (syncRoot)
+            {
+                buffer.Insert(index, value, format, provider);
+                return this;
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// Inserts the string representation of a specified 16-bit unsigned integer to this instance
+        /// with the specified numeric format and culture-specific format information.
+        /// <para/>
+        /// Unless otherwise specified, formatting is performed in the invariant culture, which
+        /// is similar to how the JDK formats numbers.
+        /// 
+        /// </summary>
+        /// <param name="index">
+        /// The position in this instance where insertion begins.
+        /// </param>
+        /// <param name="value">
+        /// The value to format and append.
+        /// </param>
+        /// <param name="format">
+        /// A standard or custom numeric format string.
+        /// </param>
+        /// <param name="provider">
+        /// An object that supplies culture-specific formatting information.
+        /// </param>
+        /// <returns>
+        /// A reference to this instance after the operation has completed.
+        /// </returns>
+        /// <remarks>
+        /// 
+        /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
+        /// 
+        /// </remarks>
+        [CLSCompliant(false)]
+        public SynchronizedTextBuilder Insert(int index, ushort value, string? format = null, IFormatProvider? provider = null)
+        {
+            lock (syncRoot)
+            {
+                buffer.Insert(index, value, format, provider);
+                return this;
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// Inserts the string representation of a specified 32-bit unsigned integer to this instance
+        /// with the specified numeric format and culture-specific format information.
+        /// <para/>
+        /// Unless otherwise specified, formatting is performed in the invariant culture, which
+        /// is similar to how the JDK formats numbers.
+        /// 
+        /// </summary>
+        /// <param name="index">
+        /// The position in this instance where insertion begins.
+        /// </param>
+        /// <param name="value">
+        /// The value to format and append.
+        /// </param>
+        /// <param name="format">
+        /// A standard or custom numeric format string.
+        /// </param>
+        /// <param name="provider">
+        /// An object that supplies culture-specific formatting information.
+        /// </param>
+        /// <returns>
+        /// A reference to this instance after the operation has completed.
+        /// </returns>
+        /// <remarks>
+        /// 
+        /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
+        /// 
+        /// </remarks>
+        [CLSCompliant(false)]
+        public SynchronizedTextBuilder Insert(int index, uint value, string? format = null, IFormatProvider? provider = null)
+        {
+            lock (syncRoot)
+            {
+                buffer.Insert(index, value, format, provider);
+                return this;
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// Inserts the string representation of a specified 64-bit unsigned integer to this instance
+        /// with the specified numeric format and culture-specific format information.
+        /// <para/>
+        /// Unless otherwise specified, formatting is performed in the invariant culture, which
+        /// is similar to how the JDK formats numbers.
+        /// 
+        /// </summary>
+        /// <param name="index">
+        /// The position in this instance where insertion begins.
+        /// </param>
+        /// <param name="value">
+        /// The value to format and append.
+        /// </param>
+        /// <param name="format">
+        /// A standard or custom numeric format string.
+        /// </param>
+        /// <param name="provider">
+        /// An object that supplies culture-specific formatting information.
+        /// </param>
+        /// <returns>
+        /// A reference to this instance after the operation has completed.
+        /// </returns>
+        /// <remarks>
+        /// 
+        /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
+        /// 
+        /// </remarks>
+        [CLSCompliant(false)]
+        public SynchronizedTextBuilder Insert(int index, ulong value, string? format = null, IFormatProvider? provider = null)
+        {
+            lock (syncRoot)
+            {
+                buffer.Insert(index, value, format, provider);
+                return this;
             }
         }
 
