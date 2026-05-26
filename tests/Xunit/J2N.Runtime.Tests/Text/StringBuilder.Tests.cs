@@ -2668,13 +2668,71 @@ namespace J2N.Text.Tests
         }
 
         [Fact]
-        public void ForEach()
+        public void TextBuilder_ForEach()
         {
             // Test on a variety of lengths, at least up to the point of 9 8K chunks = 72K because this is where
             // we start using a different technique for creating the ChunkEnumerator.   200 * 500 = 100K which hits this.
             for (int i = 0; i < 200; i++)
             {
-                MutableTextBuffer inBuilder = MutableTextBufferFactory();
+                TextBuilder inBuilder = new TextBuilder();
+                for (int j = 0; j < i; j++)
+                {
+                    // Make some unique strings that are at least 500 bytes long.
+                    inBuilder.Append(j);
+                    inBuilder.Append("_abcdefghijklmnopqrstuvwxyz01234567890__Abcdefghijklmnopqrstuvwxyz01234567890__ABcdefghijklmnopqrstuvwxyz01_");
+                    inBuilder.Append("_abcdefghijklmnopqrstuvwxyz01234567890__Abcdefghijklmnopqrstuvwxyz01234567890__ABcdefghijklmnopqrstuvwxyz0123_");
+                    inBuilder.Append("_abcdefghijklmnopqrstuvwxyz01234567890__Abcdefghijklmnopqrstuvwxyz01234567890__ABcdefghijklmnopqrstuvwxyz012345_");
+                    inBuilder.Append("_abcdefghijklmnopqrstuvwxyz01234567890__Abcdefghijklmnopqrstuvwxyz01234567890__ABcdefghijklmnopqrstuvwxyz012345678_");
+                    inBuilder.Append("_abcdefghijklmnopqrstuvwxyz01234567890__Abcdefghijklmnopqrstuvwxyz01234567890__ABcdefghijklmnopqrstuvwxyz01234567890_");
+                }
+
+                // Copy the string out (not using MutableTextBuffer).
+                string outStr = "";
+                foreach (ReadOnlyMemory<char> chunk in inBuilder.GetChunks())
+                    outStr += chunk.Span.ToString();
+
+                // The strings formed by concatenating the chunks should be the same as the value in the MutableTextBuffer.
+                Assert.Equal(outStr, inBuilder.ToString());
+            }
+        }
+
+        [Fact]
+        public void PooledTextBuilder_ForEach()
+        {
+            // Test on a variety of lengths, at least up to the point of 9 8K chunks = 72K because this is where
+            // we start using a different technique for creating the ChunkEnumerator.   200 * 500 = 100K which hits this.
+            for (int i = 0; i < 200; i++)
+            {
+                PooledTextBuilder inBuilder = new PooledTextBuilder();
+                for (int j = 0; j < i; j++)
+                {
+                    // Make some unique strings that are at least 500 bytes long.
+                    inBuilder.Append(j);
+                    inBuilder.Append("_abcdefghijklmnopqrstuvwxyz01234567890__Abcdefghijklmnopqrstuvwxyz01234567890__ABcdefghijklmnopqrstuvwxyz01_");
+                    inBuilder.Append("_abcdefghijklmnopqrstuvwxyz01234567890__Abcdefghijklmnopqrstuvwxyz01234567890__ABcdefghijklmnopqrstuvwxyz0123_");
+                    inBuilder.Append("_abcdefghijklmnopqrstuvwxyz01234567890__Abcdefghijklmnopqrstuvwxyz01234567890__ABcdefghijklmnopqrstuvwxyz012345_");
+                    inBuilder.Append("_abcdefghijklmnopqrstuvwxyz01234567890__Abcdefghijklmnopqrstuvwxyz01234567890__ABcdefghijklmnopqrstuvwxyz012345678_");
+                    inBuilder.Append("_abcdefghijklmnopqrstuvwxyz01234567890__Abcdefghijklmnopqrstuvwxyz01234567890__ABcdefghijklmnopqrstuvwxyz01234567890_");
+                }
+
+                // Copy the string out (not using MutableTextBuffer).
+                string outStr = "";
+                foreach (ReadOnlyMemory<char> chunk in inBuilder.GetChunks())
+                    outStr += chunk.Span.ToString();
+
+                // The strings formed by concatenating the chunks should be the same as the value in the MutableTextBuffer.
+                Assert.Equal(outStr, inBuilder.ToString());
+            }
+        }
+
+        [Fact]
+        public void SynchronizedTextBuilder_ForEach()
+        {
+            // Test on a variety of lengths, at least up to the point of 9 8K chunks = 72K because this is where
+            // we start using a different technique for creating the ChunkEnumerator.   200 * 500 = 100K which hits this.
+            for (int i = 0; i < 200; i++)
+            {
+                SynchronizedTextBuilder inBuilder = new SynchronizedTextBuilder();
                 for (int j = 0; j < i; j++)
                 {
                     // Make some unique strings that are at least 500 bytes long.
