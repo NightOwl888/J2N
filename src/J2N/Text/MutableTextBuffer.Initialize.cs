@@ -20,7 +20,7 @@ namespace J2N.Text
         public MutableTextBuffer Initialize()
         {
             m_MaxCapacity = int.MaxValue;
-            m_Chars = new char[DefaultCapacity];
+            m_Chars = allocator.Allocate(DefaultCapacity);
             return this;
         }
 
@@ -127,13 +127,7 @@ namespace J2N.Text
             if (capacity < minimumCapacity)
                 capacity = minimumCapacity;
 
-            // J2N: We assume that subclasses will not expose or call this constructor if they want
-            // full control over how the buffer is allocated.
-#if FEATURE_GC_ALLOCATEUNINITIALIZEDARRAY
-            m_Chars = GC.AllocateUninitializedArray<char>(capacity); // J2N NOTE: If we decide to expose the actual array, we must use new char[] here.
-#else
-            m_Chars = new char[capacity];
-#endif
+            m_Chars = allocator.Allocate(capacity);
             m_Position = length;
 
             value.AsSpan(startIndex, length).CopyTo(m_Chars);
@@ -189,13 +183,7 @@ namespace J2N.Text
             }
 
             m_MaxCapacity = maxCapacity;
-            // J2N: We assume that subclasses will not expose or call this method if they want
-            // full control over how the buffer is allocated.
-#if FEATURE_GC_ALLOCATEUNINITIALIZEDARRAY
-            m_Chars = GC.AllocateUninitializedArray<char>(capacity); // J2N NOTE: If we decide to expose the actual array, we must use new char[] here.
-#else
-            m_Chars = new char[capacity];
-#endif
+            m_Chars = allocator.Allocate(capacity);
             return this;
         }
 
@@ -241,14 +229,7 @@ namespace J2N.Text
             if (capacity < minimumCapacity)
                 capacity = minimumCapacity;
 
-
-            // J2N: We assume that subclasses will not expose or call this method if they want
-            // full control over how the buffer is allocated.
-#if FEATURE_GC_ALLOCATEUNINITIALIZEDARRAY
-            m_Chars = GC.AllocateUninitializedArray<char>(capacity); // J2N NOTE: If we decide to expose the actual array, we must use new char[] here.
-#else
-            m_Chars = new char[capacity];
-#endif
+            m_Chars = allocator.Allocate(capacity);
             m_Position = length;
 
             value.CopyTo(m_Chars);
@@ -276,20 +257,14 @@ namespace J2N.Text
             if (value is null)
             {
                 m_Position = 0;
-                m_Chars = new char[DefaultCapacity];
+                m_Chars = allocator.Allocate(DefaultCapacity);
                 return this;
             }
 
             int length = value.Length;
             int capacity = length + DefaultCapacity;
 
-            // J2N: We assume that subclasses will not expose or call this constructor if they want
-            // full control over how the buffer is allocated.
-#if FEATURE_GC_ALLOCATEUNINITIALIZEDARRAY
-            m_Chars = GC.AllocateUninitializedArray<char>(capacity); // J2N NOTE: If we decide to expose the actual array, we must use new char[] here.
-#else
-            m_Chars = new char[capacity];
-#endif
+            m_Chars = allocator.Allocate(capacity);
             value.CopyTo(0, m_Chars, 0, length);
             m_Position = length;
             return this;
@@ -365,13 +340,7 @@ namespace J2N.Text
             if (capacity < minimumCapacity)
                 capacity = minimumCapacity;
 
-            // J2N: We assume that subclasses will not expose or call this constructor if they want
-            // full control over how the buffer is allocated.
-#if FEATURE_GC_ALLOCATEUNINITIALIZEDARRAY
-            m_Chars = GC.AllocateUninitializedArray<char>(capacity); // J2N NOTE: If we decide to expose the actual array, we must use new char[] here.
-#else
-            m_Chars = new char[capacity];
-#endif
+            m_Chars = allocator.Allocate(capacity);
 
             if (value is null)
             {
@@ -400,13 +369,7 @@ namespace J2N.Text
             int length = value?.Length ?? 0;
             int capacity = length + DefaultCapacity;
 
-            // J2N: We assume that subclasses will not expose or call this constructor if they want
-            // full control over how the buffer is allocated.
-#if FEATURE_GC_ALLOCATEUNINITIALIZEDARRAY
-            m_Chars = GC.AllocateUninitializedArray<char>(capacity); // J2N NOTE: If we decide to expose the actual array, we must use new char[] here.
-#else
-            m_Chars = new char[capacity];
-#endif
+            m_Chars = allocator.Allocate(capacity);
 
             if (value is null || !value.HasValue)
             {
