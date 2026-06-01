@@ -1,4 +1,5 @@
 ﻿using J2N.CodeGeneration;
+using J2N.Collections;
 using System;
 using System.Text;
 
@@ -19,7 +20,7 @@ namespace J2N.Text
         [CodeGenerationConstructor]
         public MutableTextBuffer Initialize()
         {
-            m_MaxCapacity = int.MaxValue;
+            m_MaxCapacity = Arrays.MaxArrayLength;
             m_Chars = allocator.Allocate(DefaultCapacity);
             return this;
         }
@@ -40,7 +41,7 @@ namespace J2N.Text
         [CodeGenerationIgnore]
         [CodeGenerationConstructor]
         public MutableTextBuffer Initialize(int capacity)
-            => Initialize(capacity, int.MaxValue);
+            => Initialize(capacity, Arrays.MaxArrayLength);
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MutableTextBuffer"/> class using the specified string.
@@ -121,7 +122,7 @@ namespace J2N.Text
                 ThrowHelper.ThrowArgumentOutOfRange_ArgumentOutOfRange_IndexString(length, ExceptionArgument.length);
             }
 
-            m_MaxCapacity = int.MaxValue;
+            m_MaxCapacity = Arrays.MaxArrayLength;
 
             int minimumCapacity = length + DefaultCapacity;
             if (capacity < minimumCapacity)
@@ -223,7 +224,7 @@ namespace J2N.Text
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(capacity, ExceptionArgument.capacity);
 
             int length = value.Length;
-            m_MaxCapacity = int.MaxValue;
+            m_MaxCapacity = Arrays.MaxArrayLength;
 
             int minimumCapacity = length + DefaultCapacity;
             if (capacity < minimumCapacity)
@@ -252,7 +253,7 @@ namespace J2N.Text
         [CodeGenerationConstructor]
         public MutableTextBuffer Initialize(StringBuilder? value)
         {
-            m_MaxCapacity = int.MaxValue;
+            m_MaxCapacity = Arrays.MaxArrayLength;
 
             if (value is null)
             {
@@ -329,7 +330,7 @@ namespace J2N.Text
             if (startIndex < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(startIndex, ExceptionArgument.startIndex);
 
-            m_MaxCapacity = int.MaxValue;
+            m_MaxCapacity = Arrays.MaxArrayLength;
 
             if (startIndex > value?.Length - length)
             {
@@ -365,7 +366,7 @@ namespace J2N.Text
         [CodeGenerationConstructor]
         public MutableTextBuffer Initialize(ICharSequence? value) // Coverage for the JDK // J2N TODO: Add overloads to slice the ICharsequence and set capacity?
         {
-            m_MaxCapacity = int.MaxValue;
+            m_MaxCapacity = Arrays.MaxArrayLength;
             int length = value?.Length ?? 0;
             int capacity = length + DefaultCapacity;
 
@@ -412,6 +413,6 @@ namespace J2N.Text
             return this;
         }
 
-        #endregion J2N Constructors
+#endregion J2N Constructors
     }
 }

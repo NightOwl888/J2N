@@ -90,7 +90,7 @@ namespace J2N.Text
             this.allocator = allocator;
             // J2N: We rely on Initialize() to properly set up the state, but it is considered
             // an optional operation.
-            m_MaxCapacity = int.MaxValue;
+            m_MaxCapacity = Arrays.MaxArrayLength;
             m_Chars = Arrays.Empty<char>();
         }
 
@@ -218,9 +218,9 @@ namespace J2N.Text
         /// </summary>
         /// <value>The maximum number of characters this instance can hold.</value>
         /// <remarks>
-        /// The maximum capacity for this implementation is <see cref="int.MaxValue"/>.
-        /// However, this value is implementation-specific and might be different in other or
-        /// later implementations. You can explicitly set the maximum capacity of a <see cref="MutableTextBuffer"/>
+        /// The maximum capacity for this implementation is <c>Array.MaxLength</c> on .NET 6.0
+        /// or higher. On earlier versions of .NET, the maximum capacity is <c>2_146_435_071</c>.
+        /// You can explicitly set the maximum capacity of a <see cref="MutableTextBuffer"/>
         /// object by calling <see cref="Initialize(int, int)"/>.
         /// <para/>
         /// <b>Notes to Callers</b>
