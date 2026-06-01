@@ -931,9 +931,9 @@ namespace J2N.Text
 
         private void AppendCore(StringBuilder value, int startIndex, int count)
         {
-            int newLength = Length + count;
+            uint newLength = (uint)Length + (uint)count;
 
-            if ((uint)newLength > (uint)m_MaxCapacity)
+            if (newLength > (uint)m_MaxCapacity)
             {
                 ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.Capacity, ExceptionResource.ArgumentOutOfRange_Capacity);
             }
@@ -997,9 +997,9 @@ namespace J2N.Text
                 return;
             }
 
-            int newLength = Length + count;
+            uint newLength = (uint)Length + (uint)count;
 
-            if ((uint)newLength > (uint)m_MaxCapacity)
+            if (newLength > (uint)m_MaxCapacity)
             {
                 ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.Capacity, ExceptionResource.ArgumentOutOfRange_Capacity);
             }
