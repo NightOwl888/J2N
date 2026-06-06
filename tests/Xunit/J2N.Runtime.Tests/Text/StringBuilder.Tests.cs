@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text;
 using Xunit;
 //using System.Tests;
@@ -269,6 +270,28 @@ namespace J2N.Text.Tests
             Assert.Equal(expected.Length, builder.Length);
         }
 
+        //// .NET Framework and unknown platforms may have maximum object size limits that are far less than MaxArrayLength,
+        //// so this test is only reliable on .NET Core. This is a good candidate for [OuterLoop].
+        //[ConditionalFact(typeof(PlatformDetection), nameof(PlatformDetection.IsNetCore))] // J2N specific
+        //public void Ctor_ReadOnlySpan_Int_MaxArrayLength_LoadsSuccessfully()
+        //{
+        //    char[] array = new char[MaxArrayLength];
+        //    Span<char> span = array;
+        //    span.Fill('a');
+        //    MutableTextBuffer builder = MutableTextBufferFactory(span);
+        //    Assert.Equal(MaxArrayLength, builder.Length);
+        //}
+
+        [Fact] // J2N specific
+        public unsafe void Ctor_ReadOnlySpan_GreaterThanMaxArrayLength_ThrowsArgumentOutOfRangeException()
+        {
+            // We create an invalid pointer here instead of a string that is too long because the test would be very slow to run otherwise.
+            // The constructor should check the the length against MaxCapacity, so it should throw before it tries to
+            // read from the pointer.
+            char c = 'a';
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("valueCount", () => MutableTextBufferFactory(new ReadOnlySpan<char>(Unsafe.AsPointer(ref c), MaxArrayLength + 1))); // value.Length > Array.MaxLength
+        }
+
         [Theory] // J2N specific
         [InlineData("Hello", 0, 5)]
         [InlineData("Hello", 2, 3)]
@@ -286,10 +309,33 @@ namespace J2N.Text.Tests
             Assert.True(builder.Capacity >= 42);
         }
 
+        //// .NET Framework and unknown platforms may have maximum object size limits that are far less than MaxArrayLength,
+        //// so this test is only reliable on .NET Core. This is a good candidate for [OuterLoop].
+        //[ConditionalFact(typeof(PlatformDetection), nameof(PlatformDetection.IsNetCore))] // J2N specific
+        //public void Ctor_ReadOnlySpan_Int_MaxArrayLength_LoadsSuccessfully()
+        //{
+        //    char[] array = new char[MaxArrayLength];
+        //    Span<char> span = array;
+        //    span.Fill('a');
+        //    MutableTextBuffer builder = MutableTextBufferFactory(span, 0);
+        //    Assert.Equal(MaxArrayLength, builder.Length);
+        //}
+
+        [Fact] // J2N specific
+        public unsafe void Ctor_ReadOnlySpan_Int_GreaterThanMaxArrayLength_ThrowsArgumentOutOfRangeException()
+        {
+            // We create an invalid pointer here instead of a string that is too long because the test would be very slow to run otherwise.
+            // The constructor should check the the length against MaxCapacity, so it should throw before it tries to
+            // read from the pointer.
+            char c = 'a';
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("valueCount", () => MutableTextBufferFactory(new ReadOnlySpan<char>(Unsafe.AsPointer(ref c), MaxArrayLength + 1), 0)); // value.Length > Array.MaxLength
+        }
+
         [Fact] // J2N specific
         public void Ctor_ReadOnlySpan_Int_Invalid()
         {
             AssertExtensions.Throws<ArgumentOutOfRangeException>("capacity", () => MutableTextBufferFactory("foo".AsSpan(0, 0), -1)); // Capacity < 0
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("capacity", () => MutableTextBufferFactory("foo".AsSpan(0, 0), MaxArrayLength + 1)); // Capacity > Array.MaxLength
         }
 
         [Theory] // J2N specific

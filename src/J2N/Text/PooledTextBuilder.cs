@@ -192,6 +192,8 @@ namespace J2N.Text
         /// Initializes a new instance of the <see cref="PooledTextBuilder"/> with the specified sequence of characters.
         /// </summary>
         /// <param name="value">The characters used to initialize this instance.</param>
+        /// <exception cref="ArgumentOutOfRangeException">The length of <paramref name="value"/> is greater than the
+        /// platform-specific maximum array capacity.</exception>
         /// <remarks>The characters from the span are copied to the heap memory of this instance.</remarks>
         public PooledTextBuilder(ReadOnlySpan<char> value)
         {
@@ -203,7 +205,13 @@ namespace J2N.Text
         /// </summary>
         /// <param name="value">The characters used to initialize this instance.</param>
         /// <param name="capacity">The suggested starting size of the <see cref="PooledTextBuilder"/>.</param>
-        /// <exception cref="ArgumentOutOfRangeException"><paramref name="capacity"/> is less than zero.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="capacity"/> is less than zero or greater than the platform-specific maximum array capacity.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// The length of <paramref name="value"/> is greater than the platform-specific maximum array capacity.
+        /// </exception>
         /// <remarks>The <paramref name="capacity"/> parameter defines the maximum number of characters that can be
         /// stored in the memory allocated by the current instance. Its value is assigned to the <see cref="Capacity"/>
         /// property. If the number of characters to be stored in the current instance exceeds this <paramref name="capacity"/>

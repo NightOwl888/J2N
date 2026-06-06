@@ -196,6 +196,8 @@ namespace J2N.Text
         /// Initializes a new instance of the <see cref="MutableTextBuffer"/> with the specified sequence of characters.
         /// </summary>
         /// <param name="value">The characters used to initialize this instance.</param>
+        /// <exception cref="ArgumentOutOfRangeException">The length of <paramref name="value"/> is greater than the
+        /// platform-specific maximum array capacity.</exception>
         /// <remarks>The characters from the span are copied to the heap memory of this instance.</remarks>
         [CodeGenerationIgnore]
         [CodeGenerationConstructor]
@@ -207,7 +209,13 @@ namespace J2N.Text
         /// </summary>
         /// <param name="value">The characters used to initialize this instance.</param>
         /// <param name="capacity">The suggested starting size of the <see cref="MutableTextBuffer"/>.</param>
-        /// <exception cref="ArgumentOutOfRangeException"><paramref name="capacity"/> is less than zero.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="capacity"/> is less than zero or greater than the platform-specific maximum array capacity.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// The length of <paramref name="value"/> is greater than the platform-specific maximum array capacity.
+        /// </exception>
         /// <remarks>The <paramref name="capacity"/> parameter defines the maximum number of characters that can be
         /// stored in the memory allocated by the current instance. Its value is assigned to the <see cref="Capacity"/>
         /// property. If the number of characters to be stored in the current instance exceeds this <paramref name="capacity"/>
@@ -223,12 +231,27 @@ namespace J2N.Text
             if (capacity < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(capacity, ExceptionArgument.capacity);
 
-            int length = value.Length;
             m_MaxCapacity = Arrays.MaxArrayLength;
 
-            int minimumCapacity = length + DefaultCapacity;
+            if (capacity > m_MaxCapacity)
+                ThrowHelper.ThrowArgumentOutOfRangeException(capacity, ExceptionArgument.capacity, ExceptionResource.ArgumentOutOfRange_Capacity);
+
+            int length = value.Length;
+            uint minimumCapacity = (uint)length + DefaultCapacity;
+
+            // If the minimum capacity is greater than the maximum capacity, try again with the length.
+            // We assume the user doesn't intend to append anything if length <= MaxCapacity but this is still
+            // valid to create an instance with the whole length.
+            if (minimumCapacity > m_MaxCapacity)
+                minimumCapacity = (uint)length;
+
+            if (minimumCapacity > m_MaxCapacity)
+            {
+                ThrowHelper.ThrowArgumentOutOfRangeException(length, ExceptionArgument.valueCount, ExceptionResource.ArgumentOutOfRange_LengthGreaterThanCapacity);
+            }
+
             if (capacity < minimumCapacity)
-                capacity = minimumCapacity;
+                capacity = (int)minimumCapacity;
 
             m_Chars = allocator.Allocate(capacity);
             m_Position = length;
