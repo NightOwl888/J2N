@@ -253,6 +253,8 @@ namespace J2N.Text
         {
             if (capacity < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(capacity, ExceptionArgument.capacity);
+            if (capacity > m_MaxCapacity)
+                ThrowHelper.ThrowArgumentOutOfRangeException(capacity, ExceptionArgument.capacity, ExceptionResource.ArgumentOutOfRange_Capacity);
 
             if (capacity > m_Chars.Length)
             {

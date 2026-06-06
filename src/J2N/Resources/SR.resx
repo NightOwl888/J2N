@@ -505,7 +505,8 @@
     <value>Index (zero based) must be greater than or equal to zero and less than the size of the argument list.</value>
   </data>
   <data name="ArgumentOutOfRange_LengthGreaterThanCapacity" xml:space="preserve">
-    <value>The length cannot be greater than the capacity.</value>
+    <value>Expanding the buffer by length exceeds the maximum supported capacity.</value>
+    <comment>Improved BCL message for better clarity.</comment>
   </data>
   <data name="BufferWriterAdvancedTooFar" xml:space="preserve">
     <value>Cannot advance past the end of the buffer, which has a size of {0}.</value>

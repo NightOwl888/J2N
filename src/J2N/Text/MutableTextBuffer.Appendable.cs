@@ -62,7 +62,7 @@ namespace J2N.Text
                 int newLength = pos + count;
                 if (newLength > m_MaxCapacity || newLength < count)
                 {
-                    ThrowHelper.ThrowArgumentOutOfRangeException(count, ExceptionArgument.count, ExceptionResource.ArgumentOutOfRange_LengthGreaterThanCapacity);
+                    ThrowHelper.ThrowArgumentOutOfRangeException(count, ExceptionArgument.valueCount, ExceptionResource.ArgumentOutOfRange_LengthGreaterThanCapacity);
                 }
 
                 Grow(count);

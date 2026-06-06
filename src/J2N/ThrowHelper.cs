@@ -1074,6 +1074,8 @@ namespace J2N
                     return "charCount";
                 case ExceptionArgument.charSequence: // J2N TODO: Normalize to characterSequence
                     return "charSequence";
+                case ExceptionArgument.codePoint:
+                    return "codePoint";
                 case ExceptionArgument.codePoints:
                     return "codePoints";
                 case ExceptionArgument.collection:
@@ -1671,6 +1673,7 @@ namespace J2N
         characterSequence,
         charCount,
         charSequence,
+        codePoint,
         codePoints,
         collection,
         comments,

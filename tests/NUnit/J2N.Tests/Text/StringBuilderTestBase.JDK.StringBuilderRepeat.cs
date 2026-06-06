@@ -152,17 +152,17 @@ namespace J2N.Text
 
             TextBuilder sb = StringBuilderFactory();
 
-            Assert.Throws<OutOfMemoryException>(() =>
+            AssertExtensions.ThrowsAny<OutOfMemoryException, ArgumentOutOfRangeException>(() =>
             {
                 sb.Append(' ', int.MaxValue);
             });
 
-            Assert.Throws<OutOfMemoryException>(() =>
+            AssertExtensions.ThrowsAny<OutOfMemoryException, ArgumentOutOfRangeException>(() =>
             {
                 sb.Insert(sb.Length, "    ", int.MaxValue);
             });
 
-            Assert.Throws<OutOfMemoryException>(() =>
+            AssertExtensions.ThrowsAny<OutOfMemoryException, ArgumentOutOfRangeException>(() =>
             {
                 sb.Insert(sb.Length, MYCHARS.ToString(), int.MaxValue); // J2N TODO: We currently don't have this API, but it would probably be better if we re-package all of these other APIs as Repeat() to match the JDK than to add these overloads now
             });

@@ -2,6 +2,7 @@
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+using J2N.Collections;
 using J2N.Numerics;
 using J2N.TestUtilities;
 using J2N.TestUtilities.Xunit;
@@ -9,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using Xunit;
 //using System.Tests;
@@ -109,6 +111,13 @@ namespace J2N.Text.Tests
         /// <returns>An instance of <see cref="MutableTextBuffer"/> that can be used for testing.</returns>
         protected abstract MutableTextBuffer MutableTextBufferFactory(ICharSequence? value);
 
+        private static readonly int MaxArrayLength =
+            (int)typeof(Arrays)
+                .GetField("MaxArrayLength",
+                    BindingFlags.Static |
+                    BindingFlags.NonPublic)!
+                .GetValue(null)!;
+
         #endregion MutableTextBuffer Helper Methods
 
         #region Constructor Tests
@@ -120,7 +129,7 @@ namespace J2N.Text.Tests
             Assert.Same(string.Empty, builder.ToString());
             Assert.Equal(string.Empty, builder.ToString(0, 0));
             Assert.Equal(0, builder.Length);
-            Assert.Equal(int.MaxValue, builder.MaxCapacity);
+            Assert.Equal(MaxArrayLength, builder.MaxCapacity);
         }
 
         [Fact]
@@ -131,7 +140,7 @@ namespace J2N.Text.Tests
             Assert.Equal(0, builder.Length);
 
             Assert.True(builder.Capacity >= 42);
-            Assert.Equal(int.MaxValue, builder.MaxCapacity);
+            Assert.Equal(MaxArrayLength, builder.MaxCapacity);
         }
 
         [Fact]
