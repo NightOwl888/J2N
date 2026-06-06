@@ -118,6 +118,29 @@ namespace J2N.Text.Tests
                     BindingFlags.NonPublic)!
                 .GetValue(null)!;
 
+        private static StringBuilder CreateOversizeStringBuilder()
+        {
+            const int ChunkSize = 256 * 1024; // safe for .NET Framework StringBuilder
+
+            int targetLength = MaxArrayLength + 1;
+
+            var sb = new StringBuilder();
+
+            while (targetLength >= ChunkSize)
+            {
+                sb.Append('a', ChunkSize);
+                targetLength -= ChunkSize;
+            }
+
+            if (targetLength > 0)
+            {
+                sb.Append('a', (int)targetLength);
+            }
+
+            Assert.Equal(MaxArrayLength + 1, sb.Length);
+            return sb;
+        }
+
         #endregion MutableTextBuffer Helper Methods
 
         #region Constructor Tests
@@ -283,6 +306,14 @@ namespace J2N.Text.Tests
             Assert.Equal(expected.Length, builder.Length);
         }
 
+        //// This test works on .NET Framework, but it is very slow. This is a good candidate for [OuterLoop]
+        //[ConditionalFact(typeof(PlatformDetection), nameof(PlatformDetection.IsNetCore))] // J2N specific
+        //public void Ctor_StringBuilder_GreaterThanMaxArrayLength_ThrowsArgumentOutOfRangeException()
+        //{
+        //    StringBuilder sb = CreateOversizeStringBuilder();
+        //    AssertExtensions.Throws<ArgumentOutOfRangeException>("valueCount", () => MutableTextBufferFactory(sb)); // value.Length > Array.MaxLength
+        //}
+
         [Theory] // J2N specific
         [InlineData("Hello")]
         [InlineData("")]
@@ -305,6 +336,14 @@ namespace J2N.Text.Tests
             AssertExtensions.Throws<ArgumentOutOfRangeException>("capacity", () => MutableTextBufferFactory(new StringBuilder(""), -1)); // Capacity < 0
         }
 
+        //// This test works on .NET Framework, but it is very slow. This is a good candidate for [OuterLoop]
+        //[ConditionalFact(typeof(PlatformDetection), nameof(PlatformDetection.IsNetCore))] // J2N specific
+        //public void Ctor_StringBuilder_Int_GreaterThanMaxArrayLength_ThrowsArgumentOutOfRangeException()
+        //{
+        //    StringBuilder sb = CreateOversizeStringBuilder();
+        //    AssertExtensions.Throws<ArgumentOutOfRangeException>("length", () => MutableTextBufferFactory(sb, 0)); // value.Length > Array.MaxLength
+        //}
+
         [Theory] // J2N specific
         [InlineData("Hello", 0, 5)]
         [InlineData("Hello", 2, 3)]
@@ -323,13 +362,32 @@ namespace J2N.Text.Tests
             Assert.True(builder.Capacity >= 42);
         }
 
+        //// .NET Framework and unknown platforms may have maximum object size limits that are far less than MaxArrayLength,
+        //// so this test is only reliable on .NET Core.
+        //[ConditionalFact(typeof(PlatformDetection), nameof(PlatformDetection.IsNetCore))] // J2N specific
+        //public void Ctor_StringBuilder_Int_Int_Int_MaxArrayLength_LoadsSuccessfully()
+        //{
+        //    var sb = CreateOversizeStringBuilder();
+        //    MutableTextBuffer builder = MutableTextBufferFactory(sb, 0, MaxArrayLength, 0);
+        //    Assert.Equal(MaxArrayLength, builder.Length);
+        //}
+
+        //// This test works on .NET Framework, but it is very slow. This is a good candidate for [OuterLoop]
+        //[ConditionalFact(typeof(PlatformDetection), nameof(PlatformDetection.IsNetCore))] // J2N specific
+        //public void Ctor_StringBuilder_Int_Int_Int_GreaterThanMaxArrayLength_ThrowsArgumentOutOfRangeException()
+        //{
+        //    StringBuilder sb = CreateOversizeStringBuilder();
+        //    AssertExtensions.Throws<ArgumentOutOfRangeException>("length", () => MutableTextBufferFactory(sb, 0, MaxArrayLength + 1, 0)); // length > Array.MaxLength
+        //}
+
         [Fact] // J2N specific
         public void Ctor_StringBuilder_Int_Int_Int_Invalid()
         {
             AssertExtensions.Throws<ArgumentOutOfRangeException>("startIndex", () => MutableTextBufferFactory(new StringBuilder("foo"), -1, 0, 0)); // Start index < 0
             AssertExtensions.Throws<ArgumentOutOfRangeException>("length", () => MutableTextBufferFactory(new StringBuilder("foo"), 0, -1, 0)); // Length < 0
             AssertExtensions.Throws<ArgumentOutOfRangeException>("capacity", () => MutableTextBufferFactory(new StringBuilder("foo"), 0, 0, -1)); // Capacity < 0
-
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("capacity", () => MutableTextBufferFactory(new StringBuilder("foo"), 0, 0, MaxArrayLength + 1)); // Capacity > Array.MaxLength
+            
             AssertExtensions.Throws<ArgumentOutOfRangeException>("length", () => MutableTextBufferFactory(new StringBuilder("foo"), 4, 0, 0)); // Start index + length > builder.Length
             AssertExtensions.Throws<ArgumentOutOfRangeException>("length", () => MutableTextBufferFactory(new StringBuilder("foo"), 3, 1, 0)); // Start index + length > builder.Length
         }

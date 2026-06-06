@@ -244,10 +244,10 @@ namespace J2N.Text
         /// <param name="value">The string used to initialize the value of the instance. If <paramref name="value"/>
         /// is <c>null</c>, the new <see cref="MutableTextBuffer"/> will contain the empty string (that is, it
         /// contains <see cref="string.Empty"/>).</param>
+        /// <exception cref="ArgumentOutOfRangeException">The length of <paramref name="value"/> is greater than the
+        /// platform-specific maximum array capacity.</exception>
         /// <remarks>If <paramref name="value"/> is <c>null</c>, the new <see cref="MutableTextBuffer"/> will
         /// contain the empty string (that is, it contains <see cref="string.Empty"/>).
-        /// <para/>
-        /// If value is non-<c>null</c>, <see cref="Capacity"/> is set using the <see cref="StringBuilder.Capacity"/>.
         /// </remarks>
         [CodeGenerationIgnore]
         [CodeGenerationConstructor]
@@ -263,9 +263,20 @@ namespace J2N.Text
             }
 
             int length = value.Length;
-            int capacity = length + DefaultCapacity;
+            uint minimumCapacity = (uint)length + DefaultCapacity;
 
-            m_Chars = allocator.Allocate(capacity);
+            // If the minimum capacity is greater than the maximum capacity, try again with the length.
+            // We assume the user doesn't intend to append anything if length <= MaxCapacity but this is still
+            // valid to create an instance with the whole length.
+            if (minimumCapacity > m_MaxCapacity)
+                minimumCapacity = (uint)length;
+
+            if (minimumCapacity > m_MaxCapacity)
+            {
+                ThrowHelper.ThrowArgumentOutOfRangeException(length, ExceptionArgument.valueCount, ExceptionResource.ArgumentOutOfRange_LengthGreaterThanCapacity);
+            }
+
+            m_Chars = allocator.Allocate((int)minimumCapacity);
             value.CopyTo(0, m_Chars, 0, length);
             m_Position = length;
             return this;
@@ -279,7 +290,9 @@ namespace J2N.Text
         /// If <paramref name="value"/>is <c>null</c>, the new <see cref="MutableTextBuffer"/> will contain
         /// the empty string (that is, it contains <see cref="string.Empty"/>).</param>
         /// <param name="capacity">The suggested starting size of the <see cref="MutableTextBuffer"/>.</param>
-        /// <exception cref="ArgumentOutOfRangeException"><paramref name="capacity"/> is less than zero.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="capacity"/> is less than zero or greater than the platform-specific maximum array capacity.
+        /// </exception>
         /// <remarks>The <paramref name="capacity"/> parameter defines the maximum number of characters that can be
         /// stored in the memory allocated by the current instance. Its value is assigned to the <see cref="Capacity"/>
         /// property. If the number of characters to be stored in the current instance exceeds this <paramref name="capacity"/>
@@ -304,7 +317,7 @@ namespace J2N.Text
         /// <param name="length">The number of characters in the substring.</param>
         /// <param name="capacity">The suggested starting size of the <see cref="MutableTextBuffer"/>.</param>
         /// <exception cref="ArgumentOutOfRangeException">
-        /// <paramref name="capacity"/> is less than zero.
+        /// <paramref name="capacity"/> is less than zero or greater than the platform-specific maximum array capacity.
         /// <para/>
         /// -or-
         /// <para/>
@@ -332,14 +345,29 @@ namespace J2N.Text
 
             m_MaxCapacity = Arrays.MaxArrayLength;
 
+            if (capacity > m_MaxCapacity)
+                ThrowHelper.ThrowArgumentOutOfRangeException(capacity, ExceptionArgument.capacity, ExceptionResource.ArgumentOutOfRange_Capacity);
+
             if (startIndex > value?.Length - length)
             {
                 ThrowHelper.ThrowArgumentOutOfRange_IndexLengthString(startIndex, length);
             }
 
-            int minimumCapacity = length + DefaultCapacity;
-            if (capacity < minimumCapacity)
-                capacity = minimumCapacity;
+            uint minimumCapacity = (uint)length + DefaultCapacity;
+
+            // If the minimum capacity is greater than the maximum capacity, try again with the length.
+            // We assume the user doesn't intend to append anything if length <= MaxCapacity but this is still
+            // valid to create an instance with the whole length.
+            if (minimumCapacity > m_MaxCapacity)
+                minimumCapacity = (uint)length;
+
+            if (minimumCapacity > m_MaxCapacity)
+            {
+                ThrowHelper.ThrowArgumentOutOfRangeException(length, ExceptionArgument.length, ExceptionResource.ArgumentOutOfRange_LengthGreaterThanCapacity); // J2N TODO: Tests
+            }
+
+            if ((uint)capacity < minimumCapacity)
+                capacity = (int)minimumCapacity;
 
             m_Chars = allocator.Allocate(capacity);
 

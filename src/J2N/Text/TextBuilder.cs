@@ -221,8 +221,6 @@ namespace J2N.Text
         /// contains <see cref="string.Empty"/>).</param>
         /// <remarks>If <paramref name="value"/> is <c>null</c>, the new <see cref="TextBuilder"/> will
         /// contain the empty string (that is, it contains <see cref="string.Empty"/>).
-        /// <para/>
-        /// If value is non-<c>null</c>, <see cref="Capacity"/> is set using the <see cref="StringBuilder.Capacity"/>.
         /// </remarks>
         public TextBuilder(StringBuilder? value)
         {
@@ -237,7 +235,9 @@ namespace J2N.Text
         /// If <paramref name="value"/>is <c>null</c>, the new <see cref="TextBuilder"/> will contain
         /// the empty string (that is, it contains <see cref="string.Empty"/>).</param>
         /// <param name="capacity">The suggested starting size of the <see cref="TextBuilder"/>.</param>
-        /// <exception cref="ArgumentOutOfRangeException"><paramref name="capacity"/> is less than zero.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="capacity"/> is less than zero or greater than the platform-specific maximum array capacity.
+        /// </exception>
         /// <remarks>The <paramref name="capacity"/> parameter defines the maximum number of characters that can be
         /// stored in the memory allocated by the current instance. Its value is assigned to the <see cref="Capacity"/>
         /// property. If the number of characters to be stored in the current instance exceeds this <paramref name="capacity"/>
@@ -262,7 +262,7 @@ namespace J2N.Text
         /// <param name="length">The number of characters in the substring.</param>
         /// <param name="capacity">The suggested starting size of the <see cref="TextBuilder"/>.</param>
         /// <exception cref="ArgumentOutOfRangeException">
-        /// <paramref name="capacity"/> is less than zero.
+        /// <paramref name="capacity"/> is less than zero or greater than the platform-specific maximum array capacity.
         /// <para/>
         /// -or-
         /// <para/>
