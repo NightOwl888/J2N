@@ -207,6 +207,20 @@ namespace J2N.Text.Tests
             Assert.Equal(expected.Length, builder.Length);
         }
 
+        //// This is a good candidate for [OuterLoop].
+        //[Fact] // J2N specific
+        //public void Ctor_String_LessThan2GBCharLength_LoadsSuccessfully()
+        //{
+        //    const int TwoGiBChars = 1_073_741_824;
+        //    int maxLength = TwoGiBChars - 64;
+
+        //    char[] array = new char[maxLength];
+        //    Span<char> span = array;
+        //    span.Fill('a');
+        //    MutableTextBuffer builder = MutableTextBufferFactory(span.ToString());
+        //    Assert.Equal(maxLength, builder.Length);
+        //}
+
         [Theory]
         [InlineData("Hello")]
         [InlineData("")]
@@ -222,10 +236,25 @@ namespace J2N.Text.Tests
             Assert.True(builder.Capacity >= 42);
         }
 
-        [Fact]
-        public void Ctor_String_Int_NegativeCapacity_ThrowsArgumentOutOfRangeException()
+        //// This is a good candidate for [OuterLoop].
+        //[Fact] // J2N specific
+        //public void Ctor_String_Int_LessThan2GBCharLength_LoadsSuccessfully()
+        //{
+        //    const int TwoGiBChars = 1_073_741_824;
+        //    int maxLength = TwoGiBChars - 64;
+
+        //    char[] array = new char[maxLength];
+        //    Span<char> span = array;
+        //    span.Fill('a');
+        //    MutableTextBuffer builder = MutableTextBufferFactory(span.ToString(), 0);
+        //    Assert.Equal(maxLength, builder.Length);
+        //}
+
+        [Fact] // J2N specific - was Ctor_String_Int_NegativeCapacity_ThrowsArgumentOutOfRangeException()
+        public void Ctor_String_Int_Invalid()
         {
             AssertExtensions.Throws<ArgumentOutOfRangeException>("capacity", () => MutableTextBufferFactory("", -1)); // Capacity < 0
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("capacity", () => MutableTextBufferFactory("foo", MaxArrayLength + 1)); // Capacity > Array.MaxLength
         }
 
         [Theory]
@@ -245,12 +274,27 @@ namespace J2N.Text.Tests
             Assert.True(builder.Capacity >= 42);
         }
 
+        //// This is a good candidate for [OuterLoop].
+        //[Fact] // J2N specific
+        //public void Ctor_String_Int_Int_Int_LessThan2GBCharLength_LoadsSuccessfully()
+        //{
+        //    const int TwoGiBChars = 1_073_741_824;
+        //    int maxLength = TwoGiBChars - 64;
+
+        //    char[] array = new char[maxLength];
+        //    Span<char> span = array;
+        //    span.Fill('a');
+        //    MutableTextBuffer builder = MutableTextBufferFactory(span.ToString(), 0, maxLength, 0);
+        //    Assert.Equal(maxLength, builder.Length);
+        //}
+
         [Fact]
         public void Ctor_String_Int_Int_Int_Invalid()
         {
             AssertExtensions.Throws<ArgumentOutOfRangeException>("startIndex", () => MutableTextBufferFactory("foo", -1, 0, 0)); // Start index < 0
             AssertExtensions.Throws<ArgumentOutOfRangeException>("length", () => MutableTextBufferFactory("foo", 0, -1, 0)); // Length < 0
             AssertExtensions.Throws<ArgumentOutOfRangeException>("capacity", () => MutableTextBufferFactory("foo", 0, 0, -1)); // Capacity < 0
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("capacity", () => MutableTextBufferFactory("foo", 0, 0, MaxArrayLength + 1)); // Capacity > Array.MaxLength
             AssertExtensions.Throws<ArgumentOutOfRangeException>("length", () => MutableTextBufferFactory("foo", 4, 0, 0)); // Start index + length > builder.Length
             AssertExtensions.Throws<ArgumentOutOfRangeException>("length", () => MutableTextBufferFactory("foo", 3, 1, 0)); // Start index + length > builder.Length
         }
