@@ -66,7 +66,9 @@ namespace J2N.Text
         /// Initializes a new instance of the <see cref="SynchronizedTextBuilder"/> class using the specified capacity.
         /// </summary>
         /// <param name="capacity">The suggested starting size of this instance.</param>
-        /// <exception cref="ArgumentOutOfRangeException"><paramref name="capacity"/> is less than zero.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="capacity"/> is less than zero or greater than the platform-specific maximum array capacity.
+        /// </exception>
         /// <remarks>The <paramref name="capacity"/> parameter defines the maximum number of characters that can be stored
         /// in the memory allocated by the current instance. Its value is assigned to the <see cref="Capacity"/> property.
         /// If the number of characters to be stored in the current instance exceeds this <paramref name="capacity"/> value,
