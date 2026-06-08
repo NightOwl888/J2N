@@ -24,7 +24,7 @@ using System.Threading;
 
 namespace J2N.Threading
 {
-    public class TestCountdownLatch : TestCase
+    public class TestCountdownLatch : JSR166TestCase
     {
         // Delay in milliseconds for waits that are expected to time out, or for
         // giving a background thread a chance to block.
@@ -52,52 +52,52 @@ namespace J2N.Threading
         }
 
         /**
-         * a latch constructed with count zero starts open: Await does not block
-         * and CountDown has no effect
+         * a latch constructed with count zero starts open: Wait does not block
+         * and Signal has no effect
          */
-        [Test]
+        [Test] // J2N specific
         public void TestConstructor_ZeroCount()
         {
             using CountdownLatch latch = new CountdownLatch(0);
-            assertEquals(0, latch.Count);
-            latch.Await(); // returns immediately, the count is already zero
-            assertTrue(latch.Await(0));
-            assertTrue(latch.Await(TimeSpan.Zero));
-            latch.CountDown(); // no-op
-            assertEquals(0, latch.Count);
+            assertEquals(0, latch.CurrentCount);
+            latch.Wait(); // returns immediately, the count is already zero
+            assertTrue(latch.Wait(0));
+            assertTrue(latch.Wait(TimeSpan.Zero));
+            latch.Signal(); // no-op
+            assertEquals(0, latch.CurrentCount);
         }
 
         /**
-         * Count returns initial count and decreases after CountDown
+         * CurrentCount returns initial count and decreases after Signal
          */
         [Test]
         public void TestCount()
         {
             using CountdownLatch latch = new CountdownLatch(2);
-            assertEquals(2, latch.Count);
-            latch.CountDown();
-            assertEquals(1, latch.Count);
+            assertEquals(2, latch.CurrentCount);
+            latch.Signal();
+            assertEquals(1, latch.CurrentCount);
         }
 
         /**
-         * CountDown decrements count when positive and has no effect when zero
+         * Signal decrements count when positive and has no effect when zero
          */
         [Test]
         public void TestCountDown()
         {
             using CountdownLatch latch = new CountdownLatch(1);
-            assertEquals(1, latch.Count);
-            latch.CountDown();
-            assertEquals(0, latch.Count);
+            assertEquals(1, latch.CurrentCount);
+            latch.Signal();
+            assertEquals(0, latch.CurrentCount);
             // Unlike CountdownEvent.Signal(), which throws InvalidOperationException
             // once the count reaches zero, counting down past zero is a no-op,
             // matching Java's CountDownLatch.countDown() semantics.
-            latch.CountDown();
-            assertEquals(0, latch.Count);
+            latch.Signal();
+            assertEquals(0, latch.CurrentCount);
         }
 
         /**
-         * Await returns after CountDown to zero, but not before
+         * Wait returns after the count reaches zero, but not before
          */
         [Test]
         public void TestAwait()
@@ -106,23 +106,31 @@ namespace J2N.Threading
             using ManualResetEventSlim started = new ManualResetEventSlim(false);
             ThreadJob t = new ThreadJob(() =>
             {
-                started.Set();
-                latch.Await();
-                assertEquals(0, latch.Count);
+                try
+                {
+                    threadAssertTrue(latch.CurrentCount > 0);
+                    started.Set();
+                    latch.Wait();
+                    threadAssertTrue(latch.CurrentCount == 0);
+                }
+                catch (ThreadInterruptedException)
+                {
+                    threadUnexpectedException();
+                }
             });
             t.Start();
             assertTrue(started.Wait(MaxWaitMilliseconds));
-            Thread.Sleep(ShortDelayMilliseconds); // give the worker a chance to block in Await()
-            assertEquals(2, latch.Count);
-            latch.CountDown();
-            assertEquals(1, latch.Count);
-            latch.CountDown();
-            assertEquals(0, latch.Count);
+            Thread.Sleep(ShortDelayMilliseconds); // give the worker a chance to block in Wait()
+            assertEquals(2, latch.CurrentCount);
+            latch.Signal();
+            assertEquals(1, latch.CurrentCount);
+            latch.Signal();
+            assertEquals(0, latch.CurrentCount);
             JoinAndAssertCompleted(t);
         }
 
         /**
-         * timed Await returns after CountDown to zero
+         * timed Wait returns after the count reaches zero
          */
         [Test]
         public void TestTimedAwait()
@@ -131,22 +139,30 @@ namespace J2N.Threading
             using ManualResetEventSlim started = new ManualResetEventSlim(false);
             ThreadJob t = new ThreadJob(() =>
             {
-                started.Set();
-                assertTrue(latch.Await(TimeSpan.FromMilliseconds(MaxWaitMilliseconds)));
+                try
+                {
+                    threadAssertTrue(latch.CurrentCount > 0);
+                    started.Set();
+                    threadAssertTrue(latch.Wait(TimeSpan.FromMilliseconds(MaxWaitMilliseconds)));
+                }
+                catch (ThreadInterruptedException)
+                {
+                    threadUnexpectedException();
+                }
             });
             t.Start();
             assertTrue(started.Wait(MaxWaitMilliseconds));
             Thread.Sleep(ShortDelayMilliseconds);
-            assertEquals(2, latch.Count);
-            latch.CountDown();
-            assertEquals(1, latch.Count);
-            latch.CountDown();
-            assertEquals(0, latch.Count);
+            assertEquals(2, latch.CurrentCount);
+            latch.Signal();
+            assertEquals(1, latch.CurrentCount);
+            latch.Signal();
+            assertEquals(0, latch.CurrentCount);
             JoinAndAssertCompleted(t);
         }
 
         /**
-         * Await throws ThreadInterruptedException if interrupted before counted down
+         * Wait throws ThreadInterruptedException if interrupted before counted down
          */
         [Test]
         public void TestAwait_InterruptedException()
@@ -157,10 +173,10 @@ namespace J2N.Threading
             {
                 try
                 {
-                    assertTrue(latch.Count > 0);
+                    threadAssertTrue(latch.CurrentCount > 0);
                     started.Set();
-                    latch.Await();
-                    fail("Should throw ThreadInterruptedException");
+                    latch.Wait();
+                    threadShouldThrow();
                 }
                 catch (ThreadInterruptedException)
                 {
@@ -170,13 +186,13 @@ namespace J2N.Threading
             t.Start();
             assertTrue(started.Wait(MaxWaitMilliseconds));
             Thread.Sleep(ShortDelayMilliseconds);
-            assertEquals(1, latch.Count);
+            assertEquals(1, latch.CurrentCount);
             t.Interrupt();
             JoinAndAssertCompleted(t);
         }
 
         /**
-         * timed Await throws ThreadInterruptedException if interrupted before counted down
+         * timed Wait throws ThreadInterruptedException if interrupted before counted down
          */
         [Test]
         public void TestTimedAwait_InterruptedException()
@@ -187,10 +203,10 @@ namespace J2N.Threading
             {
                 try
                 {
-                    assertTrue(latch.Count > 0);
+                    threadAssertTrue(latch.CurrentCount > 0);
                     started.Set();
-                    latch.Await(TimeSpan.FromMilliseconds(MaxWaitMilliseconds));
-                    fail("Should throw ThreadInterruptedException");
+                    latch.Wait(TimeSpan.FromMilliseconds(MaxWaitMilliseconds));
+                    threadShouldThrow();
                 }
                 catch (ThreadInterruptedException)
                 {
@@ -200,57 +216,71 @@ namespace J2N.Threading
             t.Start();
             assertTrue(started.Wait(MaxWaitMilliseconds));
             Thread.Sleep(ShortDelayMilliseconds);
-            assertEquals(1, latch.Count);
+            assertEquals(1, latch.CurrentCount);
             t.Interrupt();
             JoinAndAssertCompleted(t);
         }
 
         /**
-         * timed Await times out if not counted down before timeout, leaving the count unchanged
+         * timed Wait times out if not counted down before timeout, leaving the count unchanged
          */
         [Test]
         public void TestAwaitTimeout()
         {
             using CountdownLatch latch = new CountdownLatch(1);
-            assertFalse(latch.Await(TimeSpan.FromMilliseconds(ShortDelayMilliseconds)));
-            assertEquals(1, latch.Count);
+            ThreadJob t = new ThreadJob(() =>
+            {
+                try
+                {
+                    threadAssertTrue(latch.CurrentCount > 0);
+                    threadAssertFalse(latch.Wait(TimeSpan.FromMilliseconds(ShortDelayMilliseconds)));
+                    threadAssertTrue(latch.CurrentCount > 0);
+                }
+                catch (ThreadInterruptedException)
+                {
+                    threadUnexpectedException();
+                }
+            });
+            t.Start();
+            assertEquals(1, latch.CurrentCount);
+            JoinAndAssertCompleted(t);
         }
 
         /**
          * the millisecond overload observes the same timeout and completion semantics
          * as the TimeSpan overload, including zero and infinite timeouts
          */
-        [Test]
+        [Test] // J2N specific
         public void TestAwait_MillisecondsTimeout()
         {
             using CountdownLatch latch = new CountdownLatch(1);
-            assertFalse(latch.Await(0));
-            assertFalse(latch.Await(ShortDelayMilliseconds));
-            assertEquals(1, latch.Count);
-            latch.CountDown();
-            assertTrue(latch.Await(0));
-            assertTrue(latch.Await(ShortDelayMilliseconds));
-            assertTrue(latch.Await(Timeout.Infinite));
-            assertTrue(latch.Await(Timeout.InfiniteTimeSpan));
+            assertFalse(latch.Wait(0));
+            assertFalse(latch.Wait(ShortDelayMilliseconds));
+            assertEquals(1, latch.CurrentCount);
+            latch.Signal();
+            assertTrue(latch.Wait(0));
+            assertTrue(latch.Wait(ShortDelayMilliseconds));
+            assertTrue(latch.Wait(Timeout.Infinite));
+            assertTrue(latch.Wait(Timeout.InfiniteTimeSpan));
         }
 
         /**
          * timeouts that are neither non-negative nor -1 milliseconds (infinite) are rejected
          */
-        [Test]
+        [Test] // J2N specific
         public void TestAwait_OutOfRangeTimeout()
         {
             using CountdownLatch latch = new CountdownLatch(1);
-            Assert.Throws<ArgumentOutOfRangeException>(() => latch.Await(-2));
-            Assert.Throws<ArgumentOutOfRangeException>(() => latch.Await(TimeSpan.FromMilliseconds(-2)));
-            Assert.Throws<ArgumentOutOfRangeException>(() => latch.Await(TimeSpan.MaxValue));
+            Assert.Throws<ArgumentOutOfRangeException>(() => latch.Wait(-2));
+            Assert.Throws<ArgumentOutOfRangeException>(() => latch.Wait(TimeSpan.FromMilliseconds(-2)));
+            Assert.Throws<ArgumentOutOfRangeException>(() => latch.Wait(TimeSpan.MaxValue));
         }
 
         /**
-         * Await(CancellationToken) throws OperationCanceledException when the token
+         * Wait(CancellationToken) throws OperationCanceledException when the token
          * is canceled while waiting, leaving the latch closed
          */
-        [Test]
+        [Test] // J2N specific
         public void TestAwait_CancellationToken_Canceled()
         {
             using CountdownLatch latch = new CountdownLatch(1);
@@ -261,7 +291,7 @@ namespace J2N.Threading
                 try
                 {
                     started.Set();
-                    latch.Await(cts.Token);
+                    latch.Wait(cts.Token);
                     fail("Should throw OperationCanceledException");
                 }
                 catch (OperationCanceledException)
@@ -274,14 +304,14 @@ namespace J2N.Threading
             Thread.Sleep(ShortDelayMilliseconds);
             cts.Cancel();
             JoinAndAssertCompleted(t);
-            assertEquals(1, latch.Count);
+            assertEquals(1, latch.CurrentCount);
         }
 
         /**
          * the timed token overloads throw OperationCanceledException when the token
          * is canceled while waiting
          */
-        [Test]
+        [Test] // J2N specific
         public void TestTimedAwait_CancellationToken_Canceled()
         {
             using CountdownLatch latch = new CountdownLatch(1);
@@ -292,7 +322,7 @@ namespace J2N.Threading
                 try
                 {
                     started.Signal();
-                    latch.Await(TimeSpan.FromMilliseconds(MaxWaitMilliseconds), cts.Token);
+                    latch.Wait(TimeSpan.FromMilliseconds(MaxWaitMilliseconds), cts.Token);
                     fail("Should throw OperationCanceledException");
                 }
                 catch (OperationCanceledException)
@@ -305,7 +335,7 @@ namespace J2N.Threading
                 try
                 {
                     started.Signal();
-                    latch.Await(MaxWaitMilliseconds, cts.Token);
+                    latch.Wait(MaxWaitMilliseconds, cts.Token);
                     fail("Should throw OperationCanceledException");
                 }
                 catch (OperationCanceledException)
@@ -320,14 +350,14 @@ namespace J2N.Threading
             cts.Cancel();
             JoinAndAssertCompleted(timeSpanWaiter);
             JoinAndAssertCompleted(millisecondsWaiter);
-            assertEquals(1, latch.Count);
+            assertEquals(1, latch.CurrentCount);
         }
 
         /**
          * token-observing waits complete normally when the latch is counted down
          * and the token is never canceled
          */
-        [Test]
+        [Test] // J2N specific
         public void TestAwait_CancellationToken_NotCanceled()
         {
             using CountdownLatch latch = new CountdownLatch(1);
@@ -336,43 +366,43 @@ namespace J2N.Threading
             ThreadJob untimedWaiter = new ThreadJob(() =>
             {
                 started.Signal();
-                latch.Await(cts.Token); // completes normally when the count reaches zero
+                latch.Wait(cts.Token); // completes normally when the count reaches zero
             });
             ThreadJob timedWaiter = new ThreadJob(() =>
             {
                 started.Signal();
-                assertTrue(latch.Await(MaxWaitMilliseconds, cts.Token));
+                assertTrue(latch.Wait(MaxWaitMilliseconds, cts.Token));
             });
             untimedWaiter.Start();
             timedWaiter.Start();
             assertTrue(started.Wait(MaxWaitMilliseconds));
             Thread.Sleep(ShortDelayMilliseconds);
-            latch.CountDown();
+            latch.Signal();
             JoinAndAssertCompleted(untimedWaiter);
             JoinAndAssertCompleted(timedWaiter);
-            assertEquals(0, latch.Count);
+            assertEquals(0, latch.CurrentCount);
         }
 
         /**
          * an already-canceled token throws OperationCanceledException even when
          * the count is zero, matching CountdownEvent.Wait
          */
-        [Test]
+        [Test] // J2N specific
         public void TestAwait_PreCanceledToken()
         {
             using CountdownLatch latch = new CountdownLatch(0);
             using CancellationTokenSource cts = new CancellationTokenSource();
             cts.Cancel();
-            Assert.Throws<OperationCanceledException>(() => latch.Await(cts.Token));
-            Assert.Throws<OperationCanceledException>(() => latch.Await(TimeSpan.FromMilliseconds(ShortDelayMilliseconds), cts.Token));
-            Assert.Throws<OperationCanceledException>(() => latch.Await(ShortDelayMilliseconds, cts.Token));
+            Assert.Throws<OperationCanceledException>(() => latch.Wait(cts.Token));
+            Assert.Throws<OperationCanceledException>(() => latch.Wait(TimeSpan.FromMilliseconds(ShortDelayMilliseconds), cts.Token));
+            Assert.Throws<OperationCanceledException>(() => latch.Wait(ShortDelayMilliseconds, cts.Token));
         }
 
         /**
-         * Count never goes negative and never increases, even when concurrent
-         * CountDown calls race past the early-return guard
+         * CurrentCount never goes negative and never increases, even when concurrent
+         * Signal calls race past the early-return guard
          */
-        [Test]
+        [Test] // J2N specific
         public void TestCount_NeverNegative()
         {
             const int ThreadCount = 8;
@@ -389,9 +419,9 @@ namespace J2N.Threading
                     long previous = long.MaxValue;
                     for (int j = 0; j < CountDownsPerThread; j++)
                     {
-                        latch.CountDown();
-                        long current = latch.Count;
-                        // Count is clamped at zero and the internal counter is
+                        latch.Signal();
+                        long current = latch.CurrentCount;
+                        // CurrentCount is clamped at zero and the internal counter is
                         // decrement-only, so each thread must observe a
                         // non-negative, non-increasing sequence.
                         assertTrue(current >= 0);
@@ -406,15 +436,15 @@ namespace J2N.Threading
             foreach (ThreadJob thread in threads)
                 JoinAndAssertCompleted(thread);
 
-            assertEquals(0, latch.Count);
-            assertTrue(latch.Await(0));
+            assertEquals(0, latch.CurrentCount);
+            assertTrue(latch.Wait(0));
             assertTrue(latch.ToString().IndexOf("Count = 0", StringComparison.Ordinal) >= 0);
         }
 
         /**
          * all waiting threads are released together when the count reaches zero
          */
-        [Test]
+        [Test] // J2N specific
         public void TestMultipleWaiters()
         {
             const int WaiterCount = 5;
@@ -429,7 +459,7 @@ namespace J2N.Threading
                 {
                     started.Signal();
                     // bounded so a release regression fails the test instead of hanging it
-                    assertTrue(latch.Await(MaxWaitMilliseconds));
+                    assertTrue(latch.Wait(MaxWaitMilliseconds));
                     Interlocked.Increment(ref released);
                 });
             }
@@ -438,7 +468,7 @@ namespace J2N.Threading
             assertTrue(started.Wait(MaxWaitMilliseconds));
             Thread.Sleep(ShortDelayMilliseconds);
             assertEquals(0, Volatile.Read(ref released));
-            latch.CountDown();
+            latch.Signal();
             foreach (ThreadJob waiter in waiters)
                 JoinAndAssertCompleted(waiter);
             assertEquals(WaiterCount, released);
@@ -448,7 +478,7 @@ namespace J2N.Threading
          * a single waiter is released once the count is exhausted by multiple
          * threads each counting down once
          */
-        [Test]
+        [Test] // J2N specific
         public void TestManyCountersOneWaiter()
         {
             const int CounterCount = 5;
@@ -457,12 +487,12 @@ namespace J2N.Threading
             ThreadJob[] counters = new ThreadJob[CounterCount];
             for (int i = 0; i < CounterCount; i++)
             {
-                counters[i] = new ThreadJob(() => latch.CountDown());
+                counters[i] = new ThreadJob(() => latch.Signal());
             }
             foreach (ThreadJob counter in counters)
                 counter.Start();
-            assertTrue(latch.Await(TimeSpan.FromMilliseconds(MaxWaitMilliseconds)));
-            assertEquals(0, latch.Count);
+            assertTrue(latch.Wait(TimeSpan.FromMilliseconds(MaxWaitMilliseconds)));
+            assertEquals(0, latch.CurrentCount);
             foreach (ThreadJob counter in counters)
                 JoinAndAssertCompleted(counter);
         }
@@ -476,29 +506,29 @@ namespace J2N.Threading
             using CountdownLatch latch = new CountdownLatch(2);
             string s0 = latch.ToString();
             assertTrue(s0.IndexOf("Count = 2", StringComparison.Ordinal) >= 0);
-            latch.CountDown();
+            latch.Signal();
             string s1 = latch.ToString();
             assertTrue(s1.IndexOf("Count = 1", StringComparison.Ordinal) >= 0);
-            latch.CountDown();
+            latch.Signal();
             string s2 = latch.ToString();
             assertTrue(s2.IndexOf("Count = 0", StringComparison.Ordinal) >= 0);
         }
 
         /**
          * Dispose is idempotent; waiting on or counting down a disposed latch
-         * throws ObjectDisposedException, while Count remains readable
+         * throws ObjectDisposedException, while CurrentCount remains readable
          */
-        [Test]
+        [Test] // J2N specific
         public void TestDispose()
         {
             CountdownLatch latch = new CountdownLatch(1);
             latch.Dispose();
             latch.Dispose(); // double dispose is a no-op
-            Assert.Throws<ObjectDisposedException>(() => latch.Await());
-            Assert.Throws<ObjectDisposedException>(() => latch.Await(ShortDelayMilliseconds));
-            Assert.Throws<ObjectDisposedException>(() => latch.Await(TimeSpan.FromMilliseconds(ShortDelayMilliseconds)));
-            Assert.Throws<ObjectDisposedException>(() => latch.CountDown());
-            assertEquals(1, latch.Count); // Count stays readable, like CountdownEvent.CurrentCount
+            Assert.Throws<ObjectDisposedException>(() => latch.Wait());
+            Assert.Throws<ObjectDisposedException>(() => latch.Wait(ShortDelayMilliseconds));
+            Assert.Throws<ObjectDisposedException>(() => latch.Wait(TimeSpan.FromMilliseconds(ShortDelayMilliseconds)));
+            Assert.Throws<ObjectDisposedException>(() => latch.Signal());
+            assertEquals(1, latch.CurrentCount); // CurrentCount stays readable, like CountdownEvent.CurrentCount
         }
     }
 }

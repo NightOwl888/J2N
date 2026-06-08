@@ -23,6 +23,7 @@
 // Other aspects adapted from .NET's CountdownEvent: https://github.com/dotnet/runtime/blob/38496302e54e1b6fb11a998b297492f3fdfbfd0c/src/libraries/System.Threading/src/System/Threading/CountdownEvent.cs
 
 using System;
+using System.Diagnostics;
 using System.Threading;
 
 namespace J2N.Threading
@@ -32,29 +33,29 @@ namespace J2N.Threading
     /// a set of operations being performed in other threads completes.
     /// <para/>
     /// A <see cref="CountdownLatch"/> is initialized with a given <i>count</i>.
-    /// The <see cref="Await()"/> methods block until the current count reaches
-    /// zero due to invocations of the <see cref="CountDown()"/> method, after which
+    /// The <see cref="Wait()"/> methods block until the current count reaches
+    /// zero due to invocations of the <see cref="Signal()"/> method, after which
     /// all waiting threads are released and any subsequent invocations of
-    /// <see cref="Await()"/> return immediately. This is a one-shot phenomenon:
+    /// <see cref="Wait()"/> return immediately. This is a one-shot phenomenon:
     /// the count cannot be reset.
     /// <para/>
     /// A <see cref="CountdownLatch"/> is a versatile synchronization tool
     /// and can be used for a number of purposes. A <see cref="CountdownLatch"/>
     /// initialized with a count of one serves as a simple on/off latch, or gate:
-    /// all threads invoking <see cref="Await()"/> wait at the gate until it is
-    /// opened by a thread invoking <see cref="CountDown()"/>. A
+    /// all threads invoking <see cref="Wait()"/> wait at the gate until it is
+    /// opened by a thread invoking <see cref="Signal()"/>. A
     /// <see cref="CountdownLatch"/> initialized to <i>N</i> can be used to make
     /// one thread wait until <i>N</i> threads have completed some action, or
     /// some action has been completed N times.
     /// <para/>
     /// A useful property of a <see cref="CountdownLatch"/> is that it
-    /// doesn't require that threads calling <see cref="CountDown()"/> wait for
+    /// doesn't require that threads calling <see cref="Signal()"/> wait for
     /// the count to reach zero before proceeding, it simply prevents any
-    /// thread from proceeding past an <see cref="Await()"/> until all
+    /// thread from proceeding past an <see cref="Wait()"/> until all
     /// threads could pass.
     /// <para/>
     /// Usage Note: This type is similar to <see cref="CountdownEvent"/>,
-    /// but unlike <see cref="CountdownEvent.Signal()"/>, <see cref="CountDown()"/>
+    /// but unlike <see cref="CountdownEvent.Signal()"/>, <see cref="Signal()"/>
     /// can be called any number of times after the count reaches zero without
     /// throwing. This matches the semantics of Java's <c>CountDownLatch.countDown()</c>
     /// method, so Java code that counts down past zero can be ported without adding
@@ -62,8 +63,8 @@ namespace J2N.Threading
     /// </summary>
     /// <remarks>
     /// Memory consistency effects: actions in a thread prior to calling
-    /// <see cref="CountDown()"/> happen before actions following a successful
-    /// return from a corresponding <see cref="Await()"/> in another thread.
+    /// <see cref="Signal()"/> happen before actions following a successful
+    /// return from a corresponding <see cref="Wait()"/> in another thread.
     /// <para/>
     /// Unlike Java's <c>java.util.concurrent.CountDownLatch</c>, which is not
     /// <c>AutoCloseable</c>, this type implements <see cref="IDisposable"/>
@@ -73,10 +74,12 @@ namespace J2N.Threading
     /// is not thread-safe: only dispose the latch once no threads are waiting
     /// on it or counting it down.
     /// </remarks>
-    public class CountdownLatch : IDisposable
+    [DebuggerDisplay("Initial Count={InitialCount}, Current Count={CurrentCount}")]
+    public sealed class CountdownLatch : IDisposable
     {
         // The current count and ManualResetEventSlim for signaling, instead of Java's Sync class
         private volatile int _currentCount;
+        private readonly int _initialCount;
         private readonly ManualResetEventSlim _event;
         private volatile bool _disposed;
 
@@ -84,8 +87,8 @@ namespace J2N.Threading
         /// Initializes a new instance of the <see cref="CountdownLatch"/> class
         /// with the given <paramref name="count"/>.
         /// </summary>
-        /// <param name="count">The number of times <see cref="CountDown()"/> must be invoked
-        /// before threads can pass through <see cref="Await()"/>.</param>
+        /// <param name="count">The number of times <see cref="Signal()"/> must be invoked
+        /// before threads can pass through <see cref="Wait()"/>.</param>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="count"/> is negative.</exception>
         public CountdownLatch(int count)
         {
@@ -93,6 +96,7 @@ namespace J2N.Threading
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(count, ExceptionArgument.count);
 
             _currentCount = count;
+            _initialCount = count;
             _event = new ManualResetEventSlim(count == 0);
         }
 
@@ -107,23 +111,18 @@ namespace J2N.Threading
         /// dormant until one of two things happen:
         /// <list type="bullet">
         ///     <item><description>The count reaches zero due to invocations of the
-        ///         <see cref="CountDown()"/> method; or</description></item>
+        ///         <see cref="Signal()"/> method; or</description></item>
         ///     <item><description>Some other thread interrupts the current thread.</description></item>
         /// </list>
         /// <para/>
         /// If the current thread is interrupted while waiting, a
         /// <see cref="ThreadInterruptedException"/> is thrown.
         /// </summary>
-        /// <remarks>
-        /// Unlike Java's <c>await()</c>, a pending thread interrupt does not cause
-        /// this method to throw when the count has already reached zero; the
-        /// interrupt surfaces at the thread's next blocking operation.
-        /// </remarks>
         /// <exception cref="ThreadInterruptedException">The current thread is
         /// interrupted while waiting.</exception>
         /// <exception cref="ObjectDisposedException">The current instance has
         /// already been disposed.</exception>
-        public void Await()
+        public void Wait()
         {
             _event.Wait();
         }
@@ -145,8 +144,8 @@ namespace J2N.Threading
         /// interrupted while waiting.</exception>
         /// <exception cref="ObjectDisposedException">The current instance has
         /// already been disposed.</exception>
-        /// <seealso cref="Await()"/>
-        public void Await(CancellationToken cancellationToken)
+        /// <seealso cref="Wait()"/>
+        public void Wait(CancellationToken cancellationToken)
         {
             _event.Wait(cancellationToken);
         }
@@ -164,7 +163,7 @@ namespace J2N.Threading
         /// dormant until one of three things happen:
         /// <list type="bullet">
         ///     <item><description>The count reaches zero due to invocations of the
-        ///         <see cref="CountDown()"/> method; or</description></item>
+        ///         <see cref="Signal()"/> method; or</description></item>
         ///     <item><description>Some other thread interrupts the current thread; or</description></item>
         ///     <item><description>The specified waiting time elapses.</description></item>
         /// </list>
@@ -196,7 +195,7 @@ namespace J2N.Threading
         /// interrupted while waiting.</exception>
         /// <exception cref="ObjectDisposedException">The current instance has
         /// already been disposed.</exception>
-        public bool Await(TimeSpan timeout)
+        public bool Wait(TimeSpan timeout)
         {
             return _event.Wait(timeout);
         }
@@ -225,8 +224,8 @@ namespace J2N.Threading
         /// interrupted while waiting.</exception>
         /// <exception cref="ObjectDisposedException">The current instance has
         /// already been disposed.</exception>
-        /// <seealso cref="Await(TimeSpan)"/>
-        public bool Await(TimeSpan timeout, CancellationToken cancellationToken)
+        /// <seealso cref="Wait(TimeSpan)"/>
+        public bool Wait(TimeSpan timeout, CancellationToken cancellationToken)
         {
             return _event.Wait(timeout, cancellationToken);
         }
@@ -250,8 +249,8 @@ namespace J2N.Threading
         /// interrupted while waiting.</exception>
         /// <exception cref="ObjectDisposedException">The current instance has
         /// already been disposed.</exception>
-        /// <seealso cref="Await(TimeSpan)"/>
-        public bool Await(int millisecondsTimeout)
+        /// <seealso cref="Wait(TimeSpan)"/>
+        public bool Wait(int millisecondsTimeout)
         {
             return _event.Wait(millisecondsTimeout);
         }
@@ -279,8 +278,8 @@ namespace J2N.Threading
         /// interrupted while waiting.</exception>
         /// <exception cref="ObjectDisposedException">The current instance has
         /// already been disposed.</exception>
-        /// <seealso cref="Await(TimeSpan)"/>
-        public bool Await(int millisecondsTimeout, CancellationToken cancellationToken)
+        /// <seealso cref="Wait(TimeSpan)"/>
+        public bool Wait(int millisecondsTimeout, CancellationToken cancellationToken)
         {
             return _event.Wait(millisecondsTimeout, cancellationToken);
         }
@@ -297,7 +296,7 @@ namespace J2N.Threading
         /// </summary>
         /// <exception cref="ObjectDisposedException">The current instance has
         /// already been disposed.</exception>
-        public void CountDown()
+        public void Signal()
         {
             if (_disposed)
                 ThrowHelper.ThrowObjectDisposedException(this);
@@ -317,6 +316,11 @@ namespace J2N.Threading
         }
 
         /// <summary>
+        /// Gets the number of signals initially required to release the latch.
+        /// </summary>
+        public int InitialCount => _initialCount;
+
+        /// <summary>
         /// Returns the current count.
         /// <para/>
         /// This property is typically used for debugging and testing purposes.
@@ -327,7 +331,7 @@ namespace J2N.Threading
         /// to make the internal count 64-bit.
         /// <para/>
         /// The returned value is clamped at zero. The internal counter may
-        /// briefly drop below zero under concurrent <see cref="CountDown()"/>
+        /// briefly drop below zero under concurrent <see cref="Signal()"/>
         /// calls that race past the early-return guard, but that detail is
         /// hidden here to match Java's <c>getCount()</c> semantics, which never
         /// returns a negative value.
@@ -337,7 +341,7 @@ namespace J2N.Threading
         /// as zero before waiters are released. <see cref="CountdownEvent"/>
         /// exhibits the same behavior.
         /// </remarks>
-        public long Count => Math.Max(0, _currentCount);
+        public long CurrentCount => Math.Max(0, _currentCount);
 
         /// <summary>
         /// Returns a string identifying this latch, as well as its state.
@@ -345,7 +349,7 @@ namespace J2N.Threading
         /// followed by the current count.
         /// </summary>
         /// <returns>A string identifying this latch, as well as its state.</returns>
-        public override string ToString() => $"{base.ToString()}[Count = {Count}]";
+        public override string ToString() => $"{base.ToString()}[Count = {CurrentCount}]";
 
         /// <summary>
         /// Releases all resources used by the current instance of <see cref="CountdownLatch"/>.
@@ -359,28 +363,13 @@ namespace J2N.Threading
         /// This method is not thread-safe with respect to the other members of
         /// this class. Only call it once all threads have finished waiting on
         /// and counting down the latch: disposing while a thread is blocked in
-        /// one of the <see cref="Await()"/> overloads leaves that thread waiting
+        /// one of the <see cref="Wait()"/> overloads leaves that thread waiting
         /// indefinitely.
         /// </remarks>
         public void Dispose()
         {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        /// <summary>
-        /// When overridden in a subclass, releases the unmanaged resources used by the
-        /// <see cref="CountdownLatch"/>, and optionally releases the managed resources.
-        /// </summary>
-        /// <param name="disposing"><c>true</c> indicates to dispose both managed and
-        /// unmanaged resources. <c>false</c> indicates to dispose only unmanaged resources.</param>
-        protected virtual void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                _disposed = true;
-                _event.Dispose();
-            }
+            _disposed = true;
+            _event.Dispose();
         }
     }
 }
