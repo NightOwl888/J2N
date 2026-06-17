@@ -4381,35 +4381,24 @@ namespace J2N.Text
 
         private void ReplaceInPlace(ref int index, ref char value, int count)
         {
-            if (count != 0)
-            {
-                while (true)
-                {
-                    int length = m_Position - index;
-                    Debug.Assert(length >= 0, "Index isn't in the array.");
+            if (count == 0)
+                return;
 
-                    int lengthToCopy = Math.Min(length, count);
 #if FEATURE_MEMORYMARSHAL_CREATESPAN
-                    MemoryMarshal.CreateSpan(ref value, lengthToCopy).CopyTo(m_Chars.AsSpan(index));
+            MemoryMarshal.CreateSpan(ref value, count)
+                .CopyTo(m_Chars.AsSpan(index));
 #else
-                    unsafe
-                    {
-                        fixed (char* pSource = &value)
-                        {
-                            new Span<char>(pSource, lengthToCopy).CopyTo(m_Chars.AsSpan(index));
-                        }
-                    }
-#endif
-                    // Advance the index.
-                    index += lengthToCopy;
-                    count -= lengthToCopy;
-                    if (count == 0)
-                    {
-                        break;
-                    }
-                    value = ref Unsafe.Add(ref value, lengthToCopy);
+            unsafe
+            {
+                fixed (char* pSource = &value)
+                {
+                    new ReadOnlySpan<char>(pSource, count)
+                        .CopyTo(m_Chars.AsSpan(index));
                 }
             }
+#endif
+
+            index += count;
         }
 
         #endregion Replace
