@@ -2675,6 +2675,94 @@ namespace J2N.Text.Tests
             AssertExtensions.Throws<ArgumentOutOfRangeException>("requiredLength", () => builder.Insert(builder.Length, new ReadOnlySpan<char>(new char[1]))); // New length > builder.MaxCapacity
         }
 
+        /// <summary>
+        /// Stresses the MakeRoom() implementation
+        /// </summary>
+        [Theory]
+        [InlineData("0123456789", 0, "ABC")]
+        [InlineData("0123456789", 1, "ABC")]
+        [InlineData("0123456789", 5, "ABC")]
+        [InlineData("0123456789", 9, "ABC")]
+        [InlineData("0123456789", 10, "ABC")]
+        public void Insert_CharSpan_InPlaceMove_MatchesStringInsert(string original, int index, string value)
+        {
+            // Enough spare capacity to guarantee the in-place MakeRoom() path.
+            var builder = MutableTextBufferFactory(
+                original,
+                original.Length + value.Length + 10);
+
+            builder.Insert(index, value.AsSpan());
+
+            Assert.Equal(
+                original.Insert(index, value),
+                builder.ToString());
+        }
+
+        /// <summary>
+        /// Stresses the MakeRoom() implementation
+        /// </summary>
+        [Theory]
+        [InlineData("0123456789", 0, "ABC")]
+        [InlineData("0123456789", 1, "ABC")]
+        [InlineData("0123456789", 5, "ABC")]
+        [InlineData("0123456789", 9, "ABC")]
+        [InlineData("0123456789", 10, "ABC")]
+        public void Insert_CharSpan_ReallocationMove_MatchesStringInsert(string original, int index, string value)
+        {
+            // No spare capacity. Forces allocation.
+            var builder = MutableTextBufferFactory(
+                original,
+                original.Length);
+
+            builder.Insert(index, value.AsSpan());
+
+            Assert.Equal(
+                original.Insert(index, value),
+                builder.ToString());
+        }
+
+        /// <summary>
+        /// Stresses the MakeRoom() implementation
+        /// </summary>
+        [Fact]
+        public void Insert_CharSpan_InPlaceMove_LargeOverlap_MatchesStringInsert()
+        {
+            string original = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            string value = "1234567890";
+
+            var builder = MutableTextBufferFactory(
+                original,
+                original.Length + value.Length + 10);
+
+            builder.Insert(1, value.AsSpan());
+
+            Assert.Equal(
+                original.Insert(1, value),
+                builder.ToString());
+        }
+
+        [Fact]
+        public void Insert_CharSpan_RepeatedFrontInsertions_MatchesStringInsert()
+        {
+            string expected = "XYZ";
+
+            var builder = MutableTextBufferFactory("XYZ", 64);
+
+            builder.Insert(0, "1".AsSpan());
+            expected = expected.Insert(0, "1");
+
+            builder.Insert(0, "2".AsSpan());
+            expected = expected.Insert(0, "2");
+
+            builder.Insert(0, "3".AsSpan());
+            expected = expected.Insert(0, "3");
+
+            builder.Insert(0, "4".AsSpan());
+            expected = expected.Insert(0, "4");
+
+            Assert.Equal(expected, builder.ToString());
+        }
+
         public IEnumerable<object?[]> Append_StringBuilder_TestData()
         {
             string mediumString = new string('a', 30);

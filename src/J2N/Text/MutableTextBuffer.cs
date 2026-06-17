@@ -106,36 +106,31 @@ namespace J2N.Text
             init => clearExposedBuffers = value;
         }
 
-        private void MakeRoom(int index, int count/*, out Span<char> chunk, out int indexInChunk,bool doNotMoveFollowingChars*/)
+        private void MakeRoom(int index, int count)
         {
             //AssertInvariants();
             Debug.Assert(count > 0);
             Debug.Assert(index >= 0);
+            Debug.Assert(index <= m_Position);
 
             if (count + Length > m_MaxCapacity || count + Length < count)
             {
                 throw new ArgumentOutOfRangeException("requiredLength", SR.ArgumentOutOfRange_SmallCapacity);
             }
 
-            //chunk = m_Chars.AsSpan();
-            //indexInChunk = index;
-
             // Cool, we have some space in this block, and we don't have to copy much to get at it, so go ahead and use it.
             // This typically happens when someone repeatedly inserts small strings at a spot (usually the absolute front) of the buffer.
-            if (/*!doNotMoveFollowingChars &&*/ m_Position <= DefaultCapacity * 2 && m_Chars.Length - m_Position >= count)
+            if (m_Chars.Length - m_Position >= count)
             {
-                for (int i = m_Position; i > index;)
-                {
-                    --i;
-                    m_Chars[i + count] = m_Chars[i];
-                }
+                new ReadOnlySpan<char>(m_Chars, index, m_Position - index)
+                    .CopyTo(m_Chars.AsSpan(index + count));
+
                 m_Position += count;
                 return;
             }
 
             // Allocate the new array
             char[] newArray = allocator.Allocate(CalculateNewArrayLength(count));
-
 
             if (m_Position > 0)
             {
