@@ -4292,8 +4292,7 @@ namespace J2N.Text
                     MakeRoom(startIndex, -diff);
                 }
                 // copy the chars based on the new length
-                int index = startIndex; // Need a copy in case it is modified so it doesn't affect the below insert.
-                ReplaceInPlace(ref index, ref MemoryMarshal.GetReference(newValue), stringLength);
+                newValue.CopyTo(m_Chars.AsSpan(startIndex));
             }
             if (startIndex == end)
             {
