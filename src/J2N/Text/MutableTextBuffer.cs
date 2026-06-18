@@ -1192,57 +1192,57 @@ namespace J2N.Text
         /// </summary>
         /// <param name="index">The position in this instance where insertion begins.</param>
         /// <param name="value">The string to insert.</param>
-        /// <param name="count">The number of times to insert <paramref name="value"/>.</param>
+        /// <param name="repeatCount">The number of times to insert <paramref name="value"/>.</param>
         /// <returns>A reference to this instance after insertion has completed.</returns>
         /// <exception cref="ArgumentOutOfRangeException">
         /// <paramref name="index"/> is less than zero or greater than the current length of this instance.
         /// <para/>
         /// -or-
         /// <para/>
-        /// <paramref name="count"/> is less than zero.
+        /// <paramref name="repeatCount"/> is less than zero.
         /// </exception>
         /// <exception cref="OutOfMemoryException">
         /// The current length of this <see cref="MutableTextBuffer"/> object plus the length of <paramref name="value"/>
-        /// times <paramref name="count"/> exceeds <see cref="MaxCapacity"/>.
+        /// times <paramref name="repeatCount"/> exceeds <see cref="MaxCapacity"/>.
         /// </exception>
         /// <remarks>
         /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
         /// <para/>
         /// This <see cref="MutableTextBuffer"/> object is not changed if <paramref name="value"/> is <c>null</c>, 
-        /// <paramref name="value"/> is not <c>null</c> but its length is zero, or <paramref name="count"/> is zero.
+        /// <paramref name="value"/> is not <c>null</c> but its length is zero, or <paramref name="repeatCount"/> is zero.
         /// </remarks>
         [CodeGenerationReturnsSelf]
-        public void Insert(int index, string? value, int count) => Insert(index, value.AsSpan(), count);
+        public void Insert(int index, string? value, int repeatCount) => Insert(index, value.AsSpan(), repeatCount);
 
         /// <summary>
         /// Inserts one or more copies of a specified sequence of characters into this instance at the specified character position.
         /// </summary>
         /// <param name="index">The position in this instance where insertion begins.</param>
         /// <param name="value">The sequence of characters to insert.</param>
-        /// <param name="count">The number of times to insert <paramref name="value"/>.</param>
+        /// <param name="repeatCount">The number of times to insert <paramref name="value"/>.</param>
         /// <returns>A reference to this instance after insertion has completed.</returns>
         /// <exception cref="ArgumentOutOfRangeException">
         /// <paramref name="index"/> is less than zero or greater than the current length of this instance.
         /// <para/>
         /// -or-
         /// <para/>
-        /// <paramref name="count"/> is less than zero.
+        /// <paramref name="repeatCount"/> is less than zero.
         /// </exception>
         /// <exception cref="OutOfMemoryException">
         /// The current length of this <see cref="MutableTextBuffer"/> object plus the length of <paramref name="value"/>
-        /// times <paramref name="count"/> exceeds <see cref="MaxCapacity"/>.
+        /// times <paramref name="repeatCount"/> exceeds <see cref="MaxCapacity"/>.
         /// </exception>
         /// <remarks>
         /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
         /// <para/>
         /// This <see cref="MutableTextBuffer"/> object is not changed if the length of <paramref name="value"/> is zero or
-        /// <paramref name="count"/> is zero.
+        /// <paramref name="repeatCount"/> is zero.
         /// </remarks>
         [CodeGenerationReturnsSelf]
-        public void Insert(int index, ReadOnlySpan<char> value, int count) // J2N: Made public to match ValueStringBuilder API
+        public void Insert(int index, ReadOnlySpan<char> value, int repeatCount) // J2N: Made public to match ValueStringBuilder API
         {
-            if (count < 0)
-                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(count, ExceptionArgument.count);
+            if (repeatCount < 0)
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(repeatCount, ExceptionArgument.repeatCount);
 
             int currentLength = Length;
             if ((uint)index > (uint)currentLength)
@@ -1250,27 +1250,42 @@ namespace J2N.Text
                 ThrowHelper.ThrowArgumentOutOfRange_IndexMustBeLessOrEqualException(index, ExceptionArgument.index);
             }
 
-            if (value.IsEmpty || count == 0)
+            if (value.IsEmpty || repeatCount == 0)
             {
                 return;
             }
 
             // Ensure we don't insert more chars than we can hold, and we don't
             // have any integer overflow in our new length.
-            long insertingChars = (long)value.Length * count;
-            if (insertingChars > MaxCapacity - this.Length)
+            long insertingChars = (long)value.Length * repeatCount;
+            if (insertingChars > MaxCapacity - m_Position)
             {
                 throw new OutOfMemoryException();
             }
-            Debug.Assert(insertingChars + this.Length < int.MaxValue);
+            Debug.Assert(insertingChars + m_Position < int.MaxValue);
 
             MakeRoom(index, (int)insertingChars);
 
-            int valueLength = value.Length;
-            while (count > 0)
+            Span<char> destination =
+                m_Chars.AsSpan(index, (int)insertingChars);
+
+            // We only copy from the source once. The remainder of the copies
+            // are from destination to destination. This allows for more opportunities
+            // for the BCL to optimize the copy.
+            value.CopyTo(destination);
+
+            int copied = value.Length;
+            int destinationLength = destination.Length;
+
+            while (copied < destinationLength)
             {
-                ReplaceInPlace(ref index, ref MemoryMarshal.GetReference(value), valueLength);
-                --count;
+                int remaining = destinationLength - copied;
+                int copyLength = copied < remaining ? copied : remaining;
+
+                destination.Slice(0, copyLength)
+                    .CopyTo(destination.Slice(copied));
+
+                copied += copyLength;
             }
         }
 

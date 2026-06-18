@@ -2110,7 +2110,18 @@ namespace J2N.Text.Tests
         [InlineData("Hello", 0, null, 1, "Hello")]
         [InlineData("Hello", 3, "abc", 2, "Helabcabclo")]
         [InlineData("Hello", 5, "def", 2, "Hellodefdef")]
-        public void Insert_String_Count(string? original, int index, string? value, int count, string expected)
+
+        // J2N specific - added tests to stress copy logic
+        [InlineData("", 0, "a", 8, "aaaaaaaa")]
+        [InlineData("", 0, "ab", 4, "abababab")]
+        [InlineData("", 0, "abc", 4, "abcabcabcabc")]
+        [InlineData("", 0, "abcd", 3, "abcdabcdabcd")]
+        [InlineData("", 0, "abc", 5, "abcabcabcabcabc")]
+        [InlineData("Hello", 0, "abc", 5, "abcabcabcabcabcHello")]
+        [InlineData("Hello", 2, "abc", 5, "Heabcabcabcabcabcllo")]
+        [InlineData("Hello", 5, "abc", 5, "Helloabcabcabcabcabc")]
+        [InlineData("", 0, "abcde", 7, "abcdeabcdeabcdeabcdeabcdeabcdeabcde")]
+        public void Insert_String_RepeatCount(string? original, int index, string? value, int count, string expected)
         {
             MutableTextBuffer builder;
             if (count == 1)
@@ -2127,7 +2138,7 @@ namespace J2N.Text.Tests
         }
 
         [Fact]
-        public void Insert_String_Count_Invalid()
+        public void Insert_String_RepeatCount_Invalid()
         {
             var builder = MutableTextBufferFactory(0, 6);
             builder.Append("Hello");
@@ -2138,7 +2149,7 @@ namespace J2N.Text.Tests
             AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => builder.Insert(builder.Length + 1, "")); // Index > builder.Length
             AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => builder.Insert(builder.Length + 1, "", 0)); // Index > builder.Length
 
-            AssertExtensions.Throws<ArgumentOutOfRangeException>("count", () => builder.Insert(0, "", -1)); // Count < 0
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("repeatCount", () => builder.Insert(0, "", -1)); // Count < 0
 
             AssertExtensions.Throws<ArgumentOutOfRangeException>("requiredLength", () => builder.Insert(builder.Length, "aa")); // New length > builder.MaxCapacity
             Assert.Throws<OutOfMemoryException>(() => builder.Insert(builder.Length, "aa", 1)); // New length > builder.MaxCapacity
@@ -2155,7 +2166,7 @@ namespace J2N.Text.Tests
         [InlineData("Hello", 0, null, 1, "Hello")]
         [InlineData("Hello", 3, "abc", 2, "Helabcabclo")]
         [InlineData("Hello", 5, "def", 2, "Hellodefdef")]
-        public void Insert_ReadOnlySpan_Count(string? original, int index, string? value, int count, string expected)
+        public void Insert_ReadOnlySpan_RepeatCount(string? original, int index, string? value, int count, string expected)
         {
             MutableTextBuffer builder;
             if (count == 1)
@@ -2172,7 +2183,7 @@ namespace J2N.Text.Tests
         }
 
         [Fact] // J2N specific
-        public void Insert_ReadOnlySpan_Count_Invalid()
+        public void Insert_ReadOnlySpan_RepeatCount_Invalid()
         {
             var builder = MutableTextBufferFactory(0, 6);
             builder.Append("Hello");
@@ -2183,7 +2194,7 @@ namespace J2N.Text.Tests
             AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => builder.Insert(builder.Length + 1, "".AsSpan())); // Index > builder.Length
             AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => builder.Insert(builder.Length + 1, "".AsSpan(), 0)); // Index > builder.Length
 
-            AssertExtensions.Throws<ArgumentOutOfRangeException>("count", () => builder.Insert(0, "".AsSpan(), -1)); // Count < 0
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("repeatCount", () => builder.Insert(0, "".AsSpan(), -1)); // Count < 0
 
             AssertExtensions.Throws<ArgumentOutOfRangeException>("requiredLength", () => builder.Insert(builder.Length, "aa".AsSpan())); // New length > builder.MaxCapacity
             Assert.Throws<OutOfMemoryException>(() => builder.Insert(builder.Length, "aa".AsSpan(), 1)); // New length > builder.MaxCapacity

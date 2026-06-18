@@ -1487,7 +1487,7 @@ namespace J2N.Text
         /// <param name="value">
         /// The string to insert.
         /// </param>
-        /// <param name="count">
+        /// <param name="repeatCount">
         /// The number of times to insert <paramref name="value"/>.
         /// </param>
         /// <returns>
@@ -1498,14 +1498,14 @@ namespace J2N.Text
         /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
         /// <para/>
         /// This <see cref="SynchronizedTextBuilder"/> object is not changed if <paramref name="value"/> is <c>null</c>,
-        /// <paramref name="value"/> is not <c>null</c> but its length is zero, or <paramref name="count"/> is zero.
+        /// <paramref name="value"/> is not <c>null</c> but its length is zero, or <paramref name="repeatCount"/> is zero.
         /// 
         /// </remarks>
-        public SynchronizedTextBuilder Insert(int index, string? value, int count)
+        public SynchronizedTextBuilder Insert(int index, string? value, int repeatCount)
         {
             lock (syncRoot)
             {
-                buffer.Insert(index, value, count);
+                buffer.Insert(index, value, repeatCount);
                 return this;
             }
         }
@@ -1521,7 +1521,7 @@ namespace J2N.Text
         /// <param name="value">
         /// The sequence of characters to insert.
         /// </param>
-        /// <param name="count">
+        /// <param name="repeatCount">
         /// The number of times to insert <paramref name="value"/>.
         /// </param>
         /// <returns>
@@ -1532,14 +1532,14 @@ namespace J2N.Text
         /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
         /// <para/>
         /// This <see cref="SynchronizedTextBuilder"/> object is not changed if the length of <paramref name="value"/> is zero or
-        /// <paramref name="count"/> is zero.
+        /// <paramref name="repeatCount"/> is zero.
         /// 
         /// </remarks>
-        public SynchronizedTextBuilder Insert(int index, ReadOnlySpan<char> value, int count)
+        public SynchronizedTextBuilder Insert(int index, ReadOnlySpan<char> value, int repeatCount)
         {
             lock (syncRoot)
             {
-                buffer.Insert(index, value, count);
+                buffer.Insert(index, value, repeatCount);
                 return this;
             }
         }
