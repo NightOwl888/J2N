@@ -3523,7 +3523,7 @@ namespace J2N.Text
         /// <paramref name="startIndex"/> and ends to the character at
         /// <c><paramref name="count"/> - <paramref name="startIndex"/></c> or
         /// to the end of the sequence if no such character exists. First the
-        /// characters in the substring ar removed and then the specified
+        /// characters in the substring are removed and then the specified
         /// <paramref name="newValue"/> is inserted at <paramref name="startIndex"/>.
         /// This <see cref="ValueStringBuilder"/> will be lengthened to accommodate the
         /// specified <paramref name="newValue"/> if necessary.
@@ -3560,7 +3560,7 @@ namespace J2N.Text
         /// <paramref name="startIndex"/> and ends to the character at
         /// <c><paramref name="count"/> - <paramref name="startIndex"/></c> or
         /// to the end of the sequence if no such character exists. First the
-        /// characters in the substring ar removed and then the specified
+        /// characters in the substring are removed and then the specified
         /// <paramref name="newValue"/> is inserted at <paramref name="startIndex"/>.
         /// This <see cref="ValueStringBuilder"/> will be lengthened to accommodate the
         /// specified <paramref name="newValue"/> if necessary.
@@ -3581,6 +3581,11 @@ namespace J2N.Text
         /// <returns>
         /// A reference to this instance after the operation has completed.
         /// </returns>
+        /// <remarks>
+        /// 
+        /// This method allows <paramref name="newValue"/> to be this instance or a slice of this instance.
+        /// 
+        /// </remarks>
         public SynchronizedTextBuilder Replace(int startIndex, int count, ReadOnlySpan<char> newValue)
         {
             lock (syncRoot)

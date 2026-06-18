@@ -199,5 +199,220 @@ namespace J2N.Text.Tests
             AssertExtensions.Throws<ArgumentOutOfRangeException>("count", () => builder.Replace("a".AsSpan(), "b".AsSpan(), 5, 1)); // Count + start index > builder.Length
             AssertExtensions.Throws<ArgumentOutOfRangeException>("count", () => builder.Replace("a".AsSpan(), "b".AsSpan(), 4, 2)); // Count + start index > builder.Length
         }
+
+
+
+
+        //[Fact]
+        //public void Replace_SelfReferentialSpan_FromLaterRegion()
+        //{
+        //    var builder = MutableTextBufferFactory("abcdefghijklmnopqrstuvwxyz");
+
+        //    ReadOnlySpan<char> source = builder.AsSpan(10, 5);
+
+        //    builder.Replace(0, 3, source);
+
+        //    Assert.Equal("klmnodefghijklmnopqrstuvwxyz", builder.ToString());
+        //}
+
+        //[Fact]
+        //public void Replace_SelfReferentialSpan_FromEarlierRegion()
+        //{
+        //    var builder = MutableTextBufferFactory("abcdefghijklmnopqrstuvwxyz");
+
+        //    ReadOnlySpan<char> source = builder.AsSpan(0, 5);
+
+        //    builder.Replace(10, 3, source);
+
+        //    Assert.Equal("abcdefghijabcdenopqrstuvwxyz", builder.ToString());
+        //}
+
+        [Fact]
+        public void Replace_OverlappingSpan_SourceBeforeReplaceRegion()
+        {
+            var builder = MutableTextBufferFactory("abcdefghijklmnopqrstuvwxyz");
+
+            ReadOnlySpan<char> source = builder.AsSpan(0, 5); // abcde
+
+            builder.Replace(10, 3, source);
+
+            Assert.Equal("abcdefghijabcdenopqrstuvwxyz", builder.ToString());
+        }
+
+        [Fact]
+        public void Replace_OverlappingSpan_SourceAfterReplaceRegion()
+        {
+            var builder = MutableTextBufferFactory("abcdefghijklmnopqrstuvwxyz");
+
+            ReadOnlySpan<char> source = builder.AsSpan(10, 5); // klmno
+
+            builder.Replace(0, 3, source);
+
+            Assert.Equal("klmnodefghijklmnopqrstuvwxyz", builder.ToString());
+        }
+
+        [Fact]
+        public void Replace_OverlappingSpan_EqualLength()
+        {
+            var builder = MutableTextBufferFactory("abcdefghijklmnopqrstuvwxyz");
+
+            ReadOnlySpan<char> source = builder.AsSpan(10, 3); // klm
+
+            builder.Replace(0, 3, source);
+
+            Assert.Equal("klmdefghijklmnopqrstuvwxyz", builder.ToString());
+        }
+
+        [Fact]
+        public void Replace_OverlappingSpan_Grow_SourceBeforeRegion()
+        {
+            var builder = MutableTextBufferFactory("abcdefghijklmnopqrstuvwxyz");
+
+            ReadOnlySpan<char> source = builder.AsSpan(0, 8); // abcdefgh
+
+            builder.Replace(10, 3, source);
+
+            Assert.Equal("abcdefghijabcdefghnopqrstuvwxyz", builder.ToString());
+        }
+
+        [Fact]
+        public void Replace_OverlappingSpan_Grow_SourceAfterRegion()
+        {
+            var builder = MutableTextBufferFactory("abcdefghijklmnopqrstuvwxyz");
+
+            ReadOnlySpan<char> source = builder.AsSpan(15, 8); // pqrstuvw
+
+            builder.Replace(0, 3, source);
+
+            Assert.Equal("pqrstuvwdefghijklmnopqrstuvwxyz", builder.ToString());
+        }
+
+        [Fact]
+        public void Replace_OverlappingSpan_Shrink_SourceBeforeRegion()
+        {
+            var builder = MutableTextBufferFactory("abcdefghijklmnopqrstuvwxyz");
+
+            ReadOnlySpan<char> source = builder.AsSpan(0, 2); // ab
+
+            builder.Replace(10, 8, source);
+
+            Assert.Equal("abcdefghijabstuvwxyz", builder.ToString());
+        }
+
+        [Fact]
+        public void Replace_OverlappingSpan_Shrink_SourceAfterRegion()
+        {
+            var builder = MutableTextBufferFactory("abcdefghijklmnopqrstuvwxyz");
+
+            ReadOnlySpan<char> source = builder.AsSpan(20, 2); // uv
+
+            builder.Replace(0, 8, source);
+
+            Assert.Equal("uvijklmnopqrstuvwxyz", builder.ToString());
+        }
+
+        [Fact]
+        public void Replace_OverlappingSpan_SourceInsideReplaceRegion()
+        {
+            var builder = MutableTextBufferFactory("abcdefghijklmnopqrstuvwxyz");
+
+            ReadOnlySpan<char> source = builder.AsSpan(5, 5); // fghij
+
+            builder.Replace(0, 10, source);
+
+            Assert.Equal("fghijklmnopqrstuvwxyz", builder.ToString());
+        }
+
+        [Fact]
+        public void Replace_OverlappingSpan_ReplaceRegionInsideSource()
+        {
+            var builder = MutableTextBufferFactory("abcdefghijklmnopqrstuvwxyz");
+
+            ReadOnlySpan<char> source = builder.AsSpan(0, 10); // abcdefghij
+
+            builder.Replace(3, 2, source);
+
+            Assert.Equal("abcabcdefghijfghijklmnopqrstuvwxyz", builder.ToString());
+        }
+
+        [Fact]
+        public void Replace_OverlappingSpan_PartialOverlapLeft()
+        {
+            var builder = MutableTextBufferFactory("abcdefghijklmnopqrstuvwxyz");
+
+            ReadOnlySpan<char> source = builder.AsSpan(5, 10); // fghijklmno
+
+            builder.Replace(10, 10, source);
+
+            Assert.Equal("abcdefghijfghijklmnouvwxyz", builder.ToString());
+        }
+
+        [Fact]
+        public void Replace_OverlappingSpan_PartialOverlapRight()
+        {
+            var builder = MutableTextBufferFactory("abcdefghijklmnopqrstuvwxyz");
+
+            ReadOnlySpan<char> source = builder.AsSpan(10, 10); // klmnopqrst
+
+            builder.Replace(5, 10, source);
+
+            Assert.Equal("abcdeklmnopqrstpqrstuvwxyz", builder.ToString());
+        }
+
+        [Fact]
+        public void Replace_OverlappingSpan_WholeBuffer()
+        {
+            var builder = MutableTextBufferFactory("abcdefghijklmnopqrstuvwxyz");
+
+            ReadOnlySpan<char> source = builder.AsSpan();
+
+            builder.Replace(0, builder.Length, source);
+
+            Assert.Equal("abcdefghijklmnopqrstuvwxyz", builder.ToString());
+        }
+
+        // Empty span from overlapping memory causes Overlaps() to return false,
+        // so these tests end up going down the main path instead of the overlapping
+        // path. The logic is the same, though because there is nothing to temporarily
+        // capture if the span is empty even if the source of the AsSpan() call is the same buffer.
+        [Fact]
+        public void Replace_OverlappingSpan_EmptySpan_RemovesMiddle()
+        {
+            var builder = MutableTextBufferFactory("abcdef");
+
+            builder.Replace(2, 3, builder.AsSpan(1, 0));
+
+            Assert.Equal("abf", builder.ToString());
+        }
+
+        [Fact]
+        public void Replace_OverlappingSpan_EmptySpan_RemovesAll()
+        {
+            var builder = MutableTextBufferFactory("abcdef");
+
+            builder.Replace(0, builder.Length, builder.AsSpan(2, 0));
+
+            Assert.Equal("", builder.ToString());
+        }
+
+        [Fact]
+        public void Replace_OverlappingSpan_EmptySpan_RemoveTail()
+        {
+            var builder = MutableTextBufferFactory("abcdef");
+
+            builder.Replace(4, 2, builder.AsSpan(0, 0));
+
+            Assert.Equal("abcd", builder.ToString());
+        }
+
+        [Fact]
+        public void Replace_OverlappingSpan_EmptySpan_NoOp()
+        {
+            var builder = MutableTextBufferFactory("abcdef");
+
+            builder.Replace(3, 0, builder.AsSpan(1, 0));
+
+            Assert.Equal("abcdef", builder.ToString());
+        }
     }
 }

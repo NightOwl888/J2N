@@ -4199,7 +4199,7 @@ namespace J2N.Text
         /// <paramref name="startIndex"/> and ends to the character at
         /// <c><paramref name="count"/> - <paramref name="startIndex"/></c> or
         /// to the end of the sequence if no such character exists. First the
-        /// characters in the substring ar removed and then the specified
+        /// characters in the substring are removed and then the specified
         /// <paramref name="newValue"/> is inserted at <paramref name="startIndex"/>.
         /// This <see cref="ValueStringBuilder"/> will be lengthened to accommodate the
         /// specified <paramref name="newValue"/> if necessary.
@@ -4238,7 +4238,7 @@ namespace J2N.Text
         /// <paramref name="startIndex"/> and ends to the character at
         /// <c><paramref name="count"/> - <paramref name="startIndex"/></c> or
         /// to the end of the sequence if no such character exists. First the
-        /// characters in the substring ar removed and then the specified
+        /// characters in the substring are removed and then the specified
         /// <paramref name="newValue"/> is inserted at <paramref name="startIndex"/>.
         /// This <see cref="ValueStringBuilder"/> will be lengthened to accommodate the
         /// specified <paramref name="newValue"/> if necessary.
@@ -4257,6 +4257,9 @@ namespace J2N.Text
         /// <para/>
         /// <paramref name="startIndex"/> is greater than or equal to <see cref="Length"/>.
         /// </exception>
+        /// <remarks>
+        /// This method allows <paramref name="newValue"/> to be this instance or a slice of this instance.
+        /// </remarks>
         [CodeGenerationReturnsSelf]
         public void Replace(int startIndex, int count, ReadOnlySpan<char> newValue)
         {
@@ -4270,33 +4273,106 @@ namespace J2N.Text
 
         private void ReplaceCore(int startIndex, int count, ReadOnlySpan<char> newValue)
         {
-            Debug.Assert(startIndex >= 0 || startIndex <= m_Position);
+            Debug.Assert(startIndex >= 0 && startIndex <= m_Position);
             Debug.Assert(count >= 0);
 
-            int end = startIndex + count;
-            if (end > m_Position)
+            // Clamp to end of buffer (Harmony/JDK behavior)
+            int end = count > m_Position - startIndex
+                ? m_Position
+                : startIndex + count; // Overflow not possible here
+
+            int replacedLength = end - startIndex;
+
+            if (m_Chars.AsSpan().Overlaps(newValue, out int sourceOffset))
             {
-                end = m_Position; // J2N TODO: Do we need this?
+                ReplaceCoreOverlapping(startIndex, count, sourceOffset, newValue.Length, replacedLength, end);
+                return;
             }
-            if (end > startIndex)
+
+            int delta = newValue.Length - replacedLength;
+            if (delta > 0)
             {
-                int stringLength = newValue.Length;
-                int diff = end - startIndex - stringLength;
-                if (diff > 0)
-                { // replacing with fewer characters
-                    RemoveCore(startIndex, diff);
-                }
-                else if (diff < 0)
-                {
-                    // replacing with more characters...need some room
-                    MakeRoom(startIndex, -diff);
-                }
-                // copy the chars based on the new length
+                // Need more space.
+                //
+                // Insert the additional space immediately after the replaced region.
+                // This preserves the replacement area while shifting only the tail.
+                MakeRoom(end, delta);
+            }
+            else if (delta < 0)
+            {
+                // Need less space.
+                //
+                // Remove only the excess characters after the replacement area.
+                RemoveCore(startIndex + newValue.Length, -delta);
+            }
+
+            // Overwrite the replacement area.
+            if (!newValue.IsEmpty)
+            {
                 newValue.CopyTo(m_Chars.AsSpan(startIndex));
             }
-            if (startIndex == end)
+        }
+
+        private void ReplaceCoreOverlapping(int startIndex, int count, int sourceOffset, int sourceLength, int replacedLength, int end)
+        {
+            Debug.Assert(startIndex <= int.MaxValue - sourceLength);
+
+            // Fast path: Exact self-replacement (no-op)
+            if (sourceOffset == startIndex && sourceLength == replacedLength)
             {
-                Insert(startIndex, ref MemoryMarshal.GetReference(newValue), newValue.Length);
+                return;
+            }
+
+            // Common case: Source entirely before the replacement region
+            if ((uint)sourceOffset + (uint)sourceLength <= startIndex)
+            {
+                ReadOnlySpan<char> source = m_Chars.AsSpan(sourceOffset, sourceLength);
+
+                int delta = sourceLength - replacedLength;
+
+                if (delta > 0)
+                {
+                    MakeRoom(end, delta);
+                }
+                else if (delta < 0)
+                {
+                    RemoveCore(startIndex + sourceLength, -delta);
+                }
+
+                if (sourceLength > 0)
+                {
+                    source.CopyTo(m_Chars.AsSpan(startIndex));
+                }
+                return;
+            }
+
+            char[]? arrayToReturn = null;
+            try
+            {
+                Span<char> temp = sourceLength <= CharStackBufferSize
+                    ? stackalloc char[sourceLength]
+                    : (arrayToReturn = allocator.Allocate(sourceLength)).AsSpan(0, sourceLength);
+
+                m_Chars.AsSpan(sourceOffset, sourceLength)
+                    .CopyTo(temp);
+
+                int delta = sourceLength - replacedLength;
+
+                if (delta > 0)
+                {
+                    MakeRoom(end, delta);
+                }
+                else if (delta < 0)
+                {
+                    RemoveCore(startIndex + sourceLength, -delta);
+                }
+
+                temp.CopyTo(m_Chars.AsSpan(startIndex));
+            }
+            finally
+            {
+                if (arrayToReturn is not null)
+                    allocator.Return(arrayToReturn);
             }
         }
 
