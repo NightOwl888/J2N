@@ -103,13 +103,11 @@ namespace J2N.Threading
         public void TestAwait()
         {
             using CountdownLatch latch = new CountdownLatch(2);
-            using ManualResetEventSlim started = new ManualResetEventSlim(false);
             ThreadJob t = new ThreadJob(() =>
             {
                 try
                 {
                     threadAssertTrue(latch.CurrentCount > 0);
-                    started.Set();
                     latch.Wait();
                     threadAssertTrue(latch.CurrentCount == 0);
                 }
@@ -119,14 +117,20 @@ namespace J2N.Threading
                 }
             });
             t.Start();
-            assertTrue(started.Wait(MaxWaitMilliseconds));
-            Thread.Sleep(ShortDelayMilliseconds); // give the worker a chance to block in Wait()
-            assertEquals(2, latch.CurrentCount);
-            latch.Signal();
-            assertEquals(1, latch.CurrentCount);
-            latch.Signal();
-            assertEquals(0, latch.CurrentCount);
-            JoinAndAssertCompleted(t);
+            try
+            {
+                Thread.Sleep(ShortDelayMilliseconds); // give the worker a chance to block in Wait()
+                assertEquals(2, latch.CurrentCount);
+                latch.Signal();
+                assertEquals(1, latch.CurrentCount);
+                latch.Signal();
+                assertEquals(0, latch.CurrentCount);
+                JoinAndAssertCompleted(t);
+            }
+            catch (ThreadInterruptedException)
+            {
+                unexpectedException();
+            }
         }
 
         /**
@@ -136,13 +140,11 @@ namespace J2N.Threading
         public void TestTimedAwait()
         {
             using CountdownLatch latch = new CountdownLatch(2);
-            using ManualResetEventSlim started = new ManualResetEventSlim(false);
             ThreadJob t = new ThreadJob(() =>
             {
                 try
                 {
                     threadAssertTrue(latch.CurrentCount > 0);
-                    started.Set();
                     threadAssertTrue(latch.Wait(TimeSpan.FromMilliseconds(MaxWaitMilliseconds)));
                 }
                 catch (ThreadInterruptedException)
@@ -151,14 +153,20 @@ namespace J2N.Threading
                 }
             });
             t.Start();
-            assertTrue(started.Wait(MaxWaitMilliseconds));
-            Thread.Sleep(ShortDelayMilliseconds);
-            assertEquals(2, latch.CurrentCount);
-            latch.Signal();
-            assertEquals(1, latch.CurrentCount);
-            latch.Signal();
-            assertEquals(0, latch.CurrentCount);
-            JoinAndAssertCompleted(t);
+            try
+            {
+                Thread.Sleep(ShortDelayMilliseconds);
+                assertEquals(2, latch.CurrentCount);
+                latch.Signal();
+                assertEquals(1, latch.CurrentCount);
+                latch.Signal();
+                assertEquals(0, latch.CurrentCount);
+                JoinAndAssertCompleted(t);
+            }
+            catch (ThreadInterruptedException)
+            {
+                unexpectedException();
+            }
         }
 
         /**
@@ -168,13 +176,11 @@ namespace J2N.Threading
         public void TestAwait_InterruptedException()
         {
             using CountdownLatch latch = new CountdownLatch(1);
-            using ManualResetEventSlim started = new ManualResetEventSlim(false);
             ThreadJob t = new ThreadJob(() =>
             {
                 try
                 {
                     threadAssertTrue(latch.CurrentCount > 0);
-                    started.Set();
                     latch.Wait();
                     threadShouldThrow();
                 }
@@ -184,11 +190,16 @@ namespace J2N.Threading
                 }
             });
             t.Start();
-            assertTrue(started.Wait(MaxWaitMilliseconds));
-            Thread.Sleep(ShortDelayMilliseconds);
-            assertEquals(1, latch.CurrentCount);
-            t.Interrupt();
-            JoinAndAssertCompleted(t);
+            try
+            {
+                assertEquals(1, latch.CurrentCount);
+                t.Interrupt();
+                JoinAndAssertCompleted(t);
+            }
+            catch (ThreadInterruptedException)
+            {
+                unexpectedException();
+            }
         }
 
         /**
@@ -198,13 +209,11 @@ namespace J2N.Threading
         public void TestTimedAwait_InterruptedException()
         {
             using CountdownLatch latch = new CountdownLatch(1);
-            using ManualResetEventSlim started = new ManualResetEventSlim(false);
             ThreadJob t = new ThreadJob(() =>
             {
                 try
                 {
                     threadAssertTrue(latch.CurrentCount > 0);
-                    started.Set();
                     latch.Wait(TimeSpan.FromMilliseconds(MaxWaitMilliseconds));
                     threadShouldThrow();
                 }
@@ -214,11 +223,17 @@ namespace J2N.Threading
                 }
             });
             t.Start();
-            assertTrue(started.Wait(MaxWaitMilliseconds));
-            Thread.Sleep(ShortDelayMilliseconds);
-            assertEquals(1, latch.CurrentCount);
-            t.Interrupt();
-            JoinAndAssertCompleted(t);
+            try
+            {
+                Thread.Sleep(ShortDelayMilliseconds);
+                assertEquals(1, latch.CurrentCount);
+                t.Interrupt();
+                JoinAndAssertCompleted(t);
+            }
+            catch (ThreadInterruptedException)
+            {
+                unexpectedException();
+            }
         }
 
         /**
@@ -242,8 +257,15 @@ namespace J2N.Threading
                 }
             });
             t.Start();
-            assertEquals(1, latch.CurrentCount);
-            JoinAndAssertCompleted(t);
+            try
+            {
+                assertEquals(1, latch.CurrentCount);
+                JoinAndAssertCompleted(t);
+            }
+            catch (ThreadInterruptedException)
+            {
+                unexpectedException();
+            }
         }
 
         /**
