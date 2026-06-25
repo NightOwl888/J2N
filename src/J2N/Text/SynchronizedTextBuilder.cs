@@ -37,7 +37,8 @@ namespace J2N.Text
     ///     </description></item>
     /// </list>
     /// </remarks>
-    public sealed partial class SynchronizedTextBuilder : IAppendable, ISpanAppendable, ICharSequence, IBufferWriter<char>
+    public sealed partial class SynchronizedTextBuilder : IAppendable, ISpanAppendable, ICharSequence, IBufferWriter<char>,
+        ICopyable<char>, ISpanCopyable<char>
     {
         private readonly object syncRoot = new();
         internal readonly MutableTextBuffer buffer;

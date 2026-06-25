@@ -63,7 +63,10 @@ namespace J2N.Text
 #if FEATURE_SERIALIZABLE_STRINGS
     [Serializable]
 #endif
-    public sealed class StringBuffer : IAppendable, ICharSequence, ISpanAppendable
+    public sealed class StringBuffer : IAppendable, ICharSequence, ISpanAppendable, ICopyable<char>
+#if FEATURE_STRINGBUILDER_COPYTO_SPAN
+        , ISpanCopyable<char>
+#endif
     {
         private const int DefaultCapacity = 16;
 
@@ -2717,5 +2720,31 @@ namespace J2N.Text
         string ICharSequence.ToString() => ToString();
 
         #endregion
+
+        #region ICopyable<char> Members
+
+        void ICopyable<char>.CopyTo(int sourceIndex, char[] destination, int destinationIndex, int count)
+        {
+            lock (syncRoot)
+            {
+                builder?.CopyTo(sourceIndex, destination, destinationIndex, count);
+            }
+        }
+
+        #endregion ICopyable<char> Members
+
+        #region ISpanCopyable<char> Members
+
+#if FEATURE_STRINGBUILDER_COPYTO_SPAN
+        void ISpanCopyable<char>.CopyTo(int sourceIndex, Span<char> destination, int count)
+        {
+            lock (syncRoot)
+            {
+                builder?.CopyTo(sourceIndex, destination, count);
+            }
+        }
+#endif
+
+        #endregion ISpanCopyable<char> Members
     }
 }

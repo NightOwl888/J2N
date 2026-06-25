@@ -31,7 +31,8 @@ namespace J2N.Text
         IComparable<string>, IComparable<StringBuilder>, IComparable<char[]>,
         IEquatable<ICharSequence>,
         IEquatable<CharArrayCharSequence>, IEquatable<StringBuilderCharSequence>, IEquatable<StringCharSequence>, 
-        IEquatable<string>, IEquatable<StringBuilder>, IEquatable<char[]>
+        IEquatable<string>, IEquatable<StringBuilder>, IEquatable<char[]>,
+        ICopyable<char>, ISpanCopyable<char>
     {
         private const int CharStackBufferSize = 64;
 
@@ -543,5 +544,23 @@ namespace J2N.Text
         }
 
         #endregion
+
+        #region ICopyable<char> Members
+
+        void ICopyable<char>.CopyTo(int sourceIndex, char[] destination, int destinationIndex, int count)
+        {
+            Value?.CopyTo(sourceIndex, destination, destinationIndex, count);
+        }
+
+        #endregion ICopyable<char> Members
+
+        #region ISpanCopyable<char> Members
+
+        void ISpanCopyable<char>.CopyTo(int sourceIndex, Span<char> destination, int count)
+        {
+            Value?.AsSpan(sourceIndex, count).CopyTo(destination);
+        }
+
+        #endregion ISpanCopyable<char> Members
     }
 }

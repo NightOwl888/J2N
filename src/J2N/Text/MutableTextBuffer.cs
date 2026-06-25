@@ -44,7 +44,8 @@ namespace J2N.Text
     ///     </description></item>
     /// </list>
     /// </remarks>
-    public partial class MutableTextBuffer : IAppendable, ISpanAppendable, ICharSequence, IBufferWriter<char>, IDisposable
+    public partial class MutableTextBuffer : IAppendable, ISpanAppendable, ICharSequence, IBufferWriter<char>,
+        ICopyable<char>, ISpanCopyable<char>, IDisposable
         //, IEnumerable<char> // ICU4N TODO: Implement?
     {
         private const int CharStackBufferSize = 32;
