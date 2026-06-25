@@ -1196,7 +1196,7 @@ namespace J2N.Text.Tests
             var builder = MutableTextBufferFactory(0, 5);
             builder.Append("Hello");
 
-            AssertExtensions.Throws<ArgumentNullException>("charSequence", () => builder.Append((ICharSequence?)null, 1, 1)); // Value is null, startIndex > 0 and count > 0
+            AssertExtensions.Throws<ArgumentNullException>("value", () => builder.Append((ICharSequence?)null, 1, 1)); // Value is null, startIndex > 0 and count > 0
 
             AssertExtensions.Throws<ArgumentOutOfRangeException>("startIndex", () => builder.Append(new char[0].AsCharSequence(), -1, 0)); // Start index < 0
             AssertExtensions.Throws<ArgumentOutOfRangeException>("count", () => builder.Append(new char[0].AsCharSequence(), 0, -1)); // Count < 0

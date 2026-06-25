@@ -179,18 +179,18 @@ namespace J2N.Text
         /// Appends the string representation of the Unicode characters in a specified sequence to this instance.
         /// <para/>
         /// NOTE: Unlike the Java implementation, this method does not add the word <c>"null"</c> to the <see cref="PooledTextBuilder"/>
-        /// if <paramref name="charSequence"/> is <c>null</c>. Instead, no operation is performed.
+        /// if <paramref name="value"/> is <c>null</c>. Instead, no operation is performed.
         /// 
         /// </summary>
-        /// <param name="charSequence">
+        /// <param name="value">
         /// The sequence of characters to append.
         /// </param>
         /// <returns>
         /// A reference to this instance after the operation has completed.
         /// </returns>
-        public PooledTextBuilder Append(ICharSequence? charSequence)
+        public PooledTextBuilder Append(ICharSequence? value)
         {
-            buffer.Append(charSequence);
+            buffer.Append(value);
             return this;
         }
 
@@ -199,11 +199,11 @@ namespace J2N.Text
         /// Appends the string representation of a specified subarray of Unicode characters to this instance.
         /// 
         /// </summary>
-        /// <param name="charSequence">
+        /// <param name="value">
         /// The UTF-16-encoded code unit to append.
         /// </param>
         /// <param name="startIndex">
-        /// The starting position in <paramref name="charSequence"/>.
+        /// The starting position in <paramref name="value"/>.
         /// </param>
         /// <param name="count">
         /// The number of characters to append.
@@ -211,9 +211,9 @@ namespace J2N.Text
         /// <returns>
         /// A reference to this instance after the operation has completed.
         /// </returns>
-        public PooledTextBuilder Append(ICharSequence? charSequence, int startIndex, int count)
+        public PooledTextBuilder Append(ICharSequence? value, int startIndex, int count)
         {
-            buffer.Append(charSequence, startIndex, count);
+            buffer.Append(value, startIndex, count);
             return this;
         }
 
@@ -225,15 +225,15 @@ namespace J2N.Text
         /// <param name="index">
         /// The position in this instance where insertion begins.
         /// </param>
-        /// <param name="charSequence">
+        /// <param name="value">
         /// The character sequence to insert.
         /// </param>
         /// <returns>
         /// A reference to this instance after the operation has completed.
         /// </returns>
-        public PooledTextBuilder Insert(int index, ICharSequence? charSequence)
+        public PooledTextBuilder Insert(int index, ICharSequence? value)
         {
-            buffer.Insert(index, charSequence);
+            buffer.Insert(index, value);
             return this;
         }
 
@@ -248,11 +248,11 @@ namespace J2N.Text
         /// <param name="index">
         /// The position in this instance where insertion begins.
         /// </param>
-        /// <param name="charSequence">
+        /// <param name="value">
         /// A character array.
         /// </param>
         /// <param name="startIndex">
-        /// The starting index within <paramref name="charSequence"/>.
+        /// The starting index within <paramref name="value"/>.
         /// </param>
         /// <param name="count">
         /// The number of characters to insert.
@@ -260,9 +260,9 @@ namespace J2N.Text
         /// <returns>
         /// A reference to this instance after the operation has completed.
         /// </returns>
-        public PooledTextBuilder Insert(int index, ICharSequence? charSequence, int startIndex, int count)
+        public PooledTextBuilder Insert(int index, ICharSequence? value, int startIndex, int count)
         {
-            buffer.Insert(index, charSequence, startIndex, count);
+            buffer.Insert(index, value, startIndex, count);
             return this;
         }
 
