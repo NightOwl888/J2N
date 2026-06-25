@@ -477,21 +477,49 @@ namespace J2N.Text.Tests
             AssertExtensions.Throws<ArgumentOutOfRangeException>("length", () => MutableTextBufferFactory(new StringBuilder("foo"), 0, -1, 0)); // Length < 0
             AssertExtensions.Throws<ArgumentOutOfRangeException>("capacity", () => MutableTextBufferFactory(new StringBuilder("foo"), 0, 0, -1)); // Capacity < 0
             AssertExtensions.Throws<ArgumentOutOfRangeException>("capacity", () => MutableTextBufferFactory(new StringBuilder("foo"), 0, 0, MaxArrayLength + 1)); // Capacity > Array.MaxLength
-            
+
             AssertExtensions.Throws<ArgumentOutOfRangeException>("length", () => MutableTextBufferFactory(new StringBuilder("foo"), 4, 0, 0)); // Start index + length > builder.Length
             AssertExtensions.Throws<ArgumentOutOfRangeException>("length", () => MutableTextBufferFactory(new StringBuilder("foo"), 3, 1, 0)); // Start index + length > builder.Length
         }
 
-        [Theory] // J2N specific
-        [InlineData("Hello")]
-        [InlineData("")]
-        [InlineData(null)]
-        public void Ctor_ICharSequence(string? value)
+        public static IEnumerable<object?[]> Test_Ctor_ICharSequence_TestData()
         {
-            var sb = value is not null ? value.AsCharSequence() : (ICharSequence?)null;
-            MutableTextBuffer builder = MutableTextBufferFactory(sb);
+            yield return new object?[] { "Hello", "Hello" };
+            yield return new object?[] { "", "" };
+            yield return new object?[] { null, "" };
+        }
 
-            string expected = value ?? "";
+        public static IEnumerable<object?[]> Test_Ctor_ICharSequence_Typed_TestData()
+        {
+            foreach (var testCase in Test_Ctor_ICharSequence_TestData())
+            {
+                yield return new object?[] { new StringCharSequence((string?)testCase[0]), testCase[1] };
+                yield return new object?[] { new StringBuilderCharSequence(new StringBuilder((string?)testCase[0])), testCase[1] };
+                yield return new object?[] { new CharArrayCharSequence(((string?)testCase[0])?.ToCharArray()), testCase[1] };
+
+                ReadOnlyMemory<char> memory = ((string?)testCase[0]).AsMemory();
+                yield return new object?[] { new MockCharSequence(memory), testCase[1] };
+                if (testCase[0] is not null)
+                {
+                    yield return new object?[] { new StringBuffer((string?)testCase[0]), testCase[1] };
+                }
+                else
+                {
+                    yield return new object?[] { (StringCharSequence?)null, testCase[1] };
+                    yield return new object?[] { (StringBuilderCharSequence?)null, testCase[1] };
+                    yield return new object?[] { (CharArrayCharSequence?)null, testCase[1] };
+                    yield return new object?[] { (ICharSequence?)null, testCase[1] };
+                }
+            }
+        }
+
+
+        [Theory] // J2N specific
+        [MemberData(nameof(Test_Ctor_ICharSequence_Typed_TestData))]
+        public void Ctor_ICharSequence(ICharSequence? value, string expected)
+        {
+            MutableTextBuffer builder = MutableTextBufferFactory(value);
+
             Assert.Equal(expected, builder.ToString());
             Assert.Equal(expected.Length, builder.Length);
         }
@@ -1108,6 +1136,78 @@ namespace J2N.Text.Tests
             AssertExtensions.Throws<ArgumentOutOfRangeException>("valueCount", () => builder.Append(new char[] { 'a' }, 0, 1)); // New length > builder.MaxCapacity
         }
 
+        public static IEnumerable<object?[]> Test_Append_ICharSequence_TestData()
+        {
+            yield return new object?[] { "Hello", "a", 0, 1, "Helloa" };
+            yield return new object?[] { "Hello", "bcd", 0, 3, "Hellobcd" };
+            yield return new object?[] { "Hello", "bcd", 1, 2, "Hellocd" };
+            yield return new object?[] { "Hello", "bcd", 2, 1, "Hellod" };
+            yield return new object?[] { "", "efg", 0, 3, "efg" };
+            yield return new object?[] { "Hello", "e", 1, 0, "Hello" };
+            yield return new object?[] { "Hello", "e", 0, 0, "Hello" };
+            yield return new object?[] { "Hello", "", 0, 0, "Hello" };
+            yield return new object?[] { "Hello", null, 0, 0, "Hello" };
+        }
+
+        public static IEnumerable<object?[]> Test_Append_ICharSequence_Typed_TestData()
+        {
+            foreach (var testCase in Test_Append_ICharSequence_TestData())
+            {
+                yield return new object?[] { testCase[0], new StringCharSequence((string?)testCase[1]), testCase[2], testCase[3], testCase[4] };
+                yield return new object?[] { testCase[0], new StringBuilderCharSequence(new StringBuilder((string?)testCase[1])), testCase[2], testCase[3], testCase[4] };
+                yield return new object?[] { testCase[0], new CharArrayCharSequence(((string?)testCase[1])?.ToCharArray()), testCase[2], testCase[3], testCase[4] };
+                ReadOnlyMemory<char> memory = ((string?)testCase[1]).AsMemory();
+                yield return new object?[] { testCase[0], new MockCharSequence(memory), testCase[2], testCase[3], testCase[4] };
+                if (testCase[1] is not null)
+                {
+                    yield return new object?[] { testCase[0], new StringBuffer((string?)testCase[1]), testCase[2], testCase[3], testCase[4] };
+                }
+                else
+                {
+                    yield return new object?[] { testCase[0], (StringCharSequence?)null, testCase[2], testCase[3], testCase[4] };
+                    yield return new object?[] { testCase[0], (StringBuilderCharSequence?)null, testCase[2], testCase[3], testCase[4] };
+                    yield return new object?[] { testCase[0], (CharArrayCharSequence?)null, testCase[2], testCase[3], testCase[4] };
+                    yield return new object?[] { testCase[0], (ICharSequence?)null, testCase[2], testCase[3], testCase[4] };
+                }
+            }
+        }
+
+        [Theory]
+        [MemberData(nameof(Test_Append_ICharSequence_Typed_TestData))]
+        public void Append_ICharSequence(string? original, ICharSequence? value, int startIndex, int charCount, string expected)
+        {
+            MutableTextBuffer builder;
+            if (startIndex == 0 && charCount == (value?.Length ?? 0))
+            {
+                // Use Append(char[])
+                builder = MutableTextBufferFactory(original);
+                builder.Append(value);
+                Assert.Equal(expected, builder.ToString());
+            }
+            // Use Append(char[], int, int)
+            builder = MutableTextBufferFactory(original);
+            builder.Append(value, startIndex, charCount);
+            Assert.Equal(expected, builder.ToString());
+        }
+
+        [Fact]
+        public void Append_ICharSequence_Invalid()
+        {
+            var builder = MutableTextBufferFactory(0, 5);
+            builder.Append("Hello");
+
+            AssertExtensions.Throws<ArgumentNullException>("charSequence", () => builder.Append((ICharSequence?)null, 1, 1)); // Value is null, startIndex > 0 and count > 0
+
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("startIndex", () => builder.Append(new char[0].AsCharSequence(), -1, 0)); // Start index < 0
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("count", () => builder.Append(new char[0].AsCharSequence(), 0, -1)); // Count < 0
+
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("count", () => builder.Append(new char[5].AsCharSequence(), 6, 0)); // Start index + count > value.Length
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("count", () => builder.Append(new char[5].AsCharSequence(), 5, 1)); // Start index + count > value.Length
+
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("valueCount", () => builder.Append(new char[] { 'a' }.AsCharSequence())); // New length > builder.MaxCapacity
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("valueCount", () => builder.Append(new char[] { 'a' }.AsCharSequence(), 0, 1)); // New length > builder.MaxCapacity
+        }
+
 #nullable disable
 
         public static IEnumerable<object[]> AppendFormat_TestData()
@@ -1626,7 +1726,7 @@ namespace J2N.Text.Tests
 
             yield return new object?[] { sb6, sb7, true };
             yield return new object?[] { sb6, sb8, false };
-            
+
             yield return new object?[] { sb1, null, false };
 
             // J2N TODO: StringBuilder with multiple chunks?
@@ -1913,6 +2013,93 @@ namespace J2N.Text.Tests
             AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => builder.Insert(-1, (float)1)); // Index < 0
             AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => builder.Insert(builder.Length + 1, (float)1)); // Index > builder.Length
             Assert.Throws<OutOfMemoryException>(() => builder.Insert(builder.Length, (float)1)); // New length > builder.MaxCapacity
+        }
+
+        public static IEnumerable<object?[]> Test_Insert_ICharSequence_TestData()
+        {
+            yield return new object?[] { "Hello", 0, "\0", 0, 1, "\0Hello" };
+            yield return new object?[] { "Hello", 3, "abc", 0, 1, "Helalo" };
+            yield return new object?[] { "Hello", 3, "abc", 0, 3, "Helabclo" };
+            yield return new object?[] { "Hello", 5, "def", 0, 1, "Hellod" };
+            yield return new object?[] { "Hello", 5, "def", 0, 3, "Hellodef" };
+
+            yield return new object?[] { "Hello", 0, "", 0, 0, "Hello" };
+            yield return new object?[] { "Hello", 0, null, 0, 0, "Hello" };
+            yield return new object?[] { "Hello", 3, "abc", 1, 1, "Helblo" };
+            yield return new object?[] { "Hello", 3, "abc", 1, 2, "Helbclo" };
+            yield return new object?[] { "Hello", 3, "abc", 0, 2, "Helablo" };
+        }
+
+        public static IEnumerable<object?[]> Test_Insert_ICharSequence_Typed_TestData()
+        {
+            foreach (var testCase in Test_Insert_ICharSequence_TestData())
+            {
+                yield return new object?[] { testCase[0], testCase[1], new StringCharSequence((string?)testCase[2]), testCase[3], testCase[4], testCase[5] };
+                yield return new object?[] { testCase[0], testCase[1], new StringBuilderCharSequence(new StringBuilder((string?)testCase[2])), testCase[3], testCase[4], testCase[5] };
+                yield return new object?[] { testCase[0], testCase[1], new CharArrayCharSequence(((string?)testCase[2])?.ToCharArray()), testCase[3], testCase[4], testCase[5] };
+                ReadOnlyMemory<char> memory = ((string?)testCase[2]).AsMemory();
+                yield return new object?[] { testCase[0], testCase[1], new MockCharSequence(memory), testCase[3], testCase[4], testCase[5] };
+                if (testCase[2] is not null)
+                {
+                    yield return new object?[] { testCase[0], testCase[1], new StringBuffer((string?)testCase[2]), testCase[3], testCase[4], testCase[5] };
+                }
+                else
+                {
+                    yield return new object?[] { testCase[0], testCase[1], (StringCharSequence?)null, testCase[3], testCase[4], testCase[5] };
+                    yield return new object?[] { testCase[0], testCase[1], (StringBuilderCharSequence?)null, testCase[3], testCase[4], testCase[5] };
+                    yield return new object?[] { testCase[0], testCase[1], (CharArrayCharSequence?)null, testCase[3], testCase[4], testCase[5] };
+                    yield return new object?[] { testCase[0], testCase[1], (ICharSequence?)null, testCase[3], testCase[4], testCase[5] };
+                }
+            }
+        }
+
+        [Theory]
+        [MemberData(nameof(Test_Insert_ICharSequence_Typed_TestData))]
+        public void Insert_ICharSequence(string? original, int index, ICharSequence? value, int startIndex, int count, string expected)
+        {
+            MutableTextBuffer builder;
+            if (startIndex == 0 && count == (value?.Length ?? 0))
+            {
+                // Use Insert(int, ICharSequence)
+                builder = MutableTextBufferFactory(original);
+                builder.Insert(index, value);
+                Assert.Equal(expected, builder.ToString());
+            }
+            // Use Insert(int, ICharSequence, int, int)
+            builder = MutableTextBufferFactory(original);
+            builder.Insert(index, value, startIndex, count);
+            Assert.Equal(expected, builder.ToString());
+        }
+
+        [Fact]
+        public void Insert_ICharSequence_Invalid()
+        {
+            var builder = MutableTextBufferFactory(0, 5);
+            builder.Append("Hello");
+
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => builder.Insert(-1, new char[1].AsCharSequence())); // Index < 0
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => builder.Insert(-1, new char[0].AsCharSequence(), 0, 0)); // Index < 0
+
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => builder.Insert(builder.Length + 1, new char[1].AsCharSequence())); // Index > builder.Length
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => builder.Insert(builder.Length + 1, new char[0].AsCharSequence(), 0, 0)); // Index > builder.Length
+
+            Assert.Throws<ArgumentNullException>(() => builder.Insert(0, (char[]?)null, 1, 1)); // Value is null (startIndex and count are not zero)
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("startIndex", () => builder.Insert(0, new char[0].AsCharSequence(), -1, 0)); // Start index < 0
+
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("startIndex", () => builder.Insert(0, new char[3].AsCharSequence(), 4, 0)); // Start index + char count > value.Length
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("startIndex", () => builder.Insert(0, new char[3].AsCharSequence(), 3, 1)); // Start index + char count > value.Length
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("startIndex", () => builder.Insert(0, new char[3].AsCharSequence(), 2, 2)); // Start index + char count > value.Length
+
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("requiredLength", () => builder.Insert(builder.Length, new char[1].AsCharSequence())); // New length > builder.MaxCapacity
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("requiredLength", () => builder.Insert(builder.Length, new char[] { 'a' }.AsCharSequence(), 0, 1)); // New length > builder.MaxCapacity
+        }
+
+        [Fact]
+        public void Insert_ICharSequence_InvalidCount()
+        {
+            var builder = MutableTextBufferFactory(0, 5);
+            builder.Append("Hello");
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("count", () => builder.Insert(0, new char[0].AsCharSequence(), 0, -1)); // Char count < 0
         }
 
         [Theory]
@@ -3310,5 +3497,36 @@ namespace J2N.Text.Tests
 #endif
 
         #endregion InsertSelf Tests
+
+        /// <summary>
+        /// A custom <see cref="ICharSequence"/> implementation used for testing unknown
+        /// implementations, since we generally optimize by using the underlying value of
+        /// <see cref="CharArrayCharSequence"/>, <see cref="StringCharSequence"/> or 
+        /// <see cref="StringBuilderCharSequence"/> rather than the interface itself.
+        /// </summary>
+        private sealed class MockCharSequence : ICharSequence
+        {
+            private readonly ReadOnlyMemory<char> value;
+            public MockCharSequence(ReadOnlyMemory<char> value)
+            {
+                this.value = value;
+            }
+
+            public char this[int index] => value.Span[index];
+
+            public bool HasValue => true;
+
+            public int Length => value.Length;
+
+            public ICharSequence Subsequence(int startIndex, int length)
+            {
+                return new MockCharSequence(value.Slice(startIndex, length));
+            }
+
+            public override string ToString()
+            {
+                return value.ToString();
+            }
+        }
     }
 }

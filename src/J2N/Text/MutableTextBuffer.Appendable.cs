@@ -24,35 +24,6 @@ namespace J2N.Text
             if (charSequence is null || !charSequence.HasValue)
                 return;
 
-            if (charSequence is StringCharSequence str)
-            {
-                Append(str.Value);
-                return;
-            }
-            else if (charSequence is CharArrayCharSequence chars)
-            {
-                Append(chars.Value);
-                return;
-            }
-            else if (charSequence is StringBuilderCharSequence sb)
-            {
-                Append(sb.Value);
-                return;
-            }
-            else if (charSequence is MutableTextBuffer osb)
-            {
-                Append(osb);
-                return;
-            }
-            else if (charSequence is StringBuffer buffer)
-            {
-                lock (buffer.SyncRoot)
-                {
-                    Append(buffer.builder);
-                    return;
-                }
-            }
-
             int count = charSequence.Length;
             int pos = m_Position;
             if ((uint)pos + (uint)count > (uint)m_Chars.Length)
@@ -68,9 +39,20 @@ namespace J2N.Text
                 Grow(count);
             }
 
-            for (int i = 0; i < count; i++)
+            if (charSequence is ISpanCopyable<char> spanCopyable)
             {
-                m_Chars[pos++] = charSequence[i];
+                spanCopyable.CopyTo(0, m_Chars.AsSpan(pos), count);
+            }
+            else if (charSequence is ICopyable<char> copyable)
+            {
+                copyable.CopyTo(0, m_Chars, pos, count);
+            }
+            else
+            {
+                for (int i = 0; i < count; i++)
+                {
+                    m_Chars[pos++] = charSequence[i];
+                }
             }
             m_Position += count;
         }
@@ -103,35 +85,6 @@ namespace J2N.Text
         [CodeGenerationReturnsSelf]
         public void Append(ICharSequence? charSequence, int startIndex, int count)
         {
-            if (charSequence is StringCharSequence str)
-            {
-                Append(str.Value, startIndex, count);
-                return;
-            }
-            else if (charSequence is CharArrayCharSequence chars)
-            {
-                Append(chars.Value, startIndex, count);
-                return;
-            }
-            else if (charSequence is StringBuilderCharSequence sb)
-            {
-                Append(sb.Value, startIndex, count);
-                return;
-            }
-            else if (charSequence is MutableTextBuffer osb)
-            {
-                Append(osb, startIndex, count);
-                return;
-            }
-            else if (charSequence is StringBuffer buffer)
-            {
-                lock (buffer.SyncRoot)
-                {
-                    Append(buffer.builder, startIndex, count);
-                    return;
-                }
-            }
-
             if (startIndex < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(startIndex, ExceptionArgument.startIndex);
             if (count < 0)
@@ -144,6 +97,10 @@ namespace J2N.Text
                     return;
                 }
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.charSequence);
+            }
+            if (count > charSequence.Length - startIndex)
+            {
+                ThrowHelper.ThrowArgumentOutOfRange_IndexMustBeLessOrEqualException(count, ExceptionArgument.count);
             }
 
             if (count != 0)
@@ -161,15 +118,26 @@ namespace J2N.Text
                     int newLength = pos + count;
                     if (newLength > m_MaxCapacity || newLength < count)
                     {
-                        ThrowHelper.ThrowArgumentOutOfRangeException(count, ExceptionArgument.count, ExceptionResource.ArgumentOutOfRange_LengthGreaterThanCapacity);
+                        ThrowHelper.ThrowArgumentOutOfRangeException(count, ExceptionArgument.valueCount, ExceptionResource.ArgumentOutOfRange_LengthGreaterThanCapacity);
                     }
 
                     Grow(count);
                 }
 
-                for (int i = 0; i < count; i++)
+                if (charSequence is ISpanCopyable<char> spanCopyable)
                 {
-                    m_Chars[pos++] = charSequence[i + startIndex];
+                    spanCopyable.CopyTo(startIndex, m_Chars.AsSpan(pos), count);
+                }
+                else if (charSequence is ICopyable<char> copyable)
+                {
+                    copyable.CopyTo(startIndex, m_Chars, pos, count);
+                }
+                else
+                {
+                    for (int i = 0; i < count; i++)
+                    {
+                        m_Chars[pos++] = charSequence[i + startIndex];
+                    }
                 }
                 m_Position += count;
             }
@@ -195,49 +163,31 @@ namespace J2N.Text
         [CodeGenerationReturnsSelf]
         public void Insert(int index, ICharSequence? charSequence)
         {
-            if (charSequence is null || !charSequence.HasValue || charSequence.Length == 0)
-                return;
-
-            if (charSequence is StringCharSequence stringCharSequence)
-            {
-                Insert(index, stringCharSequence?.Value);
-                return;
-            }
-            else if (charSequence is CharArrayCharSequence chars)
-            {
-                Insert(index, chars.Value);
-                return;
-            }
-            else if (charSequence is StringBuilderCharSequence sbCharSequence)
-            {
-                Insert(index, sbCharSequence.Value);
-                return;
-            }
-            else if (charSequence is MutableTextBuffer osb)
-            {
-                Insert(index, osb.AsSpan());
-                return;
-            }
-            else if (charSequence is StringBuffer sBuffer)
-            {
-                lock (sBuffer.SyncRoot)
-                {
-                    Insert(index, sBuffer.builder);
-                    return;
-                }
-            }
-
             if ((uint)index > (uint)Length)
             {
                 ThrowHelper.ThrowArgumentOutOfRange_IndexMustBeLessOrEqualException(index);
             }
 
+            if (charSequence is null || !charSequence.HasValue || charSequence.Length == 0)
+                return;
+
             int count = charSequence.Length;
             MakeRoom(index, count);
 
-            for (int i = 0; i < count; i++)
+            if (charSequence is ISpanCopyable<char> spanCopyable)
             {
-                m_Chars[index++] = charSequence[i];
+                spanCopyable.CopyTo(0, m_Chars.AsSpan(index), count);
+            }
+            else if (charSequence is ICopyable<char> copyable)
+            {
+                copyable.CopyTo(0, m_Chars, index, count);
+            }
+            else
+            {
+                for (int i = 0; i < count; i++)
+                {
+                    m_Chars[index++] = charSequence[i];
+                }
             }
         }
 
@@ -285,35 +235,6 @@ namespace J2N.Text
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.value);
             }
 
-            if (charSequence is StringCharSequence stringCharSequence)
-            {
-                Insert(index, stringCharSequence.Value.AsSpan(startIndex, count));
-                return;
-            }
-            else if (charSequence is CharArrayCharSequence chars)
-            {
-                Insert(index, chars.Value, startIndex, count);
-                return;
-            }
-            else if (charSequence is StringBuilderCharSequence sbCharSequence)
-            {
-                Insert(index, sbCharSequence.Value!.ToString(startIndex, count));
-                return;
-            }
-            else if (charSequence is MutableTextBuffer osb)
-            {
-                Insert(index, osb.AsSpan(startIndex, count));
-                return;
-            }
-            else if (charSequence is StringBuffer sBuffer)
-            {
-                lock (sBuffer.SyncRoot)
-                {
-                    Insert(index, sBuffer.builder.ToString(startIndex, count));
-                    return;
-                }
-            }
-
             if (startIndex < 0)
             {
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(startIndex, ExceptionArgument.startIndex);
@@ -332,9 +253,21 @@ namespace J2N.Text
             if (count > 0)
             {
                 MakeRoom(index, count);
-                for (int i = 0; i < count; i++)
+
+                if (charSequence is ISpanCopyable<char> spanCopyable)
                 {
-                    m_Chars[index++] = charSequence[i + startIndex];
+                    spanCopyable.CopyTo(startIndex, m_Chars.AsSpan(index), count);
+                }
+                else if (charSequence is ICopyable<char> copyable)
+                {
+                    copyable.CopyTo(startIndex, m_Chars, index, count);
+                }
+                else
+                {
+                    for (int i = 0; i < count; i++)
+                    {
+                        m_Chars[index++] = charSequence[i + startIndex];
+                    }
                 }
             }
         }

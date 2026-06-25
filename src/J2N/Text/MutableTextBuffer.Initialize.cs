@@ -440,34 +440,19 @@ namespace J2N.Text
 
             m_Chars = allocator.Allocate(capacity);
 
-            if (value is null || !value.HasValue)
+            if (value is null || !value.HasValue || length == 0)
             {
                 m_Position = 0;
                 return this;
             }
 
-            if (value is StringCharSequence str)
+            if (value is ISpanCopyable<char> copyable)
             {
-                str.Value!.CopyTo(0, m_Chars, 0, str.Length);
+                copyable.CopyTo(0, m_Chars, length);
             }
-            else if (value is StringBuilderCharSequence sb)
+            else if (value is ICopyable<char> spanCopyable)
             {
-                sb.Value!.CopyTo(0, m_Chars, 0, sb.Length);
-            }
-            else if (value is MutableTextBuffer osb)
-            {
-                osb.CopyTo(0, m_Chars, 0, osb.Length);
-            }
-            else if (value is CharArrayCharSequence chars)
-            {
-                chars.Value!.CopyTo(m_Chars, 0);
-            }
-            else if (value is StringBuffer sbuffer)
-            {
-                lock (sbuffer.SyncRoot)
-                {
-                    sbuffer.builder.CopyTo(0, m_Chars, 0, sbuffer.Length);
-                }
+                spanCopyable.CopyTo(0, m_Chars, 0, length);
             }
             else
             {
