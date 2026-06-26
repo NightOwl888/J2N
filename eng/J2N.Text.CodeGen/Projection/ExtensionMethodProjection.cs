@@ -8,7 +8,8 @@ namespace J2N.Text.CodeGen.Projection
             TypeModel extensionSource,
             string targetSourceType,
             string facadeNamespace,
-            string facadeType,
+            string projectedBuilderType,
+            string projectedTypeName,
             ProjectionOptions? options = null)
         {
             options ??= new ProjectionOptions();
@@ -17,7 +18,7 @@ namespace J2N.Text.CodeGen.Projection
             {
                 Source = extensionSource,
                 Namespace = facadeNamespace,
-                Name = extensionSource.Name
+                Name = projectedTypeName,
             };
 
             foreach (MethodModel method in extensionSource.Methods.Where(x => !x.Ignore))
@@ -32,7 +33,7 @@ namespace J2N.Text.CodeGen.Projection
                     ProjectMethod(
                         method,
                         targetSourceType,
-                        facadeType,
+                        projectedBuilderType,
                         options));
             }
 
@@ -42,7 +43,7 @@ namespace J2N.Text.CodeGen.Projection
         private static MethodModel ProjectMethod(
             MethodModel method,
             string sourceType,
-            string facadeType,
+            string projectedBuilderType,
             ProjectionOptions options)
         {
             var methodModel =  new MethodModel
@@ -53,7 +54,7 @@ namespace J2N.Text.CodeGen.Projection
                     RewriteType(
                         method.ReturnType,
                         sourceType,
-                        facadeType),
+                        projectedBuilderType),
 
                 ReturnsSelf = method.ReturnsSelf,
                 IsBuilderMethod = method.IsBuilderMethod,
@@ -70,7 +71,7 @@ namespace J2N.Text.CodeGen.Projection
                                 RewriteType(
                                     p.TypeName,
                                     sourceType,
-                                    facadeType),
+                                    projectedBuilderType),
 
                             SourceTypeName = p.SourceTypeName,
 
@@ -78,7 +79,7 @@ namespace J2N.Text.CodeGen.Projection
                                 RewriteDocumentation(
                                     p.Documentation,
                                     sourceType,
-                                    facadeType),
+                                    projectedBuilderType),
 
                             Modifier = p.Modifier,
                             IsThis = p.IsThis,
@@ -105,25 +106,25 @@ namespace J2N.Text.CodeGen.Projection
                                     RewriteDocumentation(
                                         method.Documentation.SummaryXml,
                                         sourceType,
-                                        facadeType),
+                                        projectedBuilderType),
 
                                 RemarksXml =
                                     RewriteDocumentation(
                                         method.Documentation.RemarksXml,
                                         sourceType,
-                                        facadeType),
+                                        projectedBuilderType),
 
                                 ReturnsXml =
                                     RewriteDocumentation(
                                         method.Documentation.ReturnsXml,
                                         sourceType,
-                                        facadeType),
+                                        projectedBuilderType),
 
                                 SynchronizationNoteXml =
                                     RewriteDocumentation(
                                         method.Documentation.SynchronizationNoteXml,
                                         sourceType,
-                                        facadeType)
+                                        projectedBuilderType)
                             },
                             includeSynchronizationNote: options.EmitSynchronizationNotes && method.SkipSynchronization),
 
@@ -131,7 +132,7 @@ namespace J2N.Text.CodeGen.Projection
                     RewriteBody(
                         method.BodyText,
                         sourceType,
-                        facadeType)
+                        projectedBuilderType)
             };
 
             methodModel.ConditionalCompilationSymbol =
@@ -161,20 +162,20 @@ namespace J2N.Text.CodeGen.Projection
         private static string RewriteType(
             string typeName,
             string sourceType,
-            string facadeType)
+            string projectedBuilderType)
         {
-            return typeName.Replace(sourceType, facadeType);
+            return typeName.Replace(sourceType, projectedBuilderType);
         }
 
         private static string? RewriteDocumentation(
             string? xml,
             string sourceType,
-            string facadeType)
+            string projectedBuilderType)
         {
             if (string.IsNullOrWhiteSpace(xml))
                 return xml;
 
-            return xml.Replace(sourceType, facadeType);
+            return xml.Replace(sourceType, projectedBuilderType);
         }
 
         private static DocumentationModel? MergeSynchronizationDocumentation(DocumentationModel? docs, bool includeSynchronizationNote)
@@ -210,7 +211,7 @@ namespace J2N.Text.CodeGen.Projection
         private static string? RewriteBody(
             string? body,
             string sourceType,
-            string facadeType)
+            string projectedBuilderType)
         {
             if (string.IsNullOrWhiteSpace(body))
                 return body;
@@ -220,7 +221,7 @@ namespace J2N.Text.CodeGen.Projection
             result =
                 result.Replace(
                     sourceType,
-                    facadeType);
+                    projectedBuilderType);
 
             result =
                 result.Replace(

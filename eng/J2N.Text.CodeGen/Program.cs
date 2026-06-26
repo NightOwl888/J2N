@@ -196,7 +196,8 @@ namespace J2N.Text.CodGen
                     extensionModel,
                     "MutableTextBuffer",
                     facadeNamespace: "J2N.Text",
-                    facadeType: facadeName,
+                    projectedBuilderType: facadeName,
+                    projectedTypeName: facadeName + "Extensions",
                     options: new ProjectionOptions
                     {
                         EmitSynchronizationNotes = emitSynchronizationNotes,
@@ -208,7 +209,7 @@ namespace J2N.Text.CodGen
             string extensionPath =
                 Path.Combine(
                     sourceDirectory,
-                    $"TextMemoryExtensions.{facadeName}.generated.cs");
+                    $"{facadeName}Extensions.generated.cs");
 
             File.WriteAllText(
                 extensionPath,

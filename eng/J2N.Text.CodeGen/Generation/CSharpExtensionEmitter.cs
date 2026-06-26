@@ -69,7 +69,7 @@ namespace J2N.Text.CodeGen.Generation
             sb.AppendLine("//     Changes to this file may cause incorrect behavior and will be lost if");
             sb.AppendLine("//     the code is regenerated.");
             sb.AppendLine("//");
-            sb.AppendLine("//     Instead of editing this file, the TextMemoryExtensions*.cs files should be edited");
+            sb.AppendLine("//     Instead of editing this file, the MutableTextBufferExtensions*.cs files should be edited");
             sb.AppendLine("//     which will propagate the edits to this file.");
             sb.AppendLine("// </auto-generated>");
             sb.AppendLine("//------------------------------------------------------------------------------");
