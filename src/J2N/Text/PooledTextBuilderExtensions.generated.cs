@@ -5,7 +5,7 @@
 //     Changes to this file may cause incorrect behavior and will be lost if
 //     the code is regenerated.
 //
-//     Instead of editing this file, the TextMemoryExtensions*.cs files should be edited
+//     Instead of editing this file, the MutableTextBufferExtensions*.cs files should be edited
 //     which will propagate the edits to this file.
 // </auto-generated>
 //------------------------------------------------------------------------------
@@ -18,7 +18,7 @@ using System.Runtime.InteropServices;
 
 namespace J2N.Text
 {
-    public static partial class MutableTextBufferExtensions
+    public static partial class PooledTextBuilderExtensions
     {
         /// <summary>
         /// 
@@ -35,16 +35,12 @@ namespace J2N.Text
         /// 
         /// Returns <see langword="default"/> when <paramref name="text"/> is <see langword="null"/>.
         /// <para/>
-        /// The returned span is only valid while the underlying <see cref="SynchronizedTextBuilder"/> remains unchanged.
+        /// The returned span is only valid while the underlying <see cref="PooledTextBuilder"/> remains unchanged.
         /// Concurrent mutation invalidates the span contents.
-        /// <para/>
-        /// The returned span provides direct access to the underlying memory of the <see cref="SynchronizedTextBuilder"/>.
-        /// Callers must synchronize externally using <see cref = "SynchronizedTextBuilder.SyncRoot" /> property for the
-        /// entire duration of span usage if concurrent mutation is possible.
         /// 
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<char> AsSpan(this SynchronizedTextBuilder? text)
+        public static ReadOnlySpan<char> AsSpan(this PooledTextBuilder? text)
         {
             if (text is null)
                 return default;
@@ -77,16 +73,12 @@ namespace J2N.Text
         /// 
         /// Returns <see langword="default"/> when <paramref name="text"/> is <see langword="null"/>.
         /// <para/>
-        /// The returned span is only valid while the underlying <see cref="SynchronizedTextBuilder"/> remains unchanged.
+        /// The returned span is only valid while the underlying <see cref="PooledTextBuilder"/> remains unchanged.
         /// Concurrent mutation invalidates the span contents.
-        /// <para/>
-        /// The returned span provides direct access to the underlying memory of the <see cref="SynchronizedTextBuilder"/>.
-        /// Callers must synchronize externally using <see cref = "SynchronizedTextBuilder.SyncRoot" /> property for the
-        /// entire duration of span usage if concurrent mutation is possible.
         /// 
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<char> AsSpan(this SynchronizedTextBuilder? text, int start)
+        public static ReadOnlySpan<char> AsSpan(this PooledTextBuilder? text, int start)
         {
             if (text == null)
             {
@@ -130,16 +122,12 @@ namespace J2N.Text
         /// 
         /// Returns <see langword="default"/> when <paramref name="text"/> is <see langword="null"/>.
         /// <para/>
-        /// The returned span is only valid while the underlying <see cref="SynchronizedTextBuilder"/> remains unchanged.
+        /// The returned span is only valid while the underlying <see cref="PooledTextBuilder"/> remains unchanged.
         /// Concurrent mutation invalidates the span contents.
-        /// <para/>
-        /// The returned span provides direct access to the underlying memory of the <see cref="SynchronizedTextBuilder"/>.
-        /// Callers must synchronize externally using <see cref = "SynchronizedTextBuilder.SyncRoot" /> property for the
-        /// entire duration of span usage if concurrent mutation is possible.
         /// 
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<char> AsSpan(this SynchronizedTextBuilder? text, int start, int length)
+        public static ReadOnlySpan<char> AsSpan(this PooledTextBuilder? text, int start, int length)
         {
             if (text == null)
             {
@@ -190,16 +178,12 @@ namespace J2N.Text
         /// 
         /// Returns <see langword="default"/> when <paramref name="text"/> is <see langword="null"/>.
         /// <para/>
-        /// The returned span is only valid while the underlying <see cref="SynchronizedTextBuilder"/> remains unchanged.
+        /// The returned span is only valid while the underlying <see cref="PooledTextBuilder"/> remains unchanged.
         /// Concurrent mutation invalidates the span contents.
-        /// <para/>
-        /// The returned span provides direct access to the underlying memory of the <see cref="SynchronizedTextBuilder"/>.
-        /// Callers must synchronize externally using <see cref = "SynchronizedTextBuilder.SyncRoot" /> property for the
-        /// entire duration of span usage if concurrent mutation is possible.
         /// 
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<char> AsSpan(this SynchronizedTextBuilder? text, Index startIndex)
+        public static ReadOnlySpan<char> AsSpan(this PooledTextBuilder? text, Index startIndex)
         {
             if (text is null)
             {
@@ -246,16 +230,12 @@ namespace J2N.Text
         /// 
         /// Returns <see langword="default"/> when <paramref name="text"/> is <see langword="null"/>.
         /// <para/>
-        /// The returned span is only valid while the underlying <see cref="SynchronizedTextBuilder"/> remains unchanged.
+        /// The returned span is only valid while the underlying <see cref="PooledTextBuilder"/> remains unchanged.
         /// Concurrent mutation invalidates the span contents.
-        /// <para/>
-        /// The returned span provides direct access to the underlying memory of the <see cref="SynchronizedTextBuilder"/>.
-        /// Callers must synchronize externally using <see cref = "SynchronizedTextBuilder.SyncRoot" /> property for the
-        /// entire duration of span usage if concurrent mutation is possible.
         /// 
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<char> AsSpan(this SynchronizedTextBuilder? text, Range range)
+        public static ReadOnlySpan<char> AsSpan(this PooledTextBuilder? text, Range range)
         {
             if (text is null)
             {
@@ -300,15 +280,11 @@ namespace J2N.Text
         /// 
         /// Returns <see langword="default"/> when <paramref name="text"/> is <see langword="null"/>.
         /// <para/>
-        /// The returned memory is only valid while the underlying <see cref="SynchronizedTextBuilder"/> remains unchanged.
+        /// The returned memory is only valid while the underlying <see cref="PooledTextBuilder"/> remains unchanged.
         /// Concurrent mutation invalidates the memory contents.
-        /// <para/>
-        /// The returned memory provides direct access to the underlying memory of the <see cref="SynchronizedTextBuilder"/>.
-        /// Callers must synchronize externally using <see cref = "SynchronizedTextBuilder.SyncRoot" /> property for the
-        /// entire duration of memory usage if concurrent mutation is possible.
         /// 
         /// </remarks>
-        public static ReadOnlyMemory<char> AsMemory(this SynchronizedTextBuilder? text)
+        public static ReadOnlyMemory<char> AsMemory(this PooledTextBuilder? text)
         {
             if (text is null)
                 return default;
@@ -334,15 +310,11 @@ namespace J2N.Text
         /// 
         /// Returns <see langword="default"/> when <paramref name="text"/> is <see langword="null"/>.
         /// <para/>
-        /// The returned memory is only valid while the underlying <see cref="SynchronizedTextBuilder"/> remains unchanged.
+        /// The returned memory is only valid while the underlying <see cref="PooledTextBuilder"/> remains unchanged.
         /// Concurrent mutation invalidates the memory contents.
-        /// <para/>
-        /// The returned memory provides direct access to the underlying memory of the <see cref="SynchronizedTextBuilder"/>.
-        /// Callers must synchronize externally using <see cref = "SynchronizedTextBuilder.SyncRoot" /> property for the
-        /// entire duration of memory usage if concurrent mutation is possible.
         /// 
         /// </remarks>
-        public static ReadOnlyMemory<char> AsMemory(this SynchronizedTextBuilder? text, int start)
+        public static ReadOnlyMemory<char> AsMemory(this PooledTextBuilder? text, int start)
         {
             if (text == null)
             {
@@ -379,15 +351,11 @@ namespace J2N.Text
         /// 
         /// Returns <see langword="default"/> when <paramref name="text"/> is <see langword="null"/>.
         /// <para/>
-        /// The returned memory is only valid while the underlying <see cref="SynchronizedTextBuilder"/> remains unchanged.
+        /// The returned memory is only valid while the underlying <see cref="PooledTextBuilder"/> remains unchanged.
         /// Concurrent mutation invalidates the memory contents.
-        /// <para/>
-        /// The returned memory provides direct access to the underlying memory of the <see cref="SynchronizedTextBuilder"/>.
-        /// Callers must synchronize externally using <see cref = "SynchronizedTextBuilder.SyncRoot" /> property for the
-        /// entire duration of memory usage if concurrent mutation is possible.
         /// 
         /// </remarks>
-        public static ReadOnlyMemory<char> AsMemory(this SynchronizedTextBuilder? text, int start, int length)
+        public static ReadOnlyMemory<char> AsMemory(this PooledTextBuilder? text, int start, int length)
         {
             if (text == null)
             {
@@ -430,15 +398,11 @@ namespace J2N.Text
         /// 
         /// Returns <see langword="default"/> when <paramref name="text"/> is <see langword="null"/>.
         /// <para/>
-        /// The returned memory is only valid while the underlying <see cref="SynchronizedTextBuilder"/> remains unchanged.
+        /// The returned memory is only valid while the underlying <see cref="PooledTextBuilder"/> remains unchanged.
         /// Concurrent mutation invalidates the memory contents.
-        /// <para/>
-        /// The returned memory provides direct access to the underlying memory of the <see cref="SynchronizedTextBuilder"/>.
-        /// Callers must synchronize externally using <see cref = "SynchronizedTextBuilder.SyncRoot" /> property for the
-        /// entire duration of memory usage if concurrent mutation is possible.
         /// 
         /// </remarks>
-        public static ReadOnlyMemory<char> AsMemory(this SynchronizedTextBuilder? text, Index startIndex)
+        public static ReadOnlyMemory<char> AsMemory(this PooledTextBuilder? text, Index startIndex)
         {
             if (text == null)
             {
@@ -473,15 +437,11 @@ namespace J2N.Text
         /// 
         /// Returns <see langword="default"/> when <paramref name="text"/> is <see langword="null"/>.
         /// <para/>
-        /// The returned memory is only valid while the underlying <see cref="SynchronizedTextBuilder"/> remains unchanged.
+        /// The returned memory is only valid while the underlying <see cref="PooledTextBuilder"/> remains unchanged.
         /// Concurrent mutation invalidates the memory contents.
-        /// <para/>
-        /// The returned memory provides direct access to the underlying memory of the <see cref="SynchronizedTextBuilder"/>.
-        /// Callers must synchronize externally using <see cref = "SynchronizedTextBuilder.SyncRoot" /> property for the
-        /// entire duration of memory usage if concurrent mutation is possible.
         /// 
         /// </remarks>
-        public static ReadOnlyMemory<char> AsMemory(this SynchronizedTextBuilder? text, Range range)
+        public static ReadOnlyMemory<char> AsMemory(this PooledTextBuilder? text, Range range)
         {
             if (text == null)
             {
