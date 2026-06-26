@@ -23,5 +23,17 @@ namespace J2N.Text
     /// </summary>
     public static partial class PooledTextBuilderExtensions
     {
+        #region AsCharSequence
+
+        /// <summary>
+        /// Convenience method to wrap a string in a <see cref="MutableTextBufferCharSequence"/>
+        /// so a <see cref="PooledTextBuilder"/> can be used as <see cref="ICharSequence"/>.
+        /// </summary>
+        public static ICharSequence AsCharSequence(this PooledTextBuilder? text)
+        {
+            return new MutableTextBufferCharSequence(text?.buffer);
+        }
+
+        #endregion AsCharSequence
     }
 }

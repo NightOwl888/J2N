@@ -23,5 +23,17 @@ namespace J2N.Text
     /// </summary>
     public static partial class SynchronizedTextBuilderExtensions
     {
+        #region AsCharSequence
+
+        /// <summary>
+        /// Convenience method to wrap a string in a <see cref="SynchronizedTextBuilderCharSequence"/>
+        /// so a <see cref="SynchronizedTextBuilder"/> can be used as <see cref="ICharSequence"/>.
+        /// </summary>
+        public static SynchronizedTextBuilderCharSequence AsCharSequence(this SynchronizedTextBuilder? text)
+        {
+            return new SynchronizedTextBuilderCharSequence(text);
+        }
+
+        #endregion AsCharSequence
     }
 }

@@ -23,7 +23,14 @@ namespace J2N.Text
         /// <summary>
         /// Gets the current <see cref="MutableTextBuffer"/> value.
         /// </summary>
-        public MutableTextBuffer? Value { get; }
+        // J2N NOTE: Exposing this property allows users access to MutableTextBuffer.RawChars.
+        // However, we intentionally don't allow TextBuilder and PooledTextBuilder users to access the unused
+        // portion of the array because it may be uninitialized and contain sensitive data from another system.
+        // So, before we expose this, we either need specialized adapters (base classes? generics?) that don't
+        // expose the Value property. For now, advanced users are directed to use ReadOnlySpan<char> and ReadOnlyMemory<char>
+        // rather then porting Java code directly to ICharSequence. That approach is more complex, but usually
+        // ends up with far better performance.
+        internal MutableTextBuffer? Value { get; }
 
         #region ICharSequence Members
         /// <summary>

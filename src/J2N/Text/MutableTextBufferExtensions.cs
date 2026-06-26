@@ -13,6 +13,20 @@ namespace J2N.Text
     /// </summary>
     public static partial class MutableTextBufferExtensions
     {
+        #region AsCharSequence
+
+        /// <summary>
+        /// Convenience method to wrap a string in a <see cref="MutableTextBufferCharSequence"/>
+        /// so a <see cref="MutableTextBuffer"/> can be used as <see cref="ICharSequence"/>.
+        /// </summary>
+        [CodeGenerationIgnore]
+        public static ICharSequence AsCharSequence(this MutableTextBuffer? text)
+        {
+            return new MutableTextBufferCharSequence(text);
+        }
+
+        #endregion AsCharSequence
+
         #region AsSpan
 
         /// <summary>
