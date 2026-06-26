@@ -25,8 +25,8 @@ namespace J2N.Text
     ///         block of <see cref="char"/>s.
     ///     </description></item>
     ///     <item><description>
-    ///         Memory is directly accessible using <see cref="TextMemoryExtensions.AsSpan(PooledTextBuilder?)"/> and
-    ///         <see cref="TextMemoryExtensions.AsMemory(PooledTextBuilder?)"/> overloads including the ability to slice.
+    ///         Memory is directly accessible using <see cref="PooledTextBuilderExtensions.AsSpan(PooledTextBuilder?)"/> and
+    ///         <see cref="PooledTextBuilderExtensions.AsMemory(PooledTextBuilder?)"/> overloads including the ability to slice.
     ///         So, there is no need to allocate memory to call methods that require System.Memory types, such as
     ///         <see cref="ReadOnlySpan{T}"/>. So, no allocation is necessary to read the results.
     ///     </description></item>
@@ -444,8 +444,8 @@ namespace J2N.Text
         /// <remarks>
         /// This API is for compatibility with <c>StringBuilder.GetChuncks()</c> method.
         ///  <see cref="PooledTextBuilder" /> will never have more than a single chunk of memory so it is generally more efficient
-        ///  to use <see cref="TextMemoryExtensions.AsSpan(PooledTextBuilder)" /> or
-        ///  <see cref="TextMemoryExtensions.AsMemory(PooledTextBuilder)" /> when you need to access the underlying memory.
+        ///  to use <see cref="PooledTextBuilderExtensions.AsSpan(PooledTextBuilder?)" /> or
+        ///  <see cref="PooledTextBuilderExtensions.AsMemory(PooledTextBuilder?)" /> when you need to access the underlying memory.
         /// </remarks>
         public ChunkEnumerator GetChunks() => new(buffer);
 

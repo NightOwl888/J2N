@@ -734,7 +734,7 @@ namespace J2N.Text
         /// <remarks>
         /// 
         /// This method causes a heap allocation. As an allocation-free alternative,
-        /// you may call the <see cref="TextMemoryExtensions.AsSpan(PooledTextBuilder)"/> method
+        /// you may call the <see cref="PooledTextBuilderExtensions.AsSpan(PooledTextBuilder?)"/> method
         /// to get a <see cref="ReadOnlySpan{T}"/> representing the characters of this
         /// <see cref="PooledTextBuilder"/> instance.
         /// <para/>
@@ -764,7 +764,7 @@ namespace J2N.Text
         /// <remarks>
         /// 
         /// This method causes a heap allocation. As an allocation-free alternative,
-        /// you may call the <see cref="TextMemoryExtensions.AsSpan(PooledTextBuilder, int)"/> method
+        /// you may call the <see cref="PooledTextBuilderExtensions.AsSpan(PooledTextBuilder?, int)"/> method
         /// to get a <see cref="ReadOnlySpan{T}"/> representing the characters of the substring of this
         /// <see cref="PooledTextBuilder"/> instance.
         /// <para/>
@@ -796,7 +796,7 @@ namespace J2N.Text
         /// <remarks>
         /// 
         /// This method causes a heap allocation. As an allocation-free alternative,
-        /// you may call the <see cref="TextMemoryExtensions.AsSpan(PooledTextBuilder, int, int)"/> method
+        /// you may call the <see cref="PooledTextBuilderExtensions.AsSpan(PooledTextBuilder?, int, int)"/> method
         /// to get a <see cref="ReadOnlySpan{T}"/> representing the characters of the substring of this
         /// <see cref="PooledTextBuilder"/> instance.
         /// <para/>
@@ -1274,7 +1274,7 @@ namespace J2N.Text
         /// fixed size, preallocated, reusable, and possibly globally accessible.
         /// <para/>
         /// To access the characters for processing without allocating any heap memory, better alternatives are to use
-        /// <see cref="this[int]"/>, <see cref="TextMemoryExtensions.AsSpan(PooledTextBuilder, int, int)"/> or <see cref="CopyTo(int, Span{char}, int)"/>.
+        /// <see cref="this[int]"/>, <see cref="PooledTextBuilderExtensions.AsSpan(PooledTextBuilder?, int, int)"/> or <see cref="CopyTo(int, Span{char}, int)"/>.
         /// 
         /// </remarks>
         public void CopyTo(int sourceIndex, char[] destination, int destinationIndex, int count)
@@ -1303,7 +1303,7 @@ namespace J2N.Text
         /// when you need to efficiently copy successive sections of a <see cref="PooledTextBuilder"/> object to a span.
         /// <para/>
         /// To access the characters for processing without alocating any heap memory, better alternatives are to use
-        /// <see cref="this[int]"/> or <see cref="TextMemoryExtensions.AsSpan(PooledTextBuilder, int, int)"/>.
+        /// <see cref="this[int]"/> or <see cref="PooledTextBuilderExtensions.AsSpan(PooledTextBuilder?, int, int)"/>.
         /// 
         /// </remarks>
         public void CopyTo(int sourceIndex, Span<char> destination, int count)

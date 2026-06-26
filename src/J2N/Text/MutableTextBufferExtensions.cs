@@ -9,9 +9,9 @@ using System.Runtime.InteropServices;
 namespace J2N.Text
 {
     /// <summary>
-    /// Extensions to <see cref="Span{T}"/> and <see cref="ReadOnlySpan{T}"/>.
+    /// Extensions to <see cref="MutableTextBuffer"/>.
     /// </summary>
-    public static partial class TextMemoryExtensions
+    public static partial class MutableTextBufferExtensions
     {
         #region AsSpan
 

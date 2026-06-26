@@ -30,8 +30,8 @@ namespace J2N.Text
     ///         block of <see cref="char"/>s.
     ///     </description></item>
     ///     <item><description>
-    ///         Memory is directly accessible using <see cref="TextMemoryExtensions.AsSpan(MutableTextBuffer)"/> and
-    ///         <see cref="TextMemoryExtensions.AsMemory(MutableTextBuffer)"/> overloads including the ability to slice.
+    ///         Memory is directly accessible using <see cref="MutableTextBufferExtensions.AsSpan(MutableTextBuffer?)"/> and
+    ///         <see cref="MutableTextBufferExtensions.AsMemory(MutableTextBuffer?)"/> overloads including the ability to slice.
     ///         So, there is no need to allocate memory to call methods that require System.Memory types, such as
     ///         <see cref="ReadOnlySpan{T}"/>. So, no allocation is necessary to read the results.
     ///     </description></item>
@@ -266,7 +266,7 @@ namespace J2N.Text
         /// <returns>A string whose value is the same as this instance.</returns>
         /// <remarks>
         /// This method causes a heap allocation. As an allocation-free alternative,
-        /// you may call the <see cref="TextMemoryExtensions.AsSpan(MutableTextBuffer)"/> method
+        /// you may call the <see cref="MutableTextBufferExtensions.AsSpan(MutableTextBuffer?)"/> method
         /// to get a <see cref="ReadOnlySpan{T}"/> representing the characters of this
         /// <see cref="MutableTextBuffer"/> instance.
         /// <para/>
@@ -297,7 +297,7 @@ namespace J2N.Text
         /// <see cref="Length"/>.</exception>
         /// <remarks>
         /// This method causes a heap allocation. As an allocation-free alternative,
-        /// you may call the <see cref="TextMemoryExtensions.AsSpan(MutableTextBuffer, int)"/> method
+        /// you may call the <see cref="MutableTextBufferExtensions.AsSpan(MutableTextBuffer?, int)"/> method
         /// to get a <see cref="ReadOnlySpan{T}"/> representing the characters of the substring of this
         /// <see cref="MutableTextBuffer"/> instance.
         /// <para/>
@@ -331,7 +331,7 @@ namespace J2N.Text
         /// </exception>
         /// <remarks>
         /// This method causes a heap allocation. As an allocation-free alternative,
-        /// you may call the <see cref="TextMemoryExtensions.AsSpan(MutableTextBuffer, int, int)"/> method
+        /// you may call the <see cref="MutableTextBufferExtensions.AsSpan(MutableTextBuffer?, int, int)"/> method
         /// to get a <see cref="ReadOnlySpan{T}"/> representing the characters of the substring of this
         /// <see cref="MutableTextBuffer"/> instance.
         /// <para/>
@@ -1122,7 +1122,7 @@ namespace J2N.Text
         /// fixed size, preallocated, reusable, and possibly globally accessible.
         /// <para/>
         /// To access the characters for processing without allocating any heap memory, better alternatives are to use
-        /// <see cref="this[int]"/>, <see cref="TextMemoryExtensions.AsSpan(MutableTextBuffer, int, int)"/> or <see cref="CopyTo(int, Span{char}, int)"/>.
+        /// <see cref="this[int]"/>, <see cref="MutableTextBufferExtensions.AsSpan(MutableTextBuffer?, int, int)"/> or <see cref="CopyTo(int, Span{char}, int)"/>.
         /// </remarks>
         public void CopyTo(int sourceIndex, char[] destination, int destinationIndex, int count)
         {
@@ -1166,7 +1166,7 @@ namespace J2N.Text
         /// when you need to efficiently copy successive sections of a <see cref="MutableTextBuffer"/> object to a span.
         /// <para/>
         /// To access the characters for processing without alocating any heap memory, better alternatives are to use
-        /// <see cref="this[int]"/> or <see cref="TextMemoryExtensions.AsSpan(MutableTextBuffer, int, int)"/>.
+        /// <see cref="this[int]"/> or <see cref="MutableTextBufferExtensions.AsSpan(MutableTextBuffer?, int, int)"/>.
         /// </remarks>
         public void CopyTo(int sourceIndex, Span<char> destination, int count)
         {

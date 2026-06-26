@@ -23,8 +23,8 @@ namespace J2N.Text
     ///         block of <see cref="char"/>s.
     ///     </description></item>
     ///     <item><description>
-    ///         Memory is directly accessible using <see cref="TextMemoryExtensions.AsSpan(SynchronizedTextBuilder?)"/> and
-    ///         <see cref="TextMemoryExtensions.AsMemory(SynchronizedTextBuilder?)"/> overloads including the ability to slice.
+    ///         Memory is directly accessible using <see cref="SynchronizedTextBuilderExtensions.AsSpan(SynchronizedTextBuilder?)"/> and
+    ///         <see cref="SynchronizedTextBuilderExtensions.AsMemory(SynchronizedTextBuilder?)"/> overloads including the ability to slice.
     ///         So, there is no need to allocate memory to call methods that require System.Memory types, such as
     ///         <see cref="ReadOnlySpan{T}"/>. So, no allocation is necessary to read the results.
     ///     </description></item>
@@ -443,8 +443,8 @@ namespace J2N.Text
         /// <remarks>
         /// This API is for compatibility with <c>StringBuilder.GetChuncks()</c> method.
         ///  <see cref="SynchronizedTextBuilder" /> will never have more than a single chunk of memory so it is generally more efficient
-        ///  to use <see cref="TextMemoryExtensions.AsSpan(SynchronizedTextBuilder)" /> or
-        ///  <see cref="TextMemoryExtensions.AsMemory(SynchronizedTextBuilder)" /> when you need to access the underlying memory.
+        ///  to use <see cref="SynchronizedTextBuilderExtensions.AsSpan(SynchronizedTextBuilder?)" /> or
+        ///  <see cref="SynchronizedTextBuilderExtensions.AsMemory(SynchronizedTextBuilder?)" /> when you need to access the underlying memory.
         /// </remarks>
         public ChunkEnumerator GetChunks() => new(buffer);
 

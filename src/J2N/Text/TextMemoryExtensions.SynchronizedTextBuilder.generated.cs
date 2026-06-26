@@ -18,7 +18,7 @@ using System.Runtime.InteropServices;
 
 namespace J2N.Text
 {
-    public static partial class TextMemoryExtensions
+    public static partial class MutableTextBufferExtensions
     {
         /// <summary>
         /// 

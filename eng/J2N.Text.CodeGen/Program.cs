@@ -70,7 +70,7 @@ namespace J2N.Text.CodGen
             // ---------------------------------------------------------------------
 
             List<string> extensionSourceTexts =
-                Directory.GetFiles(sourceDirectory, "TextMemoryExtensions*.cs")
+                Directory.GetFiles(sourceDirectory, "MutableTextBufferExtensions*.cs")
                     .Where(f => !f.EndsWith(".generated.cs", StringComparison.OrdinalIgnoreCase))
                     .Select(File.ReadAllText)
                     .ToList();
@@ -79,7 +79,7 @@ namespace J2N.Text.CodGen
                 extractor.Extract(
                     extensionSourceTexts,
                     infrastructureTexts,
-                    "J2N.Text.TextMemoryExtensions");
+                    "J2N.Text.MutableTextBufferExtensions");
 
             // ---------------------------------------------------------------------
             // Generate TextBuilder
