@@ -1265,10 +1265,14 @@ namespace J2N.Text
             }
             Debug.Assert(insertingChars + m_Position < int.MaxValue);
 
-            MakeRoom(index, (int)insertingChars);
+            int destinationLength = (int)insertingChars;
+            if (destinationLength == 0)
+                return;
+
+            MakeRoom(index, destinationLength);
 
             Span<char> destination =
-                m_Chars.AsSpan(index, (int)insertingChars);
+                m_Chars.AsSpan(index, destinationLength);
 
             // We only copy from the source once. The remainder of the copies
             // are from destination to destination. This allows for more opportunities
@@ -1276,7 +1280,178 @@ namespace J2N.Text
             value.CopyTo(destination);
 
             int copied = value.Length;
-            int destinationLength = destination.Length;
+
+            while (copied < destinationLength)
+            {
+                int remaining = destinationLength - copied;
+                int copyLength = copied < remaining ? copied : remaining;
+
+                destination.Slice(0, copyLength)
+                    .CopyTo(destination.Slice(copied));
+
+                copied += copyLength;
+            }
+        }
+
+        /// <summary>
+        /// Inserts one or more copies of a specified sequence of characters into this instance at the specified character position.
+        /// </summary>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">The sequence of characters to insert.</param>
+        /// <param name="repeatCount">The number of times to insert <paramref name="value"/>.</param>
+        /// <returns>A reference to this instance after insertion has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="index"/> is less than zero or greater than the current length of this instance.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="repeatCount"/> is less than zero.
+        /// </exception>
+        /// <exception cref="OutOfMemoryException">
+        /// The current length of this <see cref="MutableTextBuffer"/> object plus the length of <paramref name="value"/>
+        /// times <paramref name="repeatCount"/> exceeds <see cref="MaxCapacity"/>.
+        /// </exception>
+        /// <remarks>
+        /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
+        /// <para/>
+        /// This <see cref="MutableTextBuffer"/> object is not changed if the length of <paramref name="value"/> is zero or
+        /// <paramref name="repeatCount"/> is zero.
+        /// </remarks>
+        [CodeGenerationReturnsSelf]
+        public void Insert(int index, StringBuilder? value, int repeatCount)
+        {
+            if (repeatCount < 0)
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(repeatCount, ExceptionArgument.repeatCount);
+
+            int currentLength = Length;
+            if ((uint)index > (uint)currentLength)
+            {
+                ThrowHelper.ThrowArgumentOutOfRange_IndexMustBeLessOrEqualException(index, ExceptionArgument.index);
+            }
+
+            if (value is null || repeatCount == 0)
+            {
+                return;
+            }
+
+            // Ensure we don't insert more chars than we can hold, and we don't
+            // have any integer overflow in our new length.
+            long insertingChars = (long)value.Length * repeatCount;
+            if (insertingChars > MaxCapacity - m_Position)
+            {
+                throw new OutOfMemoryException();
+            }
+            Debug.Assert(insertingChars + m_Position < int.MaxValue);
+
+            int destinationLength = (int)insertingChars;
+
+            if (destinationLength == 0)
+                return;
+
+            MakeRoom(index, destinationLength);
+
+            int copied = value.Length;
+
+            // We only copy from the source once. The remainder of the copies
+            // are from destination to destination. This allows for more opportunities
+            // for the BCL to optimize the copy.
+            value.CopyTo(0, m_Chars, index, copied);
+
+            Span<char> destination =
+                m_Chars.AsSpan(index, destinationLength);
+
+            while (copied < destinationLength)
+            {
+                int remaining = destinationLength - copied;
+                int copyLength = copied < remaining ? copied : remaining;
+
+                destination.Slice(0, copyLength)
+                    .CopyTo(destination.Slice(copied));
+
+                copied += copyLength;
+            }
+        }
+
+        /// <summary>
+        /// Inserts one or more copies of a specified sequence of characters into this instance at the specified character position.
+        /// </summary>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">The sequence of characters to insert.</param>
+        /// <param name="repeatCount">The number of times to insert <paramref name="value"/>.</param>
+        /// <returns>A reference to this instance after insertion has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="index"/> is less than zero or greater than the current length of this instance.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="repeatCount"/> is less than zero.
+        /// </exception>
+        /// <exception cref="OutOfMemoryException">
+        /// The current length of this <see cref="MutableTextBuffer"/> object plus the length of <paramref name="value"/>
+        /// times <paramref name="repeatCount"/> exceeds <see cref="MaxCapacity"/>.
+        /// </exception>
+        /// <remarks>
+        /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
+        /// <para/>
+        /// This <see cref="MutableTextBuffer"/> object is not changed if the length of <paramref name="value"/> is zero or
+        /// <paramref name="repeatCount"/> is zero.
+        /// </remarks>
+        [CodeGenerationReturnsSelf]
+        public void Insert(int index, ICharSequence? value, int repeatCount)
+        {
+            if (repeatCount < 0)
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(repeatCount, ExceptionArgument.repeatCount);
+
+            int currentLength = Length;
+            if ((uint)index > (uint)currentLength)
+            {
+                ThrowHelper.ThrowArgumentOutOfRange_IndexMustBeLessOrEqualException(index, ExceptionArgument.index);
+            }
+
+            if (value is null || repeatCount == 0)
+            {
+                return;
+            }
+
+            // Ensure we don't insert more chars than we can hold, and we don't
+            // have any integer overflow in our new length.
+            long insertingChars = (long)value.Length * repeatCount;
+            if (insertingChars > MaxCapacity - m_Position)
+            {
+                throw new OutOfMemoryException();
+            }
+            Debug.Assert(insertingChars + m_Position < int.MaxValue);
+
+            int destinationLength = (int)insertingChars;
+            if (destinationLength == 0)
+                return;
+
+            MakeRoom(index, destinationLength);
+
+            int copied = value.Length;
+
+            Span<char> destination =
+                m_Chars.AsSpan(index, destinationLength);
+
+            // We only copy from the source once. The remainder of the copies
+            // are from destination to destination. This allows for more opportunities
+            // for the BCL to optimize the copy.
+            //value.CopyTo(0, m_Chars, index, copied);
+            if (value is ISpanCopyable<char> spanCopyable)
+            {
+                spanCopyable.CopyTo(0, destination, copied);
+            }
+            else if (value is ICopyable<char> copyable)
+            {
+                copyable.CopyTo(0, m_Chars, index, copied);
+            }
+            else
+            {
+                for (int i = 0; i < copied; i++)
+                {
+                    destination[i] = value[i];
+                }
+            }
 
             while (copied < destinationLength)
             {
@@ -1797,7 +1972,7 @@ namespace J2N.Text
         [CodeGenerationReturnsSelf]
         public void Insert(int index, StringBuilder? value)
         {
-            if (value is null || value.Length == 0)
+            if (value is null)
                 return;
 
             if ((uint)index > (uint)Length)
@@ -1806,9 +1981,12 @@ namespace J2N.Text
             }
 
             int count = value.Length;
-            MakeRoom(index, count);
+            if (count > 0)
+            {
+                MakeRoom(index, count);
 
-            value.CopyTo(0, m_Chars, index, count);
+                value.CopyTo(0, m_Chars, index, count);
+            }
         }
 
         /// <summary>

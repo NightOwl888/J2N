@@ -92,7 +92,7 @@ namespace J2N.Text
             sb.Insert(sb.Length, "-\u2462", 5);
 
             // CharSequence
-            sb.Insert(sb.Length, MYCHARS.ToString(), 3); // J2N TODO: We currently don't have this API, but it would probably be better if we re-package all of these other APIs as Repeat() to match the JDK than to add these overloads now
+            sb.Insert(sb.Length, MYCHARS, 3);
 
             // null
             sb.Insert(sb.Length, (string?)null, 0); // J2N: These should be no-op in J2N to match the BCL (keeping this in place and repeating with strings below to confirm)
@@ -164,7 +164,7 @@ namespace J2N.Text
 
             AssertExtensions.ThrowsAny<OutOfMemoryException, ArgumentOutOfRangeException>(() =>
             {
-                sb.Insert(sb.Length, MYCHARS.ToString(), int.MaxValue); // J2N TODO: We currently don't have this API, but it would probably be better if we re-package all of these other APIs as Repeat() to match the JDK than to add these overloads now
+                sb.Insert(sb.Length, MYCHARS, int.MaxValue);
             });
 
             Assert.Throws<ArgumentOutOfRangeException>(() =>
@@ -179,7 +179,7 @@ namespace J2N.Text
 
             Assert.Throws<ArgumentOutOfRangeException>(() =>
             {
-                sb.Insert(sb.Length, MYCHARS.ToString(), -1); // J2N TODO: We currently don't have this API, but it would probably be better if we re-package all of these other APIs as Repeat() to match the JDK than to add these overloads now
+                sb.Insert(sb.Length, MYCHARS, -1);
             });
 
             //Assert.Throws<ArgumentOutOfRangeException>(() =>

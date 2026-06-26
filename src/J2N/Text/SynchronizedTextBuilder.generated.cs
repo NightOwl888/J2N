@@ -300,7 +300,7 @@ namespace J2N.Text
         /// The position in this instance where insertion begins.
         /// </param>
         /// <param name="value">
-        /// A character array.
+        /// The character sequence to insert.
         /// </param>
         /// <param name="startIndex">
         /// The starting index within <paramref name="value"/>.
@@ -1536,6 +1536,74 @@ namespace J2N.Text
         /// 
         /// </remarks>
         public SynchronizedTextBuilder Insert(int index, ReadOnlySpan<char> value, int repeatCount)
+        {
+            lock (syncRoot)
+            {
+                buffer.Insert(index, value, repeatCount);
+                return this;
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// Inserts one or more copies of a specified sequence of characters into this instance at the specified character position.
+        /// 
+        /// </summary>
+        /// <param name="index">
+        /// The position in this instance where insertion begins.
+        /// </param>
+        /// <param name="value">
+        /// The sequence of characters to insert.
+        /// </param>
+        /// <param name="repeatCount">
+        /// The number of times to insert <paramref name="value"/>.
+        /// </param>
+        /// <returns>
+        /// A reference to this instance after the operation has completed.
+        /// </returns>
+        /// <remarks>
+        /// 
+        /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
+        /// <para/>
+        /// This <see cref="SynchronizedTextBuilder"/> object is not changed if the length of <paramref name="value"/> is zero or
+        /// <paramref name="repeatCount"/> is zero.
+        /// 
+        /// </remarks>
+        public SynchronizedTextBuilder Insert(int index, StringBuilder? value, int repeatCount)
+        {
+            lock (syncRoot)
+            {
+                buffer.Insert(index, value, repeatCount);
+                return this;
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// Inserts one or more copies of a specified sequence of characters into this instance at the specified character position.
+        /// 
+        /// </summary>
+        /// <param name="index">
+        /// The position in this instance where insertion begins.
+        /// </param>
+        /// <param name="value">
+        /// The sequence of characters to insert.
+        /// </param>
+        /// <param name="repeatCount">
+        /// The number of times to insert <paramref name="value"/>.
+        /// </param>
+        /// <returns>
+        /// A reference to this instance after the operation has completed.
+        /// </returns>
+        /// <remarks>
+        /// 
+        /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
+        /// <para/>
+        /// This <see cref="SynchronizedTextBuilder"/> object is not changed if the length of <paramref name="value"/> is zero or
+        /// <paramref name="repeatCount"/> is zero.
+        /// 
+        /// </remarks>
+        public SynchronizedTextBuilder Insert(int index, ICharSequence? value, int repeatCount)
         {
             lock (syncRoot)
             {

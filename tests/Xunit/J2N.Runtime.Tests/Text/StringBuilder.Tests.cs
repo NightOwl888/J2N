@@ -2388,6 +2388,145 @@ namespace J2N.Text.Tests
             Assert.Throws<OutOfMemoryException>(() => builder.Insert(builder.Length, "a".AsSpan(), 2)); // New length > builder.MaxCapacity
         }
 
+        public static IEnumerable<object?[]> Test_Insert_ICharSequence_RepeatCount_TestData()
+        {
+            yield return new object?[] { "Hello", 0, "\0", 0, "Hello" };
+            yield return new object?[] { "Hello", 0, "\0", 1, "\0Hello" };
+            yield return new object?[] { "Hello", 3, "abc", 1, "Helabclo" };
+            yield return new object?[] { "Hello", 5, "def", 1, "Hellodef" };
+            yield return new object?[] { "Hello", 0, "", 1, "Hello" };
+
+            yield return new object?[] { "Hello", 0, null, 1, "Hello" };
+            yield return new object?[] { "Hello", 3, "abc", 2, "Helabcabclo" };
+            yield return new object?[] { "Hello", 5, "def", 2, "Hellodefdef" };
+
+            // J2N specific - added tests to stress copy logic
+            yield return new object?[] { "", 0, "a", 8, "aaaaaaaa" };
+            yield return new object?[] { "", 0, "ab", 4, "abababab" };
+
+            yield return new object?[] { "", 0, "abc", 4, "abcabcabcabc" };
+            yield return new object?[] { "", 0, "abcd", 3, "abcdabcdabcd" };
+            yield return new object?[] { "", 0, "abc", 5, "abcabcabcabcabc" };
+            yield return new object?[] { "Hello", 0, "abc", 5, "abcabcabcabcabcHello" };
+            yield return new object?[] { "Hello", 2, "abc", 5, "Heabcabcabcabcabcllo" };
+            yield return new object?[] { "Hello", 5, "abc", 5, "Helloabcabcabcabcabc" };
+            yield return new object?[] { "", 0, "abcde", 7, "abcdeabcdeabcdeabcdeabcdeabcdeabcde" };
+        }
+
+        public static IEnumerable<object?[]> Test_Insert_ICharSequence_Typed_RepeatCount_TestData()
+        {
+            foreach (var testCase in Test_Insert_ICharSequence_RepeatCount_TestData())
+            {
+                yield return new object?[] { testCase[0], testCase[1], new StringCharSequence((string?)testCase[2]), testCase[3], testCase[4] };
+                yield return new object?[] { testCase[0], testCase[1], new StringBuilderCharSequence(new StringBuilder((string?)testCase[2])), testCase[3], testCase[4] };
+                yield return new object?[] { testCase[0], testCase[1], new CharArrayCharSequence(((string?)testCase[2])?.ToCharArray()), testCase[3], testCase[4] };
+                ReadOnlyMemory<char> memory = ((string?)testCase[2]).AsMemory();
+                yield return new object?[] { testCase[0], testCase[1], new MockCharSequence(memory), testCase[3], testCase[4] };
+                if (testCase[2] is not null)
+                {
+                    yield return new object?[] { testCase[0], testCase[1], new StringBuffer((string?)testCase[2]), testCase[3], testCase[4] };
+                }
+                else
+                {
+                    yield return new object?[] { testCase[0], testCase[1], (StringCharSequence?)null, testCase[3], testCase[4] };
+                    yield return new object?[] { testCase[0], testCase[1], (StringBuilderCharSequence?)null, testCase[3], testCase[4] };
+                    yield return new object?[] { testCase[0], testCase[1], (CharArrayCharSequence?)null, testCase[3], testCase[4] };
+                    yield return new object?[] { testCase[0], testCase[1], (ICharSequence?)null, testCase[3], testCase[4] };
+                }
+            }
+        }
+
+
+        [Theory] // J2N specific
+        [MemberData(nameof(Test_Insert_ICharSequence_Typed_RepeatCount_TestData))]
+        public void Insert_ICharSequence_RepeatCount(string? original, int index, ICharSequence? value, int count, string expected)
+        {
+            MutableTextBuffer builder;
+            if (count == 1)
+            {
+                // Use Insert(int, ICharSequence)
+                builder = MutableTextBufferFactory(original);
+                builder.Insert(index, value);
+                Assert.Equal(expected, builder.ToString());
+            }
+            // Use Insert(int, ICharSequence, int)
+            builder = MutableTextBufferFactory(original);
+            builder.Insert(index, value, count);
+            Assert.Equal(expected, builder.ToString());
+        }
+
+        [Fact] // J2N specific
+        public void Insert_ICharSequence_RepeatCount_Invalid()
+        {
+            var builder = MutableTextBufferFactory(0, 6);
+            builder.Append("Hello");
+
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => builder.Insert(-1, "".AsCharSequence())); // Index < 0
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => builder.Insert(-1, "".AsCharSequence(), 0)); // Index < 0
+
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => builder.Insert(builder.Length + 1, "".AsCharSequence())); // Index > builder.Length
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => builder.Insert(builder.Length + 1, "".AsCharSequence(), 0)); // Index > builder.Length
+
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("repeatCount", () => builder.Insert(0, "".AsCharSequence(), -1)); // Count < 0
+
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("requiredLength", () => builder.Insert(builder.Length, "aa".AsCharSequence())); // New length > builder.MaxCapacity
+            Assert.Throws<OutOfMemoryException>(() => builder.Insert(builder.Length, "aa".AsCharSequence(), 1)); // New length > builder.MaxCapacity
+            Assert.Throws<OutOfMemoryException>(() => builder.Insert(builder.Length, "a".AsCharSequence(), 2)); // New length > builder.MaxCapacity
+        }
+
+        public static IEnumerable<object?[]> Test_Insert_StringBuilder_RepeatCount_TestData()
+        {
+            foreach (var testCase in Test_Insert_ICharSequence_RepeatCount_TestData())
+            {
+                if (testCase[2] is not null)
+                {
+                    yield return new object?[] { testCase[0], testCase[1], new StringBuilder((string?)testCase[2]), testCase[3], testCase[4] };
+                }
+                else
+                {
+                    yield return new object?[] { testCase[0], testCase[1], (StringBuilder?)null, testCase[3], testCase[4] };
+                }
+            }
+        }
+
+
+        [Theory] // J2N specific
+        [MemberData(nameof(Test_Insert_StringBuilder_RepeatCount_TestData))]
+        public void Insert_StringBuilder_RepeatCount(string? original, int index, StringBuilder? value, int count, string expected)
+        {
+            MutableTextBuffer builder;
+            if (count == 1)
+            {
+                // Use Insert(int, ICharSequence)
+                builder = MutableTextBufferFactory(original);
+                builder.Insert(index, value);
+                Assert.Equal(expected, builder.ToString());
+            }
+            // Use Insert(int, ICharSequence, int)
+            builder = MutableTextBufferFactory(original);
+            builder.Insert(index, value, count);
+            Assert.Equal(expected, builder.ToString());
+        }
+
+        [Fact] // J2N specific
+        public void Insert_StringBuilder_RepeatCount_Invalid()
+        {
+            var builder = MutableTextBufferFactory(0, 6);
+            builder.Append("Hello");
+
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => builder.Insert(-1, new StringBuilder(""))); // Index < 0
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => builder.Insert(-1, new StringBuilder(""), 0)); // Index < 0
+
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => builder.Insert(builder.Length + 1, new StringBuilder(""))); // Index > builder.Length
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => builder.Insert(builder.Length + 1, new StringBuilder(""), 0)); // Index > builder.Length
+
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("repeatCount", () => builder.Insert(0, new StringBuilder(""), -1)); // Count < 0
+
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("requiredLength", () => builder.Insert(builder.Length, new StringBuilder("aa"))); // New length > builder.MaxCapacity
+            Assert.Throws<OutOfMemoryException>(() => builder.Insert(builder.Length, new StringBuilder("aa"), 1)); // New length > builder.MaxCapacity
+            Assert.Throws<OutOfMemoryException>(() => builder.Insert(builder.Length, new StringBuilder("a"), 2)); // New length > builder.MaxCapacity
+        }
+
 
         [Theory]
         [InlineData("Hello", 0, new char[] { '\0' }, 0, 1, "\0Hello")]
