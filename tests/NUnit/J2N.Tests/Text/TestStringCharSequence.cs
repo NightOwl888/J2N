@@ -1,9 +1,7 @@
 ﻿using NUnit.Framework;
 using System;
-using System.Collections.Generic;
-using System.Globalization;
 using System.Text;
-using System.Threading;
+#nullable enable
 
 namespace J2N.Text
 {
@@ -20,6 +18,16 @@ namespace J2N.Text
             emptyTarget = new StringCharSequence(string.Empty);
         }
 
+        protected override int CompareToString(StringCharSequence target, string? value) => target.CompareTo(value);
+        protected override int CompareToCharArray(StringCharSequence target, char[]? value) => target.CompareTo(value);
+        protected override int CompareToStringBuilder(StringCharSequence target, StringBuilder? value) => target.CompareTo(value);
+        protected override int CompareToReadOnlySpan(StringCharSequence target, ReadOnlySpan<char> value) => target.CompareTo(value);
+        protected override int CompareToObject(StringCharSequence target, object? value) => target.CompareTo(value);
+
+        protected override bool EqualsString(StringCharSequence target, string? value) => target.Equals(value);
+        protected override bool EqualsCharArray(StringCharSequence target, char[]? value) => target.Equals(value);
+        protected override bool EqualsStringBuilder(StringCharSequence target, StringBuilder? value) => target.Equals(value);
+        protected override bool EqualsReadOnlySpan(StringCharSequence target, ReadOnlySpan<char> value) => target.Equals(value);
 
         [Test]
         public void TestValue()
@@ -45,8 +53,8 @@ namespace J2N.Text
             Assert.IsFalse(target == String2);
             Assert.IsFalse(String2 == target);
 
-            Assert.IsTrue(nullTarget == (string)null);
-            Assert.IsTrue((string)null == nullTarget);
+            Assert.IsTrue(nullTarget == (string?)null);
+            Assert.IsTrue((string?)null == nullTarget);
 
 
             Assert.IsFalse(target != equalTarget);
@@ -61,8 +69,8 @@ namespace J2N.Text
             Assert.IsFalse(target != String1);
             Assert.IsFalse(String1 != target);
 
-            Assert.IsFalse(nullTarget != (string)null);
-            Assert.IsFalse((string)null != nullTarget);
+            Assert.IsFalse(nullTarget != (string?)null);
+            Assert.IsFalse((string?)null != nullTarget);
         }
     }
 }

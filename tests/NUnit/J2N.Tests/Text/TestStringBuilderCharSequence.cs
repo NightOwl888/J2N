@@ -1,7 +1,7 @@
 ﻿using NUnit.Framework;
 using System;
-using System.Collections.Generic;
 using System.Text;
+#nullable enable
 
 namespace J2N.Text
 {
@@ -18,6 +18,16 @@ namespace J2N.Text
             emptyTarget = new StringBuilderCharSequence(new StringBuilder());
         }
 
+        protected override int CompareToString(StringBuilderCharSequence target, string? value) => target.CompareTo(value);
+        protected override int CompareToCharArray(StringBuilderCharSequence target, char[]? value) => target.CompareTo(value);
+        protected override int CompareToStringBuilder(StringBuilderCharSequence target, StringBuilder? value) => target.CompareTo(value);
+        protected override int CompareToReadOnlySpan(StringBuilderCharSequence target, ReadOnlySpan<char> value) => target.CompareTo(value);
+        protected override int CompareToObject(StringBuilderCharSequence target, object? value) => target.CompareTo(value);
+
+        protected override bool EqualsString(StringBuilderCharSequence target, string? value) => target.Equals(value);
+        protected override bool EqualsCharArray(StringBuilderCharSequence target, char[]? value) => target.Equals(value);
+        protected override bool EqualsStringBuilder(StringBuilderCharSequence target, StringBuilder? value) => target.Equals(value);
+        protected override bool EqualsReadOnlySpan(StringBuilderCharSequence target, ReadOnlySpan<char> value) => target.Equals(value);
 
         [Test]
         public void TestValue()
@@ -43,8 +53,8 @@ namespace J2N.Text
             Assert.IsFalse(target == StringBuilder2);
             Assert.IsFalse(StringBuilder2 == target);
 
-            Assert.IsTrue(nullTarget == (StringBuilder)null);
-            Assert.IsTrue((StringBuilder)null == nullTarget);
+            Assert.IsTrue(nullTarget == (StringBuilder?)null);
+            Assert.IsTrue((StringBuilder?)null == nullTarget);
 
 
             Assert.IsFalse(target != equalTarget);
@@ -59,8 +69,8 @@ namespace J2N.Text
             Assert.IsFalse(target != StringBuilder1);
             Assert.IsFalse(StringBuilder1 != target);
 
-            Assert.IsFalse(nullTarget != (StringBuilder)null);
-            Assert.IsFalse((StringBuilder)null != nullTarget);
+            Assert.IsFalse(nullTarget != (StringBuilder?)null);
+            Assert.IsFalse((StringBuilder?)null != nullTarget);
         }
     }
 }

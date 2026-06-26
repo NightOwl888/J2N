@@ -40,7 +40,7 @@ namespace J2N.Text
     /// </list>
     /// </remarks>
     public sealed partial class PooledTextBuilder : IAppendable, ISpanAppendable, ICharSequence, IBufferWriter<char>,
-        ICopyable<char>, ISpanCopyable<char>, IDisposable
+        ISpannable<char>, ICopyable<char>, ISpanCopyable<char>, IDisposable
     {
         internal readonly MutableTextBuffer buffer;
 
@@ -453,5 +453,15 @@ namespace J2N.Text
         /// Releases ownership of the underlying array and returns it to the underlying array pool.
         /// </summary>
         public void Dispose() => buffer.Dispose();
+
+        #region ISpannable<char> Members
+
+        ReadOnlySpan<char> ISpannable<char>.AsSpan() => this.AsSpan();
+
+        ReadOnlySpan<char> ISpannable<char>.AsSpan(int start) => this.AsSpan(start);
+
+        ReadOnlySpan<char> ISpannable<char>.AsSpan(int start, int length) => this.AsSpan(start, length);
+
+        #endregion ISpannable<char> Members
     }
 }

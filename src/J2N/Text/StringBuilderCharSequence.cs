@@ -27,11 +27,11 @@ namespace J2N.Text
     /// A wrapper class that represents a <see cref="System.Text.StringBuilder"/> and implements <see cref="ICharSequence"/>.
     /// </summary>
     public class StringBuilderCharSequence : ICharSequence, IAppendable, 
-        IComparable<ICharSequence>, IComparable,
-        IComparable<string>, IComparable<StringBuilder>, IComparable<char[]>,
-        IEquatable<ICharSequence>,
-        IEquatable<CharArrayCharSequence>, IEquatable<StringBuilderCharSequence>, IEquatable<StringCharSequence>,
-        IEquatable<string>, IEquatable<StringBuilder>, IEquatable<char[]>, ISpanAppendable,
+        IComparable<ICharSequence?>, IComparable,
+        IComparable<string?>, IComparable<StringBuilder?>, IComparable<char[]?>,
+        IEquatable<ICharSequence?>,
+        IEquatable<CharArrayCharSequence?>, IEquatable<StringBuilderCharSequence?>, IEquatable<StringCharSequence?>,
+        IEquatable<string?>, IEquatable<StringBuilder?>, IEquatable<char[]?>, ISpanAppendable,
         ICopyable<char>
 #if FEATURE_STRINGBUILDER_COPYTO_SPAN
         , ISpanCopyable<char>
@@ -458,6 +458,45 @@ namespace J2N.Text
         /// <summary>
         /// Determines whether this <see cref="StringBuilderCharSequence"/> is equal to <paramref name="other"/>.
         /// </summary>
+        /// <param name="other">A <see cref="T:char[]"/> to compare to the current <see cref="StringBuilderCharSequence"/>.</param>
+        /// <returns><c>true</c> if <paramref name="other"/> is equal to the current <see cref="StringBuilderCharSequence"/>; otherwise, <c>false</c>.</returns>
+        public bool Equals(ReadOnlySpan<char> other)
+        {
+            var value = Value;
+            if (value is null)
+                return other.IsEmpty;
+
+            int len = Length;
+            int otherLength = other.Length;
+            if (len != otherLength) return false;
+
+            char[]? thisArrayToReturnToPool = null;
+            try
+            {
+#if FEATURE_STRINGBUILDER_COPYTO_SPAN // If this method isn't supported, we are buffering to an array pool to get to the stack, anyway.
+                Span<char> chars = len > CharStackBufferSize
+                    ? (thisArrayToReturnToPool = ArrayPool<char>.Shared.Rent(len))
+                    : stackalloc char[len];
+                value.CopyTo(0, chars, len);
+#else
+                Span<char> chars = thisArrayToReturnToPool = ArrayPool<char>.Shared.Rent(len);
+                value.CopyTo(0, thisArrayToReturnToPool, 0, len);
+#endif
+                for (int i = 0; i < len; i++)
+                {
+                    if (!chars[i].Equals(other[i])) return false;
+                }
+                return true;
+            }
+            finally
+            {
+                ArrayPool<char>.Shared.ReturnIfNotNull(thisArrayToReturnToPool);
+            }
+        }
+
+        /// <summary>
+        /// Determines whether this <see cref="StringBuilderCharSequence"/> is equal to <paramref name="other"/>.
+        /// </summary>
         /// <param name="other">An object to compare to the current <see cref="StringBuilderCharSequence"/>.</param>
         /// <returns><c>true</c> if <paramref name="other"/> is equal to the current <see cref="StringBuilderCharSequence"/>; otherwise, <c>false</c>.</returns>
         public override bool Equals(object? other)
@@ -576,6 +615,22 @@ namespace J2N.Text
             if (other is null) return 1;
 
             return this.Value.CompareToOrdinal(other);
+        }
+
+        /// <summary>
+        /// Compares this instance with a specified <see cref="ReadOnlySpan{Char}"/> and indicates whether
+        /// this instance precedes, follows, or appears in the same position in the sort order as the specified string.
+        /// </summary>
+        /// <param name="other">The <see cref="ReadOnlySpan{Char}"/> to compare with this instance.</param>
+        /// <returns>
+        /// An integer that indicates the lexical relationship between the two comparands.
+        /// Less than zero indicates the comparison value is greater than the current string.
+        /// Zero indicates the strings are equal.
+        /// Greater than zero indicates the comparison value is less than the current string.
+        /// </returns>
+        public int CompareTo(ReadOnlySpan<char> other)
+        {
+            return Value.CompareToOrdinal(other);
         }
 
         /// <summary>

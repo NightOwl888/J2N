@@ -28,12 +28,12 @@ namespace J2N.Text
     /// A wrapper class that represents a <see cref="T:char[]"/> and implements <see cref="ICharSequence"/>.
     /// </summary>
     public class CharArrayCharSequence : ICharSequence,
-        IComparable<ICharSequence>, IComparable,
-        IComparable<string>, IComparable<StringBuilder>, IComparable<char[]>,
-        IEquatable<ICharSequence>,
-        IEquatable<CharArrayCharSequence>, IEquatable<StringBuilderCharSequence>, IEquatable<StringCharSequence>,
-        IEquatable<string>, IEquatable<StringBuilder>, IEquatable<char[]>,
-        ICopyable<char>, ISpanCopyable<char>
+        IComparable<ICharSequence?>, IComparable,
+        IComparable<string?>, IComparable<StringBuilder?>, IComparable<char[]?>,
+        IEquatable<ICharSequence?>,
+        IEquatable<CharArrayCharSequence?>, IEquatable<StringBuilderCharSequence?>, IEquatable<StringCharSequence?>,
+        IEquatable<string?>, IEquatable<StringBuilder?>, IEquatable<char[]?>,
+        ISpannable<char>, ICopyable<char>, ISpanCopyable<char>
     {
         private const int CharStackBufferSize = 64;
 
@@ -393,6 +393,16 @@ namespace J2N.Text
         /// <summary>
         /// Determines whether this <see cref="CharArrayCharSequence"/> is equal to <paramref name="other"/>.
         /// </summary>
+        /// <param name="other">A <see cref="T:char[]"/> to compare to the current <see cref="CharArrayCharSequence"/>.</param>
+        /// <returns><c>true</c> if <paramref name="other"/> is equal to the current <see cref="CharArrayCharSequence"/>; otherwise, <c>false</c>.</returns>
+        public bool Equals(ReadOnlySpan<char> other)
+        {
+            return Value.AsSpan().SequenceEqual(other);
+        }
+
+        /// <summary>
+        /// Determines whether this <see cref="CharArrayCharSequence"/> is equal to <paramref name="other"/>.
+        /// </summary>
         /// <param name="other">An object to compare to the current <see cref="CharArrayCharSequence"/>.</param>
         /// <returns><c>true</c> if <paramref name="other"/> is equal to the current <see cref="CharArrayCharSequence"/>; otherwise, <c>false</c>.</returns>
         public override bool Equals(object? other)
@@ -514,6 +524,22 @@ namespace J2N.Text
         }
 
         /// <summary>
+        /// Compares this instance with a specified <see cref="ReadOnlySpan{Char}"/> and indicates whether
+        /// this instance precedes, follows, or appears in the same position in the sort order as the specified string.
+        /// </summary>
+        /// <param name="other">The <see cref="ReadOnlySpan{Char}"/> to compare with this instance.</param>
+        /// <returns>
+        /// An integer that indicates the lexical relationship between the two comparands.
+        /// Less than zero indicates the comparison value is greater than the current string.
+        /// Zero indicates the strings are equal.
+        /// Greater than zero indicates the comparison value is less than the current string.
+        /// </returns>
+        public int CompareTo(ReadOnlySpan<char> other)
+        {
+            return Value.CompareToOrdinal(other);
+        }
+
+        /// <summary>
         /// Compares this instance with a specified <see cref="object"/> and indicates whether
         /// this instance precedes, follows, or appears in the same position in the sort order as the specified string.
         /// </summary>
@@ -574,5 +600,15 @@ namespace J2N.Text
         }
 
         #endregion ISpanCopyable<char> Members
+
+        #region ISpannable<char> Members
+
+        ReadOnlySpan<char> ISpannable<char>.AsSpan() => Value.AsSpan();
+
+        ReadOnlySpan<char> ISpannable<char>.AsSpan(int start) => Value.AsSpan(start);
+
+        ReadOnlySpan<char> ISpannable<char>.AsSpan(int start, int length) => Value.AsSpan(start, length);
+
+        #endregion ISpannable<char> Members
     }
 }

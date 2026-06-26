@@ -1,7 +1,7 @@
 ﻿using NUnit.Framework;
 using System;
-using System.Collections.Generic;
 using System.Text;
+#nullable enable
 
 namespace J2N.Text
 {
@@ -17,6 +17,17 @@ namespace J2N.Text
             unequalTarget = new CharArrayCharSequence(CharArray2);
             emptyTarget = new CharArrayCharSequence(string.Empty.ToCharArray());
         }
+
+        protected override int CompareToString(CharArrayCharSequence target, string? value) => target.CompareTo(value);
+        protected override int CompareToCharArray(CharArrayCharSequence target, char[]? value) => target.CompareTo(value);
+        protected override int CompareToStringBuilder(CharArrayCharSequence target, StringBuilder? value) => target.CompareTo(value);
+        protected override int CompareToReadOnlySpan(CharArrayCharSequence target, ReadOnlySpan<char> value) => target.CompareTo(value);
+        protected override int CompareToObject(CharArrayCharSequence target, object? value) => target.CompareTo(value);
+
+        protected override bool EqualsString(CharArrayCharSequence target, string? value) => target.Equals(value);
+        protected override bool EqualsCharArray(CharArrayCharSequence target, char[]? value) => target.Equals(value);
+        protected override bool EqualsStringBuilder(CharArrayCharSequence target, StringBuilder? value) => target.Equals(value);
+        protected override bool EqualsReadOnlySpan(CharArrayCharSequence target, ReadOnlySpan<char> value) => target.Equals(value);
 
 
         [Test]
@@ -43,8 +54,8 @@ namespace J2N.Text
             Assert.IsFalse(target == CharArray2);
             Assert.IsFalse(CharArray2 == target);
 
-            Assert.IsTrue(nullTarget == (char[])null);
-            Assert.IsTrue((char[])null == nullTarget);
+            Assert.IsTrue(nullTarget == (char[]?)null);
+            Assert.IsTrue((char[]?)null == nullTarget);
 
 
             Assert.IsFalse(target != equalTarget);
@@ -59,8 +70,8 @@ namespace J2N.Text
             Assert.IsFalse(target != CharArray1);
             Assert.IsFalse(CharArray1 != target);
 
-            Assert.IsFalse(nullTarget != (char[])null);
-            Assert.IsFalse((char[])null != nullTarget);
+            Assert.IsFalse(nullTarget != (char[]?)null);
+            Assert.IsFalse((char[]?)null != nullTarget);
         }
     }
 }

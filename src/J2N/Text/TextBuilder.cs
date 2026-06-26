@@ -35,7 +35,7 @@ namespace J2N.Text
     /// </list>
     /// </remarks>
     public sealed partial class TextBuilder : IAppendable, ISpanAppendable, ICharSequence, IBufferWriter<char>,
-        ICopyable<char>, ISpanCopyable<char>
+        ISpannable<char>, ICopyable<char>, ISpanCopyable<char>
     {
         internal readonly MutableTextBuffer buffer;
 
@@ -443,5 +443,15 @@ namespace J2N.Text
         ///  <see cref="TextMemoryExtensions.AsMemory(TextBuilder)" /> when you need to access the underlying memory.
         /// </remarks>
         public ChunkEnumerator GetChunks() => new(buffer);
+
+        #region ISpannable<char> Members
+
+        ReadOnlySpan<char> ISpannable<char>.AsSpan() => this.AsSpan();
+
+        ReadOnlySpan<char> ISpannable<char>.AsSpan(int start) => this.AsSpan(start);
+
+        ReadOnlySpan<char> ISpannable<char>.AsSpan(int start, int length) => this.AsSpan(start, length);
+
+        #endregion ISpannable<char> Members
     }
 }

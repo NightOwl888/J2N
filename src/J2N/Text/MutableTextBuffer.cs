@@ -45,7 +45,7 @@ namespace J2N.Text
     /// </list>
     /// </remarks>
     public partial class MutableTextBuffer : IAppendable, ISpanAppendable, ICharSequence, IBufferWriter<char>,
-        ICopyable<char>, ISpanCopyable<char>, IDisposable
+        ISpannable<char>, ICopyable<char>, ISpanCopyable<char>, IDisposable
         //, IEnumerable<char> // ICU4N TODO: Implement?
     {
         private const int CharStackBufferSize = 32;
@@ -5286,5 +5286,15 @@ namespace J2N.Text
 
             m_Position += count;
         }
+
+        #region ISpannable<char> Members
+
+        ReadOnlySpan<char> ISpannable<char>.AsSpan() => this.AsSpan();
+
+        ReadOnlySpan<char> ISpannable<char>.AsSpan(int start) => this.AsSpan(start);
+
+        ReadOnlySpan<char> ISpannable<char>.AsSpan(int start, int length) => this.AsSpan(start, length);
+
+        #endregion ISpannable<char> Members
     }
 }
