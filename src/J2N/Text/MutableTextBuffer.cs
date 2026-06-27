@@ -2379,7 +2379,32 @@ namespace J2N.Text
 
             if (value.Length != 0)
             {
+                // There is a slight danger that value is actually a slice of m_Chars.
+                if (m_Chars.AsSpan().Overlaps(value, out int sourceOffset))
+                {
+                    InsertSelf(index, value, sourceOffset);
+                    return;
+                }
+
                 Insert(index, ref MemoryMarshal.GetReference(value), value.Length);
+            }
+        }
+
+        private void InsertSelf(int index, ReadOnlySpan<char> value, int sourceOffset)
+        {
+            bool entirelyWithinLiveBuffer =
+                (uint)sourceOffset <= (uint)m_Position &&
+                (uint)sourceOffset + (uint)value.Length <= (uint)m_Position;
+
+            if (entirelyWithinLiveBuffer)
+            {
+                InsertSelf(index, sourceOffset, value.Length);
+            }
+            else
+            {
+                // rare: The memory is in m_Chars, but partially outside of the usable buffer.
+                // We live with a temporary allocation in this case.
+                Insert(index, value.ToArray());
             }
         }
 

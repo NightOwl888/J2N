@@ -3,6 +3,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using J2N.Collections;
+using J2N.IO;
 using J2N.Numerics;
 using J2N.TestUtilities;
 using J2N.TestUtilities.Xunit;
@@ -3636,6 +3637,29 @@ namespace J2N.Text.Tests
 #endif
 
         #endregion InsertSelf Tests
+
+
+        [Theory]
+        [InlineData("ABCDEFGH", 0, 4)]
+        [InlineData("ABCDEFGH", 1, 3)]
+        [InlineData("ABCDEFGH", 2, 2)]
+        [InlineData("ABCDEFGH", 3, 1)]
+        [InlineData("ABCDEFGH", 0, 2)]
+        public void Insert_SelfSpan_ShouldMatchInsertSelf(string original, int sourceIndex,int length)
+        {
+            for (int insertIndex = 0; insertIndex <= original.Length; insertIndex++)
+            {
+                var expected = MutableTextBufferFactory(original);
+                expected.InsertSelf(insertIndex, sourceIndex, length);
+
+                var actual = MutableTextBufferFactory(original);
+                actual.Insert(insertIndex,
+                    actual.AsSpan(sourceIndex, length));
+
+                Assert.Equal(expected.ToString(), actual.ToString());
+            }
+        }
+
 
         /// <summary>
         /// A custom <see cref="ICharSequence"/> implementation used for testing unknown
