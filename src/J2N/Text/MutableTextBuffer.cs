@@ -1271,14 +1271,14 @@ namespace J2N.Text
 
             if (m_Chars.AsSpan().Overlaps(value))
             {
-                InsertSelfRepeated(index, value, destinationLength, repeatCount);
+                InsertOverlappingRepeated(index, value, destinationLength, repeatCount);
                 return;
             }
 
             InsertRepeated(index, value, destinationLength);
         }
 
-        private void InsertSelfRepeated(int index, ReadOnlySpan<char> value, int destinationLength, int repeatCount)
+        private void InsertOverlappingRepeated(int index, ReadOnlySpan<char> value, int destinationLength, int repeatCount)
         {
             char[]? buffer = null;
             try
@@ -1775,7 +1775,7 @@ namespace J2N.Text
 
             if (m_Chars.AsSpan().Overlaps(value, out int sourceOffset))
             {
-                AppendSelf(sourceOffset, value.Length);
+                AppendOverlapping(sourceOffset, value.Length);
                 return;
             }
 
@@ -1783,7 +1783,7 @@ namespace J2N.Text
         }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
-        private void AppendSelf(int sourceOffset, int valueCount)
+        private void AppendOverlapping(int sourceOffset, int valueCount)
         {
             // If the append fits in the existing array, Memmove already
             // supports overlap perfectly.
@@ -1794,9 +1794,10 @@ namespace J2N.Text
             }
 
             // If not, we snapshot the source so the operation is safe
-            AppendSelfSlow(sourceOffset, valueCount);
+            AppendWithSnapshot(sourceOffset, valueCount);
 
-            void AppendSelfSlow(int sourceOffset, int valueCount)
+            [MethodImpl(MethodImplOptions.NoInlining)]
+            void AppendWithSnapshot(int sourceOffset, int valueCount)
             {
                 char[]? buffer = null;
                 try
@@ -2461,7 +2462,7 @@ namespace J2N.Text
                 // There is a slight danger that value is actually a slice of m_Chars.
                 if (m_Chars.AsSpan().Overlaps(value, out int sourceOffset))
                 {
-                    InsertSelf(index, value, sourceOffset);
+                    InsertOverlapping(index, sourceOffset, value.Length);
                     return;
                 }
 
@@ -2469,21 +2470,39 @@ namespace J2N.Text
             }
         }
 
-        private void InsertSelf(int index, ReadOnlySpan<char> value, int sourceOffset)
+        private void InsertOverlapping(int index, int sourceOffset, int count)
         {
             bool entirelyWithinLiveBuffer =
                 (uint)sourceOffset <= (uint)m_Position &&
-                (uint)sourceOffset + (uint)value.Length <= (uint)m_Position;
+                (uint)sourceOffset + (uint)count <= (uint)m_Position;
 
             if (entirelyWithinLiveBuffer)
             {
-                InsertSelf(index, sourceOffset, value.Length);
+                InsertSelf(index, sourceOffset, count);
+                return;
             }
-            else
+
+            // Snapshot the value to a temporary buffer and then insert
+            InsertWithSnapshot(index, sourceOffset, count);
+
+            [MethodImpl(MethodImplOptions.NoInlining)]
+            void InsertWithSnapshot(int index, int sourceOffset, int count)
             {
-                // rare: The memory is in m_Chars, but partially outside of the usable buffer.
-                // We live with a temporary allocation in this case.
-                Insert(index, value.ToArray());
+                char[]? buffer = null;
+                try
+                {
+                    Span<char> temp = count <= CharStackBufferSize
+                        ? stackalloc char[count]
+                        : (buffer = ArrayPool<char>.Shared.Rent(count)).AsSpan(0, count);
+
+                    m_Chars.AsSpan(sourceOffset, count).CopyTo(temp);
+                    Insert(index, ref MemoryMarshal.GetReference(temp), count);
+                }
+                finally
+                {
+                    if (buffer is not null)
+                        ArrayPool<char>.Shared.Return(buffer);
+                }
             }
         }
 
@@ -4818,20 +4837,10 @@ namespace J2N.Text
             if (valueCount == 0)
                 return;
 
-            fixed (char* buffer = m_Chars)
+            if (Overlaps(value, valueCount, out int sourceOffset))
             {
-                // Test the entire buffer to see if there is an overlap
-                char* end = buffer + m_Chars.Length;
-
-                if (value >= buffer && value < end)
-                {
-                    nuint offset = (nuint)(value - buffer);
-                    if (offset <= (nuint)(m_Chars.Length - valueCount))
-                    {
-                        AppendSelf((int)offset, valueCount);
-                        return;
-                    }
-                }
+                AppendOverlapping(sourceOffset, valueCount);
+                return;
             }
 
             Append(ref *value, valueCount);
@@ -4957,7 +4966,47 @@ namespace J2N.Text
                 ThrowHelper.ThrowArgumentOutOfRangeException(valueCount, ExceptionArgument.valueCount, ExceptionResource.ArgumentOutOfRange_LengthGreaterThanCapacity);
             }
 
+            if (Overlaps(value, valueCount, out int sourceOffset))
+            {
+                InsertOverlapping(index, sourceOffset, valueCount);
+                return;
+            }
+
             Insert(index, ref *value, valueCount);
+        }
+
+        /// <summary>
+        /// Determines whether <paramref name="value"/> points into the current backing
+        /// array and, if so, returns its character offset.
+        /// </summary>
+        /// <param name="value">The source pointer.</param>
+        /// <param name="valueCount">The number of characters that will be read.</param>
+        /// <param name="sourceOffset">
+        /// Receives the offset into <see cref="m_Chars"/> if this method returns
+        /// <see langword="true"/>; otherwise -1.
+        /// </param>
+        /// <returns>
+        /// <see langword="true"/> if the entire source range lies within
+        /// <see cref="m_Chars"/>; otherwise <see langword="false"/>.
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private unsafe bool Overlaps(char* value, int valueCount, out int sourceOffset)
+        {
+            Debug.Assert(valueCount >= 0, "Invalid length; should have been validated by caller.");
+
+            fixed (char* buffer = m_Chars)
+            {
+                nuint offset = (nuint)(value - buffer);
+
+                if (offset <= (nuint)(m_Chars.Length - valueCount))
+                {
+                    sourceOffset = (int)offset;
+                    return true;
+                }
+            }
+
+            sourceOffset = -1;
+            return false;
         }
 
         /// <summary>

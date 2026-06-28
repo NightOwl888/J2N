@@ -2067,6 +2067,29 @@ namespace J2N.Text.Tests
             }
         }
 
+        [Theory]
+        [InlineData("ABCDEFGH", 0, 4)]
+        [InlineData("ABCDEFGH", 1, 3)]
+        [InlineData("ABCDEFGH", 2, 2)]
+        [InlineData("ABCDEFGH", 3, 1)]
+        [InlineData("ABCDEFGH", 0, 2)]
+        public unsafe void Insert_CharPointer_IsSelf_ShouldMatchInsertSelf(string original, int sourceIndex, int length)
+        {
+            for (int insertIndex = 0; insertIndex <= original.Length; insertIndex++)
+            {
+                var expected = MutableTextBufferFactory(original);
+                expected.InsertSelf(insertIndex, sourceIndex, length);
+
+                var actual = MutableTextBufferFactory(original);
+                fixed (char* p = &MemoryMarshal.GetReference(actual.RawChars))
+                {
+                    actual.Insert(insertIndex, p + sourceIndex, length);
+                }
+
+                Assert.Equal(expected.ToString(), actual.ToString());
+            }
+        }
+
         [Fact] // J2N specific
         public unsafe void Insert_CharPointer_Null_ThrowsNullReferenceException()
         {
