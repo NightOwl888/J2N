@@ -64,7 +64,7 @@ namespace J2N.Text.Tests
 
         [Theory]
         [MemberData(nameof(Replace_TestData))]
-        public void Replace_ReadOnlySpan(string value, string oldValue, string newValue, int startIndex, int count, string expected)
+        public void Replace_CharSpan(string value, string oldValue, string newValue, int startIndex, int count, string expected)
         {
             MutableTextBuffer builder;
             if (startIndex == 0 && count == value.Length)
@@ -99,7 +99,7 @@ namespace J2N.Text.Tests
         }
 
         [Fact]
-        public void Replace_ReadOnlySpan_Large()
+        public void Replace_CharSpan_Large()
         {
             MutableTextBuffer builder = MutableTextBufferFactory(s_chunkSplitSource);
             builder.Replace("a".AsSpan(), "b".AsSpan(), builder.Length - 10, 10);
@@ -124,7 +124,7 @@ namespace J2N.Text.Tests
         }
 
         [Fact]
-        public void Replace_ReadOnlySpan_WholeString()
+        public void Replace_CharSpan_WholeString()
         {
             MutableTextBuffer builder = MutableTextBufferFactory(s_chunkSplitSource);
             builder.Replace(builder.AsSpan(), "".AsSpan());
@@ -149,7 +149,7 @@ namespace J2N.Text.Tests
         }
 
         [Fact]
-        public void Replace_ReadOnlySpan_LongString()
+        public void Replace_CharSpan_LongString()
         {
             MutableTextBuffer builder = MutableTextBufferFactory(s_chunkSplitSource);
             string findString = builder.ToString() + "b";
@@ -181,7 +181,7 @@ namespace J2N.Text.Tests
         }
 
         [Fact]
-        public void Replace_ReadOnlySpan_Invalid()
+        public void Replace_CharSpan_Invalid()
         {
             var builder = MutableTextBufferFactory(0, 5);
             builder.Append("Hello");

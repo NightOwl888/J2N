@@ -1269,6 +1269,37 @@ namespace J2N.Text
             if (destinationLength == 0)
                 return;
 
+            if (m_Chars.AsSpan().Overlaps(value))
+            {
+                InsertSelfRepeated(index, value, destinationLength, repeatCount);
+                return;
+            }
+
+            InsertRepeated(index, value, destinationLength);
+        }
+
+        private void InsertSelfRepeated(int index, ReadOnlySpan<char> value, int destinationLength, int repeatCount)
+        {
+            char[]? buffer = null;
+            try
+            {
+                int valueLength = value.Length;
+                Span<char> temp = valueLength <= CharStackBufferSize
+                    ? stackalloc char[valueLength]
+                    : (buffer = ArrayPool<char>.Shared.Rent(valueLength)).AsSpan(0, valueLength);
+
+                value.CopyTo(temp);
+                InsertRepeated(index, temp, destinationLength);
+            }
+            finally
+            {
+                if (buffer is not null)
+                    ArrayPool<char>.Shared.Return(buffer);
+            }
+        }
+
+        private void InsertRepeated(int index, ReadOnlySpan<char> value, int destinationLength)
+        {
             MakeRoom(index, destinationLength);
 
             Span<char> destination =

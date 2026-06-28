@@ -2354,7 +2354,7 @@ namespace J2N.Text.Tests
         [InlineData("Hello", 0, null, 1, "Hello")]
         [InlineData("Hello", 3, "abc", 2, "Helabcabclo")]
         [InlineData("Hello", 5, "def", 2, "Hellodefdef")]
-        public void Insert_ReadOnlySpan_RepeatCount(string? original, int index, string? value, int count, string expected)
+        public void Insert_CharSpan_RepeatCount(string? original, int index, string? value, int count, string expected)
         {
             MutableTextBuffer builder;
             if (count == 1)
@@ -2370,8 +2370,42 @@ namespace J2N.Text.Tests
             Assert.Equal(expected, builder.ToString());
         }
 
+        [Theory] // J2N specific
+        [InlineData(0, 4, 2)]
+        [InlineData(1, 3, 2)]
+        [InlineData(2, 2, 2)]
+        [InlineData(3, 1, 5)]
+        [InlineData(0, 2, 3)]
+        public void Insert_CharSpan_RepeatCount_IsSelf_GrowingBuffer(int sourceIndex, int length, int repeatCount)
+        {
+            const string original = "ABCDEFGH";
+
+            ReadOnlySpan<char> source =
+                original.AsSpan(sourceIndex, length);
+
+            for (int insertIndex = 0; insertIndex <= original.Length; insertIndex++)
+            {
+                // Force MakeRoom() to grow.
+                var expected = MutableTextBufferFactory(original, capacity: original.Length);
+
+                for (int i = 0; i < repeatCount; i++)
+                {
+                    expected.Insert(insertIndex + i * length, source);
+                }
+
+                var actual = MutableTextBufferFactory(original, capacity: original.Length);
+
+                actual.Insert(
+                    insertIndex,
+                    actual.AsSpan(sourceIndex, length),
+                    repeatCount);
+
+                Assert.Equal(expected.ToString(), actual.ToString());
+            }
+        }
+
         [Fact] // J2N specific
-        public void Insert_ReadOnlySpan_RepeatCount_Invalid()
+        public void Insert_CharSpan_RepeatCount_Invalid()
         {
             var builder = MutableTextBufferFactory(0, 6);
             builder.Append("Hello");
@@ -3000,6 +3034,27 @@ namespace J2N.Text.Tests
             var builder = MutableTextBufferFactory(original);
             builder.Insert(index, new ReadOnlySpan<char>(value));
             Assert.Equal(expected, builder.ToString());
+        }
+
+        [Theory]
+        [InlineData("ABCDEFGH", 0, 4)]
+        [InlineData("ABCDEFGH", 1, 3)]
+        [InlineData("ABCDEFGH", 2, 2)]
+        [InlineData("ABCDEFGH", 3, 1)]
+        [InlineData("ABCDEFGH", 0, 2)]
+        public void Insert_CharSpan_IsSelf_ShouldMatchInsertSelf(string original, int sourceIndex, int length)
+        {
+            for (int insertIndex = 0; insertIndex <= original.Length; insertIndex++)
+            {
+                var expected = MutableTextBufferFactory(original);
+                expected.InsertSelf(insertIndex, sourceIndex, length);
+
+                var actual = MutableTextBufferFactory(original);
+                actual.Insert(insertIndex,
+                    actual.AsSpan(sourceIndex, length));
+
+                Assert.Equal(expected.ToString(), actual.ToString());
+            }
         }
 
         [Fact]
@@ -3639,26 +3694,6 @@ namespace J2N.Text.Tests
         #endregion InsertSelf Tests
 
 
-        [Theory]
-        [InlineData("ABCDEFGH", 0, 4)]
-        [InlineData("ABCDEFGH", 1, 3)]
-        [InlineData("ABCDEFGH", 2, 2)]
-        [InlineData("ABCDEFGH", 3, 1)]
-        [InlineData("ABCDEFGH", 0, 2)]
-        public void Insert_SelfSpan_ShouldMatchInsertSelf(string original, int sourceIndex,int length)
-        {
-            for (int insertIndex = 0; insertIndex <= original.Length; insertIndex++)
-            {
-                var expected = MutableTextBufferFactory(original);
-                expected.InsertSelf(insertIndex, sourceIndex, length);
-
-                var actual = MutableTextBufferFactory(original);
-                actual.Insert(insertIndex,
-                    actual.AsSpan(sourceIndex, length));
-
-                Assert.Equal(expected.ToString(), actual.ToString());
-            }
-        }
 
 
         /// <summary>
