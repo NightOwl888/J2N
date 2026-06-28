@@ -4815,6 +4815,25 @@ namespace J2N.Text
             if (valueCount < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(valueCount, ExceptionArgument.valueCount);
 
+            if (valueCount == 0)
+                return;
+
+            fixed (char* buffer = m_Chars)
+            {
+                // Test the entire buffer to see if there is an overlap
+                char* end = buffer + m_Chars.Length;
+
+                if (value >= buffer && value < end)
+                {
+                    nuint offset = (nuint)(value - buffer);
+                    if (offset <= (nuint)(m_Chars.Length - valueCount))
+                    {
+                        AppendSelf((int)offset, valueCount);
+                        return;
+                    }
+                }
+            }
+
             Append(ref *value, valueCount);
         }
 

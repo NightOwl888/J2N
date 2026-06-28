@@ -14,6 +14,7 @@ using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Text;
 using Xunit;
 //using System.Tests;
@@ -1040,6 +1041,129 @@ namespace J2N.Text.Tests
                 fixed (char* value = new char[] { 'a' }) { builder.Append(value, 1); }
             });
         }
+
+        [Theory]
+        [InlineData(0, 8)]
+        [InlineData(0, 4)]
+        [InlineData(2, 4)]
+        [InlineData(3, 1)]
+        [InlineData(7, 1)]
+        public unsafe void Append_CharPointer_IsSelf(int sourceIndex, int length)
+        {
+            const string original = "ABCDEFGH";
+
+            var expected = MutableTextBufferFactory(original);
+            expected.Append(original.AsSpan(sourceIndex, length));
+
+            var actual = MutableTextBufferFactory(original);
+            fixed (char* p = actual.RawChars)
+            {
+                actual.Append(p + sourceIndex, length);
+            }
+
+            Assert.Equal(expected.ToString(), actual.ToString());
+        }
+
+        [Fact]
+        public unsafe void Append_CharPointer_SourceIsUnusedBufferInSelf_AppendsCorrectly()
+        {
+            var sb = MutableTextBufferFactory("12345678", capacity: 32);
+            Span<char> source = sb.RawChars.Slice(10, 5);
+            "abcde".AsSpan().CopyTo(source);
+            fixed (char* p = &MemoryMarshal.GetReference(source))
+            {
+                sb.Append(p, source.Length);
+            }
+            Assert.Equal("12345678abcde", sb.ToString());
+        }
+
+        [Theory]
+        [InlineData(0, 8)]
+        [InlineData(0, 4)]
+        [InlineData(2, 4)]
+        [InlineData(3, 1)]
+        public unsafe void Append_CharPointer_IsSelf_GrowingBuffer(int sourceIndex, int length)
+        {
+            const string original = "ABCDEFGH";
+
+            var expected = MutableTextBufferFactory(original, capacity: original.Length);
+            expected.Append(original.AsSpan(sourceIndex, length));
+
+            var actual = MutableTextBufferFactory(original, capacity: original.Length);
+
+            fixed (char* p = actual.RawChars)
+            {
+                actual.Append(p + sourceIndex, length);
+            }
+
+            Assert.Equal(expected.ToString(), actual.ToString());
+        }
+
+        [Theory]
+        [InlineData("ABCDEFGH", 8, 0, 8)]
+        [InlineData("ABCDEFGH", 8, 0, 4)]
+        [InlineData("ABCDEFGH", 8, 2, 4)]
+        [InlineData("ABCDEFGH", 8, 3, 1)]
+        [InlineData("ABCDEFGH", 8, 7, 1)]
+        public unsafe void Append_CharPointer_SelfSpan_GrowingBuffer_ShouldNotReadReturnedBuffer(string original, int capacity, int sourceIndex, int length)
+        {
+            var allocator = new EvilCharArrayAllocator();
+
+            var expected = MutableTextBufferFactory(original);
+            expected.Append(original.AsSpan(sourceIndex, length));
+
+            var actual = MutableTextBufferFactory(original, capacity, allocator);
+
+            fixed (char* p = actual.RawChars)
+            {
+                actual.Append(p + sourceIndex, length);
+            }
+
+            Assert.Equal(expected.ToString(), actual.ToString());
+        }
+
+        [Theory]
+        [InlineData("ABCDEFGH", 8)]
+        [InlineData("abcdefghijklmnopqrstuvwxyz", 26)]
+        [InlineData("123456789", 9)]
+        public unsafe void Append_CharPointer_Self_GrowingBuffer_ShouldNotReadReturnedBuffer(string original, int capacity)
+        {
+            var allocator = new EvilCharArrayAllocator();
+
+            var expected = MutableTextBufferFactory(original);
+            expected.Append(original);
+
+            var actual = MutableTextBufferFactory(original, capacity, allocator);
+            fixed (char* p = actual.RawChars)
+            {
+                actual.Append(p, actual.Length);
+            }
+
+            Assert.Equal(expected.ToString(), actual.ToString());
+        }
+
+        [Theory]
+        [InlineData("12345678", 8, 8, 5, "abcde")]
+        [InlineData("ABCDEFGH", 8, 12, 3, "XYZ")]
+        [InlineData("Hello", 5, 6, 5, "World")]
+        public unsafe void Append_CharPointer_UnusedBuffer_GrowingBuffer_ShouldCopyBeforeGrow(string original, int capacity,
+            int sourceOffset, int sourceLength, string sourceValue)
+        {
+            var allocator = new EvilCharArrayAllocator();
+
+            var builder = MutableTextBufferFactory(original, capacity, allocator);
+
+            sourceValue.AsSpan().CopyTo(
+                builder.RawChars.Slice(sourceOffset, sourceLength));
+
+            fixed (char* p = builder.RawChars)
+            {
+                builder.Append(p + sourceOffset, sourceLength);
+            }
+
+            Assert.Equal(original + sourceValue, builder.ToString());
+        }
+
 
         [Theory]
         [InlineData("Hello", "abc", 0, 3, "Helloabc")]
