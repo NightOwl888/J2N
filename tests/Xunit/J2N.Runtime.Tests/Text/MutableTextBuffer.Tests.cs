@@ -42,5 +42,8 @@ namespace J2N.Text.Tests
 
         protected override MutableTextBuffer MutableTextBufferFactory(ICharSequence? value)
             => new MutableTextBuffer(UninitializedArrayAllocator<char>.Default).Initialize(value);
+
+        protected override MutableTextBuffer MutableTextBufferFactory(string? value, int capacity, IArrayAllocator<char> allocator)
+            => new MutableTextBuffer(allocator).Initialize(value, capacity);
     }
 }

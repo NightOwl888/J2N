@@ -2,6 +2,7 @@
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+using J2N.Buffers;
 using J2N.Collections;
 using J2N.IO;
 using J2N.Numerics;
@@ -112,6 +113,12 @@ namespace J2N.Text.Tests
         /// </summary>
         /// <returns>An instance of <see cref="MutableTextBuffer"/> that can be used for testing.</returns>
         protected abstract MutableTextBuffer MutableTextBufferFactory(ICharSequence? value);
+
+        /// <summary>
+        /// Creates an instance of an <see cref="MutableTextBuffer"/> that can be used for testing.
+        /// </summary>
+        /// <returns>An instance of <see cref="MutableTextBuffer"/> that can be used for testing.</returns>
+        protected abstract MutableTextBuffer MutableTextBufferFactory(string? value, int capacity, IArrayAllocator<char> allocator);
 
         private static readonly int MaxArrayLength =
             (int)typeof(Arrays)
@@ -2908,6 +2915,138 @@ namespace J2N.Text.Tests
             var builder = MutableTextBufferFactory(original);
             builder.Append(new ReadOnlySpan<char>(value));
             Assert.Equal(expected, builder.ToString());
+        }
+
+        [Theory]
+        [InlineData(0, 8)]
+        [InlineData(0, 4)]
+        [InlineData(2, 4)]
+        [InlineData(3, 1)]
+        [InlineData(7, 1)]
+        public void Append_CharSpan_IsSelf(int sourceIndex, int length)
+        {
+            const string original = "ABCDEFGH";
+
+            var expected = MutableTextBufferFactory(original);
+            expected.Append(original.AsSpan(sourceIndex, length));
+
+            var actual = MutableTextBufferFactory(original);
+            actual.Append(actual.AsSpan(sourceIndex, length));
+
+            Assert.Equal(expected.ToString(), actual.ToString());
+        }
+
+        [Fact]
+        public void Append_CharSpan_SourceIsUnusedBufferInSelf_AppendsCorrectly()
+        {
+            var sb = MutableTextBufferFactory("12345678", capacity: 32);
+            Span<char> source = sb.RawChars.Slice(10, 5);
+            "abcde".AsSpan().CopyTo(source);
+            sb.Append(source);
+            Assert.Equal("12345678abcde", sb.ToString());
+        }
+
+        [Theory]
+        [InlineData(0, 8)]
+        [InlineData(0, 4)]
+        [InlineData(2, 4)]
+        [InlineData(3, 1)]
+        public void Append_CharSpan_IsSelf_GrowingBuffer(int sourceIndex, int length)
+        {
+            const string original = "ABCDEFGH";
+
+            var expected = MutableTextBufferFactory(original, capacity: original.Length);
+            expected.Append(original.AsSpan(sourceIndex, length));
+
+            var actual = MutableTextBufferFactory(original, capacity: original.Length);
+            actual.Append(actual.AsSpan(sourceIndex, length));
+
+            Assert.Equal(expected.ToString(), actual.ToString());
+        }
+
+        [Theory]
+        [InlineData("ABCDEFGH", 8, 0, 8)]
+        [InlineData("ABCDEFGH", 8, 0, 4)]
+        [InlineData("ABCDEFGH", 8, 2, 4)]
+        [InlineData("ABCDEFGH", 8, 3, 1)]
+        [InlineData("ABCDEFGH", 8, 7, 1)]
+        public void Append_CharSpan_SelfSpan_GrowingBuffer_ShouldNotReadReturnedBuffer(string original, int capacity, int sourceIndex, int length)
+        {
+            var allocator = new EvilCharArrayAllocator();
+
+            var expected = MutableTextBufferFactory(original);
+            expected.Append(original.AsSpan(sourceIndex, length));
+
+            var actual = MutableTextBufferFactory(original, capacity, allocator);
+            actual.Append(actual.AsSpan(sourceIndex, length));
+
+            Assert.Equal(expected.ToString(), actual.ToString());
+        }
+
+        [Theory]
+        [InlineData("ABCDEFGH", 8)]
+        [InlineData("abcdefghijklmnopqrstuvwxyz", 26)]
+        [InlineData("123456789", 9)]
+        public void Append_CharSpan_Self_GrowingBuffer_ShouldNotReadReturnedBuffer(string original, int capacity)
+        {
+            var allocator = new EvilCharArrayAllocator();
+
+            var expected = MutableTextBufferFactory(original);
+            expected.Append(original);
+
+            var actual = MutableTextBufferFactory(original, capacity, allocator);
+            actual.Append(actual.AsSpan());
+
+            Assert.Equal(expected.ToString(), actual.ToString());
+        }
+
+        [Theory]
+        [InlineData("12345678", 8, 8, 5, "abcde")]
+        [InlineData("ABCDEFGH", 8, 12, 3, "XYZ")]
+        [InlineData("Hello", 5, 6, 5, "World")]
+        public void Append_CharSpan_UnusedBuffer_GrowingBuffer_ShouldCopyBeforeGrow(string original, int capacity,
+            int sourceOffset, int sourceLength, string sourceValue)
+        {
+            var allocator = new EvilCharArrayAllocator();
+
+            var builder = MutableTextBufferFactory(original, capacity, allocator);
+
+            sourceValue.AsSpan().CopyTo(
+                builder.RawChars.Slice(sourceOffset, sourceLength));
+
+            builder.Append(builder.RawChars.Slice(sourceOffset, sourceLength));
+
+            Assert.Equal(original + sourceValue, builder.ToString());
+        }
+
+        private sealed class EvilCharArrayAllocator : IArrayAllocator<char>
+        {
+            private char[]? returned;
+
+            public bool GuaranteesClearedArrays => false;
+
+            public char[] Allocate(int minimumLength)
+            {
+                if (returned != null && returned.Length >= minimumLength)
+                {
+                    char[] result = returned;
+                    returned = null;
+
+                    // Scribble over it a second time.
+                    result.AsSpan().Fill('#');
+
+                    return result;
+                }
+
+                return new char[minimumLength];
+            }
+
+            public void Return(char[] array)
+            {
+                // Immediately relinquish ownership.
+                array.AsSpan().Fill('!');
+                returned = array;
+            }
         }
 
         [Theory]

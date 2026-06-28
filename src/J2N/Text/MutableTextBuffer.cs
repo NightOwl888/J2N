@@ -1770,7 +1770,50 @@ namespace J2N.Text
         [CodeGenerationReturnsSelf]
         public void Append(ReadOnlySpan<char> value)
         {
+            if (value.IsEmpty)
+                return;
+
+            if (m_Chars.AsSpan().Overlaps(value, out int sourceOffset))
+            {
+                AppendSelf(sourceOffset, value.Length);
+                return;
+            }
+
             Append(ref MemoryMarshal.GetReference(value), value.Length);
+        }
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private void AppendSelf(int sourceOffset, int valueCount)
+        {
+            // If the append fits in the existing array, Memmove already
+            // supports overlap perfectly.
+            if ((uint)m_Position + (uint)valueCount <= (uint)m_Chars.Length)
+            {
+                Append(ref m_Chars[sourceOffset], valueCount);
+                return;
+            }
+
+            // If not, we snapshot the source so the operation is safe
+            AppendSelfSlow(sourceOffset, valueCount);
+
+            void AppendSelfSlow(int sourceOffset, int valueCount)
+            {
+                char[]? buffer = null;
+                try
+                {
+                    Span<char> temp = valueCount <= CharStackBufferSize
+                        ? stackalloc char[valueCount]
+                        : (buffer = ArrayPool<char>.Shared.Rent(valueCount)).AsSpan(0, valueCount);
+
+                    m_Chars.AsSpan(sourceOffset, valueCount).CopyTo(temp);
+                    Append(ref MemoryMarshal.GetReference(temp), temp.Length);
+                }
+                finally
+                {
+                    if (buffer is not null)
+                        ArrayPool<char>.Shared.Return(buffer);
+                }
+            }
         }
 
         /// <summary>
