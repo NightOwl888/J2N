@@ -21,6 +21,13 @@ namespace J2N.Text
         [CodeGenerationReturnsSelf]
         public void Append(ICharSequence? value)
         {
+            // This not only makes it faster, it will call our other overload to handle inserting into self
+            if (value is ISpannable<char> spannable)
+            {
+                Append(spannable.AsSpan());
+                return;
+            }
+
             if (value is null || !value.HasValue)
                 return;
 
@@ -124,7 +131,13 @@ namespace J2N.Text
                     Grow(count);
                 }
 
-                if (value is ISpanCopyable<char> spanCopyable)
+                // This not only makes it faster, it will call our other overload to handle inserting into self
+                if (value is ISpannable<char> spannable)
+                {
+                    Append(spannable.AsSpan(startIndex, count));
+                    return;
+                }
+                else if (value is ISpanCopyable<char> spanCopyable)
                 {
                     spanCopyable.CopyTo(startIndex, m_Chars.AsSpan(pos), count);
                 }
@@ -163,6 +176,13 @@ namespace J2N.Text
         [CodeGenerationReturnsSelf]
         public void Insert(int index, ICharSequence? value)
         {
+            // This not only makes it faster, it will call our other overload to handle inserting into self
+            if (value is ISpannable<char> spannable)
+            {
+                Insert(index, spannable.AsSpan());
+                return;
+            }
+
             if ((uint)index > (uint)Length)
             {
                 ThrowHelper.ThrowArgumentOutOfRange_IndexMustBeLessOrEqualException(index);
@@ -252,6 +272,13 @@ namespace J2N.Text
 
             if (count > 0)
             {
+                // This not only makes it faster, it will call our other overload to handle inserting into self
+                if (value is ISpannable<char> spannable)
+                {
+                    Insert(index, spannable.AsSpan(startIndex, count));
+                    return;
+                }
+
                 MakeRoom(index, count);
 
                 if (value is ISpanCopyable<char> spanCopyable)

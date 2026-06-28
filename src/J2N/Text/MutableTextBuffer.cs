@@ -1430,6 +1430,12 @@ namespace J2N.Text
         [CodeGenerationReturnsSelf]
         public void Insert(int index, ICharSequence? value, int repeatCount)
         {
+            if (value is ISpannable<char> spannable)
+            {
+                Insert(index, spannable.AsSpan(), repeatCount);
+                return;
+            }
+
             if (repeatCount < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(repeatCount, ExceptionArgument.repeatCount);
 
@@ -1467,7 +1473,6 @@ namespace J2N.Text
             // We only copy from the source once. The remainder of the copies
             // are from destination to destination. This allows for more opportunities
             // for the BCL to optimize the copy.
-            //value.CopyTo(0, m_Chars, index, copied);
             if (value is ISpanCopyable<char> spanCopyable)
             {
                 spanCopyable.CopyTo(0, destination, copied);
