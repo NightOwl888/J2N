@@ -3900,11 +3900,11 @@ namespace J2N.Text
         /// <paramref name="index"/> refers to the original buffer before insertion takes place.
         /// 
         /// </remarks>
-        public SynchronizedTextBuilder InsertSelf(int index, Range range)
+        public SynchronizedTextBuilder InsertFromSelf(int index, Range range)
         {
             lock (syncRoot)
             {
-                buffer.InsertSelf(index, range);
+                buffer.InsertFromSelf(index, range);
                 return this;
             }
         }
@@ -3938,11 +3938,11 @@ namespace J2N.Text
         /// takes place.
         /// 
         /// </remarks>
-        public SynchronizedTextBuilder InsertSelf(int index, int startIndex, int count)
+        public SynchronizedTextBuilder InsertFromSelf(int index, int startIndex, int count)
         {
             lock (syncRoot)
             {
-                buffer.InsertSelf(index, startIndex, count);
+                buffer.InsertFromSelf(index, startIndex, count);
                 return this;
             }
         }

@@ -2478,7 +2478,7 @@ namespace J2N.Text
 
             if (entirelyWithinLiveBuffer)
             {
-                InsertSelf(index, sourceOffset, count);
+                InsertFromSelf(index, sourceOffset, count);
                 return;
             }
 
@@ -5343,10 +5343,10 @@ namespace J2N.Text
         /// <paramref name="index"/> refers to the original buffer before insertion takes place.
         /// </remarks>
         [CodeGenerationReturnsSelf]
-        public void InsertSelf(int index, Range range)
+        public void InsertFromSelf(int index, Range range)
         {
             var (startIndex, count) = range.GetOffsetAndLength(Length);
-            InsertSelf(index, startIndex, count);
+            InsertFromSelf(index, startIndex, count);
         }
 #endif
 
@@ -5380,7 +5380,7 @@ namespace J2N.Text
         // using low-level operations rather than relying on the high-level Replace and CopyTo() operations to do it.
         // This allows us to optimize ReplaceableString (thus Transliterator) in ICU4N much better.
         [CodeGenerationReturnsSelf]
-        public void InsertSelf(int index, int startIndex, int count)
+        public void InsertFromSelf(int index, int startIndex, int count)
         {
             if (count < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(count, ExceptionArgument.count);

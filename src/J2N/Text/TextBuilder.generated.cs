@@ -3551,9 +3551,9 @@ namespace J2N.Text
         /// <paramref name="index"/> refers to the original buffer before insertion takes place.
         /// 
         /// </remarks>
-        public TextBuilder InsertSelf(int index, Range range)
+        public TextBuilder InsertFromSelf(int index, Range range)
         {
-            buffer.InsertSelf(index, range);
+            buffer.InsertFromSelf(index, range);
             return this;
         }
 
@@ -3586,9 +3586,9 @@ namespace J2N.Text
         /// takes place.
         /// 
         /// </remarks>
-        public TextBuilder InsertSelf(int index, int startIndex, int count)
+        public TextBuilder InsertFromSelf(int index, int startIndex, int count)
         {
-            buffer.InsertSelf(index, startIndex, count);
+            buffer.InsertFromSelf(index, startIndex, count);
             return this;
         }
 

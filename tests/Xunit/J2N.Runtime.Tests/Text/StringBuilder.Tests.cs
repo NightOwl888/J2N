@@ -2078,7 +2078,7 @@ namespace J2N.Text.Tests
             for (int insertIndex = 0; insertIndex <= original.Length; insertIndex++)
             {
                 var expected = MutableTextBufferFactory(original);
-                expected.InsertSelf(insertIndex, sourceIndex, length);
+                expected.InsertFromSelf(insertIndex, sourceIndex, length);
 
                 var actual = MutableTextBufferFactory(original);
                 fixed (char* p = &MemoryMarshal.GetReference(actual.RawChars))
@@ -3333,7 +3333,7 @@ namespace J2N.Text.Tests
             for (int insertIndex = 0; insertIndex <= original.Length; insertIndex++)
             {
                 var expected = MutableTextBufferFactory(original);
-                expected.InsertSelf(insertIndex, sourceIndex, length);
+                expected.InsertFromSelf(insertIndex, sourceIndex, length);
 
                 var actual = MutableTextBufferFactory(original);
                 actual.Insert(insertIndex,
@@ -3817,167 +3817,167 @@ namespace J2N.Text.Tests
         }
 
 
-        #region InsertSelf Tests
+        #region InsertFromSelf Tests
 
         [Fact]
-        public void InsertSelf_AppendsRange()
+        public void InsertFromSelf_AppendsRange()
         {
             var buffer = MutableTextBufferFactory("abcdef");
 
-            buffer.InsertSelf(6, 1, 3);
+            buffer.InsertFromSelf(6, 1, 3);
 
             Assert.Equal("abcdefbcd", buffer.ToString());
         }
 
         [Fact]
-        public void InsertSelf_InsertAtBeginning()
+        public void InsertFromSelf_InsertAtBeginning()
         {
             var buffer = MutableTextBufferFactory("abcdef");
 
-            buffer.InsertSelf(0, 2, 2);
+            buffer.InsertFromSelf(0, 2, 2);
 
             Assert.Equal("cdabcdef", buffer.ToString());
         }
 
         [Fact]
-        public void InsertSelf_InsertInMiddle()
+        public void InsertFromSelf_InsertInMiddle()
         {
             var buffer = MutableTextBufferFactory("abcdef");
 
-            buffer.InsertSelf(3, 1, 2);
+            buffer.InsertFromSelf(3, 1, 2);
 
             Assert.Equal("abcbcdef", buffer.ToString());
         }
 
         [Fact]
-        public void InsertSelf_OverlappingForward()
+        public void InsertFromSelf_OverlappingForward()
         {
             var buffer = MutableTextBufferFactory("abcdef");
 
-            buffer.InsertSelf(2, 1, 3);
+            buffer.InsertFromSelf(2, 1, 3);
 
             Assert.Equal("abbcdcdef", buffer.ToString());
         }
 
         [Fact]
-        public void InsertSelf_OverlappingBackward()
+        public void InsertFromSelf_OverlappingBackward()
         {
             var buffer = MutableTextBufferFactory("abcdef");
 
-            buffer.InsertSelf(1, 2, 3);
+            buffer.InsertFromSelf(1, 2, 3);
 
             Assert.Equal("acdebcdef", buffer.ToString());
         }
 
         [Fact]
-        public void InsertSelf_ZeroCount_NoChange()
+        public void InsertFromSelf_ZeroCount_NoChange()
         {
             var buffer = MutableTextBufferFactory("abcdef");
 
-            buffer.InsertSelf(2, 3, 0);
+            buffer.InsertFromSelf(2, 3, 0);
 
             Assert.Equal("abcdef", buffer.ToString());
         }
 
         [Fact]
-        public void InsertSelf_StartAtLength_WithZeroCount_IsValid()
+        public void InsertFromSelf_StartAtLength_WithZeroCount_IsValid()
         {
             var buffer = MutableTextBufferFactory("abc");
 
-            buffer.InsertSelf(0, 3, 0);
+            buffer.InsertFromSelf(0, 3, 0);
 
             Assert.Equal("abc", buffer.ToString());
         }
 
         [Fact]
-        public void InsertSelf_IndexAtLength_Appends()
+        public void InsertFromSelf_IndexAtLength_Appends()
         {
             var buffer = MutableTextBufferFactory("abc");
 
-            buffer.InsertSelf(3, 0, 2);
+            buffer.InsertFromSelf(3, 0, 2);
 
             Assert.Equal("abcab", buffer.ToString());
         }
 
         //[Fact]
-        //public void InsertSelf_InsertEntireBuffer()
+        //public void InsertFromSelf_InsertEntireBuffer()
         //{
         //    var buffer = MutableTextBufferFactory("abc");
 
-        //    buffer.InsertSelf(1);
+        //    buffer.InsertFromSelf(1);
 
         //    Assert.Equal("aabcbc", buffer.ToString());
         //}
 
         [Fact]
-        public void InsertSelf_NegativeStart_Throws()
+        public void InsertFromSelf_NegativeStart_Throws()
         {
             var buffer = MutableTextBufferFactory("abc");
 
             Assert.Throws<ArgumentOutOfRangeException>(
-                () => buffer.InsertSelf(0, -1, 1));
+                () => buffer.InsertFromSelf(0, -1, 1));
         }
 
         [Fact]
-        public void InsertSelf_NegativeCount_Throws()
+        public void InsertFromSelf_NegativeCount_Throws()
         {
             var buffer = MutableTextBufferFactory("abc");
 
             Assert.Throws<ArgumentOutOfRangeException>(
-                () => buffer.InsertSelf(0, 0, -1));
+                () => buffer.InsertFromSelf(0, 0, -1));
         }
 
         [Fact]
-        public void InsertSelf_NegativeIndex_Throws()
+        public void InsertFromSelf_NegativeIndex_Throws()
         {
             var buffer = MutableTextBufferFactory("abc");
 
             Assert.Throws<ArgumentOutOfRangeException>(
-                () => buffer.InsertSelf(-1, 0, 1));
+                () => buffer.InsertFromSelf(-1, 0, 1));
         }
 
         [Fact]
-        public void InsertSelf_StartPastLength_Throws()
+        public void InsertFromSelf_StartPastLength_Throws()
         {
             var buffer = MutableTextBufferFactory("abc");
 
             Assert.Throws<ArgumentOutOfRangeException>(
-                () => buffer.InsertSelf(0, 4, 0));
+                () => buffer.InsertFromSelf(0, 4, 0));
         }
 
         [Fact]
-        public void InsertSelf_IndexPastLength_Throws()
+        public void InsertFromSelf_IndexPastLength_Throws()
         {
             var buffer = MutableTextBufferFactory("abc");
 
             Assert.Throws<ArgumentOutOfRangeException>(
-                () => buffer.InsertSelf(4, 0, 1));
+                () => buffer.InsertFromSelf(4, 0, 1));
         }
 
         [Fact]
-        public void InsertSelf_CountTooLarge_Throws()
+        public void InsertFromSelf_CountTooLarge_Throws()
         {
             var buffer = MutableTextBufferFactory("abc");
 
             Assert.Throws<ArgumentException>(
-                () => buffer.InsertSelf(0, 1, 3));
+                () => buffer.InsertFromSelf(0, 1, 3));
         }
 
 #if FEATURE_INDEX_RANGE
 
         [Fact]
-        public void InsertSelf_Range_Overload_Works()
+        public void InsertFromSelf_Range_Overload_Works()
         {
             var buffer = MutableTextBufferFactory("abcdef");
 
-            buffer.InsertSelf(6, 1..4);
+            buffer.InsertFromSelf(6, 1..4);
 
             Assert.Equal("abcdefbcd", buffer.ToString());
         }
 
 #endif
 
-        #endregion InsertSelf Tests
+        #endregion InsertFromSelf Tests
 
 
 
