@@ -112,16 +112,11 @@
     <CodeGenInputs Include="$(MSBuildProjectDirectory)\Text\MutableTextBuffer*.cs" />
     <CodeGenInputs Include="$(MSBuildProjectDirectory)\Text\TextMemoryExtensions*.cs" />
     <CodeGenInputs Include="$(MSBuildProjectDirectory)\CodeGeneration\**\*.cs" />
-    <CodeGenInputs Include="$(MSBuildThisFileDirectory)..\..\eng\J2N.Text.CodeGen\**\*.cs" />
+    <CodeGenInputs Include="$(MSBuildThisFileDirectory)..\..\eng\J2N.Text.CodeGen\**\*.cs" Exclude="**\bin\**;**\obj\**" />
   </ItemGroup>
 
   <ItemGroup>
-    <CodeGenExpectedOutputs Include="$(MSBuildProjectDirectory)\Text\TextBuilder.generated.cs" />
-    <CodeGenExpectedOutputs Include="$(MSBuildProjectDirectory)\Text\PooledTextBuilder.generated.cs" />
-    <CodeGenExpectedOutputs Include="$(MSBuildProjectDirectory)\Text\SynchronizedTextBuilder.generated.cs" />
-
-    <CodeGenExpectedOutputs Include="$(MSBuildProjectDirectory)\Text\TextMemoryExtensions.TextBuilder.generated.cs" />
-    <CodeGenExpectedOutputs Include="$(MSBuildProjectDirectory)\Text\TextMemoryExtensions.PooledTextBuilder.generated.cs" />
+    <GeneratedCode Include="$(MSBuildProjectDirectory)\Text\*.generated.cs" />
   </ItemGroup>
 
   <Target Name="ForceCodeGenIfOutputsMissing"
@@ -130,7 +125,7 @@
 
     <ItemGroup>
       <MissingCodeGenOutputs
-        Include="@(CodeGenExpectedOutputs)"
+        Include="@(GeneratedCode)"
         Condition="!Exists('%(Identity)')" />
     </ItemGroup>
 
