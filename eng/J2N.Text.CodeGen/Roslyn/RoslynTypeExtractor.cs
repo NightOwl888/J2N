@@ -98,7 +98,11 @@ namespace J2N.Text.CodeGen.Roslyn
 
             foreach (MethodDeclarationSyntax method in members.OfType<MethodDeclarationSyntax>())
             {
-                if (!method.Modifiers.Any(SyntaxKind.PublicKeyword))
+                bool include =
+                    method.Modifiers.Any(SyntaxKind.PublicKeyword)
+                    || method.Modifiers.Any(SyntaxKind.InternalKeyword);
+
+                if (!include)
                     continue;
 
                 SemanticModel semanticModel =
@@ -217,6 +221,7 @@ namespace J2N.Text.CodeGen.Roslyn
                         CodeGenerationAttributeNames.Constructor),
                 IsStatic =
                     method.Modifiers.Any(SyntaxKind.StaticKeyword),
+                DeclaredAccessibility = methodSymbol.DeclaredAccessibility,
                 IsUnsafe =
                     IsUnsafeType(returnType)
                     || parameters.Any(p => IsUnsafeType(p.TypeName)),
@@ -229,6 +234,9 @@ namespace J2N.Text.CodeGen.Roslyn
                 SkipSynchronization =
                     methodSymbol.HasAttribute(
                         CodeGenerationAttributeNames.SkipSynchronization),
+                IsExtensionImplementation =
+                    methodSymbol.HasAttribute(
+                        CodeGenerationAttributeNames.ExtensionImplementation),
             };
         }
 

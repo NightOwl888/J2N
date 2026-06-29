@@ -23,6 +23,9 @@ namespace J2N.Text.CodeGen.Projection
 
             foreach (MethodModel method in source.Methods.Where(x => !x.Ignore))
             {
+                if (method.DeclaredAccessibility != Accessibility.Public)
+                    continue;
+
                 projected.Methods.Add(
                     ProjectMethod(
                         method,

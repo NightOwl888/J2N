@@ -66,7 +66,7 @@ namespace J2N.Text.CodGen
                     "J2N.Text.MutableTextBuffer");
 
             // ---------------------------------------------------------------------
-            // TextMemoryExtensions
+            // MutableTextBufferExtensions
             // ---------------------------------------------------------------------
 
             List<string> extensionSourceTexts =
@@ -80,6 +80,19 @@ namespace J2N.Text.CodGen
                     extensionSourceTexts,
                     infrastructureTexts,
                     "J2N.Text.MutableTextBufferExtensions");
+
+            List<string> implementationSourceTexts =
+                Directory.GetFiles(sourceDirectory, "MutableTextBuffer*.cs")
+                    .Where(f => !f.EndsWith(".generated.cs", StringComparison.OrdinalIgnoreCase))
+                    .Where(f => !f.StartsWith("MutableTextBufferExtensions", StringComparison.OrdinalIgnoreCase))
+                    .Select(File.ReadAllText)
+                    .ToList();
+
+            TypeModel implementationModel =
+                extractor.Extract(
+                    implementationSourceTexts,
+                    infrastructureTexts,
+                    "J2N.Text.MutableTextBuffer");
 
             // ---------------------------------------------------------------------
             // Generate TextBuilder
@@ -96,7 +109,8 @@ namespace J2N.Text.CodGen
                 sourceDirectory,
                 facadeName: "TextBuilder",
                 emitSynchronizationNotes: false,
-                extensionModel);
+                extensionModel,
+                implementationModel);
 
             // ---------------------------------------------------------------------
             // Generate PooledTextBuilder
@@ -113,7 +127,8 @@ namespace J2N.Text.CodGen
                 sourceDirectory,
                 facadeName: "PooledTextBuilder",
                 emitSynchronizationNotes: false,
-                extensionModel);
+                extensionModel,
+                implementationModel);
 
             // ---------------------------------------------------------------------
             // Generate SynchronizedTextBuilder
@@ -130,7 +145,8 @@ namespace J2N.Text.CodGen
                 sourceDirectory,
                 facadeName: "SynchronizedTextBuilder",
                 emitSynchronizationNotes: true,
-                extensionModel);
+                extensionModel,
+                implementationModel);
 
             // ---------------------------------------------------------------------
             // Report completion
@@ -186,7 +202,8 @@ namespace J2N.Text.CodGen
             string sourceDirectory,
             string facadeName,
             bool emitSynchronizationNotes,
-            TypeModel extensionModel)
+            TypeModel extensionModel,
+            TypeModel implementationModel)
         {
             var extensionProjection = new ExtensionMethodProjection();
             var extensionEmitter = new CSharpExtensionEmitter();
@@ -194,6 +211,7 @@ namespace J2N.Text.CodGen
             ProjectedTypeModel projectedExtensions =
                 extensionProjection.Project(
                     extensionModel,
+                    implementationModel,
                     "MutableTextBuffer",
                     facadeNamespace: "J2N.Text",
                     projectedBuilderType: facadeName,

@@ -13,5 +13,8 @@
 
         public const string SkipSynchronization =
             "J2N.CodeGeneration.CodeGenerationSkipSynchronizationAttribute";
+
+        public const string ExtensionImplementation =
+            "J2N.CodeGeneration.CodeGenerationExtensionImplementationAttribute";
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace J2N.Text.CodeGen.Metadata
+﻿using Microsoft.CodeAnalysis;
+
+namespace J2N.Text.CodeGen.Metadata
 {
     public sealed class MethodModel
     {
@@ -11,6 +13,8 @@
         public bool IsBuilderMethod { get; init; }
 
         public bool IsStatic { get; init; }
+
+        public Accessibility DeclaredAccessibility { get; init; }
 
         public bool IsExtensionMethod { get; init; }
 
@@ -33,5 +37,7 @@
         public bool Ignore { get; init; }
 
         public bool SkipSynchronization { get; init; }
+
+        public bool IsExtensionImplementation { get; init; }
     }
 }

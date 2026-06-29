@@ -6,6 +6,7 @@ namespace J2N.Text.CodeGen.Projection
     {
         public ProjectedTypeModel Project(
             TypeModel extensionSource,
+            TypeModel implementationModel,
             string targetSourceType,
             string facadeNamespace,
             string projectedBuilderType,
@@ -21,6 +22,12 @@ namespace J2N.Text.CodeGen.Projection
                 Name = projectedTypeName,
             };
 
+            HashSet<string> extensionMethodTargetMethods =
+                implementationModel.Methods
+                .Where(m => m.IsExtensionImplementation)
+                .Select(m => m.Name)
+                .ToHashSet();
+
             foreach (MethodModel method in extensionSource.Methods.Where(x => !x.Ignore))
             {
                 if (!method.IsExtensionMethod)
@@ -34,6 +41,7 @@ namespace J2N.Text.CodeGen.Projection
                         method,
                         targetSourceType,
                         projectedBuilderType,
+                        extensionMethodTargetMethods,
                         options));
             }
 
@@ -44,6 +52,7 @@ namespace J2N.Text.CodeGen.Projection
             MethodModel method,
             string sourceType,
             string projectedBuilderType,
+            ISet<string> extensionMethodTargetMethods,
             ProjectionOptions options)
         {
             var methodModel =  new MethodModel
@@ -132,7 +141,8 @@ namespace J2N.Text.CodeGen.Projection
                     RewriteBody(
                         method.BodyText,
                         sourceType,
-                        projectedBuilderType)
+                        projectedBuilderType,
+                        extensionMethodTargetMethods)
             };
 
             methodModel.ConditionalCompilationSymbol =
@@ -211,12 +221,23 @@ namespace J2N.Text.CodeGen.Projection
         private static string? RewriteBody(
             string? body,
             string sourceType,
-            string projectedBuilderType)
+            string projectedBuilderType,
+            ISet<string> extensionMethodTargetMethods)
         {
             if (string.IsNullOrWhiteSpace(body))
                 return body;
 
+
+
             string result = body;
+
+            foreach (string methodName in extensionMethodTargetMethods)
+            {
+                result =
+                    result.Replace(
+                        $"text.{methodName}(",
+                        $"text.buffer.{methodName}(");
+            }
 
             result =
                 result.Replace(
