@@ -163,16 +163,20 @@ namespace J2N.Text.CodeGen.Generation
             sb.AppendLine();
         }
 
-        private static string FormatParameter(
-            ParameterModel parameter)
+        private static string FormatParameter(ParameterModel parameter)
         {
             string modifier =
                 string.IsNullOrWhiteSpace(parameter.Modifier)
                     ? ""
                     : parameter.Modifier + " ";
 
+            string defaultValue =
+                parameter.DefaultValueExpression is null
+                    ? ""
+                    : $" = {parameter.DefaultValueExpression}";
+
             return
-                $"{modifier}{parameter.TypeName} {parameter.Name}";
+                $"{modifier}{parameter.TypeName} {parameter.Name}{defaultValue}";
         }
 
         private static void EmitConstraints(
