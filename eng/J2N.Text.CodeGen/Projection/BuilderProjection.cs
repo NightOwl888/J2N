@@ -95,7 +95,7 @@ namespace J2N.Text.CodeGen.Projection
                             SourceTypeName = p.SourceTypeName,
 
                             Documentation =
-                                RewriteDocumentation(
+                                DocumentationRewriter.RewriteDocumentation(
                                     p.Documentation,
                                     source,
                                     source.Name,
@@ -150,28 +150,28 @@ namespace J2N.Text.CodeGen.Projection
                 : new DocumentationModel
                 {
                     SummaryXml =
-                        RewriteDocumentation(
+                        DocumentationRewriter.RewriteDocumentation(
                             property.Documentation.SummaryXml,
                             source,
                             source.Name,
                             facadeName),
 
                     RemarksXml =
-                        RewriteDocumentation(
+                        DocumentationRewriter.RewriteDocumentation(
                             property.Documentation.RemarksXml,
                             source,
                             source.Name,
                             facadeName),
 
                     ReturnsXml =
-                        RewriteDocumentation(
+                        DocumentationRewriter.RewriteDocumentation(
                             property.Documentation.ReturnsXml,
                             source,
                             source.Name,
                             facadeName),
 
                     SynchronizationNoteXml =
-                        RewriteDocumentation(
+                        DocumentationRewriter.RewriteDocumentation(
                             property.Documentation.SynchronizationNoteXml,
                             source,
                             source.Name,
@@ -209,7 +209,7 @@ namespace J2N.Text.CodeGen.Projection
                             SourceTypeName = p.SourceTypeName,
 
                             Documentation =
-                                RewriteDocumentation(
+                                DocumentationRewriter.RewriteDocumentation(
                                     p.Documentation,
                                     source,
                                     source.Name,
@@ -250,63 +250,6 @@ namespace J2N.Text.CodeGen.Projection
             return typeName.Replace(sourceType, facadeName);
         }
 
-        private static string? RewriteDocumentation(
-            string? xml,
-            TypeModel source,
-            string sourceType,
-            string facadeType)
-        {
-            if (string.IsNullOrWhiteSpace(xml))
-                return xml;
-
-            string result =
-                Regex.Replace(
-                    xml,
-                    @"cref\s*=\s*""([^""]+)""",
-                    match =>
-                    {
-                        string cref =
-                            match.Groups[1].Value;
-
-                        string rewritten =
-                            RewriteCrefTarget(
-                                cref,
-                                source,
-                                facadeType);
-
-                        return $"cref=\"{rewritten}\"";
-                    });
-
-            result = result.Replace(sourceType, facadeType);
-
-            return result;
-        }
-
-        private static string RewriteCrefTarget(
-            string cref,
-            TypeModel source,
-            string facadeType)
-        {
-            foreach (MethodModel method in source.Methods)
-            {
-                if (!method.IsConstructorProjection)
-                    continue;
-
-                string methodPrefix =
-                    method.Name + "(";
-
-                if (cref.StartsWith(
-                    methodPrefix,
-                    StringComparison.Ordinal))
-                {
-                    return facadeType
-                        + cref.Substring(method.Name.Length);
-                }
-            }
-
-            return cref;
-        }
-
         private static DocumentationModel? CreateProjectedDocumentation(
             MethodModel method,
             TypeModel source,
@@ -335,7 +278,7 @@ namespace J2N.Text.CodeGen.Projection
             }
 
             string? returnsXml =
-                RewriteDocumentation(
+                DocumentationRewriter.RewriteDocumentation(
                     docs.ReturnsXml,
                     source,
                     source.Name,
@@ -354,14 +297,14 @@ namespace J2N.Text.CodeGen.Projection
                 new DocumentationModel
                 {
                     SummaryXml =
-                        RewriteDocumentation(
+                        DocumentationRewriter.RewriteDocumentation(
                             docs.SummaryXml,
                             source,
                             source.Name,
                             facadeName),
 
                     RemarksXml =
-                        RewriteDocumentation(
+                        DocumentationRewriter.RewriteDocumentation(
                             docs.RemarksXml,
                             source,
                             source.Name,
@@ -370,7 +313,7 @@ namespace J2N.Text.CodeGen.Projection
                     ReturnsXml = returnsXml,
 
                     SynchronizationNoteXml =
-                        RewriteDocumentation(
+                        DocumentationRewriter.RewriteDocumentation(
                             docs.SynchronizationNoteXml,
                             source,
                             source.Name,

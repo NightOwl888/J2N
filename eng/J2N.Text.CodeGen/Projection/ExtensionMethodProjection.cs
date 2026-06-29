@@ -39,6 +39,7 @@ namespace J2N.Text.CodeGen.Projection
                 projected.Methods.Add(
                     ProjectMethod(
                         method,
+                        implementationModel,
                         targetSourceType,
                         projectedBuilderType,
                         extensionMethodTargetMethods,
@@ -50,6 +51,7 @@ namespace J2N.Text.CodeGen.Projection
 
         private static MethodModel ProjectMethod(
             MethodModel method,
+            TypeModel implementationModel,
             string sourceType,
             string projectedBuilderType,
             ISet<string> extensionMethodTargetMethods,
@@ -85,8 +87,9 @@ namespace J2N.Text.CodeGen.Projection
                             SourceTypeName = p.SourceTypeName,
 
                             Documentation =
-                                RewriteDocumentation(
+                                DocumentationRewriter.RewriteDocumentation(
                                     p.Documentation,
+                                    implementationModel,
                                     sourceType,
                                     projectedBuilderType),
 
@@ -112,26 +115,30 @@ namespace J2N.Text.CodeGen.Projection
                             : new DocumentationModel
                             {
                                 SummaryXml =
-                                    RewriteDocumentation(
+                                    DocumentationRewriter.RewriteDocumentation(
                                         method.Documentation.SummaryXml,
+                                        implementationModel,
                                         sourceType,
                                         projectedBuilderType),
 
                                 RemarksXml =
-                                    RewriteDocumentation(
+                                    DocumentationRewriter.RewriteDocumentation(
                                         method.Documentation.RemarksXml,
+                                        implementationModel,
                                         sourceType,
                                         projectedBuilderType),
 
                                 ReturnsXml =
-                                    RewriteDocumentation(
+                                    DocumentationRewriter.RewriteDocumentation(
                                         method.Documentation.ReturnsXml,
+                                        implementationModel,
                                         sourceType,
                                         projectedBuilderType),
 
                                 SynchronizationNoteXml =
-                                    RewriteDocumentation(
+                                    DocumentationRewriter.RewriteDocumentation(
                                         method.Documentation.SynchronizationNoteXml,
+                                        implementationModel,
                                         sourceType,
                                         projectedBuilderType)
                             },
@@ -175,17 +182,6 @@ namespace J2N.Text.CodeGen.Projection
             string projectedBuilderType)
         {
             return typeName.Replace(sourceType, projectedBuilderType);
-        }
-
-        private static string? RewriteDocumentation(
-            string? xml,
-            string sourceType,
-            string projectedBuilderType)
-        {
-            if (string.IsNullOrWhiteSpace(xml))
-                return xml;
-
-            return xml.Replace(sourceType, projectedBuilderType);
         }
 
         private static DocumentationModel? MergeSynchronizationDocumentation(DocumentationModel? docs, bool includeSynchronizationNote)
