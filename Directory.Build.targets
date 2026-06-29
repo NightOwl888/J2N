@@ -6,6 +6,9 @@
     <!-- .NET Framework doesn't support range or index operators -->
     <NoWarn Label="Use index operator">$(NoWarn);IDE0056</NoWarn>
     <NoWarn Label="Use range operator">$(NoWarn);IDE0057</NoWarn>
+    <NoWarn Label="Use ArgumentNullException throw helper">$(NoWarn);CA1510</NoWarn>
+    <NoWarn Label="Use ArgumentException throw helper">$(NoWarn);CA1511</NoWarn>
+    <NoWarn Label="Use ArgumentOutOfRangeException throw helper">$(NoWarn);CA1512</NoWarn>
   </PropertyGroup>
 
   <PropertyGroup Label="Solution-level Publish to Project-specific Directory">
