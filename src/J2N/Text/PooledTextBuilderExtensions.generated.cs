@@ -12,6 +12,7 @@
 #nullable enable
 
 using J2N.CodeGeneration;
+using J2N.Numerics;
 using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -459,6 +460,93 @@ namespace J2N.Text
         }
 
 #endif
+
+        /// <summary>
+        /// 
+        /// Appends the string representation of a specified object to this instance using the specified format
+        /// and culture-specific format information.
+        /// 
+        /// </summary>
+        /// <param name="text">
+        /// The target builder.
+        /// </param>
+        /// <param name="value">
+        /// The object to append.
+        /// </param>
+        /// <param name="format">
+        /// A standard or custom format string.
+        /// </param>
+        /// <param name="provider">
+        /// An object that supplies culture-specific formatting information.
+        /// </param>
+        /// <returns>
+        /// A reference to this instance after the operation has completed.
+        /// </returns>
+        /// <remarks>
+        /// 
+        /// <paramref name="format"/> and <paramref name="provider"/> are only applied if the object implements <see cref="ISpanFormattable"/>,
+        /// <see cref="IFormattable"/>, <c>IStructuralFormattable</c>, or subclasses <see cref="Number"/>.
+        /// <para/>
+        /// The capacity of this instance is adjusted as needed.
+        /// <para/>
+        /// <b>Notes to Callers</b>
+        /// <para/>
+        /// When you instantiate an <see cref="PooledTextBuilder"/> object by calling <see cref="PooledTextBuilder(int, int)"/>,
+        /// both the length and the capacity of the <see cref="PooledTextBuilder"/> instance can grow beyond
+        /// the value of its <see cref="PooledTextBuilder.MaxCapacity"/> property. This can occur particularly when you call the <see cref="PooledTextBuilder.Append(string)"/>
+        /// and <see cref="PooledTextBuilder.AppendFormat(string, object?)"/> methods to append small strings.
+        /// 
+        /// </remarks>
+        public static PooledTextBuilder Append(this PooledTextBuilder text, object? value, string? format = null, IFormatProvider? provider = null)
+        {
+            if (text is null)
+                throw new ArgumentNullException(nameof(text));
+
+            text.buffer.AppendInternal(value, format, provider);
+            return text;
+        }
+
+        /// <summary>
+        /// 
+        /// Inserts the string representation of an object into this instance at the specified character position.
+        /// 
+        /// </summary>
+        /// <param name="text">
+        /// The target builder.
+        /// </param>
+        /// <param name="index">
+        /// The position in this instance where insertion begins.
+        /// </param>
+        /// <param name="value">
+        /// The object to insert, or <see langword="null"/>.
+        /// </param>
+        /// <param name="format">
+        /// A standard or custom format string.
+        /// </param>
+        /// <param name="provider">
+        /// An object that supplies culture-specific formatting information.
+        /// </param>
+        /// <returns>
+        /// A reference to this instance after the append operation has completed.
+        /// </returns>
+        /// <remarks>
+        /// 
+        /// <paramref name="format"/> and <paramref name="provider"/> are only applied if the object implements <see cref="ISpanFormattable"/>,
+        /// <see cref="IFormattable"/>, <c>IStructuralFormattable</c>, or subclasses <see cref="Number"/>.
+        /// <para/>
+        /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
+        /// <para/>
+        /// If <paramref name="value"/> is <see langword="null"/>, the <see cref="PooledTextBuilder"/> is not changed.
+        /// 
+        /// </remarks>
+        public static PooledTextBuilder Insert(this PooledTextBuilder text, int index, object? value, string? format = null, IFormatProvider? provider = null)
+        {
+            if (text is null)
+                throw new ArgumentNullException(nameof(text));
+
+            text.buffer.InsertInternal(index, value, format, provider);
+            return text;
+        }
 
     }
 }
