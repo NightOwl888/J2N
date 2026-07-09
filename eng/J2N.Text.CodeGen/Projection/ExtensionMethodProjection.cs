@@ -102,7 +102,11 @@ namespace J2N.Text.CodeGen.Projection
 
                 GenericParameters =
                     method.GenericParameters
-                        .Select(CloneGenericParameter)
+                        .Select(p =>
+                            RewriteGenericParameter(
+                                p,
+                                sourceType,
+                                projectedBuilderType))
                         .ToList(),
 
                 Attributes =
@@ -190,7 +194,32 @@ namespace J2N.Text.CodeGen.Projection
             if (!first.IsThis)
                 return false;
 
-            return first.TypeName.Contains(sourceType);
+            // Generic type is exactly sourceType or its nullable counterpart
+            if (IsSourceTypeMatch(first.TypeName, sourceType))
+                return true;
+
+            // Generic form:
+            //
+            // this T text where T : MutableTextBuffer
+            //
+            GenericParameterModel? genericParameter =
+                method.GenericParameters.FirstOrDefault(
+                    p => p.Name == first.TypeName);
+
+            if (genericParameter is null)
+            {
+                return false;
+            }
+
+            return genericParameter.Constraints.Any(c => IsSourceTypeMatch(c, sourceType));
+        }
+
+        private static bool IsSourceTypeMatch(
+            string typeName,
+            string sourceType)
+        {
+            return typeName == sourceType
+                || typeName == sourceType + "?";
         }
 
         private static string RewriteType(
@@ -199,6 +228,26 @@ namespace J2N.Text.CodeGen.Projection
             string projectedBuilderType)
         {
             return typeName.Replace(sourceType, projectedBuilderType);
+        }
+
+        private static GenericParameterModel RewriteGenericParameter(
+            GenericParameterModel parameter,
+            string sourceType,
+            string projectedBuilderType)
+        {
+            return new GenericParameterModel
+            {
+                Name = parameter.Name,
+
+                Constraints =
+                    parameter.Constraints
+                        .Select(c =>
+                            RewriteType(
+                                c,
+                                sourceType,
+                                projectedBuilderType))
+                        .ToList()
+            };
         }
 
         private static DocumentationModel? MergeSynchronizationDocumentation(DocumentationModel? docs, bool includeSynchronizationNote)
@@ -287,16 +336,6 @@ namespace J2N.Text.CodeGen.Projection
             {
                 Name = attribute.Name,
                 Arguments = attribute.Arguments.ToList()
-            };
-        }
-
-        private static GenericParameterModel CloneGenericParameter(
-            GenericParameterModel parameter)
-        {
-            return new GenericParameterModel
-            {
-                Name = parameter.Name,
-                Constraints = parameter.Constraints.ToList()
             };
         }
 
