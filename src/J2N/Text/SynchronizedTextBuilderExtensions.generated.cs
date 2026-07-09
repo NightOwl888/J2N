@@ -542,8 +542,11 @@ namespace J2N.Text
             if (text is null)
                 throw new ArgumentNullException(nameof(text));
 
-            text.buffer.AppendInternal(value, format, provider);
-            return text;
+            lock (text.SyncRoot)
+            {
+                text.buffer.AppendInternal(value, format, provider);
+                return text;
+            }
         }
 
         /// <summary>
@@ -584,8 +587,11 @@ namespace J2N.Text
             if (text is null)
                 throw new ArgumentNullException(nameof(text));
 
-            text.buffer.InsertInternal(index, value, format, provider);
-            return text;
+            lock (text.SyncRoot)
+            {
+                text.buffer.InsertInternal(index, value, format, provider);
+                return text;
+            }
         }
 
     }

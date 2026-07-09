@@ -492,6 +492,7 @@ namespace J2N.Text
         /// and <see cref="MutableTextBuffer.AppendFormat(string, object?)"/> methods to append small strings.
         /// </remarks>
         /// <seealso cref="object"/>
+        [CodeGenerationGenerateForwarder]
         public static MutableTextBuffer Append(this MutableTextBuffer text, object? value, string? format = null, IFormatProvider? provider = null)
         {
             if (text is null)
@@ -524,6 +525,7 @@ namespace J2N.Text
         /// If <paramref name="value"/> is <see langword="null"/>, the <see cref="MutableTextBuffer"/> is not changed.
         /// </remarks>
         /// <seealso cref="object"/>
+        [CodeGenerationGenerateForwarder]
         public static MutableTextBuffer Insert(this MutableTextBuffer text, int index, object? value, string? format = null, IFormatProvider? provider = null)
         {
             if (text is null)
