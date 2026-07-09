@@ -493,7 +493,8 @@ namespace J2N.Text
         /// </remarks>
         /// <seealso cref="object"/>
         [CodeGenerationGenerateForwarder]
-        public static MutableTextBuffer Append(this MutableTextBuffer text, object? value, string? format = null, IFormatProvider? provider = null)
+        public static T Append<T>(this T text, object? value, string? format = null, IFormatProvider? provider = null)
+            where T: MutableTextBuffer
         {
             if (text is null)
                 throw new ArgumentNullException(nameof(text));
@@ -526,7 +527,8 @@ namespace J2N.Text
         /// </remarks>
         /// <seealso cref="object"/>
         [CodeGenerationGenerateForwarder]
-        public static MutableTextBuffer Insert(this MutableTextBuffer text, int index, object? value, string? format = null, IFormatProvider? provider = null)
+        public static T Insert<T>(this T text, int index, object? value, string? format = null, IFormatProvider? provider = null)
+            where T: MutableTextBuffer
         {
             if (text is null)
                 throw new ArgumentNullException(nameof(text));

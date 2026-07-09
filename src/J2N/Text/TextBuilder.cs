@@ -34,7 +34,7 @@ namespace J2N.Text
     ///     </description></item>
     /// </list>
     /// </remarks>
-    public sealed partial class TextBuilder : IAppendable, ISpanAppendable, ICharSequence, IBufferWriter<char>,
+    public partial class TextBuilder : IAppendable, ISpanAppendable, ICharSequence, IBufferWriter<char>,
         ISpannable<char>, ICopyable<char>, ISpanCopyable<char>
     {
         internal readonly MutableTextBuffer buffer;

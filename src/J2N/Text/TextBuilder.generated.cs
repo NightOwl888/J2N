@@ -31,7 +31,7 @@ using J2N.Numerics.Formatters;
 namespace J2N.Text
 {
 
-    public sealed partial class TextBuilder
+    public partial class TextBuilder
     {
         /// <summary>
         /// 

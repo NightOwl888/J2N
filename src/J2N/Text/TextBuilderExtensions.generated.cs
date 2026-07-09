@@ -497,7 +497,8 @@ namespace J2N.Text
         /// and <see cref="TextBuilder.AppendFormat(string, object?)"/> methods to append small strings.
         /// 
         /// </remarks>
-        public static TextBuilder Append(this TextBuilder text, object? value, string? format = null, IFormatProvider? provider = null)
+        public static T Append<T>(this T text, object? value, string? format = null, IFormatProvider? provider = null)
+            where T : TextBuilder
         {
             if (text is null)
                 throw new ArgumentNullException(nameof(text));
@@ -539,7 +540,8 @@ namespace J2N.Text
         /// If <paramref name="value"/> is <see langword="null"/>, the <see cref="TextBuilder"/> is not changed.
         /// 
         /// </remarks>
-        public static TextBuilder Insert(this TextBuilder text, int index, object? value, string? format = null, IFormatProvider? provider = null)
+        public static T Insert<T>(this T text, int index, object? value, string? format = null, IFormatProvider? provider = null)
+            where T : TextBuilder
         {
             if (text is null)
                 throw new ArgumentNullException(nameof(text));
