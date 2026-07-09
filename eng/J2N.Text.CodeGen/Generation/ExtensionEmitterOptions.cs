@@ -1,0 +1,11 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace J2N.Text.CodeGen.Generation
+{
+    public sealed class ExtensionEmitterOptions
+    {
+        public bool WrapMembersInLock { get; init; }
+    }
+}

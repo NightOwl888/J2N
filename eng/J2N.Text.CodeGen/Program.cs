@@ -108,6 +108,7 @@ namespace J2N.Text.CodGen
             GenerateExtensions(
                 sourceDirectory,
                 facadeName: "TextBuilder",
+                synchronized: false,
                 emitSynchronizationNotes: false,
                 extensionModel,
                 implementationModel);
@@ -126,6 +127,7 @@ namespace J2N.Text.CodGen
             GenerateExtensions(
                 sourceDirectory,
                 facadeName: "PooledTextBuilder",
+                synchronized: false,
                 emitSynchronizationNotes: false,
                 extensionModel,
                 implementationModel);
@@ -144,6 +146,7 @@ namespace J2N.Text.CodGen
             GenerateExtensions(
                 sourceDirectory,
                 facadeName: "SynchronizedTextBuilder",
+                synchronized: true,
                 emitSynchronizationNotes: true,
                 extensionModel,
                 implementationModel);
@@ -201,6 +204,7 @@ namespace J2N.Text.CodGen
         static void GenerateExtensions(
             string sourceDirectory,
             string facadeName,
+            bool synchronized,
             bool emitSynchronizationNotes,
             TypeModel extensionModel,
             TypeModel implementationModel)
@@ -222,7 +226,12 @@ namespace J2N.Text.CodGen
                     });
 
             string extensionCode =
-                extensionEmitter.Emit(projectedExtensions);
+                extensionEmitter.Emit(
+                    projectedExtensions,
+                    options: new ExtensionEmitterOptions
+                    {
+                        WrapMembersInLock = synchronized,
+                    });
 
             string extensionPath =
                 Path.Combine(

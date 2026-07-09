@@ -2,7 +2,7 @@
 
 namespace J2N.CodeGeneration
 {
-    [AttributeUsage(AttributeTargets.Method, Inherited = false)]
+    [AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = false)]
     internal sealed class CodeGenerationExtensionImplementationAttribute : Attribute
     {
     }

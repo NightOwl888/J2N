@@ -22,11 +22,12 @@ namespace J2N.Text.CodeGen.Projection
                 Name = projectedTypeName,
             };
 
-            HashSet<string> extensionMethodTargetMethods =
+            Dictionary<string, string> implementationLookup =
                 implementationModel.Methods
-                .Where(m => m.IsExtensionImplementation)
-                .Select(m => m.Name)
-                .ToHashSet();
+                    .Where(m => m.IsExtensionImplementation)
+                    .ToDictionary(
+                        m => RemoveSuffix(m.Name, "Internal"),
+                        m => m.Name);
 
             foreach (MethodModel method in extensionSource.Methods.Where(x => !x.Ignore))
             {
@@ -42,7 +43,7 @@ namespace J2N.Text.CodeGen.Projection
                         implementationModel,
                         targetSourceType,
                         projectedBuilderType,
-                        extensionMethodTargetMethods,
+                        implementationLookup,
                         options));
             }
 
@@ -54,10 +55,10 @@ namespace J2N.Text.CodeGen.Projection
             TypeModel implementationModel,
             string sourceType,
             string projectedBuilderType,
-            ISet<string> extensionMethodTargetMethods,
+            IDictionary<string, string> implementationLookup,
             ProjectionOptions options)
         {
-            var methodModel =  new MethodModel
+            var methodModel = new MethodModel
             {
                 Name = method.Name,
 
@@ -145,12 +146,27 @@ namespace J2N.Text.CodeGen.Projection
                             },
                             includeSynchronizationNote: options.EmitSynchronizationNotes && method.SkipSynchronization),
 
+                GenerateForwarder = method.GenerateForwarder,
+
                 BodyText =
-                    RewriteBody(
-                        method.BodyText,
-                        sourceType,
-                        projectedBuilderType,
-                        extensionMethodTargetMethods)
+                    method.GenerateForwarder
+                        ? null
+                        : RewriteBody(
+                            method.BodyText,
+                            sourceType,
+                            projectedBuilderType,
+                            new HashSet<string>(implementationLookup.Values)),
+
+                ForwardTarget = method.GenerateForwarder && implementationLookup.TryGetValue(method.Name, out string? targetName)
+                    ? targetName
+                    : null,
+
+                ForwardTargetObject = method.GenerateForwarder
+                    ? (projectedBuilderType == "MutableTextBuffer" ? null : "buffer")
+                    : null,
+
+                SkipSynchronization =
+                    method.SkipSynchronization,
             };
 
             methodModel.ConditionalCompilationSymbol =
@@ -282,6 +298,13 @@ namespace J2N.Text.CodeGen.Projection
                 Name = parameter.Name,
                 Constraints = parameter.Constraints.ToList()
             };
+        }
+
+        private static string RemoveSuffix(string name, string suffix)
+        {
+             return name.EndsWith(suffix, StringComparison.Ordinal)
+                ? name[..^suffix.Length]
+                : name;
         }
     }
 }

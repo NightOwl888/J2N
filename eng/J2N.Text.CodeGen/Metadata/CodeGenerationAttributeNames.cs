@@ -16,5 +16,8 @@
 
         public const string ExtensionImplementation =
             "J2N.CodeGeneration.CodeGenerationExtensionImplementationAttribute";
+
+        public const string GenerateForwarder =
+            "J2N.CodeGeneration.CodeGenerationGenerateForwarderAttribute";
     }
 }

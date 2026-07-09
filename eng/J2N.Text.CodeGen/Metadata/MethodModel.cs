@@ -39,5 +39,11 @@ namespace J2N.Text.CodeGen.Metadata
         public bool SkipSynchronization { get; init; }
 
         public bool IsExtensionImplementation { get; init; }
+
+        public bool GenerateForwarder { get; init; }
+
+        public string? ForwardTarget { get; init; }
+
+        public string? ForwardTargetObject { get; init; }
     }
 }

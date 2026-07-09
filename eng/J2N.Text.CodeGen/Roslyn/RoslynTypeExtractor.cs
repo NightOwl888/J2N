@@ -237,6 +237,9 @@ namespace J2N.Text.CodeGen.Roslyn
                 IsExtensionImplementation =
                     methodSymbol.HasAttribute(
                         CodeGenerationAttributeNames.ExtensionImplementation),
+                GenerateForwarder =
+                    methodSymbol.HasAttribute(
+                        CodeGenerationAttributeNames.GenerateForwarder),
             };
         }
 

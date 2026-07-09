@@ -6,8 +6,14 @@ namespace J2N.Text.CodeGen.Generation
 {
     public sealed class CSharpExtensionEmitter
     {
-        public string Emit(ProjectedTypeModel model)
+        public string Emit(
+            ProjectedTypeModel model,
+            ExtensionEmitterOptions? options = null)
         {
+            options ??= new ExtensionEmitterOptions();
+
+            bool wrapMembersInLock = options.WrapMembersInLock;
+
             var sb = new StringBuilder();
 
             EmitHeader(sb);
@@ -44,7 +50,7 @@ namespace J2N.Text.CodeGen.Generation
                     }
                 }
 
-                EmitMethod(sb, method);
+                EmitMethod(sb, method, wrapMembersInLock);
             }
 
             if (activeConditional is not null)
@@ -90,7 +96,8 @@ namespace J2N.Text.CodeGen.Generation
 
         private static void EmitMethod(
             StringBuilder sb,
-            MethodModel method)
+            MethodModel method,
+            bool wrapMembersInLock)
         {
             EmitDocumentation(
                 sb,
@@ -117,6 +124,10 @@ namespace J2N.Text.CodeGen.Generation
                         method.GenericParameters.Select(p => p.Name)) + ">"
                     : "";
 
+            bool shouldWrapInLock =
+                wrapMembersInLock
+                && !method.SkipSynchronization;
+
             sb.AppendLine(
                 $"        public static{unsafeModifier} {method.ReturnType} {method.Name}{genericParameters}({parameterList})");
 
@@ -124,40 +135,15 @@ namespace J2N.Text.CodeGen.Generation
                 sb,
                 method.GenericParameters);
 
-            //
-            // BodyText already contains properly formatted code.
-            // Just emit it exactly as-is, preserving indentation.
-            //
-
-            if (!string.IsNullOrWhiteSpace(method.BodyText))
+            if (method.GenerateForwarder)
             {
-                string normalized =
-                    method.BodyText.Replace("\r\n", "\n")
-                                   .Replace('\r', '\n');
-
-                string[] lines =
-                    normalized.Split('\n');
-
-                // Remove leading/trailing blank lines
-                int start = 0;
-                int end = lines.Length - 1;
-
-                while (start <= end && string.IsNullOrWhiteSpace(lines[start]))
-                    start++;
-
-                while (end >= start && string.IsNullOrWhiteSpace(lines[end]))
-                    end--;
-
-                for (int i = start; i <= end; i++)
-                {
-                    sb.AppendLine(lines[i]);
-                }
+                EmitForwarder(sb, method, shouldWrapInLock);
             }
             else
             {
-                sb.AppendLine("        {");
-                sb.AppendLine("            throw new NotImplementedException();");
-                sb.AppendLine("        }");
+
+                // BodyText currently cannot be combined with shouldWrapInLock
+                EmitBodyText(sb, method);
             }
 
             sb.AppendLine();
@@ -309,6 +295,102 @@ namespace J2N.Text.CodeGen.Generation
 
                     return line;
                 });
+        }
+
+        private static void EmitBodyText(
+            StringBuilder sb,
+            MethodModel method)
+        {
+            //
+            // BodyText already contains properly formatted code.
+            // Just emit it exactly as-is, preserving indentation.
+            //
+
+            if (!string.IsNullOrWhiteSpace(method.BodyText))
+            {
+                string normalized =
+                    method.BodyText.Replace("\r\n", "\n")
+                                   .Replace('\r', '\n');
+
+                string[] lines =
+                    normalized.Split('\n');
+
+                // Remove leading/trailing blank lines
+                int start = 0;
+                int end = lines.Length - 1;
+
+                while (start <= end && string.IsNullOrWhiteSpace(lines[start]))
+                    start++;
+
+                while (end >= start && string.IsNullOrWhiteSpace(lines[end]))
+                    end--;
+
+                for (int i = start; i <= end; i++)
+                {
+                    sb.AppendLine(lines[i]);
+                }
+            }
+            else
+            {
+                sb.AppendLine("        {");
+                sb.AppendLine("            throw new NotImplementedException();");
+                sb.AppendLine("        }");
+            }
+        }
+
+        private static void EmitForwarder(
+            StringBuilder sb,
+            MethodModel method,
+            bool shouldWrapInLock)
+        {
+            string argumentList =
+                string.Join(
+                    ", ",
+                    method.Parameters.Skip(1).Select(
+                        p => p.Name));
+
+            string extensionParameterName =
+                method.Parameters.FirstOrDefault()?.Name ?? "text";
+
+
+            sb.AppendLine("        {");
+
+            sb.AppendLine($"            if ({extensionParameterName} is null)");
+            sb.AppendLine($"                throw new ArgumentNullException(nameof({extensionParameterName}));");
+            sb.AppendLine();
+
+            if (shouldWrapInLock)
+            {
+                sb.AppendLine($"            lock ({extensionParameterName}.SyncRoot)");
+                sb.AppendLine("            {");
+
+                if (string.IsNullOrEmpty(method.ForwardTargetObject))
+                {
+                    sb.AppendLine($"                {extensionParameterName}.{method.ForwardTarget}({argumentList});");
+                }
+                else
+                {
+                    sb.AppendLine($"                {extensionParameterName}.{method.ForwardTargetObject}.{method.ForwardTarget}({argumentList});");
+                }
+
+                sb.AppendLine($"                return {extensionParameterName};");
+                sb.AppendLine("            }");
+            }
+            else
+            {
+                if (string.IsNullOrEmpty(method.ForwardTargetObject))
+                {
+                    sb.AppendLine($"            {extensionParameterName}.{method.ForwardTarget}({argumentList});");
+                }
+                else
+                {
+                    sb.AppendLine($"            {extensionParameterName}.{method.ForwardTargetObject}.{method.ForwardTarget}({argumentList});");
+                }
+
+                sb.AppendLine($"            return {extensionParameterName};");
+            }
+
+            sb.AppendLine("        }");
         }
     }
 }
