@@ -5,5 +5,6 @@
         public bool SuppressMissingDocumentationWarnings { get; init; }
         public bool WrapMembersInLock { get; init; }
         public bool EmitSynchronizationNotes { get; init; }
+        public bool IsSealed { get; init; } = true;
     }
 }

@@ -30,7 +30,10 @@ namespace J2N.Text.CodeGen.Generation
             sb.AppendLine("{");
             sb.AppendLine();
 
-            sb.AppendLine($"    public sealed partial class {model.Name}");
+            string sealedModifier =
+                options.IsSealed ? "sealed " : "";
+
+            sb.AppendLine($"    public {sealedModifier}partial class {model.Name}");
             sb.AppendLine("    {");
 
             foreach (PropertyModel property in model.Properties)

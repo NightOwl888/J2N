@@ -63,8 +63,9 @@ namespace J2N.Text.CodeGen.Projection
                 Name = method.Name,
 
                 ReturnType =
-                    RewriteType(
-                        method.ReturnType,
+                    RewriteReturnType(
+                        method,
+                        options.PreserveSelfTypeGenerics,
                         sourceType,
                         projectedBuilderType),
 
@@ -80,8 +81,10 @@ namespace J2N.Text.CodeGen.Projection
                             Name = p.Name,
 
                             TypeName =
-                                RewriteType(
-                                    p.TypeName,
+                                RewriteParameterType(
+                                    p,
+                                    method,
+                                    options.PreserveSelfTypeGenerics,
                                     sourceType,
                                     projectedBuilderType),
 
@@ -101,13 +104,15 @@ namespace J2N.Text.CodeGen.Projection
                         .ToList(),
 
                 GenericParameters =
-                    method.GenericParameters
-                        .Select(p =>
-                            RewriteGenericParameter(
-                                p,
-                                sourceType,
-                                projectedBuilderType))
-                        .ToList(),
+                    options.PreserveSelfTypeGenerics
+                        ? method.GenericParameters
+                            .Select(p =>
+                                RewriteGenericParameter(
+                                    p,
+                                    sourceType,
+                                    projectedBuilderType))
+                            .ToList()
+                        : [],
 
                 Attributes =
                     method.Attributes
@@ -228,6 +233,61 @@ namespace J2N.Text.CodeGen.Projection
             string projectedBuilderType)
         {
             return typeName.Replace(sourceType, projectedBuilderType);
+        }
+
+        private static string RewriteParameterType(
+            ParameterModel parameter,
+            MethodModel method,
+            bool preserveSelfTypeGenerics,
+            string sourceType,
+            string projectedBuilderType)
+        {
+            if (preserveSelfTypeGenerics)
+            {
+                return RewriteType(
+                    parameter.TypeName,
+                    sourceType,
+                    projectedBuilderType);
+            }
+
+            GenericParameterModel? generic =
+                method.GenericParameters.FirstOrDefault(
+                    p => p.Name == parameter.TypeName);
+
+            if (generic is not null)
+            {
+                return projectedBuilderType;
+            }
+
+            return RewriteType(
+                parameter.TypeName,
+                sourceType,
+                projectedBuilderType);
+        }
+
+        private static string RewriteReturnType(
+            MethodModel method,
+            bool preserveSelfTypeGenerics,
+            string sourceType,
+            string projectedBuilderType)
+        {
+            if (preserveSelfTypeGenerics)
+            {
+                return RewriteType(
+                    method.ReturnType,
+                    sourceType,
+                    projectedBuilderType);
+            }
+
+            if (method.GenericParameters.Any(p => p.Name == method.ReturnType))
+            {
+                return projectedBuilderType;
+            }
+
+            return RewriteType(
+                method.ReturnType,
+                sourceType,
+                projectedBuilderType);
         }
 
         private static GenericParameterModel RewriteGenericParameter(

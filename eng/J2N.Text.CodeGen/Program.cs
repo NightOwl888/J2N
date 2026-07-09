@@ -98,18 +98,22 @@ namespace J2N.Text.CodeGen
             // Generate TextBuilder
             // ---------------------------------------------------------------------
 
+            FacadeGenerationOptions textBuilderOptions = new()
+            {
+                FacadeName = "TextBuilder",
+                IsSynchronized = false,
+                EmitSynchronizationNotes = false,
+                IsSealed = false,
+            };
+
             GenerateFacade(
                 sourceDirectory,
-                facadeName: "TextBuilder",
-                synchronized: false,
-                emitSynchronizationNotes: false,
+                textBuilderOptions,
                 model);
 
             GenerateExtensions(
                 sourceDirectory,
-                facadeName: "TextBuilder",
-                synchronized: false,
-                emitSynchronizationNotes: false,
+                textBuilderOptions,
                 extensionModel,
                 implementationModel);
 
@@ -117,18 +121,23 @@ namespace J2N.Text.CodeGen
             // Generate PooledTextBuilder
             // ---------------------------------------------------------------------
 
+            FacadeGenerationOptions pooledTextBuilderOptions = new()
+            {
+                FacadeName = "PooledTextBuilder",
+                IsSynchronized = false,
+                EmitSynchronizationNotes = false,
+                IsSealed = true,
+            };
+
             GenerateFacade(
                 sourceDirectory,
-                facadeName: "PooledTextBuilder",
-                synchronized: false,
-                emitSynchronizationNotes: false,
+                pooledTextBuilderOptions,
                 model);
+
 
             GenerateExtensions(
                 sourceDirectory,
-                facadeName: "PooledTextBuilder",
-                synchronized: false,
-                emitSynchronizationNotes: false,
+                pooledTextBuilderOptions,
                 extensionModel,
                 implementationModel);
 
@@ -136,18 +145,22 @@ namespace J2N.Text.CodeGen
             // Generate SynchronizedTextBuilder
             // ---------------------------------------------------------------------
 
+            FacadeGenerationOptions synchronizedTextBuilderOptions = new()
+            {
+                FacadeName = "SynchronizedTextBuilder",
+                IsSynchronized = true,
+                EmitSynchronizationNotes = true,
+                IsSealed = true,
+            };
+
             GenerateFacade(
                 sourceDirectory,
-                facadeName: "SynchronizedTextBuilder",
-                synchronized: true,
-                emitSynchronizationNotes: true,
+                synchronizedTextBuilderOptions,
                 model);
 
             GenerateExtensions(
                 sourceDirectory,
-                facadeName: "SynchronizedTextBuilder",
-                synchronized: true,
-                emitSynchronizationNotes: true,
+                synchronizedTextBuilderOptions,
                 extensionModel,
                 implementationModel);
 
@@ -162,9 +175,7 @@ namespace J2N.Text.CodeGen
 
         static void GenerateFacade(
             string sourceDirectory,
-            string facadeName,
-            bool synchronized,
-            bool emitSynchronizationNotes,
+            FacadeGenerationOptions generationOptions,
             TypeModel model)
         {
             var projection = new BuilderProjection();
@@ -174,10 +185,10 @@ namespace J2N.Text.CodeGen
                 projection.Project(
                     model,
                     facadeNamespace: "J2N.Text",
-                    facadeName: facadeName,
+                    facadeName: generationOptions.FacadeName,
                     options: new ProjectionOptions
                     {
-                        EmitSynchronizationNotes = emitSynchronizationNotes,
+                        EmitSynchronizationNotes = generationOptions.EmitSynchronizationNotes,
                     });
 
             string facadeCode =
@@ -187,14 +198,15 @@ namespace J2N.Text.CodeGen
                     options: new FacadeEmitterOptions
                     {
                         SuppressMissingDocumentationWarnings = true,
-                        WrapMembersInLock = synchronized,
-                        EmitSynchronizationNotes = emitSynchronizationNotes,
+                        WrapMembersInLock = generationOptions.IsSynchronized,
+                        EmitSynchronizationNotes = generationOptions.EmitSynchronizationNotes,
+                        IsSealed = generationOptions.IsSealed,
                     });
 
             string facadePath =
                 Path.Combine(
                     sourceDirectory,
-                    $"{facadeName}.generated.cs");
+                    $"{generationOptions.FacadeName}.generated.cs");
 
             File.WriteAllText(
                 facadePath,
@@ -203,9 +215,7 @@ namespace J2N.Text.CodeGen
 
         static void GenerateExtensions(
             string sourceDirectory,
-            string facadeName,
-            bool synchronized,
-            bool emitSynchronizationNotes,
+            FacadeGenerationOptions generationOptions,
             TypeModel extensionModel,
             TypeModel implementationModel)
         {
@@ -218,11 +228,12 @@ namespace J2N.Text.CodeGen
                     implementationModel,
                     "MutableTextBuffer",
                     facadeNamespace: "J2N.Text",
-                    projectedBuilderType: facadeName,
-                    projectedTypeName: facadeName + "Extensions",
+                    projectedBuilderType: generationOptions.FacadeName,
+                    projectedTypeName: generationOptions.FacadeName + "Extensions",
                     options: new ProjectionOptions
                     {
-                        EmitSynchronizationNotes = emitSynchronizationNotes,
+                        EmitSynchronizationNotes = generationOptions.EmitSynchronizationNotes,
+                        PreserveSelfTypeGenerics = !generationOptions.IsSealed,
                     });
 
             string extensionCode =
@@ -230,13 +241,13 @@ namespace J2N.Text.CodeGen
                     projectedExtensions,
                     options: new ExtensionEmitterOptions
                     {
-                        WrapMembersInLock = synchronized,
+                        WrapMembersInLock = generationOptions.IsSynchronized,
                     });
 
             string extensionPath =
                 Path.Combine(
                     sourceDirectory,
-                    $"{facadeName}Extensions.generated.cs");
+                    $"{generationOptions.FacadeName}Extensions.generated.cs");
 
             File.WriteAllText(
                 extensionPath,

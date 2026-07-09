@@ -71,7 +71,8 @@ namespace J2N.Text.CodeGen.Roslyn
             {
                 Namespace = typeSymbol.ContainingNamespace.ToDisplayString(),
                 Name = typeSymbol.Name,
-                SourceType = typeSymbol.Name
+                SourceType = typeSymbol.Name,
+                IsSealed = typeSymbol.IsSealed,
             };
 
             foreach (SyntaxTree tree in trees)
