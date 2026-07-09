@@ -4,7 +4,7 @@ using J2N.Text.CodeGen.Projection;
 using J2N.Text.CodeGen.Roslyn;
 using Microsoft.CodeAnalysis;
 
-namespace J2N.Text.CodGen
+namespace J2N.Text.CodeGen
 {
     internal class Program
     {
