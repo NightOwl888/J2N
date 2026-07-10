@@ -120,16 +120,16 @@ namespace J2N.Text.CodeGen.Projection
                         .ToList(),
 
                 Documentation =
-                    RewriteDocumentation(
+                    DocumentationRewriter.RewriteDocumentation(
                         method.Documentation,
                         implementationModel,
+                        sourceType,
                         projectedBuilderType,
-                        options,
-                        includeSynchronizationNote:
-                            options.EmitSynchronizationNotes &&
-                            method.SkipSynchronization,
-                        forceBuilderReturns:
-                            method.ReturnsSelf),
+                        new DocumentationRewriteOptions
+                        {
+                            IncludeSynchronizationNote = options.EmitSynchronizationNotes && method.SkipSynchronization,
+                            ForceBuilderReturns = method.ReturnsSelf
+                        }),
 
                 GenerateForwarder = method.GenerateForwarder,
 
@@ -284,95 +284,6 @@ namespace J2N.Text.CodeGen.Projection
                                 projectedBuilderType))
                         .ToList()
             };
-        }
-
-        private static DocumentationModel? RewriteDocumentation(
-            DocumentationModel? documentation,
-            TypeModel source,
-            string projectedBuilderType,
-            ProjectionOptions options,
-            bool includeSynchronizationNote,
-            bool forceBuilderReturns = false)
-        {
-            if (documentation is null)
-            {
-                if (!forceBuilderReturns)
-                    return null;
-
-                documentation = new DocumentationModel();
-            }
-
-            DocumentationModel result = new();
-
-            foreach (XmlDocumentationElementModel element in documentation.Elements)
-            {
-                if (element.ElementName == "synchronizationNote")
-                    continue;
-
-                result.Elements.Add(
-                    DocumentationRewriter.RewriteElement(
-                        element,
-                        source,
-                        source.Name,
-                        projectedBuilderType));
-            }
-
-            if (includeSynchronizationNote)
-            {
-                XmlDocumentationElementModel? sync =
-                    documentation.Elements.FirstOrDefault(
-                        e => e.ElementName == "synchronizationNote");
-
-                if (sync is not null)
-                {
-                    XmlDocumentationElementModel? remarks =
-                        result.Elements.FirstOrDefault(
-                            e => e.ElementName == "remarks");
-
-                    if (remarks is null)
-                    {
-                        result.Elements.Add(
-                            new XmlDocumentationElementModel
-                            {
-                                ElementName = "remarks",
-                                InnerXml = sync.InnerXml
-                            });
-                    }
-                    else
-                    {
-                        remarks.InnerXml +=
-                            Environment.NewLine +
-                            "<para/>" +
-                            Environment.NewLine +
-                            sync.InnerXml;
-                    }
-                }
-            }
-
-            if (forceBuilderReturns)
-            {
-                XmlDocumentationElementModel? returns =
-                    result.Elements.FirstOrDefault(
-                        e => e.ElementName == "returns");
-
-                if (returns is null)
-                {
-                    result.Elements.Add(
-                        new XmlDocumentationElementModel
-                        {
-                            ElementName = "returns",
-                            InnerXml =
-                                "A reference to this instance after the operation has completed."
-                        });
-                }
-                else
-                {
-                    returns.InnerXml =
-                        "A reference to this instance after the operation has completed.";
-                }
-            }
-
-            return result;
         }
 
         private static string? RewriteBody(

@@ -1193,7 +1193,7 @@ namespace J2N.Text
             }
         }
 
-        /// <returns>A reference to this instance after the operation has completed.</returns>
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
         public SynchronizedTextBuilder Append(SynchronizedTextBuilder? value)
         {
             lock (syncRoot)
@@ -1203,7 +1203,9 @@ namespace J2N.Text
             }
         }
 
-        /// <returns>A reference to this instance after the operation has completed.</returns>
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
+
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
         public SynchronizedTextBuilder Append(SynchronizedTextBuilder? value, int startIndex, int count)
         {
             lock (syncRoot)
@@ -1212,6 +1214,8 @@ namespace J2N.Text
                 return this;
             }
         }
+
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
 
         /// <summary>Appends the default line terminator to the end of the current <see cref="SynchronizedTextBuilder"/> object.</summary>
         /// <returns>A reference to this instance after the operation has completed.</returns>
@@ -1698,7 +1702,7 @@ namespace J2N.Text
             }
         }
 
-        /// <returns>A reference to this instance after the operation has completed.</returns>
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
         public SynchronizedTextBuilder AppendJoin(string? separator, params object?[] values)
         {
             lock (syncRoot)
@@ -1708,7 +1712,9 @@ namespace J2N.Text
             }
         }
 
-        /// <returns>A reference to this instance after the operation has completed.</returns>
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
+
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
         public SynchronizedTextBuilder AppendJoin(string? separator, params ReadOnlySpan<object?> values)
         {
             lock (syncRoot)
@@ -1718,7 +1724,9 @@ namespace J2N.Text
             }
         }
 
-        /// <returns>A reference to this instance after the operation has completed.</returns>
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
+
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
         public SynchronizedTextBuilder AppendJoin<T>(string? separator, IEnumerable<T> values)
         {
             lock (syncRoot)
@@ -1728,7 +1736,9 @@ namespace J2N.Text
             }
         }
 
-        /// <returns>A reference to this instance after the operation has completed.</returns>
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
+
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
         public SynchronizedTextBuilder AppendJoin(string? separator, params string?[] values)
         {
             lock (syncRoot)
@@ -1738,7 +1748,9 @@ namespace J2N.Text
             }
         }
 
-        /// <returns>A reference to this instance after the operation has completed.</returns>
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
+
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
         public SynchronizedTextBuilder AppendJoin(string? separator, params ReadOnlySpan<string?> values)
         {
             lock (syncRoot)
@@ -1748,7 +1760,9 @@ namespace J2N.Text
             }
         }
 
-        /// <returns>A reference to this instance after the operation has completed.</returns>
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
+
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
         public SynchronizedTextBuilder AppendJoin(char separator, params object?[] values)
         {
             lock (syncRoot)
@@ -1758,7 +1772,9 @@ namespace J2N.Text
             }
         }
 
-        /// <returns>A reference to this instance after the operation has completed.</returns>
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
+
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
         public SynchronizedTextBuilder AppendJoin(char separator, params ReadOnlySpan<object?> values)
         {
             lock (syncRoot)
@@ -1768,7 +1784,9 @@ namespace J2N.Text
             }
         }
 
-        /// <returns>A reference to this instance after the operation has completed.</returns>
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
+
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
         public SynchronizedTextBuilder AppendJoin<T>(char separator, IEnumerable<T> values)
         {
             lock (syncRoot)
@@ -1778,7 +1796,9 @@ namespace J2N.Text
             }
         }
 
-        /// <returns>A reference to this instance after the operation has completed.</returns>
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
+
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
         public SynchronizedTextBuilder AppendJoin(char separator, params string?[] values)
         {
             lock (syncRoot)
@@ -1788,7 +1808,9 @@ namespace J2N.Text
             }
         }
 
-        /// <returns>A reference to this instance after the operation has completed.</returns>
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
+
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
         public SynchronizedTextBuilder AppendJoin(char separator, params ReadOnlySpan<string?> values)
         {
             lock (syncRoot)
@@ -1797,6 +1819,8 @@ namespace J2N.Text
                 return this;
             }
         }
+
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
 
         /// <summary>Inserts a string into this instance at the specified character position.</summary>
         /// <param name="index">The position in this instance where insertion begins.</param>

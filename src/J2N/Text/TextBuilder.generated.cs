@@ -1045,19 +1045,23 @@ namespace J2N.Text
             return this;
         }
 
-        /// <returns>A reference to this instance after the operation has completed.</returns>
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
         public TextBuilder Append(TextBuilder? value)
         {
             buffer.Append(value?.buffer);
             return this;
         }
 
-        /// <returns>A reference to this instance after the operation has completed.</returns>
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
+
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
         public TextBuilder Append(TextBuilder? value, int startIndex, int count)
         {
             buffer.Append(value?.buffer, startIndex, count);
             return this;
         }
+
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
 
         /// <summary>Appends the default line terminator to the end of the current <see cref="TextBuilder"/> object.</summary>
         /// <returns>A reference to this instance after the operation has completed.</returns>
@@ -1493,75 +1497,95 @@ namespace J2N.Text
             return this;
         }
 
-        /// <returns>A reference to this instance after the operation has completed.</returns>
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
         public TextBuilder AppendJoin(string? separator, params object?[] values)
         {
             buffer.AppendJoin(separator, values);
             return this;
         }
 
-        /// <returns>A reference to this instance after the operation has completed.</returns>
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
+
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
         public TextBuilder AppendJoin(string? separator, params ReadOnlySpan<object?> values)
         {
             buffer.AppendJoin(separator, values);
             return this;
         }
 
-        /// <returns>A reference to this instance after the operation has completed.</returns>
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
+
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
         public TextBuilder AppendJoin<T>(string? separator, IEnumerable<T> values)
         {
             buffer.AppendJoin(separator, values);
             return this;
         }
 
-        /// <returns>A reference to this instance after the operation has completed.</returns>
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
+
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
         public TextBuilder AppendJoin(string? separator, params string?[] values)
         {
             buffer.AppendJoin(separator, values);
             return this;
         }
 
-        /// <returns>A reference to this instance after the operation has completed.</returns>
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
+
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
         public TextBuilder AppendJoin(string? separator, params ReadOnlySpan<string?> values)
         {
             buffer.AppendJoin(separator, values);
             return this;
         }
 
-        /// <returns>A reference to this instance after the operation has completed.</returns>
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
+
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
         public TextBuilder AppendJoin(char separator, params object?[] values)
         {
             buffer.AppendJoin(separator, values);
             return this;
         }
 
-        /// <returns>A reference to this instance after the operation has completed.</returns>
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
+
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
         public TextBuilder AppendJoin(char separator, params ReadOnlySpan<object?> values)
         {
             buffer.AppendJoin(separator, values);
             return this;
         }
 
-        /// <returns>A reference to this instance after the operation has completed.</returns>
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
+
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
         public TextBuilder AppendJoin<T>(char separator, IEnumerable<T> values)
         {
             buffer.AppendJoin(separator, values);
             return this;
         }
 
-        /// <returns>A reference to this instance after the operation has completed.</returns>
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
+
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
         public TextBuilder AppendJoin(char separator, params string?[] values)
         {
             buffer.AppendJoin(separator, values);
             return this;
         }
 
-        /// <returns>A reference to this instance after the operation has completed.</returns>
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
+
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
         public TextBuilder AppendJoin(char separator, params ReadOnlySpan<string?> values)
         {
             buffer.AppendJoin(separator, values);
             return this;
         }
+
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
 
         /// <summary>Inserts a string into this instance at the specified character position.</summary>
         /// <param name="index">The position in this instance where insertion begins.</param>

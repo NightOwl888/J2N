@@ -1,0 +1,17 @@
+﻿using J2N.Text.CodeGen.Metadata;
+
+namespace J2N.Text.CodeGen.Projection
+{
+    internal sealed class DocumentationRewriteOptions
+    {
+        public bool IncludeSynchronizationNote { get; init; }
+
+        public bool ForceBuilderReturns { get; init; }
+
+        /// <summary>
+        /// Inserts the synthetic extension-method "this" parameter before all
+        /// existing <param/> elements.
+        /// </summary>
+        public XmlDocumentationElementModel? AdditionalThisParameter { get; init; }
+    }
+}

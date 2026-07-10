@@ -42,6 +42,141 @@ namespace J2N.Text.CodeGen.Projection
             documentation.Elements.AddRange(ordered);
         }
 
+        public static DocumentationModel? RewriteDocumentation(
+            DocumentationModel? documentation,
+            TypeModel implementationModel,
+            string sourceType,
+            string projectedBuilderType,
+            DocumentationRewriteOptions? options = null)
+        {
+            options ??= new DocumentationRewriteOptions();
+
+            //
+            // No source documentation means no output documentation.
+            // The emitter will generate the suppression pragma instead.
+            //
+            if (documentation is null)
+            {
+                return null;
+            }
+
+            DocumentationModel result = new();
+
+            bool insertedThisParameter = false;
+
+            foreach (XmlDocumentationElementModel element in documentation.Elements)
+            {
+                if (element.ElementName == "synchronizationNote")
+                {
+                    continue;
+                }
+
+                //
+                // The extension-method "this" parameter must appear before the
+                // first existing <param/>.
+                //
+                if (!insertedThisParameter &&
+                    options.AdditionalThisParameter is not null &&
+                    element.ElementName == "param")
+                {
+                    result.Elements.Add(options.AdditionalThisParameter);
+                    insertedThisParameter = true;
+                }
+
+                result.Elements.Add(
+                    RewriteElement(
+                        element,
+                        implementationModel,
+                        sourceType,
+                        projectedBuilderType));
+            }
+
+            //
+            // If there were no existing <param/> elements, insert the synthetic
+            // one immediately after <summary/> if present, otherwise near the
+            // beginning of the document.
+            //
+            if (!insertedThisParameter &&
+                options.AdditionalThisParameter is not null)
+            {
+                int summaryIndex =
+                    result.Elements.FindIndex(
+                        e => e.ElementName == "summary");
+
+                if (summaryIndex >= 0)
+                {
+                    result.Elements.Insert(
+                        summaryIndex + 1,
+                        options.AdditionalThisParameter);
+                }
+                else
+                {
+                    result.Elements.Insert(
+                        0,
+                        options.AdditionalThisParameter);
+                }
+            }
+
+            if (options.IncludeSynchronizationNote)
+            {
+                XmlDocumentationElementModel? synchronizationNote =
+                    documentation.Elements.FirstOrDefault(
+                        e => e.ElementName == "synchronizationNote");
+
+                if (synchronizationNote is not null)
+                {
+                    XmlDocumentationElementModel? remarks =
+                        result.Elements.FirstOrDefault(
+                            e => e.ElementName == "remarks");
+
+                    if (remarks is null)
+                    {
+                        result.Elements.Add(
+                            new XmlDocumentationElementModel
+                            {
+                                ElementName = "remarks",
+                                InnerXml = synchronizationNote.InnerXml
+                            });
+                    }
+                    else
+                    {
+                        remarks.InnerXml +=
+                            Environment.NewLine +
+                            "<para/>" +
+                            Environment.NewLine +
+                            synchronizationNote.InnerXml;
+                    }
+                }
+            }
+
+            if (options.ForceBuilderReturns)
+            {
+                XmlDocumentationElementModel? returns =
+                    result.Elements.FirstOrDefault(
+                        e => e.ElementName == "returns");
+
+                if (returns is null)
+                {
+                    result.Elements.Add(
+                        new XmlDocumentationElementModel
+                        {
+                            ElementName = "returns",
+                            InnerXml =
+                                "A reference to this instance after the operation has completed."
+                        });
+                }
+                else
+                {
+                    returns.InnerXml =
+                        "A reference to this instance after the operation has completed.";
+                }
+            }
+
+            SortDocumentationElements(result);
+
+            return result;
+        }
+
         public static string? RewriteDocumentation(
             string? xml,
             TypeModel source,
