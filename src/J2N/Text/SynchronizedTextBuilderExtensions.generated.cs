@@ -21,28 +21,18 @@ namespace J2N.Text
 {
     public static partial class SynchronizedTextBuilderExtensions
     {
-        /// <summary>
-        /// 
-        /// Creates a new readonly span over the portion of the target string.
-        /// 
-        /// </summary>
-        /// <param name="text">
-        /// The target string.
-        /// </param>
-        /// <returns>
-        /// The read-only span representation of the string.
-        /// </returns>
+        /// <summary>Creates a new readonly span over the portion of the target string.</summary>
+        /// <param name="text">The target string.</param>
+        /// <returns>The read-only span representation of the string.</returns>
         /// <remarks>
-        /// 
         /// Returns <see langword="default"/> when <paramref name="text"/> is <see langword="null"/>.
         /// <para/>
         /// The returned span is only valid while the underlying <see cref="SynchronizedTextBuilder"/> remains unchanged.
         /// Concurrent mutation invalidates the span contents.
         /// <para/>
         /// The returned span provides direct access to the underlying memory of the <see cref="SynchronizedTextBuilder"/>.
-        /// Callers must synchronize externally using <see cref="SynchronizedTextBuilder.SyncRoot" /> property for the
+        /// Callers must synchronize externally using <see cref = "SynchronizedTextBuilder.SyncRoot" /> property for the
         /// entire duration of span usage if concurrent mutation is possible.
-        /// 
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ReadOnlySpan<char> AsSpan(this SynchronizedTextBuilder? text)
@@ -60,31 +50,23 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// 
         /// Creates a new read-only span over a portion of the target string from
         /// a specified position to the end of the string.
-        /// 
         /// </summary>
-        /// <param name="text">
-        /// The target string.
-        /// </param>
-        /// <param name="start">
-        /// The index at which to begin this slice.
-        /// </param>
-        /// <returns>
-        /// The read-only span representation of the string.
-        /// </returns>
+        /// <param name="text">The target string.</param>
+        /// <param name="start">The index at which to begin this slice.</param>
+        /// <returns>The read-only span representation of the string.</returns>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="start"/> is less than 0 or greater than <c>text.Length</c>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="text"/> is <c>null</c>.</exception>
         /// <remarks>
-        /// 
         /// Returns <see langword="default"/> when <paramref name="text"/> is <see langword="null"/>.
         /// <para/>
         /// The returned span is only valid while the underlying <see cref="SynchronizedTextBuilder"/> remains unchanged.
         /// Concurrent mutation invalidates the span contents.
         /// <para/>
         /// The returned span provides direct access to the underlying memory of the <see cref="SynchronizedTextBuilder"/>.
-        /// Callers must synchronize externally using <see cref="SynchronizedTextBuilder.SyncRoot" /> property for the
+        /// Callers must synchronize externally using <see cref = "SynchronizedTextBuilder.SyncRoot" /> property for the
         /// entire duration of span usage if concurrent mutation is possible.
-        /// 
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ReadOnlySpan<char> AsSpan(this SynchronizedTextBuilder? text, int start)
@@ -110,34 +92,27 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// 
         /// Creates a new read-only span over a portion of the target string from a
         /// specified position for a specified number of characters.
-        /// 
         /// </summary>
-        /// <param name="text">
-        /// The target string.
-        /// </param>
-        /// <param name="start">
-        /// The index at which to begin this slice.
-        /// </param>
-        /// <param name="length">
-        /// The desired length for the slice.
-        /// </param>
-        /// <returns>
-        /// The read-only span representation of the string.
-        /// </returns>
+        /// <param name="text">The target string.</param>
+        /// <param name="start">The index at which to begin this slice.</param>
+        /// <param name="length">The desired length for the slice.</param>
+        /// <returns>The read-only span representation of the string.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="start"/>, <paramref name="length"/>, or
+        /// <paramref name="start"/> + <paramref name="length"/> is not
+        /// in the range of <paramref name="text"/>.
+        /// </exception>
         /// <remarks>
-        /// 
         /// Returns <see langword="default"/> when <paramref name="text"/> is <see langword="null"/>.
         /// <para/>
         /// The returned span is only valid while the underlying <see cref="SynchronizedTextBuilder"/> remains unchanged.
         /// Concurrent mutation invalidates the span contents.
         /// <para/>
         /// The returned span provides direct access to the underlying memory of the <see cref="SynchronizedTextBuilder"/>.
-        /// Callers must synchronize externally using <see cref="SynchronizedTextBuilder.SyncRoot" /> property for the
+        /// Callers must synchronize externally using <see cref = "SynchronizedTextBuilder.SyncRoot" /> property for the
         /// entire duration of span usage if concurrent mutation is possible.
-        /// 
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ReadOnlySpan<char> AsSpan(this SynchronizedTextBuilder? text, int start, int length)
@@ -173,31 +148,26 @@ namespace J2N.Text
 
 #if FEATURE_INDEX_RANGE
         /// <summary>
-        /// 
         /// Creates a new read-only span over a portion of the
         /// target string from a specified position to the end of the string.
-        /// 
         /// </summary>
-        /// <param name="text">
-        /// The target string.
-        /// </param>
-        /// <param name="startIndex">
-        /// The index at which to begin this slice.
-        /// </param>
-        /// <returns>
-        /// The read-only span representation of the string.
-        /// </returns>
+        /// <param name="text">The target string.</param>
+        /// <param name="startIndex">The index at which to begin this slice.</param>
+        /// <returns>The read-only span representation of the string.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="text"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="startIndex"/> is less
+        /// than 0 or greater than <c>text.Length</c>.
+        /// </exception>
         /// <remarks>
-        /// 
         /// Returns <see langword="default"/> when <paramref name="text"/> is <see langword="null"/>.
         /// <para/>
         /// The returned span is only valid while the underlying <see cref="SynchronizedTextBuilder"/> remains unchanged.
         /// Concurrent mutation invalidates the span contents.
         /// <para/>
         /// The returned span provides direct access to the underlying memory of the <see cref="SynchronizedTextBuilder"/>.
-        /// Callers must synchronize externally using <see cref="SynchronizedTextBuilder.SyncRoot" /> property for the
+        /// Callers must synchronize externally using <see cref = "SynchronizedTextBuilder.SyncRoot" /> property for the
         /// entire duration of span usage if concurrent mutation is possible.
-        /// 
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ReadOnlySpan<char> AsSpan(this SynchronizedTextBuilder? text, Index startIndex)
@@ -229,31 +199,27 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// 
         /// Creates a new read-only span over a portion of a target string
         /// using the range start and end indexes.
-        /// 
         /// </summary>
-        /// <param name="text">
-        /// The target string.
-        /// </param>
-        /// <param name="range">
-        /// The range that has start and end indexes to use for slicing the string.
-        /// </param>
-        /// <returns>
-        /// The read-only span representation of the string.
-        /// </returns>
+        /// <param name="text">The target string.</param>
+        /// <param name="range">The range that has start and end indexes to use for slicing the string.</param>
+        /// <returns>The read-only span representation of the string.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="text"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="range"/>'s start or end index is not within the bounds of the string.
+        /// -or-
+        /// <paramref name="range"/>'s start index is greater than its end index.
+        /// </exception>
         /// <remarks>
-        /// 
         /// Returns <see langword="default"/> when <paramref name="text"/> is <see langword="null"/>.
         /// <para/>
         /// The returned span is only valid while the underlying <see cref="SynchronizedTextBuilder"/> remains unchanged.
         /// Concurrent mutation invalidates the span contents.
         /// <para/>
         /// The returned span provides direct access to the underlying memory of the <see cref="SynchronizedTextBuilder"/>.
-        /// Callers must synchronize externally using <see cref="SynchronizedTextBuilder.SyncRoot" /> property for the
+        /// Callers must synchronize externally using <see cref = "SynchronizedTextBuilder.SyncRoot" /> property for the
         /// entire duration of span usage if concurrent mutation is possible.
-        /// 
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ReadOnlySpan<char> AsSpan(this SynchronizedTextBuilder? text, Range range)
@@ -285,29 +251,21 @@ namespace J2N.Text
 
 #endif
 
-        /// <summary>
-        /// 
-        /// Creates a new <see cref="ReadOnlyMemory{T}"/> over the portion of the target string.
-        /// 
-        /// </summary>
-        /// <param name="text">
-        /// The target string.
-        /// </param>
+        /// <summary>Creates a new <see cref="ReadOnlyMemory{T}"/> over the portion of the target string.</summary>
+        /// <param name="text">The target string.</param>
         /// <returns>
         /// The read-only character memory representation of the string, or <c>default</c> if
         /// <paramref name="text"/> is <c>null</c>.
         /// </returns>
         /// <remarks>
-        /// 
         /// Returns <see langword="default"/> when <paramref name="text"/> is <see langword="null"/>.
         /// <para/>
         /// The returned memory is only valid while the underlying <see cref="SynchronizedTextBuilder"/> remains unchanged.
         /// Concurrent mutation invalidates the memory contents.
         /// <para/>
         /// The returned memory provides direct access to the underlying memory of the <see cref="SynchronizedTextBuilder"/>.
-        /// Callers must synchronize externally using <see cref="SynchronizedTextBuilder.SyncRoot" /> property for the
+        /// Callers must synchronize externally using <see cref = "SynchronizedTextBuilder.SyncRoot" /> property for the
         /// entire duration of memory usage if concurrent mutation is possible.
-        /// 
         /// </remarks>
         public static ReadOnlyMemory<char> AsMemory(this SynchronizedTextBuilder? text)
         {
@@ -317,31 +275,23 @@ namespace J2N.Text
             return new ReadOnlyMemory<char>(text.buffer.m_Chars, 0, text.Length);
         }
 
-        /// <summary>
-        /// 
-        /// Creates a new <see cref="ReadOnlyMemory{T}"/> over the portion of the target string.
-        /// 
-        /// </summary>
-        /// <param name="text">
-        /// The target string.
-        /// </param>
-        /// <param name="start">
-        /// The index at which to begin this slice.
-        /// </param>
-        /// <returns>
-        /// Returns default when <paramref name="text"/> is null.
-        /// </returns>
+        /// <summary>Creates a new <see cref="ReadOnlyMemory{T}"/> over the portion of the target string.</summary>
+        /// <param name="text">The target string.</param>
+        /// <param name="start">The index at which to begin this slice.</param>
+        /// <returns>Returns default when <paramref name="text"/> is null.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="start"/> is not in range of <paramref name="text"/>
+        /// (<paramref name="start"/> is &lt;0 or &gt;<c>text.Length</c>).
+        /// </exception>
         /// <remarks>
-        /// 
         /// Returns <see langword="default"/> when <paramref name="text"/> is <see langword="null"/>.
         /// <para/>
         /// The returned memory is only valid while the underlying <see cref="SynchronizedTextBuilder"/> remains unchanged.
         /// Concurrent mutation invalidates the memory contents.
         /// <para/>
         /// The returned memory provides direct access to the underlying memory of the <see cref="SynchronizedTextBuilder"/>.
-        /// Callers must synchronize externally using <see cref="SynchronizedTextBuilder.SyncRoot" /> property for the
+        /// Callers must synchronize externally using <see cref = "SynchronizedTextBuilder.SyncRoot" /> property for the
         /// entire duration of memory usage if concurrent mutation is possible.
-        /// 
         /// </remarks>
         public static ReadOnlyMemory<char> AsMemory(this SynchronizedTextBuilder? text, int start)
         {
@@ -358,35 +308,27 @@ namespace J2N.Text
             return new ReadOnlyMemory<char>(text.buffer.m_Chars, start, text.Length - start);
         }
 
-        /// <summary>
-        /// 
-        /// Creates a new <see cref="ReadOnlyMemory{T}"/> over the portion of the target string.
-        /// 
-        /// </summary>
-        /// <param name="text">
-        /// The target string.
-        /// </param>
-        /// <param name="start">
-        /// The index at which to begin this slice.
-        /// </param>
-        /// <param name="length">
-        /// The desired length for the slice (exclusive).
-        /// </param>
+        /// <summary>Creates a new <see cref="ReadOnlyMemory{T}"/> over the portion of the target string.</summary>
+        /// <param name="text">The target string.</param>
+        /// <param name="start">The index at which to begin this slice.</param>
+        /// <param name="length">The desired length for the slice (exclusive).</param>
         /// <returns>
         /// The read-only character memory representation of the string, or <c>default</c>
         /// if <paramref name="text"/> is <c>null</c>.
         /// </returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="start"/>, <paramref name="length"/>,
+        /// or <paramref name="start"/> + <paramref name="length"/> is not in the range of <paramref name="text"/>.
+        /// </exception>
         /// <remarks>
-        /// 
         /// Returns <see langword="default"/> when <paramref name="text"/> is <see langword="null"/>.
         /// <para/>
         /// The returned memory is only valid while the underlying <see cref="SynchronizedTextBuilder"/> remains unchanged.
         /// Concurrent mutation invalidates the memory contents.
         /// <para/>
         /// The returned memory provides direct access to the underlying memory of the <see cref="SynchronizedTextBuilder"/>.
-        /// Callers must synchronize externally using <see cref="SynchronizedTextBuilder.SyncRoot" /> property for the
+        /// Callers must synchronize externally using <see cref = "SynchronizedTextBuilder.SyncRoot" /> property for the
         /// entire duration of memory usage if concurrent mutation is possible.
-        /// 
         /// </remarks>
         public static ReadOnlyMemory<char> AsMemory(this SynchronizedTextBuilder? text, int start, int length)
         {
@@ -413,31 +355,24 @@ namespace J2N.Text
         }
 
 #if FEATURE_INDEX_RANGE
-        /// <summary>
-        /// 
-        /// Creates a new <see cref="ReadOnlyMemory{T}"/> over the portion of the target string.
-        /// 
-        /// </summary>
-        /// <param name="text">
-        /// The target string.
-        /// </param>
-        /// <param name="startIndex">
-        /// The index at which to begin this slice.
-        /// </param>
-        /// <returns>
-        /// The read-only character memory representation of the string.
-        /// </returns>
+        /// <summary>Creates a new <see cref="ReadOnlyMemory{T}"/> over the portion of the target string.</summary>
+        /// <param name="text">The target string.</param>
+        /// <param name="startIndex">The index at which to begin this slice.</param>
+        /// <returns>The read-only character memory representation of the string.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="text"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="startIndex"/> is less
+        /// than 0 or greater than <c>text.Length</c>.
+        /// </exception>
         /// <remarks>
-        /// 
         /// Returns <see langword="default"/> when <paramref name="text"/> is <see langword="null"/>.
         /// <para/>
         /// The returned memory is only valid while the underlying <see cref="SynchronizedTextBuilder"/> remains unchanged.
         /// Concurrent mutation invalidates the memory contents.
         /// <para/>
         /// The returned memory provides direct access to the underlying memory of the <see cref="SynchronizedTextBuilder"/>.
-        /// Callers must synchronize externally using <see cref="SynchronizedTextBuilder.SyncRoot" /> property for the
+        /// Callers must synchronize externally using <see cref = "SynchronizedTextBuilder.SyncRoot" /> property for the
         /// entire duration of memory usage if concurrent mutation is possible.
-        /// 
         /// </remarks>
         public static ReadOnlyMemory<char> AsMemory(this SynchronizedTextBuilder? text, Index startIndex)
         {
@@ -456,31 +391,27 @@ namespace J2N.Text
             return new ReadOnlyMemory<char>(text.buffer.m_Chars, actualIndex, text.Length - actualIndex);
         }
 
-        /// <summary>
-        /// 
-        /// Creates a new <see cref="ReadOnlyMemory{T}"/> over the portion of the target string.
-        /// 
-        /// </summary>
-        /// <param name="text">
-        /// The target string.
-        /// </param>
-        /// <param name="range">
-        /// The range used to indicate the start and length of the sliced string.
-        /// </param>
-        /// <returns>
-        /// The read-only character memory representation of the string.
-        /// </returns>
+        /// <summary>Creates a new <see cref="ReadOnlyMemory{T}"/> over the portion of the target string.</summary>
+        /// <param name="text">The target string.</param>
+        /// <param name="range">The range used to indicate the start and length of the sliced string.</param>
+        /// <returns>The read-only character memory representation of the string.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="text"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="range"/>'s start or end index is not within the bounds of the string.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="range"/>'s start index is greater than its end index.
+        /// </exception>
         /// <remarks>
-        /// 
         /// Returns <see langword="default"/> when <paramref name="text"/> is <see langword="null"/>.
         /// <para/>
         /// The returned memory is only valid while the underlying <see cref="SynchronizedTextBuilder"/> remains unchanged.
         /// Concurrent mutation invalidates the memory contents.
         /// <para/>
         /// The returned memory provides direct access to the underlying memory of the <see cref="SynchronizedTextBuilder"/>.
-        /// Callers must synchronize externally using <see cref="SynchronizedTextBuilder.SyncRoot" /> property for the
+        /// Callers must synchronize externally using <see cref = "SynchronizedTextBuilder.SyncRoot" /> property for the
         /// entire duration of memory usage if concurrent mutation is possible.
-        /// 
         /// </remarks>
         public static ReadOnlyMemory<char> AsMemory(this SynchronizedTextBuilder? text, Range range)
         {
@@ -502,28 +433,16 @@ namespace J2N.Text
 #endif
 
         /// <summary>
-        /// 
         /// Appends the string representation of a specified object to this instance using the specified format
         /// and culture-specific format information.
-        /// 
         /// </summary>
-        /// <param name="text">
-        /// The target builder.
-        /// </param>
-        /// <param name="value">
-        /// The object to append.
-        /// </param>
-        /// <param name="format">
-        /// A standard or custom format string.
-        /// </param>
-        /// <param name="provider">
-        /// An object that supplies culture-specific formatting information.
-        /// </param>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
+        /// <param name="text">The target builder.</param>
+        /// <param name="value">The object to append.</param>
+        /// <param name="format">A standard or custom format string.</param>
+        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="text"/> is <see langword="null"/></exception>
         /// <remarks>
-        /// 
         /// <paramref name="format"/> and <paramref name="provider"/> are only applied if the object implements <see cref="ISpanFormattable"/>,
         /// <see cref="IFormattable"/>, <c>IStructuralFormattable</c>, or subclasses <see cref="Number"/>.
         /// <para/>
@@ -535,8 +454,8 @@ namespace J2N.Text
         /// both the length and the capacity of the <see cref="SynchronizedTextBuilder"/> instance can grow beyond
         /// the value of its <see cref="SynchronizedTextBuilder.MaxCapacity"/> property. This can occur particularly when you call the <see cref="SynchronizedTextBuilder.Append(string)"/>
         /// and <see cref="SynchronizedTextBuilder.AppendFormat(string, object?)"/> methods to append small strings.
-        /// 
         /// </remarks>
+        /// <seealso cref="object" />
         public static SynchronizedTextBuilder Append(this SynchronizedTextBuilder text, object? value, string? format = null, IFormatProvider? provider = null)
         {
             if (text is null)
@@ -549,39 +468,25 @@ namespace J2N.Text
             }
         }
 
-        /// <summary>
-        /// 
-        /// Inserts the string representation of an object into this instance at the specified character position.
-        /// 
-        /// </summary>
-        /// <param name="text">
-        /// The target builder.
-        /// </param>
-        /// <param name="index">
-        /// The position in this instance where insertion begins.
-        /// </param>
-        /// <param name="value">
-        /// The object to insert, or <see langword="null"/>.
-        /// </param>
-        /// <param name="format">
-        /// A standard or custom format string.
-        /// </param>
-        /// <param name="provider">
-        /// An object that supplies culture-specific formatting information.
-        /// </param>
-        /// <returns>
-        /// A reference to this instance after the append operation has completed.
-        /// </returns>
+        /// <summary>Inserts the string representation of an object into this instance at the specified character position.</summary>
+        /// <param name="text">The target builder.</param>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">The object to insert, or <see langword="null"/>.</param>
+        /// <param name="format">A standard or custom format string.</param>
+        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
+        /// <returns>A reference to this instance after the append operation has completed.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="text"/> is <see langword="null"/></exception>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> is less than zero or greater than the current length of this instance.</exception>
+        /// <exception cref="OutOfMemoryException">Enlarging the value of this instance would exceed <see cref="SynchronizedTextBuilder.MaxCapacity"/>.</exception>
         /// <remarks>
-        /// 
         /// <paramref name="format"/> and <paramref name="provider"/> are only applied if the object implements <see cref="ISpanFormattable"/>,
         /// <see cref="IFormattable"/>, <c>IStructuralFormattable</c>, or subclasses <see cref="Number"/>.
         /// <para/>
         /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
         /// <para/>
         /// If <paramref name="value"/> is <see langword="null"/>, the <see cref="SynchronizedTextBuilder"/> is not changed.
-        /// 
         /// </remarks>
+        /// <seealso cref="object" />
         public static SynchronizedTextBuilder Insert(this SynchronizedTextBuilder text, int index, object? value, string? format = null, IFormatProvider? provider = null)
         {
             if (text is null)

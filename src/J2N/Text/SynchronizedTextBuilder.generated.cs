@@ -33,20 +33,25 @@ namespace J2N.Text
 
     public sealed partial class SynchronizedTextBuilder
     {
-        /// <summary>
-        /// 
-        /// Gets or sets the maximum number of characters that can be contained in the memory allocated by the current instance.
-        /// 
-        /// </summary>
+        /// <summary>Gets or sets the maximum number of characters that can be contained in the memory allocated by the current instance.</summary>
+        /// <value>
+        /// The maximum number of characters that can be contained in the memory allocated by the current instance.
+        /// Its value can range from <see cref="Length"/> to <see cref="MaxCapacity"/>.
+        /// </value>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// The value specified for a set operation is less than the current length of this instance.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// The value specified for a set operation is greater than the maximum capacity.
+        /// </exception>
         /// <remarks>
-        /// 
         /// <see cref="Capacity"/> does not affect the string value of the current instance. <see cref="Capacity"/> can
         /// be decreased as long as it is not less than <see cref="Length"/>.
         /// <para/>
         /// The <see cref="SynchronizedTextBuilder"/> dynamically allocates more space when required and increases
         /// <see cref="Capacity"/> accordingly. For performance reasons, a <see cref="SynchronizedTextBuilder"/> might
         /// allocate more memory than needed. The amount of memory allocated is implementation-specific.
-        /// 
         /// </remarks>
         public int Capacity
         {
@@ -66,13 +71,9 @@ namespace J2N.Text
             }
         }
 
-        /// <summary>
-        /// 
-        /// Gets the maximum capacity of this instance.
-        /// 
-        /// </summary>
+        /// <summary>Gets the maximum capacity of this instance.</summary>
+        /// <value>The maximum number of characters this instance can hold.</value>
         /// <remarks>
-        /// 
         /// The maximum capacity for this implementation is <c>Array.MaxLength</c> on .NET 6.0
         /// or higher. On earlier versions of .NET, the maximum capacity is <c>2_146_435_071</c>.
         /// You can explicitly set the maximum capacity of a <see cref="SynchronizedTextBuilder"/>
@@ -84,7 +85,6 @@ namespace J2N.Text
         /// both the length and the capacity of the <see cref="SynchronizedTextBuilder"/> instance can grow beyond
         /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
-        /// 
         /// </remarks>
         public int MaxCapacity
         {
@@ -97,13 +97,13 @@ namespace J2N.Text
             }
         }
 
-        /// <summary>
-        /// 
-        /// Gets or sets the length of the current <see cref="SynchronizedTextBuilder"/> object.
-        /// 
-        /// </summary>
+        /// <summary>Gets or sets the length of the current <see cref="SynchronizedTextBuilder"/> object.</summary>
+        /// <value>The length of this instance.</value>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// The value specified for a set operation
+        /// is less than zero or greater than <see cref="MaxCapacity"/>.
+        /// </exception>
         /// <remarks>
-        /// 
         /// The length of a <see cref="SynchronizedTextBuilder"/> object is defined by its number of
         /// <see cref="char"/> objects.
         /// <para/>
@@ -119,7 +119,6 @@ namespace J2N.Text
         /// <para/>
         /// If the specified length is greater than the current capacity, <see cref="Capacity"/> increases so
         /// that it is greater than or equal to the specified length.
-        /// 
         /// </remarks>
         public int Length
         {
@@ -139,16 +138,18 @@ namespace J2N.Text
             }
         }
 
-        /// <summary>
-        /// 
-        /// Gets or sets the character at the specified character position in this instance.
-        /// 
-        /// </summary>
-        /// <param name="index">
-        /// The position of the character.
-        /// </param>
+        /// <summary>Gets or sets the character at the specified character position in this instance.</summary>
+        /// <param name="index">The position of the character.</param>
+        /// <value>The Unicode character at position <paramref name="index"/>.</value>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="index"/> is outside
+        /// the bounds of this instance while setting a character.
+        /// </exception>
+        /// <exception cref="IndexOutOfRangeException">
+        /// <paramref name="index"/> is outside the bounds
+        /// of this instance while getting a character.
+        /// </exception>
         /// <remarks>
-        /// 
         /// The index parameter is the position of a character within the <see cref="SynchronizedTextBuilder"/>.
         /// The first character in the string is at index 0. The length of a string is the number of
         /// characters it contains. The last accessible character of a <see cref="SynchronizedTextBuilder"/> instance
@@ -195,7 +196,6 @@ namespace J2N.Text
         /// Unlike the <see cref="StringBuilder"/> class, <see cref="SynchronizedTextBuilder"/>'s indexer does
         /// not suffer from degraded performance due to chunky memory, since <see cref="SynchronizedTextBuilder"/>
         /// uses a single contiguous block of characters in memory.
-        /// 
         /// </remarks>
         [IndexerName("Chars")]
         public char this[int index]
@@ -217,19 +217,15 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// 
         /// Appends the string representation of the Unicode characters in a specified sequence to this instance.
         /// <para/>
         /// NOTE: Unlike the Java implementation, this method does not add the word <c>"null"</c> to the <see cref="SynchronizedTextBuilder"/>
         /// if <paramref name="value"/> is <c>null</c>. Instead, no operation is performed.
-        /// 
         /// </summary>
-        /// <param name="value">
-        /// The sequence of characters to append.
-        /// </param>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
+        /// <param name="value">The sequence of characters to append.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.</exception>
+        /// <seealso cref="ICharSequence" />
         public SynchronizedTextBuilder Append(ICharSequence? value)
         {
             lock (syncRoot)
@@ -239,23 +235,31 @@ namespace J2N.Text
             }
         }
 
-        /// <summary>
-        /// 
-        /// Appends the string representation of a specified subarray of Unicode characters to this instance.
-        /// 
-        /// </summary>
-        /// <param name="value">
-        /// The UTF-16-encoded code unit to append.
-        /// </param>
-        /// <param name="startIndex">
-        /// The starting position in <paramref name="value"/>.
-        /// </param>
-        /// <param name="count">
-        /// The number of characters to append.
-        /// </param>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
+        /// <summary>Appends the string representation of a specified subarray of Unicode characters to this instance.</summary>
+        /// <param name="value">The UTF-16-encoded code unit to append.</param>
+        /// <param name="startIndex">The starting position in <paramref name="value"/>.</param>
+        /// <param name="count">The number of characters to append.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="value"/> is <c>null</c>, and
+        /// <paramref name="startIndex"/> and <paramref name="count"/> are not zero.
+        /// </exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="count"/> is less than zero.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="startIndex"/> is less than zero.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="startIndex"/> + <paramref name="count"/> is greater than the length of <paramref name="value"/>.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.
+        /// </exception>
+        /// <seealso cref="ICharSequence" />
         public SynchronizedTextBuilder Append(ICharSequence? value, int startIndex, int count)
         {
             lock (syncRoot)
@@ -265,20 +269,17 @@ namespace J2N.Text
             }
         }
 
-        /// <summary>
-        /// 
-        /// Inserts the string representation of a specified sequence of Unicode characters into this instance at the specified character position.
-        /// 
-        /// </summary>
-        /// <param name="index">
-        /// The position in this instance where insertion begins.
-        /// </param>
-        /// <param name="value">
-        /// The character sequence to insert.
-        /// </param>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
+        /// <summary>Inserts the string representation of a specified sequence of Unicode characters into this instance at the specified character position.</summary>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">The character sequence to insert.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="index"/> is less than zero or greater than the length of this instance.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.
+        /// </exception>
         public SynchronizedTextBuilder Insert(int index, ICharSequence? value)
         {
             lock (syncRoot)
@@ -289,28 +290,31 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// 
         /// Inserts the string representation of a specified subarray of Unicode characters into this instance at the specified character position.
         /// <para/>
         /// IMPORTANT: This method has .NET semantics. That is, the fourth parameter is a count, not an exclusive end index as would be the
         /// case in Java. To translate from Java, use <c>end - start</c> to resolve <paramref name="count"/>.
-        /// 
         /// </summary>
-        /// <param name="index">
-        /// The position in this instance where insertion begins.
-        /// </param>
-        /// <param name="value">
-        /// The character sequence to insert.
-        /// </param>
-        /// <param name="startIndex">
-        /// The starting index within <paramref name="value"/>.
-        /// </param>
-        /// <param name="count">
-        /// The number of characters to insert.
-        /// </param>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">The character sequence to insert.</param>
+        /// <param name="startIndex">The starting index within <paramref name="value"/>.</param>
+        /// <param name="count">The number of characters to insert.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="index"/>, <paramref name="startIndex"/> or <paramref name="count"/> is less than zero.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="index"/> is greater than the length of this instance.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="startIndex"/> plus <paramref name="count"/> is not a position within <paramref name="value"/>.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.
+        /// </exception>
         public SynchronizedTextBuilder Insert(int index, ICharSequence? value, int startIndex, int count)
         {
             lock (syncRoot)
@@ -321,10 +325,8 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// 
         /// Returns a <see cref="Span{Char}"/> to write to that is at least the requested size
         /// (specified by <paramref name="sizeHint"/>).
-        /// 
         /// </summary>
         /// <param name="sizeHint">
         /// The minimum length of the returned <see cref="Span{Char}"/>.
@@ -334,12 +336,13 @@ namespace J2N.Text
         /// A <see cref="Span{Char}"/> of at least the size <paramref name="sizeHint"/>.
         /// If <paramref name="sizeHint"/> is 0, returns a non-empty buffer.
         /// </returns>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="sizeHint"/> is less than zero.</exception>
         /// <remarks>
-        /// This method never returns <see cref="Span{Char}.Empty"/>.<para/>
+        /// This method never returns <see cref="Span{Char}.Empty"/>.
+        /// <para/>
         /// The returned span provides direct access to the underlying memory of the <see cref="SynchronizedTextBuilder"/>.
         /// Callers must synchronize externally using <see cref="SynchronizedTextBuilder.SyncRoot"/> for the duration of the
         /// span usage if concurrent mutation is possible.
-        /// 
         /// </remarks>
         public Span<char> GetSpan(int sizeHint = 0)
         {
@@ -347,10 +350,8 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// 
         /// Returns a <see cref="Memory{Char}"/> to write to that is at least the length
         /// specified by <paramref name="sizeHint"/>.
-        /// 
         /// </summary>
         /// <param name="sizeHint">
         /// The minimum requested length of the <see cref="Memory{Char}"/>.
@@ -360,12 +361,13 @@ namespace J2N.Text
         /// A <see cref="Memory{Char}"/> whose length is at least <paramref name="sizeHint"/>.
         /// If <paramref name="sizeHint"/> is not provided or is equal to 0, some non-empty buffer is returned.
         /// </returns>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="sizeHint"/> is less than zero.</exception>
         /// <remarks>
-        /// This method never returns <see cref="Memory{Char}.Empty"/>.<para/>
+        /// This method never returns <see cref="Memory{Char}.Empty"/>.
+        /// <para/>
         /// The returned memory provides direct access to the underlying memory of the <see cref="SynchronizedTextBuilder"/>.
         /// Callers must synchronize externally using <see cref="SynchronizedTextBuilder.SyncRoot"/> for the duration of the
         /// span usage if concurrent mutation is possible.
-        /// 
         /// </remarks>
         public Memory<char> GetMemory(int sizeHint = 0)
         {
@@ -373,21 +375,22 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// 
         /// Notifies the <see cref="SynchronizedTextBuilder"/> that <paramref name="count"/> items were
         /// written to the output <see cref="Span{Char}"/> or <see cref="Memory{Char}"/>.
-        /// 
         /// </summary>
-        /// <param name="count">
-        /// The number of items written.
-        /// </param>
+        /// <param name="count">The number of items written.</param>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="count"/> is less than zero.</exception>
+        /// <exception cref="InvalidOperationException">
+        /// The method call attempts to advance past the remaining <see cref="Capacity"/>
+        /// beyond <see cref="Length"/>.
+        /// </exception>
         /// <remarks>
         /// You must request a new buffer after calling <see cref="Advance(int)"/> to continue writing more data
-        /// and cannot write to a previously acquired buffer.<para/>
+        /// and cannot write to a previously acquired buffer.
+        /// <para/>
         /// This method is intended to be used in conjunction with either <see cref="GetSpan(int)"/> or <see cref="GetMemory(int)"/>.
         /// If concurrent mutation is possible, this method should be synchronized externally by the caller with either of those two
         /// methods using <see cref="SynchronizedTextBuilder.SyncRoot"/> for the duration of the memory usage.
-        /// 
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Advance(int count)
@@ -396,26 +399,16 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// 
         /// Appends the upper case string representation of a specified string
         /// to this instance using the casing rules from the specified culture.
-        /// 
         /// </summary>
-        /// <param name="value">
-        /// The string to append.
-        /// </param>
-        /// <param name="culture">
-        /// An object that supplies culture-specific casing rules.
-        /// </param>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
+        /// <param name="value">The string to append.</param>
+        /// <param name="culture">An object that supplies culture-specific casing rules.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
         /// <remarks>
-        /// 
         /// The capacity of this instance is adjusted as needed.
         /// <para/>
         /// If <paramref name="culture"/> is <c>null</c>, <see cref="CultureInfo.CurrentCulture"/> will be used.
-        /// 
         /// </remarks>
         public SynchronizedTextBuilder AppendUpper(string? value, CultureInfo? culture)
         {
@@ -427,26 +420,16 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// 
         /// Appends the upper case string representation of a specified read-only character
         /// span to this instance using the casing rules from the specified culture.
-        /// 
         /// </summary>
-        /// <param name="value">
-        /// The read-only character span to append.
-        /// </param>
-        /// <param name="culture">
-        /// An object that supplies culture-specific casing rules.
-        /// </param>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
+        /// <param name="value">The read-only character span to append.</param>
+        /// <param name="culture">An object that supplies culture-specific casing rules.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
         /// <remarks>
-        /// 
         /// The capacity of this instance is adjusted as needed.
         /// <para/>
         /// If <paramref name="culture"/> is <c>null</c>, <see cref="CultureInfo.CurrentCulture"/> will be used.
-        /// 
         /// </remarks>
         public SynchronizedTextBuilder AppendUpper(ReadOnlySpan<char> value, CultureInfo? culture)
         {
@@ -458,26 +441,16 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// 
         /// Appends the lower case string representation of a specified string
         /// to this instance using the casing rules from the specified culture.
-        /// 
         /// </summary>
-        /// <param name="value">
-        /// The string to append.
-        /// </param>
-        /// <param name="culture">
-        /// An object that supplies culture-specific casing rules.
-        /// </param>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
+        /// <param name="value">The string to append.</param>
+        /// <param name="culture">An object that supplies culture-specific casing rules.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
         /// <remarks>
-        /// 
         /// The capacity of this instance is adjusted as needed.
         /// <para/>
         /// If <paramref name="culture"/> is <c>null</c>, <see cref="CultureInfo.CurrentCulture"/> will be used.
-        /// 
         /// </remarks>
         public SynchronizedTextBuilder AppendLower(string? value, CultureInfo? culture)
         {
@@ -489,23 +462,13 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// 
         /// Appends the lower case string representation of a specified read-only character
         /// span to this instance using the casing rules from the specified culture.
-        /// 
         /// </summary>
-        /// <param name="value">
-        /// The read-only character span to append.
-        /// </param>
-        /// <param name="culture">
-        /// An object that supplies culture-specific casing rules.
-        /// </param>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
-        /// <remarks>
-        /// The capacity of this instance is adjusted as needed.
-        /// </remarks>
+        /// <param name="value">The read-only character span to append.</param>
+        /// <param name="culture">An object that supplies culture-specific casing rules.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <remarks>The capacity of this instance is adjusted as needed.</remarks>
         public SynchronizedTextBuilder AppendLower(ReadOnlySpan<char> value, CultureInfo? culture)
         {
             lock (syncRoot)
@@ -516,20 +479,12 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// 
         /// Appends the upper case string representation of a specified string
         /// to this instance using the casing rules from the invariant culture.
-        /// 
         /// </summary>
-        /// <param name="value">
-        /// The string to append.
-        /// </param>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
-        /// <remarks>
-        /// The capacity of this instance is adjusted as needed.
-        /// </remarks>
+        /// <param name="value">The string to append.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <remarks>The capacity of this instance is adjusted as needed.</remarks>
         public SynchronizedTextBuilder AppendUpperInvariant(string? value)
         {
             lock (syncRoot)
@@ -540,20 +495,12 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// 
         /// Appends the upper case string representation of a specified read-only character
         /// span to this instance using the casing rules from the invariant culture.
-        /// 
         /// </summary>
-        /// <param name="value">
-        /// The read-only character span to append.
-        /// </param>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
-        /// <remarks>
-        /// The capacity of this instance is adjusted as needed.
-        /// </remarks>
+        /// <param name="value">The read-only character span to append.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <remarks>The capacity of this instance is adjusted as needed.</remarks>
         public SynchronizedTextBuilder AppendUpperInvariant(ReadOnlySpan<char> value)
         {
             lock (syncRoot)
@@ -564,20 +511,12 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// 
         /// Appends the lower case string representation of a specified string
         /// to this instance using the casing rules from the invariant culture.
-        /// 
         /// </summary>
-        /// <param name="value">
-        /// The string to append.
-        /// </param>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
-        /// <remarks>
-        /// The capacity of this instance is adjusted as needed.
-        /// </remarks>
+        /// <param name="value">The string to append.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <remarks>The capacity of this instance is adjusted as needed.</remarks>
         public SynchronizedTextBuilder AppendLowerInvariant(string? value)
         {
             lock (syncRoot)
@@ -588,20 +527,12 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// 
         /// Appends the lower case string representation of a specified read-only character
         /// span to this instance using the casing rules from the invariant culture.
-        /// 
         /// </summary>
-        /// <param name="value">
-        /// The read-only character span to append.
-        /// </param>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
-        /// <remarks>
-        /// The capacity of this instance is adjusted as needed.
-        /// </remarks>
+        /// <param name="value">The read-only character span to append.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <remarks>The capacity of this instance is adjusted as needed.</remarks>
         public SynchronizedTextBuilder AppendLowerInvariant(ReadOnlySpan<char> value)
         {
             lock (syncRoot)
@@ -612,24 +543,25 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// 
         /// Retrieves a sub-sequence from this instance.
         /// The sub-sequence starts at a specified character position and has a specified length.
         /// <para/>
         /// IMPORTANT: This method has .NET semantics, that is, the second parameter is a length,
         /// not an exclusive end index as it would be in Java.
-        /// 
         /// </summary>
         /// <param name="startIndex">
-        /// 
         /// The start index of the sub-sequence. It is inclusive, that
         /// is, the index of the first character that is included in the
         /// sub-sequence.
-        /// 
         /// </param>
-        /// <param name="length">
-        /// The number of characters to return in the sub-sequence.
-        /// </param>
+        /// <param name="length">The number of characters to return in the sub-sequence.</param>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="startIndex"/> plus <paramref name="length"/> indicates a position not within this instance.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="startIndex"/> or <paramref name="length"/> is less than zero.
+        /// </exception>
         public ICharSequence Subsequence(int startIndex, int length)
         {
             lock (syncRoot)
@@ -639,7 +571,6 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// 
         /// Appends the string representation of the <paramref name="codePoint"/>
         /// argument to this sequence.
         /// <para>
@@ -653,14 +584,10 @@ namespace J2N.Text
         /// were then <see cref="Append(char[])">appended</see> to this
         /// <see cref="SynchronizedTextBuilder"/>.
         /// </para>
-        /// 
         /// </summary>
-        /// <param name="codePoint">
-        /// A Unicode code point.
-        /// </param>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
+        /// <param name="codePoint">A Unicode code point.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="ArgumentException"><paramref name="codePoint"/> is not a valid Unicode code point.</exception>
         public SynchronizedTextBuilder AppendCodePoint(int codePoint)
         {
             lock (syncRoot)
@@ -671,7 +598,6 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// 
         /// Insert the string representation of the <paramref name="codePoint"/>
         /// argument to this sequence at <paramref name="index"/>.
         /// <para>
@@ -685,17 +611,15 @@ namespace J2N.Text
         /// were then <see cref="Insert(int, char[])">inserted</see> into this
         /// <see cref="SynchronizedTextBuilder"/>.
         /// </para>
-        /// 
         /// </summary>
-        /// <param name="index">
-        /// The position in this instance where insertion begins.
-        /// </param>
-        /// <param name="codePoint">
-        /// A Unicode code point.
-        /// </param>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="codePoint">A Unicode code point.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="index"/> is less than zero or greater
+        /// than the length of this instance.
+        /// </exception>
+        /// <exception cref="ArgumentException"><paramref name="codePoint"/> is not a valid Unicode code point.</exception>
         public SynchronizedTextBuilder InsertCodePoint(int index, int codePoint)
         {
             lock (syncRoot)
@@ -706,14 +630,12 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// 
         /// Returns the code point at <paramref name="index"/> in the specified sequence of
         /// character units. If the unit at <paramref name="index"/> is a high-surrogate unit,
         /// <c><paramref name="index"/> + 1</c> is less than the length of the sequence and the unit at
         /// <c><paramref name="index"/> + 1</c> is a low-surrogate unit, then the supplementary code
         /// point represented by the pair is returned; otherwise the <see cref="char"/>
         /// value at <paramref name="index"/> is returned.
-        /// 
         /// </summary>
         /// <param name="index">
         /// The position in this <see cref="SynchronizedTextBuilder"/> from which to retrieve the code
@@ -723,6 +645,13 @@ namespace J2N.Text
         /// The Unicode code point or <see cref="char"/> value at <paramref name="index"/> in
         /// this <see cref="SynchronizedTextBuilder"/>.
         /// </returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="index"/> is greater than or equal to <see cref="Length"/>.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="index"/> is less than zero.
+        /// </exception>
         public int CodePointAt(int index)
         {
             lock (syncRoot)
@@ -732,14 +661,12 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// 
         /// Returns the code point that precedes <paramref name="index"/> in the specified
         /// sequence of character units. If the unit at <c><paramref name="index"/> - 1</c> is a
         /// low-surrogate unit, <c><paramref name="index"/> - 2</c> is not negative and the unit at
         /// <c><paramref name="index"/> - 2</c> is a high-surrogate unit, then the supplementary code
         /// point represented by the pair is returned; otherwise the <see cref="char"/>
         /// value at <c><paramref name="index"/> - 1</c> is returned.
-        /// 
         /// </summary>
         /// <param name="index">
         /// The position in this <see cref="SynchronizedTextBuilder"/> following the code
@@ -749,6 +676,10 @@ namespace J2N.Text
         /// The Unicode code point or <see cref="char"/> value before <paramref name="index"/>
         /// in this <see cref="SynchronizedTextBuilder"/>.
         /// </returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// If the <paramref name="index"/> is less than
+        /// 1 or greater than <see cref="Length"/>.
+        /// </exception>
         public int CodePointBefore(int index)
         {
             lock (syncRoot)
@@ -758,7 +689,6 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// 
         /// Returns the number of Unicode code points in the text range of the specified char sequence.
         /// The text range begins at the specified <paramref name="startIndex"/> and extends for the number
         /// of characters specified in <paramref name="length"/>.
@@ -767,17 +697,18 @@ namespace J2N.Text
         /// IMPORTANT: This method has .NET semantics. That is, the <paramref name="length"/> parameter
         /// is a length rather than an exclusive end index. To convert from
         /// Java, use <c>endIndex - startIndex</c> to obtain the length.
-        /// 
         /// </summary>
-        /// <param name="startIndex">
-        /// The index to the first char of the text range.
-        /// </param>
-        /// <param name="length">
-        /// The number of characters to consider in this <see cref="SynchronizedTextBuilder"/>.
-        /// </param>
-        /// <returns>
-        /// The number of Unicode code points in the specified text range.
-        /// </returns>
+        /// <param name="startIndex">The index to the first char of the text range.</param>
+        /// <param name="length">The number of characters to consider in this <see cref="SynchronizedTextBuilder"/>.</param>
+        /// <returns>The number of Unicode code points in the specified text range.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="startIndex"/> plus <paramref name="length"/> indicates a position not within
+        /// this <see cref="SynchronizedTextBuilder"/>.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="startIndex"/> or <paramref name="length"/> is less than zero.
+        /// </exception>
         public int CodePointCount(int startIndex, int length)
         {
             lock (syncRoot)
@@ -787,22 +718,29 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// 
         /// Returns the index within the given char sequence that is offset from the given <paramref name="index"/> by
         /// <paramref name="codePointOffset"/> code points. Unpaired surrogates within the text range given by
         /// <paramref name="index"/> and <paramref name="codePointOffset"/> count as one code point each.
-        /// 
         /// </summary>
-        /// <param name="index">
-        /// The index to be offset.
-        /// </param>
+        /// <param name="index">The index to be offset.</param>
         /// <param name="codePointOffset">
         /// The number of code points to look backwards or forwards; may
         /// be a negative or positive value.
         /// </param>
-        /// <returns>
-        /// The index within the char sequence, offset by <paramref name="codePointOffset"/> code points.
-        /// </returns>
+        /// <returns>The index within the char sequence, offset by <paramref name="codePointOffset"/> code points.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="index"/> is less than zero or greater than <see cref="Length"/>.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="codePointOffset"/> is positive and the subsequence starting with
+        /// <paramref name="index"/> has fewer than <paramref name="codePointOffset"/> code points.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="codePointOffset"/> is negative and the subsequence before <paramref name="index"/>
+        /// has fewer than the absolute value of <paramref name="codePointOffset"/> code points.
+        /// </exception>
         public int OffsetByCodePoints(int index, int codePointOffset)
         {
             lock (syncRoot)
@@ -811,23 +749,20 @@ namespace J2N.Text
             }
         }
 
-        /// <summary>
-        /// 
-        /// Ensures that the capacity of this builder is at least the specified value.
-        /// 
-        /// </summary>
-        /// <param name="capacity">
-        /// The minimum capacity to ensure.
-        /// </param>
-        /// <returns>
-        /// The new capacity of this instance.
-        /// </returns>
+        /// <summary>Ensures that the capacity of this builder is at least the specified value.</summary>
+        /// <param name="capacity">The minimum capacity to ensure.</param>
+        /// <returns>The new capacity of this instance.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="capacity"/> is less than zero.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.
+        /// </exception>
         /// <remarks>
-        /// 
         /// If the current capacity is less than the <paramref name="capacity"/> parameter,
         /// memory for this instance is reallocated to hold at least <paramref name="capacity"/> number
         /// of characters; otherwise, no memory is changed.
-        /// 
         /// </remarks>
         public int EnsureCapacity(int capacity)
         {
@@ -837,16 +772,9 @@ namespace J2N.Text
             }
         }
 
-        /// <summary>
-        /// 
-        /// Converts the value of this instance to a <see cref="string"/>.
-        /// 
-        /// </summary>
-        /// <returns>
-        /// A string whose value is the same as this instance.
-        /// </returns>
+        /// <summary>Converts the value of this instance to a <see cref="string"/>.</summary>
+        /// <returns>A string whose value is the same as this instance.</returns>
         /// <remarks>
-        /// 
         /// This method causes a heap allocation. As an allocation-free alternative,
         /// you may call the <see cref="SynchronizedTextBuilderExtensions.AsSpan(SynchronizedTextBuilder?)"/> method
         /// to get a <see cref="ReadOnlySpan{T}"/> representing the characters of this
@@ -856,7 +784,6 @@ namespace J2N.Text
         /// <see cref="SynchronizedTextBuilder"/> object to a <see cref="string"/> object before
         /// you can pass the string represented by the <see cref="SynchronizedTextBuilder"/> object to
         /// a method that has a <see cref="string"/> parameter or display it in the user interface.
-        /// 
         /// </remarks>
         public override string ToString()
         {
@@ -866,20 +793,17 @@ namespace J2N.Text
             }
         }
 
-        /// <summary>
-        /// 
-        /// Converts the value of a substring of this instance to a <see cref="string"/>.
-        /// 
-        /// </summary>
-        /// <param name="startIndex">
-        /// The starting position of the substring in this instance.
-        /// </param>
+        /// <summary>Converts the value of a substring of this instance to a <see cref="string"/>.</summary>
+        /// <param name="startIndex">The starting position of the substring in this instance.</param>
         /// <returns>
         /// A string whose value is the same as the specified substring of this instance.
         /// That is, from <paramref name="startIndex"/> to the end of the string.
         /// </returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="startIndex"/> is less than 0 or greater than
+        /// <see cref="Length"/>.
+        /// </exception>
         /// <remarks>
-        /// 
         /// This method causes a heap allocation. As an allocation-free alternative,
         /// you may call the <see cref="SynchronizedTextBuilderExtensions.AsSpan(SynchronizedTextBuilder?, int)"/> method
         /// to get a <see cref="ReadOnlySpan{T}"/> representing the characters of the substring of this
@@ -889,7 +813,6 @@ namespace J2N.Text
         /// <see cref="SynchronizedTextBuilder"/> object to a <see cref="string"/> object before
         /// you can pass the string represented by the <see cref="SynchronizedTextBuilder"/> object to
         /// a method that has a <see cref="string"/> parameter or display it in the user interface.
-        /// 
         /// </remarks>
         public string ToString(int startIndex)
         {
@@ -899,22 +822,19 @@ namespace J2N.Text
             }
         }
 
-        /// <summary>
-        /// 
-        /// Converts the value of a substring of this instance to a <see cref="string"/>.
-        /// 
-        /// </summary>
-        /// <param name="startIndex">
-        /// The starting position of the substring in this instance.
-        /// </param>
-        /// <param name="length">
-        /// The length of the substring.
-        /// </param>
-        /// <returns>
-        /// A string whose value is the same as the specified substring of this instance.
-        /// </returns>
+        /// <summary>Converts the value of a substring of this instance to a <see cref="string"/>.</summary>
+        /// <param name="startIndex">The starting position of the substring in this instance.</param>
+        /// <param name="length">The length of the substring.</param>
+        /// <returns>A string whose value is the same as the specified substring of this instance.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="startIndex"/> or <paramref name="length"/> is less than zero.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// The sum of <paramref name="startIndex"/> and <paramref name="length"/> is greater than the length
+        /// of the current instance.
+        /// </exception>
         /// <remarks>
-        /// 
         /// This method causes a heap allocation. As an allocation-free alternative,
         /// you may call the <see cref="SynchronizedTextBuilderExtensions.AsSpan(SynchronizedTextBuilder?, int, int)"/> method
         /// to get a <see cref="ReadOnlySpan{T}"/> representing the characters of the substring of this
@@ -924,7 +844,6 @@ namespace J2N.Text
         /// <see cref="SynchronizedTextBuilder"/> object to a <see cref="string"/> object before
         /// you can pass the string represented by the <see cref="SynchronizedTextBuilder"/> object to
         /// a method that has a <see cref="string"/> parameter or display it in the user interface.
-        /// 
         /// </remarks>
         public string ToString(int startIndex, int length)
         {
@@ -934,14 +853,8 @@ namespace J2N.Text
             }
         }
 
-        /// <summary>
-        /// 
-        /// Removes all characters from the current <see cref="SynchronizedTextBuilder"/> instance.
-        /// 
-        /// </summary>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
+        /// <summary>Removes all characters from the current <see cref="SynchronizedTextBuilder"/> instance.</summary>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
         /// <remarks>
         /// <see cref="Clear"/> is a convenience method that is equivalent to setting
         /// the <see cref="Length"/> property of the current instance to 0 (zero).
@@ -955,22 +868,19 @@ namespace J2N.Text
             }
         }
 
-        /// <summary>
-        /// 
-        /// Appends a specified number of copies of the string representation of a Unicode character to this instance.
-        /// 
-        /// </summary>
-        /// <param name="value">
-        /// The character to append.
-        /// </param>
-        /// <param name="repeatCount">
-        /// The number of times to append value.
-        /// </param>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
+        /// <summary>Appends a specified number of copies of the string representation of a Unicode character to this instance.</summary>
+        /// <param name="value">The character to append.</param>
+        /// <param name="repeatCount">The number of times to append value.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="repeatCount"/> is less than zero.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.
+        /// </exception>
+        /// <exception cref="OutOfMemoryException">Out of memory.</exception>
         /// <remarks>
-        /// 
         /// The <see cref="Append(char, int)"/> method modifies the existing instance of this class;
         /// it does not return a new class instance. Because of this, you can call a method or property
         /// on the existing reference and you do not have to assign the return value to an
@@ -992,8 +902,8 @@ namespace J2N.Text
         /// both the length and the capacity of the <see cref="SynchronizedTextBuilder"/> instance can grow beyond
         /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
-        /// 
         /// </remarks>
+        /// <seealso cref="char" />
         public SynchronizedTextBuilder Append(char value, int repeatCount)
         {
             lock (syncRoot)
@@ -1003,25 +913,31 @@ namespace J2N.Text
             }
         }
 
-        /// <summary>
-        /// 
-        /// Appends the string representation of a specified subarray of Unicode characters to this instance.
-        /// 
-        /// </summary>
-        /// <param name="value">
-        /// A character array.
-        /// </param>
-        /// <param name="startIndex">
-        /// The starting position in <paramref name="value"/>.
-        /// </param>
-        /// <param name="charCount">
-        /// The number of characters to append.
-        /// </param>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
+        /// <summary>Appends the string representation of a specified subarray of Unicode characters to this instance.</summary>
+        /// <param name="value">A character array.</param>
+        /// <param name="startIndex">The starting position in <paramref name="value"/>.</param>
+        /// <param name="charCount">The number of characters to append.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="value"/> is <c>null</c>, and <paramref name="startIndex"/>
+        /// and <paramref name="charCount"/> are not zero.
+        /// </exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="charCount"/> is less than zero.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="startIndex"/> is less than zero.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="startIndex"/> + <paramref name="charCount"/> is greater than the length of <paramref name="value"/>.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.
+        /// </exception>
         /// <remarks>
-        /// 
         /// This method appends the specified range of characters in <paramref name="value"/> to the current instance. If
         /// <paramref name="value"/> is <c>null</c> and <paramref name="startIndex"/> and <paramref name="charCount"/>
         /// are both zero, no changes are made.
@@ -1053,8 +969,8 @@ namespace J2N.Text
         /// both the length and the capacity of the <see cref="SynchronizedTextBuilder"/> instance can grow beyond
         /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
-        /// 
         /// </remarks>
+        /// <seealso cref="char" />
         public SynchronizedTextBuilder Append(char[]? value, int startIndex, int charCount)
         {
             lock (syncRoot)
@@ -1064,19 +980,11 @@ namespace J2N.Text
             }
         }
 
-        /// <summary>
-        /// 
-        /// Appends a copy of the specified string to this instance.
-        /// 
-        /// </summary>
-        /// <param name="value">
-        /// The string to append.
-        /// </param>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
+        /// <summary>Appends a copy of the specified string to this instance.</summary>
+        /// <param name="value">The string to append.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.</exception>
         /// <remarks>
-        /// 
         /// The <see cref="Append(string)"/> method modifies the existing instance of this class;
         /// it does not return a new class instance. Because of this, you can call a method or
         /// property on the existing reference and you do not have to assign the return value
@@ -1100,8 +1008,8 @@ namespace J2N.Text
         /// both the length and the capacity of the <see cref="SynchronizedTextBuilder"/> instance can grow beyond
         /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
-        /// 
         /// </remarks>
+        /// <seealso cref="string" />
         public SynchronizedTextBuilder Append(string? value)
         {
             lock (syncRoot)
@@ -1111,25 +1019,31 @@ namespace J2N.Text
             }
         }
 
-        /// <summary>
-        /// 
-        /// Appends a copy of a specified substring to this instance.
-        /// 
-        /// </summary>
-        /// <param name="value">
-        /// The string that contains the substring to append.
-        /// </param>
-        /// <param name="startIndex">
-        /// The starting position of the substring within <paramref name="value"/>.
-        /// </param>
-        /// <param name="count">
-        /// The number of characters in <paramref name="value"/> to append.
-        /// </param>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
+        /// <summary>Appends a copy of a specified substring to this instance.</summary>
+        /// <param name="value">The string that contains the substring to append.</param>
+        /// <param name="startIndex">The starting position of the substring within <paramref name="value"/>.</param>
+        /// <param name="count">The number of characters in <paramref name="value"/> to append.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="value"/> is <c>null</c>, and <paramref name="startIndex"/>
+        /// and <paramref name="count"/> are not zero.
+        /// </exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="count"/> is less than zero.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="startIndex"/> is less than zero.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="startIndex"/> + <paramref name="count"/> is greater than the length of <paramref name="value"/>.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.
+        /// </exception>
         /// <remarks>
-        /// 
         /// This method appends the specified range of characters in <paramref name="value"/> to the current instance. If
         /// <paramref name="value"/> is <c>null</c> and <paramref name="startIndex"/> and <paramref name="count"/>
         /// are both zero, no changes are made.
@@ -1165,8 +1079,8 @@ namespace J2N.Text
         /// both the length and the capacity of the <see cref="SynchronizedTextBuilder"/> instance can grow beyond
         /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
-        /// 
         /// </remarks>
+        /// <seealso cref="string" />
         public SynchronizedTextBuilder Append(string? value, int startIndex, int count)
         {
             lock (syncRoot)
@@ -1176,19 +1090,11 @@ namespace J2N.Text
             }
         }
 
-        /// <summary>
-        /// 
-        /// Appends the string representation of a specified string builder to this instance.
-        /// 
-        /// </summary>
-        /// <param name="value">
-        /// The string builder to append.
-        /// </param>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
+        /// <summary>Appends the string representation of a specified string builder to this instance.</summary>
+        /// <param name="value">The string builder to append.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.</exception>
         /// <remarks>
-        /// 
         /// The <see cref="Append(StringBuilder)"/> method modifies the existing instance of this class;
         /// it does not return a new class instance. Because of this, you can call a method or
         /// property on the existing reference and you do not have to assign the return value
@@ -1204,8 +1110,8 @@ namespace J2N.Text
         /// both the length and the capacity of the <see cref="SynchronizedTextBuilder"/> instance can grow beyond
         /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
-        /// 
         /// </remarks>
+        /// <seealso cref="StringBuilder" />
         public SynchronizedTextBuilder Append(StringBuilder? value)
         {
             lock (syncRoot)
@@ -1215,25 +1121,31 @@ namespace J2N.Text
             }
         }
 
-        /// <summary>
-        /// 
-        /// Appends a copy of a specified substring of a string builder to this instance.
-        /// 
-        /// </summary>
-        /// <param name="value">
-        /// The string builder that contains the substring to append.
-        /// </param>
-        /// <param name="startIndex">
-        /// The starting position of the substring within <paramref name="value"/>.
-        /// </param>
-        /// <param name="count">
-        /// The number of characters in <paramref name="value"/> to append.
-        /// </param>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
+        /// <summary>Appends a copy of a specified substring of a string builder to this instance.</summary>
+        /// <param name="value">The string builder that contains the substring to append.</param>
+        /// <param name="startIndex">The starting position of the substring within <paramref name="value"/>.</param>
+        /// <param name="count">The number of characters in <paramref name="value"/> to append.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="value"/> is <c>null</c>, and <paramref name="startIndex"/>
+        /// and <paramref name="count"/> are not zero.
+        /// </exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="count"/> is less than zero.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="startIndex"/> is less than zero.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="startIndex"/> + <paramref name="count"/> is greater than the length of <paramref name="value"/>.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.
+        /// </exception>
         /// <remarks>
-        /// 
         /// This method appends the specified range of characters in <paramref name="value"/> to the current instance. If
         /// <paramref name="value"/> is <c>null</c> and <paramref name="startIndex"/> and <paramref name="count"/>
         /// are both zero, no changes are made.
@@ -1270,8 +1182,8 @@ namespace J2N.Text
         /// both the length and the capacity of the <see cref="SynchronizedTextBuilder"/> instance can grow beyond
         /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
-        /// 
         /// </remarks>
+        /// <seealso cref="StringBuilder" />
         public SynchronizedTextBuilder Append(StringBuilder? value, int startIndex, int count)
         {
             lock (syncRoot)
@@ -1281,9 +1193,7 @@ namespace J2N.Text
             }
         }
 
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
         public SynchronizedTextBuilder Append(SynchronizedTextBuilder? value)
         {
             lock (syncRoot)
@@ -1293,9 +1203,7 @@ namespace J2N.Text
             }
         }
 
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
         public SynchronizedTextBuilder Append(SynchronizedTextBuilder? value, int startIndex, int count)
         {
             lock (syncRoot)
@@ -1305,16 +1213,13 @@ namespace J2N.Text
             }
         }
 
-        /// <summary>
-        /// 
-        /// Appends the default line terminator to the end of the current <see cref="SynchronizedTextBuilder"/> object.
-        /// 
-        /// </summary>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
+        /// <summary>Appends the default line terminator to the end of the current <see cref="SynchronizedTextBuilder"/> object.</summary>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// Enlarging the value of this instance would exceed
+        /// <see cref="MaxCapacity"/>.
+        /// </exception>
         /// <remarks>
-        /// 
         /// The default line terminator is the current value of the <see cref="Environment.NewLine"/> property.
         /// <para/>
         /// The capacity of this instance is adjusted as needed.
@@ -1325,7 +1230,6 @@ namespace J2N.Text
         /// both the length and the capacity of the <see cref="SynchronizedTextBuilder"/> instance can grow beyond
         /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
-        /// 
         /// </remarks>
         public SynchronizedTextBuilder AppendLine()
         {
@@ -1337,19 +1241,16 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// 
         /// Appends a copy of the specified string followed by the default line terminator to the end of the
         /// current <see cref="SynchronizedTextBuilder"/> object.
-        /// 
         /// </summary>
-        /// <param name="value">
-        /// The string to append.
-        /// </param>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
+        /// <param name="value">The string to append.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// Enlarging the value of this instance would exceed
+        /// <see cref="MaxCapacity"/>.
+        /// </exception>
         /// <remarks>
-        /// 
         /// The default line terminator is the current value of the <see cref="Environment.NewLine"/> property.
         /// <para/>
         /// The capacity of this instance is adjusted as needed.
@@ -1360,8 +1261,8 @@ namespace J2N.Text
         /// both the length and the capacity of the <see cref="SynchronizedTextBuilder"/> instance can grow beyond
         /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
-        /// 
         /// </remarks>
+        /// <seealso cref="string" />
         public SynchronizedTextBuilder AppendLine(string? value)
         {
             lock (syncRoot)
@@ -1372,19 +1273,16 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// 
         /// Appends a copy of the specified sequence of characters followed by the default line terminator to the end of the
         /// current <see cref="SynchronizedTextBuilder"/> object.
-        /// 
         /// </summary>
-        /// <param name="value">
-        /// The sequence of characters to append.
-        /// </param>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
+        /// <param name="value">The sequence of characters to append.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// Enlarging the value of this instance would exceed
+        /// <see cref="MaxCapacity"/>.
+        /// </exception>
         /// <remarks>
-        /// 
         /// The default line terminator is the current value of the <see cref="Environment.NewLine"/> property.
         /// <para/>
         /// The capacity of this instance is adjusted as needed.
@@ -1395,8 +1293,8 @@ namespace J2N.Text
         /// both the length and the capacity of the <see cref="SynchronizedTextBuilder"/> instance can grow beyond
         /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
-        /// 
         /// </remarks>
+        /// <seealso cref="ReadOnlySpan{Char}" />
         public SynchronizedTextBuilder AppendLine(ReadOnlySpan<char> value)
         {
             lock (syncRoot)
@@ -1407,34 +1305,41 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// 
         /// Copies the characters from a specified segment of this instance to a specified segment of a destination
         /// <see cref="char"/> array.
-        /// 
         /// </summary>
         /// <param name="sourceIndex">
         /// The starting position in this instance where characters will be copied from.
         /// The index is zero-based.
         /// </param>
-        /// <param name="destination">
-        /// The array where characters will be copied.
-        /// </param>
+        /// <param name="destination">The array where characters will be copied.</param>
         /// <param name="destinationIndex">
         /// The starting position in <paramref name="destination"/> where characters will be copied.
         /// The index is zero-based.
         /// </param>
-        /// <param name="count">
-        /// The number of characters to be copied.
-        /// </param>
+        /// <param name="count">The number of characters to be copied.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="destination"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="sourceIndex"/>, <paramref name="destinationIndex"/>, or <paramref name="count"/>, is less than zero.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="sourceIndex"/> is greater than the length of this instance.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// <paramref name="sourceIndex"/> + <paramref name="count"/> is greater than the length of this instance.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="destinationIndex"/> + <paramref name="count"/> is greater than the length of <paramref name="destination"/>.
+        /// </exception>
         /// <remarks>
-        /// 
         /// The <see cref="CopyTo(int, char[], int, int)"/> method is intended to be used in the rare situation when you need to
         /// efficiently copy successive sections of a <see cref="SynchronizedTextBuilder"/> object to an array. The array should be a
         /// fixed size, preallocated, reusable, and possibly globally accessible.
         /// <para/>
         /// To access the characters for processing without allocating any heap memory, better alternatives are to use
         /// <see cref="this[int]"/>, <see cref="SynchronizedTextBuilderExtensions.AsSpan(SynchronizedTextBuilder?, int, int)"/> or <see cref="CopyTo(int, Span{char}, int)"/>.
-        /// 
         /// </remarks>
         public void CopyTo(int sourceIndex, char[] destination, int destinationIndex, int count)
         {
@@ -1444,29 +1349,27 @@ namespace J2N.Text
             }
         }
 
-        /// <summary>
-        /// 
-        /// Copies the characters from a specified segment of this instance to a destination <see cref="char"/> span.
-        /// 
-        /// </summary>
+        /// <summary>Copies the characters from a specified segment of this instance to a destination <see cref="char"/> span.</summary>
         /// <param name="sourceIndex">
         /// The starting position in this instance where characters will be copied from.
         /// The index is zero-based.
         /// </param>
-        /// <param name="destination">
-        /// The writable span where characters will be copied.
-        /// </param>
-        /// <param name="count">
-        /// The number of characters to be copied.
-        /// </param>
+        /// <param name="destination">The writable span where characters will be copied.</param>
+        /// <param name="count">The number of characters to be copied.</param>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="sourceIndex"/> or <paramref name="count"/> is less than 0.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="sourceIndex"/> is greater than <see cref="Length"/>.
+        /// </exception>
+        /// <exception cref="ArgumentException"><paramref name="sourceIndex"/> + <paramref name="count"/> is greater than <see cref="Length"/>.</exception>
         /// <remarks>
-        /// 
         /// The <see cref="CopyTo(int, Span{char}, int)"/> method is intended to be used in the rare situation
         /// when you need to efficiently copy successive sections of a <see cref="SynchronizedTextBuilder"/> object to a span.
         /// <para/>
         /// To access the characters for processing without alocating any heap memory, better alternatives are to use
         /// <see cref="this[int]"/> or <see cref="SynchronizedTextBuilderExtensions.AsSpan(SynchronizedTextBuilder?, int, int)"/>.
-        /// 
         /// </remarks>
         public void CopyTo(int sourceIndex, Span<char> destination, int count)
         {
@@ -1476,30 +1379,27 @@ namespace J2N.Text
             }
         }
 
-        /// <summary>
-        /// 
-        /// Inserts one or more copies of a specified string into this instance at the specified character position.
-        /// 
-        /// </summary>
-        /// <param name="index">
-        /// The position in this instance where insertion begins.
-        /// </param>
-        /// <param name="value">
-        /// The string to insert.
-        /// </param>
-        /// <param name="repeatCount">
-        /// The number of times to insert <paramref name="value"/>.
-        /// </param>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
+        /// <summary>Inserts one or more copies of a specified string into this instance at the specified character position.</summary>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">The string to insert.</param>
+        /// <param name="repeatCount">The number of times to insert <paramref name="value"/>.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="index"/> is less than zero or greater than the current length of this instance.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="repeatCount"/> is less than zero.
+        /// </exception>
+        /// <exception cref="OutOfMemoryException">
+        /// The current length of this <see cref="SynchronizedTextBuilder"/> object plus the length of <paramref name="value"/>
+        /// times <paramref name="repeatCount"/> exceeds <see cref="MaxCapacity"/>.
+        /// </exception>
         /// <remarks>
-        /// 
         /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
         /// <para/>
         /// This <see cref="SynchronizedTextBuilder"/> object is not changed if <paramref name="value"/> is <c>null</c>,
         /// <paramref name="value"/> is not <c>null</c> but its length is zero, or <paramref name="repeatCount"/> is zero.
-        /// 
         /// </remarks>
         public SynchronizedTextBuilder Insert(int index, string? value, int repeatCount)
         {
@@ -1510,30 +1410,27 @@ namespace J2N.Text
             }
         }
 
-        /// <summary>
-        /// 
-        /// Inserts one or more copies of a specified sequence of characters into this instance at the specified character position.
-        /// 
-        /// </summary>
-        /// <param name="index">
-        /// The position in this instance where insertion begins.
-        /// </param>
-        /// <param name="value">
-        /// The sequence of characters to insert.
-        /// </param>
-        /// <param name="repeatCount">
-        /// The number of times to insert <paramref name="value"/>.
-        /// </param>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
+        /// <summary>Inserts one or more copies of a specified sequence of characters into this instance at the specified character position.</summary>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">The sequence of characters to insert.</param>
+        /// <param name="repeatCount">The number of times to insert <paramref name="value"/>.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="index"/> is less than zero or greater than the current length of this instance.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="repeatCount"/> is less than zero.
+        /// </exception>
+        /// <exception cref="OutOfMemoryException">
+        /// The current length of this <see cref="SynchronizedTextBuilder"/> object plus the length of <paramref name="value"/>
+        /// times <paramref name="repeatCount"/> exceeds <see cref="MaxCapacity"/>.
+        /// </exception>
         /// <remarks>
-        /// 
         /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
         /// <para/>
         /// This <see cref="SynchronizedTextBuilder"/> object is not changed if the length of <paramref name="value"/> is zero or
         /// <paramref name="repeatCount"/> is zero.
-        /// 
         /// </remarks>
         public SynchronizedTextBuilder Insert(int index, ReadOnlySpan<char> value, int repeatCount)
         {
@@ -1544,30 +1441,27 @@ namespace J2N.Text
             }
         }
 
-        /// <summary>
-        /// 
-        /// Inserts one or more copies of a specified sequence of characters into this instance at the specified character position.
-        /// 
-        /// </summary>
-        /// <param name="index">
-        /// The position in this instance where insertion begins.
-        /// </param>
-        /// <param name="value">
-        /// The sequence of characters to insert.
-        /// </param>
-        /// <param name="repeatCount">
-        /// The number of times to insert <paramref name="value"/>.
-        /// </param>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
+        /// <summary>Inserts one or more copies of a specified sequence of characters into this instance at the specified character position.</summary>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">The sequence of characters to insert.</param>
+        /// <param name="repeatCount">The number of times to insert <paramref name="value"/>.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="index"/> is less than zero or greater than the current length of this instance.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="repeatCount"/> is less than zero.
+        /// </exception>
+        /// <exception cref="OutOfMemoryException">
+        /// The current length of this <see cref="SynchronizedTextBuilder"/> object plus the length of <paramref name="value"/>
+        /// times <paramref name="repeatCount"/> exceeds <see cref="MaxCapacity"/>.
+        /// </exception>
         /// <remarks>
-        /// 
         /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
         /// <para/>
         /// This <see cref="SynchronizedTextBuilder"/> object is not changed if the length of <paramref name="value"/> is zero or
         /// <paramref name="repeatCount"/> is zero.
-        /// 
         /// </remarks>
         public SynchronizedTextBuilder Insert(int index, StringBuilder? value, int repeatCount)
         {
@@ -1578,30 +1472,27 @@ namespace J2N.Text
             }
         }
 
-        /// <summary>
-        /// 
-        /// Inserts one or more copies of a specified sequence of characters into this instance at the specified character position.
-        /// 
-        /// </summary>
-        /// <param name="index">
-        /// The position in this instance where insertion begins.
-        /// </param>
-        /// <param name="value">
-        /// The sequence of characters to insert.
-        /// </param>
-        /// <param name="repeatCount">
-        /// The number of times to insert <paramref name="value"/>.
-        /// </param>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
+        /// <summary>Inserts one or more copies of a specified sequence of characters into this instance at the specified character position.</summary>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">The sequence of characters to insert.</param>
+        /// <param name="repeatCount">The number of times to insert <paramref name="value"/>.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="index"/> is less than zero or greater than the current length of this instance.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="repeatCount"/> is less than zero.
+        /// </exception>
+        /// <exception cref="OutOfMemoryException">
+        /// The current length of this <see cref="SynchronizedTextBuilder"/> object plus the length of <paramref name="value"/>
+        /// times <paramref name="repeatCount"/> exceeds <see cref="MaxCapacity"/>.
+        /// </exception>
         /// <remarks>
-        /// 
         /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
         /// <para/>
         /// This <see cref="SynchronizedTextBuilder"/> object is not changed if the length of <paramref name="value"/> is zero or
         /// <paramref name="repeatCount"/> is zero.
-        /// 
         /// </remarks>
         public SynchronizedTextBuilder Insert(int index, ICharSequence? value, int repeatCount)
         {
@@ -1612,27 +1503,19 @@ namespace J2N.Text
             }
         }
 
-        /// <summary>
-        /// 
-        /// Removes the specified range of characters from this instance.
-        /// 
-        /// </summary>
-        /// <param name="startIndex">
-        /// The zero-based position in this instance where removal begins.
-        /// </param>
-        /// <param name="length">
-        /// The number of characters to remove.
-        /// </param>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
+        /// <summary>Removes the specified range of characters from this instance.</summary>
+        /// <param name="startIndex">The zero-based position in this instance where removal begins.</param>
+        /// <param name="length">The number of characters to remove.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// If <paramref name="startIndex"/> or <paramref name="length"/> is less than zero,
+        /// or <paramref name="startIndex"/> + <paramref name="length"/> is greater than the length of this instance.
+        /// </exception>
         /// <remarks>
-        /// 
         /// The current method removes the specified range of characters from the current instance. The characters at
         /// (<paramref name="startIndex"/> + <paramref name="length"/>) are moved to <paramref name="startIndex"/>, and
         /// the string value of the current instance is shortened by <paramref name="length"/>. The capacity of the
         /// current instance is unaffected.
-        /// 
         /// </remarks>
         public SynchronizedTextBuilder Remove(int startIndex, int length)
         {
@@ -1643,24 +1526,18 @@ namespace J2N.Text
             }
         }
 
-        /// <summary>
-        /// 
-        /// Removes the character at the specified index from this instance.
-        /// 
-        /// </summary>
-        /// <param name="index">
-        /// The zero-based position in this instance of the character to remove.
-        /// </param>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
+        /// <summary>Removes the character at the specified index from this instance.</summary>
+        /// <param name="index">The zero-based position in this instance of the character to remove.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="index"/> is less than zero or
+        /// greater than or equal to the length of this instance.
+        /// </exception>
         /// <remarks>
-        /// 
         /// The current method removes the specified character from the current instance. The characters at
         /// (<paramref name="index"/> + 1) are moved to <paramref name="index"/>, and
         /// the string value of the current instance is shortened by 1. The capacity of the
         /// current instance is unaffected.
-        /// 
         /// </remarks>
         public SynchronizedTextBuilder RemoveAt(int index)
         {
@@ -1672,25 +1549,18 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// 
         /// Appends the string representation of a specified Boolean value to this instance
         /// in lowercase.
-        /// 
         /// </summary>
-        /// <param name="value">
-        /// The Boolean value to append.
-        /// </param>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
+        /// <param name="value">The Boolean value to append.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
         /// <remarks>
-        /// 
         /// This matches the behavior of Java's StringBuilder. To match the behavior
         /// of .NET, call <see cref="Insert(int, bool, BooleanFormat)"/> and specify <see cref="BooleanFormat.TitleCase"/>.
         /// <para/>
         /// The capacity of this instance is adjusted as needed.
-        /// 
         /// </remarks>
+        /// <seealso cref="bool" />
         public SynchronizedTextBuilder Append(bool value)
         {
             lock (syncRoot)
@@ -1701,24 +1571,18 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// 
         /// Appends the string representation of a specified Boolean value to this instance
         /// in the specified format.
-        /// 
         /// </summary>
-        /// <param name="value">
-        /// The Boolean value to append.
-        /// </param>
+        /// <param name="value">The Boolean value to append.</param>
         /// <param name="format">
         /// The format to use. Specify <see cref="BooleanFormat.Lowercase"/> to match Java.
         /// Specify <see cref="BooleanFormat.TitleCase"/> to match .NET.
         /// </param>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
-        /// <remarks>
-        /// The capacity of this instance is adjusted as needed.
-        /// </remarks>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <remarks>The capacity of this instance is adjusted as needed.</remarks>
+        /// <seealso cref="bool" />
+        /// <seealso cref="BooleanFormat" />
         public SynchronizedTextBuilder Append(bool value, BooleanFormat format)
         {
             lock (syncRoot)
@@ -1728,19 +1592,10 @@ namespace J2N.Text
             }
         }
 
-        /// <summary>
-        /// 
-        /// Appends the string representation of a specified <see cref="char"/> object to this instance.
-        /// 
-        /// </summary>
-        /// <param name="value">
-        /// The UTF-16-encoded code unit to append.
-        /// </param>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
+        /// <summary>Appends the string representation of a specified <see cref="char"/> object to this instance.</summary>
+        /// <param name="value">The UTF-16-encoded code unit to append.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
         /// <remarks>
-        /// 
         /// The <see cref="Append(char)"/> method modifies the existing instance of this class;
         /// it does not return a new class instance. Because of this, you can call a method or property
         /// on the existing reference and you do not have to assign the return value to an <see cref="SynchronizedTextBuilder"/>
@@ -1766,8 +1621,8 @@ namespace J2N.Text
         /// both the length and the capacity of the <see cref="SynchronizedTextBuilder"/> instance can grow beyond
         /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
-        /// 
         /// </remarks>
+        /// <seealso cref="char" />
         public SynchronizedTextBuilder Append(char value)
         {
             lock (syncRoot)
@@ -1777,19 +1632,11 @@ namespace J2N.Text
             }
         }
 
-        /// <summary>
-        /// 
-        /// Appends the string representation of the Unicode characters in a specified array to this instance.
-        /// 
-        /// </summary>
-        /// <param name="value">
-        /// The array of characters to append.
-        /// </param>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
+        /// <summary>Appends the string representation of the Unicode characters in a specified array to this instance.</summary>
+        /// <param name="value">The array of characters to append.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.</exception>
         /// <remarks>
-        /// 
         /// This method appends the characters in the specified array to the current instance in the same order they
         /// appear in value. If <paramref name="value"/> is <c>null</c>, no changes are made.
         /// <para/>
@@ -1814,8 +1661,8 @@ namespace J2N.Text
         /// both the length and the capacity of the <see cref="SynchronizedTextBuilder"/> instance can grow beyond
         /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
-        /// 
         /// </remarks>
+        /// <seealso cref="char" />
         public SynchronizedTextBuilder Append(char[]? value)
         {
             lock (syncRoot)
@@ -1825,17 +1672,10 @@ namespace J2N.Text
             }
         }
 
-        /// <summary>
-        /// 
-        /// Appends the string representation of a specified read-only character span to this instance.
-        /// 
-        /// </summary>
-        /// <param name="value">
-        /// The read-only character span to append.
-        /// </param>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
+        /// <summary>Appends the string representation of a specified read-only character span to this instance.</summary>
+        /// <param name="value">The read-only character span to append.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <seealso cref="ReadOnlySpan{Char}" />
         public SynchronizedTextBuilder Append(ReadOnlySpan<char> value)
         {
             lock (syncRoot)
@@ -1845,17 +1685,10 @@ namespace J2N.Text
             }
         }
 
-        /// <summary>
-        /// 
-        /// Appends the string representation of a specified read-only character memory region to this instance.
-        /// 
-        /// </summary>
-        /// <param name="value">
-        /// The read-only character memory region to append.
-        /// </param>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
+        /// <summary>Appends the string representation of a specified read-only character memory region to this instance.</summary>
+        /// <param name="value">The read-only character memory region to append.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <seealso cref="ReadOnlyMemory{Char}" />
         public SynchronizedTextBuilder Append(ReadOnlyMemory<char> value)
         {
             lock (syncRoot)
@@ -1865,9 +1698,7 @@ namespace J2N.Text
             }
         }
 
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
         public SynchronizedTextBuilder AppendJoin(string? separator, params object?[] values)
         {
             lock (syncRoot)
@@ -1877,9 +1708,7 @@ namespace J2N.Text
             }
         }
 
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
         public SynchronizedTextBuilder AppendJoin(string? separator, params ReadOnlySpan<object?> values)
         {
             lock (syncRoot)
@@ -1889,9 +1718,7 @@ namespace J2N.Text
             }
         }
 
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
         public SynchronizedTextBuilder AppendJoin<T>(string? separator, IEnumerable<T> values)
         {
             lock (syncRoot)
@@ -1901,9 +1728,7 @@ namespace J2N.Text
             }
         }
 
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
         public SynchronizedTextBuilder AppendJoin(string? separator, params string?[] values)
         {
             lock (syncRoot)
@@ -1913,9 +1738,7 @@ namespace J2N.Text
             }
         }
 
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
         public SynchronizedTextBuilder AppendJoin(string? separator, params ReadOnlySpan<string?> values)
         {
             lock (syncRoot)
@@ -1925,9 +1748,7 @@ namespace J2N.Text
             }
         }
 
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
         public SynchronizedTextBuilder AppendJoin(char separator, params object?[] values)
         {
             lock (syncRoot)
@@ -1937,9 +1758,7 @@ namespace J2N.Text
             }
         }
 
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
         public SynchronizedTextBuilder AppendJoin(char separator, params ReadOnlySpan<object?> values)
         {
             lock (syncRoot)
@@ -1949,9 +1768,7 @@ namespace J2N.Text
             }
         }
 
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
         public SynchronizedTextBuilder AppendJoin<T>(char separator, IEnumerable<T> values)
         {
             lock (syncRoot)
@@ -1961,9 +1778,7 @@ namespace J2N.Text
             }
         }
 
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
         public SynchronizedTextBuilder AppendJoin(char separator, params string?[] values)
         {
             lock (syncRoot)
@@ -1973,9 +1788,7 @@ namespace J2N.Text
             }
         }
 
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
         public SynchronizedTextBuilder AppendJoin(char separator, params ReadOnlySpan<string?> values)
         {
             lock (syncRoot)
@@ -1985,27 +1798,23 @@ namespace J2N.Text
             }
         }
 
-        /// <summary>
-        /// 
-        /// Inserts a string into this instance at the specified character position.
-        /// 
-        /// </summary>
-        /// <param name="index">
-        /// The position in this instance where insertion begins.
-        /// </param>
-        /// <param name="value">
-        /// The string to insert.
-        /// </param>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
+        /// <summary>Inserts a string into this instance at the specified character position.</summary>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">The string to insert.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="index"/> is less than zero or greater than the current length of this instance.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// The current length of this <see cref="SynchronizedTextBuilder"/> object plus the length of
+        /// <paramref name="value"/> exceeds <see cref="MaxCapacity"/>.
+        /// </exception>
         /// <remarks>
-        /// 
         /// Existing characters are shifted to make room for the new text. The capacity is adjusted as needed.
         /// <para/>
         /// This instance of <see cref="SynchronizedTextBuilder"/> is not changed if <paramref name="value"/> is <c>null</c>,
         /// or <paramref name="value"/> is not <c>null</c> but its length is zero.
-        /// 
         /// </remarks>
         public SynchronizedTextBuilder Insert(int index, string? value)
         {
@@ -2016,20 +1825,17 @@ namespace J2N.Text
             }
         }
 
-        /// <summary>
-        /// 
-        /// Inserts a <see cref="StringBuilder"/> into this instance at the specified character position.
-        /// 
-        /// </summary>
-        /// <param name="index">
-        /// The position in this instance where insertion begins.
-        /// </param>
-        /// <param name="value">
-        /// The value to insert.
-        /// </param>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
+        /// <summary>Inserts a <see cref="StringBuilder"/> into this instance at the specified character position.</summary>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">The value to insert.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="index"/> is less than zero or greater than the length of this instance.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.
+        /// </exception>
         public SynchronizedTextBuilder Insert(int index, StringBuilder? value)
         {
             lock (syncRoot)
@@ -2040,28 +1846,31 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// 
         /// Inserts the string representation of a specified subarray of Unicode characters into this instance at the specified character position.
         /// <para/>
         /// IMPORTANT: This method has .NET semantics. That is, the fourth parameter is a count, not an exclusive end index as would be the
         /// case in Java. To translate from Java, use <c>end - start</c> to resolve <paramref name="count"/>.
-        /// 
         /// </summary>
-        /// <param name="index">
-        /// The position in this instance where insertion begins.
-        /// </param>
-        /// <param name="value">
-        /// The value to insert.
-        /// </param>
-        /// <param name="startIndex">
-        /// The starting index within <paramref name="value"/>.
-        /// </param>
-        /// <param name="count">
-        /// The number of characters to insert.
-        /// </param>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">The value to insert.</param>
+        /// <param name="startIndex">The starting index within <paramref name="value"/>.</param>
+        /// <param name="count">The number of characters to insert.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="index"/>, <paramref name="startIndex"/> or <paramref name="count"/> is less than zero.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="index"/> is greater than the length of this instance.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="startIndex"/> plus <paramref name="count"/> is not a position within <paramref name="value"/>.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.
+        /// </exception>
         public SynchronizedTextBuilder Insert(int index, StringBuilder? value, int startIndex, int count)
         {
             lock (syncRoot)
@@ -2072,28 +1881,27 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// 
         /// Inserts the string representation of a specified Boolean value to this instance
         /// in lowercase at the specifed character position.
-        /// 
         /// </summary>
-        /// <param name="index">
-        /// The position in this instance where insertion begins.
-        /// </param>
-        /// <param name="value">
-        /// The value to insert.
-        /// </param>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">The value to insert.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="index"/> is less than zero or greater than the current length of this instance.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// The current length of this <see cref="SynchronizedTextBuilder"/> object plus the length of
+        /// <paramref name="value"/> exceeds <see cref="MaxCapacity"/>.
+        /// </exception>
         /// <remarks>
-        /// 
         /// This matches the behavior of Java's StringBuilder. To match the behavior
         /// of .NET, call <see cref="Insert(int, bool, BooleanFormat)"/> and specify <see cref="BooleanFormat.TitleCase"/>.
         /// <para/>
         /// Existing characters are shifted to make room for the new text. The capacity is adjusted as needed.
-        /// 
         /// </remarks>
+        /// <seealso cref="bool" />
         public SynchronizedTextBuilder Insert(int index, bool value)
         {
             lock (syncRoot)
@@ -2104,29 +1912,27 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// 
         /// Inserts the string representation of a specified Boolean value to this instance
         /// in the specified format at the specified position.
-        /// 
         /// </summary>
-        /// <param name="index">
-        /// The position in this instance where insertion begins.
-        /// </param>
-        /// <param name="value">
-        /// The value to insert.
-        /// </param>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">The value to insert.</param>
         /// <param name="format">
         /// The format to use. Specify <see cref="BooleanFormat.Lowercase"/> to match Java.
         /// Specify <see cref="BooleanFormat.TitleCase"/> to match .NET.
         /// </param>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
-        /// <remarks>
-        /// 
-        /// Existing characters are shifted to make room for the new text. The capacity is adjusted as needed.
-        /// 
-        /// </remarks>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="index"/> is less than zero or greater than the current length of this instance.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// The current length of this <see cref="SynchronizedTextBuilder"/> object plus the length of
+        /// <paramref name="value"/> exceeds <see cref="MaxCapacity"/>.
+        /// </exception>
+        /// <remarks>Existing characters are shifted to make room for the new text. The capacity is adjusted as needed.</remarks>
+        /// <seealso cref="bool" />
+        /// <seealso cref="BooleanFormat" />
         public SynchronizedTextBuilder Insert(int index, bool value, BooleanFormat format)
         {
             lock (syncRoot)
@@ -2136,25 +1942,20 @@ namespace J2N.Text
             }
         }
 
-        /// <summary>
-        /// 
-        /// Inserts the string representation of a specified Unicode character into this instance at the specified character position.
-        /// 
-        /// </summary>
-        /// <param name="index">
-        /// The position in this instance where insertion begins.
-        /// </param>
-        /// <param name="value">
-        /// The value to insert.
-        /// </param>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
-        /// <remarks>
-        /// 
-        /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
-        /// 
-        /// </remarks>
+        /// <summary>Inserts the string representation of a specified Unicode character into this instance at the specified character position.</summary>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">The value to insert.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="index"/> is less than zero or greater than the current length of this instance.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// The current length of this <see cref="SynchronizedTextBuilder"/> object plus the length of
+        /// <paramref name="value"/> exceeds <see cref="MaxCapacity"/>.
+        /// </exception>
+        /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
+        /// <seealso cref="char" />
         public SynchronizedTextBuilder Insert(int index, char value)
         {
             lock (syncRoot)
@@ -2165,27 +1966,26 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// 
         /// Inserts the string representation of a specified array of Unicode characters into this
         /// instance at the specified character position.
-        /// 
         /// </summary>
-        /// <param name="index">
-        /// The position in this instance where insertion begins.
-        /// </param>
-        /// <param name="value">
-        /// The character array to insert.
-        /// </param>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">The character array to insert.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="index"/> is less than zero or greater than the current length of this instance.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// The current length of this <see cref="SynchronizedTextBuilder"/> object plus the length of
+        /// <paramref name="value"/> exceeds <see cref="MaxCapacity"/>.
+        /// </exception>
         /// <remarks>
-        /// 
         /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
         /// <para/>
         /// If <paramref name="value"/> is <c>null</c>, the <see cref="SynchronizedTextBuilder"/> is not changed.
-        /// 
         /// </remarks>
+        /// <seealso cref="char" />
         public SynchronizedTextBuilder Insert(int index, char[]? value)
         {
             lock (syncRoot)
@@ -2196,31 +1996,35 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// 
         /// Inserts the string representation of a specified subarray of Unicode characters
         /// into this instance at the specified character position.
-        /// 
         /// </summary>
-        /// <param name="index">
-        /// The position in this instance where insertion begins.
-        /// </param>
-        /// <param name="value">
-        /// A character array.
-        /// </param>
-        /// <param name="startIndex">
-        /// The starting index within <paramref name="value"/>.
-        /// </param>
-        /// <param name="charCount">
-        /// The number of characters to insert.
-        /// </param>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
-        /// <remarks>
-        /// 
-        /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
-        /// 
-        /// </remarks>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">A character array.</param>
+        /// <param name="startIndex">The starting index within <paramref name="value"/>.</param>
+        /// <param name="charCount">The number of characters to insert.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="value"/> is <c>null</c>, and <paramref name="startIndex"/>
+        /// and <paramref name="charCount"/> are not zero.
+        /// </exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="index"/>, <paramref name="startIndex"/>, or <paramref name="charCount"/> is less than zero.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="index"/> is greater than the length of this instance.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="startIndex"/> plus <paramref name="charCount"/> is not a position within <paramref name="value"/>.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.
+        /// </exception>
+        /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
+        /// <seealso cref="char" />
         public SynchronizedTextBuilder Insert(int index, char[]? value, int startIndex, int charCount)
         {
             lock (syncRoot)
@@ -2231,31 +2035,35 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// 
         /// Inserts the string representation of a specified string
         /// into this instance at the specified character position.
-        /// 
         /// </summary>
-        /// <param name="index">
-        /// The position in this instance where insertion begins.
-        /// </param>
-        /// <param name="value">
-        /// A character array.
-        /// </param>
-        /// <param name="startIndex">
-        /// The starting index within <paramref name="value"/>.
-        /// </param>
-        /// <param name="count">
-        /// The number of characters to insert.
-        /// </param>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
-        /// <remarks>
-        /// 
-        /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
-        /// 
-        /// </remarks>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">A character array.</param>
+        /// <param name="startIndex">The starting index within <paramref name="value"/>.</param>
+        /// <param name="count">The number of characters to insert.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="value"/> is <c>null</c>, and <paramref name="startIndex"/>
+        /// and <paramref name="count"/> are not zero.
+        /// </exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="index"/>, <paramref name="startIndex"/>, or <paramref name="count"/> is less than zero.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="index"/> is greater than the length of this instance.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="startIndex"/> plus <paramref name="count"/> is not a position within <paramref name="value"/>.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.
+        /// </exception>
+        /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
+        /// <seealso cref="char" />
         public SynchronizedTextBuilder Insert(int index, string? value, int startIndex, int count)
         {
             lock (syncRoot)
@@ -2265,24 +2073,15 @@ namespace J2N.Text
             }
         }
 
-        /// <summary>
-        /// 
-        /// Inserts the sequence of characters into this instance at the specified character position.
-        /// 
-        /// </summary>
-        /// <param name="index">
-        /// The position in this instance where insertion begins.
-        /// </param>
-        /// <param name="value">
-        /// The character span to insert.
-        /// </param>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
+        /// <summary>Inserts the sequence of characters into this instance at the specified character position.</summary>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">The character span to insert.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
         /// <remarks>
         /// The existing characters are shifted to make room for the character sequence in the
         /// <paramref name="value"/> to insert it. The capacity is adjusted as needed.
         /// </remarks>
+        /// <seealso cref="ReadOnlySpan{Char}" />
         public SynchronizedTextBuilder Insert(int index, ReadOnlySpan<char> value)
         {
             lock (syncRoot)
@@ -2293,22 +2092,22 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// 
         /// Appends the string returned by processing a composite format string, which contains zero or more format items,
         /// to this instance. Each format item is replaced by the string representation of a single argument.
-        /// 
         /// </summary>
-        /// <param name="format">
-        /// A composite format string.
-        /// </param>
-        /// <param name="arg0">
-        /// An object to format.
-        /// </param>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
+        /// <param name="format">A composite format string.</param>
+        /// <param name="arg0">An object to format.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="format"/> is <c>null</c>.</exception>
+        /// <exception cref="FormatException">
+        /// <paramref name="format"/> is invalid.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// The index of a format item is less than 0 (zero), or greater than or equal to 1.
+        /// </exception>
+        /// <exception cref="ArgumentOutOfRangeException">The length of the expanded string would exceed <see cref="MaxCapacity"/>.</exception>
         /// <remarks>
-        /// 
         /// This method uses the <a href="https://learn.microsoft.com/en-us/dotnet/standard/base-types/composite-formatting">
         /// composite formatting feature</a> of the .NET Framework to convert the value of an object to its text
         /// representation and embed that representation in the current <see cref="SynchronizedTextBuilder"/> object.
@@ -2364,7 +2163,6 @@ namespace J2N.Text
         /// both the length and the capacity of the <see cref="SynchronizedTextBuilder"/> instance can grow beyond
         /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
-        /// 
         /// </remarks>
         public SynchronizedTextBuilder AppendFormat(string format, object? arg0)
         {
@@ -2376,25 +2174,23 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// 
         /// Appends the string returned by processing a composite format string, which contains zero or more format items,
         /// to this instance. Each format item is replaced by the string representation of either of two arguments.
-        /// 
         /// </summary>
-        /// <param name="format">
-        /// A composite format string.
-        /// </param>
-        /// <param name="arg0">
-        /// The first object to format.
-        /// </param>
-        /// <param name="arg1">
-        /// The second object to format.
-        /// </param>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
+        /// <param name="format">A composite format string.</param>
+        /// <param name="arg0">The first object to format.</param>
+        /// <param name="arg1">The second object to format.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="format"/> is <c>null</c>.</exception>
+        /// <exception cref="FormatException">
+        /// <paramref name="format"/> is invalid.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// The index of a format item is less than 0 (zero), or greater than or equal to 2.
+        /// </exception>
+        /// <exception cref="ArgumentOutOfRangeException">The length of the expanded string would exceed <see cref="MaxCapacity"/>.</exception>
         /// <remarks>
-        /// 
         /// This method uses the <a href="https://learn.microsoft.com/en-us/dotnet/standard/base-types/composite-formatting">
         /// composite formatting feature</a> of the .NET Framework to convert the value of an object to its text
         /// representation and embed that representation in the current <see cref="SynchronizedTextBuilder"/> object.
@@ -2450,7 +2246,6 @@ namespace J2N.Text
         /// both the length and the capacity of the <see cref="SynchronizedTextBuilder"/> instance can grow beyond
         /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
-        /// 
         /// </remarks>
         public SynchronizedTextBuilder AppendFormat(string format, object? arg0, object? arg1)
         {
@@ -2462,28 +2257,24 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// 
         /// Appends the string returned by processing a composite format string, which contains zero or more format items,
         /// to this instance. Each format item is replaced by the string representation of either of three arguments.
-        /// 
         /// </summary>
-        /// <param name="format">
-        /// A composite format string.
-        /// </param>
-        /// <param name="arg0">
-        /// The first object to format.
-        /// </param>
-        /// <param name="arg1">
-        /// The second object to format.
-        /// </param>
-        /// <param name="arg2">
-        /// The third object to format.
-        /// </param>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
+        /// <param name="format">A composite format string.</param>
+        /// <param name="arg0">The first object to format.</param>
+        /// <param name="arg1">The second object to format.</param>
+        /// <param name="arg2">The third object to format.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="format"/> is <c>null</c>.</exception>
+        /// <exception cref="FormatException">
+        /// <paramref name="format"/> is invalid.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// The index of a format item is less than 0 (zero), or greater than or equal to 3.
+        /// </exception>
+        /// <exception cref="ArgumentOutOfRangeException">The length of the expanded string would exceed <see cref="MaxCapacity"/>.</exception>
         /// <remarks>
-        /// 
         /// This method uses the <a href="https://learn.microsoft.com/en-us/dotnet/standard/base-types/composite-formatting">
         /// composite formatting feature</a> of the .NET Framework to convert the value of an object to its text
         /// representation and embed that representation in the current <see cref="SynchronizedTextBuilder"/> object.
@@ -2540,7 +2331,6 @@ namespace J2N.Text
         /// both the length and the capacity of the <see cref="SynchronizedTextBuilder"/> instance can grow beyond
         /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
-        /// 
         /// </remarks>
         public SynchronizedTextBuilder AppendFormat(string format, object? arg0, object? arg1, object? arg2)
         {
@@ -2552,22 +2342,22 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// 
         /// Appends the string returned by processing a composite format string, which contains zero or more format items,
         /// to this instance. Each format item is replaced by the string representation of a corresponding argument in a parameter array.
-        /// 
         /// </summary>
-        /// <param name="format">
-        /// A composite format string.
-        /// </param>
-        /// <param name="args">
-        /// An array of objects to format.
-        /// </param>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
+        /// <param name="format">A composite format string.</param>
+        /// <param name="args">An array of objects to format.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="format"/> or <paramref name="args"/> is <c>null</c>.</exception>
+        /// <exception cref="FormatException">
+        /// <paramref name="format"/> is invalid.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// The index of a format item is less than 0 (zero), or greater than or equal to the length of the <paramref name="args"/> array.
+        /// </exception>
+        /// <exception cref="ArgumentOutOfRangeException">The length of the expanded string would exceed <see cref="MaxCapacity"/>.</exception>
         /// <remarks>
-        /// 
         /// This method uses the <a href="https://learn.microsoft.com/en-us/dotnet/standard/base-types/composite-formatting">
         /// composite formatting feature</a> of the .NET Framework to convert the value of an object to its text
         /// representation and embed that representation in the current <see cref="SynchronizedTextBuilder"/> object.
@@ -2623,7 +2413,6 @@ namespace J2N.Text
         /// both the length and the capacity of the <see cref="SynchronizedTextBuilder"/> instance can grow beyond
         /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
-        /// 
         /// </remarks>
         public SynchronizedTextBuilder AppendFormat(string format, params object?[] args)
         {
@@ -2635,22 +2424,22 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// 
         /// Appends the string returned by processing a composite format string, which contains zero or more format items,
         /// to this instance. Each format item is replaced by the string representation of a corresponding argument in a parameter span.
-        /// 
         /// </summary>
-        /// <param name="format">
-        /// A composite format string.
-        /// </param>
-        /// <param name="args">
-        /// A span of objects to format.
-        /// </param>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
+        /// <param name="format">A composite format string.</param>
+        /// <param name="args">A span of objects to format.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="format"/> or <paramref name="args"/> is <c>null</c>.</exception>
+        /// <exception cref="FormatException">
+        /// <paramref name="format"/> is invalid.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// The index of a format item is less than 0 (zero), or greater than or equal to the length of the <paramref name="args"/> span.
+        /// </exception>
+        /// <exception cref="ArgumentOutOfRangeException">The length of the expanded string would exceed <see cref="MaxCapacity"/>.</exception>
         /// <remarks>
-        /// 
         /// This method uses the <a href="https://learn.microsoft.com/en-us/dotnet/standard/base-types/composite-formatting">
         /// composite formatting feature</a> of the .NET Framework to convert the value of an object to its text
         /// representation and embed that representation in the current <see cref="SynchronizedTextBuilder"/> object.
@@ -2706,7 +2495,6 @@ namespace J2N.Text
         /// both the length and the capacity of the <see cref="SynchronizedTextBuilder"/> instance can grow beyond
         /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
-        /// 
         /// </remarks>
         public SynchronizedTextBuilder AppendFormat(string format, params ReadOnlySpan<object?> args)
         {
@@ -2718,26 +2506,24 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// 
         /// Appends the string returned by processing a composite format string, which contains zero or more format items,
         /// to this instance. Each format item is replaced by the string representation of a single argument using a specified
         /// format provider.
-        /// 
         /// </summary>
-        /// <param name="provider">
-        /// An object that supplies culture-specific formatting information.
-        /// </param>
-        /// <param name="format">
-        /// A composite format string.
-        /// </param>
-        /// <param name="arg0">
-        /// An object to format.
-        /// </param>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
+        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
+        /// <param name="format">A composite format string.</param>
+        /// <param name="arg0">An object to format.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="format"/> is <c>null</c>.</exception>
+        /// <exception cref="FormatException">
+        /// <paramref name="format"/> is invalid.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// The index of a format item is less than 0 (zero), or greater than or equal to 1 (one).
+        /// </exception>
+        /// <exception cref="ArgumentOutOfRangeException">The length of the expanded string would exceed <see cref="MaxCapacity"/>.</exception>
         /// <remarks>
-        /// 
         /// This method uses the <a href="https://learn.microsoft.com/en-us/dotnet/standard/base-types/composite-formatting">
         /// composite formatting feature</a> of the .NET Framework to convert the value of an object to its text
         /// representation and embed that representation in the current <see cref="SynchronizedTextBuilder"/> object.
@@ -2806,7 +2592,6 @@ namespace J2N.Text
         /// both the length and the capacity of the <see cref="SynchronizedTextBuilder"/> instance can grow beyond
         /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
-        /// 
         /// </remarks>
         public SynchronizedTextBuilder AppendFormat(IFormatProvider? provider, string format, object? arg0)
         {
@@ -2818,29 +2603,25 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// 
         /// Appends the string returned by processing a composite format string, which contains zero or more format items,
         /// to this instance. Each format item is replaced by the string representation of either of two arguments using a specified
         /// format provider.
-        /// 
         /// </summary>
-        /// <param name="provider">
-        /// An object that supplies culture-specific formatting information.
-        /// </param>
-        /// <param name="format">
-        /// A composite format string.
-        /// </param>
-        /// <param name="arg0">
-        /// The first object to format.
-        /// </param>
-        /// <param name="arg1">
-        /// The second object to format.
-        /// </param>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
+        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
+        /// <param name="format">A composite format string.</param>
+        /// <param name="arg0">The first object to format.</param>
+        /// <param name="arg1">The second object to format.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="format"/> is <c>null</c>.</exception>
+        /// <exception cref="FormatException">
+        /// <paramref name="format"/> is invalid.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// The index of a format item is less than 0 (zero), or greater than or equal to 2 (two).
+        /// </exception>
+        /// <exception cref="ArgumentOutOfRangeException">The length of the expanded string would exceed <see cref="MaxCapacity"/>.</exception>
         /// <remarks>
-        /// 
         /// This method uses the <a href="https://learn.microsoft.com/en-us/dotnet/standard/base-types/composite-formatting">
         /// composite formatting feature</a> of the .NET Framework to convert the value of an object to its text
         /// representation and embed that representation in the current <see cref="SynchronizedTextBuilder"/> object.
@@ -2908,7 +2689,6 @@ namespace J2N.Text
         /// both the length and the capacity of the <see cref="SynchronizedTextBuilder"/> instance can grow beyond
         /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
-        /// 
         /// </remarks>
         public SynchronizedTextBuilder AppendFormat(IFormatProvider? provider, string format, object? arg0, object? arg1)
         {
@@ -2920,32 +2700,26 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// 
         /// Appends the string returned by processing a composite format string, which contains zero or more format items,
         /// to this instance. Each format item is replaced by the string representation of either of three arguments using a specified
         /// format provider.
-        /// 
         /// </summary>
-        /// <param name="provider">
-        /// An object that supplies culture-specific formatting information.
-        /// </param>
-        /// <param name="format">
-        /// A composite format string.
-        /// </param>
-        /// <param name="arg0">
-        /// The first object to format.
-        /// </param>
-        /// <param name="arg1">
-        /// The second object to format.
-        /// </param>
-        /// <param name="arg2">
-        /// The third object to format.
-        /// </param>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
+        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
+        /// <param name="format">A composite format string.</param>
+        /// <param name="arg0">The first object to format.</param>
+        /// <param name="arg1">The second object to format.</param>
+        /// <param name="arg2">The third object to format.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="format"/> is <c>null</c>.</exception>
+        /// <exception cref="FormatException">
+        /// <paramref name="format"/> is invalid.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// The index of a format item is less than 0 (zero), or greater than or equal to 3 (three).
+        /// </exception>
+        /// <exception cref="ArgumentOutOfRangeException">The length of the expanded string would exceed <see cref="MaxCapacity"/>.</exception>
         /// <remarks>
-        /// 
         /// This method uses the <a href="https://learn.microsoft.com/en-us/dotnet/standard/base-types/composite-formatting">
         /// composite formatting feature</a> of the .NET Framework to convert the value of an object to its text
         /// representation and embed that representation in the current <see cref="SynchronizedTextBuilder"/> object.
@@ -3014,7 +2788,6 @@ namespace J2N.Text
         /// both the length and the capacity of the <see cref="SynchronizedTextBuilder"/> instance can grow beyond
         /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
-        /// 
         /// </remarks>
         public SynchronizedTextBuilder AppendFormat(IFormatProvider? provider, string format, object? arg0, object? arg1, object? arg2)
         {
@@ -3026,26 +2799,24 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// 
         /// Appends the string returned by processing a composite format string, which contains zero or more format items,
         /// to this instance. Each format item is replaced by the string representation of a corresponding argument in a
         /// parameter array using a specified format provider.
-        /// 
         /// </summary>
-        /// <param name="provider">
-        /// An object that supplies culture-specific formatting information.
-        /// </param>
-        /// <param name="format">
-        /// A composite format string.
-        /// </param>
-        /// <param name="args">
-        /// An array of objects to format.
-        /// </param>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
+        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
+        /// <param name="format">A composite format string.</param>
+        /// <param name="args">An array of objects to format.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="format"/> is <c>null</c>.</exception>
+        /// <exception cref="FormatException">
+        /// <paramref name="format"/> is invalid.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// The index of a format item is less than 0 (zero), or greater than or equal to the length of the <paramref name="args"/> array.
+        /// </exception>
+        /// <exception cref="ArgumentOutOfRangeException">The length of the expanded string would exceed <see cref="MaxCapacity"/>.</exception>
         /// <remarks>
-        /// 
         /// This method uses the <a href="https://learn.microsoft.com/en-us/dotnet/standard/base-types/composite-formatting">
         /// composite formatting feature</a> of the .NET Framework to convert the value of an object to its text
         /// representation and embed that representation in the current <see cref="SynchronizedTextBuilder"/> object.
@@ -3114,7 +2885,6 @@ namespace J2N.Text
         /// both the length and the capacity of the <see cref="SynchronizedTextBuilder"/> instance can grow beyond
         /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
-        /// 
         /// </remarks>
         public SynchronizedTextBuilder AppendFormat(IFormatProvider? provider, string format, params object?[] args)
         {
@@ -3126,26 +2896,24 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// 
         /// Appends the string returned by processing a composite format string, which contains zero or more format items,
         /// to this instance. Each format item is replaced by the string representation of a corresponding argument in a
         /// parameter span using a specified format provider.
-        /// 
         /// </summary>
-        /// <param name="provider">
-        /// An object that supplies culture-specific formatting information.
-        /// </param>
-        /// <param name="format">
-        /// A composite format string.
-        /// </param>
-        /// <param name="args">
-        /// An span of objects to format.
-        /// </param>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
+        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
+        /// <param name="format">A composite format string.</param>
+        /// <param name="args">An span of objects to format.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="format"/> is <c>null</c>.</exception>
+        /// <exception cref="FormatException">
+        /// <paramref name="format"/> is invalid.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// The index of a format item is less than 0 (zero), or greater than or equal to the length of the <paramref name="args"/> span.
+        /// </exception>
+        /// <exception cref="ArgumentOutOfRangeException">The length of the expanded string would exceed <see cref="MaxCapacity"/>.</exception>
         /// <remarks>
-        /// 
         /// This method uses the <a href="https://learn.microsoft.com/en-us/dotnet/standard/base-types/composite-formatting">
         /// composite formatting feature</a> of the .NET Framework to convert the value of an object to its text
         /// representation and embed that representation in the current <see cref="SynchronizedTextBuilder"/> object.
@@ -3214,7 +2982,6 @@ namespace J2N.Text
         /// both the length and the capacity of the <see cref="SynchronizedTextBuilder"/> instance can grow beyond
         /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
-        /// 
         /// </remarks>
         public SynchronizedTextBuilder AppendFormat(IFormatProvider? provider, string format, params ReadOnlySpan<object?> args)
         {
@@ -3225,27 +2992,19 @@ namespace J2N.Text
             }
         }
 
-        /// <summary>
-        /// 
-        /// Replaces all occurrences of a specified string in this instance with another specified string.
-        /// 
-        /// </summary>
-        /// <param name="oldValue">
-        /// The string to replace.
-        /// </param>
-        /// <param name="newValue">
-        /// The string that replaces <paramref name="oldValue"/>, or <c>null</c>.
-        /// </param>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
+        /// <summary>Replaces all occurrences of a specified string in this instance with another specified string.</summary>
+        /// <param name="oldValue">The string to replace.</param>
+        /// <param name="newValue">The string that replaces <paramref name="oldValue"/>, or <c>null</c>.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="oldValue"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentException">The length of <paramref name="oldValue"/> is zero.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.</exception>
         /// <remarks>
-        /// 
         /// This method performs an ordinal, case-sensitive comparison to identify occurrences of <paramref name="oldValue"/> in the
         /// current instance. If <paramref name="newValue"/> is <c>null</c> or <see cref="string.Empty"/>, all occurrences of
         /// <paramref name="oldValue"/> are removed.
-        /// 
         /// </remarks>
+        /// <seealso cref="Remove(int, int)" />
         public SynchronizedTextBuilder Replace(string oldValue, string? newValue)
         {
             lock (syncRoot)
@@ -3255,26 +3014,17 @@ namespace J2N.Text
             }
         }
 
-        /// <summary>
-        /// 
-        /// Replaces all instances of one read-only character span with another in this builder.
-        /// 
-        /// </summary>
-        /// <param name="oldValue">
-        /// The read-only character span to replace.
-        /// </param>
-        /// <param name="newValue">
-        /// The read-only character span to replace <paramref name="oldValue"/> with.
-        /// </param>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
+        /// <summary>Replaces all instances of one read-only character span with another in this builder.</summary>
+        /// <param name="oldValue">The read-only character span to replace.</param>
+        /// <param name="newValue">The read-only character span to replace <paramref name="oldValue"/> with.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="ArgumentException">The length of <paramref name="oldValue"/> is zero.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.</exception>
         /// <remarks>
-        /// 
         /// This method performs an ordinal, case-sensitive comparison to identify occurrences of <paramref name="oldValue"/> in the
         /// current instance. If <paramref name="newValue"/> is empty, all occurrences of <paramref name="oldValue"/> are removed.
-        /// 
         /// </remarks>
+        /// <seealso cref="Remove(int, int)" />
         public SynchronizedTextBuilder Replace(ReadOnlySpan<char> oldValue, ReadOnlySpan<char> newValue)
         {
             lock (syncRoot)
@@ -3284,24 +3034,16 @@ namespace J2N.Text
             }
         }
 
-        /// <summary>
-        /// 
-        /// Returns a value indicating whether this instance is equal to a specified object.
-        /// 
-        /// </summary>
-        /// <param name="sb">
-        /// An object to compare with this instance, or <c>null</c>.
-        /// </param>
+        /// <summary>Returns a value indicating whether this instance is equal to a specified object.</summary>
+        /// <param name="sb">An object to compare with this instance, or <c>null</c>.</param>
         /// <returns>
         /// <c>true</c> if the characters in this instance and <paramref name="sb"/> are the same;
         /// otherwise, <c>false</c>.
         /// </returns>
         /// <remarks>
-        /// 
         /// The current instance and <paramref name="sb"/> are equal if the strings assigned to both
         /// <see cref="SynchronizedTextBuilder"/> objects are the same. To determine equality, the
         /// <see cref="Equals(SynchronizedTextBuilder)"/> method uses ordinal comparison.
-        /// 
         /// </remarks>
         public bool Equals(SynchronizedTextBuilder? sb)
         {
@@ -3311,24 +3053,20 @@ namespace J2N.Text
             }
         }
 
-        /// <summary>
-        /// 
-        /// Returns a value indicating whether this instance is equal to a specified object.
-        /// 
-        /// </summary>
-        /// <param name="sb">
-        /// An object to compare with this instance, or <c>null</c>.
-        /// </param>
+        /// <summary>Returns a value indicating whether this instance is equal to a specified object.</summary>
+        /// <param name="sb">An object to compare with this instance, or <c>null</c>.</param>
         /// <returns>
         /// <c>true</c> if the characters in this instance and <paramref name="sb"/> are the same;
         /// otherwise, <c>false</c>.
         /// </returns>
         /// <remarks>
-        /// 
         /// The current instance and <paramref name="sb"/> are equal if the strings assigned to both
         /// objects are the same. To determine equality, the <see cref="Equals(SynchronizedTextBuilder)"/>
         /// method uses ordinal comparison.
-        /// 
+        /// </remarks>
+        /// <remarks>
+        /// The <see cref="Equals(StringBuilder)"/> method performs an ordinal comparison to determine
+        /// whether the characters in the current instance and span are equal.
         /// </remarks>
         public bool Equals(StringBuilder? sb)
         {
@@ -3339,23 +3077,17 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// 
         /// Returns a value indicating whether the characters in this instance are equal to the
         /// characters in a specified read-only character span.
-        /// 
         /// </summary>
-        /// <param name="span">
-        /// The character span to compare with the current instance.
-        /// </param>
+        /// <param name="span">The character span to compare with the current instance.</param>
         /// <returns>
         /// <c>true</c> if the characters in this instance and <paramref name="span"/> are the same;
         /// otherwise, <c>false</c>.
         /// </returns>
         /// <remarks>
-        /// 
         /// The <see cref="Equals(SynchronizedTextBuilder)"/> method performs an ordinal comparison to determine
         /// whether the characters in the current instance and span are equal.
-        /// 
         /// </remarks>
         public bool Equals(ReadOnlySpan<char> span)
         {
@@ -3365,33 +3097,31 @@ namespace J2N.Text
             }
         }
 
-        /// <summary>
-        /// 
-        /// Replaces, within a substring of this instance, all occurrences of a specified string with another specified string.
-        /// 
-        /// </summary>
-        /// <param name="oldValue">
-        /// The string to replace.
-        /// </param>
-        /// <param name="newValue">
-        /// The string that replaces <paramref name="oldValue"/>, or <c>null</c>.
-        /// </param>
-        /// <param name="startIndex">
-        /// The position in this instance where the substring begins.
-        /// </param>
-        /// <param name="count">
-        /// The length of the substring to search within.
-        /// </param>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
+        /// <summary>Replaces, within a substring of this instance, all occurrences of a specified string with another specified string.</summary>
+        /// <param name="oldValue">The string to replace.</param>
+        /// <param name="newValue">The string that replaces <paramref name="oldValue"/>, or <c>null</c>.</param>
+        /// <param name="startIndex">The position in this instance where the substring begins.</param>
+        /// <param name="count">The length of the substring to search within.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="oldValue"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentException">The length of <paramref name="oldValue"/> is zero.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="startIndex"/> or <paramref name="count"/> is less than zero.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="startIndex"/> plus <paramref name="count"/> indicates a character position not within this instance.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.
+        /// </exception>
         /// <remarks>
-        /// 
         /// This method performs an ordinal, case-sensitive comparison to identify occurrences of <paramref name="oldValue"/>
         /// in the specified substring. If <paramref name="newValue"/> is <c>null</c> or <see cref="string.Empty"/>,
         /// all occurrences of <paramref name="oldValue"/> in the specified range are removed.
-        /// 
         /// </remarks>
+        /// <seealso cref="Remove(int, int)" />
         public SynchronizedTextBuilder Replace(string oldValue, string? newValue, int startIndex, int count)
         {
             lock (syncRoot)
@@ -3401,33 +3131,30 @@ namespace J2N.Text
             }
         }
 
-        /// <summary>
-        /// 
-        /// Replaces all instances of one read-only character span with another in a substring of this builder.
-        /// 
-        /// </summary>
-        /// <param name="oldValue">
-        /// The read-only character span to replace.
-        /// </param>
-        /// <param name="newValue">
-        /// The read-only character span to replace <paramref name="oldValue"/> with.
-        /// </param>
-        /// <param name="startIndex">
-        /// The position in this instance where the substring begins.
-        /// </param>
-        /// <param name="count">
-        /// The length of the substring to search within.
-        /// </param>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
+        /// <summary>Replaces all instances of one read-only character span with another in a substring of this builder.</summary>
+        /// <param name="oldValue">The read-only character span to replace.</param>
+        /// <param name="newValue">The read-only character span to replace <paramref name="oldValue"/> with.</param>
+        /// <param name="startIndex">The position in this instance where the substring begins.</param>
+        /// <param name="count">The length of the substring to search within.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="ArgumentException">The length of <paramref name="oldValue"/> is zero.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="startIndex"/> or <paramref name="count"/> is less than zero.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="startIndex"/> plus <paramref name="count"/> indicates a character position not within this instance.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.
+        /// </exception>
         /// <remarks>
-        /// 
         /// This method performs an ordinal, case-sensitive comparison to identify occurrences of <paramref name="oldValue"/>
         /// in the specified substring. If <paramref name="newValue"/> is empty, all occurrences of <paramref name="oldValue"/>
         /// in the specified range are removed.
-        /// 
         /// </remarks>
+        /// <seealso cref="Remove(int, int)" />
         public SynchronizedTextBuilder Replace(ReadOnlySpan<char> oldValue, ReadOnlySpan<char> newValue, int startIndex, int count)
         {
             lock (syncRoot)
@@ -3437,26 +3164,14 @@ namespace J2N.Text
             }
         }
 
-        /// <summary>
-        /// 
-        /// Replaces all occurrences of a specified character in this instance with another specified character.
-        /// 
-        /// </summary>
-        /// <param name="oldChar">
-        /// The character to replace.
-        /// </param>
-        /// <param name="newChar">
-        /// The character that replaces <paramref name="oldChar"/>.
-        /// </param>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
+        /// <summary>Replaces all occurrences of a specified character in this instance with another specified character.</summary>
+        /// <param name="oldChar">The character to replace.</param>
+        /// <param name="newChar">The character that replaces <paramref name="oldChar"/>.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
         /// <remarks>
-        /// 
         /// This method performs an ordinal, case-sensitive comparison to identify occurrences of
         /// <paramref name="oldChar"/> in the current instance. The size of the current
         /// <see cref="SynchronizedTextBuilder"/> instance is unchanged after the replacement.
-        /// 
         /// </remarks>
         public SynchronizedTextBuilder Replace(char oldChar, char newChar)
         {
@@ -3467,32 +3182,23 @@ namespace J2N.Text
             }
         }
 
-        /// <summary>
-        /// 
-        /// Replaces, within a substring of this instance, all occurrences of a specified character with another specified character.
-        /// 
-        /// </summary>
-        /// <param name="oldChar">
-        /// The character to replace.
-        /// </param>
-        /// <param name="newChar">
-        /// The character that replaces <paramref name="oldChar"/>.
-        /// </param>
-        /// <param name="startIndex">
-        /// The position in this instance where the substring begins.
-        /// </param>
-        /// <param name="count">
-        /// The length of the substring to search within.
-        /// </param>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
+        /// <summary>Replaces, within a substring of this instance, all occurrences of a specified character with another specified character.</summary>
+        /// <param name="oldChar">The character to replace.</param>
+        /// <param name="newChar">The character that replaces <paramref name="oldChar"/>.</param>
+        /// <param name="startIndex">The position in this instance where the substring begins.</param>
+        /// <param name="count">The length of the substring to search within.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="startIndex"/> or <paramref name="count"/> is less than zero.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="startIndex"/> plus <paramref name="count"/> indicates a character position not within this instance.
+        /// </exception>
         /// <remarks>
-        /// 
         /// This method performs an ordinal, case-sensitive comparison to identify occurrences of
         /// <paramref name="oldChar"/> in the current instance within the specified substring. The size of the current
         /// <see cref="SynchronizedTextBuilder"/> instance is unchanged after the replacement.
-        /// 
         /// </remarks>
         public SynchronizedTextBuilder Replace(char oldChar, char newChar, int startIndex, int count)
         {
@@ -3504,7 +3210,6 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// 
         /// Replaces the specified substring in this builder with the specified
         /// string, <paramref name="newValue"/>. The substring begins at the specified
         /// <paramref name="startIndex"/> and ends to the character at
@@ -3517,20 +3222,19 @@ namespace J2N.Text
         /// <para/>
         /// IMPORTANT: This method has .NET semantics. That is, the <paramref name="count"/> parameter is a count rather than
         /// an exclusive end index. To translate from Java, use <c>end - start</c> for <paramref name="count"/>.
-        /// 
         /// </summary>
-        /// <param name="startIndex">
-        /// The inclusive begin index in this builder.
-        /// </param>
-        /// <param name="count">
-        /// The number of characters to replace.
-        /// </param>
-        /// <param name="newValue">
-        /// The replacement string.
-        /// </param>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
+        /// <param name="startIndex">The inclusive begin index in this builder.</param>
+        /// <param name="count">The number of characters to replace.</param>
+        /// <param name="newValue">The replacement string.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="newValue"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="startIndex"/> or <paramref name="count"/> is less than zero.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="startIndex"/> is greater than or equal to <see cref="Length"/>.
+        /// </exception>
         public SynchronizedTextBuilder Replace(int startIndex, int count, string newValue)
         {
             lock (syncRoot)
@@ -3541,7 +3245,6 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// 
         /// Replaces the specified substring in this builder with the specified
         /// character span, <paramref name="newValue"/>. The substring begins at the specified
         /// <paramref name="startIndex"/> and ends to the character at
@@ -3554,25 +3257,19 @@ namespace J2N.Text
         /// <para/>
         /// IMPORTANT: This method has .NET semantics. That is, the <paramref name="count"/> parameter is a count rather than
         /// an exclusive end index. To translate from Java, use <c>end - start</c> for <paramref name="count"/>.
-        /// 
         /// </summary>
-        /// <param name="startIndex">
-        /// The inclusive begin index in this builder.
-        /// </param>
-        /// <param name="count">
-        /// The number of characters to replace.
-        /// </param>
-        /// <param name="newValue">
-        /// The replacement string.
-        /// </param>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
-        /// <remarks>
-        /// 
-        /// This method allows <paramref name="newValue"/> to be this instance or a slice of this instance.
-        /// 
-        /// </remarks>
+        /// <param name="startIndex">The inclusive begin index in this builder.</param>
+        /// <param name="count">The number of characters to replace.</param>
+        /// <param name="newValue">The replacement string.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="startIndex"/> or <paramref name="count"/> is less than zero.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="startIndex"/> is greater than or equal to <see cref="Length"/>.
+        /// </exception>
+        /// <remarks>This method allows <paramref name="newValue"/> to be this instance or a slice of this instance.</remarks>
         public SynchronizedTextBuilder Replace(int startIndex, int count, ReadOnlySpan<char> newValue)
         {
             lock (syncRoot)
@@ -3582,22 +3279,19 @@ namespace J2N.Text
             }
         }
 
-        /// <summary>
-        /// 
-        /// Appends an array of Unicode characters starting at a specified address to this instance.
-        /// 
-        /// </summary>
-        /// <param name="value">
-        /// A pointer to an array of characters.
-        /// </param>
-        /// <param name="valueCount">
-        /// The number of characters in the array.
-        /// </param>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
+        /// <summary>Appends an array of Unicode characters starting at a specified address to this instance.</summary>
+        /// <param name="value">A pointer to an array of characters.</param>
+        /// <param name="valueCount">The number of characters in the array.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="valueCount"/> is less than zero.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.
+        /// </exception>
+        /// <exception cref="NullReferenceException"><paramref name="value"/> is a null pointer.</exception>
         /// <remarks>
-        /// 
         /// This method appends <paramref name="valueCount"/> characters starting at address <paramref name="value"/>
         /// to the current instance.
         /// <para/>
@@ -3613,7 +3307,6 @@ namespace J2N.Text
         /// both the length and the capacity of the <see cref="SynchronizedTextBuilder"/> instance can grow beyond
         /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
-        /// 
         /// </remarks>
         [CLSCompliant(false)]
         public unsafe SynchronizedTextBuilder Append(char* value, int valueCount)
@@ -3625,30 +3318,28 @@ namespace J2N.Text
             }
         }
 
-        /// <summary>
-        /// 
-        /// Inserts an array of Unicode characters starting at a specified address into this instance.
-        /// 
-        /// </summary>
-        /// <param name="index">
-        /// The position in this instance where insertion begins.
-        /// </param>
-        /// <param name="value">
-        /// A pointer to an array of characters.
-        /// </param>
-        /// <param name="valueCount">
-        /// The number of characters in the array.
-        /// </param>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
+        /// <summary>Inserts an array of Unicode characters starting at a specified address into this instance.</summary>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">A pointer to an array of characters.</param>
+        /// <param name="valueCount">The number of characters in the array.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="index"/> or <paramref name="valueCount"/> is less than zero.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="index"/> is greater than the length of this instance.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.
+        /// </exception>
+        /// <exception cref="NullReferenceException"><paramref name="value"/> is a null pointer.</exception>
         /// <remarks>
-        /// 
         /// This method inserts <paramref name="valueCount"/> characters starting at address <paramref name="value"/>
         /// to the current instance.
         /// <para/>
         /// Existing characters are shifted to make room for the new text. The capacity is adjusted as needed.
-        /// 
         /// </remarks>
         [CLSCompliant(false)]
         public unsafe SynchronizedTextBuilder Insert(int index, char* value, int valueCount)
@@ -3661,7 +3352,6 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// 
         /// Deletes a sequence of characters specified by <paramref name="startIndex"/> and <paramref name="count"/>.
         /// Shifts any remaining characters to the left.
         /// <para/>
@@ -3671,17 +3361,17 @@ namespace J2N.Text
         /// This method differs from <see cref="Remove(int, int)"/> in that it will automatically
         /// adjust the <paramref name="count"/> if <c><paramref name="startIndex"/> + <paramref name="count"/> > <see cref="Length"/></c>
         /// to <c><see cref="Length"/> - <paramref name="startIndex"/>.</c>, provided it is not bounded by <see cref="MaxCapacity"/>.
-        /// 
         /// </summary>
-        /// <param name="startIndex">
-        /// The start index.
-        /// </param>
-        /// <param name="count">
-        /// The number of characters to delete.
-        /// </param>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
+        /// <param name="startIndex">The start index.</param>
+        /// <param name="count">The number of characters to delete.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="startIndex"/> or <paramref name="count"/> is less than zero.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="startIndex"/> is greater than <see cref="SynchronizedTextBuilder.Length"/>.
+        /// </exception>
         public SynchronizedTextBuilder Delete(int startIndex, int count)
         {
             lock (syncRoot)
@@ -3692,7 +3382,6 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// 
         /// Causes this character sequence to be replaced by the reverse of
         /// the sequence. If there are any surrogate pairs included in the
         /// sequence, these are treated as single characters for the
@@ -3719,11 +3408,11 @@ namespace J2N.Text
         /// method. However, J2N also provides <see cref="J2N.Text.StringExtensions.ReverseText(string)"/>
         /// and <see cref="J2N.MemoryExtensions.ReverseText(Span{char})"/> which
         /// don't require an <see cref="SynchronizedTextBuilder"/> instance.
-        /// 
         /// </summary>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <seealso cref="StringExtensions.ReverseText(string)" />
+        /// <seealso cref="MemoryExtensions.ReverseText(Span{char})" />
+        /// <seealso cref="StringBuilderExtensions.Reverse(StringBuilder)" />
         public SynchronizedTextBuilder Reverse()
         {
             lock (syncRoot)
@@ -3734,13 +3423,10 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// 
         /// Sets the capacity of an <see cref="SynchronizedTextBuilder"/> object to the actual number of characters
         /// it contains.
-        /// 
         /// </summary>
         /// <remarks>
-        /// 
         /// This method is similar to <c>trimToSize()</c> in the JDK.
         /// <para/>
         /// You can use the <see cref="TrimExcess()"/> method to minimize an <see cref="SynchronizedTextBuilder"/> object's
@@ -3749,7 +3435,6 @@ namespace J2N.Text
         /// after calling the <see cref="Clear()"/> method or setting <see cref="Length"/> property to 0.
         /// <para/>
         /// If the capacity is already equal to the current length, this method has no effect.
-        /// 
         /// </remarks>
         public void TrimExcess()
         {
@@ -3760,20 +3445,22 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// 
         /// Appends and returns a writable <see cref="Span{Char}"/> of the specified length to this builder.
         /// Writes to the returned span will update the value of this instance.
-        /// 
         /// </summary>
-        /// <param name="length">
-        /// The number of characters to append to this instance.
-        /// </param>
+        /// <param name="length">The number of characters to append to this instance.</param>
         /// <returns>
         /// >A <see cref="Span{Char}"/> wrapping a block of memory that is appended to the existing
         /// sequence of characters. The span may be written to by the caller to update this instance.
         /// </returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="length"/> is less than zero.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="length"/> plus the current length of this instance exceeds <see cref="MaxCapacity"/>.
+        /// </exception>
         /// <remarks>
-        /// 
         /// This method allows callers to append a block of a specific length to this instance that can be written
         /// to after the fact. This is most useful for passing a span to an API that writes directly into a character buffer,
         /// which can save a copy operation if the data fits in the returned span.
@@ -3790,7 +3477,6 @@ namespace J2N.Text
         /// The returned span provides direct access to the underlying memory of the <see cref="SynchronizedTextBuilder"/>.
         /// Callers must synchronize externally using <see cref="SynchronizedTextBuilder.SyncRoot"/> for the duration of the
         /// span usage if concurrent mutation is possible.
-        /// 
         /// </remarks>
         public Span<char> AppendSpan(int length)
         {
@@ -3798,26 +3484,25 @@ namespace J2N.Text
         }
 
 #if FEATURE_INDEX_RANGE
-        /// <summary>
-        /// 
-        /// Inserts a copy of the specified range from this buffer at the specified index.
-        /// 
-        /// </summary>
-        /// <param name="index">
-        /// The index at which the copied range will be inserted.
-        /// </param>
-        /// <param name="range">
-        /// The range of characters to copy and insert.
-        /// </param>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
+        /// <summary>Inserts a copy of the specified range from this buffer at the specified index.</summary>
+        /// <param name="index">The index at which the copied range will be inserted.</param>
+        /// <param name="range">The range of characters to copy and insert.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="index"/> is less than zero.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="index"/> is greater than <see cref="Length"/>.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// The specified <paramref name="range"/> extends beyond the bounds
+        /// of the buffer.
+        /// </exception>
         /// <remarks>
-        /// 
         /// This operation supports overlapping source and destination ranges.
         /// <para/>
         /// <paramref name="index"/> refers to the original buffer before insertion takes place.
-        /// 
         /// </remarks>
         public SynchronizedTextBuilder InsertFromSelf(int index, Range range)
         {
@@ -3831,31 +3516,31 @@ namespace J2N.Text
 #endif
 
         /// <summary>
-        /// 
         /// Inserts a copy of a range of characters from this buffer
         /// at the specified index, expanding the <see cref="Length"/> by
         /// <paramref name="count"/>.
-        /// 
         /// </summary>
-        /// <param name="index">
-        /// The index at which the copied range will be inserted.
-        /// </param>
-        /// <param name="startIndex">
-        /// The starting index of the source range to copy.
-        /// </param>
-        /// <param name="count">
-        /// The number of characters to copy.
-        /// </param>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
+        /// <param name="index">The index at which the copied range will be inserted.</param>
+        /// <param name="startIndex">The starting index of the source range to copy.</param>
+        /// <param name="count">The number of characters to copy.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="index"/>, <paramref name="startIndex"/>, or <paramref name="count"/> is less than zero.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="index"/> or <paramref name="startIndex"/> is greater
+        /// than <see cref="Length"/>.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// <paramref name="startIndex"/> + <paramref name="count"/> is greater
+        /// than <see cref="Length"/>.
+        /// </exception>
         /// <remarks>
-        /// 
         /// This operation supports overlapping source and destination ranges.
         /// <para/>
         /// <paramref name="index"/> refers to the original buffer before insertion
         /// takes place.
-        /// 
         /// </remarks>
         public SynchronizedTextBuilder InsertFromSelf(int index, int startIndex, int count)
         {
@@ -3867,25 +3552,19 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// 
         /// Reports the zero-based index of the first occurrence of the specified Unicode character
         /// in this instance.
-        /// 
         /// </summary>
-        /// <param name="value">
-        /// A Unicode character to seek.
-        /// </param>
+        /// <param name="value">A Unicode character to seek.</param>
         /// <returns>
         /// The zero-based index position of <paramref name="value"/> if that character
         /// is found, or -1 if it is not.
         /// </returns>
         /// <remarks>
-        /// 
         /// Index numbering starts from zero.
         /// <para/>
         /// This method performs an ordinal (culture-insensitive) search, where a character is considered
         /// equivalent to another character only if their Unicode scalar values are the same.
-        /// 
         /// </remarks>
         public int IndexOf(char value)
         {
@@ -3895,22 +3574,16 @@ namespace J2N.Text
             }
         }
 
-        /// <summary>
-        /// 
-        /// Reports the zero-based index of the first occurrence of the specified string.
-        /// 
-        /// </summary>
-        /// <param name="value">
-        /// The string to find.
-        /// </param>
+        /// <summary>Reports the zero-based index of the first occurrence of the specified string.</summary>
+        /// <param name="value">The string to find.</param>
         /// <returns>
         /// The zero-based index position of <paramref name="value"/> from the start of
         /// the current instance if that sequence of characters is found, or -1 if it is not.
         /// If <paramref name="value"/> is <see cref="string.Empty"/>, the return value
         /// is 0.
         /// </returns>
+        /// <exception cref="ArgumentNullException"><paramref name="value"/> is <c>null</c>.</exception>
         /// <remarks>
-        /// 
         /// Index numbering starts from zero.
         /// <para/>
         /// This method performs an ordinal (culture-insensitive) search, where a character is considered
@@ -3918,7 +3591,6 @@ namespace J2N.Text
         /// <para/>
         /// To match the behavior of the JDK, this method allows searches for the empty string, which will
         /// always return 0.
-        /// 
         /// </remarks>
         public int IndexOf(string value)
         {
@@ -3928,14 +3600,8 @@ namespace J2N.Text
             }
         }
 
-        /// <summary>
-        /// 
-        /// Reports the zero-based index of the first occurrence of the specified span.
-        /// 
-        /// </summary>
-        /// <param name="value">
-        /// The span to find.
-        /// </param>
+        /// <summary>Reports the zero-based index of the first occurrence of the specified span.</summary>
+        /// <param name="value">The span to find.</param>
         /// <returns>
         /// The zero-based index position of <paramref name="value"/> from the start of
         /// the current instance if that sequence of characters is found, or -1 if it is not.
@@ -3943,7 +3609,6 @@ namespace J2N.Text
         /// is 0.
         /// </returns>
         /// <remarks>
-        /// 
         /// Index numbering starts from zero.
         /// <para/>
         /// This method performs an ordinal (culture-insensitive) search, where a character is considered
@@ -3951,7 +3616,6 @@ namespace J2N.Text
         /// <para/>
         /// To match the behavior of the JDK, this method allows searches for the empty span, which will
         /// always return 0.
-        /// 
         /// </remarks>
         public int IndexOf(ReadOnlySpan<char> value)
         {
@@ -3962,25 +3626,19 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// 
         /// Reports the zero-based index of the first occurrence of the specified string beginning
         /// at the specified index in this instance.
-        /// 
         /// </summary>
-        /// <param name="value">
-        /// The string to find.
-        /// </param>
-        /// <param name="startIndex">
-        /// The search starting position.
-        /// </param>
+        /// <param name="value">The string to find.</param>
+        /// <param name="startIndex">The search starting position.</param>
         /// <returns>
         /// The zero-based index position of <paramref name="value"/> from the specified index of
         /// the current instance if that sequence of characters is found, or -1 if it is not.
         /// If <paramref name="value"/> is empty, the return value is the effective start index
         /// after clamping.
         /// </returns>
+        /// <exception cref="ArgumentNullException"><paramref name="value"/> is <c>null</c>.</exception>
         /// <remarks>
-        /// 
         /// Index numbering starts from zero. The <paramref name="startIndex"/> parameter is clamped to
         /// the valid range of the current instance. Values less than zero are treated as zero, and values
         /// greater than <see cref="Length" /> are treated as equal to <see cref="Length" />.
@@ -3996,7 +3654,6 @@ namespace J2N.Text
         /// <para/>
         /// If <paramref name="startIndex"/> is less than zero, it is treated as zero. If it is greater
         /// than <see cref="Length"/>, it is treated as equal to <see cref="Length"/>.
-        /// 
         /// </remarks>
         public int IndexOf(string value, int startIndex)
         {
@@ -4007,17 +3664,11 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// 
         /// Reports the zero-based index of the first occurrence of the specified span beginning
         /// at the specified index in this instance.
-        /// 
         /// </summary>
-        /// <param name="value">
-        /// The span to find.
-        /// </param>
-        /// <param name="startIndex">
-        /// The search starting position.
-        /// </param>
+        /// <param name="value">The span to find.</param>
+        /// <param name="startIndex">The search starting position.</param>
         /// <returns>
         /// The zero-based index position of <paramref name="value"/> from the start of
         /// the current instance if that sequence of characters is found, or -1 if it is not.
@@ -4025,7 +3676,6 @@ namespace J2N.Text
         /// after clamping.
         /// </returns>
         /// <remarks>
-        /// 
         /// Index numbering starts from zero. The <paramref name="startIndex"/> parameter is clamped to
         /// the valid range of the current instance. Values less than zero are treated as zero, and values
         /// greater than <see cref="Length" /> are treated as equal to <see cref="Length" />.
@@ -4041,7 +3691,6 @@ namespace J2N.Text
         /// <para/>
         /// If <paramref name="startIndex"/> is less than zero, it is treated as zero. If it is greater
         /// than <see cref="Length"/>, it is treated as equal to <see cref="Length"/>.
-        /// 
         /// </remarks>
         public int IndexOf(ReadOnlySpan<char> value, int startIndex)
         {
@@ -4051,14 +3700,8 @@ namespace J2N.Text
             }
         }
 
-        /// <summary>
-        /// 
-        /// Reports the zero-based index of the first occurrence of the specified string.
-        /// 
-        /// </summary>
-        /// <param name="value">
-        /// The string to find.
-        /// </param>
+        /// <summary>Reports the zero-based index of the first occurrence of the specified string.</summary>
+        /// <param name="value">The string to find.</param>
         /// <param name="comparisonType">
         /// One of the enumeration values that determines how the current instance
         /// and <paramref name="value"/> are compared.
@@ -4069,8 +3712,8 @@ namespace J2N.Text
         /// If <paramref name="value"/> is <see cref="string.Empty"/>, the return value
         /// is 0.
         /// </returns>
+        /// <exception cref="ArgumentNullException"><paramref name="value"/> is <c>null</c>.</exception>
         /// <remarks>
-        /// 
         /// Index numbering starts from zero.
         /// <para/>
         /// The <paramref name="comparisonType"/> parameter specifies to search for the <paramref name="value"/>
@@ -4082,7 +3725,6 @@ namespace J2N.Text
         /// <para/>
         /// On older platforms than .NET Core, this overload provides optimizations for
         /// <see cref="StringComparison.OrdinalIgnoreCase"/> over and above the System.Memory package.
-        /// 
         /// </remarks>
         public int IndexOf(string value, StringComparison comparisonType)
         {
@@ -4092,14 +3734,8 @@ namespace J2N.Text
             }
         }
 
-        /// <summary>
-        /// 
-        /// Reports the zero-based index of the first occurrence of the specified span.
-        /// 
-        /// </summary>
-        /// <param name="value">
-        /// The span to find.
-        /// </param>
+        /// <summary>Reports the zero-based index of the first occurrence of the specified span.</summary>
+        /// <param name="value">The span to find.</param>
         /// <param name="comparisonType">
         /// One of the enumeration values that determines how the current instance
         /// and <paramref name="value"/> are compared.
@@ -4110,8 +3746,8 @@ namespace J2N.Text
         /// If <paramref name="value"/> is <see cref="ReadOnlySpan{T}.Empty"/>, the return value
         /// is 0.
         /// </returns>
+        /// <exception cref="ArgumentNullException"><paramref name="value"/> is <c>null</c>.</exception>
         /// <remarks>
-        /// 
         /// Index numbering starts from zero.
         /// <para/>
         /// The <paramref name="comparisonType"/> parameter specifies to search for the <paramref name="value"/>
@@ -4123,7 +3759,6 @@ namespace J2N.Text
         /// <para/>
         /// On older platforms than .NET Core, this overload provides optimizations for
         /// <see cref="StringComparison.OrdinalIgnoreCase"/> over and above the System.Memory package.
-        /// 
         /// </remarks>
         public int IndexOf(ReadOnlySpan<char> value, StringComparison comparisonType)
         {
@@ -4134,17 +3769,11 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// 
         /// Reports the zero-based index of the first occurrence of the specified string beginning
         /// at the specified index in this instance.
-        /// 
         /// </summary>
-        /// <param name="value">
-        /// The string to find.
-        /// </param>
-        /// <param name="startIndex">
-        /// The search starting position.
-        /// </param>
+        /// <param name="value">The string to find.</param>
+        /// <param name="startIndex">The search starting position.</param>
         /// <param name="comparisonType">
         /// One of the enumeration values that determines how the current instance
         /// and <paramref name="value"/> are compared.
@@ -4155,8 +3784,12 @@ namespace J2N.Text
         /// If <paramref name="value"/> is empty, the return value is the effective start index
         /// after clamping.
         /// </returns>
+        /// <exception cref="ArgumentNullException"><paramref name="value"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentException">
+        /// <paramref name="comparisonType"/> is not a
+        /// <see cref="StringComparison"/> value.
+        /// </exception>
         /// <remarks>
-        /// 
         /// Index numbering starts from zero. The <paramref name="startIndex"/> parameter is clamped to
         /// the valid range of the current instance. Values less than zero are treated as zero, and values
         /// greater than <see cref="Length" /> are treated as equal to <see cref="Length" />.
@@ -4176,7 +3809,6 @@ namespace J2N.Text
         /// <para/>
         /// On older platforms than .NET Core, this overload provides optimizations for
         /// <see cref="StringComparison.OrdinalIgnoreCase"/> over and above the System.Memory package.
-        /// 
         /// </remarks>
         public int IndexOf(string value, int startIndex, StringComparison comparisonType)
         {
@@ -4187,17 +3819,11 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// 
         /// Reports the zero-based index of the first occurrence of the specified span beginning
         /// at the specified index in this instance.
-        /// 
         /// </summary>
-        /// <param name="value">
-        /// The span to find.
-        /// </param>
-        /// <param name="startIndex">
-        /// The search starting position.
-        /// </param>
+        /// <param name="value">The span to find.</param>
+        /// <param name="startIndex">The search starting position.</param>
         /// <param name="comparisonType">
         /// One of the enumeration values that determines how the current instance
         /// and <paramref name="value"/> are compared.
@@ -4208,8 +3834,11 @@ namespace J2N.Text
         /// If <paramref name="value"/> is empty, the return value is the effective start index
         /// after clamping.
         /// </returns>
+        /// <exception cref="ArgumentException">
+        /// <paramref name="comparisonType"/> is not a
+        /// <see cref="StringComparison"/> value.
+        /// </exception>
         /// <remarks>
-        /// 
         /// Index numbering starts from zero. The <paramref name="startIndex"/> parameter is clamped to
         /// the valid range of the current instance. Values less than zero are treated as zero, and values
         /// greater than <see cref="Length" /> are treated as equal to <see cref="Length" />.
@@ -4228,7 +3857,6 @@ namespace J2N.Text
         /// <para/>
         /// On older platforms than .NET Core, this overload provides optimizations for
         /// <see cref="StringComparison.OrdinalIgnoreCase"/> over and above the System.Memory package.
-        /// 
         /// </remarks>
         public int IndexOf(ReadOnlySpan<char> value, int startIndex, StringComparison comparisonType)
         {
@@ -4239,20 +3867,15 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// 
         /// Reports the zero-based index position of the last occurrence of a specified Unicode character
         /// within this instance.
-        /// 
         /// </summary>
-        /// <param name="value">
-        /// The Unicode character to seek.
-        /// </param>
+        /// <param name="value">The Unicode character to seek.</param>
         /// <returns>
         /// The zero-based index of the last occurrence of the value in the
         /// span. If not found, returns -1.
         /// </returns>
         /// <remarks>
-        /// 
         /// Index numbering starts from zero. That is, the first character in the current instance
         /// is at index zero and the last is at <see cref="Length"/> - 1.
         /// <para/>
@@ -4263,7 +3886,6 @@ namespace J2N.Text
         /// This method performs an ordinal (culture-insensitive) search, where a character is
         /// considered equivalent to another character only if their Unicode scalar values are
         /// the same.
-        /// 
         /// </remarks>
         public int LastIndexOf(char value)
         {
@@ -4274,21 +3896,17 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// 
         /// Reports the zero-based index of the last occurrence of the specified string in
         /// this instance.
-        /// 
         /// </summary>
-        /// <param name="value">
-        /// The string to find.
-        /// </param>
+        /// <param name="value">The string to find.</param>
         /// <returns>
         /// The zero-based starting index position of value if that string is found, or -1
         /// if it is not found. If <paramref name="value"/> is <see cref="string.Empty"/>,
         /// it returns <see cref="Length"/>.
         /// </returns>
+        /// <exception cref="ArgumentNullException"><paramref name="value"/> is <c>null</c>.</exception>
         /// <remarks>
-        /// 
         /// Index numbering starts from zero. That is, the first character in the current instance
         /// is at index zero and the last is at <see cref="Length"/> - 1.
         /// <para/>
@@ -4302,7 +3920,6 @@ namespace J2N.Text
         /// <para/>
         /// To match the behavior of the JDK, this method allows searches for the empty string, which will
         /// always return <see cref="Length"/>.
-        /// 
         /// </remarks>
         public int LastIndexOf(string value)
         {
@@ -4313,21 +3930,16 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// 
         /// Reports the zero-based index of the last occurrence of the specified string in
         /// this instance.
-        /// 
         /// </summary>
-        /// <param name="value">
-        /// The span to find.
-        /// </param>
+        /// <param name="value">The span to find.</param>
         /// <returns>
         /// The zero-based starting index position of value if that span is found, or -1
         /// if it is not found. If <paramref name="value"/> is <see cref="ReadOnlySpan{Char}.Empty"/>,
         /// it returns <see cref="Length"/>.
         /// </returns>
         /// <remarks>
-        /// 
         /// Index numbering starts from zero. That is, the first character in the current instance
         /// is at index zero and the last is at <see cref="Length"/> - 1.
         /// <para/>
@@ -4341,7 +3953,6 @@ namespace J2N.Text
         /// <para/>
         /// To match the behavior of the JDK, this method allows searches for the empty span, which will
         /// always return <see cref="Length"/>.
-        /// 
         /// </remarks>
         public int LastIndexOf(ReadOnlySpan<char> value)
         {
@@ -4352,14 +3963,10 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// 
         /// Reports the zero-based index of the last occurrence of the specified string beginning
         /// at the specified index in this instance.
-        /// 
         /// </summary>
-        /// <param name="value">
-        /// The string to find.
-        /// </param>
+        /// <param name="value">The string to find.</param>
         /// <param name="startIndex">
         /// The search starting position. The search proceeds from
         /// <paramref name="startIndex"/> toward the beginning of this instance.
@@ -4371,8 +3978,8 @@ namespace J2N.Text
         /// if <paramref name="startIndex"/> is greater than <see cref="Length"/>, it
         /// returns <see cref="Length"/>.
         /// </returns>
+        /// <exception cref="ArgumentNullException"><paramref name="value"/> is <c>null</c>.</exception>
         /// <remarks>
-        /// 
         /// Index numbering starts from zero. That is, the first character in the current instance
         /// is at index zero and the last is at <see cref="Length"/> - 1.
         /// <para/>
@@ -4393,7 +4000,6 @@ namespace J2N.Text
         /// <para/>
         /// If <paramref name="startIndex"/> is less than zero, the method returns -1. If it is greater than
         /// <see cref="Length"/>, it is treated as equal to <see cref="Length"/>.
-        /// 
         /// </remarks>
         public int LastIndexOf(string value, int startIndex)
         {
@@ -4404,14 +4010,10 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// 
         /// Reports the zero-based index of the last occurrence of the specified span beginning
         /// at the specified index in this instance.
-        /// 
         /// </summary>
-        /// <param name="value">
-        /// The span to find.
-        /// </param>
+        /// <param name="value">The span to find.</param>
         /// <param name="startIndex">
         /// The search starting position. The search proceeds from startIndex toward the
         /// beginning of this instance.
@@ -4424,7 +4026,6 @@ namespace J2N.Text
         /// returns <see cref="Length"/>.
         /// </returns>
         /// <remarks>
-        /// 
         /// Index numbering starts from zero. That is, the first character in the current instance
         /// is at index zero and the last is at <see cref="Length"/> - 1.
         /// <para/>
@@ -4445,7 +4046,6 @@ namespace J2N.Text
         /// <para/>
         /// If <paramref name="startIndex"/> is less than zero, the method returns -1. If it is greater than
         /// <see cref="Length"/>, it is treated as equal to <see cref="Length"/>.
-        /// 
         /// </remarks>
         public int LastIndexOf(ReadOnlySpan<char> value, int startIndex)
         {
@@ -4456,14 +4056,10 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// 
         /// Reports the zero-based index of the last occurrence of the specified string in the
         /// this instance.
-        /// 
         /// </summary>
-        /// <param name="value">
-        /// The string to find.
-        /// </param>
+        /// <param name="value">The string to find.</param>
         /// <param name="comparisonType">
         /// One of the enumeration values that determines how the current instance
         /// and <paramref name="value"/> are compared.
@@ -4473,8 +4069,12 @@ namespace J2N.Text
         /// if it is not found. If <paramref name="value"/> is <see cref="string.Empty"/>,
         /// it returns <see cref="Length"/>.
         /// </returns>
+        /// <exception cref="ArgumentNullException"><paramref name="value"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentException">
+        /// <paramref name="comparisonType"/> is not a
+        /// <see cref="StringComparison"/> value.
+        /// </exception>
         /// <remarks>
-        /// 
         /// Index numbering starts from zero. That is, the first character in the current instance
         /// is at index zero and the last is at <see cref="Length"/> - 1.
         /// <para/>
@@ -4491,7 +4091,6 @@ namespace J2N.Text
         /// <para/>
         /// On older platforms than .NET Core, this overload provides optimizations for
         /// <see cref="StringComparison.OrdinalIgnoreCase"/> over and above the System.Memory package.
-        /// 
         /// </remarks>
         public int LastIndexOf(string value, StringComparison comparisonType)
         {
@@ -4502,14 +4101,10 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// 
         /// Reports the zero-based index of the last occurrence of the specified span in the
         /// this instance.
-        /// 
         /// </summary>
-        /// <param name="value">
-        /// The span to find.
-        /// </param>
+        /// <param name="value">The span to find.</param>
         /// <param name="comparisonType">
         /// One of the enumeration values that determines how the current instance
         /// and <paramref name="value"/> are compared.
@@ -4519,8 +4114,11 @@ namespace J2N.Text
         /// if it is not found. If <paramref name="value"/> is <see cref="ReadOnlySpan{Char}.Empty"/>,
         /// it returns <see cref="Length"/>.
         /// </returns>
+        /// <exception cref="ArgumentException">
+        /// <paramref name="comparisonType"/> is not a
+        /// <see cref="StringComparison"/> value.
+        /// </exception>
         /// <remarks>
-        /// 
         /// Index numbering starts from zero. That is, the first character in the current instance
         /// is at index zero and the last is at <see cref="Length"/> - 1.
         /// <para/>
@@ -4537,7 +4135,6 @@ namespace J2N.Text
         /// <para/>
         /// On older platforms than .NET Core, this overload provides optimizations for
         /// <see cref="StringComparison.OrdinalIgnoreCase"/> over and above the System.Memory package.
-        /// 
         /// </remarks>
         public int LastIndexOf(ReadOnlySpan<char> value, StringComparison comparisonType)
         {
@@ -4548,14 +4145,10 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// 
         /// Reports the zero-based index of the last occurrence of the specified string beginning
         /// at the specified index in this instance.
-        /// 
         /// </summary>
-        /// <param name="value">
-        /// The string to find.
-        /// </param>
+        /// <param name="value">The string to find.</param>
         /// <param name="startIndex">
         /// The search starting position. The search proceeds from <paramref name="startIndex"/> toward the
         /// beginning of this instance.
@@ -4571,8 +4164,12 @@ namespace J2N.Text
         /// <paramref name="startIndex"/> is greater than <see cref="Length"/>, it returns
         /// the <see cref="Length"/>.
         /// </returns>
+        /// <exception cref="ArgumentNullException"><paramref name="value"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentException">
+        /// <paramref name="comparisonType"/> is not a
+        /// <see cref="StringComparison"/> value.
+        /// </exception>
         /// <remarks>
-        /// 
         /// Index numbering starts from zero. That is, the first character in the current instance
         /// is at index zero and the last is at <see cref="Length"/> - 1.
         /// <para/>
@@ -4596,7 +4193,6 @@ namespace J2N.Text
         /// <para/>
         /// On older platforms than .NET Core, this overload provides optimizations for
         /// <see cref="StringComparison.OrdinalIgnoreCase"/> over and above the System.Memory package.
-        /// 
         /// </remarks>
         public int LastIndexOf(string value, int startIndex, StringComparison comparisonType)
         {
@@ -4607,14 +4203,10 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// 
         /// Reports the zero-based index of the last occurrence of the specified span  beginning
         /// at the specified index in this instance.
-        /// 
         /// </summary>
-        /// <param name="value">
-        /// The span to find.
-        /// </param>
+        /// <param name="value">The span to find.</param>
         /// <param name="startIndex">
         /// The search starting position. The search proceeds from <paramref name="startIndex"/> toward the
         /// beginning of this instance.
@@ -4630,8 +4222,11 @@ namespace J2N.Text
         /// <paramref name="startIndex"/> is greater than <see cref="Length"/>, it returns
         /// the <see cref="Length"/>.
         /// </returns>
+        /// <exception cref="ArgumentException">
+        /// <paramref name="comparisonType"/> is not a
+        /// <see cref="StringComparison"/> value.
+        /// </exception>
         /// <remarks>
-        /// 
         /// Index numbering starts from zero. That is, the first character in the current instance
         /// is at index zero and the last is at <see cref="Length"/> - 1.
         /// <para/>
@@ -4655,7 +4250,6 @@ namespace J2N.Text
         /// <para/>
         /// On older platforms than .NET Core, this overload provides optimizations for
         /// <see cref="StringComparison.OrdinalIgnoreCase"/> over and above the System.Memory package.
-        /// 
         /// </remarks>
         public int LastIndexOf(ReadOnlySpan<char> value, int startIndex, StringComparison comparisonType)
         {
@@ -4666,28 +4260,18 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// 
         /// Appends the string representation of a specified 8-bit signed integer to this instance
         /// with the specified numeric format and culture-specific format information.
         /// <para/>
         /// Unless otherwise specified, formatting is performed in the invariant culture, which
         /// is similar to how the JDK formats numbers.
-        /// 
         /// </summary>
-        /// <param name="value">
-        /// The value to format and append.
-        /// </param>
-        /// <param name="format">
-        /// A standard or custom numeric format string.
-        /// </param>
-        /// <param name="provider">
-        /// An object that supplies culture-specific formatting information.
-        /// </param>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
+        /// <param name="value">The value to format and append.</param>
+        /// <param name="format">A standard or custom numeric format string.</param>
+        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
         /// <remarks>
-        /// 
         /// This method allows similar options as the <c>AppendFormat</c> methods, but has better performance because
         /// the value being formatted is not boxed.
         /// <para/>
@@ -4699,8 +4283,8 @@ namespace J2N.Text
         /// both the length and the capacity of the <see cref="SynchronizedTextBuilder"/> instance can grow beyond
         /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
-        /// 
         /// </remarks>
+        /// <seealso cref="sbyte" />
         [CLSCompliant(false)]
         public SynchronizedTextBuilder Append(sbyte value, string? format = null, IFormatProvider? provider = null)
         {
@@ -4712,28 +4296,18 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// 
         /// Appends the string representation of a specified 8-bit unsigned integer to this instance
         /// with the specified numeric format and culture-specific format information.
         /// <para/>
         /// Unless otherwise specified, formatting is performed in the invariant culture, which
         /// is similar to how the JDK formats numbers.
-        /// 
         /// </summary>
-        /// <param name="value">
-        /// The value to format and append.
-        /// </param>
-        /// <param name="format">
-        /// A standard or custom numeric format string.
-        /// </param>
-        /// <param name="provider">
-        /// An object that supplies culture-specific formatting information.
-        /// </param>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
+        /// <param name="value">The value to format and append.</param>
+        /// <param name="format">A standard or custom numeric format string.</param>
+        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
         /// <remarks>
-        /// 
         /// This method allows similar options as the <c>AppendFormat</c> methods, but has better performance because
         /// the value being formatted is not boxed.
         /// <para/>
@@ -4745,8 +4319,8 @@ namespace J2N.Text
         /// both the length and the capacity of the <see cref="SynchronizedTextBuilder"/> instance can grow beyond
         /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
-        /// 
         /// </remarks>
+        /// <seealso cref="byte" />
         public SynchronizedTextBuilder Append(byte value, string? format = null, IFormatProvider? provider = null)
         {
             lock (syncRoot)
@@ -4757,28 +4331,18 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// 
         /// Appends the string representation of a specified 16-bit signed integer to this instance
         /// with the specified numeric format and culture-specific format information.
         /// <para/>
         /// Unless otherwise specified, formatting is performed in the invariant culture, which
         /// is similar to how the JDK formats numbers.
-        /// 
         /// </summary>
-        /// <param name="value">
-        /// The value to format and append.
-        /// </param>
-        /// <param name="format">
-        /// A standard or custom numeric format string.
-        /// </param>
-        /// <param name="provider">
-        /// An object that supplies culture-specific formatting information.
-        /// </param>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
+        /// <param name="value">The value to format and append.</param>
+        /// <param name="format">A standard or custom numeric format string.</param>
+        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
         /// <remarks>
-        /// 
         /// This method allows similar options as the <c>AppendFormat</c> methods, but has better performance because
         /// the value being formatted is not boxed.
         /// <para/>
@@ -4790,8 +4354,8 @@ namespace J2N.Text
         /// both the length and the capacity of the <see cref="SynchronizedTextBuilder"/> instance can grow beyond
         /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
-        /// 
         /// </remarks>
+        /// <seealso cref="short" />
         public SynchronizedTextBuilder Append(short value, string? format = null, IFormatProvider? provider = null)
         {
             lock (syncRoot)
@@ -4802,28 +4366,18 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// 
         /// Appends the string representation of a specified 32-bit signed integer to this instance
         /// with the specified numeric format and culture-specific format information.
         /// <para/>
         /// Unless otherwise specified, formatting is performed in the invariant culture, which
         /// is similar to how the JDK formats numbers.
-        /// 
         /// </summary>
-        /// <param name="value">
-        /// The value to format and append.
-        /// </param>
-        /// <param name="format">
-        /// A standard or custom numeric format string.
-        /// </param>
-        /// <param name="provider">
-        /// An object that supplies culture-specific formatting information.
-        /// </param>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
+        /// <param name="value">The value to format and append.</param>
+        /// <param name="format">A standard or custom numeric format string.</param>
+        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
         /// <remarks>
-        /// 
         /// This method allows similar options as the <c>AppendFormat</c> methods, but has better performance because
         /// the value being formatted is not boxed.
         /// <para/>
@@ -4835,8 +4389,8 @@ namespace J2N.Text
         /// both the length and the capacity of the <see cref="SynchronizedTextBuilder"/> instance can grow beyond
         /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
-        /// 
         /// </remarks>
+        /// <seealso cref="int" />
         public SynchronizedTextBuilder Append(int value, string? format = null, IFormatProvider? provider = null)
         {
             lock (syncRoot)
@@ -4847,28 +4401,18 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// 
         /// Appends the string representation of a specified 64-bit signed integer to this instance
         /// with the specified numeric format and culture-specific format information.
         /// <para/>
         /// Unless otherwise specified, formatting is performed in the invariant culture, which
         /// is similar to how the JDK formats numbers.
-        /// 
         /// </summary>
-        /// <param name="value">
-        /// The value to format and append.
-        /// </param>
-        /// <param name="format">
-        /// A standard or custom numeric format string.
-        /// </param>
-        /// <param name="provider">
-        /// An object that supplies culture-specific formatting information.
-        /// </param>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
+        /// <param name="value">The value to format and append.</param>
+        /// <param name="format">A standard or custom numeric format string.</param>
+        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
         /// <remarks>
-        /// 
         /// This method allows similar options as the <c>AppendFormat</c> methods, but has better performance because
         /// the value being formatted is not boxed.
         /// <para/>
@@ -4880,8 +4424,8 @@ namespace J2N.Text
         /// both the length and the capacity of the <see cref="SynchronizedTextBuilder"/> instance can grow beyond
         /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
-        /// 
         /// </remarks>
+        /// <seealso cref="long" />
         public SynchronizedTextBuilder Append(long value, string? format = null, IFormatProvider? provider = null)
         {
             lock (syncRoot)
@@ -4892,28 +4436,18 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// 
         /// Appends the string representation of a specified single-precision floating-point number to this instance
         /// with the specified numeric format and culture-specific format information.
         /// <para/>
         /// Unless otherwise specified, formatting is performed in the invariant culture using the "J" format, which
         /// is similar to how the JDK formats numbers.
-        /// 
         /// </summary>
-        /// <param name="value">
-        /// The value to format and append.
-        /// </param>
-        /// <param name="format">
-        /// A standard or custom numeric format string.
-        /// </param>
-        /// <param name="provider">
-        /// An object that supplies culture-specific formatting information.
-        /// </param>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
+        /// <param name="value">The value to format and append.</param>
+        /// <param name="format">A standard or custom numeric format string.</param>
+        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
         /// <remarks>
-        /// 
         /// This method allows similar options as the <c>AppendFormat</c> methods, but has better performance because
         /// the value being formatted is not boxed.
         /// <para/>
@@ -4925,8 +4459,8 @@ namespace J2N.Text
         /// both the length and the capacity of the <see cref="SynchronizedTextBuilder"/> instance can grow beyond
         /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
-        /// 
         /// </remarks>
+        /// <seealso cref="float" />
         public SynchronizedTextBuilder Append(float value, string? format = null, IFormatProvider? provider = null)
         {
             lock (syncRoot)
@@ -4937,28 +4471,18 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// 
         /// Appends the string representation of a specified double-precision floating-point number to this instance
         /// with the specified numeric format and culture-specific format information.
         /// <para/>
         /// Unless otherwise specified, formatting is performed in the invariant culture using the "J" format, which
         /// is similar to how the JDK formats numbers.
-        /// 
         /// </summary>
-        /// <param name="value">
-        /// The value to format and append.
-        /// </param>
-        /// <param name="format">
-        /// A standard or custom numeric format string.
-        /// </param>
-        /// <param name="provider">
-        /// An object that supplies culture-specific formatting information.
-        /// </param>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
+        /// <param name="value">The value to format and append.</param>
+        /// <param name="format">A standard or custom numeric format string.</param>
+        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
         /// <remarks>
-        /// 
         /// This method allows similar options as the <c>AppendFormat</c> methods, but has better performance because
         /// the value being formatted is not boxed.
         /// <para/>
@@ -4970,8 +4494,8 @@ namespace J2N.Text
         /// both the length and the capacity of the <see cref="SynchronizedTextBuilder"/> instance can grow beyond
         /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
-        /// 
         /// </remarks>
+        /// <seealso cref="double" />
         public SynchronizedTextBuilder Append(double value, string? format = null, IFormatProvider? provider = null)
         {
             lock (syncRoot)
@@ -4982,28 +4506,18 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// 
         /// Appends the string representation of a specified 16-bit unsigned integer to this instance
         /// with the specified numeric format and culture-specific format information.
         /// <para/>
         /// Unless otherwise specified, formatting is performed in the invariant culture, which
         /// is similar to how the JDK formats numbers.
-        /// 
         /// </summary>
-        /// <param name="value">
-        /// The value to format and append.
-        /// </param>
-        /// <param name="format">
-        /// A standard or custom numeric format string.
-        /// </param>
-        /// <param name="provider">
-        /// An object that supplies culture-specific formatting information.
-        /// </param>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
+        /// <param name="value">The value to format and append.</param>
+        /// <param name="format">A standard or custom numeric format string.</param>
+        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
         /// <remarks>
-        /// 
         /// This method allows similar options as the <c>AppendFormat</c> methods, but has better performance because
         /// the value being formatted is not boxed.
         /// <para/>
@@ -5015,8 +4529,8 @@ namespace J2N.Text
         /// both the length and the capacity of the <see cref="SynchronizedTextBuilder"/> instance can grow beyond
         /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
-        /// 
         /// </remarks>
+        /// <seealso cref="ushort" />
         [CLSCompliant(false)]
         public SynchronizedTextBuilder Append(ushort value, string? format = null, IFormatProvider? provider = null)
         {
@@ -5028,28 +4542,18 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// 
         /// Appends the string representation of a specified 32-bit unsigned integer to this instance
         /// with the specified numeric format and culture-specific format information.
         /// <para/>
         /// Unless otherwise specified, formatting is performed in the invariant culture, which
         /// is similar to how the JDK formats numbers.
-        /// 
         /// </summary>
-        /// <param name="value">
-        /// The value to format and append.
-        /// </param>
-        /// <param name="format">
-        /// A standard or custom numeric format string.
-        /// </param>
-        /// <param name="provider">
-        /// An object that supplies culture-specific formatting information.
-        /// </param>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
+        /// <param name="value">The value to format and append.</param>
+        /// <param name="format">A standard or custom numeric format string.</param>
+        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
         /// <remarks>
-        /// 
         /// This method allows similar options as the <c>AppendFormat</c> methods, but has better performance because
         /// the value being formatted is not boxed.
         /// <para/>
@@ -5061,8 +4565,8 @@ namespace J2N.Text
         /// both the length and the capacity of the <see cref="SynchronizedTextBuilder"/> instance can grow beyond
         /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
-        /// 
         /// </remarks>
+        /// <seealso cref="uint" />
         [CLSCompliant(false)]
         public SynchronizedTextBuilder Append(uint value, string? format = null, IFormatProvider? provider = null)
         {
@@ -5074,28 +4578,18 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// 
         /// Appends the string representation of a specified 64-bit unsigned integer to this instance
         /// with the specified numeric format and culture-specific format information.
         /// <para/>
         /// Unless otherwise specified, formatting is performed in the invariant culture, which
         /// is similar to how the JDK formats numbers.
-        /// 
         /// </summary>
-        /// <param name="value">
-        /// The value to format and append.
-        /// </param>
-        /// <param name="format">
-        /// A standard or custom numeric format string.
-        /// </param>
-        /// <param name="provider">
-        /// An object that supplies culture-specific formatting information.
-        /// </param>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
+        /// <param name="value">The value to format and append.</param>
+        /// <param name="format">A standard or custom numeric format string.</param>
+        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
         /// <remarks>
-        /// 
         /// This method allows similar options as the <c>AppendFormat</c> methods, but has better performance because
         /// the value being formatted is not boxed.
         /// <para/>
@@ -5107,8 +4601,8 @@ namespace J2N.Text
         /// both the length and the capacity of the <see cref="SynchronizedTextBuilder"/> instance can grow beyond
         /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
         /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
-        /// 
         /// </remarks>
+        /// <seealso cref="ulong" />
         [CLSCompliant(false)]
         public SynchronizedTextBuilder Append(ulong value, string? format = null, IFormatProvider? provider = null)
         {
@@ -5120,34 +4614,28 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// 
         /// Inserts the string representation of a specified 8-bit signed integer to this instance
         /// with the specified numeric format and culture-specific format information.
         /// <para/>
         /// Unless otherwise specified, formatting is performed in the invariant culture, which
         /// is similar to how the JDK formats numbers.
-        /// 
         /// </summary>
-        /// <param name="index">
-        /// The position in this instance where insertion begins.
-        /// </param>
-        /// <param name="value">
-        /// The value to format and append.
-        /// </param>
-        /// <param name="format">
-        /// A standard or custom numeric format string.
-        /// </param>
-        /// <param name="provider">
-        /// An object that supplies culture-specific formatting information.
-        /// </param>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
-        /// <remarks>
-        /// 
-        /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
-        /// 
-        /// </remarks>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">The value to format and append.</param>
+        /// <param name="format">A standard or custom numeric format string.</param>
+        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="index"/> is less than zero or greater than the current length of this instance.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// The current length of this <see cref="SynchronizedTextBuilder"/> object plus the length of
+        /// <paramref name="value"/> exceeds <see cref="MaxCapacity"/>.
+        /// </exception>
+        /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
+        /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
+        /// <seealso cref="sbyte" />
         [CLSCompliant(false)]
         public SynchronizedTextBuilder Insert(int index, sbyte value, string? format = null, IFormatProvider? provider = null)
         {
@@ -5159,34 +4647,28 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// 
         /// Inserts the string representation of a specified 8-bit unsigned integer to this instance
         /// with the specified numeric format and culture-specific format information.
         /// <para/>
         /// Unless otherwise specified, formatting is performed in the invariant culture, which
         /// is similar to how the JDK formats numbers.
-        /// 
         /// </summary>
-        /// <param name="index">
-        /// The position in this instance where insertion begins.
-        /// </param>
-        /// <param name="value">
-        /// The value to format and append.
-        /// </param>
-        /// <param name="format">
-        /// A standard or custom numeric format string.
-        /// </param>
-        /// <param name="provider">
-        /// An object that supplies culture-specific formatting information.
-        /// </param>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
-        /// <remarks>
-        /// 
-        /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
-        /// 
-        /// </remarks>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">The value to format and append.</param>
+        /// <param name="format">A standard or custom numeric format string.</param>
+        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="index"/> is less than zero or greater than the current length of this instance.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// The current length of this <see cref="SynchronizedTextBuilder"/> object plus the length of
+        /// <paramref name="value"/> exceeds <see cref="MaxCapacity"/>.
+        /// </exception>
+        /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
+        /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
+        /// <seealso cref="byte" />
         public SynchronizedTextBuilder Insert(int index, byte value, string? format = null, IFormatProvider? provider = null)
         {
             lock (syncRoot)
@@ -5197,34 +4679,28 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// 
         /// Inserts the string representation of a specified 16-bit signed integer to this instance
         /// with the specified numeric format and culture-specific format information.
         /// <para/>
         /// Unless otherwise specified, formatting is performed in the invariant culture, which
         /// is similar to how the JDK formats numbers.
-        /// 
         /// </summary>
-        /// <param name="index">
-        /// The position in this instance where insertion begins.
-        /// </param>
-        /// <param name="value">
-        /// The value to format and append.
-        /// </param>
-        /// <param name="format">
-        /// A standard or custom numeric format string.
-        /// </param>
-        /// <param name="provider">
-        /// An object that supplies culture-specific formatting information.
-        /// </param>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
-        /// <remarks>
-        /// 
-        /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
-        /// 
-        /// </remarks>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">The value to format and append.</param>
+        /// <param name="format">A standard or custom numeric format string.</param>
+        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="index"/> is less than zero or greater than the current length of this instance.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// The current length of this <see cref="SynchronizedTextBuilder"/> object plus the length of
+        /// <paramref name="value"/> exceeds <see cref="MaxCapacity"/>.
+        /// </exception>
+        /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
+        /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
+        /// <seealso cref="short" />
         public SynchronizedTextBuilder Insert(int index, short value, string? format = null, IFormatProvider? provider = null)
         {
             lock (syncRoot)
@@ -5235,34 +4711,28 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// 
         /// Inserts the string representation of a specified 32-bit signed integer to this instance
         /// with the specified numeric format and culture-specific format information.
         /// <para/>
         /// Unless otherwise specified, formatting is performed in the invariant culture, which
         /// is similar to how the JDK formats numbers.
-        /// 
         /// </summary>
-        /// <param name="index">
-        /// The position in this instance where insertion begins.
-        /// </param>
-        /// <param name="value">
-        /// The value to format and append.
-        /// </param>
-        /// <param name="format">
-        /// A standard or custom numeric format string.
-        /// </param>
-        /// <param name="provider">
-        /// An object that supplies culture-specific formatting information.
-        /// </param>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
-        /// <remarks>
-        /// 
-        /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
-        /// 
-        /// </remarks>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">The value to format and append.</param>
+        /// <param name="format">A standard or custom numeric format string.</param>
+        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="index"/> is less than zero or greater than the current length of this instance.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// The current length of this <see cref="SynchronizedTextBuilder"/> object plus the length of
+        /// <paramref name="value"/> exceeds <see cref="MaxCapacity"/>.
+        /// </exception>
+        /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
+        /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
+        /// <seealso cref="int" />
         public SynchronizedTextBuilder Insert(int index, int value, string? format = null, IFormatProvider? provider = null)
         {
             lock (syncRoot)
@@ -5273,34 +4743,28 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// 
         /// Inserts the string representation of a specified 64-bit signed integer to this instance
         /// with the specified numeric format and culture-specific format information.
         /// <para/>
         /// Unless otherwise specified, formatting is performed in the invariant culture, which
         /// is similar to how the JDK formats numbers.
-        /// 
         /// </summary>
-        /// <param name="index">
-        /// The position in this instance where insertion begins.
-        /// </param>
-        /// <param name="value">
-        /// The value to format and append.
-        /// </param>
-        /// <param name="format">
-        /// A standard or custom numeric format string.
-        /// </param>
-        /// <param name="provider">
-        /// An object that supplies culture-specific formatting information.
-        /// </param>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
-        /// <remarks>
-        /// 
-        /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
-        /// 
-        /// </remarks>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">The value to format and append.</param>
+        /// <param name="format">A standard or custom numeric format string.</param>
+        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="index"/> is less than zero or greater than the current length of this instance.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// The current length of this <see cref="SynchronizedTextBuilder"/> object plus the length of
+        /// <paramref name="value"/> exceeds <see cref="MaxCapacity"/>.
+        /// </exception>
+        /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
+        /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
+        /// <seealso cref="long" />
         public SynchronizedTextBuilder Insert(int index, long value, string? format = null, IFormatProvider? provider = null)
         {
             lock (syncRoot)
@@ -5311,34 +4775,28 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// 
         /// Inserts the string representation of a specified single-precision floating-point number to this instance
         /// with the specified numeric format and culture-specific format information.
         /// <para/>
         /// Unless otherwise specified, formatting is performed in the invariant culture using the "J" format, which
         /// is similar to how the JDK formats numbers.
-        /// 
         /// </summary>
-        /// <param name="index">
-        /// The position in this instance where insertion begins.
-        /// </param>
-        /// <param name="value">
-        /// The value to format and append.
-        /// </param>
-        /// <param name="format">
-        /// A standard or custom numeric format string.
-        /// </param>
-        /// <param name="provider">
-        /// An object that supplies culture-specific formatting information.
-        /// </param>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
-        /// <remarks>
-        /// 
-        /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
-        /// 
-        /// </remarks>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">The value to format and append.</param>
+        /// <param name="format">A standard or custom numeric format string.</param>
+        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="index"/> is less than zero or greater than the current length of this instance.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// The current length of this <see cref="SynchronizedTextBuilder"/> object plus the length of
+        /// <paramref name="value"/> exceeds <see cref="MaxCapacity"/>.
+        /// </exception>
+        /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
+        /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
+        /// <seealso cref="float" />
         public SynchronizedTextBuilder Insert(int index, float value, string? format = null, IFormatProvider? provider = null)
         {
             lock (syncRoot)
@@ -5349,34 +4807,28 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// 
         /// Inserts the string representation of a specified double-precision floating-point number to this instance
         /// with the specified numeric format and culture-specific format information.
         /// <para/>
         /// Unless otherwise specified, formatting is performed in the invariant culture using the "J" format, which
         /// is similar to how the JDK formats numbers.
-        /// 
         /// </summary>
-        /// <param name="index">
-        /// The position in this instance where insertion begins.
-        /// </param>
-        /// <param name="value">
-        /// The value to format and append.
-        /// </param>
-        /// <param name="format">
-        /// A standard or custom numeric format string.
-        /// </param>
-        /// <param name="provider">
-        /// An object that supplies culture-specific formatting information.
-        /// </param>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
-        /// <remarks>
-        /// 
-        /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
-        /// 
-        /// </remarks>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">The value to format and append.</param>
+        /// <param name="format">A standard or custom numeric format string.</param>
+        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="index"/> is less than zero or greater than the current length of this instance.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// The current length of this <see cref="SynchronizedTextBuilder"/> object plus the length of
+        /// <paramref name="value"/> exceeds <see cref="MaxCapacity"/>.
+        /// </exception>
+        /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
+        /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
+        /// <seealso cref="double" />
         public SynchronizedTextBuilder Insert(int index, double value, string? format = null, IFormatProvider? provider = null)
         {
             lock (syncRoot)
@@ -5387,34 +4839,28 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// 
         /// Inserts the string representation of a specified 16-bit unsigned integer to this instance
         /// with the specified numeric format and culture-specific format information.
         /// <para/>
         /// Unless otherwise specified, formatting is performed in the invariant culture, which
         /// is similar to how the JDK formats numbers.
-        /// 
         /// </summary>
-        /// <param name="index">
-        /// The position in this instance where insertion begins.
-        /// </param>
-        /// <param name="value">
-        /// The value to format and append.
-        /// </param>
-        /// <param name="format">
-        /// A standard or custom numeric format string.
-        /// </param>
-        /// <param name="provider">
-        /// An object that supplies culture-specific formatting information.
-        /// </param>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
-        /// <remarks>
-        /// 
-        /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
-        /// 
-        /// </remarks>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">The value to format and append.</param>
+        /// <param name="format">A standard or custom numeric format string.</param>
+        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="index"/> is less than zero or greater than the current length of this instance.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// The current length of this <see cref="SynchronizedTextBuilder"/> object plus the length of
+        /// <paramref name="value"/> exceeds <see cref="MaxCapacity"/>.
+        /// </exception>
+        /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
+        /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
+        /// <seealso cref="ushort" />
         [CLSCompliant(false)]
         public SynchronizedTextBuilder Insert(int index, ushort value, string? format = null, IFormatProvider? provider = null)
         {
@@ -5426,34 +4872,28 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// 
         /// Inserts the string representation of a specified 32-bit unsigned integer to this instance
         /// with the specified numeric format and culture-specific format information.
         /// <para/>
         /// Unless otherwise specified, formatting is performed in the invariant culture, which
         /// is similar to how the JDK formats numbers.
-        /// 
         /// </summary>
-        /// <param name="index">
-        /// The position in this instance where insertion begins.
-        /// </param>
-        /// <param name="value">
-        /// The value to format and append.
-        /// </param>
-        /// <param name="format">
-        /// A standard or custom numeric format string.
-        /// </param>
-        /// <param name="provider">
-        /// An object that supplies culture-specific formatting information.
-        /// </param>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
-        /// <remarks>
-        /// 
-        /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
-        /// 
-        /// </remarks>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">The value to format and append.</param>
+        /// <param name="format">A standard or custom numeric format string.</param>
+        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="index"/> is less than zero or greater than the current length of this instance.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// The current length of this <see cref="SynchronizedTextBuilder"/> object plus the length of
+        /// <paramref name="value"/> exceeds <see cref="MaxCapacity"/>.
+        /// </exception>
+        /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
+        /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
+        /// <seealso cref="uint" />
         [CLSCompliant(false)]
         public SynchronizedTextBuilder Insert(int index, uint value, string? format = null, IFormatProvider? provider = null)
         {
@@ -5465,34 +4905,28 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// 
         /// Inserts the string representation of a specified 64-bit unsigned integer to this instance
         /// with the specified numeric format and culture-specific format information.
         /// <para/>
         /// Unless otherwise specified, formatting is performed in the invariant culture, which
         /// is similar to how the JDK formats numbers.
-        /// 
         /// </summary>
-        /// <param name="index">
-        /// The position in this instance where insertion begins.
-        /// </param>
-        /// <param name="value">
-        /// The value to format and append.
-        /// </param>
-        /// <param name="format">
-        /// A standard or custom numeric format string.
-        /// </param>
-        /// <param name="provider">
-        /// An object that supplies culture-specific formatting information.
-        /// </param>
-        /// <returns>
-        /// A reference to this instance after the operation has completed.
-        /// </returns>
-        /// <remarks>
-        /// 
-        /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
-        /// 
-        /// </remarks>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">The value to format and append.</param>
+        /// <param name="format">A standard or custom numeric format string.</param>
+        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="index"/> is less than zero or greater than the current length of this instance.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// The current length of this <see cref="SynchronizedTextBuilder"/> object plus the length of
+        /// <paramref name="value"/> exceeds <see cref="MaxCapacity"/>.
+        /// </exception>
+        /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
+        /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
+        /// <seealso cref="ulong" />
         [CLSCompliant(false)]
         public SynchronizedTextBuilder Insert(int index, ulong value, string? format = null, IFormatProvider? provider = null)
         {
