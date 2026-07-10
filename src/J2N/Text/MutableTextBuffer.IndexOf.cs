@@ -45,7 +45,7 @@ namespace J2N.Text
         /// the current instance if that sequence of characters is found, or -1 if it is not.
         /// If <paramref name="value"/> is <see cref="string.Empty"/>, the return value
         /// is 0.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="value"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="value"/> is <see langword="null"/>.</exception>
         /// <remarks>
         /// Index numbering starts from zero.
         /// <para/>
@@ -88,7 +88,7 @@ namespace J2N.Text
         /// the current instance if that sequence of characters is found, or -1 if it is not.
         /// If <paramref name="value"/> is empty, the return value is the effective start index
         /// after clamping.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="value"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="value"/> is <see langword="null"/>.</exception>
         /// <remarks>
         /// Index numbering starts from zero. The <paramref name="startIndex"/> parameter is clamped to
         /// the valid range of the current instance. Values less than zero are treated as zero, and values
@@ -149,7 +149,7 @@ namespace J2N.Text
         /// the current instance if that sequence of characters is found, or -1 if it is not.
         /// If <paramref name="value"/> is <see cref="string.Empty"/>, the return value
         /// is 0.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="value"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="value"/> is <see langword="null"/>.</exception>
         /// <remarks>
         /// Index numbering starts from zero.
         /// <para/>
@@ -176,7 +176,7 @@ namespace J2N.Text
         /// the current instance if that sequence of characters is found, or -1 if it is not.
         /// If <paramref name="value"/> is <see cref="ReadOnlySpan{T}.Empty"/>, the return value
         /// is 0.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="value"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="value"/> is <see langword="null"/>.</exception>
         /// <remarks>
         /// Index numbering starts from zero.
         /// <para/>
@@ -205,7 +205,7 @@ namespace J2N.Text
         /// the current instance if that sequence of characters is found, or -1 if it is not.
         /// If <paramref name="value"/> is empty, the return value is the effective start index
         /// after clamping.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="value"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="value"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentException"><paramref name="comparisonType"/> is not a
         /// <see cref="StringComparison"/> value.</exception>
         /// <remarks>
@@ -298,7 +298,7 @@ namespace J2N.Text
         /// <returns>The zero-based starting index position of value if that string is found, or -1
         /// if it is not found. If <paramref name="value"/> is <see cref="string.Empty"/>,
         /// it returns <see cref="Length"/>.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="value"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="value"/> is <see langword="null"/>.</exception>
         /// <remarks>
         /// Index numbering starts from zero. That is, the first character in the current instance
         /// is at index zero and the last is at <see cref="Length"/> - 1.
@@ -355,7 +355,7 @@ namespace J2N.Text
         /// it returns <paramref name="startIndex"/> if it is within the bounds of the current instance; otherwise,
         /// if <paramref name="startIndex"/> is greater than <see cref="Length"/>, it
         /// returns <see cref="Length"/>.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="value"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="value"/> is <see langword="null"/>.</exception>
         /// <remarks>
         /// Index numbering starts from zero. That is, the first character in the current instance
         /// is at index zero and the last is at <see cref="Length"/> - 1.
@@ -428,7 +428,7 @@ namespace J2N.Text
         /// <returns>The zero-based starting index position of value if that string is found, or -1
         /// if it is not found. If <paramref name="value"/> is <see cref="string.Empty"/>,
         /// it returns <see cref="Length"/>.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="value"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="value"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentException"><paramref name="comparisonType"/> is not a
         /// <see cref="StringComparison"/> value.</exception>
         /// <remarks>
@@ -499,7 +499,7 @@ namespace J2N.Text
         /// it returns <paramref name="startIndex"/> if it is within the bounds of the the current instance; otherwise, if
         /// <paramref name="startIndex"/> is greater than <see cref="Length"/>, it returns
         /// the <see cref="Length"/>.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="value"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="value"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentException"><paramref name="comparisonType"/> is not a
         /// <see cref="StringComparison"/> value.</exception>
         /// <remarks>

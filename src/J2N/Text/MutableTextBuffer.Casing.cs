@@ -34,7 +34,7 @@ namespace J2N.Text
         /// <remarks>
         /// The capacity of this instance is adjusted as needed.
         /// <para/>
-        /// If <paramref name="culture"/> is <c>null</c>, <see cref="CultureInfo.CurrentCulture"/> will be used.
+        /// If <paramref name="culture"/> is <see langword="null"/>, <see cref="CultureInfo.CurrentCulture"/> will be used.
         /// </remarks>
         [CodeGenerationReturnsSelf]
         public void AppendUpper(string? value, CultureInfo? culture)
@@ -49,7 +49,7 @@ namespace J2N.Text
         /// <remarks>
         /// The capacity of this instance is adjusted as needed.
         /// <para/>
-        /// If <paramref name="culture"/> is <c>null</c>, <see cref="CultureInfo.CurrentCulture"/> will be used.
+        /// If <paramref name="culture"/> is <see langword="null"/>, <see cref="CultureInfo.CurrentCulture"/> will be used.
         /// </remarks>
         [CodeGenerationReturnsSelf]
         public void AppendUpper(ReadOnlySpan<char> value, CultureInfo? culture)
@@ -84,7 +84,7 @@ namespace J2N.Text
         /// <remarks>
         /// The capacity of this instance is adjusted as needed.
         /// <para/>
-        /// If <paramref name="culture"/> is <c>null</c>, <see cref="CultureInfo.CurrentCulture"/> will be used.
+        /// If <paramref name="culture"/> is <see langword="null"/>, <see cref="CultureInfo.CurrentCulture"/> will be used.
         /// </remarks>
         [CodeGenerationReturnsSelf]
         public void AppendLower(string? value, CultureInfo? culture)

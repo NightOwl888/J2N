@@ -49,9 +49,9 @@ namespace J2N.Text
         /// Initializes a new instance of the <see cref="MutableTextBuffer"/> class using the specified string.
         /// </summary>
         /// <param name="value">The string used to initialize the value of the instance. If <paramref name="value"/>
-        /// is <c>null</c>, the new <see cref="MutableTextBuffer"/> will contain the empty string (that is, it
+        /// is <see langword="null"/>, the new <see cref="MutableTextBuffer"/> will contain the empty string (that is, it
         /// contains <see cref="string.Empty"/>).</param>
-        /// <remarks>If <paramref name="value"/> is <c>null</c>, the new <see cref="MutableTextBuffer"/> will
+        /// <remarks>If <paramref name="value"/> is <see langword="null"/>, the new <see cref="MutableTextBuffer"/> will
         /// contain the empty string (that is, it contains <see cref="string.Empty"/>).</remarks>
         [CodeGenerationIgnore]
         [CodeGenerationConstructor]
@@ -63,7 +63,7 @@ namespace J2N.Text
         /// and capacity.
         /// </summary>
         /// <param name="value">The string used to initialize the value of the instance. If <paramref name="value"/>
-        /// is <c>null</c>, the new <see cref="MutableTextBuffer"/> will contain the empty string (that is, it
+        /// is <see langword="null"/>, the new <see cref="MutableTextBuffer"/> will contain the empty string (that is, it
         /// contains <see cref="string.Empty"/>).</param>
         /// <param name="capacity">The suggested starting size of the <see cref="MutableTextBuffer"/>.</param>
         /// <exception cref="ArgumentOutOfRangeException">
@@ -87,7 +87,7 @@ namespace J2N.Text
         /// substring and capacity.
         /// </summary>
         /// <param name="value">The string that contains the substring used to initialize the value of this instance.
-        /// If <paramref name="value"/> is <c>null</c>, the new <see cref="MutableTextBuffer"/> will contain the empty
+        /// If <paramref name="value"/> is <see langword="null"/>, the new <see cref="MutableTextBuffer"/> will contain the empty
         /// string (that is, it contains <see cref="string.Empty"/>).</param>
         /// <param name="startIndex">The position within <paramref name="value"/> where the substring begins.</param>
         /// <param name="length">The number of characters in the substring.</param>
@@ -282,11 +282,11 @@ namespace J2N.Text
         /// <see cref="StringBuilder"/>.
         /// </summary>
         /// <param name="value">The string used to initialize the value of the instance. If <paramref name="value"/>
-        /// is <c>null</c>, the new <see cref="MutableTextBuffer"/> will contain the empty string (that is, it
+        /// is <see langword="null"/>, the new <see cref="MutableTextBuffer"/> will contain the empty string (that is, it
         /// contains <see cref="string.Empty"/>).</param>
         /// <exception cref="ArgumentOutOfRangeException">The length of <paramref name="value"/> is greater than the
         /// platform-specific maximum array capacity.</exception>
-        /// <remarks>If <paramref name="value"/> is <c>null</c>, the new <see cref="MutableTextBuffer"/> will
+        /// <remarks>If <paramref name="value"/> is <see langword="null"/>, the new <see cref="MutableTextBuffer"/> will
         /// contain the empty string (that is, it contains <see cref="string.Empty"/>).
         /// </remarks>
         [CodeGenerationIgnore]
@@ -327,7 +327,7 @@ namespace J2N.Text
         /// <see cref="StringBuilder"/> and capacity.
         /// </summary>
         /// <param name="value">The <see cref="StringBuilder"/> used to initialize the value of the instance.
-        /// If <paramref name="value"/>is <c>null</c>, the new <see cref="MutableTextBuffer"/> will contain
+        /// If <paramref name="value"/>is <see langword="null"/>, the new <see cref="MutableTextBuffer"/> will contain
         /// the empty string (that is, it contains <see cref="string.Empty"/>).</param>
         /// <param name="capacity">The suggested starting size of the <see cref="MutableTextBuffer"/>.</param>
         /// <exception cref="ArgumentOutOfRangeException">
@@ -351,7 +351,7 @@ namespace J2N.Text
         /// substring and capacity.
         /// </summary>
         /// <param name="value">The <see cref="StringBuilder"/> that contains the substring used to initialize the
-        /// value of this instance. If <paramref name="value"/> is <c>null</c>, the new <see cref="MutableTextBuffer"/>
+        /// value of this instance. If <paramref name="value"/> is <see langword="null"/>, the new <see cref="MutableTextBuffer"/>
         /// will contain the empty string (that is, it contains <see cref="string.Empty"/>).</param>
         /// <param name="startIndex">The position within <paramref name="value"/> where the substring begins.</param>
         /// <param name="length">The number of characters in the substring.</param>
@@ -426,9 +426,9 @@ namespace J2N.Text
         /// Initializes a new instance of the <see cref="MutableTextBuffer"/> with the specified sequence of characters.
         /// </summary>
         /// <param name="value">The <see cref="ICharSequence"/> used to initialize the value of the instance.
-        /// If <paramref name="value"/> is <c>null</c>, the new <see cref="MutableTextBuffer"/> will contain
+        /// If <paramref name="value"/> is <see langword="null"/>, the new <see cref="MutableTextBuffer"/> will contain
         /// the empty string (that is, it contains <see cref="string.Empty"/>).</param>
-        /// <remarks>If <paramref name="value"/> is <c>null</c>, the new <see cref="MutableTextBuffer"/> will
+        /// <remarks>If <paramref name="value"/> is <see langword="null"/>, the new <see cref="MutableTextBuffer"/> will
         /// contain the empty string (that is, it contains <see cref="string.Empty"/>).</remarks>
         [CodeGenerationIgnore]
         [CodeGenerationConstructor]

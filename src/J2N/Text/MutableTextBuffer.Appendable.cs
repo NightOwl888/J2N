@@ -12,7 +12,7 @@ namespace J2N.Text
         /// Appends the string representation of the Unicode characters in a specified sequence to this instance.
         /// <para/>
         /// NOTE: Unlike the Java implementation, this method does not add the word <c>"null"</c> to the <see cref="MutableTextBuffer"/>
-        /// if <paramref name="value"/> is <c>null</c>. Instead, no operation is performed.
+        /// if <paramref name="value"/> is <see langword="null"/>. Instead, no operation is performed.
         /// </summary>
         /// <param name="value">The sequence of characters to append.</param>
         /// <returns>A reference to this instance after the append operation has completed.</returns>
@@ -71,7 +71,7 @@ namespace J2N.Text
         /// <param name="startIndex">The starting position in <paramref name="value"/>.</param>
         /// <param name="count">The number of characters to append.</param>
         /// <returns>A reference to this instance after the append operation has completed.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="value"/> is <c>null</c>, and
+        /// <exception cref="ArgumentNullException"><paramref name="value"/> is <see langword="null"/>, and
         /// <paramref name="startIndex"/> and <paramref name="count"/> are not zero.</exception>
         /// <exception cref="ArgumentOutOfRangeException">
         /// <paramref name="count"/> is less than zero.

@@ -588,7 +588,7 @@ namespace J2N.Text
         /// <param name="startIndex">The starting position in <paramref name="value"/>.</param>
         /// <param name="charCount">The number of characters to append.</param>
         /// <returns>A reference to this instance after the append operation has completed.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="value"/> is <c>null</c>, and <paramref name="startIndex"/>
+        /// <exception cref="ArgumentNullException"><paramref name="value"/> is <see langword="null"/>, and <paramref name="startIndex"/>
         /// and <paramref name="charCount"/> are not zero.</exception>
         /// <exception cref="ArgumentOutOfRangeException">
         /// <paramref name="charCount"/> is less than zero.
@@ -607,7 +607,7 @@ namespace J2N.Text
         /// </exception>
         /// <remarks>
         /// This method appends the specified range of characters in <paramref name="value"/> to the current instance. If
-        /// <paramref name="value"/> is <c>null</c> and <paramref name="startIndex"/> and <paramref name="charCount"/>
+        /// <paramref name="value"/> is <see langword="null"/> and <paramref name="startIndex"/> and <paramref name="charCount"/>
         /// are both zero, no changes are made.
         /// <para/>
         /// The <see cref="MutableTextBuffer.Append(char[], int, int)"/> method modifies the existing instance of this class; it does
@@ -688,7 +688,7 @@ namespace J2N.Text
         /// //       The value of the flag is False.
         /// </code>
         /// <para/>
-        /// If <paramref name="value"/> is <c>null</c>, no changes are made.
+        /// If <paramref name="value"/> is <see langword="null"/>, no changes are made.
         /// <para/>
         /// The capacity of this instance is adjusted as needed.
         /// <para/>
@@ -716,7 +716,7 @@ namespace J2N.Text
         /// <param name="startIndex">The starting position of the substring within <paramref name="value"/>.</param>
         /// <param name="count">The number of characters in <paramref name="value"/> to append.</param>
         /// <returns>A reference to this instance after the append operation has completed.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="value"/> is <c>null</c>, and <paramref name="startIndex"/>
+        /// <exception cref="ArgumentNullException"><paramref name="value"/> is <see langword="null"/>, and <paramref name="startIndex"/>
         /// and <paramref name="count"/> are not zero.</exception>
         /// <exception cref="ArgumentOutOfRangeException">
         /// <paramref name="count"/> is less than zero.
@@ -735,7 +735,7 @@ namespace J2N.Text
         /// </exception>
         /// <remarks>
         /// This method appends the specified range of characters in <paramref name="value"/> to the current instance. If
-        /// <paramref name="value"/> is <c>null</c> and <paramref name="startIndex"/> and <paramref name="count"/>
+        /// <paramref name="value"/> is <see langword="null"/> and <paramref name="startIndex"/> and <paramref name="count"/>
         /// are both zero, no changes are made.
         /// <para/>
         /// The <see cref="Append(string, int, int)"/> method modifies the existing instance of this class; it does
@@ -814,7 +814,7 @@ namespace J2N.Text
         /// property on the existing reference and you do not have to assign the return value
         /// to a <see cref="MutableTextBuffer"/> object.
         /// <para/>
-        /// If <paramref name="value"/> is <c>null</c>, no changes are made.
+        /// If <paramref name="value"/> is <see langword="null"/>, no changes are made.
         /// <para/>
         /// The capacity of this instance is adjusted as needed.
         /// <para/>
@@ -842,7 +842,7 @@ namespace J2N.Text
         /// <param name="startIndex">The starting position of the substring within <paramref name="value"/>.</param>
         /// <param name="count">The number of characters in <paramref name="value"/> to append.</param>
         /// <returns>A reference to this instance after the append operation has completed.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="value"/> is <c>null</c>, and <paramref name="startIndex"/>
+        /// <exception cref="ArgumentNullException"><paramref name="value"/> is <see langword="null"/>, and <paramref name="startIndex"/>
         /// and <paramref name="count"/> are not zero.</exception>
         /// <exception cref="ArgumentOutOfRangeException">
         /// <paramref name="count"/> is less than zero.
@@ -861,7 +861,7 @@ namespace J2N.Text
         /// </exception>
         /// <remarks>
         /// This method appends the specified range of characters in <paramref name="value"/> to the current instance. If
-        /// <paramref name="value"/> is <c>null</c> and <paramref name="startIndex"/> and <paramref name="count"/>
+        /// <paramref name="value"/> is <see langword="null"/> and <paramref name="startIndex"/> and <paramref name="count"/>
         /// are both zero, no changes are made.
         /// <para/>
         /// The <see cref="MutableTextBuffer.Append(StringBuilder?, int, int)"/> method modifies the existing instance of this class; it does
@@ -1102,7 +1102,7 @@ namespace J2N.Text
         /// <param name="destinationIndex">The starting position in <paramref name="destination"/> where characters will be copied.
         /// The index is zero-based.</param>
         /// <param name="count">The number of characters to be copied.</param>
-        /// <exception cref="ArgumentNullException"><paramref name="destination"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="destination"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentOutOfRangeException">
         /// <paramref name="sourceIndex"/>, <paramref name="destinationIndex"/>, or <paramref name="count"/>, is less than zero.
         /// <para/>
@@ -1210,8 +1210,8 @@ namespace J2N.Text
         /// <remarks>
         /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
         /// <para/>
-        /// This <see cref="MutableTextBuffer"/> object is not changed if <paramref name="value"/> is <c>null</c>, 
-        /// <paramref name="value"/> is not <c>null</c> but its length is zero, or <paramref name="repeatCount"/> is zero.
+        /// This <see cref="MutableTextBuffer"/> object is not changed if <paramref name="value"/> is <see langword="null"/>, 
+        /// <paramref name="value"/> is not <see langword="null"/> but its length is zero, or <paramref name="repeatCount"/> is zero.
         /// </remarks>
         [CodeGenerationReturnsSelf]
         public void Insert(int index, string? value, int repeatCount) => Insert(index, value.AsSpan(), repeatCount);
@@ -1701,7 +1701,7 @@ namespace J2N.Text
         /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed <see cref="MutableTextBuffer.MaxCapacity"/>.</exception>
         /// <remarks>
         /// This method appends the characters in the specified array to the current instance in the same order they
-        /// appear in value. If <paramref name="value"/> is <c>null</c>, no changes are made.
+        /// appear in value. If <paramref name="value"/> is <see langword="null"/>, no changes are made.
         /// <para/>
         /// The <see cref="MutableTextBuffer.Append(char[])"/> method modifies the existing instance of this class; it does not
         /// return a new class instance. Because of this, you can call a method or property on the existing
@@ -1997,8 +1997,8 @@ namespace J2N.Text
         /// <remarks>
         /// Existing characters are shifted to make room for the new text. The capacity is adjusted as needed.
         /// <para/>
-        /// This instance of <see cref="MutableTextBuffer"/> is not changed if <paramref name="value"/> is <c>null</c>,
-        /// or <paramref name="value"/> is not <c>null</c> but its length is zero.
+        /// This instance of <see cref="MutableTextBuffer"/> is not changed if <paramref name="value"/> is <see langword="null"/>,
+        /// or <paramref name="value"/> is not <see langword="null"/> but its length is zero.
         /// </remarks>
         [CodeGenerationReturnsSelf]
         public void Insert(int index, string? value)
@@ -2216,7 +2216,7 @@ namespace J2N.Text
         /// <remarks>
         /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
         /// <para/>
-        /// If <paramref name="value"/> is <c>null</c>, the <see cref="MutableTextBuffer"/> is not changed.
+        /// If <paramref name="value"/> is <see langword="null"/>, the <see cref="MutableTextBuffer"/> is not changed.
         /// </remarks>
         /// <seealso cref="char"/>
         [CodeGenerationReturnsSelf]
@@ -2246,7 +2246,7 @@ namespace J2N.Text
         /// <param name="startIndex">The starting index within <paramref name="value"/>.</param>
         /// <param name="charCount">The number of characters to insert.</param>
         /// <returns>A reference to this instance after the insert operation has completed.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="value"/> is <c>null</c>, and <paramref name="startIndex"/>
+        /// <exception cref="ArgumentNullException"><paramref name="value"/> is <see langword="null"/>, and <paramref name="startIndex"/>
         /// and <paramref name="charCount"/> are not zero.</exception>
         /// <exception cref="ArgumentOutOfRangeException">
         /// <paramref name="index"/>, <paramref name="startIndex"/>, or <paramref name="charCount"/> is less than zero.
@@ -2315,7 +2315,7 @@ namespace J2N.Text
         /// <param name="startIndex">The starting index within <paramref name="value"/>.</param>
         /// <param name="count">The number of characters to insert.</param>
         /// <returns>A reference to this instance after the insert operation has completed.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="value"/> is <c>null</c>, and <paramref name="startIndex"/>
+        /// <exception cref="ArgumentNullException"><paramref name="value"/> is <see langword="null"/>, and <paramref name="startIndex"/>
         /// and <paramref name="count"/> are not zero.</exception>
         /// <exception cref="ArgumentOutOfRangeException">
         /// <paramref name="index"/>, <paramref name="startIndex"/>, or <paramref name="count"/> is less than zero.
@@ -2473,7 +2473,7 @@ namespace J2N.Text
         /// <param name="arg0">An object to format.</param>
         /// <returns>A reference to this instance with format appended. Each format item in <paramref name="format"/> is replaced
         /// by the string representation of <paramref name="arg0"/>.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="format"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="format"/> is <see langword="null"/>.</exception>
         /// <exception cref="FormatException">
         /// <paramref name="format"/> is invalid.
         /// <para/>
@@ -2508,7 +2508,7 @@ namespace J2N.Text
         ///     <description><i>index</i></description>
         ///     <description>
         ///       The zero-based position in the parameter list of the object to be formatted.
-        ///       If the object specified by index is <c>null</c>, the format item is replaced by <see cref="String.Empty"/>.
+        ///       If the object specified by index is <see langword="null"/>, the format item is replaced by <see cref="String.Empty"/>.
         ///       If there is no parameter in the index position, a <see cref="FormatException"/> is thrown.
         ///     </description>
         ///   </item>
@@ -2560,7 +2560,7 @@ namespace J2N.Text
         /// <param name="arg1">The second object to format.</param>
         /// <returns>A reference to this instance with format appended. Each format item in <paramref name="format"/> is replaced by the
         /// string representation of the corresponding object argument.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="format"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="format"/> is <see langword="null"/>.</exception>
         /// <exception cref="FormatException">
         /// <paramref name="format"/> is invalid.
         /// <para/>
@@ -2595,7 +2595,7 @@ namespace J2N.Text
         ///     <description><i>index</i></description>
         ///     <description>
         ///       The zero-based position in the parameter list of the object to be formatted.
-        ///       If the object specified by index is <c>null</c>, the format item is replaced by <see cref="String.Empty"/>.
+        ///       If the object specified by index is <see langword="null"/>, the format item is replaced by <see cref="String.Empty"/>.
         ///       If there is no parameter in the index position, a <see cref="FormatException"/> is thrown.
         ///     </description>
         ///   </item>
@@ -2649,7 +2649,7 @@ namespace J2N.Text
         /// <param name="arg2">The third object to format.</param>
         /// <returns>A reference to this instance with format appended. Each format item in <paramref name="format"/> is replaced by the
         /// string representation of the corresponding object argument.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="format"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="format"/> is <see langword="null"/>.</exception>
         /// <exception cref="FormatException">
         /// <paramref name="format"/> is invalid.
         /// <para/>
@@ -2684,7 +2684,7 @@ namespace J2N.Text
         ///     <description><i>index</i></description>
         ///     <description>
         ///       The zero-based position in the parameter list of the object to be formatted.
-        ///       If the object specified by index is <c>null</c>, the format item is replaced by <see cref="String.Empty"/>.
+        ///       If the object specified by index is <see langword="null"/>, the format item is replaced by <see cref="String.Empty"/>.
         ///       If there is no parameter in the index position, a <see cref="FormatException"/> is thrown.
         ///     </description>
         ///   </item>
@@ -2737,7 +2737,7 @@ namespace J2N.Text
         /// <param name="args">An array of objects to format.</param>
         /// <returns>A reference to this instance with format appended. Each format item in <paramref name="format"/> is replaced by the string representation
         /// of the corresponding object argument.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="format"/> or <paramref name="args"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="format"/> or <paramref name="args"/> is <see langword="null"/>.</exception>
         /// <exception cref="FormatException">
         /// <paramref name="format"/> is invalid.
         /// <para/>
@@ -2771,7 +2771,7 @@ namespace J2N.Text
         ///     <description><i>index</i></description>
         ///     <description>
         ///       The zero-based position in the parameter list of the object to be formatted.
-        ///       If the object specified by index is <c>null</c>, the format item is replaced by <see cref="String.Empty"/>.
+        ///       If the object specified by index is <see langword="null"/>, the format item is replaced by <see cref="String.Empty"/>.
         ///       If there is no parameter in the index position, a <see cref="FormatException"/> is thrown.
         ///     </description>
         ///   </item>
@@ -2826,7 +2826,7 @@ namespace J2N.Text
         /// <param name="args">A span of objects to format.</param>
         /// <returns>A reference to this instance with format appended. Each format item in <paramref name="format"/> is replaced by the string representation
         /// of the corresponding object argument.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="format"/> or <paramref name="args"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="format"/> or <paramref name="args"/> is <see langword="null"/>.</exception>
         /// <exception cref="FormatException">
         /// <paramref name="format"/> is invalid.
         /// <para/>
@@ -2860,7 +2860,7 @@ namespace J2N.Text
         ///     <description><i>index</i></description>
         ///     <description>
         ///       The zero-based position in the parameter list of the object to be formatted.
-        ///       If the object specified by index is <c>null</c>, the format item is replaced by <see cref="String.Empty"/>.
+        ///       If the object specified by index is <see langword="null"/>, the format item is replaced by <see cref="String.Empty"/>.
         ///       If there is no parameter in the index position, a <see cref="FormatException"/> is thrown.
         ///     </description>
         ///   </item>
@@ -2911,7 +2911,7 @@ namespace J2N.Text
         /// <returns>A reference to this instance after the append operation has completed. After the append operation,
         /// this instance contains any data that existed before the operation, suffixed by a copy of <paramref name="format"/> in which any
         /// format specification is replaced by the string representation of <paramref name="arg0"/>.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="format"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="format"/> is <see langword="null"/>.</exception>
         /// <exception cref="FormatException">
         /// <paramref name="format"/> is invalid.
         /// <para/>
@@ -2946,7 +2946,7 @@ namespace J2N.Text
         ///     <description><i>index</i></description>
         ///     <description>
         ///       The zero-based position in the parameter list of the object to be formatted.
-        ///       If the object specified by index is <c>null</c>, the format item is replaced by <see cref="String.Empty"/>.
+        ///       If the object specified by index is <see langword="null"/>, the format item is replaced by <see cref="String.Empty"/>.
         ///       If there is no parameter in the index position, a <see cref="FormatException"/> is thrown.
         ///     </description>
         ///   </item>
@@ -2978,7 +2978,7 @@ namespace J2N.Text
         ///     <see cref="ICustomFormatter"/> interface.</item>
         /// </list>
         /// <para/>
-        /// If the <paramref name="provider"/> parameter is <c>null</c>, formatting information is obtained from the current culture.
+        /// If the <paramref name="provider"/> parameter is <see langword="null"/>, formatting information is obtained from the current culture.
         /// <para/>
         /// <paramref name="arg0"/> represents the object to be formatted. Each format item in <paramref name="format"/> is replaced
         /// with the string representation of <paramref name="arg0"/>. If the format item includes <c>formatString</c>
@@ -3014,7 +3014,7 @@ namespace J2N.Text
         /// <returns>A reference to this instance after the append operation has completed. After the append operation,
         /// this instance contains any data that existed before the operation, suffixed by a copy of <paramref name="format"/> in which any
         /// format specification is replaced by the string representation of the corresponding object argument.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="format"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="format"/> is <see langword="null"/>.</exception>
         /// <exception cref="FormatException">
         /// <paramref name="format"/> is invalid.
         /// <para/>
@@ -3048,7 +3048,7 @@ namespace J2N.Text
         ///     <description><i>index</i></description>
         ///     <description>
         ///       The zero-based position in the parameter list of the object to be formatted.
-        ///       If the object specified by index is <c>null</c>, the format item is replaced by <see cref="String.Empty"/>.
+        ///       If the object specified by index is <see langword="null"/>, the format item is replaced by <see cref="String.Empty"/>.
         ///       If there is no parameter in the index position, a <see cref="FormatException"/> is thrown.
         ///     </description>
         ///   </item>
@@ -3080,7 +3080,7 @@ namespace J2N.Text
         ///     <see cref="ICustomFormatter"/> interface.</item>
         /// </list>
         /// <para/>
-        /// If the <paramref name="provider"/> parameter is <c>null</c>, formatting information is obtained from the current culture.
+        /// If the <paramref name="provider"/> parameter is <see langword="null"/>, formatting information is obtained from the current culture.
         /// <para/>
         /// <paramref name="arg0"/> and <paramref name="arg1"/> represent the objects to be formatted. Each format item in <paramref name="format"/> is replaced
         /// with the string representation of the object that has the corresponding index. If the format item includes <c>formatString</c>
@@ -3118,7 +3118,7 @@ namespace J2N.Text
         /// <returns>A reference to this instance after the append operation has completed. After the append operation,
         /// this instance contains any data that existed before the operation, suffixed by a copy of <paramref name="format"/> in which any
         /// format specification is replaced by the string representation of the corresponding object argument.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="format"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="format"/> is <see langword="null"/>.</exception>
         /// <exception cref="FormatException">
         /// <paramref name="format"/> is invalid.
         /// <para/>
@@ -3152,7 +3152,7 @@ namespace J2N.Text
         ///     <description><i>index</i></description>
         ///     <description>
         ///       The zero-based position in the parameter list of the object to be formatted.
-        ///       If the object specified by index is <c>null</c>, the format item is replaced by <see cref="String.Empty"/>.
+        ///       If the object specified by index is <see langword="null"/>, the format item is replaced by <see cref="String.Empty"/>.
         ///       If there is no parameter in the index position, a <see cref="FormatException"/> is thrown.
         ///     </description>
         ///   </item>
@@ -3184,7 +3184,7 @@ namespace J2N.Text
         ///     implementation also implements the <see cref="ICustomFormatter"/> interface.</item>
         /// </list>
         /// <para/>
-        /// If the <paramref name="provider"/> parameter is <c>null</c>, formatting information is obtained from the current culture.
+        /// If the <paramref name="provider"/> parameter is <see langword="null"/>, formatting information is obtained from the current culture.
         /// <para/>
         /// <paramref name="arg0"/>, <paramref name="arg1"/>, and <paramref name="arg2"/> represent the objects to be formatted.
         /// Each format item in <paramref name="format"/> is replaced with the string representation of the object that has the
@@ -3221,7 +3221,7 @@ namespace J2N.Text
         /// <returns>A reference to this instance after the append operation has completed. After the append operation,
         /// this instance contains any data that existed before the operation, suffixed by a copy of <paramref name="format"/> in which any
         /// format specification is replaced by the string representation of the corresponding object argument.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="format"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="format"/> is <see langword="null"/>.</exception>
         /// <exception cref="FormatException">
         /// <paramref name="format"/> is invalid.
         /// <para/>
@@ -3255,7 +3255,7 @@ namespace J2N.Text
         ///     <description><i>index</i></description>
         ///     <description>
         ///       The zero-based position in the parameter list of the object to be formatted.
-        ///       If the object specified by index is <c>null</c>, the format item is replaced by <see cref="String.Empty"/>.
+        ///       If the object specified by index is <see langword="null"/>, the format item is replaced by <see cref="String.Empty"/>.
         ///       If there is no parameter in the index position, a <see cref="FormatException"/> is thrown.
         ///     </description>
         ///   </item>
@@ -3287,7 +3287,7 @@ namespace J2N.Text
         ///     <see cref="ICustomFormatter"/> interface.</item>
         /// </list>
         /// <para/>
-        /// If the <paramref name="provider"/> parameter is <c>null</c>, formatting information is obtained from the current culture.
+        /// If the <paramref name="provider"/> parameter is <see langword="null"/>, formatting information is obtained from the current culture.
         /// <para/>
         /// <paramref name="args"/> represents the objects to be formatted. Each format item in <paramref name="format"/> is replaced
         /// with the string representation of the corresponding object in <paramref name="args"/>. If the format item includes
@@ -3326,7 +3326,7 @@ namespace J2N.Text
         /// <returns>A reference to this instance after the append operation has completed. After the append operation,
         /// this instance contains any data that existed before the operation, suffixed by a copy of <paramref name="format"/> in which any
         /// format specification is replaced by the string representation of the corresponding object argument.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="format"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="format"/> is <see langword="null"/>.</exception>
         /// <exception cref="FormatException">
         /// <paramref name="format"/> is invalid.
         /// <para/>
@@ -3360,7 +3360,7 @@ namespace J2N.Text
         ///     <description><i>index</i></description>
         ///     <description>
         ///       The zero-based position in the parameter list of the object to be formatted.
-        ///       If the object specified by index is <c>null</c>, the format item is replaced by <see cref="String.Empty"/>.
+        ///       If the object specified by index is <see langword="null"/>, the format item is replaced by <see cref="String.Empty"/>.
         ///       If there is no parameter in the index position, a <see cref="FormatException"/> is thrown.
         ///     </description>
         ///   </item>
@@ -3392,7 +3392,7 @@ namespace J2N.Text
         ///     <see cref="ICustomFormatter"/> interface.</item>
         /// </list>
         /// <para/>
-        /// If the <paramref name="provider"/> parameter is <c>null</c>, formatting information is obtained from the current culture.
+        /// If the <paramref name="provider"/> parameter is <see langword="null"/>, formatting information is obtained from the current culture.
         /// <para/>
         /// <paramref name="args"/> represents the objects to be formatted. Each format item in <paramref name="format"/> is replaced
         /// with the string representation of the corresponding object in <paramref name="args"/>. If the format item includes
@@ -4073,16 +4073,16 @@ namespace J2N.Text
         /// Replaces all occurrences of a specified string in this instance with another specified string.
         /// </summary>
         /// <param name="oldValue">The string to replace.</param>
-        /// <param name="newValue">The string that replaces <paramref name="oldValue"/>, or <c>null</c>.</param>
+        /// <param name="newValue">The string that replaces <paramref name="oldValue"/>, or <see langword="null"/>.</param>
         /// <returns>A reference to this instance with all instances of <paramref name="oldValue"/> replaced by <paramref name="newValue"/>.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="oldValue"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="oldValue"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentException">The length of <paramref name="oldValue"/> is zero.</exception>
         /// <exception cref="ArgumentOutOfRangeException">
         /// Enlarging the value of this instance would exceed <see cref="MutableTextBuffer.MaxCapacity"/>.
         /// </exception>
         /// <remarks>
         /// This method performs an ordinal, case-sensitive comparison to identify occurrences of <paramref name="oldValue"/> in the
-        /// current instance. If <paramref name="newValue"/> is <c>null</c> or <see cref="string.Empty"/>, all occurrences of
+        /// current instance. If <paramref name="newValue"/> is <see langword="null"/> or <see cref="string.Empty"/>, all occurrences of
         /// <paramref name="oldValue"/> are removed.
         /// </remarks>
         /// <seealso cref="Remove(int, int)"/>
@@ -4116,7 +4116,7 @@ namespace J2N.Text
         /// <summary>
         /// Returns a value indicating whether this instance is equal to a specified object.
         /// </summary>
-        /// <param name="sb">An object to compare with this instance, or <c>null</c>.</param>
+        /// <param name="sb">An object to compare with this instance, or <see langword="null"/>.</param>
         /// <returns><c>true</c> if the characters in this instance and <paramref name="sb"/> are the same;
         /// otherwise, <c>false</c>.</returns>
         /// <remarks>
@@ -4144,7 +4144,7 @@ namespace J2N.Text
         /// <summary>
         /// Returns a value indicating whether this instance is equal to a specified object.
         /// </summary>
-        /// <param name="sb">An object to compare with this instance, or <c>null</c>.</param>
+        /// <param name="sb">An object to compare with this instance, or <see langword="null"/>.</param>
         /// <returns><c>true</c> if the characters in this instance and <paramref name="sb"/> are the same;
         /// otherwise, <c>false</c>.</returns>
         /// <remarks>
@@ -4230,12 +4230,12 @@ namespace J2N.Text
         /// Replaces, within a substring of this instance, all occurrences of a specified string with another specified string.
         /// </summary>
         /// <param name="oldValue">The string to replace.</param>
-        /// <param name="newValue">The string that replaces <paramref name="oldValue"/>, or <c>null</c>.</param>
+        /// <param name="newValue">The string that replaces <paramref name="oldValue"/>, or <see langword="null"/>.</param>
         /// <param name="startIndex">The position in this instance where the substring begins.</param>
         /// <param name="count">The length of the substring to search within.</param>
         /// <returns>A reference to this instance with all instances of <paramref name="oldValue"/> replaced by <paramref name="newValue"/>
         /// in the range from <paramref name="startIndex"/> to <paramref name="startIndex"/> + <paramref name="count"/> - 1.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="oldValue"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="oldValue"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentException">The length of <paramref name="oldValue"/> is zero.</exception>
         /// <exception cref="ArgumentOutOfRangeException">
         /// <paramref name="startIndex"/> or <paramref name="count"/> is less than zero.
@@ -4250,7 +4250,7 @@ namespace J2N.Text
         /// </exception>
         /// <remarks>
         /// This method performs an ordinal, case-sensitive comparison to identify occurrences of <paramref name="oldValue"/>
-        /// in the specified substring. If <paramref name="newValue"/> is <c>null</c> or <see cref="string.Empty"/>,
+        /// in the specified substring. If <paramref name="newValue"/> is <see langword="null"/> or <see cref="string.Empty"/>,
         /// all occurrences of <paramref name="oldValue"/> in the specified range are removed.
         /// </remarks>
         /// <seealso cref="Remove(int, int)"/>
@@ -4485,7 +4485,7 @@ namespace J2N.Text
         /// <param name="count">The number of characters to replace.</param>
         /// <param name="newValue">The replacement string.</param>
         /// <returns>A reference to this instance after the append operation has completed.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="newValue"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="newValue"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentOutOfRangeException">
         /// <paramref name="startIndex"/> or <paramref name="count"/> is less than zero.
         /// <para/>

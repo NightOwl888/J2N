@@ -13,7 +13,7 @@ namespace J2N.Text
         /// <summary>
         /// Initializes a new instance of <see cref="MutableTextBufferCharSequence"/> with the provided <paramref name="value"/>.
         /// </summary>
-        /// <param name="value">A <see cref="MutableTextBuffer"/> to wrap in a <see cref="ICharSequence"/>. The value may be <c>null</c>.</param>
+        /// <param name="value">A <see cref="MutableTextBuffer"/> to wrap in a <see cref="ICharSequence"/>. The value may be <see langword="null"/>.</param>
         public MutableTextBufferCharSequence(MutableTextBuffer? value)
         {
             Value = value;
@@ -50,7 +50,7 @@ namespace J2N.Text
         /// length of this sequence.
         /// </exception>
         /// <exception cref="InvalidOperationException">
-        /// If the underlying value of this sequence is <c>null</c>.
+        /// If the underlying value of this sequence is <see langword="null"/>.
         /// </exception>
         public char this[int index]
         {
@@ -127,7 +127,7 @@ namespace J2N.Text
         /// <param name="value">The UTF-16-encoded code unit to append.</param>
         /// <returns>A reference to this instance after the append operation has completed.</returns>
         /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed <see cref="MutableTextBuffer.MaxCapacity"/>.</exception>
-        /// <exception cref="InvalidOperationException"><see cref="Value"/> is <c>null</c>.</exception>
+        /// <exception cref="InvalidOperationException"><see cref="Value"/> is <see langword="null"/>.</exception>
         public MutableTextBufferCharSequence Append(char value)
         {
             if (Value is null)
@@ -143,7 +143,7 @@ namespace J2N.Text
         /// <param name="value">The string to append.</param>
         /// <returns>A reference to this instance after the append operation has completed.</returns>
         /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed <see cref="MutableTextBuffer.MaxCapacity"/>.</exception>
-        /// <exception cref="InvalidOperationException"><see cref="Value"/> is <c>null</c>.</exception>
+        /// <exception cref="InvalidOperationException"><see cref="Value"/> is <see langword="null"/>.</exception>
         public MutableTextBufferCharSequence Append(string? value)
         {
             // For null values, this is a no-op
@@ -164,7 +164,7 @@ namespace J2N.Text
         /// <param name="startIndex">The starting position of the substring within <paramref name="value"/>.</param>
         /// <param name="count">The number of characters in <paramref name="value"/> to append.</param>
         /// <returns>A reference to this instance after the append operation has completed.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="value"/> is <c>null</c>, and 
+        /// <exception cref="ArgumentNullException"><paramref name="value"/> is <see langword="null"/>, and 
         /// <paramref name="startIndex"/> and <paramref name="count"/> are not zero.</exception>
         /// <exception cref="ArgumentOutOfRangeException">
         /// <paramref name="count"/> less than zero.
@@ -181,7 +181,7 @@ namespace J2N.Text
         /// <para/>
         /// Enlarging the value of this instance would exceed <see cref="MutableTextBuffer.MaxCapacity"/>.
         /// </exception>
-        /// <exception cref="InvalidOperationException"><see cref="Value"/> is <c>null</c>.</exception>
+        /// <exception cref="InvalidOperationException"><see cref="Value"/> is <see langword="null"/>.</exception>
         public MutableTextBufferCharSequence Append(string? value, int startIndex, int count)
         {
             if (Value is null)
@@ -197,7 +197,7 @@ namespace J2N.Text
         /// <param name="value">The <see cref="StringBuilder"/> that contains the string to append.</param>
         /// <returns>A reference to this instance after the append operation has completed.</returns>
         /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed <see cref="MutableTextBuffer.MaxCapacity"/>.</exception>
-        /// <exception cref="InvalidOperationException"><see cref="Value"/> is <c>null</c>.</exception>
+        /// <exception cref="InvalidOperationException"><see cref="Value"/> is <see langword="null"/>.</exception>
         public MutableTextBufferCharSequence Append(StringBuilder? value)
         {
             // For null values, this is a no-op
@@ -218,7 +218,7 @@ namespace J2N.Text
         /// <param name="startIndex">The starting position of the substring within <paramref name="value"/>.</param>
         /// <param name="count">The number of characters in <paramref name="value"/> to append.</param>
         /// <returns>A reference to this instance after the append operation has completed.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="value"/> is <c>null</c>, and
+        /// <exception cref="ArgumentNullException"><paramref name="value"/> is <see langword="null"/>, and
         /// <paramref name="startIndex"/> and <paramref name="count"/> are not zero.</exception>
         /// <exception cref="ArgumentOutOfRangeException">
         /// <paramref name="count"/> less than zero.
@@ -235,7 +235,7 @@ namespace J2N.Text
         /// <para/>
         /// Enlarging the value of this instance would exceed <see cref="MutableTextBuffer.MaxCapacity"/>.
         /// </exception>
-        /// <exception cref="InvalidOperationException"><see cref="Value"/> is <c>null</c>.</exception>
+        /// <exception cref="InvalidOperationException"><see cref="Value"/> is <see langword="null"/>.</exception>
         public MutableTextBufferCharSequence Append(StringBuilder? value, int startIndex, int count)
         {
             if (Value is null)
@@ -251,7 +251,7 @@ namespace J2N.Text
         /// <param name="value">The array of characters to append.</param>
         /// <returns>A reference to this instance after the append operation has completed.</returns>
         /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed <see cref="MutableTextBuffer.MaxCapacity"/>.</exception>
-        /// <exception cref="InvalidOperationException"><see cref="Value"/> is <c>null</c>.</exception>
+        /// <exception cref="InvalidOperationException"><see cref="Value"/> is <see langword="null"/>.</exception>
         public MutableTextBufferCharSequence Append(char[]? value)
         {
             // For null values, this is a no-op
@@ -272,7 +272,7 @@ namespace J2N.Text
         /// <param name="startIndex">The starting position in <paramref name="value"/>.</param>
         /// <param name="count">The number of characters in <paramref name="value"/> to append.</param>
         /// <returns>A reference to this instance after the append operation has completed.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="value"/> is <c>null</c>, and 
+        /// <exception cref="ArgumentNullException"><paramref name="value"/> is <see langword="null"/>, and 
         /// <paramref name="startIndex"/> and <paramref name="count"/> are not zero.</exception>
         /// <exception cref="ArgumentOutOfRangeException">
         /// <paramref name="count"/> less than zero.
@@ -289,7 +289,7 @@ namespace J2N.Text
         /// <para/>
         /// Enlarging the value of this instance would exceed <see cref="MutableTextBuffer.MaxCapacity"/>.
         /// </exception>
-        /// <exception cref="InvalidOperationException"><see cref="Value"/> is <c>null</c>.</exception>
+        /// <exception cref="InvalidOperationException"><see cref="Value"/> is <see langword="null"/>.</exception>
         public MutableTextBufferCharSequence Append(char[]? value, int startIndex, int count)
         {
             if (Value is null)
@@ -305,7 +305,7 @@ namespace J2N.Text
         /// <param name="value">The <see cref="ICharSequence"/> containing the characters to append.</param>
         /// <returns>A reference to this instance after the append operation has completed.</returns>
         /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed <see cref="MutableTextBuffer.MaxCapacity"/>.</exception>
-        /// <exception cref="InvalidOperationException"><see cref="Value"/> is <c>null</c>.</exception>
+        /// <exception cref="InvalidOperationException"><see cref="Value"/> is <see langword="null"/>.</exception>
         public MutableTextBufferCharSequence Append(ICharSequence? value)
         {
             // For null values, this is a no-op
@@ -326,7 +326,7 @@ namespace J2N.Text
         /// <param name="startIndex">The starting position in <paramref name="value"/>.</param>
         /// <param name="count">The number of characters in <paramref name="value"/> to append.</param>
         /// <returns>A reference to this instance after the append operation has completed.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="value"/> is <c>null</c>, and 
+        /// <exception cref="ArgumentNullException"><paramref name="value"/> is <see langword="null"/>, and 
         /// <paramref name="startIndex"/> and <paramref name="count"/> are not zero.</exception>
         /// <exception cref="ArgumentOutOfRangeException">
         /// <paramref name="count"/> less than zero.
@@ -343,7 +343,7 @@ namespace J2N.Text
         /// <para/>
         /// Enlarging the value of this instance would exceed <see cref="MutableTextBuffer.MaxCapacity"/>.
         /// </exception>
-        /// <exception cref="InvalidOperationException"><see cref="Value"/> is <c>null</c>.</exception>
+        /// <exception cref="InvalidOperationException"><see cref="Value"/> is <see langword="null"/>.</exception>
         public MutableTextBufferCharSequence Append(ICharSequence? value, int startIndex, int count)
         {
             // For null values, this is a no-op
@@ -362,7 +362,7 @@ namespace J2N.Text
         /// </summary>
         /// <param name="value">The <see cref="ReadOnlySpan{T}"/> containing the characters to append.</param>
         /// <returns>A reference to this instance after the append operation has completed.</returns>
-        /// <exception cref="InvalidOperationException"><see cref="Value"/> is <c>null</c>.</exception>
+        /// <exception cref="InvalidOperationException"><see cref="Value"/> is <see langword="null"/>.</exception>
         public MutableTextBufferCharSequence Append(ReadOnlySpan<char> value)
         {
             if (Value is null)
@@ -535,7 +535,7 @@ namespace J2N.Text
         /// <summary>
         /// Gets the hash code for the current <see cref="ICharSequence"/>.
         /// </summary>
-        /// <returns>Returns the hash code for <see cref="Value"/>. If <see cref="Value"/> is <c>null</c>, returns <see cref="int.MaxValue"/>.</returns>
+        /// <returns>Returns the hash code for <see cref="Value"/>. If <see cref="Value"/> is <see langword="null"/>, returns <see cref="int.MaxValue"/>.</returns>
         public override int GetHashCode()
         {
             // NOTE: For consistency, we match all char sequences to the same
@@ -761,7 +761,7 @@ namespace J2N.Text
         /// <param name="destinationIndex">The starting position in <paramref name="destination"/> where characters will be copied.
         /// The index is zero-based.</param>
         /// <param name="count">The number of characters to be copied.</param>
-        /// <exception cref="ArgumentNullException"><paramref name="destination"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="destination"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentOutOfRangeException">
         /// <paramref name="sourceIndex"/>, <paramref name="destinationIndex"/>, or <paramref name="count"/>, is less than zero.
         /// <para/>
