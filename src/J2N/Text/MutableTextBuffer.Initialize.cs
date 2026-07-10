@@ -171,7 +171,7 @@ namespace J2N.Text
         /// If <paramref name="capacity"/> is zero, the implementation-specific default capacity is used.
         /// <para/>
         /// The <paramref name="maxCapacity"/> property defines the maximum number of characters that the current
-        /// instance can hold. Its value is assigned to the <see cref="MaxCapacity"/> property. If the number of
+        /// instance can hold. Its value is assigned to the <see cref="MutableTextBuffer.MaxCapacity"/> property. If the number of
         /// characters to be stored in the current instance exceeds this <paramref name="maxCapacity"/> value,
         /// the <see cref="MutableTextBuffer"/> object does not allocate additional memory, but instead throws an exception.
         /// <para/>
@@ -179,8 +179,8 @@ namespace J2N.Text
         /// <para/>
         /// When you instantiate an <see cref="MutableTextBuffer"/> object by calling the <see cref="Initialize(int, int)"/>
         /// method, both the length and the capacity of the <see cref="MutableTextBuffer"/> instance can grow beyond
-        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
-        /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
+        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string?)"/>
+        /// and <see cref="AppendFormat(string, object?)"/> methods to append small strings.
         /// </remarks>
         /// <seealso cref="Capacity"/>
         /// <seealso cref="MaxCapacity"/>

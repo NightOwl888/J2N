@@ -33,10 +33,10 @@ namespace J2N.Text
         /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
-        /// When you instantiate an <see cref="MutableTextBuffer"/> object by calling <see cref="Initialize(int, int)"/>,
+        /// When you instantiate an <see cref="MutableTextBuffer"/> object by calling <see cref="MutableTextBuffer.Initialize(int, int)"/>,
         /// both the length and the capacity of the <see cref="MutableTextBuffer"/> instance can grow beyond
-        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
-        /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
+        /// the value of its <see cref="MutableTextBuffer.MaxCapacity"/> property. This can occur particularly when you call the <see cref="MutableTextBuffer.Append(string?)"/>
+        /// and <see cref="MutableTextBuffer.AppendFormat(string, object?)"/> methods to append small strings.
         /// </remarks>
         /// <seealso cref="sbyte"/>
         [CLSCompliant(false)]
@@ -68,10 +68,10 @@ namespace J2N.Text
         /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
-        /// When you instantiate an <see cref="MutableTextBuffer"/> object by calling <see cref="Initialize(int, int)"/>,
+        /// When you instantiate an <see cref="MutableTextBuffer"/> object by calling <see cref="MutableTextBuffer.Initialize(int, int)"/>,
         /// both the length and the capacity of the <see cref="MutableTextBuffer"/> instance can grow beyond
-        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
-        /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
+        /// the value of its <see cref="MutableTextBuffer.MaxCapacity"/> property. This can occur particularly when you call the <see cref="MutableTextBuffer.Append(string?)"/>
+        /// and <see cref="MutableTextBuffer.AppendFormat(string, object?)"/> methods to append small strings.
         /// </remarks>
         /// <seealso cref="byte"/>
         [CodeGenerationReturnsSelf]
@@ -102,10 +102,10 @@ namespace J2N.Text
         /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
-        /// When you instantiate an <see cref="MutableTextBuffer"/> object by calling <see cref="Initialize(int, int)"/>,
+        /// When you instantiate an <see cref="MutableTextBuffer"/> object by calling <see cref="MutableTextBuffer.Initialize(int, int)"/>,
         /// both the length and the capacity of the <see cref="MutableTextBuffer"/> instance can grow beyond
-        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
-        /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
+        /// the value of its <see cref="MutableTextBuffer.MaxCapacity"/> property. This can occur particularly when you call the <see cref="MutableTextBuffer.Append(string?)"/>
+        /// and <see cref="MutableTextBuffer.AppendFormat(string, object?)"/> methods to append small strings.
         /// </remarks>
         /// <seealso cref="short"/>
         [CodeGenerationReturnsSelf]
@@ -136,10 +136,10 @@ namespace J2N.Text
         /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
-        /// When you instantiate an <see cref="MutableTextBuffer"/> object by calling <see cref="Initialize(int, int)"/>,
+        /// When you instantiate an <see cref="MutableTextBuffer"/> object by calling <see cref="MutableTextBuffer.Initialize(int, int)"/>,
         /// both the length and the capacity of the <see cref="MutableTextBuffer"/> instance can grow beyond
-        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
-        /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
+        /// the value of its <see cref="MutableTextBuffer.MaxCapacity"/> property. This can occur particularly when you call the <see cref="MutableTextBuffer.Append(string?)"/>
+        /// and <see cref="MutableTextBuffer.AppendFormat(string, object?)"/> methods to append small strings.
         /// </remarks>
         /// <seealso cref="int"/>
         [CodeGenerationReturnsSelf]
@@ -170,10 +170,10 @@ namespace J2N.Text
         /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
-        /// When you instantiate an <see cref="MutableTextBuffer"/> object by calling <see cref="Initialize(int, int)"/>,
+        /// When you instantiate an <see cref="MutableTextBuffer"/> object by calling <see cref="MutableTextBuffer.Initialize(int, int)"/>,
         /// both the length and the capacity of the <see cref="MutableTextBuffer"/> instance can grow beyond
-        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
-        /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
+        /// the value of its <see cref="MutableTextBuffer.MaxCapacity"/> property. This can occur particularly when you call the <see cref="MutableTextBuffer.Append(string?)"/>
+        /// and <see cref="MutableTextBuffer.AppendFormat(string, object?)"/> methods to append small strings.
         /// </remarks>
         /// <seealso cref="long"/>
         [CodeGenerationReturnsSelf]
@@ -203,10 +203,10 @@ namespace J2N.Text
         /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
-        /// When you instantiate an <see cref="MutableTextBuffer"/> object by calling <see cref="Initialize(int, int)"/>,
+        /// When you instantiate an <see cref="MutableTextBuffer"/> object by calling <see cref="MutableTextBuffer.Initialize(int, int)"/>,
         /// both the length and the capacity of the <see cref="MutableTextBuffer"/> instance can grow beyond
-        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
-        /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
+        /// the value of its <see cref="MutableTextBuffer.MaxCapacity"/> property. This can occur particularly when you call the <see cref="MutableTextBuffer.Append(string?)"/>
+        /// and <see cref="MutableTextBuffer.AppendFormat(string, object?)"/> methods to append small strings.
         /// </remarks>
         /// <seealso cref="float"/>
         [CodeGenerationReturnsSelf]
@@ -233,10 +233,10 @@ namespace J2N.Text
         /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
-        /// When you instantiate an <see cref="MutableTextBuffer"/> object by calling <see cref="Initialize(int, int)"/>,
+        /// When you instantiate an <see cref="MutableTextBuffer"/> object by calling <see cref="MutableTextBuffer.Initialize(int, int)"/>,
         /// both the length and the capacity of the <see cref="MutableTextBuffer"/> instance can grow beyond
-        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
-        /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
+        /// the value of its <see cref="MutableTextBuffer.MaxCapacity"/> property. This can occur particularly when you call the <see cref="MutableTextBuffer.Append(string?)"/>
+        /// and <see cref="MutableTextBuffer.AppendFormat(string, object?)"/> methods to append small strings.
         /// </remarks>
         /// <seealso cref="double"/>
         [CodeGenerationReturnsSelf]
@@ -263,10 +263,10 @@ namespace J2N.Text
         /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
-        /// When you instantiate an <see cref="MutableTextBuffer"/> object by calling <see cref="Initialize(int, int)"/>,
+        /// When you instantiate an <see cref="MutableTextBuffer"/> object by calling <see cref="MutableTextBuffer.Initialize(int, int)"/>,
         /// both the length and the capacity of the <see cref="MutableTextBuffer"/> instance can grow beyond
-        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
-        /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
+        /// the value of its <see cref="MutableTextBuffer.MaxCapacity"/> property. This can occur particularly when you call the <see cref="MutableTextBuffer.Append(string?)"/>
+        /// and <see cref="MutableTextBuffer.AppendFormat(string, object?)"/> methods to append small strings.
         /// </remarks>
         /// <seealso cref="decimal"/>
         // J2N TODO: Since BigDecimal in Java doesn't use the same default format as this, we will need to change the default before this can be made public
@@ -298,10 +298,10 @@ namespace J2N.Text
         /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
-        /// When you instantiate an <see cref="MutableTextBuffer"/> object by calling <see cref="Initialize(int, int)"/>,
+        /// When you instantiate an <see cref="MutableTextBuffer"/> object by calling <see cref="MutableTextBuffer.Initialize(int, int)"/>,
         /// both the length and the capacity of the <see cref="MutableTextBuffer"/> instance can grow beyond
-        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
-        /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
+        /// the value of its <see cref="MutableTextBuffer.MaxCapacity"/> property. This can occur particularly when you call the <see cref="MutableTextBuffer.Append(string?)"/>
+        /// and <see cref="MutableTextBuffer.AppendFormat(string, object?)"/> methods to append small strings.
         /// </remarks>
         /// <seealso cref="ushort"/>
         [CLSCompliant(false)]
@@ -332,10 +332,10 @@ namespace J2N.Text
         /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
-        /// When you instantiate an <see cref="MutableTextBuffer"/> object by calling <see cref="Initialize(int, int)"/>,
+        /// When you instantiate an <see cref="MutableTextBuffer"/> object by calling <see cref="MutableTextBuffer.Initialize(int, int)"/>,
         /// both the length and the capacity of the <see cref="MutableTextBuffer"/> instance can grow beyond
-        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
-        /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
+        /// the value of its <see cref="MutableTextBuffer.MaxCapacity"/> property. This can occur particularly when you call the <see cref="MutableTextBuffer.Append(string?)"/>
+        /// and <see cref="MutableTextBuffer.AppendFormat(string, object?)"/> methods to append small strings.
         /// </remarks>
         /// <seealso cref="uint"/>
         [CLSCompliant(false)]
@@ -367,10 +367,10 @@ namespace J2N.Text
         /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
-        /// When you instantiate an <see cref="MutableTextBuffer"/> object by calling <see cref="Initialize(int, int)"/>,
+        /// When you instantiate an <see cref="MutableTextBuffer"/> object by calling <see cref="MutableTextBuffer.Initialize(int, int)"/>,
         /// both the length and the capacity of the <see cref="MutableTextBuffer"/> instance can grow beyond
-        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
-        /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
+        /// the value of its <see cref="MutableTextBuffer.MaxCapacity"/> property. This can occur particularly when you call the <see cref="MutableTextBuffer.Append(string?)"/>
+        /// and <see cref="MutableTextBuffer.AppendFormat(string, object?)"/> methods to append small strings.
         /// </remarks>
         /// <seealso cref="ulong"/>
         [CLSCompliant(false)]
@@ -474,7 +474,7 @@ namespace J2N.Text
         /// -or-
         /// <para/>
         /// The current length of this <see cref="MutableTextBuffer"/> object plus the length of
-        /// <paramref name="value"/> exceeds <see cref="MaxCapacity"/>.
+        /// <paramref name="value"/> exceeds <see cref="MutableTextBuffer.MaxCapacity"/>.
         /// </exception>
         /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
         /// <remarks>
@@ -508,7 +508,7 @@ namespace J2N.Text
         /// -or-
         /// <para/>
         /// The current length of this <see cref="MutableTextBuffer"/> object plus the length of
-        /// <paramref name="value"/> exceeds <see cref="MaxCapacity"/>.
+        /// <paramref name="value"/> exceeds <see cref="MutableTextBuffer.MaxCapacity"/>.
         /// </exception>
         /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
         /// <remarks>
@@ -541,7 +541,7 @@ namespace J2N.Text
         /// -or-
         /// <para/>
         /// The current length of this <see cref="MutableTextBuffer"/> object plus the length of
-        /// <paramref name="value"/> exceeds <see cref="MaxCapacity"/>.
+        /// <paramref name="value"/> exceeds <see cref="MutableTextBuffer.MaxCapacity"/>.
         /// </exception>
         /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
         /// <remarks>
@@ -573,7 +573,7 @@ namespace J2N.Text
         /// -or-
         /// <para/>
         /// The current length of this <see cref="MutableTextBuffer"/> object plus the length of
-        /// <paramref name="value"/> exceeds <see cref="MaxCapacity"/>.
+        /// <paramref name="value"/> exceeds <see cref="MutableTextBuffer.MaxCapacity"/>.
         /// </exception>
         /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
         /// <returns>A reference to this instance after the append operation has completed.</returns>
@@ -607,7 +607,7 @@ namespace J2N.Text
         /// -or-
         /// <para/>
         /// The current length of this <see cref="MutableTextBuffer"/> object plus the length of
-        /// <paramref name="value"/> exceeds <see cref="MaxCapacity"/>.
+        /// <paramref name="value"/> exceeds <see cref="MutableTextBuffer.MaxCapacity"/>.
         /// </exception>
         /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
         /// <remarks>
@@ -640,7 +640,7 @@ namespace J2N.Text
         /// -or-
         /// <para/>
         /// The current length of this <see cref="MutableTextBuffer"/> object plus the length of
-        /// <paramref name="value"/> exceeds <see cref="MaxCapacity"/>.
+        /// <paramref name="value"/> exceeds <see cref="MutableTextBuffer.MaxCapacity"/>.
         /// </exception>
         /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
         /// <remarks>
@@ -669,7 +669,7 @@ namespace J2N.Text
         /// -or-
         /// <para/>
         /// The current length of this <see cref="MutableTextBuffer"/> object plus the length of
-        /// <paramref name="value"/> exceeds <see cref="MaxCapacity"/>.
+        /// <paramref name="value"/> exceeds <see cref="MutableTextBuffer.MaxCapacity"/>.
         /// </exception>
         /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
         /// <remarks>
@@ -698,7 +698,7 @@ namespace J2N.Text
         /// -or-
         /// <para/>
         /// The current length of this <see cref="MutableTextBuffer"/> object plus the length of
-        /// <paramref name="value"/> exceeds <see cref="MaxCapacity"/>.
+        /// <paramref name="value"/> exceeds <see cref="MutableTextBuffer.MaxCapacity"/>.
         /// </exception>
         /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
         /// <remarks>
@@ -732,7 +732,7 @@ namespace J2N.Text
         /// -or-
         /// <para/>
         /// The current length of this <see cref="MutableTextBuffer"/> object plus the length of
-        /// <paramref name="value"/> exceeds <see cref="MaxCapacity"/>.
+        /// <paramref name="value"/> exceeds <see cref="MutableTextBuffer.MaxCapacity"/>.
         /// </exception>
         /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
         /// <remarks>
@@ -766,7 +766,7 @@ namespace J2N.Text
         /// -or-
         /// <para/>
         /// The current length of this <see cref="MutableTextBuffer"/> object plus the length of
-        /// <paramref name="value"/> exceeds <see cref="MaxCapacity"/>.
+        /// <paramref name="value"/> exceeds <see cref="MutableTextBuffer.MaxCapacity"/>.
         /// </exception>
         /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
         /// <remarks>
@@ -800,7 +800,7 @@ namespace J2N.Text
         /// -or-
         /// <para/>
         /// The current length of this <see cref="MutableTextBuffer"/> object plus the length of
-        /// <paramref name="value"/> exceeds <see cref="MaxCapacity"/>.
+        /// <paramref name="value"/> exceeds <see cref="MutableTextBuffer.MaxCapacity"/>.
         /// </exception>
         /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
         /// <remarks>

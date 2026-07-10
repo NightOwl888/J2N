@@ -16,7 +16,7 @@ namespace J2N.Text
         /// </summary>
         /// <param name="value">The sequence of characters to append.</param>
         /// <returns>A reference to this instance after the append operation has completed.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed <see cref="MutableTextBuffer.MaxCapacity"/>.</exception>
         /// <seealso cref="ICharSequence"/>
         [CodeGenerationReturnsSelf]
         public void Append(ICharSequence? value)
@@ -86,7 +86,7 @@ namespace J2N.Text
         /// <para/>
         /// -or-
         /// <para/>
-        /// Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.
+        /// Enlarging the value of this instance would exceed <see cref="MutableTextBuffer.MaxCapacity"/>.
         /// </exception>
         /// <seealso cref="ICharSequence"/>
         [CodeGenerationReturnsSelf]
@@ -171,7 +171,7 @@ namespace J2N.Text
         /// <para/>
         /// -or-
         /// <para/>
-        /// Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.
+        /// Enlarging the value of this instance would exceed <see cref="MutableTextBuffer.MaxCapacity"/>.
         /// </exception>
         [CodeGenerationReturnsSelf]
         public void Insert(int index, ICharSequence? value)
@@ -235,7 +235,7 @@ namespace J2N.Text
         /// <para/>
         /// -or-
         /// <para/>
-        /// Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.
+        /// Enlarging the value of this instance would exceed <see cref="MutableTextBuffer.MaxCapacity"/>.
         /// </exception>
         [CodeGenerationReturnsSelf]
         public void Insert(int index, ICharSequence? value, int startIndex, int count)

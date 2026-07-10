@@ -16,8 +16,7 @@ namespace J2N.Text
         /// The overall effect is exactly as if the argument were
         /// converted to a <see cref="char"/> array by the method
         /// <see cref="Character.ToChars(int)"/> and the character in that array
-        /// were then <see cref="Append(char[])">appended</see> to this
-        /// <see cref="MutableTextBuffer"/>.
+        /// were then appended to this <see cref="MutableTextBuffer"/>.
         /// </para>
         /// </summary>
         /// <param name="codePoint">A Unicode code point.</param>
@@ -59,8 +58,7 @@ namespace J2N.Text
         /// The overall effect is exactly as if the argument were
         /// converted to a <see cref="char"/> array by the method
         /// <see cref="Character.ToChars(int)"/> and the character in that array
-        /// were then <see cref="Insert(int, char[])">inserted</see> into this
-        /// <see cref="MutableTextBuffer"/>.
+        /// were then inserted into this <see cref="MutableTextBuffer"/>.
         /// </para>
         /// </summary>
         /// <param name="index">The position in this instance where insertion begins.</param>
