@@ -487,7 +487,7 @@ namespace J2N.Text
         /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
-        /// When you instantiate an <see cref="MutableTextBuffer"/> object by calling <see cref="MutableTextBuffer.Initialize(int, int)"/>,
+        /// When you instantiate a <see cref="MutableTextBuffer"/> object by calling <see cref="MutableTextBuffer.Initialize(int, int)"/>,
         /// both the length and the capacity of the <see cref="MutableTextBuffer"/> instance can grow beyond
         /// the value of its <see cref="MutableTextBuffer.MaxCapacity"/> property. This can occur particularly when you call the <see cref="MutableTextBuffer.Append(string)"/>
         /// and <see cref="MutableTextBuffer.AppendFormat(string, object?)"/> methods to append small strings.
