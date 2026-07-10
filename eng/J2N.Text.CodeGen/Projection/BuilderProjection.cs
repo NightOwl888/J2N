@@ -253,9 +253,10 @@ namespace J2N.Text.CodeGen.Projection
                 }
 
                 XmlDocumentationElementModel rewritten =
-                    RewriteDocumentationElement(
+                    DocumentationRewriter.RewriteElement(
                         element,
                         source,
+                        source.Name,
                         facadeName);
 
                 result.Elements.Add(rewritten);
@@ -319,38 +320,6 @@ namespace J2N.Text.CodeGen.Projection
             DocumentationRewriter.SortDocumentationElements(result);
 
             return result;
-        }
-
-        private static XmlDocumentationElementModel RewriteDocumentationElement(
-            XmlDocumentationElementModel element,
-            TypeModel source,
-            string facadeName)
-        {
-            XmlDocumentationElementModel rewritten =
-                new()
-                {
-                    ElementName = element.ElementName,
-                    InnerXml =
-                        DocumentationRewriter.RewriteDocumentation(
-                            element.InnerXml,
-                            source,
-                            source.Name,
-                            facadeName)
-                };
-
-            foreach (KeyValuePair<string, string> attribute in element.Attributes)
-            {
-                rewritten.Attributes.Add(
-                    attribute.Key,
-                    DocumentationRewriter.RewriteDocumentation(
-                        attribute.Value,
-                        source,
-                        source.Name,
-                        facadeName)
-                    ?? attribute.Value);
-            }
-
-            return rewritten;
         }
 
         private static AttributeModel CloneAttribute(

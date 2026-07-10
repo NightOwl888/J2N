@@ -144,5 +144,38 @@ namespace J2N.Text.CodeGen.Projection
 
             return cref;
         }
+
+        public static XmlDocumentationElementModel RewriteElement(
+            XmlDocumentationElementModel element,
+            TypeModel source,
+            string sourceType,
+            string projectedType)
+        {
+            XmlDocumentationElementModel rewritten =
+                new()
+                {
+                    ElementName = element.ElementName,
+                    InnerXml =
+                        RewriteDocumentation(
+                            element.InnerXml,
+                            source,
+                            sourceType,
+                            projectedType)
+                };
+
+            foreach ((string key, string value) in element.Attributes)
+            {
+                rewritten.Attributes.Add(
+                    key,
+                    RewriteDocumentation(
+                        value,
+                        source,
+                        sourceType,
+                        projectedType)
+                    ?? value);
+            }
+
+            return rewritten;
+        }
     }
 }

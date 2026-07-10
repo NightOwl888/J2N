@@ -310,9 +310,10 @@ namespace J2N.Text.CodeGen.Projection
                     continue;
 
                 result.Elements.Add(
-                    RewriteDocumentationElement(
+                    DocumentationRewriter.RewriteElement(
                         element,
                         source,
+                        source.Name,
                         projectedBuilderType));
             }
 
@@ -372,38 +373,6 @@ namespace J2N.Text.CodeGen.Projection
             }
 
             return result;
-        }
-
-        private static XmlDocumentationElementModel RewriteDocumentationElement(
-            XmlDocumentationElementModel element,
-            TypeModel source,
-            string projectedBuilderType)
-        {
-            XmlDocumentationElementModel rewritten =
-                new()
-                {
-                    ElementName = element.ElementName,
-                    InnerXml =
-                        DocumentationRewriter.RewriteDocumentation(
-                            element.InnerXml,
-                            source,
-                            source.Name,
-                            projectedBuilderType)
-                };
-
-            foreach (KeyValuePair<string, string> attribute in element.Attributes)
-            {
-                rewritten.Attributes.Add(
-                    attribute.Key,
-                    DocumentationRewriter.RewriteDocumentation(
-                        attribute.Value,
-                        source,
-                        source.Name,
-                        projectedBuilderType)
-                    ?? attribute.Value);
-            }
-
-            return rewritten;
         }
 
         private static string? RewriteBody(
