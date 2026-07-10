@@ -91,6 +91,11 @@ namespace J2N.Text.CodeGen.Projection
                         projectedBuilderType));
             }
 
+            if (options.AdditionalTypeParameter is not null)
+            {
+                result.Elements.Add(options.AdditionalTypeParameter);
+            }
+
             //
             // If there were no existing <param/> elements, insert the synthetic
             // one immediately after <summary/> if present, otherwise near the

@@ -1,4 +1,5 @@
 ﻿using J2N.Text.CodeGen.Generation;
+using J2N.Text.CodeGen.Generation.Migration;
 using J2N.Text.CodeGen.Metadata;
 using J2N.Text.CodeGen.Projection;
 using J2N.Text.CodeGen.Roslyn;
@@ -12,6 +13,7 @@ namespace J2N.Text.CodeGen
         {
             string? sourceDirectory = null;
             string? infrastructureDirectory = null;
+            bool migration = false;
 
             for (int i = 0; i < args.Length; i++)
             {
@@ -23,6 +25,10 @@ namespace J2N.Text.CodeGen
 
                     case "--infrastructure-directory":
                         infrastructureDirectory = args[++i];
+                        break;
+
+                    case "--migration":
+                        migration = true;
                         break;
                 }
             }
@@ -45,6 +51,15 @@ namespace J2N.Text.CodeGen
 
             Console.WriteLine($"Source directory: {sourceDirectory}");
             Console.WriteLine($"Infrastructure directory: {infrastructureDirectory}");
+
+            if (migration)
+            {
+                MutableTextBufferExtensionMigrationGenerator.Generate(
+                    sourceDirectory,
+                    infrastructureDirectory);
+
+                return 0;
+            }
 
             List<string> sourceTexts =
                 Directory.GetFiles(sourceDirectory, "MutableTextBuffer*.cs")

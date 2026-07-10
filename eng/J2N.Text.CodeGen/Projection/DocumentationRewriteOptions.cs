@@ -13,5 +13,7 @@ namespace J2N.Text.CodeGen.Projection
         /// existing <param/> elements.
         /// </summary>
         public XmlDocumentationElementModel? AdditionalThisParameter { get; init; }
+
+        public XmlDocumentationElementModel? AdditionalTypeParameter { get; init; }
     }
 }
