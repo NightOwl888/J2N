@@ -90,13 +90,6 @@ namespace J2N.Text.CodeGen.Projection
 
                             SourceTypeName = p.SourceTypeName,
 
-                            Documentation =
-                                DocumentationRewriter.RewriteDocumentation(
-                                    p.Documentation,
-                                    implementationModel,
-                                    sourceType,
-                                    projectedBuilderType),
-
                             Modifier = p.Modifier,
                             IsThis = p.IsThis,
                             DefaultValueExpression = p.DefaultValueExpression,

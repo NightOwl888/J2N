@@ -184,11 +184,6 @@ namespace J2N.Text.CodeGen.Roslyn
                         TypeName = parameterType,
                         SourceTypeName = parameterType,
 
-                        Documentation =
-                            ExtractParamDocumentation(
-                                method,
-                                p.Identifier.Text),
-
                         Modifier =
                             string.Join(
                                 " ",
@@ -343,11 +338,6 @@ namespace J2N.Text.CodeGen.Roslyn
                         TypeName = parameterType,
                         SourceTypeName = parameterType,
 
-                        Documentation =
-                            ExtractParamDocumentation(
-                                indexer,
-                                p.Identifier.Text),
-
                         Modifier =
                             string.Join(
                                 " ",
@@ -473,33 +463,6 @@ namespace J2N.Text.CodeGen.Roslyn
             return model;
         }
 
-        private static string? ExtractParamDocumentation(
-            MemberDeclarationSyntax member,
-            string paramName)
-        {
-            DocumentationCommentTriviaSyntax? docs =
-                GetDocumentationTrivia(member);
-
-            if (docs is null)
-                return null;
-
-            XmlElementSyntax? paramElement =
-                docs.Content
-                    .OfType<XmlElementSyntax>()
-                    .FirstOrDefault(e =>
-                        e.StartTag?.Name.LocalName.Text == "param"
-                        && e.StartTag.Attributes
-                            .OfType<XmlNameAttributeSyntax>()
-                            .Any(a =>
-                                a.Name?.LocalName.Text == "name"
-                                && a.Identifier?.Identifier.ValueText == paramName));
-
-            if (paramElement is null)
-                return null;
-
-            return NormalizeDocumentationContent(
-                paramElement.Content);
-        }
 
         private static List<XmlDocumentationElementModel> GetAllXmlElements(
             DocumentationCommentTriviaSyntax docs)

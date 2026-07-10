@@ -8,8 +8,6 @@
 
         public string? SourceTypeName { get; init; }
 
-        public string? Documentation { get; init; }
-
         public bool IsThis { get; init; }
 
         public string? Modifier { get; init; }

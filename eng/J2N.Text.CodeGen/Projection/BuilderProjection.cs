@@ -93,13 +93,6 @@ namespace J2N.Text.CodeGen.Projection
 
                             SourceTypeName = p.SourceTypeName,
 
-                            Documentation =
-                                DocumentationRewriter.RewriteDocumentation(
-                                    p.Documentation,
-                                    source,
-                                    source.Name,
-                                    facadeName),
-
                             Modifier = p.Modifier,
                             IsThis = p.IsThis,
                             DefaultValueExpression = p.DefaultValueExpression,
@@ -178,13 +171,6 @@ namespace J2N.Text.CodeGen.Projection
                                     facadeName),
 
                             SourceTypeName = p.SourceTypeName,
-
-                            Documentation =
-                                DocumentationRewriter.RewriteDocumentation(
-                                    p.Documentation,
-                                    source,
-                                    source.Name,
-                                    facadeName),
 
                             Modifier = p.Modifier,
                             IsThis = p.IsThis,
