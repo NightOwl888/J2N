@@ -4117,8 +4117,8 @@ namespace J2N.Text
         /// Returns a value indicating whether this instance is equal to a specified object.
         /// </summary>
         /// <param name="sb">An object to compare with this instance, or <see langword="null"/>.</param>
-        /// <returns><c>true</c> if the characters in this instance and <paramref name="sb"/> are the same;
-        /// otherwise, <c>false</c>.</returns>
+        /// <returns><see langword="true"/> if the characters in this instance and <paramref name="sb"/> are the same;
+        /// otherwise, <see langword="false"/>.</returns>
         /// <remarks>
         /// The current instance and <paramref name="sb"/> are equal if the strings assigned to both
         /// <see cref="MutableTextBuffer"/> objects are the same. To determine equality, the
@@ -4145,8 +4145,8 @@ namespace J2N.Text
         /// Returns a value indicating whether this instance is equal to a specified object.
         /// </summary>
         /// <param name="sb">An object to compare with this instance, or <see langword="null"/>.</param>
-        /// <returns><c>true</c> if the characters in this instance and <paramref name="sb"/> are the same;
-        /// otherwise, <c>false</c>.</returns>
+        /// <returns><see langword="true"/> if the characters in this instance and <paramref name="sb"/> are the same;
+        /// otherwise, <see langword="false"/>.</returns>
         /// <remarks>
         /// The current instance and <paramref name="sb"/> are equal if the strings assigned to both
         /// objects are the same. To determine equality, the <see cref="Equals(MutableTextBuffer)"/>
@@ -4206,8 +4206,8 @@ namespace J2N.Text
         /// characters in a specified read-only character span.
         /// </summary>
         /// <param name="span">The character span to compare with the current instance.</param>
-        /// <returns><c>true</c> if the characters in this instance and <paramref name="span"/> are the same;
-        /// otherwise, <c>false</c>.</returns>
+        /// <returns><see langword="true"/> if the characters in this instance and <paramref name="span"/> are the same;
+        /// otherwise, <see langword="false"/>.</returns>
         /// <remarks>
         /// The <see cref="Equals(MutableTextBuffer)"/> method performs an ordinal comparison to determine
         /// whether the characters in the current instance and span are equal.
@@ -5086,11 +5086,11 @@ namespace J2N.Text
         /// Releases resources owned by the current instance.
         /// </summary>
         /// <param name="disposing">
-        /// <c>true</c> to release managed resources; otherwise, <c>false</c>.
+        /// <see langword="true"/> to release managed resources; otherwise, <see langword="false"/>.
         /// </param>
         /// <remarks>
         /// Derived classes overriding this method should release any managed state
-        /// when <paramref name="disposing"/> is <c>true</c>, and then call the base
+        /// when <paramref name="disposing"/> is <see langword="true"/>, and then call the base
         /// implementation.
         /// <para/>
         /// This implementation releases ownership of the underlying character buffer

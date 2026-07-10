@@ -400,7 +400,7 @@ namespace J2N.Text
         /// Determines whether this char sequence is equal to <paramref name="other"/>.
         /// </summary>
         /// <param name="other">An <see cref="ICharSequence"/> to compare to the current char sequence.</param>
-        /// <returns><c>true</c> if <paramref name="other"/> is equal to the current char sequence; otherwise, <c>false</c>.</returns>
+        /// <returns><see langword="true"/> if <paramref name="other"/> is equal to the current char sequence; otherwise, <see langword="false"/>.</returns>
         public bool Equals(ICharSequence? other)
         {
             if (!HasValue)
@@ -442,7 +442,7 @@ namespace J2N.Text
         /// Determines whether this char sequence is equal to <paramref name="other"/>.
         /// </summary>
         /// <param name="other">A <see cref="T:char[]"/> to compare to the current char sequence.</param>
-        /// <returns><c>true</c> if <paramref name="other"/> is equal to the current char sequence; otherwise, <c>false</c>.</returns>
+        /// <returns><see langword="true"/> if <paramref name="other"/> is equal to the current char sequence; otherwise, <see langword="false"/>.</returns>
         public bool Equals(char[]? other)
         {
             var value = Value;
@@ -458,7 +458,7 @@ namespace J2N.Text
         /// Determines whether this char sequence is equal to <paramref name="other"/>.
         /// </summary>
         /// <param name="other">A <see cref="string"/> to compare to the current char sequence.</param>
-        /// <returns><c>true</c> if <paramref name="other"/> is equal to the current char sequence; otherwise, <c>false</c>.</returns>
+        /// <returns><see langword="true"/> if <paramref name="other"/> is equal to the current char sequence; otherwise, <see langword="false"/>.</returns>
         public bool Equals(ReadOnlySpan<char> other)
         {
             return Value.AsSpan().SequenceEqual(other);
@@ -468,7 +468,7 @@ namespace J2N.Text
         /// Determines whether this char sequence is equal to <paramref name="other"/>.
         /// </summary>
         /// <param name="other">A <see cref="string"/> to compare to the current char sequence.</param>
-        /// <returns><c>true</c> if <paramref name="other"/> is equal to the current char sequence; otherwise, <c>false</c>.</returns>
+        /// <returns><see langword="true"/> if <paramref name="other"/> is equal to the current char sequence; otherwise, <see langword="false"/>.</returns>
         public bool Equals(string? other)
         {
             var value = Value;
@@ -484,7 +484,7 @@ namespace J2N.Text
         /// Determines whether this char sequence is equal to <paramref name="other"/>.
         /// </summary>
         /// <param name="other">A <see cref="StringBuilder"/> to compare to the current char sequence.</param>
-        /// <returns><c>true</c> if <paramref name="other"/> is equal to the current char sequence; otherwise, <c>false</c>.</returns>
+        /// <returns><see langword="true"/> if <paramref name="other"/> is equal to the current char sequence; otherwise, <see langword="false"/>.</returns>
         public bool Equals(StringBuilder? other)
         {
             var value = Value;
@@ -513,7 +513,7 @@ namespace J2N.Text
         /// Determines whether this char sequence is equal to <paramref name="other"/>.
         /// </summary>
         /// <param name="other">An object to compare to the current char sequence.</param>
-        /// <returns><c>true</c> if <paramref name="other"/> is equal to the current char sequence; otherwise, <c>false</c>.</returns>
+        /// <returns><see langword="true"/> if <paramref name="other"/> is equal to the current char sequence; otherwise, <see langword="false"/>.</returns>
         public override bool Equals(object? other)
         {
             if (other is null)
