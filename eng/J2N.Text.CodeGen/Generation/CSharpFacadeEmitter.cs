@@ -40,14 +40,14 @@ namespace J2N.Text.CodeGen.Generation
             {
                 bool suppressDocs =
                     options.SuppressMissingDocumentationWarnings
-                    && !HasDocumentation(property.Documentation, property.IndexParameters);
+                    && !HasDocumentation(property.Documentation);
 
                 if (suppressDocs)
                 {
                     sb.AppendLine("#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member");
                 }
 
-                EmitDocumentation(sb, property.Documentation, property.IndexParameters);
+                CSharpDocumentationEmitter.EmitDocumentation(sb, property.Documentation);
                 EmitAttributes(sb, property.Attributes, "        ");
                 EmitProperty(sb, property, backingFieldName, wrapMembersInLock);
 
@@ -83,9 +83,7 @@ namespace J2N.Text.CodeGen.Generation
 
                 bool suppressDocs =
                     options.SuppressMissingDocumentationWarnings
-                    && !HasDocumentation(
-                        method.Documentation,
-                        method.Parameters);
+                    && !HasDocumentation(method.Documentation);
 
                 if (suppressDocs)
                 {
@@ -93,10 +91,9 @@ namespace J2N.Text.CodeGen.Generation
                         "#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member");
                 }
 
-                EmitDocumentation(
+                CSharpDocumentationEmitter.EmitDocumentation(
                     sb,
-                    method.Documentation,
-                    method.Parameters);
+                    method.Documentation);
 
                 EmitAttributes(
                     sb,
@@ -389,61 +386,6 @@ namespace J2N.Text.CodeGen.Generation
             }
         }
 
-        private static void EmitDocumentation(
-            StringBuilder sb,
-            DocumentationModel? docs,
-            IEnumerable<ParameterModel> parameters)
-        {
-            if (docs is null && !parameters.Any())
-                return;
-
-            EmitXmlElement(sb, "summary", docs?.SummaryXml);
-
-            foreach (ParameterModel parameter in parameters)
-            {
-                EmitParamDocumentation(sb, parameter);
-            }
-
-            EmitXmlElement(sb, "returns", docs?.ReturnsXml);
-
-            EmitXmlElement(sb, "remarks", docs?.RemarksXml);
-        }
-
-        private static void EmitParamDocumentation(
-            StringBuilder sb,
-            ParameterModel parameter)
-        {
-            if (string.IsNullOrWhiteSpace(parameter.Documentation))
-                return;
-
-            sb.AppendLine($"        /// <param name=\"{parameter.Name}\">");
-
-            foreach (string line in NormalizeLines(parameter.Documentation))
-            {
-                sb.AppendLine($"        /// {line.TrimEnd()}");
-            }
-
-            sb.AppendLine("        /// </param>");
-        }
-
-        private static void EmitXmlElement(
-            StringBuilder sb,
-            string elementName,
-            string? content)
-        {
-            if (string.IsNullOrWhiteSpace(content))
-                return;
-
-            sb.AppendLine($"        /// <{elementName}>");
-
-            foreach (string line in NormalizeLines(content))
-            {
-                sb.AppendLine($"        /// {line.TrimEnd()}");
-            }
-
-            sb.AppendLine($"        /// </{elementName}>");
-        }
-
         private static bool IsObjectMethod(MethodModel method)
         {
             if (method.Name == "ToString"
@@ -468,21 +410,10 @@ namespace J2N.Text.CodeGen.Generation
         }
 
         private static bool HasDocumentation(
-            DocumentationModel? docs,
-            IEnumerable<ParameterModel> parameters)
+            DocumentationModel? docs)
         {
-            if (docs is not null)
-            {
-                if (!string.IsNullOrWhiteSpace(docs.SummaryXml)
-                    || !string.IsNullOrWhiteSpace(docs.ReturnsXml)
-                    || !string.IsNullOrWhiteSpace(docs.RemarksXml))
-                {
-                    return true;
-                }
-            }
-
-            return parameters.Any(p =>
-                !string.IsNullOrWhiteSpace(p.Documentation));
+            return docs is not null
+                && docs.Elements.Count != 0;
         }
 
         private static string GetArgumentExpression(
@@ -517,36 +448,6 @@ namespace J2N.Text.CodeGen.Generation
 
             return
                 $"{modifier}{parameter.TypeName} {parameter.Name}{defaultValue}";
-        }
-
-        private static IEnumerable<string> NormalizeLines(string text)
-        {
-            string normalized =
-                text.Replace("\r\n", "\n")
-                    .Replace('\r', '\n');
-
-            return normalized
-                .Split('\n')
-                .Select(l =>
-                {
-                    string line = l.TrimEnd();
-
-                    string trimmed = line.TrimStart();
-
-                    if (trimmed.StartsWith("///"))
-                    {
-                        trimmed = trimmed.Substring(3);
-
-                        if (trimmed.StartsWith(" "))
-                        {
-                            trimmed = trimmed.Substring(1);
-                        }
-
-                        return trimmed;
-                    }
-
-                    return line;
-                });
         }
     }
 }

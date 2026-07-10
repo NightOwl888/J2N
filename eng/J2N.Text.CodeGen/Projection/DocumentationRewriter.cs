@@ -5,6 +5,43 @@ namespace J2N.Text.CodeGen.Projection
 {
     internal static class DocumentationRewriter
     {
+        private static readonly Dictionary<string, int> DocumentationElementOrder = new(StringComparer.Ordinal)
+        {
+            ["summary"] = 0,
+
+            ["typeparam"] = 10,
+            ["param"] = 20,
+
+            ["returns"] = 30,
+            ["value"] = 40,
+
+            ["exception"] = 50,
+            ["permission"] = 60,
+
+            ["remarks"] = 70,
+            ["example"] = 80,
+
+            ["seealso"] = 90,
+            ["see"] = 100,
+        };
+
+        public static void SortDocumentationElements(
+            DocumentationModel documentation)
+        {
+            List<XmlDocumentationElementModel> ordered =
+                documentation.Elements
+                    .OrderBy(e =>
+                        DocumentationElementOrder.TryGetValue(
+                            e.ElementName,
+                            out int order)
+                                ? order
+                                : int.MaxValue)
+                    .ToList();
+
+            documentation.Elements.Clear();
+            documentation.Elements.AddRange(ordered);
+        }
+
         public static string? RewriteDocumentation(
             string? xml,
             TypeModel source,
@@ -106,6 +143,127 @@ namespace J2N.Text.CodeGen.Projection
             }
 
             return cref;
+        }
+
+        public static DocumentationModel? RewriteDocumentation(
+            DocumentationModel? documentation,
+            TypeModel implementationModel,
+            string sourceType,
+            string projectedBuilderType)
+        {
+            if (documentation is null)
+                return null;
+
+            DocumentationModel result = documentation.Clone();
+
+            result.SummaryXml =
+                RewriteDocumentation(
+                    result.SummaryXml,
+                    implementationModel,
+                    sourceType,
+                    projectedBuilderType);
+
+            result.RemarksXml =
+                RewriteDocumentation(
+                    result.RemarksXml,
+                    implementationModel,
+                    sourceType,
+                    projectedBuilderType);
+
+            result.ReturnsXml =
+                RewriteDocumentation(
+                    result.ReturnsXml,
+                    implementationModel,
+                    sourceType,
+                    projectedBuilderType);
+
+            result.ValueXml =
+                RewriteDocumentation(
+                    result.ValueXml,
+                    implementationModel,
+                    sourceType,
+                    projectedBuilderType);
+
+            result.ExampleXml =
+                RewriteDocumentation(
+                    result.ExampleXml,
+                    implementationModel,
+                    sourceType,
+                    projectedBuilderType);
+
+            RewriteElementCollection(
+                result.Exceptions,
+                implementationModel,
+                sourceType,
+                projectedBuilderType);
+
+            RewriteElementCollection(
+                result.Permissions,
+                implementationModel,
+                sourceType,
+                projectedBuilderType);
+
+            RewriteElementCollection(
+                result.SeeAlsos,
+                implementationModel,
+                sourceType,
+                projectedBuilderType);
+
+            RewriteElementCollection(
+                result.Sees,
+                implementationModel,
+                sourceType,
+                projectedBuilderType);
+
+            RewriteElementCollection(
+                result.TypeParameters,
+                implementationModel,
+                sourceType,
+                projectedBuilderType);
+
+            result.SynchronizationNoteXml =
+                RewriteDocumentation(
+                    result.SynchronizationNoteXml,
+                    implementationModel,
+                    sourceType,
+                    projectedBuilderType);
+
+            SortDocumentationElements(result);
+            return result;
+        }
+
+        private static void RewriteElementCollection(
+            IEnumerable<XmlDocumentationElementModel> elements,
+            TypeModel implementationModel,
+            string sourceType,
+            string projectedBuilderType)
+        {
+            foreach (XmlDocumentationElementModel element in elements)
+            {
+                if (element.InnerXml is not null)
+                {
+                    element.InnerXml =
+                        RewriteDocumentation(
+                            element.InnerXml,
+                            implementationModel,
+                            sourceType,
+                            projectedBuilderType);
+                }
+
+                List<string> keys =
+                    element.Attributes.Keys.ToList();
+
+                foreach (string key in keys)
+                {
+                    element.Attributes[key] =
+                        RewriteDocumentation(
+                            element.Attributes[key],
+                            implementationModel,
+                            sourceType,
+                            projectedBuilderType)
+                        ?? element.Attributes[key];
+                }
+            }
         }
     }
 }

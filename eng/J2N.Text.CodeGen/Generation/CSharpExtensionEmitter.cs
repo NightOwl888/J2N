@@ -99,10 +99,9 @@ namespace J2N.Text.CodeGen.Generation
             MethodModel method,
             bool wrapMembersInLock)
         {
-            EmitDocumentation(
+            CSharpDocumentationEmitter.EmitDocumentation(
                 sb,
-                method.Documentation,
-                method.Parameters);
+                method.Documentation);
 
             EmitAttributes(
                 sb,
@@ -199,102 +198,6 @@ namespace J2N.Text.CodeGen.Generation
                     sb.AppendLine($"{indent}[{attribute.Name}({args})]");
                 }
             }
-        }
-
-        private static void EmitDocumentation(
-            StringBuilder sb,
-            DocumentationModel? docs,
-            IEnumerable<ParameterModel> parameters)
-        {
-            if (docs is null && !parameters.Any())
-                return;
-
-            EmitXmlElement(
-                sb,
-                "summary",
-                docs?.SummaryXml);
-
-            foreach (ParameterModel parameter in parameters)
-            {
-                if (string.IsNullOrWhiteSpace(parameter.Documentation))
-                    continue;
-
-                sb.AppendLine(
-                    $"        /// <param name=\"{parameter.Name}\">");
-
-                foreach (string line in NormalizeLines(parameter.Documentation))
-                {
-                    sb.AppendLine($"        /// {line}");
-                }
-
-                sb.AppendLine(
-                    $"        /// </param>");
-            }
-
-            EmitXmlElement(
-                sb,
-                "returns",
-                docs?.ReturnsXml);
-
-            EmitXmlElement(
-                sb,
-                "remarks",
-                docs?.RemarksXml);
-        }
-
-        private static void EmitXmlElement(
-            StringBuilder sb,
-            string elementName,
-            string? content)
-        {
-            if (string.IsNullOrWhiteSpace(content))
-                return;
-
-            sb.AppendLine(
-                $"        /// <{elementName}>");
-
-            foreach (string line in NormalizeLines(content))
-            {
-                sb.AppendLine(
-                    $"        /// {line}");
-            }
-
-            sb.AppendLine(
-                $"        /// </{elementName}>");
-        }
-
-        private static IEnumerable<string> NormalizeLines(string text)
-        {
-            return text
-                .Split(
-                    new[]
-                    {
-                        Environment.NewLine,
-                        "\r\n",
-                        "\n",
-                        "\r"
-                    },
-                    StringSplitOptions.None)
-                .Select(l =>
-                {
-                    string line = l.TrimEnd();
-
-                    string trimmed = line.TrimStart();
-
-                    if (trimmed.StartsWith("///"))
-                    {
-                        trimmed = trimmed.Substring(3);
-
-                        if (trimmed.StartsWith(" "))
-                        {
-                            trimmed = trimmed.Substring(1);
-                        }
-
-                        return trimmed;
-                    }
-
-                    return line;
-                });
         }
 
         private static void EmitBodyText(

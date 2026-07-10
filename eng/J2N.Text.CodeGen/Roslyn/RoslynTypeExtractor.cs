@@ -1,5 +1,4 @@
-﻿using System.Xml.Linq;
-using J2N.Text.CodeGen.Metadata;
+﻿using J2N.Text.CodeGen.Metadata;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -466,20 +465,46 @@ namespace J2N.Text.CodeGen.Roslyn
             if (docs is null)
                 return null;
 
-            return new DocumentationModel
-            {
-                SummaryXml =
-                    GetXmlElementInnerText(docs, "summary"),
+            DocumentationModel model = new();
 
-                RemarksXml =
-                    GetXmlElementInnerText(docs, "remarks"),
+            // Preserve every XML element in document order.
+            model.Elements.AddRange(GetAllXmlElements(docs));
 
-                ReturnsXml =
-                    GetXmlElementInnerText(docs, "returns"),
+            // Convenience properties for the generator.
+            model.SummaryXml =
+                GetElementInnerXml(model.Elements, "summary");
 
-                SynchronizationNoteXml =
-                    GetXmlElementInnerText(docs, "synchronizationNote")
-            };
+            model.RemarksXml =
+                GetElementInnerXml(model.Elements, "remarks");
+
+            model.ReturnsXml =
+                GetElementInnerXml(model.Elements, "returns");
+
+            model.ValueXml =
+                GetElementInnerXml(model.Elements, "value");
+
+            model.ExampleXml =
+                GetElementInnerXml(model.Elements, "example");
+
+            model.SynchronizationNoteXml =
+                GetElementInnerXml(model.Elements, "synchronizationNote");
+
+            model.Exceptions.AddRange(
+                GetElements(model.Elements, "exception"));
+
+            model.Permissions.AddRange(
+                GetElements(model.Elements, "permission"));
+
+            model.SeeAlsos.AddRange(
+                GetElements(model.Elements, "seealso"));
+
+            model.Sees.AddRange(
+                GetElements(model.Elements, "see"));
+
+            model.TypeParameters.AddRange(
+                GetElements(model.Elements, "typeparam"));
+
+            return model;
         }
 
         private static string? ExtractParamDocumentation(
@@ -510,21 +535,114 @@ namespace J2N.Text.CodeGen.Roslyn
                 paramElement.Content);
         }
 
-        private static string? GetXmlElementInnerText(
-            DocumentationCommentTriviaSyntax docs,
+        private static List<XmlDocumentationElementModel> GetAllXmlElements(
+            DocumentationCommentTriviaSyntax docs)
+        {
+            List<XmlDocumentationElementModel> result = [];
+
+            foreach (XmlNodeSyntax node in docs.Content)
+            {
+                switch (node)
+                {
+                    case XmlElementSyntax element:
+                        {
+                            XmlDocumentationElementModel model = new()
+                            {
+                                ElementName = element.StartTag.Name.LocalName.Text,
+                                InnerXml = NormalizeDocumentationContent(element.Content)
+                            };
+
+                            AddAttributes(model, element.StartTag.Attributes);
+
+                            result.Add(model);
+                            break;
+                        }
+
+                    case XmlEmptyElementSyntax element:
+                        {
+                            XmlDocumentationElementModel model = new()
+                            {
+                                ElementName = element.Name.LocalName.Text,
+                                InnerXml = null
+                            };
+
+                            AddAttributes(model, element.Attributes);
+
+                            result.Add(model);
+                            break;
+                        }
+
+                    case XmlTextSyntax:
+                        // Formatting (newlines/whitespace) between documentation elements (ignore)
+                        break;
+
+                    default:
+                        throw new NotSupportedException(
+                            $"Unsupported XML documentation element syntax '{node.GetType().Name}'.");
+                }
+            }
+
+            return result;
+        }
+
+        private static void AddAttributes(
+            XmlDocumentationElementModel model,
+            SyntaxList<XmlAttributeSyntax> attributes)
+        {
+            foreach (XmlAttributeSyntax attribute in attributes)
+            {
+                switch (attribute)
+                {
+                    case XmlNameAttributeSyntax nameAttribute:
+
+                        model.Attributes.Add(
+                            nameAttribute.Name!.LocalName.Text,
+                            nameAttribute.Identifier!.Identifier.ValueText);
+
+                        break;
+
+                    case XmlTextAttributeSyntax textAttribute:
+
+                        model.Attributes.Add(
+                            textAttribute.Name!.LocalName.Text,
+                            string.Concat(
+                                textAttribute.TextTokens.Select(
+                                    t => t.ValueText)));
+
+                        break;
+
+                    case XmlCrefAttributeSyntax crefAttribute:
+                        model.Attributes.Add(
+                            crefAttribute.Name!.LocalName.Text,
+                            crefAttribute.Cref?.ToString() ?? "");
+
+                        break;
+
+                    default:
+                        throw new NotSupportedException(
+                            $"Unsupported XML documentation attribute syntax '{attribute.GetType().Name}'.");
+                }
+            }
+        }
+
+        private static string? GetElementInnerXml(
+            IEnumerable<XmlDocumentationElementModel> elements,
             string elementName)
         {
-            XmlElementSyntax? element =
-                docs.Content
-                    .OfType<XmlElementSyntax>()
-                    .FirstOrDefault(e =>
-                        e.StartTag?.Name.LocalName.Text == elementName);
+            return elements
+                .FirstOrDefault(e =>
+                    e.ElementName == elementName)?
+                .InnerXml;
+        }
 
-            if (element is null)
-                return null;
-
-            return NormalizeDocumentationContent(
-                element.Content);
+        private static List<XmlDocumentationElementModel> GetElements(
+            IEnumerable<XmlDocumentationElementModel> elements,
+            string elementName)
+        {
+            return elements
+                .Where(e =>
+                    e.ElementName == elementName)
+                .ToList();
         }
 
         private static string NormalizeDocumentationContent(
@@ -537,12 +655,43 @@ namespace J2N.Text.CodeGen.Roslyn
                 raw.Replace("\r\n", "\n")
                    .Replace('\r', '\n');
 
-            string[] lines =
-                normalized.Split('\n');
+            List<string> lines =
+                normalized
+                    .Split('\n')
+                    .Select(line =>
+                    {
+                        line = line.TrimEnd();
 
-            return string.Join(
-                Environment.NewLine,
-                lines.Select(l => l.TrimEnd()));
+                        int commentIndex =
+                            line.IndexOf("///", StringComparison.Ordinal);
+
+                        if (commentIndex >= 0)
+                        {
+                            line = line[(commentIndex + 3)..];
+
+                            if (line.StartsWith(" ", StringComparison.Ordinal))
+                            {
+                                line = line[1..];
+                            }
+                        }
+
+                        return line;
+                    })
+                    .ToList();
+
+            while (lines.Count > 0 &&
+                   string.IsNullOrWhiteSpace(lines[0]))
+            {
+                lines.RemoveAt(0);
+            }
+
+            while (lines.Count > 0 &&
+                   string.IsNullOrWhiteSpace(lines[^1]))
+            {
+                lines.RemoveAt(lines.Count - 1);
+            }
+
+            return string.Join(Environment.NewLine, lines);
         }
 
         private static bool IsUnsafeType(string typeName)

@@ -120,40 +120,16 @@ namespace J2N.Text.CodeGen.Projection
                         .ToList(),
 
                 Documentation =
-                    MergeSynchronizationDocumentation(
-                        method.Documentation is null
-                            ? null
-                            : new DocumentationModel
-                            {
-                                SummaryXml =
-                                    DocumentationRewriter.RewriteDocumentation(
-                                        method.Documentation.SummaryXml,
-                                        implementationModel,
-                                        sourceType,
-                                        projectedBuilderType),
-
-                                RemarksXml =
-                                    DocumentationRewriter.RewriteDocumentation(
-                                        method.Documentation.RemarksXml,
-                                        implementationModel,
-                                        sourceType,
-                                        projectedBuilderType),
-
-                                ReturnsXml =
-                                    DocumentationRewriter.RewriteDocumentation(
-                                        method.Documentation.ReturnsXml,
-                                        implementationModel,
-                                        sourceType,
-                                        projectedBuilderType),
-
-                                SynchronizationNoteXml =
-                                    DocumentationRewriter.RewriteDocumentation(
-                                        method.Documentation.SynchronizationNoteXml,
-                                        implementationModel,
-                                        sourceType,
-                                        projectedBuilderType)
-                            },
-                            includeSynchronizationNote: options.EmitSynchronizationNotes && method.SkipSynchronization),
+                    RewriteDocumentation(
+                        method.Documentation,
+                        implementationModel,
+                        projectedBuilderType,
+                        options,
+                        includeSynchronizationNote:
+                            options.EmitSynchronizationNotes &&
+                            method.SkipSynchronization,
+                        forceBuilderReturns:
+                            method.ReturnsSelf),
 
                 GenerateForwarder = method.GenerateForwarder,
 
@@ -310,34 +286,124 @@ namespace J2N.Text.CodeGen.Projection
             };
         }
 
-        private static DocumentationModel? MergeSynchronizationDocumentation(DocumentationModel? docs, bool includeSynchronizationNote)
+        private static DocumentationModel? RewriteDocumentation(
+            DocumentationModel? documentation,
+            TypeModel source,
+            string projectedBuilderType,
+            ProjectionOptions options,
+            bool includeSynchronizationNote,
+            bool forceBuilderReturns = false)
         {
-            if (docs is null)
-                return null;
-
-            string? remarksXml = docs.RemarksXml;
-
-            if (includeSynchronizationNote
-                && !string.IsNullOrWhiteSpace(docs.SynchronizationNoteXml))
+            if (documentation is null)
             {
-                if (string.IsNullOrWhiteSpace(remarksXml))
+                if (!forceBuilderReturns)
+                    return null;
+
+                documentation = new DocumentationModel();
+            }
+
+            DocumentationModel result = new();
+
+            foreach (XmlDocumentationElementModel element in documentation.Elements)
+            {
+                if (element.ElementName == "synchronizationNote")
+                    continue;
+
+                result.Elements.Add(
+                    RewriteDocumentationElement(
+                        element,
+                        source,
+                        projectedBuilderType));
+            }
+
+            if (includeSynchronizationNote)
+            {
+                XmlDocumentationElementModel? sync =
+                    documentation.Elements.FirstOrDefault(
+                        e => e.ElementName == "synchronizationNote");
+
+                if (sync is not null)
                 {
-                    remarksXml = docs.SynchronizationNoteXml;
-                }
-                else
-                {
-                    remarksXml +=
-                        "<para/>"
-                        + docs.SynchronizationNoteXml;
+                    XmlDocumentationElementModel? remarks =
+                        result.Elements.FirstOrDefault(
+                            e => e.ElementName == "remarks");
+
+                    if (remarks is null)
+                    {
+                        result.Elements.Add(
+                            new XmlDocumentationElementModel
+                            {
+                                ElementName = "remarks",
+                                InnerXml = sync.InnerXml
+                            });
+                    }
+                    else
+                    {
+                        remarks.InnerXml +=
+                            Environment.NewLine +
+                            "<para/>" +
+                            Environment.NewLine +
+                            sync.InnerXml;
+                    }
                 }
             }
 
-            return new DocumentationModel
+            if (forceBuilderReturns)
             {
-                SummaryXml = docs.SummaryXml,
-                RemarksXml = remarksXml,
-                ReturnsXml = docs.ReturnsXml
-            };
+                XmlDocumentationElementModel? returns =
+                    result.Elements.FirstOrDefault(
+                        e => e.ElementName == "returns");
+
+                if (returns is null)
+                {
+                    result.Elements.Add(
+                        new XmlDocumentationElementModel
+                        {
+                            ElementName = "returns",
+                            InnerXml =
+                                "A reference to this instance after the operation has completed."
+                        });
+                }
+                else
+                {
+                    returns.InnerXml =
+                        "A reference to this instance after the operation has completed.";
+                }
+            }
+
+            return result;
+        }
+
+        private static XmlDocumentationElementModel RewriteDocumentationElement(
+            XmlDocumentationElementModel element,
+            TypeModel source,
+            string projectedBuilderType)
+        {
+            XmlDocumentationElementModel rewritten =
+                new()
+                {
+                    ElementName = element.ElementName,
+                    InnerXml =
+                        DocumentationRewriter.RewriteDocumentation(
+                            element.InnerXml,
+                            source,
+                            source.Name,
+                            projectedBuilderType)
+                };
+
+            foreach (KeyValuePair<string, string> attribute in element.Attributes)
+            {
+                rewritten.Attributes.Add(
+                    attribute.Key,
+                    DocumentationRewriter.RewriteDocumentation(
+                        attribute.Value,
+                        source,
+                        source.Name,
+                        projectedBuilderType)
+                    ?? attribute.Value);
+            }
+
+            return rewritten;
         }
 
         private static string? RewriteBody(
