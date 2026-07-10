@@ -470,40 +470,6 @@ namespace J2N.Text.CodeGen.Roslyn
             // Preserve every XML element in document order.
             model.Elements.AddRange(GetAllXmlElements(docs));
 
-            // Convenience properties for the generator.
-            model.SummaryXml =
-                GetElementInnerXml(model.Elements, "summary");
-
-            model.RemarksXml =
-                GetElementInnerXml(model.Elements, "remarks");
-
-            model.ReturnsXml =
-                GetElementInnerXml(model.Elements, "returns");
-
-            model.ValueXml =
-                GetElementInnerXml(model.Elements, "value");
-
-            model.ExampleXml =
-                GetElementInnerXml(model.Elements, "example");
-
-            model.SynchronizationNoteXml =
-                GetElementInnerXml(model.Elements, "synchronizationNote");
-
-            model.Exceptions.AddRange(
-                GetElements(model.Elements, "exception"));
-
-            model.Permissions.AddRange(
-                GetElements(model.Elements, "permission"));
-
-            model.SeeAlsos.AddRange(
-                GetElements(model.Elements, "seealso"));
-
-            model.Sees.AddRange(
-                GetElements(model.Elements, "see"));
-
-            model.TypeParameters.AddRange(
-                GetElements(model.Elements, "typeparam"));
-
             return model;
         }
 
