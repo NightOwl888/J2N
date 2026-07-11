@@ -33,6 +33,7 @@ namespace J2N.Text.CodeGen.Projection
                 projected.Methods.Add(
                     ProjectMethod(
                         method,
+                        extensionSource,
                         implementationModel,
                         targetSourceType,
                         projectedBuilderType,
@@ -44,6 +45,7 @@ namespace J2N.Text.CodeGen.Projection
 
         private static MethodModel ProjectMethod(
             MethodModel method,
+            TypeModel extensionSource,
             TypeModel implementationModel,
             string sourceType,
             string projectedBuilderType,
@@ -92,13 +94,6 @@ namespace J2N.Text.CodeGen.Projection
             {
                 Name = method.Name,
 
-                //ReturnType =
-                //    RewriteReturnType(
-                //        method,
-                //        options.PreserveSelfTypeGenerics,
-                //        sourceType,
-                //        projectedBuilderType),
-
                 ReturnType = "TBuilder",
 
                 ReturnsSelf = method.ReturnsSelf,
@@ -107,17 +102,6 @@ namespace J2N.Text.CodeGen.Projection
                 IsExtensionMethod = method.IsExtensionMethod,
 
                 Parameters = parameters,
-
-                //GenericParameters =
-                //    options.PreserveSelfTypeGenerics
-                //        ? method.GenericParameters
-                //            .Select(p =>
-                //                RewriteGenericParameter(
-                //                    p,
-                //                    sourceType,
-                //                    projectedBuilderType))
-                //            .ToList()
-                //        : [],
 
                 GenericParameters =
                 [
@@ -135,40 +119,6 @@ namespace J2N.Text.CodeGen.Projection
                     method.Attributes
                         .Select(CloneAttribute)
                         .ToList(),
-
-                //Documentation =
-                //    DocumentationRewriter.RewriteDocumentation(
-                //        method.Documentation,
-                //        implementationModel,
-                //        sourceType,
-                //        projectedBuilderType,
-                //        new DocumentationRewriteOptions
-                //        {
-                //            IncludeSynchronizationNote = options.EmitSynchronizationNotes && method.SkipSynchronization,
-                //            ForceBuilderReturns = method.ReturnsSelf
-                //        }),
-
-                //Documentation =
-                //    DocumentationRewriter.RewriteDocumentation(
-                //        method.Documentation,
-                //        implementationModel,
-                //        sourceType,
-                //        projectedBuilderType,
-                //        new DocumentationRewriteOptions
-                //        {
-                //            ForceBuilderReturns = true,
-
-                //            AdditionalThisParameter =
-                //                new XmlDocumentationElementModel
-                //                {
-                //                    ElementName = "param",
-                //                    InnerXml = "The target builder.",
-                //                    Attributes =
-                //                    {
-                //                        ["name"] = "text"
-                //                    }
-                //                }
-                //        }),
 
                 Documentation =
                     DocumentationRewriter.RewriteDocumentation(
@@ -200,8 +150,16 @@ namespace J2N.Text.CodeGen.Projection
                                     {
                                         ["name"] = "text"
                                     }
-                                }
-                        }),
+                                },
+
+                            RewriteCref =
+                                cref =>
+                                    RewriteMigrationCref(
+                                        cref,
+                                        extensionSource,
+                                        implementationModel,
+                                        projectedBuilderType)
+                                        }),
 
                 GenerateForwarder = true,
 
@@ -270,6 +228,115 @@ namespace J2N.Text.CodeGen.Projection
                 Name = attribute.Name,
                 Arguments = attribute.Arguments.ToList()
             };
+        }
+
+        private static string RewriteMigrationCref(
+            string cref,
+            TypeModel extensionSource,
+            TypeModel implementationModel,
+            string projectedBuilderType)
+        {
+            //
+            // Apply every existing rewrite EXCEPT the constructor rewrite.
+            //
+            cref = RewriteMigrationSelfReference(
+                cref,
+                extensionSource,
+                projectedBuilderType);
+
+            return cref;
+        }
+
+        private static string RewriteMigrationSelfReference(
+            string cref,
+            TypeModel source,
+            string projectedBuilderType)
+        {
+            foreach (MethodModel method in source.Methods)
+            {
+                if (!method.ReturnsSelf)
+                    continue;
+
+                //
+                // Append(...)
+                //
+                string shortPrefix =
+                    method.Name + "(";
+
+                if (cref.StartsWith(shortPrefix, StringComparison.Ordinal))
+                {
+                    return RewriteMigrationMethodSignature(
+                        cref,
+                        method.Name.Length,
+                        projectedBuilderType);
+                }
+
+                //
+                // MutableTextBuffer.Append(...)
+                //
+                string qualifiedPrefix =
+                    source.SourceType + "." + method.Name;
+
+                if (cref.StartsWith(qualifiedPrefix, StringComparison.Ordinal))
+                {
+                    return RewriteMigrationMethodSignature(
+                        cref,
+                        qualifiedPrefix.Length,
+                        projectedBuilderType);
+                }
+            }
+
+            return cref;
+        }
+
+        private static string RewriteMigrationMethodSignature(
+            string cref,
+            int methodNameLength,
+            string projectedBuilderType)
+        {
+            int openParen =
+                cref.IndexOf('(', methodNameLength);
+
+            if (openParen < 0)
+                return cref;
+
+            //
+            // Remove the source type qualifier if present.
+            //
+            int dot =
+                cref.LastIndexOf('.', openParen);
+
+            string methodName;
+
+            if (dot >= 0)
+            {
+                methodName =
+                    cref.Substring(
+                        dot + 1,
+                        openParen - dot - 1);
+            }
+            else
+            {
+                methodName =
+                    cref.Substring(
+                        0,
+                        openParen);
+            }
+
+            string parameters =
+                cref.Substring(openParen + 1);
+
+            if (parameters.StartsWith(")", StringComparison.Ordinal))
+            {
+                return
+                    methodName +
+                    "{TBuilder}(TBuilder)";
+            }
+
+            return
+                methodName +
+                "{TBuilder}(TBuilder, " +
+                parameters;
         }
     }
 }
