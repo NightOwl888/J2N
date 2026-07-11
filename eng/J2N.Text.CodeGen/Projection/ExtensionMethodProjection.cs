@@ -40,6 +40,7 @@ namespace J2N.Text.CodeGen.Projection
                 projected.Methods.Add(
                     ProjectMethod(
                         method,
+                        extensionSource,
                         implementationModel,
                         targetSourceType,
                         projectedBuilderType,
@@ -52,6 +53,7 @@ namespace J2N.Text.CodeGen.Projection
 
         private static MethodModel ProjectMethod(
             MethodModel method,
+            TypeModel extensionSource,
             TypeModel implementationModel,
             string sourceType,
             string projectedBuilderType,
@@ -123,6 +125,20 @@ namespace J2N.Text.CodeGen.Projection
                             IncludeSynchronizationNote = options.EmitSynchronizationNotes && method.SkipSynchronization,
                             ForceBuilderReturns = method.ReturnsSelf,
                             PreserveTypeParameterDocumentation = options.PreserveSelfTypeGenerics,
+                            RewriteCref =
+                                options.PreserveSelfTypeGenerics
+                                    ? (cref) =>
+                                        RewriteNonGenericExtensionMethodCref(
+                                            cref,
+                                            extensionSource,
+                                            implementationModel,
+                                            projectedBuilderType)
+                                    : (cref) =>
+                                        RewriteGenericExtensionMethodCref(
+                                            cref,
+                                            extensionSource,
+                                            implementationModel,
+                                            projectedBuilderType),
                         }),
 
                 GenerateForwarder = method.GenerateForwarder,
@@ -344,6 +360,121 @@ namespace J2N.Text.CodeGen.Projection
              return name.EndsWith(suffix, StringComparison.Ordinal)
                 ? name[..^suffix.Length]
                 : name;
+        }
+
+        public static string RewriteNonGenericExtensionMethodCref(
+            string cref,
+            TypeModel extensionSource,
+            TypeModel implementationModel,
+            string facadeType)
+        {
+            cref = DocumentationRewriter.RewriteCrefTarget(cref, implementationModel, facadeType);
+            cref = DocumentationRewriter.RewriteCrefTarget(cref, extensionSource, facadeType);
+            return cref;
+        }
+
+        public static string RewriteGenericExtensionMethodCref(
+            string cref,
+            TypeModel extensionSource,
+            TypeModel implementationModel,
+            string facadeType)
+        {
+            cref = DocumentationRewriter.RewriteCrefTarget(cref, implementationModel, facadeType);
+            cref = DocumentationRewriter.RewriteCrefTarget(cref, extensionSource, facadeType);
+
+            foreach (MethodModel method in extensionSource.Methods)
+            {
+                //
+                // New rule:
+                //
+                // Insert{TBuilder}(TBuilder,...)
+                // ->
+                // Insert(TextBuilder,...)
+                //
+                if (!method.IsExtensionMethod)
+                    continue;
+
+                string genericMethod =
+                    method.Name + "{";
+
+                string qualifiedGenericMethod =
+                    extensionSource.SourceType + "." + method.Name + "{";
+
+                if (cref.StartsWith(genericMethod, StringComparison.Ordinal))
+                {
+                    return RewriteGenericExtensionMethodSignature(
+                        cref,
+                        method.Name.Length,
+                        facadeType);
+                }
+
+                if (cref.StartsWith(qualifiedGenericMethod, StringComparison.Ordinal))
+                {
+                    return RewriteGenericExtensionMethodSignature(
+                        cref,
+                        qualifiedGenericMethod.Length - 1,
+                        facadeType);
+                }
+            }
+
+            return cref;
+        }
+
+        private static string RewriteGenericExtensionMethodSignature(
+            string cref,
+            int methodNameLength,
+            string facadeType)
+        {
+            //
+            // Find the end of the generic argument list.
+            //
+            int genericEnd =
+                cref.IndexOf('}', methodNameLength);
+
+            if (genericEnd < 0)
+                return cref;
+
+            //
+            // Strip the generic argument list.
+            //
+            string rewritten =
+                cref.Remove(
+                    methodNameLength,
+                    genericEnd - methodNameLength + 1);
+
+            //
+            // Rewrite only the first parameter.
+            //
+            int openParen =
+                rewritten.IndexOf('(');
+
+            if (openParen < 0)
+                return rewritten;
+
+            int firstComma =
+                rewritten.IndexOf(',', openParen + 1);
+
+            int closeParen =
+                rewritten.IndexOf(')', openParen + 1);
+
+            int endOfFirstParameter;
+
+            if (firstComma >= 0)
+            {
+                endOfFirstParameter = firstComma;
+            }
+            else
+            {
+                endOfFirstParameter = closeParen;
+            }
+
+            if (endOfFirstParameter < 0)
+                return rewritten;
+
+            return
+                rewritten.Substring(0, openParen + 1) +
+                facadeType +
+                rewritten.Substring(endOfFirstParameter);
         }
     }
 }
