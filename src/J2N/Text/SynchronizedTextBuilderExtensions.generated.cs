@@ -57,7 +57,7 @@ namespace J2N.Text
         /// <param name="start">The index at which to begin this slice.</param>
         /// <returns>The read-only span representation of the string.</returns>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="start"/> is less than 0 or greater than <c>text.Length</c>.</exception>
-        /// <exception cref="ArgumentNullException"><paramref name="text"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="text"/> is <see langword="null"/>.</exception>
         /// <remarks>
         /// Returns <see langword="default"/> when <paramref name="text"/> is <see langword="null"/>.
         /// <para/>
@@ -154,7 +154,7 @@ namespace J2N.Text
         /// <param name="text">The target string.</param>
         /// <param name="startIndex">The index at which to begin this slice.</param>
         /// <returns>The read-only span representation of the string.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="text"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="text"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentOutOfRangeException">
         /// <paramref name="startIndex"/> is less
         /// than 0 or greater than <c>text.Length</c>.
@@ -205,7 +205,7 @@ namespace J2N.Text
         /// <param name="text">The target string.</param>
         /// <param name="range">The range that has start and end indexes to use for slicing the string.</param>
         /// <returns>The read-only span representation of the string.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="text"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="text"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentOutOfRangeException">
         /// <paramref name="range"/>'s start or end index is not within the bounds of the string.
         /// -or-
@@ -255,7 +255,7 @@ namespace J2N.Text
         /// <param name="text">The target string.</param>
         /// <returns>
         /// The read-only character memory representation of the string, or <c>default</c> if
-        /// <paramref name="text"/> is <c>null</c>.
+        /// <paramref name="text"/> is <see langword="null"/>.
         /// </returns>
         /// <remarks>
         /// Returns <see langword="default"/> when <paramref name="text"/> is <see langword="null"/>.
@@ -314,7 +314,7 @@ namespace J2N.Text
         /// <param name="length">The desired length for the slice (exclusive).</param>
         /// <returns>
         /// The read-only character memory representation of the string, or <c>default</c>
-        /// if <paramref name="text"/> is <c>null</c>.
+        /// if <paramref name="text"/> is <see langword="null"/>.
         /// </returns>
         /// <exception cref="ArgumentOutOfRangeException">
         /// <paramref name="start"/>, <paramref name="length"/>,
@@ -359,7 +359,7 @@ namespace J2N.Text
         /// <param name="text">The target string.</param>
         /// <param name="startIndex">The index at which to begin this slice.</param>
         /// <returns>The read-only character memory representation of the string.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="text"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="text"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentOutOfRangeException">
         /// <paramref name="startIndex"/> is less
         /// than 0 or greater than <c>text.Length</c>.
@@ -395,7 +395,7 @@ namespace J2N.Text
         /// <param name="text">The target string.</param>
         /// <param name="range">The range used to indicate the start and length of the sliced string.</param>
         /// <returns>The read-only character memory representation of the string.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="text"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="text"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentOutOfRangeException">
         /// <paramref name="range"/>'s start or end index is not within the bounds of the string.
         /// <para/>
@@ -450,7 +450,7 @@ namespace J2N.Text
         /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
-        /// When you instantiate an <see cref="SynchronizedTextBuilder"/> object by calling <see cref="SynchronizedTextBuilder(int, int)"/>,
+        /// When you instantiate a <see cref="SynchronizedTextBuilder"/> object by calling <see cref="SynchronizedTextBuilder(int, int)"/>,
         /// both the length and the capacity of the <see cref="SynchronizedTextBuilder"/> instance can grow beyond
         /// the value of its <see cref="SynchronizedTextBuilder.MaxCapacity"/> property. This can occur particularly when you call the <see cref="SynchronizedTextBuilder.Append(string)"/>
         /// and <see cref="SynchronizedTextBuilder.AppendFormat(string, object?)"/> methods to append small strings.

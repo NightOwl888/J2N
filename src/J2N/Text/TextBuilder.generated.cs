@@ -36,7 +36,7 @@ namespace J2N.Text
         /// <summary>Gets or sets the maximum number of characters that can be contained in the memory allocated by the current instance.</summary>
         /// <value>
         /// The maximum number of characters that can be contained in the memory allocated by the current instance.
-        /// Its value can range from <see cref="Length"/> to <see cref="MaxCapacity"/>.
+        /// Its value can range from <see cref="Length"/> to <see cref="TextBuilder.MaxCapacity"/>.
         /// </value>
         /// <exception cref="ArgumentOutOfRangeException">
         /// The value specified for a set operation is less than the current length of this instance.
@@ -69,10 +69,10 @@ namespace J2N.Text
         /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
-        /// When you instantiate an <see cref="TextBuilder"/> object by calling <see cref="TextBuilder(int, int)"/>,
+        /// When you instantiate a <see cref="TextBuilder"/> object by calling <see cref="TextBuilder(int, int)"/>,
         /// both the length and the capacity of the <see cref="TextBuilder"/> instance can grow beyond
-        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
-        /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
+        /// the value of its <see cref="TextBuilder.MaxCapacity"/> property. This can occur particularly when you call the <see cref="TextBuilder.Append(string?)"/>
+        /// and <see cref="TextBuilder.AppendFormat(string, object?)"/> methods to append small strings.
         /// </remarks>
         public int MaxCapacity
         {
@@ -178,11 +178,11 @@ namespace J2N.Text
         /// Appends the string representation of the Unicode characters in a specified sequence to this instance.
         /// <para/>
         /// NOTE: Unlike the Java implementation, this method does not add the word <c>"null"</c> to the <see cref="TextBuilder"/>
-        /// if <paramref name="value"/> is <c>null</c>. Instead, no operation is performed.
+        /// if <paramref name="value"/> is <see langword="null"/>. Instead, no operation is performed.
         /// </summary>
         /// <param name="value">The sequence of characters to append.</param>
         /// <returns>A reference to this instance after the operation has completed.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed <see cref="TextBuilder.MaxCapacity"/>.</exception>
         /// <seealso cref="ICharSequence" />
         public TextBuilder Append(ICharSequence? value)
         {
@@ -196,7 +196,7 @@ namespace J2N.Text
         /// <param name="count">The number of characters to append.</param>
         /// <returns>A reference to this instance after the operation has completed.</returns>
         /// <exception cref="ArgumentNullException">
-        /// <paramref name="value"/> is <c>null</c>, and
+        /// <paramref name="value"/> is <see langword="null"/>, and
         /// <paramref name="startIndex"/> and <paramref name="count"/> are not zero.
         /// </exception>
         /// <exception cref="ArgumentOutOfRangeException">
@@ -212,7 +212,7 @@ namespace J2N.Text
         /// <para/>
         /// -or-
         /// <para/>
-        /// Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.
+        /// Enlarging the value of this instance would exceed <see cref="TextBuilder.MaxCapacity"/>.
         /// </exception>
         /// <seealso cref="ICharSequence" />
         public TextBuilder Append(ICharSequence? value, int startIndex, int count)
@@ -230,7 +230,7 @@ namespace J2N.Text
         /// <para/>
         /// -or-
         /// <para/>
-        /// Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.
+        /// Enlarging the value of this instance would exceed <see cref="TextBuilder.MaxCapacity"/>.
         /// </exception>
         public TextBuilder Insert(int index, ICharSequence? value)
         {
@@ -262,7 +262,7 @@ namespace J2N.Text
         /// <para/>
         /// -or-
         /// <para/>
-        /// Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.
+        /// Enlarging the value of this instance would exceed <see cref="TextBuilder.MaxCapacity"/>.
         /// </exception>
         public TextBuilder Insert(int index, ICharSequence? value, int startIndex, int count)
         {
@@ -338,7 +338,7 @@ namespace J2N.Text
         /// <remarks>
         /// The capacity of this instance is adjusted as needed.
         /// <para/>
-        /// If <paramref name="culture"/> is <c>null</c>, <see cref="CultureInfo.CurrentCulture"/> will be used.
+        /// If <paramref name="culture"/> is <see langword="null"/>, <see cref="CultureInfo.CurrentCulture"/> will be used.
         /// </remarks>
         public TextBuilder AppendUpper(string? value, CultureInfo? culture)
         {
@@ -356,7 +356,7 @@ namespace J2N.Text
         /// <remarks>
         /// The capacity of this instance is adjusted as needed.
         /// <para/>
-        /// If <paramref name="culture"/> is <c>null</c>, <see cref="CultureInfo.CurrentCulture"/> will be used.
+        /// If <paramref name="culture"/> is <see langword="null"/>, <see cref="CultureInfo.CurrentCulture"/> will be used.
         /// </remarks>
         public TextBuilder AppendUpper(ReadOnlySpan<char> value, CultureInfo? culture)
         {
@@ -374,7 +374,7 @@ namespace J2N.Text
         /// <remarks>
         /// The capacity of this instance is adjusted as needed.
         /// <para/>
-        /// If <paramref name="culture"/> is <c>null</c>, <see cref="CultureInfo.CurrentCulture"/> will be used.
+        /// If <paramref name="culture"/> is <see langword="null"/>, <see cref="CultureInfo.CurrentCulture"/> will be used.
         /// </remarks>
         public TextBuilder AppendLower(string? value, CultureInfo? culture)
         {
@@ -484,8 +484,7 @@ namespace J2N.Text
         /// The overall effect is exactly as if the argument were
         /// converted to a <see cref="char"/> array by the method
         /// <see cref="Character.ToChars(int)"/> and the character in that array
-        /// were then <see cref="Append(char[])">appended</see> to this
-        /// <see cref="TextBuilder"/>.
+        /// were then appended to this <see cref="TextBuilder"/>.
         /// </para>
         /// </summary>
         /// <param name="codePoint">A Unicode code point.</param>
@@ -508,8 +507,7 @@ namespace J2N.Text
         /// The overall effect is exactly as if the argument were
         /// converted to a <see cref="char"/> array by the method
         /// <see cref="Character.ToChars(int)"/> and the character in that array
-        /// were then <see cref="Insert(int, char[])">inserted</see> into this
-        /// <see cref="TextBuilder"/>.
+        /// were then inserted into this <see cref="TextBuilder"/>.
         /// </para>
         /// </summary>
         /// <param name="index">The position in this instance where insertion begins.</param>
@@ -747,7 +745,7 @@ namespace J2N.Text
         /// <para/>
         /// -or-
         /// <para/>
-        /// Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.
+        /// Enlarging the value of this instance would exceed <see cref="TextBuilder.MaxCapacity"/>.
         /// </exception>
         /// <exception cref="OutOfMemoryException">Out of memory.</exception>
         /// <remarks>
@@ -768,10 +766,10 @@ namespace J2N.Text
         /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
-        /// When you instantiate an <see cref="TextBuilder"/> object by calling <see cref="TextBuilder(int, int)"/>,
+        /// When you instantiate a <see cref="TextBuilder"/> object by calling <see cref="TextBuilder(int, int)"/>,
         /// both the length and the capacity of the <see cref="TextBuilder"/> instance can grow beyond
-        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
-        /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
+        /// the value of its <see cref="TextBuilder.MaxCapacity"/> property. This can occur particularly when you call the <see cref="TextBuilder.Append(string?)"/>
+        /// and <see cref="TextBuilder.AppendFormat(string, object?)"/> methods to append small strings.
         /// </remarks>
         /// <seealso cref="char" />
         public TextBuilder Append(char value, int repeatCount)
@@ -786,7 +784,7 @@ namespace J2N.Text
         /// <param name="charCount">The number of characters to append.</param>
         /// <returns>A reference to this instance after the operation has completed.</returns>
         /// <exception cref="ArgumentNullException">
-        /// <paramref name="value"/> is <c>null</c>, and <paramref name="startIndex"/>
+        /// <paramref name="value"/> is <see langword="null"/>, and <paramref name="startIndex"/>
         /// and <paramref name="charCount"/> are not zero.
         /// </exception>
         /// <exception cref="ArgumentOutOfRangeException">
@@ -802,16 +800,16 @@ namespace J2N.Text
         /// <para/>
         /// -or-
         /// <para/>
-        /// Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.
+        /// Enlarging the value of this instance would exceed <see cref="TextBuilder.MaxCapacity"/>.
         /// </exception>
         /// <remarks>
         /// This method appends the specified range of characters in <paramref name="value"/> to the current instance. If
-        /// <paramref name="value"/> is <c>null</c> and <paramref name="startIndex"/> and <paramref name="charCount"/>
+        /// <paramref name="value"/> is <see langword="null"/> and <paramref name="startIndex"/> and <paramref name="charCount"/>
         /// are both zero, no changes are made.
         /// <para/>
-        /// The <see cref="Append(char[], int, int)"/> method modifies the existing instance of this class; it does
+        /// The <see cref="TextBuilder.Append(char[], int, int)"/> method modifies the existing instance of this class; it does
         /// not return a new class instance. Because of this, you can call a method or property on the existing
-        /// reference and you do not have to assign the return value to an <see cref="TextBuilder"/> object,
+        /// reference and you do not have to assign the return value to a <see cref="TextBuilder"/> object,
         /// as the following example illustrates.
         /// <code>
         /// char[] chars = { 'a', 'b', 'c', 'd', 'e'};
@@ -832,10 +830,10 @@ namespace J2N.Text
         /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
-        /// When you instantiate an <see cref="TextBuilder"/> object by calling <see cref="TextBuilder(int, int)"/>,
+        /// When you instantiate a <see cref="TextBuilder"/> object by calling <see cref="TextBuilder(int, int)"/>,
         /// both the length and the capacity of the <see cref="TextBuilder"/> instance can grow beyond
-        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
-        /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
+        /// the value of its <see cref="TextBuilder.MaxCapacity"/> property. This can occur particularly when you call the <see cref="TextBuilder.Append(string?)"/>
+        /// and <see cref="TextBuilder.AppendFormat(string, object?)"/> methods to append small strings.
         /// </remarks>
         /// <seealso cref="char" />
         public TextBuilder Append(char[]? value, int startIndex, int charCount)
@@ -847,12 +845,12 @@ namespace J2N.Text
         /// <summary>Appends a copy of the specified string to this instance.</summary>
         /// <param name="value">The string to append.</param>
         /// <returns>A reference to this instance after the operation has completed.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed <see cref="TextBuilder.MaxCapacity"/>.</exception>
         /// <remarks>
-        /// The <see cref="Append(string)"/> method modifies the existing instance of this class;
+        /// The <see cref="TextBuilder.Append(string?)"/> method modifies the existing instance of this class;
         /// it does not return a new class instance. Because of this, you can call a method or
         /// property on the existing reference and you do not have to assign the return value
-        /// to an <see cref="TextBuilder"/> object, as the following example illustrates.
+        /// to a <see cref="TextBuilder"/> object, as the following example illustrates.
         /// <code>
         /// bool flag = false;
         /// J2N.Text.TextBuilder sb = new J2N.Text.TextBuilder();
@@ -862,16 +860,16 @@ namespace J2N.Text
         /// //       The value of the flag is False.
         /// </code>
         /// <para/>
-        /// If <paramref name="value"/> is <c>null</c>, no changes are made.
+        /// If <paramref name="value"/> is <see langword="null"/>, no changes are made.
         /// <para/>
         /// The capacity of this instance is adjusted as needed.
         /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
-        /// When you instantiate an <see cref="TextBuilder"/> object by calling <see cref="TextBuilder(int, int)"/>,
+        /// When you instantiate a <see cref="TextBuilder"/> object by calling <see cref="TextBuilder(int, int)"/>,
         /// both the length and the capacity of the <see cref="TextBuilder"/> instance can grow beyond
-        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
-        /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
+        /// the value of its <see cref="TextBuilder.MaxCapacity"/> property. This can occur particularly when you call the <see cref="TextBuilder.Append(string?)"/>
+        /// and <see cref="TextBuilder.AppendFormat(string, object?)"/> methods to append small strings.
         /// </remarks>
         /// <seealso cref="string" />
         public TextBuilder Append(string? value)
@@ -886,7 +884,7 @@ namespace J2N.Text
         /// <param name="count">The number of characters in <paramref name="value"/> to append.</param>
         /// <returns>A reference to this instance after the operation has completed.</returns>
         /// <exception cref="ArgumentNullException">
-        /// <paramref name="value"/> is <c>null</c>, and <paramref name="startIndex"/>
+        /// <paramref name="value"/> is <see langword="null"/>, and <paramref name="startIndex"/>
         /// and <paramref name="count"/> are not zero.
         /// </exception>
         /// <exception cref="ArgumentOutOfRangeException">
@@ -902,16 +900,16 @@ namespace J2N.Text
         /// <para/>
         /// -or-
         /// <para/>
-        /// Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.
+        /// Enlarging the value of this instance would exceed <see cref="TextBuilder.MaxCapacity"/>.
         /// </exception>
         /// <remarks>
         /// This method appends the specified range of characters in <paramref name="value"/> to the current instance. If
-        /// <paramref name="value"/> is <c>null</c> and <paramref name="startIndex"/> and <paramref name="count"/>
+        /// <paramref name="value"/> is <see langword="null"/> and <paramref name="startIndex"/> and <paramref name="count"/>
         /// are both zero, no changes are made.
         /// <para/>
         /// The <see cref="Append(string, int, int)"/> method modifies the existing instance of this class; it does
         /// not return a new class instance. Because of this, you can call a method or property on the existing
-        /// reference and you do not have to assign the return value to an <see cref="TextBuilder"/> object,
+        /// reference and you do not have to assign the return value to a <see cref="TextBuilder"/> object,
         /// as the following example illustrates.
         /// <code>
         /// string str = "First;George Washington;1789;1797";
@@ -936,10 +934,11 @@ namespace J2N.Text
         /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
-        /// When you instantiate an <see cref="TextBuilder"/> object by calling <see cref="TextBuilder(int, int)"/>,
+        /// When you instantiate a <see cref="TextBuilder"/> object by calling <see cref="TextBuilder(int, int)"/>,
         /// both the length and the capacity of the <see cref="TextBuilder"/> instance can grow beyond
-        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
-        /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
+        /// the value of its <see cref="TextBuilder.MaxCapacity"/> property. This can occur particularly when you
+        /// call the <see cref="TextBuilder.Append(string?)"/> and <see cref="TextBuilder.AppendFormat(string, object?)"/>
+        /// methods to append small strings.
         /// </remarks>
         /// <seealso cref="string" />
         public TextBuilder Append(string? value, int startIndex, int count)
@@ -951,23 +950,23 @@ namespace J2N.Text
         /// <summary>Appends the string representation of a specified string builder to this instance.</summary>
         /// <param name="value">The string builder to append.</param>
         /// <returns>A reference to this instance after the operation has completed.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed <see cref="TextBuilder.MaxCapacity"/>.</exception>
         /// <remarks>
-        /// The <see cref="Append(StringBuilder)"/> method modifies the existing instance of this class;
+        /// The <see cref="TextBuilder.Append(StringBuilder?)"/> method modifies the existing instance of this class;
         /// it does not return a new class instance. Because of this, you can call a method or
         /// property on the existing reference and you do not have to assign the return value
-        /// to an <see cref="TextBuilder"/> object.
+        /// to a <see cref="TextBuilder"/> object.
         /// <para/>
-        /// If <paramref name="value"/> is <c>null</c>, no changes are made.
+        /// If <paramref name="value"/> is <see langword="null"/>, no changes are made.
         /// <para/>
         /// The capacity of this instance is adjusted as needed.
         /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
-        /// When you instantiate an <see cref="TextBuilder"/> object by calling <see cref="TextBuilder(int, int)"/>,
+        /// When you instantiate a <see cref="TextBuilder"/> object by calling <see cref="TextBuilder(int, int)"/>,
         /// both the length and the capacity of the <see cref="TextBuilder"/> instance can grow beyond
-        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
-        /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
+        /// the value of its <see cref="TextBuilder.MaxCapacity"/> property. This can occur particularly when you call the <see cref="TextBuilder.Append(string?)"/>
+        /// and <see cref="TextBuilder.AppendFormat(string, object?)"/> methods to append small strings.
         /// </remarks>
         /// <seealso cref="StringBuilder" />
         public TextBuilder Append(StringBuilder? value)
@@ -982,7 +981,7 @@ namespace J2N.Text
         /// <param name="count">The number of characters in <paramref name="value"/> to append.</param>
         /// <returns>A reference to this instance after the operation has completed.</returns>
         /// <exception cref="ArgumentNullException">
-        /// <paramref name="value"/> is <c>null</c>, and <paramref name="startIndex"/>
+        /// <paramref name="value"/> is <see langword="null"/>, and <paramref name="startIndex"/>
         /// and <paramref name="count"/> are not zero.
         /// </exception>
         /// <exception cref="ArgumentOutOfRangeException">
@@ -998,16 +997,16 @@ namespace J2N.Text
         /// <para/>
         /// -or-
         /// <para/>
-        /// Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.
+        /// Enlarging the value of this instance would exceed <see cref="TextBuilder.MaxCapacity"/>.
         /// </exception>
         /// <remarks>
         /// This method appends the specified range of characters in <paramref name="value"/> to the current instance. If
-        /// <paramref name="value"/> is <c>null</c> and <paramref name="startIndex"/> and <paramref name="count"/>
+        /// <paramref name="value"/> is <see langword="null"/> and <paramref name="startIndex"/> and <paramref name="count"/>
         /// are both zero, no changes are made.
         /// <para/>
-        /// The <see cref="Append(string, int, int)"/> method modifies the existing instance of this class; it does
+        /// The <see cref="TextBuilder.Append(StringBuilder?, int, int)"/> method modifies the existing instance of this class; it does
         /// not return a new class instance. Because of this, you can call a method or property on the existing
-        /// reference and you do not have to assign the return value to an <see cref="TextBuilder"/> object,
+        /// reference and you do not have to assign the return value to a <see cref="TextBuilder"/> object,
         /// as the following example illustrates.
         /// <code>
         /// string str = "First;George Washington;1789;1797";
@@ -1033,10 +1032,10 @@ namespace J2N.Text
         /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
-        /// When you instantiate an <see cref="TextBuilder"/> object by calling <see cref="TextBuilder(int, int)"/>,
+        /// When you instantiate a <see cref="TextBuilder"/> object by calling <see cref="TextBuilder(int, int)"/>,
         /// both the length and the capacity of the <see cref="TextBuilder"/> instance can grow beyond
-        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
-        /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
+        /// the value of its <see cref="TextBuilder.MaxCapacity"/> property. This can occur particularly when you call the <see cref="TextBuilder.Append(string?)"/>
+        /// and <see cref="TextBuilder.AppendFormat(string, object?)"/> methods to append small strings.
         /// </remarks>
         /// <seealso cref="StringBuilder" />
         public TextBuilder Append(StringBuilder? value, int startIndex, int count)
@@ -1067,7 +1066,7 @@ namespace J2N.Text
         /// <returns>A reference to this instance after the operation has completed.</returns>
         /// <exception cref="ArgumentOutOfRangeException">
         /// Enlarging the value of this instance would exceed
-        /// <see cref="MaxCapacity"/>.
+        /// <see cref="TextBuilder.MaxCapacity"/>.
         /// </exception>
         /// <remarks>
         /// The default line terminator is the current value of the <see cref="Environment.NewLine"/> property.
@@ -1076,10 +1075,10 @@ namespace J2N.Text
         /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
-        /// When you instantiate an <see cref="TextBuilder"/> object by calling <see cref="TextBuilder(int, int)"/>,
+        /// When you instantiate a <see cref="TextBuilder"/> object by calling <see cref="TextBuilder(int, int)"/>,
         /// both the length and the capacity of the <see cref="TextBuilder"/> instance can grow beyond
-        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
-        /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
+        /// the value of its <see cref="TextBuilder.MaxCapacity"/> property. This can occur particularly when you call the <see cref="TextBuilder.Append(string?)"/>
+        /// and <see cref="TextBuilder.AppendFormat(string, object?)"/> methods to append small strings.
         /// </remarks>
         public TextBuilder AppendLine()
         {
@@ -1095,7 +1094,7 @@ namespace J2N.Text
         /// <returns>A reference to this instance after the operation has completed.</returns>
         /// <exception cref="ArgumentOutOfRangeException">
         /// Enlarging the value of this instance would exceed
-        /// <see cref="MaxCapacity"/>.
+        /// <see cref="TextBuilder.MaxCapacity"/>.
         /// </exception>
         /// <remarks>
         /// The default line terminator is the current value of the <see cref="Environment.NewLine"/> property.
@@ -1104,10 +1103,10 @@ namespace J2N.Text
         /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
-        /// When you instantiate an <see cref="TextBuilder"/> object by calling <see cref="TextBuilder(int, int)"/>,
+        /// When you instantiate a <see cref="TextBuilder"/> object by calling <see cref="TextBuilder(int, int)"/>,
         /// both the length and the capacity of the <see cref="TextBuilder"/> instance can grow beyond
-        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
-        /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
+        /// the value of its <see cref="TextBuilder.MaxCapacity"/> property. This can occur particularly when you call the <see cref="TextBuilder.Append(string?)"/>
+        /// and <see cref="TextBuilder.AppendFormat(string, object?)"/> methods to append small strings.
         /// </remarks>
         /// <seealso cref="string" />
         public TextBuilder AppendLine(string? value)
@@ -1124,7 +1123,7 @@ namespace J2N.Text
         /// <returns>A reference to this instance after the operation has completed.</returns>
         /// <exception cref="ArgumentOutOfRangeException">
         /// Enlarging the value of this instance would exceed
-        /// <see cref="MaxCapacity"/>.
+        /// <see cref="TextBuilder.MaxCapacity"/>.
         /// </exception>
         /// <remarks>
         /// The default line terminator is the current value of the <see cref="Environment.NewLine"/> property.
@@ -1133,10 +1132,10 @@ namespace J2N.Text
         /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
-        /// When you instantiate an <see cref="TextBuilder"/> object by calling <see cref="TextBuilder(int, int)"/>,
+        /// When you instantiate a <see cref="TextBuilder"/> object by calling <see cref="TextBuilder(int, int)"/>,
         /// both the length and the capacity of the <see cref="TextBuilder"/> instance can grow beyond
-        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
-        /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
+        /// the value of its <see cref="TextBuilder.MaxCapacity"/> property. This can occur particularly when you call the <see cref="TextBuilder.Append(string?)"/>
+        /// and <see cref="TextBuilder.AppendFormat(string, object?)"/> methods to append small strings.
         /// </remarks>
         /// <seealso cref="ReadOnlySpan{Char}" />
         public TextBuilder AppendLine(ReadOnlySpan<char> value)
@@ -1159,7 +1158,7 @@ namespace J2N.Text
         /// The index is zero-based.
         /// </param>
         /// <param name="count">The number of characters to be copied.</param>
-        /// <exception cref="ArgumentNullException"><paramref name="destination"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="destination"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentOutOfRangeException">
         /// <paramref name="sourceIndex"/>, <paramref name="destinationIndex"/>, or <paramref name="count"/>, is less than zero.
         /// <para/>
@@ -1228,13 +1227,13 @@ namespace J2N.Text
         /// </exception>
         /// <exception cref="OutOfMemoryException">
         /// The current length of this <see cref="TextBuilder"/> object plus the length of <paramref name="value"/>
-        /// times <paramref name="repeatCount"/> exceeds <see cref="MaxCapacity"/>.
+        /// times <paramref name="repeatCount"/> exceeds <see cref="TextBuilder.MaxCapacity"/>.
         /// </exception>
         /// <remarks>
         /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
         /// <para/>
-        /// This <see cref="TextBuilder"/> object is not changed if <paramref name="value"/> is <c>null</c>,
-        /// <paramref name="value"/> is not <c>null</c> but its length is zero, or <paramref name="repeatCount"/> is zero.
+        /// This <see cref="TextBuilder"/> object is not changed if <paramref name="value"/> is <see langword="null"/>,
+        /// <paramref name="value"/> is not <see langword="null"/> but its length is zero, or <paramref name="repeatCount"/> is zero.
         /// </remarks>
         public TextBuilder Insert(int index, string? value, int repeatCount)
         {
@@ -1256,7 +1255,7 @@ namespace J2N.Text
         /// </exception>
         /// <exception cref="OutOfMemoryException">
         /// The current length of this <see cref="TextBuilder"/> object plus the length of <paramref name="value"/>
-        /// times <paramref name="repeatCount"/> exceeds <see cref="MaxCapacity"/>.
+        /// times <paramref name="repeatCount"/> exceeds <see cref="TextBuilder.MaxCapacity"/>.
         /// </exception>
         /// <remarks>
         /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
@@ -1284,7 +1283,7 @@ namespace J2N.Text
         /// </exception>
         /// <exception cref="OutOfMemoryException">
         /// The current length of this <see cref="TextBuilder"/> object plus the length of <paramref name="value"/>
-        /// times <paramref name="repeatCount"/> exceeds <see cref="MaxCapacity"/>.
+        /// times <paramref name="repeatCount"/> exceeds <see cref="TextBuilder.MaxCapacity"/>.
         /// </exception>
         /// <remarks>
         /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
@@ -1312,7 +1311,7 @@ namespace J2N.Text
         /// </exception>
         /// <exception cref="OutOfMemoryException">
         /// The current length of this <see cref="TextBuilder"/> object plus the length of <paramref name="value"/>
-        /// times <paramref name="repeatCount"/> exceeds <see cref="MaxCapacity"/>.
+        /// times <paramref name="repeatCount"/> exceeds <see cref="TextBuilder.MaxCapacity"/>.
         /// </exception>
         /// <remarks>
         /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
@@ -1409,7 +1408,7 @@ namespace J2N.Text
         /// <remarks>
         /// The <see cref="Append(char)"/> method modifies the existing instance of this class;
         /// it does not return a new class instance. Because of this, you can call a method or property
-        /// on the existing reference and you do not have to assign the return value to an <see cref="TextBuilder"/>
+        /// on the existing reference and you do not have to assign the return value to a <see cref="TextBuilder"/>
         /// object, as the following example illustrates.
         /// <code>
         /// string str = "Characters in a string.";
@@ -1428,10 +1427,10 @@ namespace J2N.Text
         /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
-        /// When you instantiate an <see cref="TextBuilder"/> object by calling <see cref="TextBuilder(int, int)"/>,
+        /// When you instantiate a <see cref="TextBuilder"/> object by calling <see cref="TextBuilder(int, int)"/>,
         /// both the length and the capacity of the <see cref="TextBuilder"/> instance can grow beyond
-        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
-        /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
+        /// the value of its <see cref="TextBuilder.MaxCapacity"/> property. This can occur particularly when you call the <see cref="TextBuilder.Append(string?)"/>
+        /// and <see cref="TextBuilder.AppendFormat(string, object?)"/> methods to append small strings.
         /// </remarks>
         /// <seealso cref="char" />
         public TextBuilder Append(char value)
@@ -1443,14 +1442,14 @@ namespace J2N.Text
         /// <summary>Appends the string representation of the Unicode characters in a specified array to this instance.</summary>
         /// <param name="value">The array of characters to append.</param>
         /// <returns>A reference to this instance after the operation has completed.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed <see cref="TextBuilder.MaxCapacity"/>.</exception>
         /// <remarks>
         /// This method appends the characters in the specified array to the current instance in the same order they
-        /// appear in value. If <paramref name="value"/> is <c>null</c>, no changes are made.
+        /// appear in value. If <paramref name="value"/> is <see langword="null"/>, no changes are made.
         /// <para/>
-        /// The <see cref="Append(char[])"/> method modifies the existing instance of this class; it does not
+        /// The <see cref="TextBuilder.Append(char[])"/> method modifies the existing instance of this class; it does not
         /// return a new class instance. Because of this, you can call a method or property on the existing
-        /// reference and you do not have to assign the return value to an <see cref="TextBuilder"/> object,
+        /// reference and you do not have to assign the return value to a <see cref="TextBuilder"/> object,
         /// as the following example illustrates.
         /// <code>
         /// char[] chars = { 'a', 'e', 'i', 'o', 'u' };
@@ -1465,10 +1464,10 @@ namespace J2N.Text
         /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
-        /// When you instantiate an <see cref="TextBuilder"/> object by calling <see cref="TextBuilder(int, int)"/>,
+        /// When you instantiate a <see cref="TextBuilder"/> object by calling <see cref="TextBuilder(int, int)"/>,
         /// both the length and the capacity of the <see cref="TextBuilder"/> instance can grow beyond
-        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
-        /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
+        /// the value of its <see cref="TextBuilder.MaxCapacity"/> property. This can occur particularly when you call the <see cref="TextBuilder.Append(string?)"/>
+        /// and <see cref="TextBuilder.AppendFormat(string, object?)"/> methods to append small strings.
         /// </remarks>
         /// <seealso cref="char" />
         public TextBuilder Append(char[]? value)
@@ -1597,13 +1596,13 @@ namespace J2N.Text
         /// -or-
         /// <para/>
         /// The current length of this <see cref="TextBuilder"/> object plus the length of
-        /// <paramref name="value"/> exceeds <see cref="MaxCapacity"/>.
+        /// <paramref name="value"/> exceeds <see cref="TextBuilder.MaxCapacity"/>.
         /// </exception>
         /// <remarks>
         /// Existing characters are shifted to make room for the new text. The capacity is adjusted as needed.
         /// <para/>
-        /// This instance of <see cref="TextBuilder"/> is not changed if <paramref name="value"/> is <c>null</c>,
-        /// or <paramref name="value"/> is not <c>null</c> but its length is zero.
+        /// This instance of <see cref="TextBuilder"/> is not changed if <paramref name="value"/> is <see langword="null"/>,
+        /// or <paramref name="value"/> is not <see langword="null"/> but its length is zero.
         /// </remarks>
         public TextBuilder Insert(int index, string? value)
         {
@@ -1620,7 +1619,7 @@ namespace J2N.Text
         /// <para/>
         /// -or-
         /// <para/>
-        /// Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.
+        /// Enlarging the value of this instance would exceed <see cref="TextBuilder.MaxCapacity"/>.
         /// </exception>
         public TextBuilder Insert(int index, StringBuilder? value)
         {
@@ -1652,7 +1651,7 @@ namespace J2N.Text
         /// <para/>
         /// -or-
         /// <para/>
-        /// Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.
+        /// Enlarging the value of this instance would exceed <see cref="TextBuilder.MaxCapacity"/>.
         /// </exception>
         public TextBuilder Insert(int index, StringBuilder? value, int startIndex, int count)
         {
@@ -1673,7 +1672,7 @@ namespace J2N.Text
         /// -or-
         /// <para/>
         /// The current length of this <see cref="TextBuilder"/> object plus the length of
-        /// <paramref name="value"/> exceeds <see cref="MaxCapacity"/>.
+        /// <paramref name="value"/> exceeds <see cref="TextBuilder.MaxCapacity"/>.
         /// </exception>
         /// <remarks>
         /// This matches the behavior of Java's StringBuilder. To match the behavior
@@ -1705,7 +1704,7 @@ namespace J2N.Text
         /// -or-
         /// <para/>
         /// The current length of this <see cref="TextBuilder"/> object plus the length of
-        /// <paramref name="value"/> exceeds <see cref="MaxCapacity"/>.
+        /// <paramref name="value"/> exceeds <see cref="TextBuilder.MaxCapacity"/>.
         /// </exception>
         /// <remarks>Existing characters are shifted to make room for the new text. The capacity is adjusted as needed.</remarks>
         /// <seealso cref="bool" />
@@ -1726,7 +1725,7 @@ namespace J2N.Text
         /// -or-
         /// <para/>
         /// The current length of this <see cref="TextBuilder"/> object plus the length of
-        /// <paramref name="value"/> exceeds <see cref="MaxCapacity"/>.
+        /// <paramref name="value"/> exceeds <see cref="TextBuilder.MaxCapacity"/>.
         /// </exception>
         /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
         /// <seealso cref="char" />
@@ -1749,12 +1748,12 @@ namespace J2N.Text
         /// -or-
         /// <para/>
         /// The current length of this <see cref="TextBuilder"/> object plus the length of
-        /// <paramref name="value"/> exceeds <see cref="MaxCapacity"/>.
+        /// <paramref name="value"/> exceeds <see cref="TextBuilder.MaxCapacity"/>.
         /// </exception>
         /// <remarks>
         /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
         /// <para/>
-        /// If <paramref name="value"/> is <c>null</c>, the <see cref="TextBuilder"/> is not changed.
+        /// If <paramref name="value"/> is <see langword="null"/>, the <see cref="TextBuilder"/> is not changed.
         /// </remarks>
         /// <seealso cref="char" />
         public TextBuilder Insert(int index, char[]? value)
@@ -1773,7 +1772,7 @@ namespace J2N.Text
         /// <param name="charCount">The number of characters to insert.</param>
         /// <returns>A reference to this instance after the operation has completed.</returns>
         /// <exception cref="ArgumentNullException">
-        /// <paramref name="value"/> is <c>null</c>, and <paramref name="startIndex"/>
+        /// <paramref name="value"/> is <see langword="null"/>, and <paramref name="startIndex"/>
         /// and <paramref name="charCount"/> are not zero.
         /// </exception>
         /// <exception cref="ArgumentOutOfRangeException">
@@ -1789,7 +1788,7 @@ namespace J2N.Text
         /// <para/>
         /// -or-
         /// <para/>
-        /// Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.
+        /// Enlarging the value of this instance would exceed <see cref="TextBuilder.MaxCapacity"/>.
         /// </exception>
         /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
         /// <seealso cref="char" />
@@ -1809,7 +1808,7 @@ namespace J2N.Text
         /// <param name="count">The number of characters to insert.</param>
         /// <returns>A reference to this instance after the operation has completed.</returns>
         /// <exception cref="ArgumentNullException">
-        /// <paramref name="value"/> is <c>null</c>, and <paramref name="startIndex"/>
+        /// <paramref name="value"/> is <see langword="null"/>, and <paramref name="startIndex"/>
         /// and <paramref name="count"/> are not zero.
         /// </exception>
         /// <exception cref="ArgumentOutOfRangeException">
@@ -1825,7 +1824,7 @@ namespace J2N.Text
         /// <para/>
         /// -or-
         /// <para/>
-        /// Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.
+        /// Enlarging the value of this instance would exceed <see cref="TextBuilder.MaxCapacity"/>.
         /// </exception>
         /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
         /// <seealso cref="char" />
@@ -1857,7 +1856,7 @@ namespace J2N.Text
         /// <param name="format">A composite format string.</param>
         /// <param name="arg0">An object to format.</param>
         /// <returns>A reference to this instance after the operation has completed.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="format"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="format"/> is <see langword="null"/>.</exception>
         /// <exception cref="FormatException">
         /// <paramref name="format"/> is invalid.
         /// <para/>
@@ -1865,7 +1864,7 @@ namespace J2N.Text
         /// <para/>
         /// The index of a format item is less than 0 (zero), or greater than or equal to 1.
         /// </exception>
-        /// <exception cref="ArgumentOutOfRangeException">The length of the expanded string would exceed <see cref="MaxCapacity"/>.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">The length of the expanded string would exceed <see cref="TextBuilder.MaxCapacity"/>.</exception>
         /// <remarks>
         /// This method uses the <a href="https://learn.microsoft.com/en-us/dotnet/standard/base-types/composite-formatting">
         /// composite formatting feature</a> of the .NET Framework to convert the value of an object to its text
@@ -1890,7 +1889,7 @@ namespace J2N.Text
         ///     <description><i>index</i></description>
         ///     <description>
         ///       The zero-based position in the parameter list of the object to be formatted.
-        ///       If the object specified by index is <c>null</c>, the format item is replaced by <see cref="String.Empty"/>.
+        ///       If the object specified by index is <see langword="null"/>, the format item is replaced by <see cref="String.Empty"/>.
         ///       If there is no parameter in the index position, a <see cref="FormatException"/> is thrown.
         ///     </description>
         ///   </item>
@@ -1918,10 +1917,10 @@ namespace J2N.Text
         /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
-        /// When you instantiate an <see cref="TextBuilder"/> object by calling <see cref="TextBuilder(int, int)"/>,
+        /// When you instantiate a <see cref="TextBuilder"/> object by calling <see cref="TextBuilder(int, int)"/>,
         /// both the length and the capacity of the <see cref="TextBuilder"/> instance can grow beyond
-        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
-        /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
+        /// the value of its <see cref="TextBuilder.MaxCapacity"/> property. This can occur particularly when you call the <see cref="TextBuilder.Append(string?)"/>
+        /// and <see cref="TextBuilder.AppendFormat(string, object?)"/> methods to append small strings.
         /// </remarks>
         public TextBuilder AppendFormat(string format, object? arg0)
         {
@@ -1937,7 +1936,7 @@ namespace J2N.Text
         /// <param name="arg0">The first object to format.</param>
         /// <param name="arg1">The second object to format.</param>
         /// <returns>A reference to this instance after the operation has completed.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="format"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="format"/> is <see langword="null"/>.</exception>
         /// <exception cref="FormatException">
         /// <paramref name="format"/> is invalid.
         /// <para/>
@@ -1945,7 +1944,7 @@ namespace J2N.Text
         /// <para/>
         /// The index of a format item is less than 0 (zero), or greater than or equal to 2.
         /// </exception>
-        /// <exception cref="ArgumentOutOfRangeException">The length of the expanded string would exceed <see cref="MaxCapacity"/>.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">The length of the expanded string would exceed <see cref="TextBuilder.MaxCapacity"/>.</exception>
         /// <remarks>
         /// This method uses the <a href="https://learn.microsoft.com/en-us/dotnet/standard/base-types/composite-formatting">
         /// composite formatting feature</a> of the .NET Framework to convert the value of an object to its text
@@ -1970,7 +1969,7 @@ namespace J2N.Text
         ///     <description><i>index</i></description>
         ///     <description>
         ///       The zero-based position in the parameter list of the object to be formatted.
-        ///       If the object specified by index is <c>null</c>, the format item is replaced by <see cref="String.Empty"/>.
+        ///       If the object specified by index is <see langword="null"/>, the format item is replaced by <see cref="String.Empty"/>.
         ///       If there is no parameter in the index position, a <see cref="FormatException"/> is thrown.
         ///     </description>
         ///   </item>
@@ -1998,10 +1997,10 @@ namespace J2N.Text
         /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
-        /// When you instantiate an <see cref="TextBuilder"/> object by calling <see cref="TextBuilder(int, int)"/>,
+        /// When you instantiate a <see cref="TextBuilder"/> object by calling <see cref="TextBuilder(int, int)"/>,
         /// both the length and the capacity of the <see cref="TextBuilder"/> instance can grow beyond
-        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
-        /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
+        /// the value of its <see cref="TextBuilder.MaxCapacity"/> property. This can occur particularly when you call the <see cref="TextBuilder.Append(string?)"/>
+        /// and <see cref="TextBuilder.AppendFormat(string, object?)"/> methods to append small strings.
         /// </remarks>
         public TextBuilder AppendFormat(string format, object? arg0, object? arg1)
         {
@@ -2018,7 +2017,7 @@ namespace J2N.Text
         /// <param name="arg1">The second object to format.</param>
         /// <param name="arg2">The third object to format.</param>
         /// <returns>A reference to this instance after the operation has completed.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="format"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="format"/> is <see langword="null"/>.</exception>
         /// <exception cref="FormatException">
         /// <paramref name="format"/> is invalid.
         /// <para/>
@@ -2026,7 +2025,7 @@ namespace J2N.Text
         /// <para/>
         /// The index of a format item is less than 0 (zero), or greater than or equal to 3.
         /// </exception>
-        /// <exception cref="ArgumentOutOfRangeException">The length of the expanded string would exceed <see cref="MaxCapacity"/>.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">The length of the expanded string would exceed <see cref="TextBuilder.MaxCapacity"/>.</exception>
         /// <remarks>
         /// This method uses the <a href="https://learn.microsoft.com/en-us/dotnet/standard/base-types/composite-formatting">
         /// composite formatting feature</a> of the .NET Framework to convert the value of an object to its text
@@ -2051,7 +2050,7 @@ namespace J2N.Text
         ///     <description><i>index</i></description>
         ///     <description>
         ///       The zero-based position in the parameter list of the object to be formatted.
-        ///       If the object specified by index is <c>null</c>, the format item is replaced by <see cref="String.Empty"/>.
+        ///       If the object specified by index is <see langword="null"/>, the format item is replaced by <see cref="String.Empty"/>.
         ///       If there is no parameter in the index position, a <see cref="FormatException"/> is thrown.
         ///     </description>
         ///   </item>
@@ -2080,10 +2079,10 @@ namespace J2N.Text
         /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
-        /// When you instantiate an <see cref="TextBuilder"/> object by calling <see cref="TextBuilder(int, int)"/>,
+        /// When you instantiate a <see cref="TextBuilder"/> object by calling <see cref="TextBuilder(int, int)"/>,
         /// both the length and the capacity of the <see cref="TextBuilder"/> instance can grow beyond
-        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
-        /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
+        /// the value of its <see cref="TextBuilder.MaxCapacity"/> property. This can occur particularly when you call the <see cref="TextBuilder.Append(string?)"/>
+        /// and <see cref="TextBuilder.AppendFormat(string, object?)"/> methods to append small strings.
         /// </remarks>
         public TextBuilder AppendFormat(string format, object? arg0, object? arg1, object? arg2)
         {
@@ -2098,7 +2097,7 @@ namespace J2N.Text
         /// <param name="format">A composite format string.</param>
         /// <param name="args">An array of objects to format.</param>
         /// <returns>A reference to this instance after the operation has completed.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="format"/> or <paramref name="args"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="format"/> or <paramref name="args"/> is <see langword="null"/>.</exception>
         /// <exception cref="FormatException">
         /// <paramref name="format"/> is invalid.
         /// <para/>
@@ -2106,7 +2105,7 @@ namespace J2N.Text
         /// <para/>
         /// The index of a format item is less than 0 (zero), or greater than or equal to the length of the <paramref name="args"/> array.
         /// </exception>
-        /// <exception cref="ArgumentOutOfRangeException">The length of the expanded string would exceed <see cref="MaxCapacity"/>.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">The length of the expanded string would exceed <see cref="TextBuilder.MaxCapacity"/>.</exception>
         /// <remarks>
         /// This method uses the <a href="https://learn.microsoft.com/en-us/dotnet/standard/base-types/composite-formatting">
         /// composite formatting feature</a> of the .NET Framework to convert the value of an object to its text
@@ -2130,7 +2129,7 @@ namespace J2N.Text
         ///     <description><i>index</i></description>
         ///     <description>
         ///       The zero-based position in the parameter list of the object to be formatted.
-        ///       If the object specified by index is <c>null</c>, the format item is replaced by <see cref="String.Empty"/>.
+        ///       If the object specified by index is <see langword="null"/>, the format item is replaced by <see cref="String.Empty"/>.
         ///       If there is no parameter in the index position, a <see cref="FormatException"/> is thrown.
         ///     </description>
         ///   </item>
@@ -2159,10 +2158,10 @@ namespace J2N.Text
         /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
-        /// When you instantiate an <see cref="TextBuilder"/> object by calling <see cref="TextBuilder(int, int)"/>,
+        /// When you instantiate a <see cref="TextBuilder"/> object by calling <see cref="TextBuilder(int, int)"/>,
         /// both the length and the capacity of the <see cref="TextBuilder"/> instance can grow beyond
-        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
-        /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
+        /// the value of its <see cref="TextBuilder.MaxCapacity"/> property. This can occur particularly when you call the <see cref="TextBuilder.Append(string?)"/>
+        /// and <see cref="TextBuilder.AppendFormat(string, object?)"/> methods to append small strings.
         /// </remarks>
         public TextBuilder AppendFormat(string format, params object?[] args)
         {
@@ -2177,7 +2176,7 @@ namespace J2N.Text
         /// <param name="format">A composite format string.</param>
         /// <param name="args">A span of objects to format.</param>
         /// <returns>A reference to this instance after the operation has completed.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="format"/> or <paramref name="args"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="format"/> or <paramref name="args"/> is <see langword="null"/>.</exception>
         /// <exception cref="FormatException">
         /// <paramref name="format"/> is invalid.
         /// <para/>
@@ -2185,7 +2184,7 @@ namespace J2N.Text
         /// <para/>
         /// The index of a format item is less than 0 (zero), or greater than or equal to the length of the <paramref name="args"/> span.
         /// </exception>
-        /// <exception cref="ArgumentOutOfRangeException">The length of the expanded string would exceed <see cref="MaxCapacity"/>.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">The length of the expanded string would exceed <see cref="TextBuilder.MaxCapacity"/>.</exception>
         /// <remarks>
         /// This method uses the <a href="https://learn.microsoft.com/en-us/dotnet/standard/base-types/composite-formatting">
         /// composite formatting feature</a> of the .NET Framework to convert the value of an object to its text
@@ -2209,7 +2208,7 @@ namespace J2N.Text
         ///     <description><i>index</i></description>
         ///     <description>
         ///       The zero-based position in the parameter list of the object to be formatted.
-        ///       If the object specified by index is <c>null</c>, the format item is replaced by <see cref="String.Empty"/>.
+        ///       If the object specified by index is <see langword="null"/>, the format item is replaced by <see cref="String.Empty"/>.
         ///       If there is no parameter in the index position, a <see cref="FormatException"/> is thrown.
         ///     </description>
         ///   </item>
@@ -2238,10 +2237,10 @@ namespace J2N.Text
         /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
-        /// When you instantiate an <see cref="TextBuilder"/> object by calling <see cref="TextBuilder(int, int)"/>,
+        /// When you instantiate a <see cref="TextBuilder"/> object by calling <see cref="TextBuilder(int, int)"/>,
         /// both the length and the capacity of the <see cref="TextBuilder"/> instance can grow beyond
-        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
-        /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
+        /// the value of its <see cref="TextBuilder.MaxCapacity"/> property. This can occur particularly when you call the <see cref="TextBuilder.Append(string?)"/>
+        /// and <see cref="TextBuilder.AppendFormat(string, object?)"/> methods to append small strings.
         /// </remarks>
         public TextBuilder AppendFormat(string format, params ReadOnlySpan<object?> args)
         {
@@ -2258,7 +2257,7 @@ namespace J2N.Text
         /// <param name="format">A composite format string.</param>
         /// <param name="arg0">An object to format.</param>
         /// <returns>A reference to this instance after the operation has completed.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="format"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="format"/> is <see langword="null"/>.</exception>
         /// <exception cref="FormatException">
         /// <paramref name="format"/> is invalid.
         /// <para/>
@@ -2266,7 +2265,7 @@ namespace J2N.Text
         /// <para/>
         /// The index of a format item is less than 0 (zero), or greater than or equal to 1 (one).
         /// </exception>
-        /// <exception cref="ArgumentOutOfRangeException">The length of the expanded string would exceed <see cref="MaxCapacity"/>.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">The length of the expanded string would exceed <see cref="TextBuilder.MaxCapacity"/>.</exception>
         /// <remarks>
         /// This method uses the <a href="https://learn.microsoft.com/en-us/dotnet/standard/base-types/composite-formatting">
         /// composite formatting feature</a> of the .NET Framework to convert the value of an object to its text
@@ -2291,7 +2290,7 @@ namespace J2N.Text
         ///     <description><i>index</i></description>
         ///     <description>
         ///       The zero-based position in the parameter list of the object to be formatted.
-        ///       If the object specified by index is <c>null</c>, the format item is replaced by <see cref="String.Empty"/>.
+        ///       If the object specified by index is <see langword="null"/>, the format item is replaced by <see cref="String.Empty"/>.
         ///       If there is no parameter in the index position, a <see cref="FormatException"/> is thrown.
         ///     </description>
         ///   </item>
@@ -2323,7 +2322,7 @@ namespace J2N.Text
         ///     <see cref="ICustomFormatter"/> interface.</item>
         /// </list>
         /// <para/>
-        /// If the <paramref name="provider"/> parameter is <c>null</c>, formatting information is obtained from the current culture.
+        /// If the <paramref name="provider"/> parameter is <see langword="null"/>, formatting information is obtained from the current culture.
         /// <para/>
         /// <paramref name="arg0"/> represents the object to be formatted. Each format item in <paramref name="format"/> is replaced
         /// with the string representation of <paramref name="arg0"/>. If the format item includes <c>formatString</c>
@@ -2332,10 +2331,10 @@ namespace J2N.Text
         /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
-        /// When you instantiate an <see cref="TextBuilder"/> object by calling <see cref="TextBuilder(int, int)"/>,
+        /// When you instantiate a <see cref="TextBuilder"/> object by calling <see cref="TextBuilder(int, int)"/>,
         /// both the length and the capacity of the <see cref="TextBuilder"/> instance can grow beyond
-        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
-        /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
+        /// the value of its <see cref="TextBuilder.MaxCapacity"/> property. This can occur particularly when you call the <see cref="TextBuilder.Append(string?)"/>
+        /// and <see cref="TextBuilder.AppendFormat(string, object?)"/> methods to append small strings.
         /// </remarks>
         public TextBuilder AppendFormat(IFormatProvider? provider, string format, object? arg0)
         {
@@ -2353,7 +2352,7 @@ namespace J2N.Text
         /// <param name="arg0">The first object to format.</param>
         /// <param name="arg1">The second object to format.</param>
         /// <returns>A reference to this instance after the operation has completed.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="format"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="format"/> is <see langword="null"/>.</exception>
         /// <exception cref="FormatException">
         /// <paramref name="format"/> is invalid.
         /// <para/>
@@ -2361,7 +2360,7 @@ namespace J2N.Text
         /// <para/>
         /// The index of a format item is less than 0 (zero), or greater than or equal to 2 (two).
         /// </exception>
-        /// <exception cref="ArgumentOutOfRangeException">The length of the expanded string would exceed <see cref="MaxCapacity"/>.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">The length of the expanded string would exceed <see cref="TextBuilder.MaxCapacity"/>.</exception>
         /// <remarks>
         /// This method uses the <a href="https://learn.microsoft.com/en-us/dotnet/standard/base-types/composite-formatting">
         /// composite formatting feature</a> of the .NET Framework to convert the value of an object to its text
@@ -2385,7 +2384,7 @@ namespace J2N.Text
         ///     <description><i>index</i></description>
         ///     <description>
         ///       The zero-based position in the parameter list of the object to be formatted.
-        ///       If the object specified by index is <c>null</c>, the format item is replaced by <see cref="String.Empty"/>.
+        ///       If the object specified by index is <see langword="null"/>, the format item is replaced by <see cref="String.Empty"/>.
         ///       If there is no parameter in the index position, a <see cref="FormatException"/> is thrown.
         ///     </description>
         ///   </item>
@@ -2417,7 +2416,7 @@ namespace J2N.Text
         ///     <see cref="ICustomFormatter"/> interface.</item>
         /// </list>
         /// <para/>
-        /// If the <paramref name="provider"/> parameter is <c>null</c>, formatting information is obtained from the current culture.
+        /// If the <paramref name="provider"/> parameter is <see langword="null"/>, formatting information is obtained from the current culture.
         /// <para/>
         /// <paramref name="arg0"/> and <paramref name="arg1"/> represent the objects to be formatted. Each format item in <paramref name="format"/> is replaced
         /// with the string representation of the object that has the corresponding index. If the format item includes <c>formatString</c>
@@ -2426,10 +2425,10 @@ namespace J2N.Text
         /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
-        /// When you instantiate an <see cref="TextBuilder"/> object by calling <see cref="TextBuilder(int, int)"/>,
+        /// When you instantiate a <see cref="TextBuilder"/> object by calling <see cref="TextBuilder(int, int)"/>,
         /// both the length and the capacity of the <see cref="TextBuilder"/> instance can grow beyond
-        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
-        /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
+        /// the value of its <see cref="TextBuilder.MaxCapacity"/> property. This can occur particularly when you call the <see cref="TextBuilder.Append(string?)"/>
+        /// and <see cref="TextBuilder.AppendFormat(string, object?)"/> methods to append small strings.
         /// </remarks>
         public TextBuilder AppendFormat(IFormatProvider? provider, string format, object? arg0, object? arg1)
         {
@@ -2448,7 +2447,7 @@ namespace J2N.Text
         /// <param name="arg1">The second object to format.</param>
         /// <param name="arg2">The third object to format.</param>
         /// <returns>A reference to this instance after the operation has completed.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="format"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="format"/> is <see langword="null"/>.</exception>
         /// <exception cref="FormatException">
         /// <paramref name="format"/> is invalid.
         /// <para/>
@@ -2456,7 +2455,7 @@ namespace J2N.Text
         /// <para/>
         /// The index of a format item is less than 0 (zero), or greater than or equal to 3 (three).
         /// </exception>
-        /// <exception cref="ArgumentOutOfRangeException">The length of the expanded string would exceed <see cref="MaxCapacity"/>.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">The length of the expanded string would exceed <see cref="TextBuilder.MaxCapacity"/>.</exception>
         /// <remarks>
         /// This method uses the <a href="https://learn.microsoft.com/en-us/dotnet/standard/base-types/composite-formatting">
         /// composite formatting feature</a> of the .NET Framework to convert the value of an object to its text
@@ -2480,7 +2479,7 @@ namespace J2N.Text
         ///     <description><i>index</i></description>
         ///     <description>
         ///       The zero-based position in the parameter list of the object to be formatted.
-        ///       If the object specified by index is <c>null</c>, the format item is replaced by <see cref="String.Empty"/>.
+        ///       If the object specified by index is <see langword="null"/>, the format item is replaced by <see cref="String.Empty"/>.
         ///       If there is no parameter in the index position, a <see cref="FormatException"/> is thrown.
         ///     </description>
         ///   </item>
@@ -2512,7 +2511,7 @@ namespace J2N.Text
         ///     implementation also implements the <see cref="ICustomFormatter"/> interface.</item>
         /// </list>
         /// <para/>
-        /// If the <paramref name="provider"/> parameter is <c>null</c>, formatting information is obtained from the current culture.
+        /// If the <paramref name="provider"/> parameter is <see langword="null"/>, formatting information is obtained from the current culture.
         /// <para/>
         /// <paramref name="arg0"/>, <paramref name="arg1"/>, and <paramref name="arg2"/> represent the objects to be formatted.
         /// Each format item in <paramref name="format"/> is replaced with the string representation of the object that has the
@@ -2522,10 +2521,10 @@ namespace J2N.Text
         /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
-        /// When you instantiate an <see cref="TextBuilder"/> object by calling <see cref="TextBuilder(int, int)"/>,
+        /// When you instantiate a <see cref="TextBuilder"/> object by calling <see cref="TextBuilder(int, int)"/>,
         /// both the length and the capacity of the <see cref="TextBuilder"/> instance can grow beyond
-        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
-        /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
+        /// the value of its <see cref="TextBuilder.MaxCapacity"/> property. This can occur particularly when you call the <see cref="TextBuilder.Append(string?)"/>
+        /// and <see cref="TextBuilder.AppendFormat(string, object?)"/> methods to append small strings.
         /// </remarks>
         public TextBuilder AppendFormat(IFormatProvider? provider, string format, object? arg0, object? arg1, object? arg2)
         {
@@ -2542,7 +2541,7 @@ namespace J2N.Text
         /// <param name="format">A composite format string.</param>
         /// <param name="args">An array of objects to format.</param>
         /// <returns>A reference to this instance after the operation has completed.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="format"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="format"/> is <see langword="null"/>.</exception>
         /// <exception cref="FormatException">
         /// <paramref name="format"/> is invalid.
         /// <para/>
@@ -2550,7 +2549,7 @@ namespace J2N.Text
         /// <para/>
         /// The index of a format item is less than 0 (zero), or greater than or equal to the length of the <paramref name="args"/> array.
         /// </exception>
-        /// <exception cref="ArgumentOutOfRangeException">The length of the expanded string would exceed <see cref="MaxCapacity"/>.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">The length of the expanded string would exceed <see cref="TextBuilder.MaxCapacity"/>.</exception>
         /// <remarks>
         /// This method uses the <a href="https://learn.microsoft.com/en-us/dotnet/standard/base-types/composite-formatting">
         /// composite formatting feature</a> of the .NET Framework to convert the value of an object to its text
@@ -2574,7 +2573,7 @@ namespace J2N.Text
         ///     <description><i>index</i></description>
         ///     <description>
         ///       The zero-based position in the parameter list of the object to be formatted.
-        ///       If the object specified by index is <c>null</c>, the format item is replaced by <see cref="String.Empty"/>.
+        ///       If the object specified by index is <see langword="null"/>, the format item is replaced by <see cref="String.Empty"/>.
         ///       If there is no parameter in the index position, a <see cref="FormatException"/> is thrown.
         ///     </description>
         ///   </item>
@@ -2606,7 +2605,7 @@ namespace J2N.Text
         ///     <see cref="ICustomFormatter"/> interface.</item>
         /// </list>
         /// <para/>
-        /// If the <paramref name="provider"/> parameter is <c>null</c>, formatting information is obtained from the current culture.
+        /// If the <paramref name="provider"/> parameter is <see langword="null"/>, formatting information is obtained from the current culture.
         /// <para/>
         /// <paramref name="args"/> represents the objects to be formatted. Each format item in <paramref name="format"/> is replaced
         /// with the string representation of the corresponding object in <paramref name="args"/>. If the format item includes
@@ -2616,10 +2615,10 @@ namespace J2N.Text
         /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
-        /// When you instantiate an <see cref="TextBuilder"/> object by calling <see cref="TextBuilder(int, int)"/>,
+        /// When you instantiate a <see cref="TextBuilder"/> object by calling <see cref="TextBuilder(int, int)"/>,
         /// both the length and the capacity of the <see cref="TextBuilder"/> instance can grow beyond
-        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
-        /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
+        /// the value of its <see cref="TextBuilder.MaxCapacity"/> property. This can occur particularly when you call the <see cref="TextBuilder.Append(string?)"/>
+        /// and <see cref="TextBuilder.AppendFormat(string, object?)"/> methods to append small strings.
         /// </remarks>
         public TextBuilder AppendFormat(IFormatProvider? provider, string format, params object?[] args)
         {
@@ -2636,7 +2635,7 @@ namespace J2N.Text
         /// <param name="format">A composite format string.</param>
         /// <param name="args">An span of objects to format.</param>
         /// <returns>A reference to this instance after the operation has completed.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="format"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="format"/> is <see langword="null"/>.</exception>
         /// <exception cref="FormatException">
         /// <paramref name="format"/> is invalid.
         /// <para/>
@@ -2644,7 +2643,7 @@ namespace J2N.Text
         /// <para/>
         /// The index of a format item is less than 0 (zero), or greater than or equal to the length of the <paramref name="args"/> span.
         /// </exception>
-        /// <exception cref="ArgumentOutOfRangeException">The length of the expanded string would exceed <see cref="MaxCapacity"/>.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">The length of the expanded string would exceed <see cref="TextBuilder.MaxCapacity"/>.</exception>
         /// <remarks>
         /// This method uses the <a href="https://learn.microsoft.com/en-us/dotnet/standard/base-types/composite-formatting">
         /// composite formatting feature</a> of the .NET Framework to convert the value of an object to its text
@@ -2668,7 +2667,7 @@ namespace J2N.Text
         ///     <description><i>index</i></description>
         ///     <description>
         ///       The zero-based position in the parameter list of the object to be formatted.
-        ///       If the object specified by index is <c>null</c>, the format item is replaced by <see cref="String.Empty"/>.
+        ///       If the object specified by index is <see langword="null"/>, the format item is replaced by <see cref="String.Empty"/>.
         ///       If there is no parameter in the index position, a <see cref="FormatException"/> is thrown.
         ///     </description>
         ///   </item>
@@ -2700,7 +2699,7 @@ namespace J2N.Text
         ///     <see cref="ICustomFormatter"/> interface.</item>
         /// </list>
         /// <para/>
-        /// If the <paramref name="provider"/> parameter is <c>null</c>, formatting information is obtained from the current culture.
+        /// If the <paramref name="provider"/> parameter is <see langword="null"/>, formatting information is obtained from the current culture.
         /// <para/>
         /// <paramref name="args"/> represents the objects to be formatted. Each format item in <paramref name="format"/> is replaced
         /// with the string representation of the corresponding object in <paramref name="args"/>. If the format item includes
@@ -2710,10 +2709,10 @@ namespace J2N.Text
         /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
-        /// When you instantiate an <see cref="TextBuilder"/> object by calling <see cref="TextBuilder(int, int)"/>,
+        /// When you instantiate a <see cref="TextBuilder"/> object by calling <see cref="TextBuilder(int, int)"/>,
         /// both the length and the capacity of the <see cref="TextBuilder"/> instance can grow beyond
-        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
-        /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
+        /// the value of its <see cref="TextBuilder.MaxCapacity"/> property. This can occur particularly when you call the <see cref="TextBuilder.Append(string?)"/>
+        /// and <see cref="TextBuilder.AppendFormat(string, object?)"/> methods to append small strings.
         /// </remarks>
         public TextBuilder AppendFormat(IFormatProvider? provider, string format, params ReadOnlySpan<object?> args)
         {
@@ -2723,14 +2722,14 @@ namespace J2N.Text
 
         /// <summary>Replaces all occurrences of a specified string in this instance with another specified string.</summary>
         /// <param name="oldValue">The string to replace.</param>
-        /// <param name="newValue">The string that replaces <paramref name="oldValue"/>, or <c>null</c>.</param>
+        /// <param name="newValue">The string that replaces <paramref name="oldValue"/>, or <see langword="null"/>.</param>
         /// <returns>A reference to this instance after the operation has completed.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="oldValue"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="oldValue"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentException">The length of <paramref name="oldValue"/> is zero.</exception>
-        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed <see cref="TextBuilder.MaxCapacity"/>.</exception>
         /// <remarks>
         /// This method performs an ordinal, case-sensitive comparison to identify occurrences of <paramref name="oldValue"/> in the
-        /// current instance. If <paramref name="newValue"/> is <c>null</c> or <see cref="string.Empty"/>, all occurrences of
+        /// current instance. If <paramref name="newValue"/> is <see langword="null"/> or <see cref="string.Empty"/>, all occurrences of
         /// <paramref name="oldValue"/> are removed.
         /// </remarks>
         /// <seealso cref="Remove(int, int)" />
@@ -2745,7 +2744,7 @@ namespace J2N.Text
         /// <param name="newValue">The read-only character span to replace <paramref name="oldValue"/> with.</param>
         /// <returns>A reference to this instance after the operation has completed.</returns>
         /// <exception cref="ArgumentException">The length of <paramref name="oldValue"/> is zero.</exception>
-        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed <see cref="TextBuilder.MaxCapacity"/>.</exception>
         /// <remarks>
         /// This method performs an ordinal, case-sensitive comparison to identify occurrences of <paramref name="oldValue"/> in the
         /// current instance. If <paramref name="newValue"/> is empty, all occurrences of <paramref name="oldValue"/> are removed.
@@ -2758,10 +2757,10 @@ namespace J2N.Text
         }
 
         /// <summary>Returns a value indicating whether this instance is equal to a specified object.</summary>
-        /// <param name="sb">An object to compare with this instance, or <c>null</c>.</param>
+        /// <param name="sb">An object to compare with this instance, or <see langword="null"/>.</param>
         /// <returns>
-        /// <c>true</c> if the characters in this instance and <paramref name="sb"/> are the same;
-        /// otherwise, <c>false</c>.
+        /// <see langword="true"/> if the characters in this instance and <paramref name="sb"/> are the same;
+        /// otherwise, <see langword="false"/>.
         /// </returns>
         /// <remarks>
         /// The current instance and <paramref name="sb"/> are equal if the strings assigned to both
@@ -2774,10 +2773,10 @@ namespace J2N.Text
         }
 
         /// <summary>Returns a value indicating whether this instance is equal to a specified object.</summary>
-        /// <param name="sb">An object to compare with this instance, or <c>null</c>.</param>
+        /// <param name="sb">An object to compare with this instance, or <see langword="null"/>.</param>
         /// <returns>
-        /// <c>true</c> if the characters in this instance and <paramref name="sb"/> are the same;
-        /// otherwise, <c>false</c>.
+        /// <see langword="true"/> if the characters in this instance and <paramref name="sb"/> are the same;
+        /// otherwise, <see langword="false"/>.
         /// </returns>
         /// <remarks>
         /// The current instance and <paramref name="sb"/> are equal if the strings assigned to both
@@ -2799,8 +2798,8 @@ namespace J2N.Text
         /// </summary>
         /// <param name="span">The character span to compare with the current instance.</param>
         /// <returns>
-        /// <c>true</c> if the characters in this instance and <paramref name="span"/> are the same;
-        /// otherwise, <c>false</c>.
+        /// <see langword="true"/> if the characters in this instance and <paramref name="span"/> are the same;
+        /// otherwise, <see langword="false"/>.
         /// </returns>
         /// <remarks>
         /// The <see cref="Equals(TextBuilder)"/> method performs an ordinal comparison to determine
@@ -2813,11 +2812,11 @@ namespace J2N.Text
 
         /// <summary>Replaces, within a substring of this instance, all occurrences of a specified string with another specified string.</summary>
         /// <param name="oldValue">The string to replace.</param>
-        /// <param name="newValue">The string that replaces <paramref name="oldValue"/>, or <c>null</c>.</param>
+        /// <param name="newValue">The string that replaces <paramref name="oldValue"/>, or <see langword="null"/>.</param>
         /// <param name="startIndex">The position in this instance where the substring begins.</param>
         /// <param name="count">The length of the substring to search within.</param>
         /// <returns>A reference to this instance after the operation has completed.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="oldValue"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="oldValue"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentException">The length of <paramref name="oldValue"/> is zero.</exception>
         /// <exception cref="ArgumentOutOfRangeException">
         /// <paramref name="startIndex"/> or <paramref name="count"/> is less than zero.
@@ -2828,11 +2827,11 @@ namespace J2N.Text
         /// <para/>
         /// -or-
         /// <para/>
-        /// Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.
+        /// Enlarging the value of this instance would exceed <see cref="TextBuilder.MaxCapacity"/>.
         /// </exception>
         /// <remarks>
         /// This method performs an ordinal, case-sensitive comparison to identify occurrences of <paramref name="oldValue"/>
-        /// in the specified substring. If <paramref name="newValue"/> is <c>null</c> or <see cref="string.Empty"/>,
+        /// in the specified substring. If <paramref name="newValue"/> is <see langword="null"/> or <see cref="string.Empty"/>,
         /// all occurrences of <paramref name="oldValue"/> in the specified range are removed.
         /// </remarks>
         /// <seealso cref="Remove(int, int)" />
@@ -2858,7 +2857,7 @@ namespace J2N.Text
         /// <para/>
         /// -or-
         /// <para/>
-        /// Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.
+        /// Enlarging the value of this instance would exceed <see cref="TextBuilder.MaxCapacity"/>.
         /// </exception>
         /// <remarks>
         /// This method performs an ordinal, case-sensitive comparison to identify occurrences of <paramref name="oldValue"/>
@@ -2929,7 +2928,7 @@ namespace J2N.Text
         /// <param name="count">The number of characters to replace.</param>
         /// <param name="newValue">The replacement string.</param>
         /// <returns>A reference to this instance after the operation has completed.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="newValue"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="newValue"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentOutOfRangeException">
         /// <paramref name="startIndex"/> or <paramref name="count"/> is less than zero.
         /// <para/>
@@ -2984,25 +2983,25 @@ namespace J2N.Text
         /// <para/>
         /// -or-
         /// <para/>
-        /// Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.
+        /// Enlarging the value of this instance would exceed <see cref="TextBuilder.MaxCapacity"/>.
         /// </exception>
         /// <exception cref="NullReferenceException"><paramref name="value"/> is a null pointer.</exception>
         /// <remarks>
         /// This method appends <paramref name="valueCount"/> characters starting at address <paramref name="value"/>
         /// to the current instance.
         /// <para/>
-        /// The <see cref="Append(char*, int)"/> method modifies the existing instance of this class; it does
+        /// The <see cref="TextBuilder.Append(char*, int)"/> method modifies the existing instance of this class; it does
         /// not return a new class instance. Because of this, you can call a method or property on the existing
-        /// reference and you do not have to assign the return value to an <see cref="TextBuilder"/> object.
+        /// reference and you do not have to assign the return value to a <see cref="TextBuilder"/> object.
         /// <para/>
         /// The capacity of this instance is adjusted as needed.
         /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
-        /// When you instantiate an <see cref="TextBuilder"/> object by calling <see cref="TextBuilder(int, int)"/>,
+        /// When you instantiate a <see cref="TextBuilder"/> object by calling <see cref="TextBuilder(int, int)"/>,
         /// both the length and the capacity of the <see cref="TextBuilder"/> instance can grow beyond
-        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
-        /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
+        /// the value of its <see cref="TextBuilder.MaxCapacity"/> property. This can occur particularly when you call the <see cref="TextBuilder.Append(string?)"/>
+        /// and <see cref="TextBuilder.AppendFormat(string, object?)"/> methods to append small strings.
         /// </remarks>
         [CLSCompliant(false)]
         public unsafe TextBuilder Append(char* value, int valueCount)
@@ -3025,7 +3024,7 @@ namespace J2N.Text
         /// <para/>
         /// -or-
         /// <para/>
-        /// Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.
+        /// Enlarging the value of this instance would exceed <see cref="TextBuilder.MaxCapacity"/>.
         /// </exception>
         /// <exception cref="NullReferenceException"><paramref name="value"/> is a null pointer.</exception>
         /// <remarks>
@@ -3050,7 +3049,7 @@ namespace J2N.Text
         /// <para/>
         /// This method differs from <see cref="Remove(int, int)"/> in that it will automatically
         /// adjust the <paramref name="count"/> if <c><paramref name="startIndex"/> + <paramref name="count"/> > <see cref="Length"/></c>
-        /// to <c><see cref="Length"/> - <paramref name="startIndex"/>.</c>, provided it is not bounded by <see cref="MaxCapacity"/>.
+        /// to <c><see cref="Length"/> - <paramref name="startIndex"/>.</c>, provided it is not bounded by <see cref="TextBuilder.MaxCapacity"/>.
         /// </summary>
         /// <param name="startIndex">The start index.</param>
         /// <param name="count">The number of characters to delete.</param>
@@ -3075,12 +3074,12 @@ namespace J2N.Text
         /// reverse operation. Thus, the order of the high-low surrogates
         /// is never reversed.
         /// <para/>
-        /// IMPORTANT: This operation is done in-place. Although an <see cref="TextBuilder"/>
+        /// IMPORTANT: This operation is done in-place. Although a <see cref="TextBuilder"/>
         /// is returned, it is the SAME instance as the one that is passed in.
         /// <para/>
         /// Let <c>n</c> be the character length of this character sequence
         /// (not the length in <see cref="char"/> values) just prior to
-        /// execution of the <see cref="Reverse()"/> method. Then the
+        /// execution of the <see cref="TextBuilder.Reverse()"/> method. Then the
         /// character at index <c>k</c> in the new character sequence is
         /// equal to the character at index <c>n-k-1</c> in the old
         /// character sequence.
@@ -3094,7 +3093,7 @@ namespace J2N.Text
         /// Usage Note: This is the same operation as Java's StringBuilder.reverse()
         /// method. However, J2N also provides <see cref="J2N.Text.StringExtensions.ReverseText(string)"/>
         /// and <see cref="J2N.MemoryExtensions.ReverseText(Span{char})"/> which
-        /// don't require an <see cref="TextBuilder"/> instance.
+        /// don't require a <see cref="TextBuilder"/> instance.
         /// </summary>
         /// <returns>A reference to this instance after the operation has completed.</returns>
         /// <seealso cref="StringExtensions.ReverseText(string)" />
@@ -3107,13 +3106,13 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// Sets the capacity of an <see cref="TextBuilder"/> object to the actual number of characters
+        /// Sets the capacity of a <see cref="TextBuilder"/> object to the actual number of characters
         /// it contains.
         /// </summary>
         /// <remarks>
         /// This method is similar to <c>trimToSize()</c> in the JDK.
         /// <para/>
-        /// You can use the <see cref="TrimExcess()"/> method to minimize an <see cref="TextBuilder"/> object's
+        /// You can use the <see cref="TrimExcess()"/> method to minimize a <see cref="TextBuilder"/> object's
         /// memory overhead once it is known that no new characters will be added. To completely clear an
         /// <see cref="TextBuilder"/> object and release all memory referenced by it, call this method
         /// after calling the <see cref="Clear()"/> method or setting <see cref="Length"/> property to 0.
@@ -3139,7 +3138,7 @@ namespace J2N.Text
         /// <para/>
         /// -or-
         /// <para/>
-        /// <paramref name="length"/> plus the current length of this instance exceeds <see cref="MaxCapacity"/>.
+        /// <paramref name="length"/> plus the current length of this instance exceeds <see cref="TextBuilder.MaxCapacity"/>.
         /// </exception>
         /// <remarks>
         /// This method allows callers to append a block of a specific length to this instance that can be written
@@ -3150,10 +3149,10 @@ namespace J2N.Text
         /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
-        /// When you instantiate an <see cref="TextBuilder"/> object by calling <see cref="TextBuilder(int, int)"/>,
+        /// When you instantiate a <see cref="TextBuilder"/> object by calling <see cref="TextBuilder(int, int)"/>,
         /// both the length and the capacity of the <see cref="TextBuilder"/> instance can grow beyond
-        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
-        /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
+        /// the value of its <see cref="TextBuilder.MaxCapacity"/> property. This can occur particularly when you call the <see cref="TextBuilder.Append(string?)"/>
+        /// and <see cref="TextBuilder.AppendFormat(string, object?)"/> methods to append small strings.
         /// </remarks>
         public Span<char> AppendSpan(int length)
         {
@@ -3250,7 +3249,7 @@ namespace J2N.Text
         /// If <paramref name="value"/> is <see cref="string.Empty"/>, the return value
         /// is 0.
         /// </returns>
-        /// <exception cref="ArgumentNullException"><paramref name="value"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="value"/> is <see langword="null"/>.</exception>
         /// <remarks>
         /// Index numbering starts from zero.
         /// <para/>
@@ -3299,7 +3298,7 @@ namespace J2N.Text
         /// If <paramref name="value"/> is empty, the return value is the effective start index
         /// after clamping.
         /// </returns>
-        /// <exception cref="ArgumentNullException"><paramref name="value"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="value"/> is <see langword="null"/>.</exception>
         /// <remarks>
         /// Index numbering starts from zero. The <paramref name="startIndex"/> parameter is clamped to
         /// the valid range of the current instance. Values less than zero are treated as zero, and values
@@ -3368,7 +3367,7 @@ namespace J2N.Text
         /// If <paramref name="value"/> is <see cref="string.Empty"/>, the return value
         /// is 0.
         /// </returns>
-        /// <exception cref="ArgumentNullException"><paramref name="value"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="value"/> is <see langword="null"/>.</exception>
         /// <remarks>
         /// Index numbering starts from zero.
         /// <para/>
@@ -3399,7 +3398,7 @@ namespace J2N.Text
         /// If <paramref name="value"/> is <see cref="ReadOnlySpan{T}.Empty"/>, the return value
         /// is 0.
         /// </returns>
-        /// <exception cref="ArgumentNullException"><paramref name="value"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="value"/> is <see langword="null"/>.</exception>
         /// <remarks>
         /// Index numbering starts from zero.
         /// <para/>
@@ -3434,7 +3433,7 @@ namespace J2N.Text
         /// If <paramref name="value"/> is empty, the return value is the effective start index
         /// after clamping.
         /// </returns>
-        /// <exception cref="ArgumentNullException"><paramref name="value"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="value"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentException">
         /// <paramref name="comparisonType"/> is not a
         /// <see cref="StringComparison"/> value.
@@ -3546,7 +3545,7 @@ namespace J2N.Text
         /// if it is not found. If <paramref name="value"/> is <see cref="string.Empty"/>,
         /// it returns <see cref="Length"/>.
         /// </returns>
-        /// <exception cref="ArgumentNullException"><paramref name="value"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="value"/> is <see langword="null"/>.</exception>
         /// <remarks>
         /// Index numbering starts from zero. That is, the first character in the current instance
         /// is at index zero and the last is at <see cref="Length"/> - 1.
@@ -3613,7 +3612,7 @@ namespace J2N.Text
         /// if <paramref name="startIndex"/> is greater than <see cref="Length"/>, it
         /// returns <see cref="Length"/>.
         /// </returns>
-        /// <exception cref="ArgumentNullException"><paramref name="value"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="value"/> is <see langword="null"/>.</exception>
         /// <remarks>
         /// Index numbering starts from zero. That is, the first character in the current instance
         /// is at index zero and the last is at <see cref="Length"/> - 1.
@@ -3698,7 +3697,7 @@ namespace J2N.Text
         /// if it is not found. If <paramref name="value"/> is <see cref="string.Empty"/>,
         /// it returns <see cref="Length"/>.
         /// </returns>
-        /// <exception cref="ArgumentNullException"><paramref name="value"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="value"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentException">
         /// <paramref name="comparisonType"/> is not a
         /// <see cref="StringComparison"/> value.
@@ -3787,7 +3786,7 @@ namespace J2N.Text
         /// <paramref name="startIndex"/> is greater than <see cref="Length"/>, it returns
         /// the <see cref="Length"/>.
         /// </returns>
-        /// <exception cref="ArgumentNullException"><paramref name="value"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="value"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentException">
         /// <paramref name="comparisonType"/> is not a
         /// <see cref="StringComparison"/> value.
@@ -3896,10 +3895,10 @@ namespace J2N.Text
         /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
-        /// When you instantiate an <see cref="TextBuilder"/> object by calling <see cref="TextBuilder(int, int)"/>,
+        /// When you instantiate a <see cref="TextBuilder"/> object by calling <see cref="TextBuilder(int, int)"/>,
         /// both the length and the capacity of the <see cref="TextBuilder"/> instance can grow beyond
-        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
-        /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
+        /// the value of its <see cref="TextBuilder.MaxCapacity"/> property. This can occur particularly when you call the <see cref="TextBuilder.Append(string?)"/>
+        /// and <see cref="TextBuilder.AppendFormat(string, object?)"/> methods to append small strings.
         /// </remarks>
         /// <seealso cref="sbyte" />
         [CLSCompliant(false)]
@@ -3929,10 +3928,10 @@ namespace J2N.Text
         /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
-        /// When you instantiate an <see cref="TextBuilder"/> object by calling <see cref="TextBuilder(int, int)"/>,
+        /// When you instantiate a <see cref="TextBuilder"/> object by calling <see cref="TextBuilder(int, int)"/>,
         /// both the length and the capacity of the <see cref="TextBuilder"/> instance can grow beyond
-        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
-        /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
+        /// the value of its <see cref="TextBuilder.MaxCapacity"/> property. This can occur particularly when you call the <see cref="TextBuilder.Append(string?)"/>
+        /// and <see cref="TextBuilder.AppendFormat(string, object?)"/> methods to append small strings.
         /// </remarks>
         /// <seealso cref="byte" />
         public TextBuilder Append(byte value, string? format = null, IFormatProvider? provider = null)
@@ -3961,10 +3960,10 @@ namespace J2N.Text
         /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
-        /// When you instantiate an <see cref="TextBuilder"/> object by calling <see cref="TextBuilder(int, int)"/>,
+        /// When you instantiate a <see cref="TextBuilder"/> object by calling <see cref="TextBuilder(int, int)"/>,
         /// both the length and the capacity of the <see cref="TextBuilder"/> instance can grow beyond
-        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
-        /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
+        /// the value of its <see cref="TextBuilder.MaxCapacity"/> property. This can occur particularly when you call the <see cref="TextBuilder.Append(string?)"/>
+        /// and <see cref="TextBuilder.AppendFormat(string, object?)"/> methods to append small strings.
         /// </remarks>
         /// <seealso cref="short" />
         public TextBuilder Append(short value, string? format = null, IFormatProvider? provider = null)
@@ -3993,10 +3992,10 @@ namespace J2N.Text
         /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
-        /// When you instantiate an <see cref="TextBuilder"/> object by calling <see cref="TextBuilder(int, int)"/>,
+        /// When you instantiate a <see cref="TextBuilder"/> object by calling <see cref="TextBuilder(int, int)"/>,
         /// both the length and the capacity of the <see cref="TextBuilder"/> instance can grow beyond
-        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
-        /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
+        /// the value of its <see cref="TextBuilder.MaxCapacity"/> property. This can occur particularly when you call the <see cref="TextBuilder.Append(string?)"/>
+        /// and <see cref="TextBuilder.AppendFormat(string, object?)"/> methods to append small strings.
         /// </remarks>
         /// <seealso cref="int" />
         public TextBuilder Append(int value, string? format = null, IFormatProvider? provider = null)
@@ -4025,10 +4024,10 @@ namespace J2N.Text
         /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
-        /// When you instantiate an <see cref="TextBuilder"/> object by calling <see cref="TextBuilder(int, int)"/>,
+        /// When you instantiate a <see cref="TextBuilder"/> object by calling <see cref="TextBuilder(int, int)"/>,
         /// both the length and the capacity of the <see cref="TextBuilder"/> instance can grow beyond
-        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
-        /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
+        /// the value of its <see cref="TextBuilder.MaxCapacity"/> property. This can occur particularly when you call the <see cref="TextBuilder.Append(string?)"/>
+        /// and <see cref="TextBuilder.AppendFormat(string, object?)"/> methods to append small strings.
         /// </remarks>
         /// <seealso cref="long" />
         public TextBuilder Append(long value, string? format = null, IFormatProvider? provider = null)
@@ -4057,10 +4056,10 @@ namespace J2N.Text
         /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
-        /// When you instantiate an <see cref="TextBuilder"/> object by calling <see cref="TextBuilder(int, int)"/>,
+        /// When you instantiate a <see cref="TextBuilder"/> object by calling <see cref="TextBuilder(int, int)"/>,
         /// both the length and the capacity of the <see cref="TextBuilder"/> instance can grow beyond
-        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
-        /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
+        /// the value of its <see cref="TextBuilder.MaxCapacity"/> property. This can occur particularly when you call the <see cref="TextBuilder.Append(string?)"/>
+        /// and <see cref="TextBuilder.AppendFormat(string, object?)"/> methods to append small strings.
         /// </remarks>
         /// <seealso cref="float" />
         public TextBuilder Append(float value, string? format = null, IFormatProvider? provider = null)
@@ -4089,10 +4088,10 @@ namespace J2N.Text
         /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
-        /// When you instantiate an <see cref="TextBuilder"/> object by calling <see cref="TextBuilder(int, int)"/>,
+        /// When you instantiate a <see cref="TextBuilder"/> object by calling <see cref="TextBuilder(int, int)"/>,
         /// both the length and the capacity of the <see cref="TextBuilder"/> instance can grow beyond
-        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
-        /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
+        /// the value of its <see cref="TextBuilder.MaxCapacity"/> property. This can occur particularly when you call the <see cref="TextBuilder.Append(string?)"/>
+        /// and <see cref="TextBuilder.AppendFormat(string, object?)"/> methods to append small strings.
         /// </remarks>
         /// <seealso cref="double" />
         public TextBuilder Append(double value, string? format = null, IFormatProvider? provider = null)
@@ -4121,10 +4120,10 @@ namespace J2N.Text
         /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
-        /// When you instantiate an <see cref="TextBuilder"/> object by calling <see cref="TextBuilder(int, int)"/>,
+        /// When you instantiate a <see cref="TextBuilder"/> object by calling <see cref="TextBuilder(int, int)"/>,
         /// both the length and the capacity of the <see cref="TextBuilder"/> instance can grow beyond
-        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
-        /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
+        /// the value of its <see cref="TextBuilder.MaxCapacity"/> property. This can occur particularly when you call the <see cref="TextBuilder.Append(string?)"/>
+        /// and <see cref="TextBuilder.AppendFormat(string, object?)"/> methods to append small strings.
         /// </remarks>
         /// <seealso cref="ushort" />
         [CLSCompliant(false)]
@@ -4154,10 +4153,10 @@ namespace J2N.Text
         /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
-        /// When you instantiate an <see cref="TextBuilder"/> object by calling <see cref="TextBuilder(int, int)"/>,
+        /// When you instantiate a <see cref="TextBuilder"/> object by calling <see cref="TextBuilder(int, int)"/>,
         /// both the length and the capacity of the <see cref="TextBuilder"/> instance can grow beyond
-        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
-        /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
+        /// the value of its <see cref="TextBuilder.MaxCapacity"/> property. This can occur particularly when you call the <see cref="TextBuilder.Append(string?)"/>
+        /// and <see cref="TextBuilder.AppendFormat(string, object?)"/> methods to append small strings.
         /// </remarks>
         /// <seealso cref="uint" />
         [CLSCompliant(false)]
@@ -4187,10 +4186,10 @@ namespace J2N.Text
         /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
-        /// When you instantiate an <see cref="TextBuilder"/> object by calling <see cref="TextBuilder(int, int)"/>,
+        /// When you instantiate a <see cref="TextBuilder"/> object by calling <see cref="TextBuilder(int, int)"/>,
         /// both the length and the capacity of the <see cref="TextBuilder"/> instance can grow beyond
-        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
-        /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
+        /// the value of its <see cref="TextBuilder.MaxCapacity"/> property. This can occur particularly when you call the <see cref="TextBuilder.Append(string?)"/>
+        /// and <see cref="TextBuilder.AppendFormat(string, object?)"/> methods to append small strings.
         /// </remarks>
         /// <seealso cref="ulong" />
         [CLSCompliant(false)]
@@ -4218,7 +4217,7 @@ namespace J2N.Text
         /// -or-
         /// <para/>
         /// The current length of this <see cref="TextBuilder"/> object plus the length of
-        /// <paramref name="value"/> exceeds <see cref="MaxCapacity"/>.
+        /// <paramref name="value"/> exceeds <see cref="TextBuilder.MaxCapacity"/>.
         /// </exception>
         /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
         /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
@@ -4248,7 +4247,7 @@ namespace J2N.Text
         /// -or-
         /// <para/>
         /// The current length of this <see cref="TextBuilder"/> object plus the length of
-        /// <paramref name="value"/> exceeds <see cref="MaxCapacity"/>.
+        /// <paramref name="value"/> exceeds <see cref="TextBuilder.MaxCapacity"/>.
         /// </exception>
         /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
         /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
@@ -4277,7 +4276,7 @@ namespace J2N.Text
         /// -or-
         /// <para/>
         /// The current length of this <see cref="TextBuilder"/> object plus the length of
-        /// <paramref name="value"/> exceeds <see cref="MaxCapacity"/>.
+        /// <paramref name="value"/> exceeds <see cref="TextBuilder.MaxCapacity"/>.
         /// </exception>
         /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
         /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
@@ -4306,7 +4305,7 @@ namespace J2N.Text
         /// -or-
         /// <para/>
         /// The current length of this <see cref="TextBuilder"/> object plus the length of
-        /// <paramref name="value"/> exceeds <see cref="MaxCapacity"/>.
+        /// <paramref name="value"/> exceeds <see cref="TextBuilder.MaxCapacity"/>.
         /// </exception>
         /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
         /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
@@ -4335,7 +4334,7 @@ namespace J2N.Text
         /// -or-
         /// <para/>
         /// The current length of this <see cref="TextBuilder"/> object plus the length of
-        /// <paramref name="value"/> exceeds <see cref="MaxCapacity"/>.
+        /// <paramref name="value"/> exceeds <see cref="TextBuilder.MaxCapacity"/>.
         /// </exception>
         /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
         /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
@@ -4364,7 +4363,7 @@ namespace J2N.Text
         /// -or-
         /// <para/>
         /// The current length of this <see cref="TextBuilder"/> object plus the length of
-        /// <paramref name="value"/> exceeds <see cref="MaxCapacity"/>.
+        /// <paramref name="value"/> exceeds <see cref="TextBuilder.MaxCapacity"/>.
         /// </exception>
         /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
         /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
@@ -4393,7 +4392,7 @@ namespace J2N.Text
         /// -or-
         /// <para/>
         /// The current length of this <see cref="TextBuilder"/> object plus the length of
-        /// <paramref name="value"/> exceeds <see cref="MaxCapacity"/>.
+        /// <paramref name="value"/> exceeds <see cref="TextBuilder.MaxCapacity"/>.
         /// </exception>
         /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
         /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
@@ -4422,7 +4421,7 @@ namespace J2N.Text
         /// -or-
         /// <para/>
         /// The current length of this <see cref="TextBuilder"/> object plus the length of
-        /// <paramref name="value"/> exceeds <see cref="MaxCapacity"/>.
+        /// <paramref name="value"/> exceeds <see cref="TextBuilder.MaxCapacity"/>.
         /// </exception>
         /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
         /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
@@ -4452,7 +4451,7 @@ namespace J2N.Text
         /// -or-
         /// <para/>
         /// The current length of this <see cref="TextBuilder"/> object plus the length of
-        /// <paramref name="value"/> exceeds <see cref="MaxCapacity"/>.
+        /// <paramref name="value"/> exceeds <see cref="TextBuilder.MaxCapacity"/>.
         /// </exception>
         /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
         /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
@@ -4482,7 +4481,7 @@ namespace J2N.Text
         /// -or-
         /// <para/>
         /// The current length of this <see cref="TextBuilder"/> object plus the length of
-        /// <paramref name="value"/> exceeds <see cref="MaxCapacity"/>.
+        /// <paramref name="value"/> exceeds <see cref="TextBuilder.MaxCapacity"/>.
         /// </exception>
         /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
         /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
