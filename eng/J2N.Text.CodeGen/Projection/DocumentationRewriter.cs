@@ -93,7 +93,8 @@ namespace J2N.Text.CodeGen.Projection
                         element,
                         implementationModel,
                         sourceType,
-                        projectedBuilderType));
+                        projectedBuilderType,
+                        options));
             }
 
             if (options.AdditionalTypeParameter is not null)
@@ -187,14 +188,22 @@ namespace J2N.Text.CodeGen.Projection
             return result;
         }
 
-        public static string? RewriteDocumentation(
+        private static string? RewriteDocumentation(
             string? xml,
             TypeModel source,
             string sourceType,
-            string facadeType)
+            string facadeType,
+            DocumentationRewriteOptions options)
         {
             if (string.IsNullOrWhiteSpace(xml))
                 return xml;
+
+            Func<string, string> rewriteCrefDefault = (cref) => RewriteCrefTarget(
+                cref,
+                source,
+                facadeType);
+
+            Func<string, string> rewriteCref = options.RewriteCref ?? rewriteCrefDefault;
 
             string result =
                 Regex.Replace(
@@ -205,11 +214,7 @@ namespace J2N.Text.CodeGen.Projection
                         string cref =
                             match.Groups[1].Value;
 
-                        string rewritten =
-                            RewriteCrefTarget(
-                                cref,
-                                source,
-                                facadeType);
+                        string rewritten = rewriteCref(cref);
 
                         return $"cref=\"{rewritten}\"";
                     });
@@ -219,7 +224,7 @@ namespace J2N.Text.CodeGen.Projection
             return result;
         }
 
-        private static string RewriteCrefTarget(
+        public static string RewriteCrefTarget(
             string cref,
             TypeModel source,
             string facadeType)
@@ -290,11 +295,12 @@ namespace J2N.Text.CodeGen.Projection
             return cref;
         }
 
-        public static XmlDocumentationElementModel RewriteElement(
+        private static XmlDocumentationElementModel RewriteElement(
             XmlDocumentationElementModel element,
             TypeModel source,
             string sourceType,
-            string projectedType)
+            string projectedType,
+            DocumentationRewriteOptions options)
         {
             XmlDocumentationElementModel rewritten =
                 new()
@@ -305,7 +311,8 @@ namespace J2N.Text.CodeGen.Projection
                             element.InnerXml,
                             source,
                             sourceType,
-                            projectedType)
+                            projectedType,
+                            options)
                 };
 
             foreach ((string key, string value) in element.Attributes)
@@ -316,7 +323,8 @@ namespace J2N.Text.CodeGen.Projection
                         value,
                         source,
                         sourceType,
-                        projectedType)
+                        projectedType,
+                        options)
                     ?? value);
             }
 

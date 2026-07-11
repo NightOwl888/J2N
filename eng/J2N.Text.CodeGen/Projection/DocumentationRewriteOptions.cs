@@ -21,5 +21,7 @@ namespace J2N.Text.CodeGen.Projection
         public XmlDocumentationElementModel? AdditionalThisParameter { get; init; }
 
         public XmlDocumentationElementModel? AdditionalTypeParameter { get; init; }
+
+        public Func<string, string>? RewriteCref { get; init; }
     }
 }
