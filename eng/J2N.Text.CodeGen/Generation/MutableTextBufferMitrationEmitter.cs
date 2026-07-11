@@ -127,6 +127,7 @@ namespace J2N.Text.CodeGen.Generation
                 wrapMembersInLock
                 && !method.SkipSynchronization;
 
+            sb.AppendLine("        [CodeGenerationGenerateForwarder]");
             sb.AppendLine(
                 $"        public static{unsafeModifier} {method.ReturnType} {method.Name}{genericParameters}({parameterList})");
 
