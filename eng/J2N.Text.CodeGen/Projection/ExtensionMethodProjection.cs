@@ -121,7 +121,8 @@ namespace J2N.Text.CodeGen.Projection
                         new DocumentationRewriteOptions
                         {
                             IncludeSynchronizationNote = options.EmitSynchronizationNotes && method.SkipSynchronization,
-                            ForceBuilderReturns = method.ReturnsSelf
+                            ForceBuilderReturns = method.ReturnsSelf,
+                            PreserveTypeParameterDocumentation = options.PreserveSelfTypeGenerics,
                         }),
 
                 GenerateForwarder = method.GenerateForwarder,

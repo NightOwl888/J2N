@@ -9,6 +9,12 @@ namespace J2N.Text.CodeGen.Projection
         public bool ForceBuilderReturns { get; init; }
 
         /// <summary>
+        /// Determines whether generic &lt;typeparam/&gt; elements are preserved in
+        /// the rewritten documentation.
+        /// </summary>
+        public bool PreserveTypeParameterDocumentation { get; init; } = true;
+
+        /// <summary>
         /// Inserts the synthetic extension-method "this" parameter before all
         /// existing <param/> elements.
         /// </summary>

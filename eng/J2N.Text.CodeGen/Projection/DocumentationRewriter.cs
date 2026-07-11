@@ -71,6 +71,11 @@ namespace J2N.Text.CodeGen.Projection
                     continue;
                 }
 
+                if (!options.PreserveTypeParameterDocumentation && element.ElementName == "typeparam")
+                {
+                    continue;
+                }
+
                 //
                 // The extension-method "this" parameter must appear before the
                 // first existing <param/>.
