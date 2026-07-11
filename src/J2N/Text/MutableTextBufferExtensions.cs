@@ -472,7 +472,7 @@ namespace J2N.Text
         /// Appends the string representation of a specified object to this instance using the specified format
         /// and culture-specific format information.
         /// </summary>
-        /// <typeparam name="T">The type of the target builder.</typeparam>
+        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
         /// <param name="text">The target builder.</param>
         /// <param name="value">The object to append.</param>
         /// <param name="format">A standard or custom format string.</param>
@@ -494,8 +494,8 @@ namespace J2N.Text
         /// </remarks>
         /// <seealso cref="object"/>
         [CodeGenerationGenerateForwarder]
-        public static T Append<T>(this T text, object? value, string? format = null, IFormatProvider? provider = null)
-            where T: MutableTextBuffer
+        public static TBuilder Append<TBuilder>(this TBuilder text, object? value, string? format = null, IFormatProvider? provider = null)
+            where TBuilder: MutableTextBuffer
         {
             if (text is null)
                 throw new ArgumentNullException(nameof(text));
@@ -507,7 +507,7 @@ namespace J2N.Text
         /// <summary>
         /// Inserts the string representation of an object into this instance at the specified character position.
         /// </summary>
-        /// <typeparam name="T">The type of the target builder.</typeparam>
+        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
         /// <param name="text">The target builder.</param>
         /// <param name="index">The position in this instance where insertion begins.</param>
         /// <param name="value">The object to insert, or <see langword="null"/>.</param>
@@ -529,8 +529,8 @@ namespace J2N.Text
         /// </remarks>
         /// <seealso cref="object"/>
         [CodeGenerationGenerateForwarder]
-        public static T Insert<T>(this T text, int index, object? value, string? format = null, IFormatProvider? provider = null)
-            where T: MutableTextBuffer
+        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, object? value, string? format = null, IFormatProvider? provider = null)
+            where TBuilder: MutableTextBuffer
         {
             if (text is null)
                 throw new ArgumentNullException(nameof(text));
