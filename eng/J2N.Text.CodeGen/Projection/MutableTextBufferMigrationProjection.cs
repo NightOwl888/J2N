@@ -60,7 +60,7 @@ namespace J2N.Text.CodeGen.Projection
                 new ParameterModel
                 {
                     Name = "text",
-                    TypeName = "T",
+                    TypeName = "TBuilder",
                     Modifier = "this",
                     IsThis = true
                 }
@@ -99,7 +99,7 @@ namespace J2N.Text.CodeGen.Projection
                 //        sourceType,
                 //        projectedBuilderType),
 
-                ReturnType = "T",
+                ReturnType = "TBuilder",
 
                 ReturnsSelf = method.ReturnsSelf,
                 IsBuilderMethod = method.IsBuilderMethod,
@@ -123,7 +123,7 @@ namespace J2N.Text.CodeGen.Projection
                 [
                     new GenericParameterModel
                     {
-                        Name = "T",
+                        Name = "TBuilder",
                         Constraints =
                         {
                             projectedBuilderType
@@ -187,7 +187,7 @@ namespace J2N.Text.CodeGen.Projection
                                     InnerXml = "The type of the target builder.",
                                     Attributes =
                                     {
-                                        ["name"] = "T"
+                                        ["name"] = "TBuilder"
                                     }
                                 },
 
