@@ -260,7 +260,7 @@ namespace J2N.Text.CodeGen.Generation
             sb.AppendLine("        {");
 
             sb.AppendLine($"            if ({extensionParameterName} is null)");
-            sb.AppendLine($"                throw new ArgumentNullException(nameof({extensionParameterName}));");
+            sb.AppendLine($"                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.{extensionParameterName});");
             sb.AppendLine();
 
             if (shouldWrapInLock)
