@@ -108,7 +108,14 @@ namespace J2N.Text.CodeGen.Projection
                                     sourceType,
                                     projectedBuilderType))
                             .ToList()
-                        : [],
+                        : method.GenericParameters
+                            .Where(p => !IsSourceTypeMatch(p.Name, "TBuilder"))
+                            .Select(p =>
+                                RewriteGenericParameter(
+                                    p,
+                                    sourceType,
+                                    projectedBuilderType))
+                            .ToList(),
 
                 Attributes =
                     method.Attributes
