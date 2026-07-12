@@ -133,7 +133,7 @@ namespace J2N.Text
             if (Value is null)
                 throw new InvalidOperationException(SR.Format(SR.InvalidOperation_CannotEditNullObject, nameof(MutableTextBuffer)));
 
-            Value.Append(value);
+            Value.AppendInternal(value);
             return this;
         }
 
@@ -152,7 +152,7 @@ namespace J2N.Text
                 if (Value is null)
                     throw new InvalidOperationException(SR.Format(SR.InvalidOperation_CannotEditNullObject, nameof(MutableTextBuffer)));
 
-                Value.Append(value);
+                Value.AppendInternal(value);
             }
             return this;
         }
@@ -187,7 +187,7 @@ namespace J2N.Text
             if (Value is null)
                 throw new InvalidOperationException(SR.Format(SR.InvalidOperation_CannotEditNullObject, nameof(MutableTextBuffer)));
 
-            Value.Append(value, startIndex, count);
+            Value.AppendInternal(value, startIndex, count);
             return this;
         }
 
@@ -206,7 +206,7 @@ namespace J2N.Text
                 if (Value is null)
                     throw new InvalidOperationException(SR.Format(SR.InvalidOperation_CannotEditNullObject, nameof(MutableTextBuffer)));
 
-                Value.Append(value);
+                Value.AppendInternal(value);
             }
             return this;
         }
@@ -241,7 +241,7 @@ namespace J2N.Text
             if (Value is null)
                 throw new InvalidOperationException(SR.Format(SR.InvalidOperation_CannotEditNullObject, nameof(MutableTextBuffer)));
 
-            Value.Append(value, startIndex, count);
+            Value.AppendInternal(value, startIndex, count);
             return this;
         }
 
@@ -260,7 +260,7 @@ namespace J2N.Text
                 if (Value is null)
                     throw new InvalidOperationException(SR.Format(SR.InvalidOperation_CannotEditNullObject, nameof(MutableTextBuffer)));
 
-                Value.Append(value);
+                Value.AppendInternal(value);
             }
             return this;
         }
@@ -295,7 +295,7 @@ namespace J2N.Text
             if (Value is null)
                 throw new InvalidOperationException(SR.Format(SR.InvalidOperation_CannotEditNullObject, nameof(MutableTextBuffer)));
 
-            Value.Append(value, startIndex, count);
+            Value.AppendInternal(value, startIndex, count);
             return this;
         }
 
@@ -314,7 +314,7 @@ namespace J2N.Text
                 if (Value is null)
                     throw new InvalidOperationException(SR.Format(SR.InvalidOperation_CannotEditNullObject, nameof(MutableTextBuffer)));
 
-                Value.Append(value);
+                Value.AppendInternal(value);
             }
             return this;
         }
@@ -352,7 +352,7 @@ namespace J2N.Text
                 if (Value is null)
                     throw new InvalidOperationException(SR.Format(SR.InvalidOperation_CannotEditNullObject, nameof(MutableTextBuffer)));
 
-                Value.Append(value, startIndex, count);
+                Value.AppendInternal(value, startIndex, count);
             }
             return this;
         }
@@ -368,7 +368,7 @@ namespace J2N.Text
             if (Value is null)
                 throw new InvalidOperationException(SR.Format(SR.InvalidOperation_CannotEditNullObject, nameof(MutableTextBuffer)));
 
-            Value.Append(value);
+            Value.AppendInternal(value);
             return this;
         }
 

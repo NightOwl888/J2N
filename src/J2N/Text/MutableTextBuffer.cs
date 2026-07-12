@@ -44,7 +44,7 @@ namespace J2N.Text
     ///     </description></item>
     /// </list>
     /// </remarks>
-    public partial class MutableTextBuffer : IAppendable, ISpanAppendable, ICharSequence, IBufferWriter<char>,
+    public partial class MutableTextBuffer : ICharSequence, IBufferWriter<char>,
         ISpannable<char>, ICopyable<char>, ISpanCopyable<char>, IDisposable
         //, IEnumerable<char> // ICU4N TODO: Implement?
     {
@@ -223,8 +223,8 @@ namespace J2N.Text
         /// <para/>
         /// When you instantiate a <see cref="MutableTextBuffer"/> object by calling <see cref="MutableTextBuffer.Initialize(int, int)"/>,
         /// both the length and the capacity of the <see cref="MutableTextBuffer"/> instance can grow beyond
-        /// the value of its <see cref="MutableTextBuffer.MaxCapacity"/> property. This can occur particularly when you call the <see cref="MutableTextBuffer.Append(string?)"/>
-        /// and <see cref="MutableTextBuffer.AppendFormat(string, object?)"/> methods to append small strings.
+        /// the value of its <see cref="MutableTextBuffer.MaxCapacity"/> property. This can occur particularly when you call the <see cref="MutableTextBufferExtensions.Append{TBuilder}(TBuilder, string?)"/>
+        /// and <see cref="MutableTextBufferExtensions.AppendFormat{TBuilder}(TBuilder, string, object?)"/> methods to append small strings.
         /// </remarks>
         public int MaxCapacity => m_MaxCapacity;
 
@@ -356,14 +356,14 @@ namespace J2N.Text
             return m_Chars.AsSpan(startIndex, length).ToString();
         }
 
-        /// <summary>
-        /// Removes all characters from the current <see cref="MutableTextBuffer"/> instance.
-        /// </summary>
-        /// <returns>An object whose <see cref="Length"/> is 0 (zero).</returns>
-        /// <remarks><see cref="Clear"/> is a convenience method that is equivalent to setting
-        /// the <see cref="Length"/> property of the current instance to 0 (zero).</remarks>
-        [CodeGenerationReturnsSelf]
-        public void Clear()
+        ///// <summary>
+        ///// Removes all characters from the current <see cref="MutableTextBuffer"/> instance.
+        ///// </summary>
+        ///// <returns>An object whose <see cref="Length"/> is 0 (zero).</returns>
+        ///// <remarks><see cref="Clear"/> is a convenience method that is equivalent to setting
+        ///// the <see cref="Length"/> property of the current instance to 0 (zero).</remarks>
+        [CodeGenerationExtensionImplementation]
+        internal void ClearInternal()
         {
             this.Length = 0;
         }
@@ -406,7 +406,7 @@ namespace J2N.Text
                 if (delta > 0)
                 {
                     // Pad ourselves with null characters.
-                    Append('\0', delta);
+                    AppendInternal('\0', delta);
                 }
                 else
                 {
@@ -498,46 +498,46 @@ namespace J2N.Text
             }
         }
 
-        /// <summary>
-        /// Appends a specified number of copies of the string representation of a Unicode character to this instance.
-        /// </summary>
-        /// <param name="value">The character to append.</param>
-        /// <param name="repeatCount">The number of times to append value.</param>
-        /// <returns>A reference to this instance after the append operation has completed.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// <paramref name="repeatCount"/> is less than zero.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// Enlarging the value of this instance would exceed <see cref="MutableTextBuffer.MaxCapacity"/>.
-        /// </exception>
-        /// <exception cref="OutOfMemoryException">Out of memory.</exception>
-        /// <remarks>
-        /// The <see cref="Append(char, int)"/> method modifies the existing instance of this class;
-        /// it does not return a new class instance. Because of this, you can call a method or property
-        /// on the existing reference and you do not have to assign the return value to an
-        /// <see cref="MutableTextBuffer"/> object, as the following example illustrates.
-        /// <code>
-        /// decimal value = 1346.19m;
-        /// J2N.Text.MutableTextBuffer sb = new J2N.Text.MutableTextBuffer();
-        /// sb.Append('*', 5).AppendFormat("{0:C2}", value).Append('*', 5);
-        /// Console.WriteLine(sb);
-        /// // The example displays the following output:
-        /// //       *****$1,346.19*****
-        /// </code>
-        /// <para/>
-        /// The capacity of this instance is adjusted as needed.
-        /// <para/>
-        /// <b>Notes to Callers</b>
-        /// <para/>
-        /// When you instantiate a <see cref="MutableTextBuffer"/> object by calling <see cref="MutableTextBuffer.Initialize(int, int)"/>,
-        /// both the length and the capacity of the <see cref="MutableTextBuffer"/> instance can grow beyond
-        /// the value of its <see cref="MutableTextBuffer.MaxCapacity"/> property. This can occur particularly when you call the <see cref="MutableTextBuffer.Append(string?)"/>
-        /// and <see cref="MutableTextBuffer.AppendFormat(string, object?)"/> methods to append small strings.
-        /// </remarks>
-        /// <seealso cref="char"/>
-        [CodeGenerationReturnsSelf]
-        public void Append(char value, int repeatCount)
+        ///// <summary>
+        ///// Appends a specified number of copies of the string representation of a Unicode character to this instance.
+        ///// </summary>
+        ///// <param name="value">The character to append.</param>
+        ///// <param name="repeatCount">The number of times to append value.</param>
+        ///// <returns>A reference to this instance after the append operation has completed.</returns>
+        ///// <exception cref="ArgumentOutOfRangeException">
+        ///// <paramref name="repeatCount"/> is less than zero.
+        ///// <para/>
+        ///// -or-
+        ///// <para/>
+        ///// Enlarging the value of this instance would exceed <see cref="MutableTextBuffer.MaxCapacity"/>.
+        ///// </exception>
+        ///// <exception cref="OutOfMemoryException">Out of memory.</exception>
+        ///// <remarks>
+        ///// The <see cref="Append(char, int)"/> method modifies the existing instance of this class;
+        ///// it does not return a new class instance. Because of this, you can call a method or property
+        ///// on the existing reference and you do not have to assign the return value to an
+        ///// <see cref="MutableTextBuffer"/> object, as the following example illustrates.
+        ///// <code>
+        ///// decimal value = 1346.19m;
+        ///// J2N.Text.MutableTextBuffer sb = new J2N.Text.MutableTextBuffer();
+        ///// sb.Append('*', 5).AppendFormat("{0:C2}", value).Append('*', 5);
+        ///// Console.WriteLine(sb);
+        ///// // The example displays the following output:
+        ///// //       *****$1,346.19*****
+        ///// </code>
+        ///// <para/>
+        ///// The capacity of this instance is adjusted as needed.
+        ///// <para/>
+        ///// <b>Notes to Callers</b>
+        ///// <para/>
+        ///// When you instantiate a <see cref="MutableTextBuffer"/> object by calling <see cref="MutableTextBuffer.Initialize(int, int)"/>,
+        ///// both the length and the capacity of the <see cref="MutableTextBuffer"/> instance can grow beyond
+        ///// the value of its <see cref="MutableTextBuffer.MaxCapacity"/> property. This can occur particularly when you call the <see cref="MutableTextBuffer.Append(string?)"/>
+        ///// and <see cref="MutableTextBuffer.AppendFormat(string, object?)"/> methods to append small strings.
+        ///// </remarks>
+        ///// <seealso cref="char"/>
+        [CodeGenerationExtensionImplementation]
+        internal void AppendInternal(char value, int repeatCount)
         {
             if (repeatCount < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(repeatCount, ExceptionArgument.repeatCount);
@@ -581,66 +581,66 @@ namespace J2N.Text
             m_Position += repeatCount;
         }
 
-        /// <summary>
-        /// Appends the string representation of a specified subarray of Unicode characters to this instance.
-        /// </summary>
-        /// <param name="value">A character array.</param>
-        /// <param name="startIndex">The starting position in <paramref name="value"/>.</param>
-        /// <param name="charCount">The number of characters to append.</param>
-        /// <returns>A reference to this instance after the append operation has completed.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="value"/> is <see langword="null"/>, and <paramref name="startIndex"/>
-        /// and <paramref name="charCount"/> are not zero.</exception>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// <paramref name="charCount"/> is less than zero.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// <paramref name="startIndex"/> is less than zero.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// <paramref name="startIndex"/> + <paramref name="charCount"/> is greater than the length of <paramref name="value"/>.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// Enlarging the value of this instance would exceed <see cref="MutableTextBuffer.MaxCapacity"/>.
-        /// </exception>
-        /// <remarks>
-        /// This method appends the specified range of characters in <paramref name="value"/> to the current instance. If
-        /// <paramref name="value"/> is <see langword="null"/> and <paramref name="startIndex"/> and <paramref name="charCount"/>
-        /// are both zero, no changes are made.
-        /// <para/>
-        /// The <see cref="MutableTextBuffer.Append(char[], int, int)"/> method modifies the existing instance of this class; it does
-        /// not return a new class instance. Because of this, you can call a method or property on the existing
-        /// reference and you do not have to assign the return value to a <see cref="MutableTextBuffer"/> object,
-        /// as the following example illustrates.
-        /// <code>
-        /// char[] chars = { 'a', 'b', 'c', 'd', 'e'};
-        /// J2N.Text.MutableTextBuffer sb = new J2N.Text.MutableTextBuffer();
-        /// int startPosition = Array.IndexOf(chars, 'a');
-        /// int endPosition = Array.IndexOf(chars, 'c');
-        /// if (startPosition >= 0 &amp;&amp; endPosition >= 0) {
-        ///    sb.Append("The array from positions ").Append(startPosition).
-        ///              Append(" to ").Append(endPosition).Append(" contains ").
-        ///              Append(chars, startPosition, endPosition + 1).Append(".");
-        ///    Console.WriteLine(sb);
-        /// }
-        /// // The example displays the following output:
-        /// //       The array from positions 0 to 2 contains abc.
-        /// </code>
-        /// <para/>
-        /// The capacity of this instance is adjusted as needed.
-        /// <para/>
-        /// <b>Notes to Callers</b>
-        /// <para/>
-        /// When you instantiate a <see cref="MutableTextBuffer"/> object by calling <see cref="MutableTextBuffer.Initialize(int, int)"/>,
-        /// both the length and the capacity of the <see cref="MutableTextBuffer"/> instance can grow beyond
-        /// the value of its <see cref="MutableTextBuffer.MaxCapacity"/> property. This can occur particularly when you call the <see cref="MutableTextBuffer.Append(string?)"/>
-        /// and <see cref="MutableTextBuffer.AppendFormat(string, object?)"/> methods to append small strings.
-        /// </remarks>
-        /// <seealso cref="char"/>
-        [CodeGenerationReturnsSelf]
-        public void Append(char[]? value, int startIndex, int charCount)
+        ///// <summary>
+        ///// Appends the string representation of a specified subarray of Unicode characters to this instance.
+        ///// </summary>
+        ///// <param name="value">A character array.</param>
+        ///// <param name="startIndex">The starting position in <paramref name="value"/>.</param>
+        ///// <param name="charCount">The number of characters to append.</param>
+        ///// <returns>A reference to this instance after the append operation has completed.</returns>
+        ///// <exception cref="ArgumentNullException"><paramref name="value"/> is <see langword="null"/>, and <paramref name="startIndex"/>
+        ///// and <paramref name="charCount"/> are not zero.</exception>
+        ///// <exception cref="ArgumentOutOfRangeException">
+        ///// <paramref name="charCount"/> is less than zero.
+        ///// <para/>
+        ///// -or-
+        ///// <para/>
+        ///// <paramref name="startIndex"/> is less than zero.
+        ///// <para/>
+        ///// -or-
+        ///// <para/>
+        ///// <paramref name="startIndex"/> + <paramref name="charCount"/> is greater than the length of <paramref name="value"/>.
+        ///// <para/>
+        ///// -or-
+        ///// <para/>
+        ///// Enlarging the value of this instance would exceed <see cref="MutableTextBuffer.MaxCapacity"/>.
+        ///// </exception>
+        ///// <remarks>
+        ///// This method appends the specified range of characters in <paramref name="value"/> to the current instance. If
+        ///// <paramref name="value"/> is <see langword="null"/> and <paramref name="startIndex"/> and <paramref name="charCount"/>
+        ///// are both zero, no changes are made.
+        ///// <para/>
+        ///// The <see cref="MutableTextBuffer.Append(char[], int, int)"/> method modifies the existing instance of this class; it does
+        ///// not return a new class instance. Because of this, you can call a method or property on the existing
+        ///// reference and you do not have to assign the return value to a <see cref="MutableTextBuffer"/> object,
+        ///// as the following example illustrates.
+        ///// <code>
+        ///// char[] chars = { 'a', 'b', 'c', 'd', 'e'};
+        ///// J2N.Text.MutableTextBuffer sb = new J2N.Text.MutableTextBuffer();
+        ///// int startPosition = Array.IndexOf(chars, 'a');
+        ///// int endPosition = Array.IndexOf(chars, 'c');
+        ///// if (startPosition >= 0 &amp;&amp; endPosition >= 0) {
+        /////    sb.Append("The array from positions ").Append(startPosition).
+        /////              Append(" to ").Append(endPosition).Append(" contains ").
+        /////              Append(chars, startPosition, endPosition + 1).Append(".");
+        /////    Console.WriteLine(sb);
+        ///// }
+        ///// // The example displays the following output:
+        ///// //       The array from positions 0 to 2 contains abc.
+        ///// </code>
+        ///// <para/>
+        ///// The capacity of this instance is adjusted as needed.
+        ///// <para/>
+        ///// <b>Notes to Callers</b>
+        ///// <para/>
+        ///// When you instantiate a <see cref="MutableTextBuffer"/> object by calling <see cref="MutableTextBuffer.Initialize(int, int)"/>,
+        ///// both the length and the capacity of the <see cref="MutableTextBuffer"/> instance can grow beyond
+        ///// the value of its <see cref="MutableTextBuffer.MaxCapacity"/> property. This can occur particularly when you call the <see cref="MutableTextBuffer.Append(string?)"/>
+        ///// and <see cref="MutableTextBuffer.AppendFormat(string, object?)"/> methods to append small strings.
+        ///// </remarks>
+        ///// <seealso cref="char"/>
+        [CodeGenerationExtensionImplementation]
+        internal void AppendInternal(char[]? value, int startIndex, int charCount)
         {
             if (startIndex < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(startIndex, ExceptionArgument.startIndex);
@@ -666,42 +666,42 @@ namespace J2N.Text
             }
         }
 
-        /// <summary>
-        /// Appends a copy of the specified string to this instance.
-        /// </summary>
-        /// <param name="value">The string to append.</param>
-        /// <returns>A reference to this instance after the append operation has completed.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// Enlarging the value of this instance would exceed <see cref="MutableTextBuffer.MaxCapacity"/>.
-        /// </exception>
-        /// <remarks>
-        /// The <see cref="MutableTextBuffer.Append(string?)"/> method modifies the existing instance of this class;
-        /// it does not return a new class instance. Because of this, you can call a method or
-        /// property on the existing reference and you do not have to assign the return value
-        /// to a <see cref="MutableTextBuffer"/> object, as the following example illustrates.
-        /// <code>
-        /// bool flag = false;
-        /// J2N.Text.MutableTextBuffer sb = new J2N.Text.MutableTextBuffer();
-        /// sb.Append("The value of the flag is ").Append(flag).Append(".");
-        /// Console.WriteLine(sb.ToString());
-        /// // The example displays the following output:
-        /// //       The value of the flag is False.
-        /// </code>
-        /// <para/>
-        /// If <paramref name="value"/> is <see langword="null"/>, no changes are made.
-        /// <para/>
-        /// The capacity of this instance is adjusted as needed.
-        /// <para/>
-        /// <b>Notes to Callers</b>
-        /// <para/>
-        /// When you instantiate a <see cref="MutableTextBuffer"/> object by calling <see cref="MutableTextBuffer.Initialize(int, int)"/>,
-        /// both the length and the capacity of the <see cref="MutableTextBuffer"/> instance can grow beyond
-        /// the value of its <see cref="MutableTextBuffer.MaxCapacity"/> property. This can occur particularly when you call the <see cref="MutableTextBuffer.Append(string?)"/>
-        /// and <see cref="MutableTextBuffer.AppendFormat(string, object?)"/> methods to append small strings.
-        /// </remarks>
-        /// <seealso cref="string"/>
-        [CodeGenerationReturnsSelf]
-        public void Append(string? value)
+        ///// <summary>
+        ///// Appends a copy of the specified string to this instance.
+        ///// </summary>
+        ///// <param name="value">The string to append.</param>
+        ///// <returns>A reference to this instance after the append operation has completed.</returns>
+        ///// <exception cref="ArgumentOutOfRangeException">
+        ///// Enlarging the value of this instance would exceed <see cref="MutableTextBuffer.MaxCapacity"/>.
+        ///// </exception>
+        ///// <remarks>
+        ///// The <see cref="MutableTextBuffer.Append(string?)"/> method modifies the existing instance of this class;
+        ///// it does not return a new class instance. Because of this, you can call a method or
+        ///// property on the existing reference and you do not have to assign the return value
+        ///// to a <see cref="MutableTextBuffer"/> object, as the following example illustrates.
+        ///// <code>
+        ///// bool flag = false;
+        ///// J2N.Text.MutableTextBuffer sb = new J2N.Text.MutableTextBuffer();
+        ///// sb.Append("The value of the flag is ").Append(flag).Append(".");
+        ///// Console.WriteLine(sb.ToString());
+        ///// // The example displays the following output:
+        ///// //       The value of the flag is False.
+        ///// </code>
+        ///// <para/>
+        ///// If <paramref name="value"/> is <see langword="null"/>, no changes are made.
+        ///// <para/>
+        ///// The capacity of this instance is adjusted as needed.
+        ///// <para/>
+        ///// <b>Notes to Callers</b>
+        ///// <para/>
+        ///// When you instantiate a <see cref="MutableTextBuffer"/> object by calling <see cref="MutableTextBuffer.Initialize(int, int)"/>,
+        ///// both the length and the capacity of the <see cref="MutableTextBuffer"/> instance can grow beyond
+        ///// the value of its <see cref="MutableTextBuffer.MaxCapacity"/> property. This can occur particularly when you call the <see cref="MutableTextBuffer.Append(string?)"/>
+        ///// and <see cref="MutableTextBuffer.AppendFormat(string, object?)"/> methods to append small strings.
+        ///// </remarks>
+        ///// <seealso cref="string"/>
+        [CodeGenerationExtensionImplementation]
+        internal void AppendInternal(string? value)
         {
             if (value is not null)
             {
@@ -709,71 +709,71 @@ namespace J2N.Text
             }
         }
 
-        /// <summary>
-        /// Appends a copy of a specified substring to this instance.
-        /// </summary>
-        /// <param name="value">The string that contains the substring to append.</param>
-        /// <param name="startIndex">The starting position of the substring within <paramref name="value"/>.</param>
-        /// <param name="count">The number of characters in <paramref name="value"/> to append.</param>
-        /// <returns>A reference to this instance after the append operation has completed.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="value"/> is <see langword="null"/>, and <paramref name="startIndex"/>
-        /// and <paramref name="count"/> are not zero.</exception>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// <paramref name="count"/> is less than zero.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// <paramref name="startIndex"/> is less than zero.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// <paramref name="startIndex"/> + <paramref name="count"/> is greater than the length of <paramref name="value"/>.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// Enlarging the value of this instance would exceed <see cref="MutableTextBuffer.MaxCapacity"/>.
-        /// </exception>
-        /// <remarks>
-        /// This method appends the specified range of characters in <paramref name="value"/> to the current instance. If
-        /// <paramref name="value"/> is <see langword="null"/> and <paramref name="startIndex"/> and <paramref name="count"/>
-        /// are both zero, no changes are made.
-        /// <para/>
-        /// The <see cref="Append(string, int, int)"/> method modifies the existing instance of this class; it does
-        /// not return a new class instance. Because of this, you can call a method or property on the existing
-        /// reference and you do not have to assign the return value to a <see cref="MutableTextBuffer"/> object,
-        /// as the following example illustrates.
-        /// <code>
-        /// string str = "First;George Washington;1789;1797";
-        /// int index = 0;
-        /// J2N.Text.MutableTextBuffer sb = new J2N.Text.MutableTextBuffer();
-        /// int length = str.IndexOf(';', index);
-        /// sb.Append(str, index, length).Append(" President of the United States: ");
-        /// index += length + 1;
-        /// length = str.IndexOf(';', index) - index;
-        /// sb.Append(str, index, length).Append(", from ");
-        /// index += length + 1;
-        /// length = str.IndexOf(';', index) - index;
-        /// sb.Append(str, index, length).Append(" to ");
-        /// index += length + 1;
-        /// sb.Append(str, index, str.Length - index);
-        /// Console.WriteLine(sb);
-        /// // The example displays the following output:
-        /// //    First President of the United States: George Washington, from 1789 to 1797
-        /// </code>
-        /// <para/>
-        /// The capacity of this instance is adjusted as needed.
-        /// <para/>
-        /// <b>Notes to Callers</b>
-        /// <para/>
-        /// When you instantiate a <see cref="MutableTextBuffer"/> object by calling <see cref="MutableTextBuffer.Initialize(int, int)"/>,
-        /// both the length and the capacity of the <see cref="MutableTextBuffer"/> instance can grow beyond
-        /// the value of its <see cref="MutableTextBuffer.MaxCapacity"/> property. This can occur particularly when you
-        /// call the <see cref="MutableTextBuffer.Append(string?)"/> and <see cref="MutableTextBuffer.AppendFormat(string, object?)"/>
-        /// methods to append small strings.
-        /// </remarks>
-        /// <seealso cref="string"/>
-        [CodeGenerationReturnsSelf]
-        public void Append(string? value, int startIndex, int count)
+        ///// <summary>
+        ///// Appends a copy of a specified substring to this instance.
+        ///// </summary>
+        ///// <param name="value">The string that contains the substring to append.</param>
+        ///// <param name="startIndex">The starting position of the substring within <paramref name="value"/>.</param>
+        ///// <param name="count">The number of characters in <paramref name="value"/> to append.</param>
+        ///// <returns>A reference to this instance after the append operation has completed.</returns>
+        ///// <exception cref="ArgumentNullException"><paramref name="value"/> is <see langword="null"/>, and <paramref name="startIndex"/>
+        ///// and <paramref name="count"/> are not zero.</exception>
+        ///// <exception cref="ArgumentOutOfRangeException">
+        ///// <paramref name="count"/> is less than zero.
+        ///// <para/>
+        ///// -or-
+        ///// <para/>
+        ///// <paramref name="startIndex"/> is less than zero.
+        ///// <para/>
+        ///// -or-
+        ///// <para/>
+        ///// <paramref name="startIndex"/> + <paramref name="count"/> is greater than the length of <paramref name="value"/>.
+        ///// <para/>
+        ///// -or-
+        ///// <para/>
+        ///// Enlarging the value of this instance would exceed <see cref="MutableTextBuffer.MaxCapacity"/>.
+        ///// </exception>
+        ///// <remarks>
+        ///// This method appends the specified range of characters in <paramref name="value"/> to the current instance. If
+        ///// <paramref name="value"/> is <see langword="null"/> and <paramref name="startIndex"/> and <paramref name="count"/>
+        ///// are both zero, no changes are made.
+        ///// <para/>
+        ///// The <see cref="Append(string, int, int)"/> method modifies the existing instance of this class; it does
+        ///// not return a new class instance. Because of this, you can call a method or property on the existing
+        ///// reference and you do not have to assign the return value to a <see cref="MutableTextBuffer"/> object,
+        ///// as the following example illustrates.
+        ///// <code>
+        ///// string str = "First;George Washington;1789;1797";
+        ///// int index = 0;
+        ///// J2N.Text.MutableTextBuffer sb = new J2N.Text.MutableTextBuffer();
+        ///// int length = str.IndexOf(';', index);
+        ///// sb.Append(str, index, length).Append(" President of the United States: ");
+        ///// index += length + 1;
+        ///// length = str.IndexOf(';', index) - index;
+        ///// sb.Append(str, index, length).Append(", from ");
+        ///// index += length + 1;
+        ///// length = str.IndexOf(';', index) - index;
+        ///// sb.Append(str, index, length).Append(" to ");
+        ///// index += length + 1;
+        ///// sb.Append(str, index, str.Length - index);
+        ///// Console.WriteLine(sb);
+        ///// // The example displays the following output:
+        ///// //    First President of the United States: George Washington, from 1789 to 1797
+        ///// </code>
+        ///// <para/>
+        ///// The capacity of this instance is adjusted as needed.
+        ///// <para/>
+        ///// <b>Notes to Callers</b>
+        ///// <para/>
+        ///// When you instantiate a <see cref="MutableTextBuffer"/> object by calling <see cref="MutableTextBuffer.Initialize(int, int)"/>,
+        ///// both the length and the capacity of the <see cref="MutableTextBuffer"/> instance can grow beyond
+        ///// the value of its <see cref="MutableTextBuffer.MaxCapacity"/> property. This can occur particularly when you
+        ///// call the <see cref="MutableTextBuffer.Append(string?)"/> and <see cref="MutableTextBuffer.AppendFormat(string, object?)"/>
+        ///// methods to append small strings.
+        ///// </remarks>
+        ///// <seealso cref="string"/>
+        [CodeGenerationExtensionImplementation]
+        internal void AppendInternal(string? value, int startIndex, int count)
         {
             if (startIndex < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(startIndex, ExceptionArgument.startIndex);
@@ -800,34 +800,34 @@ namespace J2N.Text
             }
         }
 
-        /// <summary>
-        /// Appends the string representation of a specified string builder to this instance.
-        /// </summary>
-        /// <param name="value">The string builder to append.</param>
-        /// <returns>A reference to this instance after the append operation is completed.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// Enlarging the value of this instance would exceed <see cref="MutableTextBuffer.MaxCapacity"/>.
-        /// </exception>
-        /// <remarks>
-        /// The <see cref="MutableTextBuffer.Append(StringBuilder?)"/> method modifies the existing instance of this class;
-        /// it does not return a new class instance. Because of this, you can call a method or
-        /// property on the existing reference and you do not have to assign the return value
-        /// to a <see cref="MutableTextBuffer"/> object.
-        /// <para/>
-        /// If <paramref name="value"/> is <see langword="null"/>, no changes are made.
-        /// <para/>
-        /// The capacity of this instance is adjusted as needed.
-        /// <para/>
-        /// <b>Notes to Callers</b>
-        /// <para/>
-        /// When you instantiate a <see cref="MutableTextBuffer"/> object by calling <see cref="MutableTextBuffer.Initialize(int, int)"/>,
-        /// both the length and the capacity of the <see cref="MutableTextBuffer"/> instance can grow beyond
-        /// the value of its <see cref="MutableTextBuffer.MaxCapacity"/> property. This can occur particularly when you call the <see cref="MutableTextBuffer.Append(string?)"/>
-        /// and <see cref="MutableTextBuffer.AppendFormat(string, object?)"/> methods to append small strings.
-        /// </remarks>
-        /// <seealso cref="StringBuilder"/>
-        [CodeGenerationReturnsSelf]
-        public void Append(StringBuilder? value)
+        ///// <summary>
+        ///// Appends the string representation of a specified string builder to this instance.
+        ///// </summary>
+        ///// <param name="value">The string builder to append.</param>
+        ///// <returns>A reference to this instance after the append operation is completed.</returns>
+        ///// <exception cref="ArgumentOutOfRangeException">
+        ///// Enlarging the value of this instance would exceed <see cref="MutableTextBuffer.MaxCapacity"/>.
+        ///// </exception>
+        ///// <remarks>
+        ///// The <see cref="MutableTextBuffer.Append(StringBuilder?)"/> method modifies the existing instance of this class;
+        ///// it does not return a new class instance. Because of this, you can call a method or
+        ///// property on the existing reference and you do not have to assign the return value
+        ///// to a <see cref="MutableTextBuffer"/> object.
+        ///// <para/>
+        ///// If <paramref name="value"/> is <see langword="null"/>, no changes are made.
+        ///// <para/>
+        ///// The capacity of this instance is adjusted as needed.
+        ///// <para/>
+        ///// <b>Notes to Callers</b>
+        ///// <para/>
+        ///// When you instantiate a <see cref="MutableTextBuffer"/> object by calling <see cref="MutableTextBuffer.Initialize(int, int)"/>,
+        ///// both the length and the capacity of the <see cref="MutableTextBuffer"/> instance can grow beyond
+        ///// the value of its <see cref="MutableTextBuffer.MaxCapacity"/> property. This can occur particularly when you call the <see cref="MutableTextBuffer.Append(string?)"/>
+        ///// and <see cref="MutableTextBuffer.AppendFormat(string, object?)"/> methods to append small strings.
+        ///// </remarks>
+        ///// <seealso cref="StringBuilder"/>
+        [CodeGenerationExtensionImplementation]
+        internal void AppendInternal(StringBuilder? value)
         {
             if (value != null && value.Length != 0)
             {
@@ -835,71 +835,71 @@ namespace J2N.Text
             }
         }
 
-        /// <summary>
-        /// Appends a copy of a specified substring of a string builder to this instance.
-        /// </summary>
-        /// <param name="value">The string builder that contains the substring to append.</param>
-        /// <param name="startIndex">The starting position of the substring within <paramref name="value"/>.</param>
-        /// <param name="count">The number of characters in <paramref name="value"/> to append.</param>
-        /// <returns>A reference to this instance after the append operation has completed.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="value"/> is <see langword="null"/>, and <paramref name="startIndex"/>
-        /// and <paramref name="count"/> are not zero.</exception>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// <paramref name="count"/> is less than zero.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// <paramref name="startIndex"/> is less than zero.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// <paramref name="startIndex"/> + <paramref name="count"/> is greater than the length of <paramref name="value"/>.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// Enlarging the value of this instance would exceed <see cref="MutableTextBuffer.MaxCapacity"/>.
-        /// </exception>
-        /// <remarks>
-        /// This method appends the specified range of characters in <paramref name="value"/> to the current instance. If
-        /// <paramref name="value"/> is <see langword="null"/> and <paramref name="startIndex"/> and <paramref name="count"/>
-        /// are both zero, no changes are made.
-        /// <para/>
-        /// The <see cref="MutableTextBuffer.Append(StringBuilder?, int, int)"/> method modifies the existing instance of this class; it does
-        /// not return a new class instance. Because of this, you can call a method or property on the existing
-        /// reference and you do not have to assign the return value to a <see cref="MutableTextBuffer"/> object,
-        /// as the following example illustrates.
-        /// <code>
-        /// string str = "First;George Washington;1789;1797";
-        /// System.Text.StringBuilder builder = new System.Text.StringBuilder(str);
-        /// int index = 0;
-        /// J2N.Text.MutableTextBuffer sb = new J2N.Text.MutableTextBuffer();
-        /// int length = str.IndexOf(';', index);
-        /// sb.Append(builder, index, length).Append(" President of the United States: ");
-        /// index += length + 1;
-        /// length = str.IndexOf(';', index) - index;
-        /// sb.Append(builder, index, length).Append(", from ");
-        /// index += length + 1;
-        /// length = str.IndexOf(';', index) - index;
-        /// sb.Append(builder, index, length).Append(" to ");
-        /// index += length + 1;
-        /// sb.Append(builder, index, str.Length - index);
-        /// Console.WriteLine(sb);
-        /// // The example displays the following output:
-        /// //    First President of the United States: George Washington, from 1789 to 1797
-        /// </code>
-        /// <para/>
-        /// The capacity of this instance is adjusted as needed.
-        /// <para/>
-        /// <b>Notes to Callers</b>
-        /// <para/>
-        /// When you instantiate a <see cref="MutableTextBuffer"/> object by calling <see cref="MutableTextBuffer.Initialize(int, int)"/>,
-        /// both the length and the capacity of the <see cref="MutableTextBuffer"/> instance can grow beyond
-        /// the value of its <see cref="MutableTextBuffer.MaxCapacity"/> property. This can occur particularly when you call the <see cref="MutableTextBuffer.Append(string?)"/>
-        /// and <see cref="MutableTextBuffer.AppendFormat(string, object?)"/> methods to append small strings.
-        /// </remarks>
-        /// <seealso cref="StringBuilder"/>
-        [CodeGenerationReturnsSelf]
-        public void Append(StringBuilder? value, int startIndex, int count)
+        ///// <summary>
+        ///// Appends a copy of a specified substring of a string builder to this instance.
+        ///// </summary>
+        ///// <param name="value">The string builder that contains the substring to append.</param>
+        ///// <param name="startIndex">The starting position of the substring within <paramref name="value"/>.</param>
+        ///// <param name="count">The number of characters in <paramref name="value"/> to append.</param>
+        ///// <returns>A reference to this instance after the append operation has completed.</returns>
+        ///// <exception cref="ArgumentNullException"><paramref name="value"/> is <see langword="null"/>, and <paramref name="startIndex"/>
+        ///// and <paramref name="count"/> are not zero.</exception>
+        ///// <exception cref="ArgumentOutOfRangeException">
+        ///// <paramref name="count"/> is less than zero.
+        ///// <para/>
+        ///// -or-
+        ///// <para/>
+        ///// <paramref name="startIndex"/> is less than zero.
+        ///// <para/>
+        ///// -or-
+        ///// <para/>
+        ///// <paramref name="startIndex"/> + <paramref name="count"/> is greater than the length of <paramref name="value"/>.
+        ///// <para/>
+        ///// -or-
+        ///// <para/>
+        ///// Enlarging the value of this instance would exceed <see cref="MutableTextBuffer.MaxCapacity"/>.
+        ///// </exception>
+        ///// <remarks>
+        ///// This method appends the specified range of characters in <paramref name="value"/> to the current instance. If
+        ///// <paramref name="value"/> is <see langword="null"/> and <paramref name="startIndex"/> and <paramref name="count"/>
+        ///// are both zero, no changes are made.
+        ///// <para/>
+        ///// The <see cref="MutableTextBuffer.Append(StringBuilder?, int, int)"/> method modifies the existing instance of this class; it does
+        ///// not return a new class instance. Because of this, you can call a method or property on the existing
+        ///// reference and you do not have to assign the return value to a <see cref="MutableTextBuffer"/> object,
+        ///// as the following example illustrates.
+        ///// <code>
+        ///// string str = "First;George Washington;1789;1797";
+        ///// System.Text.StringBuilder builder = new System.Text.StringBuilder(str);
+        ///// int index = 0;
+        ///// J2N.Text.MutableTextBuffer sb = new J2N.Text.MutableTextBuffer();
+        ///// int length = str.IndexOf(';', index);
+        ///// sb.Append(builder, index, length).Append(" President of the United States: ");
+        ///// index += length + 1;
+        ///// length = str.IndexOf(';', index) - index;
+        ///// sb.Append(builder, index, length).Append(", from ");
+        ///// index += length + 1;
+        ///// length = str.IndexOf(';', index) - index;
+        ///// sb.Append(builder, index, length).Append(" to ");
+        ///// index += length + 1;
+        ///// sb.Append(builder, index, str.Length - index);
+        ///// Console.WriteLine(sb);
+        ///// // The example displays the following output:
+        ///// //    First President of the United States: George Washington, from 1789 to 1797
+        ///// </code>
+        ///// <para/>
+        ///// The capacity of this instance is adjusted as needed.
+        ///// <para/>
+        ///// <b>Notes to Callers</b>
+        ///// <para/>
+        ///// When you instantiate a <see cref="MutableTextBuffer"/> object by calling <see cref="MutableTextBuffer.Initialize(int, int)"/>,
+        ///// both the length and the capacity of the <see cref="MutableTextBuffer"/> instance can grow beyond
+        ///// the value of its <see cref="MutableTextBuffer.MaxCapacity"/> property. This can occur particularly when you call the <see cref="MutableTextBuffer.Append(string?)"/>
+        ///// and <see cref="MutableTextBuffer.AppendFormat(string, object?)"/> methods to append small strings.
+        ///// </remarks>
+        ///// <seealso cref="StringBuilder"/>
+        [CodeGenerationExtensionImplementation]
+        internal void AppendInternal(StringBuilder? value, int startIndex, int count)
         {
             if (startIndex < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(startIndex, ExceptionArgument.startIndex);
@@ -949,8 +949,8 @@ namespace J2N.Text
 
         #region Custom Append
 
-        [CodeGenerationReturnsSelf]
-        public void Append(MutableTextBuffer? value)
+        [CodeGenerationExtensionImplementation]
+        internal void AppendInternal(MutableTextBuffer? value)
         {
             if (value != null && value.Length != 0)
             {
@@ -958,8 +958,8 @@ namespace J2N.Text
             }
         }
 
-        [CodeGenerationReturnsSelf]
-        public void Append(MutableTextBuffer? value, int startIndex, int count)
+        [CodeGenerationExtensionImplementation]
+        internal void AppendInternal(MutableTextBuffer? value, int startIndex, int count)
         {
             if (startIndex < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(startIndex, ExceptionArgument.startIndex);
@@ -992,7 +992,7 @@ namespace J2N.Text
         {
             if (value == this)
             {
-                Append(value.AsSpan(startIndex, count));
+                AppendInternal(value.AsSpan(startIndex, count));
                 return;
             }
 
@@ -1015,81 +1015,81 @@ namespace J2N.Text
 
         #endregion Custom Append
 
-        /// <summary>
-        /// Appends the default line terminator to the end of the current <see cref="MutableTextBuffer"/> object.
-        /// </summary>
-        /// <returns>A reference to this instance after the append operation has completed.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed
-        /// <see cref="MutableTextBuffer.MaxCapacity"/>.</exception>
-        /// <remarks>
-        /// The default line terminator is the current value of the <see cref="Environment.NewLine"/> property.
-        /// <para/>
-        /// The capacity of this instance is adjusted as needed.
-        /// <para/>
-        /// <b>Notes to Callers</b>
-        /// <para/>
-        /// When you instantiate a <see cref="MutableTextBuffer"/> object by calling <see cref="MutableTextBuffer.Initialize(int, int)"/>,
-        /// both the length and the capacity of the <see cref="MutableTextBuffer"/> instance can grow beyond
-        /// the value of its <see cref="MutableTextBuffer.MaxCapacity"/> property. This can occur particularly when you call the <see cref="MutableTextBuffer.Append(string?)"/>
-        /// and <see cref="MutableTextBuffer.AppendFormat(string, object?)"/> methods to append small strings.
-        /// </remarks>
-        [CodeGenerationReturnsSelf]
-        public void AppendLine() => Append(Environment.NewLine);
+        ///// <summary>
+        ///// Appends the default line terminator to the end of the current <see cref="MutableTextBuffer"/> object.
+        ///// </summary>
+        ///// <returns>A reference to this instance after the append operation has completed.</returns>
+        ///// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed
+        ///// <see cref="MutableTextBuffer.MaxCapacity"/>.</exception>
+        ///// <remarks>
+        ///// The default line terminator is the current value of the <see cref="Environment.NewLine"/> property.
+        ///// <para/>
+        ///// The capacity of this instance is adjusted as needed.
+        ///// <para/>
+        ///// <b>Notes to Callers</b>
+        ///// <para/>
+        ///// When you instantiate a <see cref="MutableTextBuffer"/> object by calling <see cref="MutableTextBuffer.Initialize(int, int)"/>,
+        ///// both the length and the capacity of the <see cref="MutableTextBuffer"/> instance can grow beyond
+        ///// the value of its <see cref="MutableTextBuffer.MaxCapacity"/> property. This can occur particularly when you call the <see cref="MutableTextBuffer.Append(string?)"/>
+        ///// and <see cref="MutableTextBuffer.AppendFormat(string, object?)"/> methods to append small strings.
+        ///// </remarks>
+        [CodeGenerationExtensionImplementation]
+        internal void AppendLineInternal() => AppendInternal(Environment.NewLine);
 
-        /// <summary>
-        /// Appends a copy of the specified string followed by the default line terminator to the end of the
-        /// current <see cref="MutableTextBuffer"/> object.
-        /// </summary>
-        /// <param name="value">The string to append.</param>
-        /// <returns>A reference to this instance after the append operation has completed.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed
-        /// <see cref="MutableTextBuffer.MaxCapacity"/>.</exception>
-        /// <remarks>
-        /// The default line terminator is the current value of the <see cref="Environment.NewLine"/> property.
-        /// <para/>
-        /// The capacity of this instance is adjusted as needed.
-        /// <para/>
-        /// <b>Notes to Callers</b>
-        /// <para/>
-        /// When you instantiate a <see cref="MutableTextBuffer"/> object by calling <see cref="MutableTextBuffer.Initialize(int, int)"/>,
-        /// both the length and the capacity of the <see cref="MutableTextBuffer"/> instance can grow beyond
-        /// the value of its <see cref="MutableTextBuffer.MaxCapacity"/> property. This can occur particularly when you call the <see cref="MutableTextBuffer.Append(string?)"/>
-        /// and <see cref="MutableTextBuffer.AppendFormat(string, object?)"/> methods to append small strings.
-        /// </remarks>
-        /// <seealso cref="string"/>
-        [CodeGenerationReturnsSelf]
-        public void AppendLine(string? value)
+        ///// <summary>
+        ///// Appends a copy of the specified string followed by the default line terminator to the end of the
+        ///// current <see cref="MutableTextBuffer"/> object.
+        ///// </summary>
+        ///// <param name="value">The string to append.</param>
+        ///// <returns>A reference to this instance after the append operation has completed.</returns>
+        ///// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed
+        ///// <see cref="MutableTextBuffer.MaxCapacity"/>.</exception>
+        ///// <remarks>
+        ///// The default line terminator is the current value of the <see cref="Environment.NewLine"/> property.
+        ///// <para/>
+        ///// The capacity of this instance is adjusted as needed.
+        ///// <para/>
+        ///// <b>Notes to Callers</b>
+        ///// <para/>
+        ///// When you instantiate a <see cref="MutableTextBuffer"/> object by calling <see cref="MutableTextBuffer.Initialize(int, int)"/>,
+        ///// both the length and the capacity of the <see cref="MutableTextBuffer"/> instance can grow beyond
+        ///// the value of its <see cref="MutableTextBuffer.MaxCapacity"/> property. This can occur particularly when you call the <see cref="MutableTextBuffer.Append(string?)"/>
+        ///// and <see cref="MutableTextBuffer.AppendFormat(string, object?)"/> methods to append small strings.
+        ///// </remarks>
+        ///// <seealso cref="string"/>
+        [CodeGenerationExtensionImplementation]
+        internal void AppendLineInternal(string? value)
         {
-            Append(value);
-            Append(Environment.NewLine);
+            AppendInternal(value);
+            AppendInternal(Environment.NewLine);
         }
 
-        /// <summary>
-        /// Appends a copy of the specified sequence of characters followed by the default line terminator to the end of the
-        /// current <see cref="MutableTextBuffer"/> object.
-        /// </summary>
-        /// <param name="value">The sequence of characters to append.</param>
-        /// <returns>A reference to this instance after the append operation has completed.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed
-        /// <see cref="MutableTextBuffer.MaxCapacity"/>.</exception>
-        /// <remarks>
-        /// The default line terminator is the current value of the <see cref="Environment.NewLine"/> property.
-        /// <para/>
-        /// The capacity of this instance is adjusted as needed.
-        /// <para/>
-        /// <b>Notes to Callers</b>
-        /// <para/>
-        /// When you instantiate a <see cref="MutableTextBuffer"/> object by calling <see cref="MutableTextBuffer.Initialize(int, int)"/>,
-        /// both the length and the capacity of the <see cref="MutableTextBuffer"/> instance can grow beyond
-        /// the value of its <see cref="MutableTextBuffer.MaxCapacity"/> property. This can occur particularly when you call the <see cref="MutableTextBuffer.Append(string?)"/>
-        /// and <see cref="MutableTextBuffer.AppendFormat(string, object?)"/> methods to append small strings.
-        /// </remarks>
-        /// <seealso cref="ReadOnlySpan{Char}"/>
-        [CodeGenerationReturnsSelf]
-        public void AppendLine(ReadOnlySpan<char> value)
+        ///// <summary>
+        ///// Appends a copy of the specified sequence of characters followed by the default line terminator to the end of the
+        ///// current <see cref="MutableTextBuffer"/> object.
+        ///// </summary>
+        ///// <param name="value">The sequence of characters to append.</param>
+        ///// <returns>A reference to this instance after the append operation has completed.</returns>
+        ///// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed
+        ///// <see cref="MutableTextBuffer.MaxCapacity"/>.</exception>
+        ///// <remarks>
+        ///// The default line terminator is the current value of the <see cref="Environment.NewLine"/> property.
+        ///// <para/>
+        ///// The capacity of this instance is adjusted as needed.
+        ///// <para/>
+        ///// <b>Notes to Callers</b>
+        ///// <para/>
+        ///// When you instantiate a <see cref="MutableTextBuffer"/> object by calling <see cref="MutableTextBuffer.Initialize(int, int)"/>,
+        ///// both the length and the capacity of the <see cref="MutableTextBuffer"/> instance can grow beyond
+        ///// the value of its <see cref="MutableTextBuffer.MaxCapacity"/> property. This can occur particularly when you call the <see cref="MutableTextBuffer.Append(string?)"/>
+        ///// and <see cref="MutableTextBuffer.AppendFormat(string, object?)"/> methods to append small strings.
+        ///// </remarks>
+        ///// <seealso cref="ReadOnlySpan{Char}"/>
+        [CodeGenerationExtensionImplementation]
+        internal void AppendLineInternal(ReadOnlySpan<char> value)
         {
-            Append(value);
-            Append(Environment.NewLine);
+            AppendInternal(value);
+            AppendInternal(Environment.NewLine);
         }
 
         /// <summary>
@@ -1189,59 +1189,59 @@ namespace J2N.Text
             m_Chars.AsSpan(sourceIndex, count).CopyTo(destination);
         }
 
-        /// <summary>
-        /// Inserts one or more copies of a specified string into this instance at the specified character position.
-        /// </summary>
-        /// <param name="index">The position in this instance where insertion begins.</param>
-        /// <param name="value">The string to insert.</param>
-        /// <param name="repeatCount">The number of times to insert <paramref name="value"/>.</param>
-        /// <returns>A reference to this instance after insertion has completed.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// <paramref name="index"/> is less than zero or greater than the current length of this instance.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// <paramref name="repeatCount"/> is less than zero.
-        /// </exception>
-        /// <exception cref="OutOfMemoryException">
-        /// The current length of this <see cref="MutableTextBuffer"/> object plus the length of <paramref name="value"/>
-        /// times <paramref name="repeatCount"/> exceeds <see cref="MutableTextBuffer.MaxCapacity"/>.
-        /// </exception>
-        /// <remarks>
-        /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
-        /// <para/>
-        /// This <see cref="MutableTextBuffer"/> object is not changed if <paramref name="value"/> is <see langword="null"/>, 
-        /// <paramref name="value"/> is not <see langword="null"/> but its length is zero, or <paramref name="repeatCount"/> is zero.
-        /// </remarks>
-        [CodeGenerationReturnsSelf]
-        public void Insert(int index, string? value, int repeatCount) => Insert(index, value.AsSpan(), repeatCount);
+        ///// <summary>
+        ///// Inserts one or more copies of a specified string into this instance at the specified character position.
+        ///// </summary>
+        ///// <param name="index">The position in this instance where insertion begins.</param>
+        ///// <param name="value">The string to insert.</param>
+        ///// <param name="repeatCount">The number of times to insert <paramref name="value"/>.</param>
+        ///// <returns>A reference to this instance after insertion has completed.</returns>
+        ///// <exception cref="ArgumentOutOfRangeException">
+        ///// <paramref name="index"/> is less than zero or greater than the current length of this instance.
+        ///// <para/>
+        ///// -or-
+        ///// <para/>
+        ///// <paramref name="repeatCount"/> is less than zero.
+        ///// </exception>
+        ///// <exception cref="OutOfMemoryException">
+        ///// The current length of this <see cref="MutableTextBuffer"/> object plus the length of <paramref name="value"/>
+        ///// times <paramref name="repeatCount"/> exceeds <see cref="MutableTextBuffer.MaxCapacity"/>.
+        ///// </exception>
+        ///// <remarks>
+        ///// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
+        ///// <para/>
+        ///// This <see cref="MutableTextBuffer"/> object is not changed if <paramref name="value"/> is <see langword="null"/>, 
+        ///// <paramref name="value"/> is not <see langword="null"/> but its length is zero, or <paramref name="repeatCount"/> is zero.
+        ///// </remarks>
+        [CodeGenerationExtensionImplementation]
+        internal void InsertInternal(int index, string? value, int repeatCount) => InsertInternal(index, value.AsSpan(), repeatCount);
 
-        /// <summary>
-        /// Inserts one or more copies of a specified sequence of characters into this instance at the specified character position.
-        /// </summary>
-        /// <param name="index">The position in this instance where insertion begins.</param>
-        /// <param name="value">The sequence of characters to insert.</param>
-        /// <param name="repeatCount">The number of times to insert <paramref name="value"/>.</param>
-        /// <returns>A reference to this instance after insertion has completed.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// <paramref name="index"/> is less than zero or greater than the current length of this instance.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// <paramref name="repeatCount"/> is less than zero.
-        /// </exception>
-        /// <exception cref="OutOfMemoryException">
-        /// The current length of this <see cref="MutableTextBuffer"/> object plus the length of <paramref name="value"/>
-        /// times <paramref name="repeatCount"/> exceeds <see cref="MutableTextBuffer.MaxCapacity"/>.
-        /// </exception>
-        /// <remarks>
-        /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
-        /// <para/>
-        /// This <see cref="MutableTextBuffer"/> object is not changed if the length of <paramref name="value"/> is zero or
-        /// <paramref name="repeatCount"/> is zero.
-        /// </remarks>
-        [CodeGenerationReturnsSelf]
-        public void Insert(int index, ReadOnlySpan<char> value, int repeatCount) // J2N: Made public to match ValueStringBuilder API
+        ///// <summary>
+        ///// Inserts one or more copies of a specified sequence of characters into this instance at the specified character position.
+        ///// </summary>
+        ///// <param name="index">The position in this instance where insertion begins.</param>
+        ///// <param name="value">The sequence of characters to insert.</param>
+        ///// <param name="repeatCount">The number of times to insert <paramref name="value"/>.</param>
+        ///// <returns>A reference to this instance after insertion has completed.</returns>
+        ///// <exception cref="ArgumentOutOfRangeException">
+        ///// <paramref name="index"/> is less than zero or greater than the current length of this instance.
+        ///// <para/>
+        ///// -or-
+        ///// <para/>
+        ///// <paramref name="repeatCount"/> is less than zero.
+        ///// </exception>
+        ///// <exception cref="OutOfMemoryException">
+        ///// The current length of this <see cref="MutableTextBuffer"/> object plus the length of <paramref name="value"/>
+        ///// times <paramref name="repeatCount"/> exceeds <see cref="MutableTextBuffer.MaxCapacity"/>.
+        ///// </exception>
+        ///// <remarks>
+        ///// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
+        ///// <para/>
+        ///// This <see cref="MutableTextBuffer"/> object is not changed if the length of <paramref name="value"/> is zero or
+        ///// <paramref name="repeatCount"/> is zero.
+        ///// </remarks>
+        [CodeGenerationExtensionImplementation]
+        internal void InsertInternal(int index, ReadOnlySpan<char> value, int repeatCount) // J2N: Made public to match ValueStringBuilder API
         {
             if (repeatCount < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(repeatCount, ExceptionArgument.repeatCount);
@@ -1325,32 +1325,32 @@ namespace J2N.Text
             }
         }
 
-        /// <summary>
-        /// Inserts one or more copies of a specified sequence of characters into this instance at the specified character position.
-        /// </summary>
-        /// <param name="index">The position in this instance where insertion begins.</param>
-        /// <param name="value">The sequence of characters to insert.</param>
-        /// <param name="repeatCount">The number of times to insert <paramref name="value"/>.</param>
-        /// <returns>A reference to this instance after insertion has completed.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// <paramref name="index"/> is less than zero or greater than the current length of this instance.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// <paramref name="repeatCount"/> is less than zero.
-        /// </exception>
-        /// <exception cref="OutOfMemoryException">
-        /// The current length of this <see cref="MutableTextBuffer"/> object plus the length of <paramref name="value"/>
-        /// times <paramref name="repeatCount"/> exceeds <see cref="MutableTextBuffer.MaxCapacity"/>.
-        /// </exception>
-        /// <remarks>
-        /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
-        /// <para/>
-        /// This <see cref="MutableTextBuffer"/> object is not changed if the length of <paramref name="value"/> is zero or
-        /// <paramref name="repeatCount"/> is zero.
-        /// </remarks>
-        [CodeGenerationReturnsSelf]
-        public void Insert(int index, StringBuilder? value, int repeatCount)
+        ///// <summary>
+        ///// Inserts one or more copies of a specified sequence of characters into this instance at the specified character position.
+        ///// </summary>
+        ///// <param name="index">The position in this instance where insertion begins.</param>
+        ///// <param name="value">The sequence of characters to insert.</param>
+        ///// <param name="repeatCount">The number of times to insert <paramref name="value"/>.</param>
+        ///// <returns>A reference to this instance after insertion has completed.</returns>
+        ///// <exception cref="ArgumentOutOfRangeException">
+        ///// <paramref name="index"/> is less than zero or greater than the current length of this instance.
+        ///// <para/>
+        ///// -or-
+        ///// <para/>
+        ///// <paramref name="repeatCount"/> is less than zero.
+        ///// </exception>
+        ///// <exception cref="OutOfMemoryException">
+        ///// The current length of this <see cref="MutableTextBuffer"/> object plus the length of <paramref name="value"/>
+        ///// times <paramref name="repeatCount"/> exceeds <see cref="MutableTextBuffer.MaxCapacity"/>.
+        ///// </exception>
+        ///// <remarks>
+        ///// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
+        ///// <para/>
+        ///// This <see cref="MutableTextBuffer"/> object is not changed if the length of <paramref name="value"/> is zero or
+        ///// <paramref name="repeatCount"/> is zero.
+        ///// </remarks>
+        [CodeGenerationExtensionImplementation]
+        internal void InsertInternal(int index, StringBuilder? value, int repeatCount)
         {
             if (repeatCount < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(repeatCount, ExceptionArgument.repeatCount);
@@ -1404,36 +1404,36 @@ namespace J2N.Text
             }
         }
 
-        /// <summary>
-        /// Inserts one or more copies of a specified sequence of characters into this instance at the specified character position.
-        /// </summary>
-        /// <param name="index">The position in this instance where insertion begins.</param>
-        /// <param name="value">The sequence of characters to insert.</param>
-        /// <param name="repeatCount">The number of times to insert <paramref name="value"/>.</param>
-        /// <returns>A reference to this instance after insertion has completed.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// <paramref name="index"/> is less than zero or greater than the current length of this instance.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// <paramref name="repeatCount"/> is less than zero.
-        /// </exception>
-        /// <exception cref="OutOfMemoryException">
-        /// The current length of this <see cref="MutableTextBuffer"/> object plus the length of <paramref name="value"/>
-        /// times <paramref name="repeatCount"/> exceeds <see cref="MutableTextBuffer.MaxCapacity"/>.
-        /// </exception>
-        /// <remarks>
-        /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
-        /// <para/>
-        /// This <see cref="MutableTextBuffer"/> object is not changed if the length of <paramref name="value"/> is zero or
-        /// <paramref name="repeatCount"/> is zero.
-        /// </remarks>
-        [CodeGenerationReturnsSelf]
-        public void Insert(int index, ICharSequence? value, int repeatCount)
+        ///// <summary>
+        ///// Inserts one or more copies of a specified sequence of characters into this instance at the specified character position.
+        ///// </summary>
+        ///// <param name="index">The position in this instance where insertion begins.</param>
+        ///// <param name="value">The sequence of characters to insert.</param>
+        ///// <param name="repeatCount">The number of times to insert <paramref name="value"/>.</param>
+        ///// <returns>A reference to this instance after insertion has completed.</returns>
+        ///// <exception cref="ArgumentOutOfRangeException">
+        ///// <paramref name="index"/> is less than zero or greater than the current length of this instance.
+        ///// <para/>
+        ///// -or-
+        ///// <para/>
+        ///// <paramref name="repeatCount"/> is less than zero.
+        ///// </exception>
+        ///// <exception cref="OutOfMemoryException">
+        ///// The current length of this <see cref="MutableTextBuffer"/> object plus the length of <paramref name="value"/>
+        ///// times <paramref name="repeatCount"/> exceeds <see cref="MutableTextBuffer.MaxCapacity"/>.
+        ///// </exception>
+        ///// <remarks>
+        ///// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
+        ///// <para/>
+        ///// This <see cref="MutableTextBuffer"/> object is not changed if the length of <paramref name="value"/> is zero or
+        ///// <paramref name="repeatCount"/> is zero.
+        ///// </remarks>
+        [CodeGenerationExtensionImplementation]
+        internal void InsertInternal(int index, ICharSequence? value, int repeatCount)
         {
             if (value is ISpannable<char> spannable)
             {
-                Insert(index, spannable.AsSpan(), repeatCount);
+                InsertInternal(index, spannable.AsSpan(), repeatCount);
                 return;
             }
 
@@ -1502,24 +1502,24 @@ namespace J2N.Text
             }
         }
 
-        /// <summary>
-        /// Removes the specified range of characters from this instance.
-        /// </summary>
-        /// <param name="startIndex">The zero-based position in this instance where removal begins.</param>
-        /// <param name="length">The number of characters to remove.</param>
-        /// <returns>A reference to this instance after the excise operation has completed.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// If <paramref name="startIndex"/> or <paramref name="length"/> is less than zero,
-        /// or <paramref name="startIndex"/> + <paramref name="length"/> is greater than the length of this instance.
-        /// </exception>
-        /// <remarks>
-        /// The current method removes the specified range of characters from the current instance. The characters at
-        /// (<paramref name="startIndex"/> + <paramref name="length"/>) are moved to <paramref name="startIndex"/>, and
-        /// the string value of the current instance is shortened by <paramref name="length"/>. The capacity of the
-        /// current instance is unaffected.
-        /// </remarks>
-        [CodeGenerationReturnsSelf]
-        public void Remove(int startIndex, int length)
+        ///// <summary>
+        ///// Removes the specified range of characters from this instance.
+        ///// </summary>
+        ///// <param name="startIndex">The zero-based position in this instance where removal begins.</param>
+        ///// <param name="length">The number of characters to remove.</param>
+        ///// <returns>A reference to this instance after the excise operation has completed.</returns>
+        ///// <exception cref="ArgumentOutOfRangeException">
+        ///// If <paramref name="startIndex"/> or <paramref name="length"/> is less than zero,
+        ///// or <paramref name="startIndex"/> + <paramref name="length"/> is greater than the length of this instance.
+        ///// </exception>
+        ///// <remarks>
+        ///// The current method removes the specified range of characters from the current instance. The characters at
+        ///// (<paramref name="startIndex"/> + <paramref name="length"/>) are moved to <paramref name="startIndex"/>, and
+        ///// the string value of the current instance is shortened by <paramref name="length"/>. The capacity of the
+        ///// current instance is unaffected.
+        ///// </remarks>
+        [CodeGenerationExtensionImplementation]
+        internal void RemoveInternal(int startIndex, int length)
         {
             if (length < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(length, ExceptionArgument.length);
@@ -1534,21 +1534,21 @@ namespace J2N.Text
             RemoveCore(startIndex, length);
         }
 
-        /// <summary>
-        /// Removes the character at the specified index from this instance.
-        /// </summary>
-        /// <param name="index">The zero-based position in this instance of the character to remove.</param>
-        /// <returns>A reference to this instance after the excise operation has completed.</returns>
-        /// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> is less than zero or
-        /// greater than or equal to the length of this instance.</exception>
-        /// <remarks>
-        /// The current method removes the specified character from the current instance. The characters at
-        /// (<paramref name="index"/> + 1) are moved to <paramref name="index"/>, and
-        /// the string value of the current instance is shortened by 1. The capacity of the
-        /// current instance is unaffected.
-        /// </remarks>
-        [CodeGenerationReturnsSelf]
-        public void RemoveAt(int index) // Coverage for the JDK (deleteCharAt)
+        ///// <summary>
+        ///// Removes the character at the specified index from this instance.
+        ///// </summary>
+        ///// <param name="index">The zero-based position in this instance of the character to remove.</param>
+        ///// <returns>A reference to this instance after the excise operation has completed.</returns>
+        ///// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> is less than zero or
+        ///// greater than or equal to the length of this instance.</exception>
+        ///// <remarks>
+        ///// The current method removes the specified character from the current instance. The characters at
+        ///// (<paramref name="index"/> + 1) are moved to <paramref name="index"/>, and
+        ///// the string value of the current instance is shortened by 1. The capacity of the
+        ///// current instance is unaffected.
+        ///// </remarks>
+        [CodeGenerationExtensionImplementation]
+        internal void RemoveAtInternal(int index) // Coverage for the JDK (deleteCharAt)
         {
             if (index < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(index, ExceptionArgument.index);
@@ -1590,74 +1590,74 @@ namespace J2N.Text
             return span;
         }
 
-        /// <summary>
-        /// Appends the string representation of a specified Boolean value to this instance
-        /// in lowercase.
-        /// </summary>
-        /// <param name="value">The Boolean value to append.</param>
-        /// <returns>A reference to this instance after the append operation has completed.</returns>
-        /// <remarks>
-        /// This matches the behavior of Java's StringBuilder. To match the behavior
-        /// of .NET, call <see cref="Insert(int, bool, BooleanFormat)"/> and specify <see cref="BooleanFormat.TitleCase"/>.
-        /// <para/>
-        /// The capacity of this instance is adjusted as needed.
-        /// </remarks>
-        /// <seealso cref="bool"/>
-        [CodeGenerationReturnsSelf]
-        public void Append(bool value) => Append(value, format: BooleanFormat.Lowercase);
+        ///// <summary>
+        ///// Appends the string representation of a specified Boolean value to this instance
+        ///// in lowercase.
+        ///// </summary>
+        ///// <param name="value">The Boolean value to append.</param>
+        ///// <returns>A reference to this instance after the append operation has completed.</returns>
+        ///// <remarks>
+        ///// This matches the behavior of Java's StringBuilder. To match the behavior
+        ///// of .NET, call <see cref="Insert(int, bool, BooleanFormat)"/> and specify <see cref="BooleanFormat.TitleCase"/>.
+        ///// <para/>
+        ///// The capacity of this instance is adjusted as needed.
+        ///// </remarks>
+        ///// <seealso cref="bool"/>
+        [CodeGenerationExtensionImplementation]
+        internal void AppendInternal(bool value) => AppendInternal(value, format: BooleanFormat.Lowercase);
 
-        /// <summary>
-        /// Appends the string representation of a specified Boolean value to this instance
-        /// in the specified format.
-        /// </summary>
-        /// <param name="value">The Boolean value to append.</param>
-        /// <param name="format">The format to use. Specify <see cref="BooleanFormat.Lowercase"/> to match Java.
-        /// Specify <see cref="BooleanFormat.TitleCase"/> to match .NET.</param>
-        /// <returns>A reference to this instance after the append operation has completed.</returns>
-        /// <remarks>The capacity of this instance is adjusted as needed. </remarks>
-        /// <seealso cref="bool"/>
-        /// <seealso cref="BooleanFormat"/>
-        [CodeGenerationReturnsSelf]
-        public void Append(bool value, BooleanFormat format)
+        ///// <summary>
+        ///// Appends the string representation of a specified Boolean value to this instance
+        ///// in the specified format.
+        ///// </summary>
+        ///// <param name="value">The Boolean value to append.</param>
+        ///// <param name="format">The format to use. Specify <see cref="BooleanFormat.Lowercase"/> to match Java.
+        ///// Specify <see cref="BooleanFormat.TitleCase"/> to match .NET.</param>
+        ///// <returns>A reference to this instance after the append operation has completed.</returns>
+        ///// <remarks>The capacity of this instance is adjusted as needed. </remarks>
+        ///// <seealso cref="bool"/>
+        ///// <seealso cref="BooleanFormat"/>
+        [CodeGenerationExtensionImplementation]
+        internal void AppendInternal(bool value, BooleanFormat format)
         {
             string text = FormatBoolean(value, format);
             Append(ref MemoryMarshal.GetReference(text.AsSpan()), text.Length);
         }
 
-        /// <summary>
-        /// Appends the string representation of a specified <see cref="char"/> object to this instance.
-        /// </summary>
-        /// <param name="value">The UTF-16-encoded code unit to append.</param>
-        /// <remarks>
-        /// The <see cref="Append(char)"/> method modifies the existing instance of this class;
-        /// it does not return a new class instance. Because of this, you can call a method or property
-        /// on the existing reference and you do not have to assign the return value to a <see cref="MutableTextBuffer"/>
-        /// object, as the following example illustrates.
-        /// <code>
-        /// string str = "Characters in a string.";
-        /// J2N.Text.MutableTextBuffer sb = new J2N.Text.MutableTextBuffer();
-        /// foreach (var ch in str)
-        ///    sb.Append(" '").Append(ch).Append("' ");
-        /// 
-        /// Console.WriteLine("Characters in the string:");
-        /// Console.WriteLine("  {0}", sb);
-        /// // The example displays the following output:
-        /// //    Characters in the string:
-        /// //       'C'  'h'  'a'  'r'  'a'  'c'  't'  'e'  'r'  's'  ' '  'i'  'n'  ' '  'a'  ' '  's'  't' 'r'  'i'  'n'  'g'  '.'
-        /// </code>
-        /// <para/>
-        /// The capacity of this instance is adjusted as needed.
-        /// <para/>
-        /// <b>Notes to Callers</b>
-        /// <para/>
-        /// When you instantiate a <see cref="MutableTextBuffer"/> object by calling <see cref="MutableTextBuffer.Initialize(int, int)"/>,
-        /// both the length and the capacity of the <see cref="MutableTextBuffer"/> instance can grow beyond
-        /// the value of its <see cref="MutableTextBuffer.MaxCapacity"/> property. This can occur particularly when you call the <see cref="MutableTextBuffer.Append(string?)"/>
-        /// and <see cref="MutableTextBuffer.AppendFormat(string, object?)"/> methods to append small strings.
-        /// </remarks>
-        /// <seealso cref="char"/>
-        [CodeGenerationReturnsSelf]
-        public void Append(char value)
+        ///// <summary>
+        ///// Appends the string representation of a specified <see cref="char"/> object to this instance.
+        ///// </summary>
+        ///// <param name="value">The UTF-16-encoded code unit to append.</param>
+        ///// <remarks>
+        ///// The <see cref="Append(char)"/> method modifies the existing instance of this class;
+        ///// it does not return a new class instance. Because of this, you can call a method or property
+        ///// on the existing reference and you do not have to assign the return value to a <see cref="MutableTextBuffer"/>
+        ///// object, as the following example illustrates.
+        ///// <code>
+        ///// string str = "Characters in a string.";
+        ///// J2N.Text.MutableTextBuffer sb = new J2N.Text.MutableTextBuffer();
+        ///// foreach (var ch in str)
+        /////    sb.Append(" '").Append(ch).Append("' ");
+        ///// 
+        ///// Console.WriteLine("Characters in the string:");
+        ///// Console.WriteLine("  {0}", sb);
+        ///// // The example displays the following output:
+        ///// //    Characters in the string:
+        ///// //       'C'  'h'  'a'  'r'  'a'  'c'  't'  'e'  'r'  's'  ' '  'i'  'n'  ' '  'a'  ' '  's'  't' 'r'  'i'  'n'  'g'  '.'
+        ///// </code>
+        ///// <para/>
+        ///// The capacity of this instance is adjusted as needed.
+        ///// <para/>
+        ///// <b>Notes to Callers</b>
+        ///// <para/>
+        ///// When you instantiate a <see cref="MutableTextBuffer"/> object by calling <see cref="MutableTextBuffer.Initialize(int, int)"/>,
+        ///// both the length and the capacity of the <see cref="MutableTextBuffer"/> instance can grow beyond
+        ///// the value of its <see cref="MutableTextBuffer.MaxCapacity"/> property. This can occur particularly when you call the <see cref="MutableTextBuffer.Append(string?)"/>
+        ///// and <see cref="MutableTextBuffer.AppendFormat(string, object?)"/> methods to append small strings.
+        ///// </remarks>
+        ///// <seealso cref="char"/>
+        [CodeGenerationExtensionImplementation]
+        internal void AppendInternal(char value)
         {
             int pos = m_Position;
             if ((uint)pos < (uint)m_Chars.Length)
@@ -1684,50 +1684,50 @@ namespace J2N.Text
                 AppendSpanFormattable(number, format, provider);
 #endif
             else if (value is IStructuralFormattable structuralFormattable)
-                Append(structuralFormattable.ToString(format, provider));
+                AppendInternal(structuralFormattable.ToString(format, provider));
             else if (value is IFormattable formattable)
-                Append(formattable.ToString(format, provider));
+                AppendInternal(formattable.ToString(format, provider));
             else if (value is ICharSequence csq)
-                Append(csq); // doesn't support format providers
+                AppendInternal(csq); // doesn't support format providers
             else
-                Append(value.ToString());
+                AppendInternal(value.ToString());
         }
 
-        /// <summary>
-        /// Appends the string representation of the Unicode characters in a specified array to this instance.
-        /// </summary>
-        /// <param name="value">The array of characters to append.</param>
-        /// <returns>A reference to this instance after the append operation has completed.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed <see cref="MutableTextBuffer.MaxCapacity"/>.</exception>
-        /// <remarks>
-        /// This method appends the characters in the specified array to the current instance in the same order they
-        /// appear in value. If <paramref name="value"/> is <see langword="null"/>, no changes are made.
-        /// <para/>
-        /// The <see cref="MutableTextBuffer.Append(char[])"/> method modifies the existing instance of this class; it does not
-        /// return a new class instance. Because of this, you can call a method or property on the existing
-        /// reference and you do not have to assign the return value to a <see cref="MutableTextBuffer"/> object,
-        /// as the following example illustrates.
-        /// <code>
-        /// char[] chars = { 'a', 'e', 'i', 'o', 'u' };
-        /// J2N.Text.MutableTextBuffer sb = new J2N.Text.MutableTextBuffer();
-        /// sb.Append("The characters in the array: ").Append(chars);
-        /// Console.WriteLine(sb);
-        /// // The example displays the following output:
-        /// //      The characters in the array: aeiou
-        /// </code>
-        /// <para/>
-        /// The capacity of this instance is adjusted as needed.
-        /// <para/>
-        /// <b>Notes to Callers</b>
-        /// <para/>
-        /// When you instantiate a <see cref="MutableTextBuffer"/> object by calling <see cref="MutableTextBuffer.Initialize(int, int)"/>,
-        /// both the length and the capacity of the <see cref="MutableTextBuffer"/> instance can grow beyond
-        /// the value of its <see cref="MutableTextBuffer.MaxCapacity"/> property. This can occur particularly when you call the <see cref="MutableTextBuffer.Append(string?)"/>
-        /// and <see cref="MutableTextBuffer.AppendFormat(string, object?)"/> methods to append small strings.
-        /// </remarks>
-        /// <seealso cref="char"/>
-        [CodeGenerationReturnsSelf]
-        public void Append(char[]? value)
+        ///// <summary>
+        ///// Appends the string representation of the Unicode characters in a specified array to this instance.
+        ///// </summary>
+        ///// <param name="value">The array of characters to append.</param>
+        ///// <returns>A reference to this instance after the append operation has completed.</returns>
+        ///// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed <see cref="MutableTextBuffer.MaxCapacity"/>.</exception>
+        ///// <remarks>
+        ///// This method appends the characters in the specified array to the current instance in the same order they
+        ///// appear in value. If <paramref name="value"/> is <see langword="null"/>, no changes are made.
+        ///// <para/>
+        ///// The <see cref="MutableTextBuffer.Append(char[])"/> method modifies the existing instance of this class; it does not
+        ///// return a new class instance. Because of this, you can call a method or property on the existing
+        ///// reference and you do not have to assign the return value to a <see cref="MutableTextBuffer"/> object,
+        ///// as the following example illustrates.
+        ///// <code>
+        ///// char[] chars = { 'a', 'e', 'i', 'o', 'u' };
+        ///// J2N.Text.MutableTextBuffer sb = new J2N.Text.MutableTextBuffer();
+        ///// sb.Append("The characters in the array: ").Append(chars);
+        ///// Console.WriteLine(sb);
+        ///// // The example displays the following output:
+        ///// //      The characters in the array: aeiou
+        ///// </code>
+        ///// <para/>
+        ///// The capacity of this instance is adjusted as needed.
+        ///// <para/>
+        ///// <b>Notes to Callers</b>
+        ///// <para/>
+        ///// When you instantiate a <see cref="MutableTextBuffer"/> object by calling <see cref="MutableTextBuffer.Initialize(int, int)"/>,
+        ///// both the length and the capacity of the <see cref="MutableTextBuffer"/> instance can grow beyond
+        ///// the value of its <see cref="MutableTextBuffer.MaxCapacity"/> property. This can occur particularly when you call the <see cref="MutableTextBuffer.Append(string?)"/>
+        ///// and <see cref="MutableTextBuffer.AppendFormat(string, object?)"/> methods to append small strings.
+        ///// </remarks>
+        ///// <seealso cref="char"/>
+        [CodeGenerationExtensionImplementation]
+        internal void AppendInternal(char[]? value)
         {
             if (value is not null)
             {
@@ -1739,14 +1739,14 @@ namespace J2N.Text
             }
         }
 
-        /// <summary>
-        /// Appends the string representation of a specified read-only character span to this instance.
-        /// </summary>
-        /// <param name="value">The read-only character span to append.</param>
-        /// <returns>A reference to this instance after the append operation is completed.</returns>
-        /// <seealso cref="ReadOnlySpan{Char}"/>
-        [CodeGenerationReturnsSelf]
-        public void Append(ReadOnlySpan<char> value)
+        ///// <summary>
+        ///// Appends the string representation of a specified read-only character span to this instance.
+        ///// </summary>
+        ///// <param name="value">The read-only character span to append.</param>
+        ///// <returns>A reference to this instance after the append operation is completed.</returns>
+        ///// <seealso cref="ReadOnlySpan{Char}"/>
+        [CodeGenerationExtensionImplementation]
+        internal void AppendInternal(ReadOnlySpan<char> value)
         {
             if (value.IsEmpty)
                 return;
@@ -1795,47 +1795,47 @@ namespace J2N.Text
             }
         }
 
-        /// <summary>
-        /// Appends the string representation of a specified read-only character memory region to this instance.
-        /// </summary>
-        /// <param name="value">The read-only character memory region to append.</param>
-        /// <returns>A reference to this instance after the append operation is completed.</returns>
-        /// <seealso cref="ReadOnlyMemory{Char}"/>
-        [CodeGenerationReturnsSelf]
-        public void Append(ReadOnlyMemory<char> value) => Append(value.Span);
+        ///// <summary>
+        ///// Appends the string representation of a specified read-only character memory region to this instance.
+        ///// </summary>
+        ///// <param name="value">The read-only character memory region to append.</param>
+        ///// <returns>A reference to this instance after the append operation is completed.</returns>
+        ///// <seealso cref="ReadOnlyMemory{Char}"/>
+        [CodeGenerationExtensionImplementation]
+        internal void AppendInternal(ReadOnlyMemory<char> value) => AppendInternal(value.Span);
 
         // J2N TODO: API - String interpolation for J2N formatters
 
         ///// <summary>Appends the specified interpolated string to this instance.</summary>
         ///// <param name="handler">The interpolated string to append.</param>
         ///// <returns>A reference to this instance after the append operation has completed.</returns>
-        //[CodeGenerationReturnsSelf]
-        //public void Append([InterpolatedStringHandlerArgument("")] ref AppendInterpolatedStringHandler handler) => this;
+        //[CodeGenerationExtensionImplementation]
+        //internal void AppendInternal([InterpolatedStringHandlerArgument("")] ref AppendInterpolatedStringHandler handler) => this;
 
         ///// <summary>Appends the specified interpolated string to this instance.</summary>
         ///// <param name="provider">An object that supplies culture-specific formatting information.</param>
         ///// <param name="handler">The interpolated string to append.</param>
         ///// <returns>A reference to this instance after the append operation has completed.</returns>
-        //[CodeGenerationReturnsSelf]
-        //public void Append(IFormatProvider? provider, [InterpolatedStringHandlerArgument("", nameof(provider))] ref AppendInterpolatedStringHandler handler) => this;
+        //[CodeGenerationExtensionImplementation]
+        //internal void AppendInternal(IFormatProvider? provider, [InterpolatedStringHandlerArgument("", nameof(provider))] ref AppendInterpolatedStringHandler handler) => this;
 
         ///// <summary>Appends the specified interpolated string followed by the default line terminator to the end of the current MutableTextBuffer object.</summary>
         ///// <param name="handler">The interpolated string to append.</param>
         ///// <returns>A reference to this instance after the append operation has completed.</returns>
-        //[CodeGenerationReturnsSelf]
-        //public void AppendLine([InterpolatedStringHandlerArgument("")] ref AppendInterpolatedStringHandler handler) => AppendLine();
+        //[CodeGenerationExtensionImplementation]
+        //internal void AppendLineInternal([InterpolatedStringHandlerArgument("")] ref AppendInterpolatedStringHandler handler) => AppendLine();
 
         ///// <summary>Appends the specified interpolated string followed by the default line terminator to the end of the current MutableTextBuffer object.</summary>
         ///// <param name="provider">An object that supplies culture-specific formatting information.</param>
         ///// <param name="handler">The interpolated string to append.</param>
         ///// <returns>A reference to this instance after the append operation has completed.</returns>
-        //[CodeGenerationReturnsSelf]
-        //public void AppendLine(IFormatProvider? provider, [InterpolatedStringHandlerArgument("", nameof(provider))] ref AppendInterpolatedStringHandler handler) => AppendLine();
+        //[CodeGenerationExtensionImplementation]
+        //internal void AppendLineInernal(IFormatProvider? provider, [InterpolatedStringHandlerArgument("", nameof(provider))] ref AppendInterpolatedStringHandler handler) => AppendLine();
 
         #region AppendJoin
 
-        [CodeGenerationReturnsSelf]
-        public void AppendJoin(string? separator, params object?[] values)
+        [CodeGenerationExtensionImplementation]
+        internal void AppendJoinInternal(string? separator, params object?[] values)
         {
             if (values is null)
             {
@@ -1846,27 +1846,15 @@ namespace J2N.Text
             AppendJoinCore(ref MemoryMarshal.GetReference(separator.AsSpan()), separator.Length, values);
         }
 
-        [CodeGenerationReturnsSelf]
-        public void AppendJoin(string? separator, params ReadOnlySpan<object?> values)
+        [CodeGenerationExtensionImplementation]
+        internal void AppendJoinInternal(string? separator, params ReadOnlySpan<object?> values)
         {
             separator ??= string.Empty;
             AppendJoinCore(ref MemoryMarshal.GetReference(separator.AsSpan()), separator.Length, values);
         }
 
-        [CodeGenerationReturnsSelf]
-        public void AppendJoin<T>(string? separator, IEnumerable<T> values)
-        {
-            if (values is null)
-            {
-                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.values);
-            }
-
-            separator ??= string.Empty;
-            AppendJoinCore(ref MemoryMarshal.GetReference(separator.AsSpan()), separator.Length, values);
-        }
-
-        [CodeGenerationReturnsSelf]
-        public void AppendJoin(string? separator, params string?[] values)
+        [CodeGenerationExtensionImplementation]
+        internal void AppendJoinInternal<T>(string? separator, IEnumerable<T> values)
         {
             if (values is null)
             {
@@ -1877,15 +1865,27 @@ namespace J2N.Text
             AppendJoinCore(ref MemoryMarshal.GetReference(separator.AsSpan()), separator.Length, values);
         }
 
-        [CodeGenerationReturnsSelf]
-        public void AppendJoin(string? separator, params ReadOnlySpan<string?> values)
+        [CodeGenerationExtensionImplementation]
+        internal void AppendJoinInternal(string? separator, params string?[] values)
+        {
+            if (values is null)
+            {
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.values);
+            }
+
+            separator ??= string.Empty;
+            AppendJoinCore(ref MemoryMarshal.GetReference(separator.AsSpan()), separator.Length, values);
+        }
+
+        [CodeGenerationExtensionImplementation]
+        internal void AppendJoinInternal(string? separator, params ReadOnlySpan<string?> values)
         {
             separator ??= string.Empty;
             AppendJoinCore(ref MemoryMarshal.GetReference(separator.AsSpan()), separator.Length, values);
         }
 
-        [CodeGenerationReturnsSelf]
-        public void AppendJoin(char separator, params object?[] values)
+        [CodeGenerationExtensionImplementation]
+        internal void AppendJoinInternal(char separator, params object?[] values)
         {
             if (values is null)
             {
@@ -1895,12 +1895,12 @@ namespace J2N.Text
             AppendJoinCore(ref separator, 1, values);
         }
 
-        [CodeGenerationReturnsSelf]
-        public void AppendJoin(char separator, params ReadOnlySpan<object?> values) =>
+        [CodeGenerationExtensionImplementation]
+        internal void AppendJoinInternal(char separator, params ReadOnlySpan<object?> values) =>
             AppendJoinCore(ref separator, 1, values);
 
-        [CodeGenerationReturnsSelf]
-        public void AppendJoin<T>(char separator, IEnumerable<T> values)
+        [CodeGenerationExtensionImplementation]
+        internal void AppendJoinInternal<T>(char separator, IEnumerable<T> values)
         {
             if (values is null)
             {
@@ -1910,8 +1910,8 @@ namespace J2N.Text
             AppendJoinCore(ref separator, 1, values);
         }
 
-        [CodeGenerationReturnsSelf]
-        public void AppendJoin(char separator, params string?[] values)
+        [CodeGenerationExtensionImplementation]
+        internal void AppendJoinInternal(char separator, params string?[] values)
         {
             if (values is null)
             {
@@ -1921,8 +1921,8 @@ namespace J2N.Text
             AppendJoinCore(ref separator, 1, values);
         }
 
-        [CodeGenerationReturnsSelf]
-        public void AppendJoin(char separator, params ReadOnlySpan<string?> values) =>
+        [CodeGenerationExtensionImplementation]
+        internal void AppendJoinInternal(char separator, params ReadOnlySpan<string?> values) =>
             AppendJoinCore(ref separator, 1, values);
 
         private void AppendJoinCore<T>(ref char separator, int separatorLength, IEnumerable<T> values)
@@ -1941,7 +1941,7 @@ namespace J2N.Text
                 T value = en.Current;
                 if (value != null)
                 {
-                    Append(value.ToString()); // J2N TODO: ISpanFormattable, IFormattable to override culture?
+                    AppendInternal(value.ToString()); // J2N TODO: ISpanFormattable, IFormattable to override culture?
                 }
 
                 while (en.MoveNext())
@@ -1950,7 +1950,7 @@ namespace J2N.Text
                     value = en.Current;
                     if (value != null)
                     {
-                        Append(value.ToString()); // J2N TODO: ISpanFormattable, IFormattable to override culture?
+                        AppendInternal(value.ToString()); // J2N TODO: ISpanFormattable, IFormattable to override culture?
                     }
                 }
             }
@@ -1965,7 +1965,7 @@ namespace J2N.Text
 
             if (values[0] != null)
             {
-                Append(values[0]!.ToString()); // J2N TODO: ISpanFormattable, IFormattable to override culture?
+                AppendInternal(values[0]!.ToString()); // J2N TODO: ISpanFormattable, IFormattable to override culture?
             }
 
             for (int i = 1; i < values.Length; i++)
@@ -1973,35 +1973,35 @@ namespace J2N.Text
                 Append(ref separator, separatorLength);
                 if (values[i] != null)
                 {
-                    Append(values[i]!.ToString()); // J2N TODO: ISpanFormattable, IFormattable to override culture?
+                    AppendInternal(values[i]!.ToString()); // J2N TODO: ISpanFormattable, IFormattable to override culture?
                 }
             }
         }
 
         #endregion AppendJoin
 
-        /// <summary>
-        /// Inserts a string into this instance at the specified character position.
-        /// </summary>
-        /// <param name="index">The position in this instance where insertion begins.</param>
-        /// <param name="value">The string to insert.</param>
-        /// <returns>A reference to this instance after the insert operation has completed.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// <paramref name="index"/> is less than zero or greater than the current length of this instance.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// The current length of this <see cref="MutableTextBuffer"/> object plus the length of
-        /// <paramref name="value"/> exceeds <see cref="MutableTextBuffer.MaxCapacity"/>.
-        /// </exception>
-        /// <remarks>
-        /// Existing characters are shifted to make room for the new text. The capacity is adjusted as needed.
-        /// <para/>
-        /// This instance of <see cref="MutableTextBuffer"/> is not changed if <paramref name="value"/> is <see langword="null"/>,
-        /// or <paramref name="value"/> is not <see langword="null"/> but its length is zero.
-        /// </remarks>
-        [CodeGenerationReturnsSelf]
-        public void Insert(int index, string? value)
+        ///// <summary>
+        ///// Inserts a string into this instance at the specified character position.
+        ///// </summary>
+        ///// <param name="index">The position in this instance where insertion begins.</param>
+        ///// <param name="value">The string to insert.</param>
+        ///// <returns>A reference to this instance after the insert operation has completed.</returns>
+        ///// <exception cref="ArgumentOutOfRangeException">
+        ///// <paramref name="index"/> is less than zero or greater than the current length of this instance.
+        ///// <para/>
+        ///// -or-
+        ///// <para/>
+        ///// The current length of this <see cref="MutableTextBuffer"/> object plus the length of
+        ///// <paramref name="value"/> exceeds <see cref="MutableTextBuffer.MaxCapacity"/>.
+        ///// </exception>
+        ///// <remarks>
+        ///// Existing characters are shifted to make room for the new text. The capacity is adjusted as needed.
+        ///// <para/>
+        ///// This instance of <see cref="MutableTextBuffer"/> is not changed if <paramref name="value"/> is <see langword="null"/>,
+        ///// or <paramref name="value"/> is not <see langword="null"/> but its length is zero.
+        ///// </remarks>
+        [CodeGenerationExtensionImplementation]
+        internal void InsertInternal(int index, string? value)
         {
             if ((uint)index > (uint)Length)
             {
@@ -2014,21 +2014,21 @@ namespace J2N.Text
             }
         }
 
-        /// <summary>
-        /// Inserts a <see cref="StringBuilder"/> into this instance at the specified character position.
-        /// </summary>
-        /// <param name="index">The position in this instance where insertion begins.</param>
-        /// <param name="value">The value to insert.</param>
-        /// <returns>A reference to this instance after the operation has completed.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// <paramref name="index"/> is less than zero or greater than the length of this instance.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// Enlarging the value of this instance would exceed <see cref="MutableTextBuffer.MaxCapacity"/>.
-        /// </exception>
-        [CodeGenerationReturnsSelf]
-        public void Insert(int index, StringBuilder? value)
+        ///// <summary>
+        ///// Inserts a <see cref="StringBuilder"/> into this instance at the specified character position.
+        ///// </summary>
+        ///// <param name="index">The position in this instance where insertion begins.</param>
+        ///// <param name="value">The value to insert.</param>
+        ///// <returns>A reference to this instance after the operation has completed.</returns>
+        ///// <exception cref="ArgumentOutOfRangeException">
+        ///// <paramref name="index"/> is less than zero or greater than the length of this instance.
+        ///// <para/>
+        ///// -or-
+        ///// <para/>
+        ///// Enlarging the value of this instance would exceed <see cref="MutableTextBuffer.MaxCapacity"/>.
+        ///// </exception>
+        [CodeGenerationExtensionImplementation]
+        internal void InsertInternal(int index, StringBuilder? value)
         {
             if (value is null)
                 return;
@@ -2047,34 +2047,34 @@ namespace J2N.Text
             }
         }
 
-        /// <summary>
-        /// Inserts the string representation of a specified subarray of Unicode characters into this instance at the specified character position.
-        /// <para/>
-        /// IMPORTANT: This method has .NET semantics. That is, the fourth parameter is a count, not an exclusive end index as would be the
-        /// case in Java. To translate from Java, use <c>end - start</c> to resolve <paramref name="count"/>.
-        /// </summary>
-        /// <param name="index">The position in this instance where insertion begins.</param>
-        /// <param name="value">The value to insert.</param>
-        /// <param name="startIndex">The starting index within <paramref name="value"/>.</param>
-        /// <param name="count">The number of characters to insert.</param>
-        /// <returns>A reference to this instance after the operation has completed.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// <paramref name="index"/>, <paramref name="startIndex"/> or <paramref name="count"/> is less than zero.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// <paramref name="index"/> is greater than the length of this instance.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// <paramref name="startIndex"/> plus <paramref name="count"/> is not a position within <paramref name="value"/>.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// Enlarging the value of this instance would exceed <see cref="MutableTextBuffer.MaxCapacity"/>.
-        /// </exception>
-        [CodeGenerationReturnsSelf]
-        public void Insert(int index, StringBuilder? value, int startIndex, int count)
+        ///// <summary>
+        ///// Inserts the string representation of a specified subarray of Unicode characters into this instance at the specified character position.
+        ///// <para/>
+        ///// IMPORTANT: This method has .NET semantics. That is, the fourth parameter is a count, not an exclusive end index as would be the
+        ///// case in Java. To translate from Java, use <c>end - start</c> to resolve <paramref name="count"/>.
+        ///// </summary>
+        ///// <param name="index">The position in this instance where insertion begins.</param>
+        ///// <param name="value">The value to insert.</param>
+        ///// <param name="startIndex">The starting index within <paramref name="value"/>.</param>
+        ///// <param name="count">The number of characters to insert.</param>
+        ///// <returns>A reference to this instance after the operation has completed.</returns>
+        ///// <exception cref="ArgumentOutOfRangeException">
+        ///// <paramref name="index"/>, <paramref name="startIndex"/> or <paramref name="count"/> is less than zero.
+        ///// <para/>
+        ///// -or-
+        ///// <para/>
+        ///// <paramref name="index"/> is greater than the length of this instance.
+        ///// <para/>
+        ///// -or-
+        ///// <para/>
+        ///// <paramref name="startIndex"/> plus <paramref name="count"/> is not a position within <paramref name="value"/>.
+        ///// <para/>
+        ///// -or-
+        ///// <para/>
+        ///// Enlarging the value of this instance would exceed <see cref="MutableTextBuffer.MaxCapacity"/>.
+        ///// </exception>
+        [CodeGenerationExtensionImplementation]
+        internal void InsertInternal(int index, StringBuilder? value, int startIndex, int count)
         {
             int currentLength = Length;
             if ((uint)index > (uint)currentLength)
@@ -2113,82 +2113,82 @@ namespace J2N.Text
             }
         }
 
-        /// <summary>
-        /// Inserts the string representation of a specified Boolean value to this instance
-        /// in lowercase at the specifed character position.
-        /// </summary>
-        /// <param name="index">The position in this instance where insertion begins.</param>
-        /// <param name="value">The value to insert.</param>
-        /// <returns>A reference to this instance after the insert operation has completed.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// <paramref name="index"/> is less than zero or greater than the current length of this instance.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// The current length of this <see cref="MutableTextBuffer"/> object plus the length of
-        /// <paramref name="value"/> exceeds <see cref="MutableTextBuffer.MaxCapacity"/>.
-        /// </exception>
-        /// <remarks>
-        /// This matches the behavior of Java's StringBuilder. To match the behavior
-        /// of .NET, call <see cref="Insert(int, bool, BooleanFormat)"/> and specify <see cref="BooleanFormat.TitleCase"/>.
-        /// <para/>
-        /// Existing characters are shifted to make room for the new text. The capacity is adjusted as needed.
-        /// </remarks>
-        /// <seealso cref="bool"/>
-        [CodeGenerationReturnsSelf]
-        public void Insert(int index, bool value) => Insert(index, value, BooleanFormat.Lowercase);
+        ///// <summary>
+        ///// Inserts the string representation of a specified Boolean value to this instance
+        ///// in lowercase at the specifed character position.
+        ///// </summary>
+        ///// <param name="index">The position in this instance where insertion begins.</param>
+        ///// <param name="value">The value to insert.</param>
+        ///// <returns>A reference to this instance after the insert operation has completed.</returns>
+        ///// <exception cref="ArgumentOutOfRangeException">
+        ///// <paramref name="index"/> is less than zero or greater than the current length of this instance.
+        ///// <para/>
+        ///// -or-
+        ///// <para/>
+        ///// The current length of this <see cref="MutableTextBuffer"/> object plus the length of
+        ///// <paramref name="value"/> exceeds <see cref="MutableTextBuffer.MaxCapacity"/>.
+        ///// </exception>
+        ///// <remarks>
+        ///// This matches the behavior of Java's StringBuilder. To match the behavior
+        ///// of .NET, call <see cref="Insert(int, bool, BooleanFormat)"/> and specify <see cref="BooleanFormat.TitleCase"/>.
+        ///// <para/>
+        ///// Existing characters are shifted to make room for the new text. The capacity is adjusted as needed.
+        ///// </remarks>
+        ///// <seealso cref="bool"/>
+        [CodeGenerationExtensionImplementation]
+        internal void InsertInternal(int index, bool value) => InsertInternal(index, value, BooleanFormat.Lowercase);
 
-        /// <summary>
-        /// Inserts the string representation of a specified Boolean value to this instance
-        /// in the specified format at the specified position.
-        /// </summary>
-        /// <param name="index">The position in this instance where insertion begins.</param>
-        /// <param name="value">The value to insert.</param>
-        /// <param name="format">The format to use. Specify <see cref="BooleanFormat.Lowercase"/> to match Java.
-        /// Specify <see cref="BooleanFormat.TitleCase"/> to match .NET.</param>
-        /// <returns>A reference to this instance after the insert operation has completed.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// <paramref name="index"/> is less than zero or greater than the current length of this instance.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// The current length of this <see cref="MutableTextBuffer"/> object plus the length of
-        /// <paramref name="value"/> exceeds <see cref="MutableTextBuffer.MaxCapacity"/>.
-        /// </exception>
-        /// <remarks>
-        /// Existing characters are shifted to make room for the new text. The capacity is adjusted as needed.
-        /// </remarks>
-        /// <seealso cref="bool"/>
-        /// <seealso cref="BooleanFormat"/>
-        [CodeGenerationReturnsSelf]
-        public void Insert(int index, bool value, BooleanFormat format)
+        ///// <summary>
+        ///// Inserts the string representation of a specified Boolean value to this instance
+        ///// in the specified format at the specified position.
+        ///// </summary>
+        ///// <param name="index">The position in this instance where insertion begins.</param>
+        ///// <param name="value">The value to insert.</param>
+        ///// <param name="format">The format to use. Specify <see cref="BooleanFormat.Lowercase"/> to match Java.
+        ///// Specify <see cref="BooleanFormat.TitleCase"/> to match .NET.</param>
+        ///// <returns>A reference to this instance after the insert operation has completed.</returns>
+        ///// <exception cref="ArgumentOutOfRangeException">
+        ///// <paramref name="index"/> is less than zero or greater than the current length of this instance.
+        ///// <para/>
+        ///// -or-
+        ///// <para/>
+        ///// The current length of this <see cref="MutableTextBuffer"/> object plus the length of
+        ///// <paramref name="value"/> exceeds <see cref="MutableTextBuffer.MaxCapacity"/>.
+        ///// </exception>
+        ///// <remarks>
+        ///// Existing characters are shifted to make room for the new text. The capacity is adjusted as needed.
+        ///// </remarks>
+        ///// <seealso cref="bool"/>
+        ///// <seealso cref="BooleanFormat"/>
+        [CodeGenerationExtensionImplementation]
+        internal void InsertInternal(int index, bool value, BooleanFormat format)
         {
             string text = FormatBoolean(value, format);
             // We don't use Insert(int, ReadOnlySpan<char>) for exception compatibility;
             // we want exceeding the maximum capacity to throw an OutOfMemoryException.
-            Insert(index, text.AsSpan(), 1);
+            InsertInternal(index, text.AsSpan(), 1);
         }
 
-        /// <summary>
-        /// Inserts the string representation of a specified Unicode character into this instance at the specified character position.
-        /// </summary>
-        /// <param name="index">The position in this instance where insertion begins.</param>
-        /// <param name="value">The value to insert.</param>
-        /// <returns>A reference to this instance after the insert operation has completed.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// <paramref name="index"/> is less than zero or greater than the current length of this instance.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// The current length of this <see cref="MutableTextBuffer"/> object plus the length of
-        /// <paramref name="value"/> exceeds <see cref="MutableTextBuffer.MaxCapacity"/>.
-        /// </exception>
-        /// <remarks>
-        /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
-        /// </remarks>
-        /// <seealso cref="char"/>
-        [CodeGenerationReturnsSelf]
-        public void Insert(int index, char value)
+        ///// <summary>
+        ///// Inserts the string representation of a specified Unicode character into this instance at the specified character position.
+        ///// </summary>
+        ///// <param name="index">The position in this instance where insertion begins.</param>
+        ///// <param name="value">The value to insert.</param>
+        ///// <returns>A reference to this instance after the insert operation has completed.</returns>
+        ///// <exception cref="ArgumentOutOfRangeException">
+        ///// <paramref name="index"/> is less than zero or greater than the current length of this instance.
+        ///// <para/>
+        ///// -or-
+        ///// <para/>
+        ///// The current length of this <see cref="MutableTextBuffer"/> object plus the length of
+        ///// <paramref name="value"/> exceeds <see cref="MutableTextBuffer.MaxCapacity"/>.
+        ///// </exception>
+        ///// <remarks>
+        ///// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
+        ///// </remarks>
+        ///// <seealso cref="char"/>
+        [CodeGenerationExtensionImplementation]
+        internal void InsertInternal(int index, char value)
         {
             if ((uint)index > (uint)Length)
             {
@@ -2198,29 +2198,29 @@ namespace J2N.Text
             Insert(index, ref value, 1);
         }
 
-        /// <summary>
-        /// Inserts the string representation of a specified array of Unicode characters into this
-        /// instance at the specified character position.
-        /// </summary>
-        /// <param name="index">The position in this instance where insertion begins.</param>
-        /// <param name="value">The character array to insert.</param>
-        /// <returns>A reference to this instance after the insert operation has completed.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// <paramref name="index"/> is less than zero or greater than the current length of this instance.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// The current length of this <see cref="MutableTextBuffer"/> object plus the length of
-        /// <paramref name="value"/> exceeds <see cref="MutableTextBuffer.MaxCapacity"/>.
-        /// </exception>
-        /// <remarks>
-        /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
-        /// <para/>
-        /// If <paramref name="value"/> is <see langword="null"/>, the <see cref="MutableTextBuffer"/> is not changed.
-        /// </remarks>
-        /// <seealso cref="char"/>
-        [CodeGenerationReturnsSelf]
-        public void Insert(int index, char[]? value)
+        ///// <summary>
+        ///// Inserts the string representation of a specified array of Unicode characters into this
+        ///// instance at the specified character position.
+        ///// </summary>
+        ///// <param name="index">The position in this instance where insertion begins.</param>
+        ///// <param name="value">The character array to insert.</param>
+        ///// <returns>A reference to this instance after the insert operation has completed.</returns>
+        ///// <exception cref="ArgumentOutOfRangeException">
+        ///// <paramref name="index"/> is less than zero or greater than the current length of this instance.
+        ///// <para/>
+        ///// -or-
+        ///// <para/>
+        ///// The current length of this <see cref="MutableTextBuffer"/> object plus the length of
+        ///// <paramref name="value"/> exceeds <see cref="MutableTextBuffer.MaxCapacity"/>.
+        ///// </exception>
+        ///// <remarks>
+        ///// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
+        ///// <para/>
+        ///// If <paramref name="value"/> is <see langword="null"/>, the <see cref="MutableTextBuffer"/> is not changed.
+        ///// </remarks>
+        ///// <seealso cref="char"/>
+        [CodeGenerationExtensionImplementation]
+        internal void InsertInternal(int index, char[]? value)
         {
             if ((uint)index > (uint)Length)
             {
@@ -2237,38 +2237,38 @@ namespace J2N.Text
             }
         }
 
-        /// <summary>
-        /// Inserts the string representation of a specified subarray of Unicode characters
-        /// into this instance at the specified character position.
-        /// </summary>
-        /// <param name="index">The position in this instance where insertion begins.</param>
-        /// <param name="value">A character array.</param>
-        /// <param name="startIndex">The starting index within <paramref name="value"/>.</param>
-        /// <param name="charCount">The number of characters to insert.</param>
-        /// <returns>A reference to this instance after the insert operation has completed.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="value"/> is <see langword="null"/>, and <paramref name="startIndex"/>
-        /// and <paramref name="charCount"/> are not zero.</exception>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// <paramref name="index"/>, <paramref name="startIndex"/>, or <paramref name="charCount"/> is less than zero.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// <paramref name="index"/> is greater than the length of this instance.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// <paramref name="startIndex"/> plus <paramref name="charCount"/> is not a position within <paramref name="value"/>.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// Enlarging the value of this instance would exceed <see cref="MutableTextBuffer.MaxCapacity"/>.
-        /// </exception>
-        /// <remarks>
-        /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
-        /// </remarks>
-        /// <seealso cref="char"/>
-        [CodeGenerationReturnsSelf]
-        public void Insert(int index, char[]? value, int startIndex, int charCount)
+        ///// <summary>
+        ///// Inserts the string representation of a specified subarray of Unicode characters
+        ///// into this instance at the specified character position.
+        ///// </summary>
+        ///// <param name="index">The position in this instance where insertion begins.</param>
+        ///// <param name="value">A character array.</param>
+        ///// <param name="startIndex">The starting index within <paramref name="value"/>.</param>
+        ///// <param name="charCount">The number of characters to insert.</param>
+        ///// <returns>A reference to this instance after the insert operation has completed.</returns>
+        ///// <exception cref="ArgumentNullException"><paramref name="value"/> is <see langword="null"/>, and <paramref name="startIndex"/>
+        ///// and <paramref name="charCount"/> are not zero.</exception>
+        ///// <exception cref="ArgumentOutOfRangeException">
+        ///// <paramref name="index"/>, <paramref name="startIndex"/>, or <paramref name="charCount"/> is less than zero.
+        ///// <para/>
+        ///// -or-
+        ///// <para/>
+        ///// <paramref name="index"/> is greater than the length of this instance.
+        ///// <para/>
+        ///// -or-
+        ///// <para/>
+        ///// <paramref name="startIndex"/> plus <paramref name="charCount"/> is not a position within <paramref name="value"/>.
+        ///// <para/>
+        ///// -or-
+        ///// <para/>
+        ///// Enlarging the value of this instance would exceed <see cref="MutableTextBuffer.MaxCapacity"/>.
+        ///// </exception>
+        ///// <remarks>
+        ///// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
+        ///// </remarks>
+        ///// <seealso cref="char"/>
+        [CodeGenerationExtensionImplementation]
+        internal void InsertInternal(int index, char[]? value, int startIndex, int charCount)
         {
             int currentLength = Length;
             if ((uint)index > (uint)currentLength)
@@ -2306,38 +2306,38 @@ namespace J2N.Text
             }
         }
 
-        /// <summary>
-        /// Inserts the string representation of a specified string
-        /// into this instance at the specified character position.
-        /// </summary>
-        /// <param name="index">The position in this instance where insertion begins.</param>
-        /// <param name="value">A character array.</param>
-        /// <param name="startIndex">The starting index within <paramref name="value"/>.</param>
-        /// <param name="count">The number of characters to insert.</param>
-        /// <returns>A reference to this instance after the insert operation has completed.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="value"/> is <see langword="null"/>, and <paramref name="startIndex"/>
-        /// and <paramref name="count"/> are not zero.</exception>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// <paramref name="index"/>, <paramref name="startIndex"/>, or <paramref name="count"/> is less than zero.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// <paramref name="index"/> is greater than the length of this instance.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// <paramref name="startIndex"/> plus <paramref name="count"/> is not a position within <paramref name="value"/>.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// Enlarging the value of this instance would exceed <see cref="MutableTextBuffer.MaxCapacity"/>.
-        /// </exception>
-        /// <remarks>
-        /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
-        /// </remarks>
-        /// <seealso cref="char"/>
-        [CodeGenerationReturnsSelf]
-        public void Insert(int index, string? value, int startIndex, int count) // J2N: Added to cover the JDK better (rather than ICharSequence only)
+        ///// <summary>
+        ///// Inserts the string representation of a specified string
+        ///// into this instance at the specified character position.
+        ///// </summary>
+        ///// <param name="index">The position in this instance where insertion begins.</param>
+        ///// <param name="value">A character array.</param>
+        ///// <param name="startIndex">The starting index within <paramref name="value"/>.</param>
+        ///// <param name="count">The number of characters to insert.</param>
+        ///// <returns>A reference to this instance after the insert operation has completed.</returns>
+        ///// <exception cref="ArgumentNullException"><paramref name="value"/> is <see langword="null"/>, and <paramref name="startIndex"/>
+        ///// and <paramref name="count"/> are not zero.</exception>
+        ///// <exception cref="ArgumentOutOfRangeException">
+        ///// <paramref name="index"/>, <paramref name="startIndex"/>, or <paramref name="count"/> is less than zero.
+        ///// <para/>
+        ///// -or-
+        ///// <para/>
+        ///// <paramref name="index"/> is greater than the length of this instance.
+        ///// <para/>
+        ///// -or-
+        ///// <para/>
+        ///// <paramref name="startIndex"/> plus <paramref name="count"/> is not a position within <paramref name="value"/>.
+        ///// <para/>
+        ///// -or-
+        ///// <para/>
+        ///// Enlarging the value of this instance would exceed <see cref="MutableTextBuffer.MaxCapacity"/>.
+        ///// </exception>
+        ///// <remarks>
+        ///// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
+        ///// </remarks>
+        ///// <seealso cref="char"/>
+        [CodeGenerationExtensionImplementation]
+        internal void InsertInternal(int index, string? value, int startIndex, int count) // J2N: Added to cover the JDK better (rather than ICharSequence only)
         {
             int currentLength = Length;
             if ((uint)index > (uint)currentLength)
@@ -2388,26 +2388,26 @@ namespace J2N.Text
                 InsertSpanFormattable(index, number, format, provider);
 #endif
             else if (value is IStructuralFormattable structuralFormattable)
-                Insert(index, structuralFormattable.ToString(format, provider), 1);
+                InsertInternal(index, structuralFormattable.ToString(format, provider), 1);
             else if (value is IFormattable formattable)
-                Insert(index, formattable.ToString(format, provider), 1);
+                InsertInternal(index, formattable.ToString(format, provider), 1);
             else if (value is ICharSequence csq)
-                Insert(index, csq); // doesn't support format providers
+                InsertInternal(index, csq); // doesn't support format providers
             else
-                Insert(index, value.ToString(), 1);
+                InsertInternal(index, value.ToString(), 1);
         }
 
-        /// <summary>
-        /// Inserts the sequence of characters into this instance at the specified character position.
-        /// </summary>
-        /// <param name="index">The position in this instance where insertion begins.</param>
-        /// <param name="value">The character span to insert.</param>
-        /// <returns>A reference to this instance after the insert operation has completed.</returns>
-        /// <remarks>The existing characters are shifted to make room for the character sequence in the
-        /// <paramref name="value"/> to insert it. The capacity is adjusted as needed.</remarks>
-        /// <seealso cref="ReadOnlySpan{Char}"/>
-        [CodeGenerationReturnsSelf]
-        public void Insert(int index, ReadOnlySpan<char> value) // J2N NOTE: Weird that upstream they made an overload of ReadOnlyMemory<char> for Append, but not Insert.
+        ///// <summary>
+        ///// Inserts the sequence of characters into this instance at the specified character position.
+        ///// </summary>
+        ///// <param name="index">The position in this instance where insertion begins.</param>
+        ///// <param name="value">The character span to insert.</param>
+        ///// <returns>A reference to this instance after the insert operation has completed.</returns>
+        ///// <remarks>The existing characters are shifted to make room for the character sequence in the
+        ///// <paramref name="value"/> to insert it. The capacity is adjusted as needed.</remarks>
+        ///// <seealso cref="ReadOnlySpan{Char}"/>
+        [CodeGenerationExtensionImplementation]
+        internal void InsertInternal(int index, ReadOnlySpan<char> value) // J2N NOTE: Weird that upstream they made an overload of ReadOnlyMemory<char> for Append, but not Insert.
         {
             if ((uint)index > (uint)Length)
             {
@@ -2435,7 +2435,7 @@ namespace J2N.Text
 
             if (entirelyWithinLiveBuffer)
             {
-                InsertFromSelf(index, sourceOffset, count);
+                InsertFromSelfInternal(index, sourceOffset, count);
                 return;
             }
 
@@ -2465,348 +2465,40 @@ namespace J2N.Text
 
         #region AppendFormat
 
-        /// <summary>
-        /// Appends the string returned by processing a composite format string, which contains zero or more format items,
-        /// to this instance. Each format item is replaced by the string representation of a single argument.
-        /// </summary>
-        /// <param name="format">A composite format string.</param>
-        /// <param name="arg0">An object to format.</param>
-        /// <returns>A reference to this instance with format appended. Each format item in <paramref name="format"/> is replaced
-        /// by the string representation of <paramref name="arg0"/>.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="format"/> is <see langword="null"/>.</exception>
-        /// <exception cref="FormatException">
-        /// <paramref name="format"/> is invalid.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// The index of a format item is less than 0 (zero), or greater than or equal to 1.
-        /// </exception>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// The length of the expanded string would exceed <see cref="MutableTextBuffer.MaxCapacity"/>.
-        /// </exception>
-        /// <remarks>
-        /// This method uses the <a href="https://learn.microsoft.com/en-us/dotnet/standard/base-types/composite-formatting">
-        /// composite formatting feature</a> of the .NET Framework to convert the value of an object to its text
-        /// representation and embed that representation in the current <see cref="MutableTextBuffer"/> object.
-        /// <para/>
-        /// The <paramref name="format"/> parameter consists of zero or more runs of text intermixed with
-        /// zero or more indexed placeholders, called format items. The index of the format items must be 0,
-        /// to correspond to <paramref name="arg0"/>, the single object in the parameter list of this method.
-        /// The formatting process replaces each format item with the string representation of <paramref name="arg0"/>.
-        /// <para/>
-        /// The syntax of a format item is as follows:
-        /// <para/>
-        /// <i>{index[,length][:formatString]}</i>
-        /// <para/>
-        /// Elements in square brackets are optional. The following table describes each element.
-        /// <list type="table">
-        ///   <listheader>
-        ///     <description>Element</description>
-        ///     <description>Descripton</description>
-        ///   </listheader>
-        ///   <item>
-        ///     <description><i>index</i></description>
-        ///     <description>
-        ///       The zero-based position in the parameter list of the object to be formatted.
-        ///       If the object specified by index is <see langword="null"/>, the format item is replaced by <see cref="String.Empty"/>.
-        ///       If there is no parameter in the index position, a <see cref="FormatException"/> is thrown.
-        ///     </description>
-        ///   </item>
-        ///   <item>
-        ///     <description><i>,length</i></description>
-        ///     <description>
-        ///       The minimum number of characters in the string representation of the parameter. If positive,
-        ///       the parameter is right-aligned; if negative, it is left-aligned.
-        ///     </description>
-        ///   </item>
-        ///   <item>
-        ///     <description><i>:formatString</i></description>
-        ///     <description>A standard or custom format string that is supported by the parameter.</description>
-        ///   </item>
-        /// </list>
-        /// <para/>
-        /// <paramref name="arg0"/> represents the object to be formatted. Each format item in <paramref name="format"/> is replaced
-        /// with the string representation of <paramref name="arg0"/>. If the format item includes <c>formatString</c>
-        /// and <paramref name="arg0"/> implements the <see cref="IFormattable"/> interface, then <c>arg0.ToString(formatString, null)</c>
-        /// defines the formatting. Otherwise, <c>arg0.ToString()</c> defines the formatting.
-        /// <para/>
-        /// If the string assigned to format is "Thank you for your donation of {0:####} cans of food to our charitable organization."
-        /// and <paramref name="arg0"/> is an integer with the value 10, the return value will be "Thank you for your donation of 10 cans
-        /// of food to our charitable organization."
-        /// <para/>
-        /// <b>Notes to Callers</b>
-        /// <para/>
-        /// When you instantiate a <see cref="MutableTextBuffer"/> object by calling <see cref="MutableTextBuffer.Initialize(int, int)"/>,
-        /// both the length and the capacity of the <see cref="MutableTextBuffer"/> instance can grow beyond
-        /// the value of its <see cref="MutableTextBuffer.MaxCapacity"/> property. This can occur particularly when you call the <see cref="MutableTextBuffer.Append(string?)"/>
-        /// and <see cref="MutableTextBuffer.AppendFormat(string, object?)"/> methods to append small strings.
-        /// </remarks>
-        [CodeGenerationReturnsSelf]
-        public void AppendFormat([StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, object? arg0)
+        [CodeGenerationExtensionImplementation]
+        internal void AppendFormatInternal([StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, object? arg0)
         {
 #if FEATURE_INLINEARRAYATTRIBUTE
-            AppendFormat(null, format, MemoryMarshal.CreateReadOnlySpan(ref arg0, 1));
+            AppendFormatInternal(null, format, MemoryMarshal.CreateReadOnlySpan(ref arg0, 1));
 #else
-            AppendFormat(null, format, new ParamsArray(arg0));
+            AppendFormatInternal(null, format, new ParamsArray(arg0));
 #endif
         }
 
-        /// <summary>
-        /// Appends the string returned by processing a composite format string, which contains zero or more format items,
-        /// to this instance. Each format item is replaced by the string representation of either of two arguments.
-        /// </summary>
-        /// <param name="format">A composite format string.</param>
-        /// <param name="arg0">The first object to format.</param>
-        /// <param name="arg1">The second object to format.</param>
-        /// <returns>A reference to this instance with format appended. Each format item in <paramref name="format"/> is replaced by the
-        /// string representation of the corresponding object argument.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="format"/> is <see langword="null"/>.</exception>
-        /// <exception cref="FormatException">
-        /// <paramref name="format"/> is invalid.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// The index of a format item is less than 0 (zero), or greater than or equal to 2.
-        /// </exception>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// The length of the expanded string would exceed <see cref="MutableTextBuffer.MaxCapacity"/>.
-        /// </exception>
-        /// <remarks>
-        /// This method uses the <a href="https://learn.microsoft.com/en-us/dotnet/standard/base-types/composite-formatting">
-        /// composite formatting feature</a> of the .NET Framework to convert the value of an object to its text
-        /// representation and embed that representation in the current <see cref="MutableTextBuffer"/> object.
-        /// <para/>
-        /// The <paramref name="format"/> parameter consists of zero or more runs of text intermixed with
-        /// zero or more indexed placeholders, called format items, that correspond to <paramref name="arg0"/>
-        /// and <paramref name="arg1"/>, the two objects in the parameter list of this method.
-        /// The formatting process replaces each format item with the string representation of the corresponding object.
-        /// <para/>
-        /// The syntax of a format item is as follows:
-        /// <para/>
-        /// <i>{index[,length][:formatString]}</i>
-        /// <para/>
-        /// Elements in square brackets are optional. The following table describes each element.
-        /// <list type="table">
-        ///   <listheader>
-        ///     <description>Element</description>
-        ///     <description>Descripton</description>
-        ///   </listheader>
-        ///   <item>
-        ///     <description><i>index</i></description>
-        ///     <description>
-        ///       The zero-based position in the parameter list of the object to be formatted.
-        ///       If the object specified by index is <see langword="null"/>, the format item is replaced by <see cref="String.Empty"/>.
-        ///       If there is no parameter in the index position, a <see cref="FormatException"/> is thrown.
-        ///     </description>
-        ///   </item>
-        ///   <item>
-        ///     <description><i>,length</i></description>
-        ///     <description>
-        ///       The minimum number of characters in the string representation of the parameter. If positive,
-        ///       the parameter is right-aligned; if negative, it is left-aligned.
-        ///     </description>
-        ///   </item>
-        ///   <item>
-        ///     <description><i>:formatString</i></description>
-        ///     <description>A standard or custom format string that is supported by the parameter.</description>
-        ///   </item>
-        /// </list>
-        /// <para/>
-        /// <paramref name="arg0"/> and <paramref name="arg1"/> represent the objects to be formatted. Each format item in <paramref name="format"/> is replaced
-        /// with the string representation of either <paramref name="arg0"/> or <paramref name="arg1"/>. If the format item includes <c>formatString</c>
-        /// and the corresponding argument implements the <see cref="IFormattable"/> interface, then the argument's <c>ToString(formatString, null)</c>
-        /// defines the formatting. Otherwise, the argument's <c>ToString()</c> defines the formatting.
-        /// <para/>
-        /// If the string assigned to format is "Thank you for your donation of {0:####} cans of food to our charitable organization."
-        /// and <paramref name="arg0"/> is an integer with the value 10, the return value will be "Thank you for your donation of 10 cans
-        /// of food to our charitable organization."
-        /// <para/>
-        /// <b>Notes to Callers</b>
-        /// <para/>
-        /// When you instantiate a <see cref="MutableTextBuffer"/> object by calling <see cref="MutableTextBuffer.Initialize(int, int)"/>,
-        /// both the length and the capacity of the <see cref="MutableTextBuffer"/> instance can grow beyond
-        /// the value of its <see cref="MutableTextBuffer.MaxCapacity"/> property. This can occur particularly when you call the <see cref="MutableTextBuffer.Append(string?)"/>
-        /// and <see cref="MutableTextBuffer.AppendFormat(string, object?)"/> methods to append small strings.
-        /// </remarks>
-        [CodeGenerationReturnsSelf]
-        public void AppendFormat([StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, object? arg0, object? arg1)
+        [CodeGenerationExtensionImplementation]
+        internal void AppendFormatInternal([StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, object? arg0, object? arg1)
         {
 #if FEATURE_INLINEARRAYATTRIBUTE
             TwoObjects two = new TwoObjects(arg0, arg1);
-            AppendFormat(null, format, (ReadOnlySpan<object?>)two);
+            AppendFormatInternal(null, format, (ReadOnlySpan<object?>)two);
 #else
-            AppendFormat(null, format, new ParamsArray(arg0, arg1));
+            AppendFormatInternal(null, format, new ParamsArray(arg0, arg1));
 #endif
         }
 
-        /// <summary>
-        /// Appends the string returned by processing a composite format string, which contains zero or more format items,
-        /// to this instance. Each format item is replaced by the string representation of either of three arguments.
-        /// </summary>
-        /// <param name="format">A composite format string.</param>
-        /// <param name="arg0">The first object to format.</param>
-        /// <param name="arg1">The second object to format.</param>
-        /// <param name="arg2">The third object to format.</param>
-        /// <returns>A reference to this instance with format appended. Each format item in <paramref name="format"/> is replaced by the
-        /// string representation of the corresponding object argument.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="format"/> is <see langword="null"/>.</exception>
-        /// <exception cref="FormatException">
-        /// <paramref name="format"/> is invalid.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// The index of a format item is less than 0 (zero), or greater than or equal to 3.
-        /// </exception>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// The length of the expanded string would exceed <see cref="MutableTextBuffer.MaxCapacity"/>.
-        /// </exception>
-        /// <remarks>
-        /// This method uses the <a href="https://learn.microsoft.com/en-us/dotnet/standard/base-types/composite-formatting">
-        /// composite formatting feature</a> of the .NET Framework to convert the value of an object to its text
-        /// representation and embed that representation in the current <see cref="MutableTextBuffer"/> object.
-        /// <para/>
-        /// The <paramref name="format"/> parameter consists of zero or more runs of text intermixed with
-        /// zero or more indexed placeholders, called format items, that correspond to <paramref name="arg0"/>
-        /// and <paramref name="arg1"/>, the two objects in the parameter list of this method.
-        /// The formatting process replaces each format item with the string representation of the corresponding object.
-        /// <para/>
-        /// The syntax of a format item is as follows:
-        /// <para/>
-        /// <i>{index[,length][:formatString]}</i>
-        /// <para/>
-        /// Elements in square brackets are optional. The following table describes each element.
-        /// <list type="table">
-        ///   <listheader>
-        ///     <description>Element</description>
-        ///     <description>Descripton</description>
-        ///   </listheader>
-        ///   <item>
-        ///     <description><i>index</i></description>
-        ///     <description>
-        ///       The zero-based position in the parameter list of the object to be formatted.
-        ///       If the object specified by index is <see langword="null"/>, the format item is replaced by <see cref="String.Empty"/>.
-        ///       If there is no parameter in the index position, a <see cref="FormatException"/> is thrown.
-        ///     </description>
-        ///   </item>
-        ///   <item>
-        ///     <description><i>,length</i></description>
-        ///     <description>
-        ///       The minimum number of characters in the string representation of the parameter. If positive,
-        ///       the parameter is right-aligned; if negative, it is left-aligned.
-        ///     </description>
-        ///   </item>
-        ///   <item>
-        ///     <description><i>:formatString</i></description>
-        ///     <description>A standard or custom format string that is supported by the parameter.</description>
-        ///   </item>
-        /// </list>
-        /// <para/>
-        /// <paramref name="arg0"/>, <paramref name="arg1"/>, and <paramref name="arg2"/> represent the objects to be formatted.
-        /// Each format item in <paramref name="format"/> is replaced with the string representation of either <paramref name="arg0"/>, <paramref name="arg1"/>,
-        /// or <paramref name="arg2"/>. If the format item includes <c>formatString</c> and the corresponding argument implements the
-        /// <see cref="IFormattable"/> interface, then the argument's <c>ToString(formatString, null)</c> defines the formatting. Otherwise,
-        /// the argument's <c>ToString()</c> defines the formatting.
-        /// <para/>
-        /// If the string assigned to format is "Thank you for your donation of {0:####} cans of food to our charitable organization."
-        /// and <paramref name="arg0"/> is an integer with the value 10, the return value will be "Thank you for your donation of 10 cans
-        /// of food to our charitable organization."
-        /// <para/>
-        /// <b>Notes to Callers</b>
-        /// <para/>
-        /// When you instantiate a <see cref="MutableTextBuffer"/> object by calling <see cref="MutableTextBuffer.Initialize(int, int)"/>,
-        /// both the length and the capacity of the <see cref="MutableTextBuffer"/> instance can grow beyond
-        /// the value of its <see cref="MutableTextBuffer.MaxCapacity"/> property. This can occur particularly when you call the <see cref="MutableTextBuffer.Append(string?)"/>
-        /// and <see cref="MutableTextBuffer.AppendFormat(string, object?)"/> methods to append small strings.
-        /// </remarks>
-        [CodeGenerationReturnsSelf]
-        public void AppendFormat([StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, object? arg0, object? arg1, object? arg2)
+        [CodeGenerationExtensionImplementation]
+        internal void AppendFormatInternal([StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, object? arg0, object? arg1, object? arg2)
         {
 #if FEATURE_INLINEARRAYATTRIBUTE
             ThreeObjects three = new ThreeObjects(arg0, arg1, arg2);
-            AppendFormat(null, format, (ReadOnlySpan<object?>)three);
+            AppendFormatInternal(null, format, (ReadOnlySpan<object?>)three);
 #else
-            AppendFormat(null, format, new ParamsArray(arg0, arg1, arg2));
+            AppendFormatInternal(null, format, new ParamsArray(arg0, arg1, arg2));
 #endif
         }
 
-        /// <summary>
-        /// Appends the string returned by processing a composite format string, which contains zero or more format items,
-        /// to this instance. Each format item is replaced by the string representation of a corresponding argument in a parameter array.
-        /// </summary>
-        /// <param name="format">A composite format string.</param>
-        /// <param name="args">An array of objects to format.</param>
-        /// <returns>A reference to this instance with format appended. Each format item in <paramref name="format"/> is replaced by the string representation
-        /// of the corresponding object argument.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="format"/> or <paramref name="args"/> is <see langword="null"/>.</exception>
-        /// <exception cref="FormatException">
-        /// <paramref name="format"/> is invalid.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// The index of a format item is less than 0 (zero), or greater than or equal to the length of the <paramref name="args"/> array.
-        /// </exception>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// The length of the expanded string would exceed <see cref="MutableTextBuffer.MaxCapacity"/>.
-        /// </exception>
-        /// <remarks>
-        /// This method uses the <a href="https://learn.microsoft.com/en-us/dotnet/standard/base-types/composite-formatting">
-        /// composite formatting feature</a> of the .NET Framework to convert the value of an object to its text
-        /// representation and embed that representation in the current <see cref="MutableTextBuffer"/> object.
-        /// <para/>
-        /// The <paramref name="format"/> parameter consists of zero or more runs of text intermixed with
-        /// zero or more indexed placeholders, called format items.
-        /// The formatting process replaces each format item with the string representation of the corresponding object.
-        /// <para/>
-        /// The syntax of a format item is as follows:
-        /// <para/>
-        /// <i>{index[,length][:formatString]}</i>
-        /// <para/>
-        /// Elements in square brackets are optional. The following table describes each element.
-        /// <list type="table">
-        ///   <listheader>
-        ///     <description>Element</description>
-        ///     <description>Descripton</description>
-        ///   </listheader>
-        ///   <item>
-        ///     <description><i>index</i></description>
-        ///     <description>
-        ///       The zero-based position in the parameter list of the object to be formatted.
-        ///       If the object specified by index is <see langword="null"/>, the format item is replaced by <see cref="String.Empty"/>.
-        ///       If there is no parameter in the index position, a <see cref="FormatException"/> is thrown.
-        ///     </description>
-        ///   </item>
-        ///   <item>
-        ///     <description><i>,length</i></description>
-        ///     <description>
-        ///       The minimum number of characters in the string representation of the parameter. If positive,
-        ///       the parameter is right-aligned; if negative, it is left-aligned.
-        ///     </description>
-        ///   </item>
-        ///   <item>
-        ///     <description><i>:formatString</i></description>
-        ///     <description>A standard or custom format string that is supported by the parameter.</description>
-        ///   </item>
-        /// </list>
-        /// <para/>
-        /// <paramref name="args"/> represents the objects to be formatted. Each format item in <paramref name="format"/> is replaced
-        /// with the string representation of the corresponding object in <paramref name="args"/>. If the format item includes <c>formatString</c>
-        /// and the corresponding object in <paramref name="args"/> implements the <see cref="IFormattable"/> interface, then
-        /// <c>args[index].ToString(formatString, null)</c> defines the formatting. Otherwise, <c>args[index].ToString()</c>
-        /// defines the formatting.
-        /// <para/>
-        /// If the string assigned to format is "Thank you for your donation of {0:####} cans of food to our charitable organization."
-        /// and <c>args[0]</c> is an integer with the value 10, the return value will be "Thank you for your donation of 10 cans
-        /// of food to our charitable organization."
-        /// <para/>
-        /// <b>Notes to Callers</b>
-        /// <para/>
-        /// When you instantiate a <see cref="MutableTextBuffer"/> object by calling <see cref="MutableTextBuffer.Initialize(int, int)"/>,
-        /// both the length and the capacity of the <see cref="MutableTextBuffer"/> instance can grow beyond
-        /// the value of its <see cref="MutableTextBuffer.MaxCapacity"/> property. This can occur particularly when you call the <see cref="MutableTextBuffer.Append(string?)"/>
-        /// and <see cref="MutableTextBuffer.AppendFormat(string, object?)"/> methods to append small strings.
-        /// </remarks>
-        [CodeGenerationReturnsSelf]
-        public void AppendFormat([StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, params object?[] args)
+        [CodeGenerationExtensionImplementation]
+        internal void AppendFormatInternal([StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, params object?[] args)
         {
             if (args is null)
             {
@@ -2815,495 +2507,49 @@ namespace J2N.Text
                 ThrowHelper.ThrowArgumentNullException(format is null ? ExceptionArgument.format : ExceptionArgument.args);
             }
 
-            AppendFormat(null, format, args);
+            AppendFormatInternal(null, format, args);
         }
 
-        /// <summary>
-        /// Appends the string returned by processing a composite format string, which contains zero or more format items,
-        /// to this instance. Each format item is replaced by the string representation of a corresponding argument in a parameter span.
-        /// </summary>
-        /// <param name="format">A composite format string.</param>
-        /// <param name="args">A span of objects to format.</param>
-        /// <returns>A reference to this instance with format appended. Each format item in <paramref name="format"/> is replaced by the string representation
-        /// of the corresponding object argument.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="format"/> or <paramref name="args"/> is <see langword="null"/>.</exception>
-        /// <exception cref="FormatException">
-        /// <paramref name="format"/> is invalid.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// The index of a format item is less than 0 (zero), or greater than or equal to the length of the <paramref name="args"/> span.
-        /// </exception>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// The length of the expanded string would exceed <see cref="MutableTextBuffer.MaxCapacity"/>.
-        /// </exception>
-        /// <remarks>
-        /// This method uses the <a href="https://learn.microsoft.com/en-us/dotnet/standard/base-types/composite-formatting">
-        /// composite formatting feature</a> of the .NET Framework to convert the value of an object to its text
-        /// representation and embed that representation in the current <see cref="MutableTextBuffer"/> object.
-        /// <para/>
-        /// The <paramref name="format"/> parameter consists of zero or more runs of text intermixed with
-        /// zero or more indexed placeholders, called format items.
-        /// The formatting process replaces each format item with the string representation of the corresponding object.
-        /// <para/>
-        /// The syntax of a format item is as follows:
-        /// <para/>
-        /// <i>{index[,length][:formatString]}</i>
-        /// <para/>
-        /// Elements in square brackets are optional. The following table describes each element.
-        /// <list type="table">
-        ///   <listheader>
-        ///     <description>Element</description>
-        ///     <description>Descripton</description>
-        ///   </listheader>
-        ///   <item>
-        ///     <description><i>index</i></description>
-        ///     <description>
-        ///       The zero-based position in the parameter list of the object to be formatted.
-        ///       If the object specified by index is <see langword="null"/>, the format item is replaced by <see cref="String.Empty"/>.
-        ///       If there is no parameter in the index position, a <see cref="FormatException"/> is thrown.
-        ///     </description>
-        ///   </item>
-        ///   <item>
-        ///     <description><i>,length</i></description>
-        ///     <description>
-        ///       The minimum number of characters in the string representation of the parameter. If positive,
-        ///       the parameter is right-aligned; if negative, it is left-aligned.
-        ///     </description>
-        ///   </item>
-        ///   <item>
-        ///     <description><i>:formatString</i></description>
-        ///     <description>A standard or custom format string that is supported by the parameter.</description>
-        ///   </item>
-        /// </list>
-        /// <para/>
-        /// <paramref name="args"/> represents the objects to be formatted. Each format item in <paramref name="format"/> is replaced
-        /// with the string representation of the corresponding object in <paramref name="args"/>. If the format item includes <c>formatString</c>
-        /// and the corresponding object in <paramref name="args"/> implements the <see cref="IFormattable"/> interface, then
-        /// <c>args[index].ToString(formatString, null)</c> defines the formatting. Otherwise, <c>args[index].ToString()</c>
-        /// defines the formatting.
-        /// <para/>
-        /// If the string assigned to format is "Thank you for your donation of {0:####} cans of food to our charitable organization."
-        /// and <c>args[0]</c> is an integer with the value 10, the return value will be "Thank you for your donation of 10 cans
-        /// of food to our charitable organization."
-        /// <para/>
-        /// <b>Notes to Callers</b>
-        /// <para/>
-        /// When you instantiate a <see cref="MutableTextBuffer"/> object by calling <see cref="MutableTextBuffer.Initialize(int, int)"/>,
-        /// both the length and the capacity of the <see cref="MutableTextBuffer"/> instance can grow beyond
-        /// the value of its <see cref="MutableTextBuffer.MaxCapacity"/> property. This can occur particularly when you call the <see cref="MutableTextBuffer.Append(string?)"/>
-        /// and <see cref="MutableTextBuffer.AppendFormat(string, object?)"/> methods to append small strings.
-        /// </remarks>
-        [CodeGenerationReturnsSelf]
-        public void AppendFormat([StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, params ReadOnlySpan<object?> args)
+        [CodeGenerationExtensionImplementation]
+        internal void AppendFormatInternal([StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, params ReadOnlySpan<object?> args)
         {
-            AppendFormat(null, format, args);
+            AppendFormatInternal(null, format, args);
         }
 
-        /// <summary>
-        /// Appends the string returned by processing a composite format string, which contains zero or more format items,
-        /// to this instance. Each format item is replaced by the string representation of a single argument using a specified
-        /// format provider.
-        /// </summary>
-        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
-        /// <param name="format">A composite format string.</param>
-        /// <param name="arg0">An object to format.</param>
-        /// <returns>A reference to this instance after the append operation has completed. After the append operation,
-        /// this instance contains any data that existed before the operation, suffixed by a copy of <paramref name="format"/> in which any
-        /// format specification is replaced by the string representation of <paramref name="arg0"/>.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="format"/> is <see langword="null"/>.</exception>
-        /// <exception cref="FormatException">
-        /// <paramref name="format"/> is invalid.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// The index of a format item is less than 0 (zero), or greater than or equal to 1 (one).
-        /// </exception>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// The length of the expanded string would exceed <see cref="MutableTextBuffer.MaxCapacity"/>.
-        /// </exception>
-        /// <remarks>
-        /// This method uses the <a href="https://learn.microsoft.com/en-us/dotnet/standard/base-types/composite-formatting">
-        /// composite formatting feature</a> of the .NET Framework to convert the value of an object to its text
-        /// representation and embed that representation in the current <see cref="MutableTextBuffer"/> object.
-        /// <para/>
-        /// The <paramref name="format"/> parameter consists of zero or more runs of text intermixed with
-        /// zero or more indexed placeholders, called format items. The index of the format items must be zero (0),
-        /// to correspond to <paramref name="arg0"/>, the single object in the parameter list of this method.
-        /// The formatting process replaces each format item with the string representation of <paramref name="arg0"/>.
-        /// <para/>
-        /// The syntax of a format item is as follows:
-        /// <para/>
-        /// <i>{index[,length][:formatString]}</i>
-        /// <para/>
-        /// Elements in square brackets are optional. The following table describes each element.
-        /// <list type="table">
-        ///   <listheader>
-        ///     <description>Element</description>
-        ///     <description>Descripton</description>
-        ///   </listheader>
-        ///   <item>
-        ///     <description><i>index</i></description>
-        ///     <description>
-        ///       The zero-based position in the parameter list of the object to be formatted.
-        ///       If the object specified by index is <see langword="null"/>, the format item is replaced by <see cref="String.Empty"/>.
-        ///       If there is no parameter in the index position, a <see cref="FormatException"/> is thrown.
-        ///     </description>
-        ///   </item>
-        ///   <item>
-        ///     <description><i>,length</i></description>
-        ///     <description>
-        ///       The minimum number of characters in the string representation of the parameter. If positive,
-        ///       the parameter is right-aligned; if negative, it is left-aligned.
-        ///     </description>
-        ///   </item>
-        ///   <item>
-        ///     <description><i>:formatString</i></description>
-        ///     <description>A standard or custom format string that is supported by the parameter.</description>
-        ///   </item>
-        /// </list>
-        /// <para/>
-        /// The provider parameter specifies an <see cref="IFormatProvider"/> implementation that can provide formatting information
-        /// for the objects in <c>args</c>. <paramref name="provider"/> can be any of the following:
-        /// <list type="bullet">
-        ///   <item><description>A <see cref="CultureInfo"/> object that provides culture-specific formatting information.</description></item>
-        ///   <item><description>A <see cref="NumberFormatInfo"/> object that provides culture-specific formatting information for
-        ///     <paramref name="arg0"/> if it is a numeric value.</description></item>
-        ///   <item><description>A <see cref="DateTimeFormatInfo"/> object that provides culture-specific formatting information for
-        ///     <paramref name="arg0"/> if it is a date and time value.</description></item>
-        ///   <item><description>A <see cref="StringFormatter"/> object that provides culture-specific formatting information for
-        ///     <paramref name="arg0"/> with rules similar to the JDK.</description></item>
-        ///   <item><description></description>A custom <see cref="IFormatProvider"/> implementation that provides formatting
-        ///     information for <paramref name="arg0"/>.Typically, such an implementation also implements the
-        ///     <see cref="ICustomFormatter"/> interface.</item>
-        /// </list>
-        /// <para/>
-        /// If the <paramref name="provider"/> parameter is <see langword="null"/>, formatting information is obtained from the current culture.
-        /// <para/>
-        /// <paramref name="arg0"/> represents the object to be formatted. Each format item in <paramref name="format"/> is replaced
-        /// with the string representation of <paramref name="arg0"/>. If the format item includes <c>formatString</c>
-        /// and <paramref name="arg0"/> implements the <see cref="IFormattable"/> interface, then <c>arg0.ToString(formatString, null)</c>
-        /// defines the formatting. Otherwise, <c>arg0.ToString()</c> defines the formatting.
-        /// <para/>
-        /// <b>Notes to Callers</b>
-        /// <para/>
-        /// When you instantiate a <see cref="MutableTextBuffer"/> object by calling <see cref="MutableTextBuffer.Initialize(int, int)"/>,
-        /// both the length and the capacity of the <see cref="MutableTextBuffer"/> instance can grow beyond
-        /// the value of its <see cref="MutableTextBuffer.MaxCapacity"/> property. This can occur particularly when you call the <see cref="MutableTextBuffer.Append(string?)"/>
-        /// and <see cref="MutableTextBuffer.AppendFormat(string, object?)"/> methods to append small strings.
-        /// </remarks>
-        [CodeGenerationReturnsSelf]
-        public void AppendFormat(IFormatProvider? provider, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, object? arg0)
+        [CodeGenerationExtensionImplementation]
+        internal void AppendFormatInternal(IFormatProvider? provider, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, object? arg0)
         {
 #if FEATURE_INLINEARRAYATTRIBUTE
-            AppendFormat(provider, format, MemoryMarshal.CreateReadOnlySpan(ref arg0, 1));
+            AppendFormatInternal(provider, format, MemoryMarshal.CreateReadOnlySpan(ref arg0, 1));
 #else
-            AppendFormat(provider, format, new ParamsArray(arg0));
+            AppendFormatInternal(provider, format, new ParamsArray(arg0));
 #endif
         }
 
-        /// <summary>
-        /// Appends the string returned by processing a composite format string, which contains zero or more format items,
-        /// to this instance. Each format item is replaced by the string representation of either of two arguments using a specified
-        /// format provider.
-        /// </summary>
-        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
-        /// <param name="format">A composite format string.</param>
-        /// <param name="arg0">The first object to format.</param>
-        /// <param name="arg1">The second object to format.</param>
-        /// <returns>A reference to this instance after the append operation has completed. After the append operation,
-        /// this instance contains any data that existed before the operation, suffixed by a copy of <paramref name="format"/> in which any
-        /// format specification is replaced by the string representation of the corresponding object argument.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="format"/> is <see langword="null"/>.</exception>
-        /// <exception cref="FormatException">
-        /// <paramref name="format"/> is invalid.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// The index of a format item is less than 0 (zero), or greater than or equal to 2 (two).
-        /// </exception>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// The length of the expanded string would exceed <see cref="MutableTextBuffer.MaxCapacity"/>.
-        /// </exception>
-        /// <remarks>
-        /// This method uses the <a href="https://learn.microsoft.com/en-us/dotnet/standard/base-types/composite-formatting">
-        /// composite formatting feature</a> of the .NET Framework to convert the value of an object to its text
-        /// representation and embed that representation in the current <see cref="MutableTextBuffer"/> object.
-        /// <para/>
-        /// The <paramref name="format"/> parameter consists of zero or more runs of text intermixed with
-        /// zero or more indexed placeholders, called format items, that correspond to objects in the parameter list of this method.
-        /// The formatting process replaces each format item with the string representation of the corresponding object.
-        /// <para/>
-        /// The syntax of a format item is as follows:
-        /// <para/>
-        /// <i>{index[,length][:formatString]}</i>
-        /// <para/>
-        /// Elements in square brackets are optional. The following table describes each element.
-        /// <list type="table">
-        ///   <listheader>
-        ///     <description>Element</description>
-        ///     <description>Descripton</description>
-        ///   </listheader>
-        ///   <item>
-        ///     <description><i>index</i></description>
-        ///     <description>
-        ///       The zero-based position in the parameter list of the object to be formatted.
-        ///       If the object specified by index is <see langword="null"/>, the format item is replaced by <see cref="String.Empty"/>.
-        ///       If there is no parameter in the index position, a <see cref="FormatException"/> is thrown.
-        ///     </description>
-        ///   </item>
-        ///   <item>
-        ///     <description><i>,length</i></description>
-        ///     <description>
-        ///       The minimum number of characters in the string representation of the parameter. If positive,
-        ///       the parameter is right-aligned; if negative, it is left-aligned.
-        ///     </description>
-        ///   </item>
-        ///   <item>
-        ///     <description><i>:formatString</i></description>
-        ///     <description>A standard or custom format string that is supported by the parameter.</description>
-        ///   </item>
-        /// </list>
-        /// <para/>
-        /// The provider parameter specifies an <see cref="IFormatProvider"/> implementation that can provide formatting information
-        /// for the objects in <c>args</c>. <paramref name="provider"/> can be any of the following:
-        /// <list type="bullet">
-        ///   <item><description>A <see cref="CultureInfo"/> object that provides culture-specific formatting information.</description></item>
-        ///   <item><description>A <see cref="NumberFormatInfo"/> object that provides culture-specific formatting information for
-        ///     <paramref name="arg0"/> or <paramref name="arg1"/> if they are numeric values.</description></item>
-        ///   <item><description>A <see cref="DateTimeFormatInfo"/> object that provides culture-specific formatting information for
-        ///     <paramref name="arg0"/> or <paramref name="arg1"/> if they are date and time values.</description></item>
-        ///   <item><description>A <see cref="StringFormatter"/> object that provides culture-specific formatting information for
-        ///     <paramref name="arg0"/> or <paramref name="arg1"/> with rules similar to the JDK.</description></item>
-        ///   <item><description></description>A custom <see cref="IFormatProvider"/> implementation that provides formatting
-        ///     information for <paramref name="arg0"/> or <paramref name="arg1"/>.Typically, such an implementation also implements the
-        ///     <see cref="ICustomFormatter"/> interface.</item>
-        /// </list>
-        /// <para/>
-        /// If the <paramref name="provider"/> parameter is <see langword="null"/>, formatting information is obtained from the current culture.
-        /// <para/>
-        /// <paramref name="arg0"/> and <paramref name="arg1"/> represent the objects to be formatted. Each format item in <paramref name="format"/> is replaced
-        /// with the string representation of the object that has the corresponding index. If the format item includes <c>formatString</c>
-        /// and the corresponding argument implements the <see cref="IFormattable"/> interface, then the argument's <c>ToString(formatString, null)</c>
-        /// defines the formatting. Otherwise, the argument's <c>ToString()</c> defines the formatting.
-        /// <para/>
-        /// <b>Notes to Callers</b>
-        /// <para/>
-        /// When you instantiate a <see cref="MutableTextBuffer"/> object by calling <see cref="MutableTextBuffer.Initialize(int, int)"/>,
-        /// both the length and the capacity of the <see cref="MutableTextBuffer"/> instance can grow beyond
-        /// the value of its <see cref="MutableTextBuffer.MaxCapacity"/> property. This can occur particularly when you call the <see cref="MutableTextBuffer.Append(string?)"/>
-        /// and <see cref="MutableTextBuffer.AppendFormat(string, object?)"/> methods to append small strings.
-        /// </remarks>
-        [CodeGenerationReturnsSelf]
-        public void AppendFormat(IFormatProvider? provider, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, object? arg0, object? arg1)
+        [CodeGenerationExtensionImplementation]
+        internal void AppendFormatInternal(IFormatProvider? provider, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, object? arg0, object? arg1)
         {
 #if FEATURE_INLINEARRAYATTRIBUTE
             TwoObjects two = new TwoObjects(arg0, arg1);
-            AppendFormat(provider, format, (ReadOnlySpan<object?>)two);
+            AppendFormatInternal(provider, format, (ReadOnlySpan<object?>)two);
 #else
-            AppendFormat(provider, format, new ParamsArray(arg0, arg1));
+            AppendFormatInternal(provider, format, new ParamsArray(arg0, arg1));
 #endif
         }
 
-        /// <summary>
-        /// Appends the string returned by processing a composite format string, which contains zero or more format items,
-        /// to this instance. Each format item is replaced by the string representation of either of three arguments using a specified
-        /// format provider.
-        /// </summary>
-        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
-        /// <param name="format">A composite format string.</param>
-        /// <param name="arg0">The first object to format.</param>
-        /// <param name="arg1">The second object to format.</param>
-        /// <param name="arg2">The third object to format.</param>
-        /// <returns>A reference to this instance after the append operation has completed. After the append operation,
-        /// this instance contains any data that existed before the operation, suffixed by a copy of <paramref name="format"/> in which any
-        /// format specification is replaced by the string representation of the corresponding object argument.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="format"/> is <see langword="null"/>.</exception>
-        /// <exception cref="FormatException">
-        /// <paramref name="format"/> is invalid.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// The index of a format item is less than 0 (zero), or greater than or equal to 3 (three).
-        /// </exception>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// The length of the expanded string would exceed <see cref="MutableTextBuffer.MaxCapacity"/>.
-        /// </exception>
-        /// <remarks>
-        /// This method uses the <a href="https://learn.microsoft.com/en-us/dotnet/standard/base-types/composite-formatting">
-        /// composite formatting feature</a> of the .NET Framework to convert the value of an object to its text
-        /// representation and embed that representation in the current <see cref="MutableTextBuffer"/> object.
-        /// <para/>
-        /// The <paramref name="format"/> parameter consists of zero or more runs of text intermixed with
-        /// zero or more indexed placeholders, called format items, that correspond to objects in the parameter list of this method.
-        /// The formatting process replaces each format item with the string representation of the corresponding object.
-        /// <para/>
-        /// The syntax of a format item is as follows:
-        /// <para/>
-        /// <i>{index[,length][:formatString]}</i>
-        /// <para/>
-        /// Elements in square brackets are optional. The following table describes each element.
-        /// <list type="table">
-        ///   <listheader>
-        ///     <description>Element</description>
-        ///     <description>Descripton</description>
-        ///   </listheader>
-        ///   <item>
-        ///     <description><i>index</i></description>
-        ///     <description>
-        ///       The zero-based position in the parameter list of the object to be formatted.
-        ///       If the object specified by index is <see langword="null"/>, the format item is replaced by <see cref="String.Empty"/>.
-        ///       If there is no parameter in the index position, a <see cref="FormatException"/> is thrown.
-        ///     </description>
-        ///   </item>
-        ///   <item>
-        ///     <description><i>,length</i></description>
-        ///     <description>
-        ///       The minimum number of characters in the string representation of the parameter. If positive,
-        ///       the parameter is right-aligned; if negative, it is left-aligned.
-        ///     </description>
-        ///   </item>
-        ///   <item>
-        ///     <description><i>:formatString</i></description>
-        ///     <description>A standard or custom format string that is supported by the parameter.</description>
-        ///   </item>
-        /// </list>
-        /// <para/>
-        /// The provider parameter specifies an <see cref="IFormatProvider"/> implementation that can provide formatting information
-        /// for the objects in <c>args</c>. <paramref name="provider"/> can be any of the following:
-        /// <list type="bullet">
-        ///   <item><description>A <see cref="CultureInfo"/> object that provides culture-specific formatting information.</description></item>
-        ///   <item><description>A <see cref="NumberFormatInfo"/> object that provides culture-specific formatting information for
-        ///     <paramref name="arg0"/>, <paramref name="arg1"/>, or <paramref name="arg2"/> if they are a numeric values.</description></item>
-        ///   <item><description>A <see cref="DateTimeFormatInfo"/> object that provides culture-specific formatting information for
-        ///     <paramref name="arg0"/>, <paramref name="arg1"/>, or <paramref name="arg2"/> if they are date and time values.</description></item>
-        ///   <item><description>A <see cref="StringFormatter"/> object that provides culture-specific formatting information for
-        ///     <paramref name="arg0"/>, <paramref name="arg1"/>, or <paramref name="arg2"/> with rules similar to the JDK.</description></item>
-        ///   <item><description></description>A custom <see cref="IFormatProvider"/> implementation that provides formatting
-        ///     information for <paramref name="arg0"/>, <paramref name="arg1"/>, or <paramref name="arg2"/>.Typically, such an
-        ///     implementation also implements the <see cref="ICustomFormatter"/> interface.</item>
-        /// </list>
-        /// <para/>
-        /// If the <paramref name="provider"/> parameter is <see langword="null"/>, formatting information is obtained from the current culture.
-        /// <para/>
-        /// <paramref name="arg0"/>, <paramref name="arg1"/>, and <paramref name="arg2"/> represent the objects to be formatted.
-        /// Each format item in <paramref name="format"/> is replaced with the string representation of the object that has the
-        /// corresponding index. If the format item includes <c>formatString</c> and the corresponding argument implements the
-        /// <see cref="IFormattable"/> interface, then the argument's <c>ToString(formatString, null)</c> defines the formatting. Otherwise,
-        /// the argument's <c>ToString()</c> defines the formatting.
-        /// <para/>
-        /// <b>Notes to Callers</b>
-        /// <para/>
-        /// When you instantiate a <see cref="MutableTextBuffer"/> object by calling <see cref="MutableTextBuffer.Initialize(int, int)"/>,
-        /// both the length and the capacity of the <see cref="MutableTextBuffer"/> instance can grow beyond
-        /// the value of its <see cref="MutableTextBuffer.MaxCapacity"/> property. This can occur particularly when you call the <see cref="MutableTextBuffer.Append(string?)"/>
-        /// and <see cref="MutableTextBuffer.AppendFormat(string, object?)"/> methods to append small strings.
-        /// </remarks>
-        [CodeGenerationReturnsSelf]
-        public void AppendFormat(IFormatProvider? provider, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, object? arg0, object? arg1, object? arg2)
+        [CodeGenerationExtensionImplementation]
+        internal void AppendFormatInternal(IFormatProvider? provider, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, object? arg0, object? arg1, object? arg2)
         {
 #if FEATURE_INLINEARRAYATTRIBUTE
             ThreeObjects three = new ThreeObjects(arg0, arg1, arg2);
-            AppendFormat(provider, format, (ReadOnlySpan<object?>)three);
+            AppendFormatInternal(provider, format, (ReadOnlySpan<object?>)three);
 #else
-            AppendFormat(provider, format, new ParamsArray(arg0, arg1, arg2));
+            AppendFormatInternal(provider, format, new ParamsArray(arg0, arg1, arg2));
 #endif
         }
 
-        /// <summary>
-        /// Appends the string returned by processing a composite format string, which contains zero or more format items,
-        /// to this instance. Each format item is replaced by the string representation of a corresponding argument in a
-        /// parameter array using a specified format provider.
-        /// </summary>
-        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
-        /// <param name="format">A composite format string.</param>
-        /// <param name="args">An array of objects to format.</param>
-        /// <returns>A reference to this instance after the append operation has completed. After the append operation,
-        /// this instance contains any data that existed before the operation, suffixed by a copy of <paramref name="format"/> in which any
-        /// format specification is replaced by the string representation of the corresponding object argument.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="format"/> is <see langword="null"/>.</exception>
-        /// <exception cref="FormatException">
-        /// <paramref name="format"/> is invalid.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// The index of a format item is less than 0 (zero), or greater than or equal to the length of the <paramref name="args"/> array.
-        /// </exception>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// The length of the expanded string would exceed <see cref="MutableTextBuffer.MaxCapacity"/>.
-        /// </exception>
-        /// <remarks>
-        /// This method uses the <a href="https://learn.microsoft.com/en-us/dotnet/standard/base-types/composite-formatting">
-        /// composite formatting feature</a> of the .NET Framework to convert the value of an object to its text
-        /// representation and embed that representation in the current <see cref="MutableTextBuffer"/> object.
-        /// <para/>
-        /// The <paramref name="format"/> parameter consists of zero or more runs of text intermixed with
-        /// zero or more indexed placeholders, called format items, that correspond to objects in the parameter list of this method.
-        /// The formatting process replaces each format item with the string representation of the corresponding object.
-        /// <para/>
-        /// The syntax of a format item is as follows:
-        /// <para/>
-        /// <i>{index[,length][:formatString]}</i>
-        /// <para/>
-        /// Elements in square brackets are optional. The following table describes each element.
-        /// <list type="table">
-        ///   <listheader>
-        ///     <description>Element</description>
-        ///     <description>Descripton</description>
-        ///   </listheader>
-        ///   <item>
-        ///     <description><i>index</i></description>
-        ///     <description>
-        ///       The zero-based position in the parameter list of the object to be formatted.
-        ///       If the object specified by index is <see langword="null"/>, the format item is replaced by <see cref="String.Empty"/>.
-        ///       If there is no parameter in the index position, a <see cref="FormatException"/> is thrown.
-        ///     </description>
-        ///   </item>
-        ///   <item>
-        ///     <description><i>,length</i></description>
-        ///     <description>
-        ///       The minimum number of characters in the string representation of the parameter. If positive,
-        ///       the parameter is right-aligned; if negative, it is left-aligned.
-        ///     </description>
-        ///   </item>
-        ///   <item>
-        ///     <description><i>:formatString</i></description>
-        ///     <description>A standard or custom format string that is supported by the parameter.</description>
-        ///   </item>
-        /// </list>
-        /// <para/>
-        /// The provider parameter specifies an <see cref="IFormatProvider"/> implementation that can provide formatting information
-        /// for the objects in <paramref name="args"/>. <paramref name="provider"/> can be any of the following:
-        /// <list type="bullet">
-        ///   <item><description>A <see cref="CultureInfo"/> object that provides culture-specific formatting information.</description></item>
-        ///   <item><description>A <see cref="NumberFormatInfo"/> object that provides culture-specific formatting information for
-        ///     numeric values in <paramref name="args"/>.</description></item>
-        ///   <item><description>A <see cref="DateTimeFormatInfo"/> object that provides culture-specific formatting information for
-        ///     date and time values in <paramref name="args"/>.</description></item>
-        ///   <item><description>A <see cref="StringFormatter"/> object that provides culture-specific formatting information for
-        ///      one or more of the objects in <paramref name="args"/> with rules similar to the JDK.</description></item>
-        ///   <item><description></description>A custom <see cref="IFormatProvider"/> implementation that provides formatting
-        ///     information for one or more of the objects in <paramref name="args"/>.Typically, such an implementation also implements the
-        ///     <see cref="ICustomFormatter"/> interface.</item>
-        /// </list>
-        /// <para/>
-        /// If the <paramref name="provider"/> parameter is <see langword="null"/>, formatting information is obtained from the current culture.
-        /// <para/>
-        /// <paramref name="args"/> represents the objects to be formatted. Each format item in <paramref name="format"/> is replaced
-        /// with the string representation of the corresponding object in <paramref name="args"/>. If the format item includes
-        /// <c>formatString</c> and the corresponding object in <paramref name="args"/> implements the <see cref="IFormattable"/> interface, then
-        /// <c>args[index].ToString(formatString, null)</c> defines the formatting. Otherwise, <c>args[index].ToString()</c>
-        /// defines the formatting.
-        /// <para/>
-        /// <b>Notes to Callers</b>
-        /// <para/>
-        /// When you instantiate a <see cref="MutableTextBuffer"/> object by calling <see cref="MutableTextBuffer.Initialize(int, int)"/>,
-        /// both the length and the capacity of the <see cref="MutableTextBuffer"/> instance can grow beyond
-        /// the value of its <see cref="MutableTextBuffer.MaxCapacity"/> property. This can occur particularly when you call the <see cref="MutableTextBuffer.Append(string?)"/>
-        /// and <see cref="MutableTextBuffer.AppendFormat(string, object?)"/> methods to append small strings.
-        /// </remarks>
-        [CodeGenerationReturnsSelf]
-        public void AppendFormat(IFormatProvider? provider, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, params object?[] args)
+        [CodeGenerationExtensionImplementation]
+        internal void AppendFormatInternal(IFormatProvider? provider, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, params object?[] args)
         {
             if (args is null)
             {
@@ -3312,103 +2558,11 @@ namespace J2N.Text
                 ThrowHelper.ThrowArgumentNullException(format is null ? ExceptionArgument.format : ExceptionArgument.args);
             }
 
-            AppendFormat(provider, format, (ReadOnlySpan<object?>)args);
+            AppendFormatInternal(provider, format, (ReadOnlySpan<object?>)args);
         }
 
-        /// <summary>
-        /// Appends the string returned by processing a composite format string, which contains zero or more format items,
-        /// to this instance. Each format item is replaced by the string representation of a corresponding argument in a
-        /// parameter span using a specified format provider.
-        /// </summary>
-        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
-        /// <param name="format">A composite format string.</param>
-        /// <param name="args">An span of objects to format.</param>
-        /// <returns>A reference to this instance after the append operation has completed. After the append operation,
-        /// this instance contains any data that existed before the operation, suffixed by a copy of <paramref name="format"/> in which any
-        /// format specification is replaced by the string representation of the corresponding object argument.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="format"/> is <see langword="null"/>.</exception>
-        /// <exception cref="FormatException">
-        /// <paramref name="format"/> is invalid.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// The index of a format item is less than 0 (zero), or greater than or equal to the length of the <paramref name="args"/> span.
-        /// </exception>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// The length of the expanded string would exceed <see cref="MutableTextBuffer.MaxCapacity"/>.
-        /// </exception>
-        /// <remarks>
-        /// This method uses the <a href="https://learn.microsoft.com/en-us/dotnet/standard/base-types/composite-formatting">
-        /// composite formatting feature</a> of the .NET Framework to convert the value of an object to its text
-        /// representation and embed that representation in the current <see cref="MutableTextBuffer"/> object.
-        /// <para/>
-        /// The <paramref name="format"/> parameter consists of zero or more runs of text intermixed with
-        /// zero or more indexed placeholders, called format items, that correspond to objects in the parameter list of this method.
-        /// The formatting process replaces each format item with the string representation of the corresponding object.
-        /// <para/>
-        /// The syntax of a format item is as follows:
-        /// <para/>
-        /// <i>{index[,length][:formatString]}</i>
-        /// <para/>
-        /// Elements in square brackets are optional. The following table describes each element.
-        /// <list type="table">
-        ///   <listheader>
-        ///     <description>Element</description>
-        ///     <description>Descripton</description>
-        ///   </listheader>
-        ///   <item>
-        ///     <description><i>index</i></description>
-        ///     <description>
-        ///       The zero-based position in the parameter list of the object to be formatted.
-        ///       If the object specified by index is <see langword="null"/>, the format item is replaced by <see cref="String.Empty"/>.
-        ///       If there is no parameter in the index position, a <see cref="FormatException"/> is thrown.
-        ///     </description>
-        ///   </item>
-        ///   <item>
-        ///     <description><i>,length</i></description>
-        ///     <description>
-        ///       The minimum number of characters in the string representation of the parameter. If positive,
-        ///       the parameter is right-aligned; if negative, it is left-aligned.
-        ///     </description>
-        ///   </item>
-        ///   <item>
-        ///     <description><i>:formatString</i></description>
-        ///     <description>A standard or custom format string that is supported by the parameter.</description>
-        ///   </item>
-        /// </list>
-        /// <para/>
-        /// The provider parameter specifies an <see cref="IFormatProvider"/> implementation that can provide formatting information
-        /// for the objects in <paramref name="args"/>. <paramref name="provider"/> can be any of the following:
-        /// <list type="bullet">
-        ///   <item><description>A <see cref="CultureInfo"/> object that provides culture-specific formatting information.</description></item>
-        ///   <item><description>A <see cref="NumberFormatInfo"/> object that provides culture-specific formatting information for
-        ///     numeric values in <paramref name="args"/>.</description></item>
-        ///   <item><description>A <see cref="DateTimeFormatInfo"/> object that provides culture-specific formatting information for
-        ///     date and time values in <paramref name="args"/>.</description></item>
-        ///   <item><description>A <see cref="StringFormatter"/> object that provides culture-specific formatting information for
-        ///      one or more of the objects in <paramref name="args"/> with rules similar to the JDK.</description></item>
-        ///   <item><description></description>A custom <see cref="IFormatProvider"/> implementation that provides formatting
-        ///     information for one or more of the objects in <paramref name="args"/>.Typically, such an implementation also implements the
-        ///     <see cref="ICustomFormatter"/> interface.</item>
-        /// </list>
-        /// <para/>
-        /// If the <paramref name="provider"/> parameter is <see langword="null"/>, formatting information is obtained from the current culture.
-        /// <para/>
-        /// <paramref name="args"/> represents the objects to be formatted. Each format item in <paramref name="format"/> is replaced
-        /// with the string representation of the corresponding object in <paramref name="args"/>. If the format item includes
-        /// <c>formatString</c> and the corresponding object in <paramref name="args"/> implements the <see cref="IFormattable"/> interface, then
-        /// <c>args[index].ToString(formatString, null)</c> defines the formatting. Otherwise, <c>args[index].ToString()</c>
-        /// defines the formatting.
-        /// <para/>
-        /// <b>Notes to Callers</b>
-        /// <para/>
-        /// When you instantiate a <see cref="MutableTextBuffer"/> object by calling <see cref="MutableTextBuffer.Initialize(int, int)"/>,
-        /// both the length and the capacity of the <see cref="MutableTextBuffer"/> instance can grow beyond
-        /// the value of its <see cref="MutableTextBuffer.MaxCapacity"/> property. This can occur particularly when you call the <see cref="MutableTextBuffer.Append(string?)"/>
-        /// and <see cref="MutableTextBuffer.AppendFormat(string, object?)"/> methods to append small strings.
-        /// </remarks>
-        [CodeGenerationReturnsSelf]
-        public void AppendFormat(IFormatProvider? provider, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, params ReadOnlySpan<object?> args) // KEEP OVERLOADS FOR ReadOnlySpan<object?> and ParamsArray IN SYNC
+        [CodeGenerationExtensionImplementation]
+        internal void AppendFormatInternal(IFormatProvider? provider, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, params ReadOnlySpan<object?> args) // KEEP OVERLOADS FOR ReadOnlySpan<object?> and ParamsArray IN SYNC
         {
             if (format is null)
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.format);
@@ -3440,12 +2594,12 @@ namespace J2N.Text
                     int countUntilNextBrace = remainder.IndexOfAny('{', '}');
                     if (countUntilNextBrace < 0)
                     {
-                        Append(remainder);
+                        AppendInternal(remainder);
                         return;
                     }
 
                     // Append the text until the brace.
-                    Append(remainder.Slice(0, countUntilNextBrace));
+                    AppendInternal(remainder.Slice(0, countUntilNextBrace));
                     pos += countUntilNextBrace;
 
                     // Get the brace.  It must be followed by another character, either a copy of itself in the case of being
@@ -3454,7 +2608,7 @@ namespace J2N.Text
                     ch = MoveNext(format, ref pos);
                     if (brace == ch)
                     {
-                        Append(ch);
+                        AppendInternal(ch);
                         pos++;
                         continue;
                     }
@@ -3631,7 +2785,7 @@ namespace J2N.Text
                         // Pad the end, if needed.
                         if (leftJustify && width > charsWritten)
                         {
-                            Append(' ', width - charsWritten);
+                            AppendInternal(' ', width - charsWritten);
                         }
 
                         // Continue to parse other characters.
@@ -3658,17 +2812,17 @@ namespace J2N.Text
                 // Append it to the final output of the Format String.
                 if (width <= s.Length)
                 {
-                    Append(s);
+                    AppendInternal(s);
                 }
                 else if (leftJustify)
                 {
-                    Append(s);
-                    Append(' ', width - s.Length);
+                    AppendInternal(s);
+                    AppendInternal(' ', width - s.Length);
                 }
                 else
                 {
-                    Append(' ', width - s.Length);
-                    Append(s);
+                    AppendInternal(' ', width - s.Length);
+                    AppendInternal(s);
                 }
 
                 // Continue parsing the rest of the format string.
@@ -3719,12 +2873,12 @@ namespace J2N.Text
                     int countUntilNextBrace = remainder.IndexOfAny('{', '}');
                     if (countUntilNextBrace < 0)
                     {
-                        Append(remainder);
+                        AppendInternal(remainder);
                         return;
                     }
 
                     // Append the text until the brace.
-                    Append(remainder.Slice(0, countUntilNextBrace));
+                    AppendInternal(remainder.Slice(0, countUntilNextBrace));
                     pos += countUntilNextBrace;
 
                     // Get the brace.  It must be followed by another character, either a copy of itself in the case of being
@@ -3733,7 +2887,7 @@ namespace J2N.Text
                     ch = MoveNext(format, ref pos);
                     if (brace == ch)
                     {
-                        Append(ch);
+                        AppendInternal(ch);
                         pos++;
                         continue;
                     }
@@ -3910,7 +3064,7 @@ namespace J2N.Text
                         // Pad the end, if needed.
                         if (leftJustify && width > charsWritten)
                         {
-                            Append(' ', width - charsWritten);
+                            AppendInternal(' ', width - charsWritten);
                         }
 
                         // Continue to parse other characters.
@@ -3937,17 +3091,17 @@ namespace J2N.Text
                 // Append it to the final output of the Format String.
                 if (width <= s.Length)
                 {
-                    Append(s);
+                    AppendInternal(s);
                 }
                 else if (leftJustify)
                 {
-                    Append(s);
-                    Append(' ', width - s.Length);
+                    AppendInternal(s);
+                    AppendInternal(' ', width - s.Length);
                 }
                 else
                 {
-                    Append(' ', width - s.Length);
-                    Append(s);
+                    AppendInternal(' ', width - s.Length);
+                    AppendInternal(s);
                 }
 
                 // Continue parsing the rest of the format string.
@@ -3969,8 +3123,8 @@ namespace J2N.Text
         // J2N TODO: API - CompositeFormat overloads
 #if FEATURE_COMPOSITEFORMAT
 
-        [CodeGenerationReturnsSelf]
-        public void AppendFormat<TArg0>(IFormatProvider? provider, CompositeFormat format, TArg0 arg0)
+        [CodeGenerationExtensionImplementation]
+        internal void AppendFormatInternal<TArg0>(IFormatProvider? provider, CompositeFormat format, TArg0 arg0)
         {
             if (format is null)
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.format);
@@ -3978,8 +3132,8 @@ namespace J2N.Text
             AppendFormat(provider, format, arg0, 0, 0, default);
         }
 
-        [CodeGenerationReturnsSelf]
-        public void AppendFormat<TArg0, TArg1>(IFormatProvider? provider, CompositeFormat format, TArg0 arg0, TArg1 arg1)
+        [CodeGenerationExtensionImplementation]
+        internal void AppendFormatInternal<TArg0, TArg1>(IFormatProvider? provider, CompositeFormat format, TArg0 arg0, TArg1 arg1)
         {
             if (format is null)
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.format);
@@ -3987,8 +3141,8 @@ namespace J2N.Text
             AppendFormat(provider, format, arg0, arg1, 0, default);
         }
 
-        [CodeGenerationReturnsSelf]
-        public void AppendFormat<TArg0, TArg1, TArg2>(IFormatProvider? provider, CompositeFormat format, TArg0 arg0, TArg1 arg1, TArg2 arg2)
+        [CodeGenerationExtensionImplementation]
+        internal void AppendFormatInternal<TArg0, TArg1, TArg2>(IFormatProvider? provider, CompositeFormat format, TArg0 arg0, TArg1 arg1, TArg2 arg2)
         {
             if (format is null)
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.format);
@@ -3996,8 +3150,8 @@ namespace J2N.Text
             AppendFormat(provider, format, arg0, arg1, arg2, default);
         }
 
-        [CodeGenerationReturnsSelf]
-        public void AppendFormat(IFormatProvider? provider, CompositeFormat format, params object?[] args)
+        [CodeGenerationExtensionImplementation]
+        internal void AppendFormatInternal(IFormatProvider? provider, CompositeFormat format, params object?[] args)
         {
             if (format is null)
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.format);
@@ -4006,8 +3160,8 @@ namespace J2N.Text
             AppendFormat(provider, format, (ReadOnlySpan<object?>)args);
         }
 
-        [CodeGenerationReturnsSelf]
-        public void AppendFormat(IFormatProvider? provider, CompositeFormat format, params ReadOnlySpan<object?> args)
+        [CodeGenerationExtensionImplementation]
+        internal void AppendFormatInternal(IFormatProvider? provider, CompositeFormat format, params ReadOnlySpan<object?> args)
         {
             //ArgumentNullException.ThrowIfNull(format);
             if (format is null)
@@ -4069,43 +3223,43 @@ namespace J2N.Text
 
         #region Replace
 
-        /// <summary>
-        /// Replaces all occurrences of a specified string in this instance with another specified string.
-        /// </summary>
-        /// <param name="oldValue">The string to replace.</param>
-        /// <param name="newValue">The string that replaces <paramref name="oldValue"/>, or <see langword="null"/>.</param>
-        /// <returns>A reference to this instance with all instances of <paramref name="oldValue"/> replaced by <paramref name="newValue"/>.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="oldValue"/> is <see langword="null"/>.</exception>
-        /// <exception cref="ArgumentException">The length of <paramref name="oldValue"/> is zero.</exception>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// Enlarging the value of this instance would exceed <see cref="MutableTextBuffer.MaxCapacity"/>.
-        /// </exception>
-        /// <remarks>
-        /// This method performs an ordinal, case-sensitive comparison to identify occurrences of <paramref name="oldValue"/> in the
-        /// current instance. If <paramref name="newValue"/> is <see langword="null"/> or <see cref="string.Empty"/>, all occurrences of
-        /// <paramref name="oldValue"/> are removed.
-        /// </remarks>
-        /// <seealso cref="Remove(int, int)"/>
-        [CodeGenerationReturnsSelf]
-        public void Replace(string oldValue, string? newValue) => Replace(oldValue, newValue, 0, Length);
+        ///// <summary>
+        ///// Replaces all occurrences of a specified string in this instance with another specified string.
+        ///// </summary>
+        ///// <param name="oldValue">The string to replace.</param>
+        ///// <param name="newValue">The string that replaces <paramref name="oldValue"/>, or <see langword="null"/>.</param>
+        ///// <returns>A reference to this instance with all instances of <paramref name="oldValue"/> replaced by <paramref name="newValue"/>.</returns>
+        ///// <exception cref="ArgumentNullException"><paramref name="oldValue"/> is <see langword="null"/>.</exception>
+        ///// <exception cref="ArgumentException">The length of <paramref name="oldValue"/> is zero.</exception>
+        ///// <exception cref="ArgumentOutOfRangeException">
+        ///// Enlarging the value of this instance would exceed <see cref="MutableTextBuffer.MaxCapacity"/>.
+        ///// </exception>
+        ///// <remarks>
+        ///// This method performs an ordinal, case-sensitive comparison to identify occurrences of <paramref name="oldValue"/> in the
+        ///// current instance. If <paramref name="newValue"/> is <see langword="null"/> or <see cref="string.Empty"/>, all occurrences of
+        ///// <paramref name="oldValue"/> are removed.
+        ///// </remarks>
+        ///// <seealso cref="Remove(int, int)"/>
+        [CodeGenerationExtensionImplementation]
+        internal void ReplaceInternal(string oldValue, string? newValue) => ReplaceInternal(oldValue, newValue, 0, Length);
 
-        /// <summary>
-        /// Replaces all instances of one read-only character span with another in this builder.
-        /// </summary>
-        /// <param name="oldValue">The read-only character span to replace.</param>
-        /// <param name="newValue">The read-only character span to replace <paramref name="oldValue"/> with.</param>
-        /// <returns>A reference to this instance with with all instances of <paramref name="oldValue"/> replaced by <paramref name="newValue"/>.</returns>
-        /// <exception cref="ArgumentException">The length of <paramref name="oldValue"/> is zero.</exception>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// Enlarging the value of this instance would exceed <see cref="MutableTextBuffer.MaxCapacity"/>.
-        /// </exception>
-        /// <remarks>
-        /// This method performs an ordinal, case-sensitive comparison to identify occurrences of <paramref name="oldValue"/> in the
-        /// current instance. If <paramref name="newValue"/> is empty, all occurrences of <paramref name="oldValue"/> are removed.
-        /// </remarks>
-        /// <seealso cref="Remove(int, int)"/>
-        [CodeGenerationReturnsSelf]
-        public void Replace(ReadOnlySpan<char> oldValue, ReadOnlySpan<char> newValue) => Replace(oldValue, newValue, 0, Length);
+        ///// <summary>
+        ///// Replaces all instances of one read-only character span with another in this builder.
+        ///// </summary>
+        ///// <param name="oldValue">The read-only character span to replace.</param>
+        ///// <param name="newValue">The read-only character span to replace <paramref name="oldValue"/> with.</param>
+        ///// <returns>A reference to this instance with with all instances of <paramref name="oldValue"/> replaced by <paramref name="newValue"/>.</returns>
+        ///// <exception cref="ArgumentException">The length of <paramref name="oldValue"/> is zero.</exception>
+        ///// <exception cref="ArgumentOutOfRangeException">
+        ///// Enlarging the value of this instance would exceed <see cref="MutableTextBuffer.MaxCapacity"/>.
+        ///// </exception>
+        ///// <remarks>
+        ///// This method performs an ordinal, case-sensitive comparison to identify occurrences of <paramref name="oldValue"/> in the
+        ///// current instance. If <paramref name="newValue"/> is empty, all occurrences of <paramref name="oldValue"/> are removed.
+        ///// </remarks>
+        ///// <seealso cref="Remove(int, int)"/>
+        [CodeGenerationExtensionImplementation]
+        internal void ReplaceInternal(ReadOnlySpan<char> oldValue, ReadOnlySpan<char> newValue) => ReplaceInternal(oldValue, newValue, 0, Length);
 
 
         #endregion Replace
@@ -4226,71 +3380,71 @@ namespace J2N.Text
 
         #region Replace
 
-        /// <summary>
-        /// Replaces, within a substring of this instance, all occurrences of a specified string with another specified string.
-        /// </summary>
-        /// <param name="oldValue">The string to replace.</param>
-        /// <param name="newValue">The string that replaces <paramref name="oldValue"/>, or <see langword="null"/>.</param>
-        /// <param name="startIndex">The position in this instance where the substring begins.</param>
-        /// <param name="count">The length of the substring to search within.</param>
-        /// <returns>A reference to this instance with all instances of <paramref name="oldValue"/> replaced by <paramref name="newValue"/>
-        /// in the range from <paramref name="startIndex"/> to <paramref name="startIndex"/> + <paramref name="count"/> - 1.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="oldValue"/> is <see langword="null"/>.</exception>
-        /// <exception cref="ArgumentException">The length of <paramref name="oldValue"/> is zero.</exception>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// <paramref name="startIndex"/> or <paramref name="count"/> is less than zero.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// <paramref name="startIndex"/> plus <paramref name="count"/> indicates a character position not within this instance.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// Enlarging the value of this instance would exceed <see cref="MutableTextBuffer.MaxCapacity"/>.
-        /// </exception>
-        /// <remarks>
-        /// This method performs an ordinal, case-sensitive comparison to identify occurrences of <paramref name="oldValue"/>
-        /// in the specified substring. If <paramref name="newValue"/> is <see langword="null"/> or <see cref="string.Empty"/>,
-        /// all occurrences of <paramref name="oldValue"/> in the specified range are removed.
-        /// </remarks>
-        /// <seealso cref="Remove(int, int)"/>
-        [CodeGenerationReturnsSelf]
-        public void Replace(string oldValue, string? newValue, int startIndex, int count)
+        ///// <summary>
+        ///// Replaces, within a substring of this instance, all occurrences of a specified string with another specified string.
+        ///// </summary>
+        ///// <param name="oldValue">The string to replace.</param>
+        ///// <param name="newValue">The string that replaces <paramref name="oldValue"/>, or <see langword="null"/>.</param>
+        ///// <param name="startIndex">The position in this instance where the substring begins.</param>
+        ///// <param name="count">The length of the substring to search within.</param>
+        ///// <returns>A reference to this instance with all instances of <paramref name="oldValue"/> replaced by <paramref name="newValue"/>
+        ///// in the range from <paramref name="startIndex"/> to <paramref name="startIndex"/> + <paramref name="count"/> - 1.</returns>
+        ///// <exception cref="ArgumentNullException"><paramref name="oldValue"/> is <see langword="null"/>.</exception>
+        ///// <exception cref="ArgumentException">The length of <paramref name="oldValue"/> is zero.</exception>
+        ///// <exception cref="ArgumentOutOfRangeException">
+        ///// <paramref name="startIndex"/> or <paramref name="count"/> is less than zero.
+        ///// <para/>
+        ///// -or-
+        ///// <para/>
+        ///// <paramref name="startIndex"/> plus <paramref name="count"/> indicates a character position not within this instance.
+        ///// <para/>
+        ///// -or-
+        ///// <para/>
+        ///// Enlarging the value of this instance would exceed <see cref="MutableTextBuffer.MaxCapacity"/>.
+        ///// </exception>
+        ///// <remarks>
+        ///// This method performs an ordinal, case-sensitive comparison to identify occurrences of <paramref name="oldValue"/>
+        ///// in the specified substring. If <paramref name="newValue"/> is <see langword="null"/> or <see cref="string.Empty"/>,
+        ///// all occurrences of <paramref name="oldValue"/> in the specified range are removed.
+        ///// </remarks>
+        ///// <seealso cref="Remove(int, int)"/>
+        [CodeGenerationExtensionImplementation]
+        internal void ReplaceInternal(string oldValue, string? newValue, int startIndex, int count)
         {
             if (oldValue is null)
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.oldValue);
-            Replace(oldValue.AsSpan(), newValue.AsSpan(), startIndex, count);
+            ReplaceInternal(oldValue.AsSpan(), newValue.AsSpan(), startIndex, count);
         }
 
-        /// <summary>
-        /// Replaces all instances of one read-only character span with another in a substring of this builder.
-        /// </summary>
-        /// <param name="oldValue">The read-only character span to replace.</param>
-        /// <param name="newValue">The read-only character span to replace <paramref name="oldValue"/> with.</param>
-        /// <param name="startIndex">The position in this instance where the substring begins.</param>
-        /// <param name="count">The length of the substring to search within.</param>
-        /// <returns>A reference to this instance with all instances of <paramref name="oldValue"/> replaced by <paramref name="newValue"/>
-        /// in the range from <paramref name="startIndex"/> to <paramref name="startIndex"/> + <paramref name="count"/> - 1.</returns>
-        /// <exception cref="ArgumentException">The length of <paramref name="oldValue"/> is zero.</exception>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// <paramref name="startIndex"/> or <paramref name="count"/> is less than zero.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// <paramref name="startIndex"/> plus <paramref name="count"/> indicates a character position not within this instance.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// Enlarging the value of this instance would exceed <see cref="MutableTextBuffer.MaxCapacity"/>.
-        /// </exception>
-        /// <remarks>
-        /// This method performs an ordinal, case-sensitive comparison to identify occurrences of <paramref name="oldValue"/>
-        /// in the specified substring. If <paramref name="newValue"/> is empty, all occurrences of <paramref name="oldValue"/>
-        /// in the specified range are removed.
-        /// </remarks>
-        /// <seealso cref="Remove(int, int)"/>
-        [CodeGenerationReturnsSelf]
-        public void Replace(ReadOnlySpan<char> oldValue, ReadOnlySpan<char> newValue, int startIndex, int count)
+        ///// <summary>
+        ///// Replaces all instances of one read-only character span with another in a substring of this builder.
+        ///// </summary>
+        ///// <param name="oldValue">The read-only character span to replace.</param>
+        ///// <param name="newValue">The read-only character span to replace <paramref name="oldValue"/> with.</param>
+        ///// <param name="startIndex">The position in this instance where the substring begins.</param>
+        ///// <param name="count">The length of the substring to search within.</param>
+        ///// <returns>A reference to this instance with all instances of <paramref name="oldValue"/> replaced by <paramref name="newValue"/>
+        ///// in the range from <paramref name="startIndex"/> to <paramref name="startIndex"/> + <paramref name="count"/> - 1.</returns>
+        ///// <exception cref="ArgumentException">The length of <paramref name="oldValue"/> is zero.</exception>
+        ///// <exception cref="ArgumentOutOfRangeException">
+        ///// <paramref name="startIndex"/> or <paramref name="count"/> is less than zero.
+        ///// <para/>
+        ///// -or-
+        ///// <para/>
+        ///// <paramref name="startIndex"/> plus <paramref name="count"/> indicates a character position not within this instance.
+        ///// <para/>
+        ///// -or-
+        ///// <para/>
+        ///// Enlarging the value of this instance would exceed <see cref="MutableTextBuffer.MaxCapacity"/>.
+        ///// </exception>
+        ///// <remarks>
+        ///// This method performs an ordinal, case-sensitive comparison to identify occurrences of <paramref name="oldValue"/>
+        ///// in the specified substring. If <paramref name="newValue"/> is empty, all occurrences of <paramref name="oldValue"/>
+        ///// in the specified range are removed.
+        ///// </remarks>
+        ///// <seealso cref="Remove(int, int)"/>
+        [CodeGenerationExtensionImplementation]
+        internal void ReplaceInternal(ReadOnlySpan<char> oldValue, ReadOnlySpan<char> newValue, int startIndex, int count)
         {
             int currentLength = Length;
             if ((uint)startIndex > (uint)currentLength)
@@ -4406,47 +3560,47 @@ namespace J2N.Text
             //AssertInvariants();
         }
 
-        /// <summary>
-        /// Replaces all occurrences of a specified character in this instance with another specified character.
-        /// </summary>
-        /// <param name="oldChar">The character to replace.</param>
-        /// <param name="newChar">The character that replaces <paramref name="oldChar"/>.</param>
-        /// <returns>A reference to this instance with all occurrences of <paramref name="oldChar"/>
-        /// replaced by <paramref name="newChar"/>.</returns>
-        /// <remarks>
-        /// This method performs an ordinal, case-sensitive comparison to identify occurrences of
-        /// <paramref name="oldChar"/> in the current instance. The size of the current
-        /// <see cref="MutableTextBuffer"/> instance is unchanged after the replacement.
-        /// </remarks>
-        [CodeGenerationReturnsSelf]
-        public void Replace(char oldChar, char newChar)
+        ///// <summary>
+        ///// Replaces all occurrences of a specified character in this instance with another specified character.
+        ///// </summary>
+        ///// <param name="oldChar">The character to replace.</param>
+        ///// <param name="newChar">The character that replaces <paramref name="oldChar"/>.</param>
+        ///// <returns>A reference to this instance with all occurrences of <paramref name="oldChar"/>
+        ///// replaced by <paramref name="newChar"/>.</returns>
+        ///// <remarks>
+        ///// This method performs an ordinal, case-sensitive comparison to identify occurrences of
+        ///// <paramref name="oldChar"/> in the current instance. The size of the current
+        ///// <see cref="MutableTextBuffer"/> instance is unchanged after the replacement.
+        ///// </remarks>
+        [CodeGenerationExtensionImplementation]
+        internal void ReplaceInternal(char oldChar, char newChar)
         {
-            Replace(oldChar, newChar, 0, Length);
+            ReplaceInternal(oldChar, newChar, 0, Length);
         }
 
-        /// <summary>
-        /// Replaces, within a substring of this instance, all occurrences of a specified character with another specified character.
-        /// </summary>
-        /// <param name="oldChar">The character to replace.</param>
-        /// <param name="newChar">The character that replaces <paramref name="oldChar"/>.</param>
-        /// <param name="startIndex">The position in this instance where the substring begins.</param>
-        /// <param name="count">The length of the substring to search within.</param>
-        /// <returns>A reference to this instance with <paramref name="oldChar"/> replaced by <paramref name="newChar"/>
-        /// in the range from <paramref name="startIndex"/> to <paramref name="startIndex"/> + <paramref name="count"/> -1.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// <paramref name="startIndex"/> or <paramref name="count"/> is less than zero.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// <paramref name="startIndex"/> plus <paramref name="count"/> indicates a character position not within this instance.
-        /// </exception>
-        /// <remarks>
-        /// This method performs an ordinal, case-sensitive comparison to identify occurrences of
-        /// <paramref name="oldChar"/> in the current instance within the specified substring. The size of the current
-        /// <see cref="MutableTextBuffer"/> instance is unchanged after the replacement.
-        /// </remarks>
-        [CodeGenerationReturnsSelf]
-        public void Replace(char oldChar, char newChar, int startIndex, int count)
+        ///// <summary>
+        ///// Replaces, within a substring of this instance, all occurrences of a specified character with another specified character.
+        ///// </summary>
+        ///// <param name="oldChar">The character to replace.</param>
+        ///// <param name="newChar">The character that replaces <paramref name="oldChar"/>.</param>
+        ///// <param name="startIndex">The position in this instance where the substring begins.</param>
+        ///// <param name="count">The length of the substring to search within.</param>
+        ///// <returns>A reference to this instance with <paramref name="oldChar"/> replaced by <paramref name="newChar"/>
+        ///// in the range from <paramref name="startIndex"/> to <paramref name="startIndex"/> + <paramref name="count"/> -1.</returns>
+        ///// <exception cref="ArgumentOutOfRangeException">
+        ///// <paramref name="startIndex"/> or <paramref name="count"/> is less than zero.
+        ///// <para/>
+        ///// -or-
+        ///// <para/>
+        ///// <paramref name="startIndex"/> plus <paramref name="count"/> indicates a character position not within this instance.
+        ///// </exception>
+        ///// <remarks>
+        ///// This method performs an ordinal, case-sensitive comparison to identify occurrences of
+        ///// <paramref name="oldChar"/> in the current instance within the specified substring. The size of the current
+        ///// <see cref="MutableTextBuffer"/> instance is unchanged after the replacement.
+        ///// </remarks>
+        [CodeGenerationExtensionImplementation]
+        internal void ReplaceInternal(char oldChar, char newChar, int startIndex, int count)
         {
             int currentLength = Length;
             if ((uint)startIndex > (uint)currentLength)
@@ -4467,34 +3621,34 @@ namespace J2N.Text
 
         // JDK overloads
 
-        /// <summary>
-        /// Replaces the specified substring in this builder with the specified
-        /// string, <paramref name="newValue"/>. The substring begins at the specified
-        /// <paramref name="startIndex"/> and ends to the character at
-        /// <c><paramref name="count"/> - <paramref name="startIndex"/></c> or
-        /// to the end of the sequence if no such character exists. First the
-        /// characters in the substring are removed and then the specified
-        /// <paramref name="newValue"/> is inserted at <paramref name="startIndex"/>.
-        /// This <see cref="ValueStringBuilder"/> will be lengthened to accommodate the
-        /// specified <paramref name="newValue"/> if necessary.
-        /// <para/>
-        /// IMPORTANT: This method has .NET semantics. That is, the <paramref name="count"/> parameter is a count rather than
-        /// an exclusive end index. To translate from Java, use <c>end - start</c> for <paramref name="count"/>.
-        /// </summary>
-        /// <param name="startIndex">The inclusive begin index in this builder.</param>
-        /// <param name="count">The number of characters to replace.</param>
-        /// <param name="newValue">The replacement string.</param>
-        /// <returns>A reference to this instance after the append operation has completed.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="newValue"/> is <see langword="null"/>.</exception>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// <paramref name="startIndex"/> or <paramref name="count"/> is less than zero.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// <paramref name="startIndex"/> is greater than or equal to <see cref="Length"/>.
-        /// </exception>
-        [CodeGenerationReturnsSelf]
-        public void Replace(int startIndex, int count, string newValue)
+        ///// <summary>
+        ///// Replaces the specified substring in this builder with the specified
+        ///// string, <paramref name="newValue"/>. The substring begins at the specified
+        ///// <paramref name="startIndex"/> and ends to the character at
+        ///// <c><paramref name="count"/> - <paramref name="startIndex"/></c> or
+        ///// to the end of the sequence if no such character exists. First the
+        ///// characters in the substring are removed and then the specified
+        ///// <paramref name="newValue"/> is inserted at <paramref name="startIndex"/>.
+        ///// This <see cref="ValueStringBuilder"/> will be lengthened to accommodate the
+        ///// specified <paramref name="newValue"/> if necessary.
+        ///// <para/>
+        ///// IMPORTANT: This method has .NET semantics. That is, the <paramref name="count"/> parameter is a count rather than
+        ///// an exclusive end index. To translate from Java, use <c>end - start</c> for <paramref name="count"/>.
+        ///// </summary>
+        ///// <param name="startIndex">The inclusive begin index in this builder.</param>
+        ///// <param name="count">The number of characters to replace.</param>
+        ///// <param name="newValue">The replacement string.</param>
+        ///// <returns>A reference to this instance after the append operation has completed.</returns>
+        ///// <exception cref="ArgumentNullException"><paramref name="newValue"/> is <see langword="null"/>.</exception>
+        ///// <exception cref="ArgumentOutOfRangeException">
+        ///// <paramref name="startIndex"/> or <paramref name="count"/> is less than zero.
+        ///// <para/>
+        ///// -or-
+        ///// <para/>
+        ///// <paramref name="startIndex"/> is greater than or equal to <see cref="Length"/>.
+        ///// </exception>
+        [CodeGenerationExtensionImplementation]
+        internal void ReplaceInternal(int startIndex, int count, string newValue)
         {
             if (newValue is null)
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.newValue);
@@ -4506,36 +3660,36 @@ namespace J2N.Text
             ReplaceCore(startIndex, count, newValue);
         }
 
-        /// <summary>
-        /// Replaces the specified substring in this builder with the specified
-        /// character span, <paramref name="newValue"/>. The substring begins at the specified
-        /// <paramref name="startIndex"/> and ends to the character at
-        /// <c><paramref name="count"/> - <paramref name="startIndex"/></c> or
-        /// to the end of the sequence if no such character exists. First the
-        /// characters in the substring are removed and then the specified
-        /// <paramref name="newValue"/> is inserted at <paramref name="startIndex"/>.
-        /// This <see cref="ValueStringBuilder"/> will be lengthened to accommodate the
-        /// specified <paramref name="newValue"/> if necessary.
-        /// <para/>
-        /// IMPORTANT: This method has .NET semantics. That is, the <paramref name="count"/> parameter is a count rather than
-        /// an exclusive end index. To translate from Java, use <c>end - start</c> for <paramref name="count"/>.
-        /// </summary>
-        /// <param name="startIndex">The inclusive begin index in this builder.</param>
-        /// <param name="count">The number of characters to replace.</param>
-        /// <param name="newValue">The replacement string.</param>
-        /// <returns>A reference to this instance after the append operation has completed.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// <paramref name="startIndex"/> or <paramref name="count"/> is less than zero.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// <paramref name="startIndex"/> is greater than or equal to <see cref="Length"/>.
-        /// </exception>
-        /// <remarks>
-        /// This method allows <paramref name="newValue"/> to be this instance or a slice of this instance.
-        /// </remarks>
-        [CodeGenerationReturnsSelf]
-        public void Replace(int startIndex, int count, ReadOnlySpan<char> newValue)
+        ///// <summary>
+        ///// Replaces the specified substring in this builder with the specified
+        ///// character span, <paramref name="newValue"/>. The substring begins at the specified
+        ///// <paramref name="startIndex"/> and ends to the character at
+        ///// <c><paramref name="count"/> - <paramref name="startIndex"/></c> or
+        ///// to the end of the sequence if no such character exists. First the
+        ///// characters in the substring are removed and then the specified
+        ///// <paramref name="newValue"/> is inserted at <paramref name="startIndex"/>.
+        ///// This <see cref="ValueStringBuilder"/> will be lengthened to accommodate the
+        ///// specified <paramref name="newValue"/> if necessary.
+        ///// <para/>
+        ///// IMPORTANT: This method has .NET semantics. That is, the <paramref name="count"/> parameter is a count rather than
+        ///// an exclusive end index. To translate from Java, use <c>end - start</c> for <paramref name="count"/>.
+        ///// </summary>
+        ///// <param name="startIndex">The inclusive begin index in this builder.</param>
+        ///// <param name="count">The number of characters to replace.</param>
+        ///// <param name="newValue">The replacement string.</param>
+        ///// <returns>A reference to this instance after the append operation has completed.</returns>
+        ///// <exception cref="ArgumentOutOfRangeException">
+        ///// <paramref name="startIndex"/> or <paramref name="count"/> is less than zero.
+        ///// <para/>
+        ///// -or-
+        ///// <para/>
+        ///// <paramref name="startIndex"/> is greater than or equal to <see cref="Length"/>.
+        ///// </exception>
+        ///// <remarks>
+        ///// This method allows <paramref name="newValue"/> to be this instance or a slice of this instance.
+        ///// </remarks>
+        [CodeGenerationExtensionImplementation]
+        internal void ReplaceInternal(int startIndex, int count, ReadOnlySpan<char> newValue)
         {
             if ((uint)startIndex > (uint)m_Position)
                 ThrowHelper.ThrowStartIndexArgumentOutOfRange_ArgumentOutOfRange_IndexMustBeLessOrEqual(startIndex);
@@ -4545,7 +3699,7 @@ namespace J2N.Text
             ReplaceCore(startIndex, count, newValue);
         }
 
-        private void ReplaceCore(int startIndex, int count, ReadOnlySpan<char> newValue)
+        internal void ReplaceCore(int startIndex, int count, ReadOnlySpan<char> newValue)
         {
             Debug.Assert(startIndex >= 0 && startIndex <= m_Position);
             Debug.Assert(count >= 0);
@@ -4752,40 +3906,40 @@ namespace J2N.Text
 
         #endregion Replace
 
-        /// <summary>
-        /// Appends an array of Unicode characters starting at a specified address to this instance.
-        /// </summary>
-        /// <param name="value">A pointer to an array of characters.</param>
-        /// <param name="valueCount">The number of characters in the array.</param>
-        /// <returns>A reference to this instance after the append operation has completed.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// <paramref name="valueCount"/> is less than zero.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// Enlarging the value of this instance would exceed <see cref="MutableTextBuffer.MaxCapacity"/>.
-        /// </exception>
-        /// <exception cref="NullReferenceException"><paramref name="value"/> is a null pointer.</exception>
-        /// <remarks>
-        /// This method appends <paramref name="valueCount"/> characters starting at address <paramref name="value"/>
-        /// to the current instance.
-        /// <para/>
-        /// The <see cref="MutableTextBuffer.Append(char*, int)"/> method modifies the existing instance of this class; it does
-        /// not return a new class instance. Because of this, you can call a method or property on the existing
-        /// reference and you do not have to assign the return value to a <see cref="MutableTextBuffer"/> object.
-        /// <para/>
-        /// The capacity of this instance is adjusted as needed.
-        /// <para/>
-        /// <b>Notes to Callers</b>
-        /// <para/>
-        /// When you instantiate a <see cref="MutableTextBuffer"/> object by calling <see cref="MutableTextBuffer.Initialize(int, int)"/>,
-        /// both the length and the capacity of the <see cref="MutableTextBuffer"/> instance can grow beyond
-        /// the value of its <see cref="MutableTextBuffer.MaxCapacity"/> property. This can occur particularly when you call the <see cref="MutableTextBuffer.Append(string?)"/>
-        /// and <see cref="MutableTextBuffer.AppendFormat(string, object?)"/> methods to append small strings.
-        /// </remarks>
-        [CLSCompliant(false)]
-        [CodeGenerationReturnsSelf]
-        public unsafe void Append(char* value, int valueCount)
+        ///// <summary>
+        ///// Appends an array of Unicode characters starting at a specified address to this instance.
+        ///// </summary>
+        ///// <param name="value">A pointer to an array of characters.</param>
+        ///// <param name="valueCount">The number of characters in the array.</param>
+        ///// <returns>A reference to this instance after the append operation has completed.</returns>
+        ///// <exception cref="ArgumentOutOfRangeException">
+        ///// <paramref name="valueCount"/> is less than zero.
+        ///// <para/>
+        ///// -or-
+        ///// <para/>
+        ///// Enlarging the value of this instance would exceed <see cref="MutableTextBuffer.MaxCapacity"/>.
+        ///// </exception>
+        ///// <exception cref="NullReferenceException"><paramref name="value"/> is a null pointer.</exception>
+        ///// <remarks>
+        ///// This method appends <paramref name="valueCount"/> characters starting at address <paramref name="value"/>
+        ///// to the current instance.
+        ///// <para/>
+        ///// The <see cref="MutableTextBuffer.Append(char*, int)"/> method modifies the existing instance of this class; it does
+        ///// not return a new class instance. Because of this, you can call a method or property on the existing
+        ///// reference and you do not have to assign the return value to a <see cref="MutableTextBuffer"/> object.
+        ///// <para/>
+        ///// The capacity of this instance is adjusted as needed.
+        ///// <para/>
+        ///// <b>Notes to Callers</b>
+        ///// <para/>
+        ///// When you instantiate a <see cref="MutableTextBuffer"/> object by calling <see cref="MutableTextBuffer.Initialize(int, int)"/>,
+        ///// both the length and the capacity of the <see cref="MutableTextBuffer"/> instance can grow beyond
+        ///// the value of its <see cref="MutableTextBuffer.MaxCapacity"/> property. This can occur particularly when you call the <see cref="MutableTextBuffer.Append(string?)"/>
+        ///// and <see cref="MutableTextBuffer.AppendFormat(string, object?)"/> methods to append small strings.
+        ///// </remarks>
+        //[CLSCompliant(false)]
+        [CodeGenerationExtensionImplementation]
+        internal unsafe void AppendInternal(char* value, int valueCount)
         {
             // We don't check null value as this case will throw null reference exception anyway
             if (valueCount < 0)
@@ -4878,33 +4032,33 @@ namespace J2N.Text
             //AssertInvariants();
         }
 
-        /// <summary>
-        /// Inserts an array of Unicode characters starting at a specified address into this instance.
-        /// </summary>
-        /// <param name="index">The position in this instance where insertion begins.</param>
-        /// <param name="value">A pointer to an array of characters.</param>
-        /// <param name="valueCount">The number of characters in the array.</param>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// <paramref name="index"/> or <paramref name="valueCount"/> is less than zero.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// <paramref name="index"/> is greater than the length of this instance.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// Enlarging the value of this instance would exceed <see cref="MutableTextBuffer.MaxCapacity"/>.
-        /// </exception>
-        /// <exception cref="NullReferenceException"><paramref name="value"/> is a null pointer.</exception>
-        /// <remarks>
-        /// This method inserts <paramref name="valueCount"/> characters starting at address <paramref name="value"/>
-        /// to the current instance.
-        /// <para/>
-        /// Existing characters are shifted to make room for the new text. The capacity is adjusted as needed.
-        /// </remarks>
-        [CLSCompliant(false)]
-        [CodeGenerationReturnsSelf]
-        public unsafe void Insert(int index, char* value, int valueCount)
+        ///// <summary>
+        ///// Inserts an array of Unicode characters starting at a specified address into this instance.
+        ///// </summary>
+        ///// <param name="index">The position in this instance where insertion begins.</param>
+        ///// <param name="value">A pointer to an array of characters.</param>
+        ///// <param name="valueCount">The number of characters in the array.</param>
+        ///// <exception cref="ArgumentOutOfRangeException">
+        ///// <paramref name="index"/> or <paramref name="valueCount"/> is less than zero.
+        ///// <para/>
+        ///// -or-
+        ///// <para/>
+        ///// <paramref name="index"/> is greater than the length of this instance.
+        ///// <para/>
+        ///// -or-
+        ///// <para/>
+        ///// Enlarging the value of this instance would exceed <see cref="MutableTextBuffer.MaxCapacity"/>.
+        ///// </exception>
+        ///// <exception cref="NullReferenceException"><paramref name="value"/> is a null pointer.</exception>
+        ///// <remarks>
+        ///// This method inserts <paramref name="valueCount"/> characters starting at address <paramref name="value"/>
+        ///// to the current instance.
+        ///// <para/>
+        ///// Existing characters are shifted to make room for the new text. The capacity is adjusted as needed.
+        ///// </remarks>
+        ////[CLSCompliant(false)]
+        [CodeGenerationExtensionImplementation]
+        internal unsafe void InsertInternal(int index, char* value, int valueCount)
         {
             // We don't check null value as this case will throw null reference exception anyway
             if ((uint)index > (uint)Length)
@@ -5119,29 +4273,29 @@ namespace J2N.Text
         // For testing
         internal char[] RawArray => m_Chars;
 
-        /// <summary>
-        /// Deletes a sequence of characters specified by <paramref name="startIndex"/> and <paramref name="count"/>.
-        /// Shifts any remaining characters to the left.
-        /// <para/>
-        /// IMPORTANT: This method has .NET semantics. That is, the <paramref name="count"/> parameter is a count rather than
-        /// an exclusive end index. To translate from Java, use <c>end - start</c> for <paramref name="count"/>.
-        /// <para/>
-        /// This method differs from <see cref="Remove(int, int)"/> in that it will automatically
-        /// adjust the <paramref name="count"/> if <c><paramref name="startIndex"/> + <paramref name="count"/> > <see cref="Length"/></c>
-        /// to <c><see cref="Length"/> - <paramref name="startIndex"/>.</c>, provided it is not bounded by <see cref="MutableTextBuffer.MaxCapacity"/>.
-        /// </summary>
-        /// <param name="startIndex">The start index.</param>
-        /// <param name="count">The number of characters to delete.</param>
-        /// <returns>This <see cref="MutableTextBuffer"/>, for chaining.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// <paramref name="startIndex"/> or <paramref name="count"/> is less than zero.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// <paramref name="startIndex"/> is greater than <see cref="MutableTextBuffer.Length"/>.
-        /// </exception>
-        [CodeGenerationReturnsSelf]
-        public void Delete(int startIndex, int count) // Coverage for the JDK
+        ///// <summary>
+        ///// Deletes a sequence of characters specified by <paramref name="startIndex"/> and <paramref name="count"/>.
+        ///// Shifts any remaining characters to the left.
+        ///// <para/>
+        ///// IMPORTANT: This method has .NET semantics. That is, the <paramref name="count"/> parameter is a count rather than
+        ///// an exclusive end index. To translate from Java, use <c>end - start</c> for <paramref name="count"/>.
+        ///// <para/>
+        ///// This method differs from <see cref="Remove(int, int)"/> in that it will automatically
+        ///// adjust the <paramref name="count"/> if <c><paramref name="startIndex"/> + <paramref name="count"/> > <see cref="Length"/></c>
+        ///// to <c><see cref="Length"/> - <paramref name="startIndex"/>.</c>, provided it is not bounded by <see cref="MutableTextBuffer.MaxCapacity"/>.
+        ///// </summary>
+        ///// <param name="startIndex">The start index.</param>
+        ///// <param name="count">The number of characters to delete.</param>
+        ///// <returns>This <see cref="MutableTextBuffer"/>, for chaining.</returns>
+        ///// <exception cref="ArgumentOutOfRangeException">
+        ///// <paramref name="startIndex"/> or <paramref name="count"/> is less than zero.
+        ///// <para/>
+        ///// -or-
+        ///// <para/>
+        ///// <paramref name="startIndex"/> is greater than <see cref="MutableTextBuffer.Length"/>.
+        ///// </exception>
+        [CodeGenerationExtensionImplementation]
+        internal void DeleteInternal(int startIndex, int count) // Coverage for the JDK
         {
             if ((uint)startIndex > (uint)m_Position)
                 ThrowHelper.ThrowArgumentOutOfRange_ArgumentOutOfRange_IndexString(startIndex, ExceptionArgument.startIndex);
@@ -5155,40 +4309,40 @@ namespace J2N.Text
                 RemoveCore(startIndex, count);
         }
 
-        /// <summary>
-        /// Causes this character sequence to be replaced by the reverse of
-        /// the sequence. If there are any surrogate pairs included in the
-        /// sequence, these are treated as single characters for the
-        /// reverse operation. Thus, the order of the high-low surrogates
-        /// is never reversed.
-        /// <para/>
-        /// IMPORTANT: This operation is done in-place. Although a <see cref="MutableTextBuffer"/>
-        /// is returned, it is the SAME instance as the one that is passed in.
-        /// <para/>
-        /// Let <c>n</c> be the character length of this character sequence
-        /// (not the length in <see cref="char"/> values) just prior to
-        /// execution of the <see cref="MutableTextBuffer.Reverse()"/> method. Then the
-        /// character at index <c>k</c> in the new character sequence is
-        /// equal to the character at index <c>n-k-1</c> in the old
-        /// character sequence.
-        /// <para/>
-        /// Note that the reverse operation may result in producing
-        /// surrogate pairs that were unpaired low-surrogates and
-        /// high-surrogates before the operation. For example, reversing
-        /// "&#92;uDC00&#92;uD800" produces "&#92;uD800&#92;uDC00" which is
-        /// a valid surrogate pair.
-        /// <para/>
-        /// Usage Note: This is the same operation as Java's StringBuilder.reverse()
-        /// method. However, J2N also provides <see cref="J2N.Text.StringExtensions.ReverseText(string)"/>
-        /// and <see cref="J2N.MemoryExtensions.ReverseText(Span{char})"/> which
-        /// don't require a <see cref="MutableTextBuffer"/> instance.
-        /// </summary>
-        /// <returns>A reference to this <see cref="MutableTextBuffer"/>, for chaining.</returns>
-        /// <seealso cref="StringExtensions.ReverseText(string)"/>
-        /// <seealso cref="MemoryExtensions.ReverseText(Span{char})"/>
-        /// <seealso cref="StringBuilderExtensions.Reverse(StringBuilder)"/>
-        [CodeGenerationReturnsSelf]
-        public void Reverse() // Coverage for the JDK
+        ///// <summary>
+        ///// Causes this character sequence to be replaced by the reverse of
+        ///// the sequence. If there are any surrogate pairs included in the
+        ///// sequence, these are treated as single characters for the
+        ///// reverse operation. Thus, the order of the high-low surrogates
+        ///// is never reversed.
+        ///// <para/>
+        ///// IMPORTANT: This operation is done in-place. Although a <see cref="MutableTextBuffer"/>
+        ///// is returned, it is the SAME instance as the one that is passed in.
+        ///// <para/>
+        ///// Let <c>n</c> be the character length of this character sequence
+        ///// (not the length in <see cref="char"/> values) just prior to
+        ///// execution of the <see cref="MutableTextBuffer.Reverse()"/> method. Then the
+        ///// character at index <c>k</c> in the new character sequence is
+        ///// equal to the character at index <c>n-k-1</c> in the old
+        ///// character sequence.
+        ///// <para/>
+        ///// Note that the reverse operation may result in producing
+        ///// surrogate pairs that were unpaired low-surrogates and
+        ///// high-surrogates before the operation. For example, reversing
+        ///// "&#92;uDC00&#92;uD800" produces "&#92;uD800&#92;uDC00" which is
+        ///// a valid surrogate pair.
+        ///// <para/>
+        ///// Usage Note: This is the same operation as Java's StringBuilder.reverse()
+        ///// method. However, J2N also provides <see cref="J2N.Text.StringExtensions.ReverseText(string)"/>
+        ///// and <see cref="J2N.MemoryExtensions.ReverseText(Span{char})"/> which
+        ///// don't require a <see cref="MutableTextBuffer"/> instance.
+        ///// </summary>
+        ///// <returns>A reference to this <see cref="MutableTextBuffer"/>, for chaining.</returns>
+        ///// <seealso cref="StringExtensions.ReverseText(string)"/>
+        ///// <seealso cref="MemoryExtensions.ReverseText(Span{char})"/>
+        ///// <seealso cref="StringBuilderExtensions.Reverse(StringBuilder)"/>
+        [CodeGenerationExtensionImplementation]
+        internal void ReverseInternal() // Coverage for the JDK
         {
             m_Chars.AsSpan(0, m_Position).ReverseText();
         }
@@ -5203,7 +4357,7 @@ namespace J2N.Text
         /// You can use the <see cref="TrimExcess()"/> method to minimize a <see cref="MutableTextBuffer"/> object's
         /// memory overhead once it is known that no new characters will be added. To completely clear an
         /// <see cref="MutableTextBuffer"/> object and release all memory referenced by it, call this method
-        /// after calling the <see cref="Clear()"/> method or setting <see cref="Length"/> property to 0.
+        /// after calling the <see cref="MutableTextBufferExtensions.Clear{TBuilder}(TBuilder)"/> method or setting <see cref="Length"/> property to 0.
         /// <para/>
         /// If the capacity is already equal to the current length, this method has no effect.
         /// </remarks>
@@ -5227,7 +4381,7 @@ namespace J2N.Text
         /// <para/>
         /// -or-
         /// <para/>
-        /// <paramref name="length"/> plus the current length of this instance exceeds <see cref="MutableTextBuffer.MaxCapacity"/>.
+        /// <paramref name="length"/> plus the current length of this instance exceeds <see cref="MaxCapacity"/>.
         /// </exception>
         /// <remarks>
         /// This method allows callers to append a block of a specific length to this instance that can be written
@@ -5238,10 +4392,10 @@ namespace J2N.Text
         /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
-        /// When you instantiate a <see cref="MutableTextBuffer"/> object by calling <see cref="MutableTextBuffer.Initialize(int, int)"/>,
+        /// When you instantiate a <see cref="MutableTextBuffer"/> object by calling <see cref="Initialize(int, int)"/>,
         /// both the length and the capacity of the <see cref="MutableTextBuffer"/> instance can grow beyond
-        /// the value of its <see cref="MutableTextBuffer.MaxCapacity"/> property. This can occur particularly when you call the <see cref="MutableTextBuffer.Append(string?)"/>
-        /// and <see cref="MutableTextBuffer.AppendFormat(string, object?)"/> methods to append small strings.
+        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="MutableTextBufferExtensions.Append{TBuilder}(TBuilder, string?)"/>
+        /// and <see cref="MutableTextBufferExtensions.AppendFormat{TBuilder}(TBuilder, string, object?)"/> methods to append small strings.
         /// </remarks>
         /// <synchronizationNote>
         /// The returned span provides direct access to the underlying memory of the <see cref="SynchronizedTextBuilder"/>.
@@ -5278,66 +4432,66 @@ namespace J2N.Text
         }
 
 #if FEATURE_INDEX_RANGE
-        /// <summary>
-        /// Inserts a copy of the specified range from this buffer at the specified index.
-        /// </summary>
-        /// <param name="index">The index at which the copied range will be inserted.</param>
-        /// <param name="range">The range of characters to copy and insert.</param>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// <paramref name="index"/> is less than zero.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// <paramref name="index"/> is greater than <see cref="Length"/>.
-        /// </exception>
-        /// <exception cref="ArgumentException">
-        /// The specified <paramref name="range"/> extends beyond the bounds
-        /// of the buffer.
-        /// </exception>
-        /// <remarks>
-        /// This operation supports overlapping source and destination ranges.
-        /// <para/>
-        /// <paramref name="index"/> refers to the original buffer before insertion takes place.
-        /// </remarks>
-        [CodeGenerationReturnsSelf]
-        public void InsertFromSelf(int index, Range range)
+        ///// <summary>
+        ///// Inserts a copy of the specified range from this buffer at the specified index.
+        ///// </summary>
+        ///// <param name="index">The index at which the copied range will be inserted.</param>
+        ///// <param name="range">The range of characters to copy and insert.</param>
+        ///// <exception cref="ArgumentOutOfRangeException">
+        ///// <paramref name="index"/> is less than zero.
+        ///// <para/>
+        ///// -or-
+        ///// <para/>
+        ///// <paramref name="index"/> is greater than <see cref="Length"/>.
+        ///// </exception>
+        ///// <exception cref="ArgumentException">
+        ///// The specified <paramref name="range"/> extends beyond the bounds
+        ///// of the buffer.
+        ///// </exception>
+        ///// <remarks>
+        ///// This operation supports overlapping source and destination ranges.
+        ///// <para/>
+        ///// <paramref name="index"/> refers to the original buffer before insertion takes place.
+        ///// </remarks>
+        [CodeGenerationExtensionImplementation]
+        internal void InsertFromSelfInternal(int index, Range range)
         {
             var (startIndex, count) = range.GetOffsetAndLength(Length);
-            InsertFromSelf(index, startIndex, count);
+            InsertFromSelfInternal(index, startIndex, count);
         }
 #endif
 
-        /// <summary>
-        /// Inserts a copy of a range of characters from this buffer
-        /// at the specified index, expanding the <see cref="Length"/> by
-        /// <paramref name="count"/>.
-        /// </summary>
-        /// <param name="index">The index at which the copied range will be inserted.</param>
-        /// <param name="startIndex">The starting index of the source range to copy.</param>
-        /// <param name="count">The number of characters to copy.</param>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// <paramref name="index"/>, <paramref name="startIndex"/>, or <paramref name="count"/> is less than zero.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// <paramref name="index"/> or <paramref name="startIndex"/> is greater
-        /// than <see cref="Length"/>.
-        /// </exception>
-        /// <exception cref="ArgumentException">
-        /// <paramref name="startIndex"/> + <paramref name="count"/> is greater
-        /// than <see cref="Length"/>.
-        /// </exception>
-        /// <remarks>
-        /// This operation supports overlapping source and destination ranges.
-        /// <para/>
-        /// <paramref name="index"/> refers to the original buffer before insertion
-        /// takes place.
-        /// </remarks>
+        ///// <summary>
+        ///// Inserts a copy of a range of characters from this buffer
+        ///// at the specified index, expanding the <see cref="Length"/> by
+        ///// <paramref name="count"/>.
+        ///// </summary>
+        ///// <param name="index">The index at which the copied range will be inserted.</param>
+        ///// <param name="startIndex">The starting index of the source range to copy.</param>
+        ///// <param name="count">The number of characters to copy.</param>
+        ///// <exception cref="ArgumentOutOfRangeException">
+        ///// <paramref name="index"/>, <paramref name="startIndex"/>, or <paramref name="count"/> is less than zero.
+        ///// <para/>
+        ///// -or-
+        ///// <para/>
+        ///// <paramref name="index"/> or <paramref name="startIndex"/> is greater
+        ///// than <see cref="Length"/>.
+        ///// </exception>
+        ///// <exception cref="ArgumentException">
+        ///// <paramref name="startIndex"/> + <paramref name="count"/> is greater
+        ///// than <see cref="Length"/>.
+        ///// </exception>
+        ///// <remarks>
+        ///// This operation supports overlapping source and destination ranges.
+        ///// <para/>
+        ///// <paramref name="index"/> refers to the original buffer before insertion
+        ///// takes place.
+        ///// </remarks>
         // J2N: This idea was borrowed from the ReplaceableString in ICU4N. We do a copy operation within the current buffer
         // using low-level operations rather than relying on the high-level Replace and CopyTo() operations to do it.
         // This allows us to optimize ReplaceableString (thus Transliterator) in ICU4N much better.
-        [CodeGenerationReturnsSelf]
-        public void InsertFromSelf(int index, int startIndex, int count)
+        [CodeGenerationExtensionImplementation]
+        internal void InsertFromSelfInternal(int index, int startIndex, int count)
         {
             if (count < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(count, ExceptionArgument.count);

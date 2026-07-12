@@ -37,7 +37,7 @@ namespace J2N.Text
     ///     </description></item>
     /// </list>
     /// </remarks>
-    public sealed partial class SynchronizedTextBuilder : IAppendable, ISpanAppendable, ICharSequence, IBufferWriter<char>,
+    public partial class SynchronizedTextBuilder : ICharSequence, IBufferWriter<char>,
         ICopyable<char>, ISpanCopyable<char>
     {
         private readonly object syncRoot = new();
@@ -178,8 +178,8 @@ namespace J2N.Text
         /// <para/>
         /// When you instantiate an <see cref="SynchronizedTextBuilder"/> object by calling the <see cref="SynchronizedTextBuilder(int, int)"/>
         /// constructor, both the length and the capacity of the <see cref="SynchronizedTextBuilder"/> instance can grow beyond
-        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
-        /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
+        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="SynchronizedTextBuilderExtensions.Append(SynchronizedTextBuilder, string)"/>
+        /// and <see cref="SynchronizedTextBuilderExtensions.AppendFormat(SynchronizedTextBuilder, string, object)"/> methods to append small strings.
         /// </remarks>
         /// <seealso cref="Capacity"/>
         /// <seealso cref="MaxCapacity"/>
@@ -327,32 +327,72 @@ namespace J2N.Text
             init => buffer.useInvariantDefaults = value;
         }
 
-        #region ISpanAppendable Members
+        //#region ISpanAppendable Members
 
-        ISpanAppendable ISpanAppendable.Append(ReadOnlySpan<char> value) => Append(value);
+        //ISpanAppendable ISpanAppendable.Append(ReadOnlySpan<char> value)
+        //{
+        //    buffer.AppendInternal(value);
+        //    return this;
+        //}
 
-        #endregion ISpanAppendable Members
+        //#endregion ISpanAppendable Members
 
-        #region IAppendable Members
-        IAppendable IAppendable.Append(char value) => Append(value);
+        //#region IAppendable Members
+        //IAppendable IAppendable.Append(char value)
+        //{
+        //    buffer.AppendInternal(value);
+        //    return this;
+        //}
 
-        IAppendable IAppendable.Append(string? value) => Append(value);
+        //IAppendable IAppendable.Append(string? value)
+        //{
+        //    buffer.AppendInternal(value);
+        //    return this;
+        //}
 
-        IAppendable IAppendable.Append(string? value, int startIndex, int count) => Append(value, startIndex, count);
+        //IAppendable IAppendable.Append(string? value, int startIndex, int count)
+        //{
+        //    buffer.AppendInternal(value, startIndex, count);
+        //    return this;
+        //}
 
-        IAppendable IAppendable.Append(StringBuilder? value) => Append(value);
+        //IAppendable IAppendable.Append(StringBuilder? value)
+        //{
+        //    buffer.AppendInternal(value);
+        //    return this;
+        //}
 
-        IAppendable IAppendable.Append(StringBuilder? value, int startIndex, int count) => Append(value, startIndex, count);
+        //IAppendable IAppendable.Append(StringBuilder? value, int startIndex, int count)
+        //{
+        //    buffer.AppendInternal(value, startIndex, count);
+        //    return this;
+        //}
 
-        IAppendable IAppendable.Append(char[]? value) => Append(value);
+        //IAppendable IAppendable.Append(char[]? value)
+        //{
+        //    buffer.AppendInternal(value);
+        //    return this;
+        //}
 
-        IAppendable IAppendable.Append(char[]? value, int startIndex, int count) => Append(value, startIndex, count);
+        //IAppendable IAppendable.Append(char[]? value, int startIndex, int count)
+        //{
+        //    buffer.AppendInternal(value, startIndex, count);
+        //    return this;
+        //}
 
-        IAppendable IAppendable.Append(ICharSequence? value) => Append(value);
+        //IAppendable IAppendable.Append(ICharSequence? value)
+        //{
+        //    buffer.AppendInternal(value);
+        //    return this;
+        //}
 
-        IAppendable IAppendable.Append(ICharSequence? value, int startIndex, int count) => Append(value, startIndex, count);
+        //IAppendable IAppendable.Append(ICharSequence? value, int startIndex, int count)
+        //{
+        //    buffer.AppendInternal(value, startIndex, count);
+        //    return this;
+        //}
 
-        #endregion IAppendable Members
+        //#endregion IAppendable Members
 
         #region ICharSequence Members
 

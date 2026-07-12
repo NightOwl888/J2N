@@ -25,34 +25,34 @@ namespace J2N.Text
 {
     public partial class MutableTextBuffer
     {
-        /// <summary>
-        /// Appends the upper case string representation of a specified string
-        /// to this instance using the casing rules from the specified culture.
-        /// </summary>
-        /// <param name="value">The string to append.</param>
-        /// <param name="culture">An object that supplies culture-specific casing rules.</param>
-        /// <remarks>
-        /// The capacity of this instance is adjusted as needed.
-        /// <para/>
-        /// If <paramref name="culture"/> is <see langword="null"/>, <see cref="CultureInfo.CurrentCulture"/> will be used.
-        /// </remarks>
-        [CodeGenerationReturnsSelf]
-        public void AppendUpper(string? value, CultureInfo? culture)
-            => AppendUpper(value.AsSpan(), culture);
+        ///// <summary>
+        ///// Appends the upper case string representation of a specified string
+        ///// to this instance using the casing rules from the specified culture.
+        ///// </summary>
+        ///// <param name="value">The string to append.</param>
+        ///// <param name="culture">An object that supplies culture-specific casing rules.</param>
+        ///// <remarks>
+        ///// The capacity of this instance is adjusted as needed.
+        ///// <para/>
+        ///// If <paramref name="culture"/> is <see langword="null"/>, <see cref="CultureInfo.CurrentCulture"/> will be used.
+        ///// </remarks>
+        [CodeGenerationExtensionImplementation]
+        internal void AppendUpperInternal(string? value, CultureInfo? culture)
+            => AppendUpperInternal(value.AsSpan(), culture);
 
-        /// <summary>
-        /// Appends the upper case string representation of a specified read-only character
-        /// span to this instance using the casing rules from the specified culture.
-        /// </summary>
-        /// <param name="value">The read-only character span to append.</param>
-        /// <param name="culture">An object that supplies culture-specific casing rules.</param>
-        /// <remarks>
-        /// The capacity of this instance is adjusted as needed.
-        /// <para/>
-        /// If <paramref name="culture"/> is <see langword="null"/>, <see cref="CultureInfo.CurrentCulture"/> will be used.
-        /// </remarks>
-        [CodeGenerationReturnsSelf]
-        public void AppendUpper(ReadOnlySpan<char> value, CultureInfo? culture)
+        ///// <summary>
+        ///// Appends the upper case string representation of a specified read-only character
+        ///// span to this instance using the casing rules from the specified culture.
+        ///// </summary>
+        ///// <param name="value">The read-only character span to append.</param>
+        ///// <param name="culture">An object that supplies culture-specific casing rules.</param>
+        ///// <remarks>
+        ///// The capacity of this instance is adjusted as needed.
+        ///// <para/>
+        ///// If <paramref name="culture"/> is <see langword="null"/>, <see cref="CultureInfo.CurrentCulture"/> will be used.
+        ///// </remarks>
+        [CodeGenerationExtensionImplementation]
+        internal void AppendUpperInternal(ReadOnlySpan<char> value, CultureInfo? culture)
         {
             culture ??= CultureInfo.CurrentCulture;
 
@@ -75,30 +75,30 @@ namespace J2N.Text
             m_Position += length;
         }
 
-        /// <summary>
-        /// Appends the lower case string representation of a specified string
-        /// to this instance using the casing rules from the specified culture.
-        /// </summary>
-        /// <param name="value">The string to append.</param>
-        /// <param name="culture">An object that supplies culture-specific casing rules.</param>
-        /// <remarks>
-        /// The capacity of this instance is adjusted as needed.
-        /// <para/>
-        /// If <paramref name="culture"/> is <see langword="null"/>, <see cref="CultureInfo.CurrentCulture"/> will be used.
-        /// </remarks>
-        [CodeGenerationReturnsSelf]
-        public void AppendLower(string? value, CultureInfo? culture)
-            => AppendLower(value.AsSpan(), culture);
+        ///// <summary>
+        ///// Appends the lower case string representation of a specified string
+        ///// to this instance using the casing rules from the specified culture.
+        ///// </summary>
+        ///// <param name="value">The string to append.</param>
+        ///// <param name="culture">An object that supplies culture-specific casing rules.</param>
+        ///// <remarks>
+        ///// The capacity of this instance is adjusted as needed.
+        ///// <para/>
+        ///// If <paramref name="culture"/> is <see langword="null"/>, <see cref="CultureInfo.CurrentCulture"/> will be used.
+        ///// </remarks>
+        [CodeGenerationExtensionImplementation]
+        internal void AppendLowerInternal(string? value, CultureInfo? culture)
+            => AppendLowerInternal(value.AsSpan(), culture);
 
-        /// <summary>
-        /// Appends the lower case string representation of a specified read-only character
-        /// span to this instance using the casing rules from the specified culture.
-        /// </summary>
-        /// <param name="value">The read-only character span to append.</param>
-        /// <param name="culture">An object that supplies culture-specific casing rules.</param>
-        /// <remarks>The capacity of this instance is adjusted as needed.</remarks>
-        [CodeGenerationReturnsSelf]
-        public void AppendLower(ReadOnlySpan<char> value, CultureInfo? culture)
+        ///// <summary>
+        ///// Appends the lower case string representation of a specified read-only character
+        ///// span to this instance using the casing rules from the specified culture.
+        ///// </summary>
+        ///// <param name="value">The read-only character span to append.</param>
+        ///// <param name="culture">An object that supplies culture-specific casing rules.</param>
+        ///// <remarks>The capacity of this instance is adjusted as needed.</remarks>
+        [CodeGenerationExtensionImplementation]
+        internal void AppendLowerInternal(ReadOnlySpan<char> value, CultureInfo? culture)
         {
             culture ??= CultureInfo.CurrentCulture;
 
@@ -121,24 +121,24 @@ namespace J2N.Text
             m_Position += length;
         }
 
-        /// <summary>
-        /// Appends the upper case string representation of a specified string
-        /// to this instance using the casing rules from the invariant culture.
-        /// </summary>
-        /// <param name="value">The string to append.</param>
-        /// <remarks>The capacity of this instance is adjusted as needed.</remarks>
-        [CodeGenerationReturnsSelf]
-        public void AppendUpperInvariant(string? value)
-            => AppendUpperInvariant(value.AsSpan());
+        ///// <summary>
+        ///// Appends the upper case string representation of a specified string
+        ///// to this instance using the casing rules from the invariant culture.
+        ///// </summary>
+        ///// <param name="value">The string to append.</param>
+        ///// <remarks>The capacity of this instance is adjusted as needed.</remarks>
+        [CodeGenerationExtensionImplementation]
+        internal void AppendUpperInvariantInternal(string? value)
+            => AppendUpperInvariantInternal(value.AsSpan());
 
-        /// <summary>
-        /// Appends the upper case string representation of a specified read-only character
-        /// span to this instance using the casing rules from the invariant culture.
-        /// </summary>
-        /// <param name="value">The read-only character span to append.</param>
-        /// <remarks>The capacity of this instance is adjusted as needed.</remarks>
-        [CodeGenerationReturnsSelf]
-        public void AppendUpperInvariant(ReadOnlySpan<char> value)
+        ///// <summary>
+        ///// Appends the upper case string representation of a specified read-only character
+        ///// span to this instance using the casing rules from the invariant culture.
+        ///// </summary>
+        ///// <param name="value">The read-only character span to append.</param>
+        ///// <remarks>The capacity of this instance is adjusted as needed.</remarks>
+        [CodeGenerationExtensionImplementation]
+        internal void AppendUpperInvariantInternal(ReadOnlySpan<char> value)
         {
             int valueLength = value.Length;
             if (valueLength == 0)
@@ -155,24 +155,24 @@ namespace J2N.Text
             m_Position += length;
         }
 
-        /// <summary>
-        /// Appends the lower case string representation of a specified string
-        /// to this instance using the casing rules from the invariant culture.
-        /// </summary>
-        /// <param name="value">The string to append.</param>
-        /// <remarks>The capacity of this instance is adjusted as needed.</remarks>
-        [CodeGenerationReturnsSelf]
-        public void AppendLowerInvariant(string? value)
-            => AppendLowerInvariant(value.AsSpan());
+        ///// <summary>
+        ///// Appends the lower case string representation of a specified string
+        ///// to this instance using the casing rules from the invariant culture.
+        ///// </summary>
+        ///// <param name="value">The string to append.</param>
+        ///// <remarks>The capacity of this instance is adjusted as needed.</remarks>
+        [CodeGenerationExtensionImplementation]
+        internal void AppendLowerInvariantInternal(string? value)
+            => AppendLowerInvariantInternal(value.AsSpan());
 
-        /// <summary>
-        /// Appends the lower case string representation of a specified read-only character
-        /// span to this instance using the casing rules from the invariant culture.
-        /// </summary>
-        /// <param name="value">The read-only character span to append.</param>
-        /// <remarks>The capacity of this instance is adjusted as needed.</remarks>
-        [CodeGenerationReturnsSelf]
-        public void AppendLowerInvariant(ReadOnlySpan<char> value)
+        ///// <summary>
+        ///// Appends the lower case string representation of a specified read-only character
+        ///// span to this instance using the casing rules from the invariant culture.
+        ///// </summary>
+        ///// <param name="value">The read-only character span to append.</param>
+        ///// <remarks>The capacity of this instance is adjusted as needed.</remarks>
+        [CodeGenerationExtensionImplementation]
+        internal void AppendLowerInvariantInternal(ReadOnlySpan<char> value)
         {
             int valueLength = value.Length;
             if (valueLength == 0)
