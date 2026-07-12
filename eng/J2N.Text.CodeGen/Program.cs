@@ -165,7 +165,7 @@ namespace J2N.Text.CodeGen
                 FacadeName = "SynchronizedTextBuilder",
                 IsSynchronized = true,
                 EmitSynchronizationNotes = true,
-                IsSealed = true,
+                IsSealed = false,
             };
 
             GenerateFacade(
