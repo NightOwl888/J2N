@@ -193,17 +193,10 @@ namespace J2N.Text.CodeGen.Projection
             TypeModel source,
             string sourceType,
             string facadeType,
-            DocumentationRewriteOptions options)
+            Func<string, string> rewriteCref)
         {
             if (string.IsNullOrWhiteSpace(xml))
                 return xml;
-
-            Func<string, string> rewriteCrefDefault = (cref) => RewriteCrefTarget(
-                cref,
-                source,
-                facadeType);
-
-            Func<string, string> rewriteCref = options.RewriteCref ?? rewriteCrefDefault;
 
             string result =
                 Regex.Replace(
@@ -302,6 +295,13 @@ namespace J2N.Text.CodeGen.Projection
             string projectedType,
             DocumentationRewriteOptions options)
         {
+            Func<string, string> rewriteCrefDefault = (cref) => RewriteCrefTarget(
+                cref,
+                source,
+                projectedType);
+
+            Func<string, string> rewriteCref = options.RewriteCref ?? rewriteCrefDefault;
+
             XmlDocumentationElementModel rewritten =
                 new()
                 {
@@ -312,20 +312,22 @@ namespace J2N.Text.CodeGen.Projection
                             source,
                             sourceType,
                             projectedType,
-                            options)
+                            rewriteCref)
                 };
 
             foreach ((string key, string value) in element.Attributes)
             {
+                if (key == "cref")
+                {
+                    rewritten.Attributes.Add(
+                        key,
+                        rewriteCref(value));
+
+                    continue;
+                }
+
                 rewritten.Attributes.Add(
-                    key,
-                    RewriteDocumentation(
-                        value,
-                        source,
-                        sourceType,
-                        projectedType,
-                        options)
-                    ?? value);
+                    key, value);
             }
 
             return rewritten;
