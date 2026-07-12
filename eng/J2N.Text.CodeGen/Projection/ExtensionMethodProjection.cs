@@ -25,6 +25,7 @@ namespace J2N.Text.CodeGen.Projection
             Dictionary<string, string> implementationLookup =
                 implementationModel.Methods
                     .Where(m => m.IsExtensionImplementation)
+                    .DistinctBy(m => m.Name)
                     .ToDictionary(
                         m => RemoveSuffix(m.Name, "Internal"),
                         m => m.Name);
