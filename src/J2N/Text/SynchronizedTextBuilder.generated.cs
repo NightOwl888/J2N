@@ -12,8 +12,8 @@
 #nullable enable
 
 using J2N.CodeGeneration;
-using System;
 using J2N.Numerics;
+using System;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
