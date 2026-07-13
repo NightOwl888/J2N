@@ -2160,10 +2160,7 @@ namespace J2N.Text
             }
         }
 
-        /// <summary>
-        /// Inserts the string representation of a specified string
-        /// into this instance at the specified character position.
-        /// </summary>
+        /// <summary>Inserts the specified substring into this instance at the specified character position.</summary>
         /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
         /// <param name="text">The target builder.</param>
         /// <param name="index">The position in this instance where insertion begins.</param>
@@ -3630,7 +3627,7 @@ namespace J2N.Text
         }
 
 #if FEATURE_INDEX_RANGE
-        /// <summary>Inserts a copy of the specified range from this buffer at the specified index.</summary>
+        /// <summary>Inserts a copy of the specified range of characters from this buffer at the specified index.</summary>
         /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
         /// <param name="text">The target builder.</param>
         /// <param name="index">The index at which the copied range will be inserted.</param>
