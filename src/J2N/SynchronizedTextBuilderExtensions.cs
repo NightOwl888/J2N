@@ -49,11 +49,12 @@ namespace J2N
         /// <para/>
         /// When you instantiate a <see cref="SynchronizedTextBuilder"/> object by calling <see cref="SynchronizedTextBuilder(int, int)"/>,
         /// both the length and the capacity of the <see cref="SynchronizedTextBuilder"/> instance can grow beyond
-        /// the value of its <see cref="SynchronizedTextBuilder.MaxCapacity"/> property. This can occur particularly when you call the <see cref="J2N.Text.SynchronizedTextBuilderExtensions.Append(SynchronizedTextBuilder, string)"/>
-        /// and <see cref="J2N.Text.SynchronizedTextBuilderExtensions.AppendFormat(SynchronizedTextBuilder, string, object?)"/> methods to append small strings.
+        /// the value of its <see cref="SynchronizedTextBuilder.MaxCapacity"/> property. This can occur particularly when you call the <see cref="J2N.Text.SynchronizedTextBuilderExtensions.Append{TBuilder}(TBuilder, string)"/>
+        /// and <see cref="J2N.Text.SynchronizedTextBuilderExtensions.AppendFormat{TBuilder}(TBuilder, string, object?)"/> methods to append small strings.
         /// </remarks>
         /// <seealso cref="object" />
-        public static SynchronizedTextBuilder Append(this SynchronizedTextBuilder text, object? value, string? format = null, IFormatProvider? provider = null)
+        public static TBuilder Append<TBuilder>(this TBuilder text, object? value, string? format = null, IFormatProvider? provider = null)
+            where TBuilder : SynchronizedTextBuilder
         {
             if (text is null)
                 throw new ArgumentNullException(nameof(text));
@@ -84,7 +85,8 @@ namespace J2N
         /// If <paramref name="value"/> is <see langword="null"/>, the <see cref="SynchronizedTextBuilder"/> is not changed.
         /// </remarks>
         /// <seealso cref="object" />
-        public static SynchronizedTextBuilder Insert(this SynchronizedTextBuilder text, int index, object? value, string? format = null, IFormatProvider? provider = null)
+        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, object? value, string? format = null, IFormatProvider? provider = null)
+            where TBuilder : SynchronizedTextBuilder
         {
             if (text is null)
                 throw new ArgumentNullException(nameof(text));
