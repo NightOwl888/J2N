@@ -1,8 +1,24 @@
-﻿using J2N.Buffers;
+﻿#region Copyright 2019-2026 by Shad Storhaug, Licensed under the Apache License, Version 2.0
+/*  Licensed to the Apache Software Foundation (ASF) under one or more
+ *  contributor license agreements.  See the NOTICE file distributed with
+ *  this work for additional information regarding copyright ownership.
+ *  The ASF licenses this file to You under the Apache License, Version 2.0
+ *  (the "License"); you may not use this file except in compliance with
+ *  the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+#endregion
+
+using J2N.Buffers;
 using System;
 using System.Buffers;
-using System.ComponentModel;
-using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Text;
 
@@ -25,13 +41,13 @@ namespace J2N.Text
     ///         block of <see cref="char"/>s.
     ///     </description></item>
     ///     <item><description>
-    ///         Memory is directly accessible using <see cref="PooledTextBuilderExtensions.AsSpan(PooledTextBuilder?)"/> and
-    ///         <see cref="PooledTextBuilderExtensions.AsMemory(PooledTextBuilder?)"/> overloads including the ability to slice.
+    ///         Memory is directly accessible using <see cref="TextBuilderExtensions.AsSpan(TextBuilder?)"/> and
+    ///         <see cref="TextBuilderExtensions.AsMemory(TextBuilder?)"/> overloads including the ability to slice.
     ///         So, there is no need to allocate memory to call methods that require System.Memory types, such as
     ///         <see cref="ReadOnlySpan{T}"/>. So, no allocation is necessary to read the results.
     ///     </description></item>
     ///     <item><description>
-    ///         Indexing through <see cref="this[int]"/> is significantly faster than with <see cref="StringBuilder"/>.
+    ///         Indexing through <see cref="TextBuilder.this[int]"/> is significantly faster than with <see cref="StringBuilder"/>.
     ///     </description></item>
     ///     <item><description>
     ///         Rather than optimizing for operations that require moving or copying characters,
@@ -39,11 +55,9 @@ namespace J2N.Text
     ///     </description></item>
     /// </list>
     /// </remarks>
-    public sealed partial class PooledTextBuilder : ICharSequence, IBufferWriter<char>,
+    public sealed partial class PooledTextBuilder : TextBuilder, ICharSequence, IBufferWriter<char>,
         ISpannable<char>, ICopyable<char>, ISpanCopyable<char>, IDisposable
     {
-        internal readonly MutableTextBuffer buffer;
-
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static MutableTextBuffer CreateBuffer() => new(PooledArrayAllocator<char>.Uncleared)
         {
@@ -60,8 +74,8 @@ namespace J2N.Text
         /// the implementation-specific default capacity.
         /// </remarks>
         public PooledTextBuilder()
+            : base(CreateBuffer().Initialize())
         {
-            buffer = CreateBuffer().Initialize();
         }
 
         /// <summary>
@@ -72,16 +86,16 @@ namespace J2N.Text
         /// <paramref name="capacity"/> is less than zero or greater than the platform-specific maximum array capacity.
         /// </exception>
         /// <remarks>The <paramref name="capacity"/> parameter defines the maximum number of characters that can be stored
-        /// in the memory allocated by the current instance. Its value is assigned to the <see cref="Capacity"/> property.
+        /// in the memory allocated by the current instance. Its value is assigned to the <see cref="TextBuilder.Capacity"/> property.
         /// If the number of characters to be stored in the current instance exceeds this <paramref name="capacity"/> value,
         /// the <see cref="PooledTextBuilder"/> object allocates additional memory to store them.
         /// <para/>
         /// The string value of this instance is set to <see cref="string.Empty"/>. If capacity is zero, the
         /// implementation-specific default capacity is used.</remarks>
-        /// <seealso cref="Capacity"/>
+        /// <seealso cref="TextBuilder.Capacity"/>
         public PooledTextBuilder(int capacity)
+            : base(CreateBuffer().Initialize(capacity))
         {
-            buffer = CreateBuffer().Initialize(capacity);
         }
 
         /// <summary>
@@ -93,8 +107,8 @@ namespace J2N.Text
         /// <remarks>If <paramref name="value"/> is <c>null</c>, the new <see cref="PooledTextBuilder"/> will
         /// contain the empty string (that is, it contains <see cref="string.Empty"/>).</remarks>
         public PooledTextBuilder(string? value)
+            : base(CreateBuffer().Initialize(value))
         {
-            buffer = CreateBuffer().Initialize(value);
         }
 
         /// <summary>
@@ -109,16 +123,16 @@ namespace J2N.Text
         /// <paramref name="capacity"/> is less than zero or greater than the platform-specific maximum array capacity.
         /// </exception>
         /// <remarks>The <paramref name="capacity"/> parameter defines the maximum number of characters that can be
-        /// stored in the memory allocated by the current instance. Its value is assigned to the <see cref="Capacity"/>
+        /// stored in the memory allocated by the current instance. Its value is assigned to the <see cref="TextBuilder.Capacity"/>
         /// property. If the number of characters to be stored in the current instance exceeds this <paramref name="capacity"/>
         /// value, the <see cref="PooledTextBuilder"/> object allocates additional memory to store them.
         /// <para/>
         /// If <paramref name="capacity"/> is zero, the implementation-specific default capacity is used.
         /// </remarks>
-        /// <seealso cref="Capacity"/>
+        /// <seealso cref="TextBuilder.Capacity"/>
         public PooledTextBuilder(string? value, int capacity)
+            : base(CreateBuffer().Initialize(value, capacity))
         {
-            buffer = CreateBuffer().Initialize(value, capacity);
         }
 
         /// <summary>
@@ -140,16 +154,16 @@ namespace J2N.Text
         /// </exception>
         /// <remarks>
         /// The <paramref name="capacity"/> parameter defines the maximum number of characters that can be
-        /// stored in the memory allocated by the current instance. Its value is assigned to the <see cref="Capacity"/>
+        /// stored in the memory allocated by the current instance. Its value is assigned to the <see cref="TextBuilder.Capacity"/>
         /// property. If the number of characters to be stored in the current instance exceeds this <paramref name="capacity"/>
         /// value, the <see cref="PooledTextBuilder"/> object allocates additional memory to store them.
         /// <para/>
         /// If <paramref name="capacity"/> is zero, the implementation-specific default capacity is used.
         /// </remarks>
-        /// <seealso cref="Capacity"/>
+        /// <seealso cref="TextBuilder.Capacity"/>
         public PooledTextBuilder(string? value, int startIndex, int length, int capacity)
+            : base(CreateBuffer().Initialize(value, startIndex, length, capacity))
         {
-            buffer = CreateBuffer().Initialize(value, startIndex, length, capacity);
         }
 
         /// <summary>
@@ -164,14 +178,14 @@ namespace J2N.Text
         /// </exception>
         /// <remarks>
         /// The <paramref name="capacity"/> parameter defines the maximum number of characters that can be stored
-        /// in the memory allocated by the current instance. Its value is assigned to the <see cref="Capacity"/> property.
+        /// in the memory allocated by the current instance. Its value is assigned to the <see cref="TextBuilder.Capacity"/> property.
         /// If the number of characters to be stored in the current instance exceeds this <paramref name="capacity"/> value,
         /// the <see cref="PooledTextBuilder"/> object allocates additional memory to store them.
         /// <para/>
         /// If <paramref name="capacity"/> is zero, the implementation-specific default capacity is used.
         /// <para/>
         /// The <paramref name="maxCapacity"/> property defines the maximum number of characters that the current
-        /// instance can hold. Its value is assigned to the <see cref="MaxCapacity"/> property. If the number of
+        /// instance can hold. Its value is assigned to the <see cref="TextBuilder.MaxCapacity"/> property. If the number of
         /// characters to be stored in the current instance exceeds this <paramref name="maxCapacity"/> value,
         /// the <see cref="PooledTextBuilder"/> object does not allocate additional memory, but instead throws an exception.
         /// <para/>
@@ -179,14 +193,14 @@ namespace J2N.Text
         /// <para/>
         /// When you instantiate an <see cref="PooledTextBuilder"/> object by calling the <see cref="PooledTextBuilder(int, int)"/>
         /// constructor, both the length and the capacity of the <see cref="PooledTextBuilder"/> instance can grow beyond
-        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="TextBuilderExtensions.Append{TBuilder}(TBuilder, string)"/>
+        /// the value of its <see cref="TextBuilder.MaxCapacity"/> property. This can occur particularly when you call the <see cref="TextBuilderExtensions.Append{TBuilder}(TBuilder, string)"/>
         /// and <see cref="TextBuilderExtensions.AppendFormat{TBuilder}(TBuilder, string, object)"/> methods to append small strings.
         /// </remarks>
-        /// <seealso cref="Capacity"/>
-        /// <seealso cref="MaxCapacity"/>
+        /// <seealso cref="TextBuilder.Capacity"/>
+        /// <seealso cref="TextBuilder.MaxCapacity"/>
         public PooledTextBuilder(int capacity, int maxCapacity)
+            : base(CreateBuffer().Initialize(capacity, maxCapacity))
         {
-            buffer = CreateBuffer().Initialize(capacity, maxCapacity);
         }
 
         #endregion BCL Constructors
@@ -201,8 +215,8 @@ namespace J2N.Text
         /// platform-specific maximum array capacity.</exception>
         /// <remarks>The characters from the span are copied to the heap memory of this instance.</remarks>
         public PooledTextBuilder(ReadOnlySpan<char> value)
+            : base(CreateBuffer().Initialize(value))
         {
-            buffer = CreateBuffer().Initialize(value);
         }
 
         /// <summary>
@@ -218,16 +232,16 @@ namespace J2N.Text
         /// The length of <paramref name="value"/> is greater than the platform-specific maximum array capacity.
         /// </exception>
         /// <remarks>The <paramref name="capacity"/> parameter defines the maximum number of characters that can be
-        /// stored in the memory allocated by the current instance. Its value is assigned to the <see cref="Capacity"/>
+        /// stored in the memory allocated by the current instance. Its value is assigned to the <see cref="TextBuilder.Capacity"/>
         /// property. If the number of characters to be stored in the current instance exceeds this <paramref name="capacity"/>
         /// value, the <see cref="PooledTextBuilder"/> object allocates additional memory to store them.
         /// <para/>
         /// If <paramref name="capacity"/> is zero, the implementation-specific default capacity is used.
         /// </remarks>
-        /// <seealso cref="Capacity"/>
+        /// <seealso cref="TextBuilder.Capacity"/>
         public PooledTextBuilder(ReadOnlySpan<char> value, int capacity)
+            : base(CreateBuffer().Initialize(value, capacity))
         {
-            buffer = CreateBuffer().Initialize(value, capacity);
         }
 
         /// <summary>
@@ -241,8 +255,8 @@ namespace J2N.Text
         /// contain the empty string (that is, it contains <see cref="string.Empty"/>).
         /// </remarks>
         public PooledTextBuilder(StringBuilder? value)
+            : base(CreateBuffer().Initialize(value))
         {
-            buffer = CreateBuffer().Initialize(value);
         }
 
         /// <summary>
@@ -257,16 +271,16 @@ namespace J2N.Text
         /// <paramref name="capacity"/> is less than zero or greater than the platform-specific maximum array capacity.
         /// </exception>
         /// <remarks>The <paramref name="capacity"/> parameter defines the maximum number of characters that can be
-        /// stored in the memory allocated by the current instance. Its value is assigned to the <see cref="Capacity"/>
+        /// stored in the memory allocated by the current instance. Its value is assigned to the <see cref="TextBuilder.Capacity"/>
         /// property. If the number of characters to be stored in the current instance exceeds this <paramref name="capacity"/>
         /// value, the <see cref="PooledTextBuilder"/> object allocates additional memory to store them.
         /// <para/>
         /// If <paramref name="capacity"/> is zero, the implementation-specific default capacity is used.
         /// </remarks>
-        /// <seealso cref="Capacity"/>
+        /// <seealso cref="TextBuilder.Capacity"/>
         public PooledTextBuilder(StringBuilder? value, int capacity)
+            : base(CreateBuffer().Initialize(value, capacity))
         {
-            buffer = CreateBuffer().Initialize(value, capacity);
         }
 
         /// <summary>
@@ -288,16 +302,16 @@ namespace J2N.Text
         /// </exception>
         /// <remarks>
         /// The <paramref name="capacity"/> parameter defines the maximum number of characters that can be
-        /// stored in the memory allocated by the current instance. Its value is assigned to the <see cref="Capacity"/>
+        /// stored in the memory allocated by the current instance. Its value is assigned to the <see cref="TextBuilder.Capacity"/>
         /// property. If the number of characters to be stored in the current instance exceeds this <paramref name="capacity"/>
         /// value, the <see cref="PooledTextBuilder"/> object allocates additional memory to store them.
         /// <para/>
         /// If <paramref name="capacity"/> is zero, the implementation-specific default capacity is used.
         /// </remarks>
-        /// <seealso cref="Capacity"/>
+        /// <seealso cref="TextBuilder.Capacity"/>
         public PooledTextBuilder(StringBuilder? value, int startIndex, int length, int capacity)
+            : base(CreateBuffer().Initialize(value, startIndex, length, capacity))
         {
-            buffer = CreateBuffer().Initialize(value, startIndex, length, capacity);
         }
 
         /// <summary>
@@ -309,199 +323,15 @@ namespace J2N.Text
         /// <remarks>If <paramref name="value"/> is <c>null</c>, the new <see cref="PooledTextBuilder"/> will
         /// contain the empty string (that is, it contains <see cref="string.Empty"/>).</remarks>
         public PooledTextBuilder(ICharSequence? value) // Coverage for the JDK // J2N TODO: Add overloads to slice the ICharsequence and set capacity?
+            : base(CreateBuffer().Initialize(value))
         {
-            buffer = CreateBuffer().Initialize(value);
         }
 
         #endregion J2N Constructors
-
-
-        /// <summary>
-        /// 
-        /// Gets or sets a flag indicating to use invariant default settings when not otherwise specified by the user.
-        /// This setting affects culture-aware features such as formatting and comparing.
-        /// 
-        /// </summary>
-        public bool UseInvariantDefaults
-        {
-            get => buffer.UseInvariantDefaults;
-            init => buffer.useInvariantDefaults = value;
-        }
-
-        //#region ISpanAppendable Members
-
-        //ISpanAppendable ISpanAppendable.Append(ReadOnlySpan<char> value)
-        //{
-        //    buffer.AppendInternal(value);
-        //    return this;
-        //}
-
-        //#endregion ISpanAppendable Members
-
-        //#region IAppendable Members
-        //IAppendable IAppendable.Append(char value)
-        //{
-        //    buffer.AppendInternal(value);
-        //    return this;
-        //}
-
-        //IAppendable IAppendable.Append(string? value)
-        //{
-        //    buffer.AppendInternal(value);
-        //    return this;
-        //}
-
-        //IAppendable IAppendable.Append(string? value, int startIndex, int count)
-        //{
-        //    buffer.AppendInternal(value, startIndex, count);
-        //    return this;
-        //}
-
-        //IAppendable IAppendable.Append(StringBuilder? value)
-        //{
-        //    buffer.AppendInternal(value);
-        //    return this;
-        //}
-
-        //IAppendable IAppendable.Append(StringBuilder? value, int startIndex, int count)
-        //{
-        //    buffer.AppendInternal(value, startIndex, count);
-        //    return this;
-        //}
-
-        //IAppendable IAppendable.Append(char[]? value)
-        //{
-        //    buffer.AppendInternal(value);
-        //    return this;
-        //}
-
-        //IAppendable IAppendable.Append(char[]? value, int startIndex, int count)
-        //{
-        //    buffer.AppendInternal(value, startIndex, count);
-        //    return this;
-        //}
-
-        //IAppendable IAppendable.Append(ICharSequence? value)
-        //{
-        //    buffer.AppendInternal(value);
-        //    return this;
-        //}
-
-        //IAppendable IAppendable.Append(ICharSequence? value, int startIndex, int count)
-        //{
-        //    buffer.AppendInternal(value, startIndex, count);
-        //    return this;
-        //}
-
-        //#endregion IAppendable Members
-
-        #region ICharSequence Members
-
-        bool ICharSequence.HasValue => true;
-
-        #endregion ICharSequence Members
-
-
-        // ChunkEnumerator supports both the IEnumerable and IEnumerator pattern so foreach
-        // works (see GetChunks).  It needs to be public (so the compiler can use it
-        // when building a foreach statement) but users typically don't use it explicitly.
-        // (which is why it is a nested type).
-
-        /// <summary>
-        /// Supports simple iteration over the chunks of an <see cref="MutableTextBuffer"/> instance.
-        /// </summary>
-        /// <remarks>
-        /// A <see cref="ChunkEnumerator"/> is returned by the <see cref="GetChunks()"/> method. It supports both the
-        /// <see cref="System.Collections.IEnumerable"/> and <see cref="System.Collections.IEnumerator"/> patterns so
-        /// that the chunks can be enumerated with foreach in C# or For Each in Visual Basic.
-        /// <para/>
-        /// <see cref="ChunkEnumerator"/> is a public structure so that language compilers can use it to build a
-        /// foreach statement. However, developers typically don't use it explicitly (which is why it is a nested type).
-        /// </remarks>
-        public struct ChunkEnumerator
-        {
-            private readonly MutableTextBuffer _firstChunk;
-            private MutableTextBuffer? _currentChunk;
-
-            /// <summary>
-            /// Provides an <see cref="System.Collections.IEnumerable.GetEnumerator()"/> implementation that
-            /// returns <c>this</c> as the <see cref="System.Collections.IEnumerator"/>.
-            /// </summary>
-            /// <returns>An enumerator object that can be used to iterate through the chunks.</returns>
-            [EditorBrowsable(EditorBrowsableState.Never)] // Only here to make foreach work
-#pragma warning disable IDE0251 // Make member 'readonly'
-            public ChunkEnumerator GetEnumerator() => this;
-#pragma warning restore IDE0251 // Make member 'readonly'
-
-            /// <summary>
-            /// Advances the enumerator to the next chunk in the collection.
-            /// </summary>
-            /// <returns><c>true</c> if the enumerator was successfully advanced to the next element;
-            /// <c>false</c> if the enumerator has passed the end of the collection.</returns>
-            public bool MoveNext()
-            {
-                if (_currentChunk == _firstChunk)
-                {
-                    return false;
-                }
-
-                _currentChunk = _firstChunk;
-                return true;
-            }
-
-            /// <summary>
-            /// Gets the chunk and the current position of the collection.
-            /// </summary>
-            /// <value>The chunk at the current position of the collection.</value>
-            public ReadOnlyMemory<char> Current
-            {
-                get
-                {
-                    if (_currentChunk == null)
-                        ThrowHelper.ThrowInvalidOperationException_InvalidOperation_EnumOpCantHappen();
-
-                    return new ReadOnlyMemory<char>(_currentChunk.m_Chars, 0, _currentChunk.m_Position);
-                }
-            }
-
-            internal ChunkEnumerator(MutableTextBuffer stringBuilder)
-            {
-                Debug.Assert(stringBuilder != null);
-                _firstChunk = stringBuilder!;
-                _currentChunk = null;   // MoveNext will find the last chunk if we do this.
-            }
-        }
-
-        /// <summary>
-        /// 
-        ///  Returns an object that can be used to iterate through the chunks of characters represented in a
-        ///  <see cref="ReadOnlyMemory{Char}" /> created from this <see cref="PooledTextBuilder" /> instance.
-        /// 
-        /// </summary>
-        /// <returns>
-        /// An enumerator for the chunks in the <see cref="ReadOnlyMemory{Char}" />.
-        /// </returns>
-        /// <remarks>
-        /// This API is for compatibility with <c>StringBuilder.GetChuncks()</c> method.
-        ///  <see cref="PooledTextBuilder" /> will never have more than a single chunk of memory so it is generally more efficient
-        ///  to use <see cref="PooledTextBuilderExtensions.AsSpan(PooledTextBuilder?)" /> or
-        ///  <see cref="PooledTextBuilderExtensions.AsMemory(PooledTextBuilder?)" /> when you need to access the underlying memory.
-        /// </remarks>
-        public ChunkEnumerator GetChunks() => new(buffer);
 
         /// <summary>
         /// Releases ownership of the underlying array and returns it to the underlying array pool.
         /// </summary>
         public void Dispose() => buffer.Dispose();
-
-        #region ISpannable<char> Members
-
-        ReadOnlySpan<char> ISpannable<char>.AsSpan() => this.AsSpan();
-
-        ReadOnlySpan<char> ISpannable<char>.AsSpan(int start) => this.AsSpan(start);
-
-        ReadOnlySpan<char> ISpannable<char>.AsSpan(int start, int length) => this.AsSpan(start, length);
-
-        #endregion ISpannable<char> Members
     }
 }

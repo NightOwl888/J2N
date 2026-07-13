@@ -37,7 +37,7 @@ namespace J2N.Text
          * @tests java.lang.StringBuilder.StringBuilder()
          */
         [Test]
-        public void Test_Constructor()
+        public virtual void Test_Constructor()
         {
             TextBuilder sb = StringBuilderFactory();
             assertNotNull(sb);
@@ -48,7 +48,7 @@ namespace J2N.Text
          * @tests java.lang.StringBuilder.StringBuilder(int)
          */
         [Test]
-        public void Test_ConstructorI()
+        public virtual void Test_ConstructorI()
         {
             TextBuilder sb = StringBuilderFactory(24);
             assertNotNull(sb);
@@ -72,7 +72,7 @@ namespace J2N.Text
          */
         //@SuppressWarnings("cast")
         [Test]
-        public void Test_ConstructorLjava_lang_CharSequence()
+        public virtual void Test_ConstructorLjava_lang_CharSequence()
         {
             TextBuilder sb = StringBuilderFactory("fixture".AsCharSequence());
             assertEquals("fixture", sb.ToString());
@@ -100,7 +100,7 @@ namespace J2N.Text
          * @tests java.lang.StringBuilder.StringBuilder(String)
          */
         [Test]
-        public void Test_ConstructorLjava_lang_String()
+        public virtual void Test_ConstructorLjava_lang_String()
         {
             TextBuilder sb = StringBuilderFactory("fixture");
             assertEquals("fixture", sb.ToString());
@@ -123,7 +123,7 @@ namespace J2N.Text
          * @tests java.lang.StringBuilder.StringBuilder(ReadOnlySpan<char>)
          */
         [Test]
-        public void Test_ConstructorLjava_lang_ReadOnlySpan()
+        public virtual void Test_ConstructorLjava_lang_ReadOnlySpan()
         {
             TextBuilder sb = StringBuilderFactory("fixture".AsSpan());
             assertEquals("fixture", sb.ToString());
@@ -811,7 +811,7 @@ namespace J2N.Text
          * @tests java.lang.StringBuilder.EnsureCapacity(int)'
          */
         [Test]
-        public void Test_ensureCapacityI()
+        public virtual void Test_ensureCapacityI()
         {
             TextBuilder sb = StringBuilderFactory(5);
             assertEquals(5, sb.Capacity);

@@ -16,6 +16,8 @@
  */
 #endregion
 
+using System;
+
 namespace J2N.Text
 {
     /// <summary>
@@ -35,5 +37,28 @@ namespace J2N.Text
         }
 
         #endregion AsCharSequence
+
+        #region GetChunks
+
+        /// <summary>
+        /// Returns an object that can be used to iterate through the chunks of characters represented in a
+        /// <see cref="ReadOnlyMemory{Char}" /> created from this <see cref="TextBuilder" /> instance.
+        /// </summary>
+        /// <returns>An enumerator for the chunks in the <see cref="ReadOnlyMemory{Char}" />.</returns>
+        /// <remarks>
+        /// This API is for compatibility with the <c>System.Text.StringBuilder.GetChuncks()</c> method.
+        /// <see cref="TextBuilder" /> will never have more than a single chunk of memory so it is generally
+        /// more efficient to use <see cref="AsSpan(TextBuilder?)" /> or <see cref="AsMemory(TextBuilder?)" />
+        /// when you need to access the underlying memory than calling this method.
+        /// </remarks>
+        public static TextBuilderChunkEnumerator GetChunks(this TextBuilder text)
+        {
+            if (text is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
+
+            return new TextBuilderChunkEnumerator(text.buffer);
+        }
+
+        #endregion GetChunks
     }
 }

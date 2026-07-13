@@ -37,21 +37,21 @@ namespace J2N.Text
 {
     public abstract partial class StringBuilderTestBase
     {
-        private const int DEFAULT_CAPACITY = 16;
+        protected const int DEFAULT_CAPACITY = 16;
 
-        private static int newCapacity(int oldCapacity,
+        protected static int newCapacity(int oldCapacity,
                 int desiredCapacity)
         {
             return Math.Max(oldCapacity * 2 + 2, desiredCapacity);
         }
 
-        private static int nextNewCapacity(int oldCapacity)
+        protected static int nextNewCapacity(int oldCapacity)
         {
             return newCapacity(oldCapacity, oldCapacity + 1);
         }
 
         [TestCaseSource(nameof(singleChar))]
-        public void Test_defaultCapacity(char ch)
+        public virtual void Test_defaultCapacity(char ch)
         {
             TextBuilder sb = StringBuilderFactory();
             assertEquals(sb.Capacity, DEFAULT_CAPACITY);
@@ -65,7 +65,7 @@ namespace J2N.Text
         }
 
         [TestCaseSource(nameof(charCapacity))]
-        public void Test_explicitCapacity(char ch, int initCapacity)
+        public virtual void Test_explicitCapacity(char ch, int initCapacity)
         {
             TextBuilder sb = StringBuilderFactory(initCapacity);
             // J2N: Altered initial capacity logic to account for the fact that
@@ -83,7 +83,7 @@ namespace J2N.Text
         }
 
         [TestCaseSource(nameof(singleChar))]
-        public void Test_sbFromString(char ch)
+        public virtual void Test_sbFromString(char ch)
         {
             string s = "string " + ch;
             int expectedCapacity = s.Length + DEFAULT_CAPACITY;
@@ -99,7 +99,24 @@ namespace J2N.Text
         }
 
         [TestCaseSource(nameof(singleChar))]
-        public void Test_sbFromCharSeq(char ch)
+        public virtual void Test_sbFromReadOnlySpan(char ch)
+        {
+            string s = "string " + ch;
+            ReadOnlySpan<char> span = s.AsSpan();
+            int expectedCapacity = span.Length + DEFAULT_CAPACITY;
+            TextBuilder sb = StringBuilderFactory(span);
+            assertEquals(sb.Capacity, expectedCapacity);
+            for (int i = 0; i < DEFAULT_CAPACITY; i++)
+            {
+                sb.Append(ch);
+                assertEquals(sb.Capacity, expectedCapacity);
+            }
+            sb.Append(ch);
+            assertEquals(sb.Capacity, nextNewCapacity(expectedCapacity));
+        }
+
+        [TestCaseSource(nameof(singleChar))]
+        public virtual void Test_sbFromCharSeq(char ch)
         {
             ICharSequence cs = new MyCharSeq(("char seq " + ch).AsCharSequence());
             int expectedCapacity = cs.Length + DEFAULT_CAPACITY;
@@ -115,7 +132,7 @@ namespace J2N.Text
         }
 
         [TestCaseSource(nameof(charCapacity))]
-        public void Test_ensureCapacity(char ch, int cap)
+        public virtual void Test_ensureCapacity(char ch, int cap)
         {
             // J2N: Keeping .NET's default capacity semantics because setting it to a
             // zero-length buffer makes the first hit allocate every time. This does
@@ -192,7 +209,7 @@ namespace J2N.Text
             yield return [int.MinValue];
         }
 
-        private sealed class MyCharSeq : ICharSequence
+        protected sealed class MyCharSeq : ICharSequence
         {
             private ICharSequence s;
             public MyCharSeq(ICharSequence s) { this.s = s; }

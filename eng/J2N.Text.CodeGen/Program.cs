@@ -133,30 +133,6 @@ namespace J2N.Text.CodeGen
                 implementationModel);
 
             // ---------------------------------------------------------------------
-            // Generate PooledTextBuilder
-            // ---------------------------------------------------------------------
-
-            FacadeGenerationOptions pooledTextBuilderOptions = new()
-            {
-                FacadeName = "PooledTextBuilder",
-                IsSynchronized = false,
-                EmitSynchronizationNotes = false,
-                IsSealed = true,
-            };
-
-            GenerateFacade(
-                sourceDirectory,
-                pooledTextBuilderOptions,
-                model);
-
-
-            GenerateExtensions(
-                sourceDirectory,
-                pooledTextBuilderOptions,
-                extensionModel,
-                implementationModel);
-
-            // ---------------------------------------------------------------------
             // Generate SynchronizedTextBuilder
             // ---------------------------------------------------------------------
 

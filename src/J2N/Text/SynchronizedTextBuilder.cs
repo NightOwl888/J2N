@@ -1,8 +1,6 @@
 ﻿using J2N.Buffers;
 using System;
 using System.Buffers;
-using System.ComponentModel;
-using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Text;
 
@@ -178,8 +176,8 @@ namespace J2N.Text
         /// <para/>
         /// When you instantiate an <see cref="SynchronizedTextBuilder"/> object by calling the <see cref="SynchronizedTextBuilder(int, int)"/>
         /// constructor, both the length and the capacity of the <see cref="SynchronizedTextBuilder"/> instance can grow beyond
-        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="SynchronizedTextBuilderExtensions.Append(SynchronizedTextBuilder, string)"/>
-        /// and <see cref="SynchronizedTextBuilderExtensions.AppendFormat(SynchronizedTextBuilder, string, object)"/> methods to append small strings.
+        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="SynchronizedTextBuilderExtensions.Append{TBuilder}(TBuilder, string)"/>
+        /// and <see cref="SynchronizedTextBuilderExtensions.AppendFormat{TBuilder}(TBuilder, string, object)"/> methods to append small strings.
         /// </remarks>
         /// <seealso cref="Capacity"/>
         /// <seealso cref="MaxCapacity"/>
@@ -327,166 +325,11 @@ namespace J2N.Text
             init => buffer.useInvariantDefaults = value;
         }
 
-        //#region ISpanAppendable Members
-
-        //ISpanAppendable ISpanAppendable.Append(ReadOnlySpan<char> value)
-        //{
-        //    buffer.AppendInternal(value);
-        //    return this;
-        //}
-
-        //#endregion ISpanAppendable Members
-
-        //#region IAppendable Members
-        //IAppendable IAppendable.Append(char value)
-        //{
-        //    buffer.AppendInternal(value);
-        //    return this;
-        //}
-
-        //IAppendable IAppendable.Append(string? value)
-        //{
-        //    buffer.AppendInternal(value);
-        //    return this;
-        //}
-
-        //IAppendable IAppendable.Append(string? value, int startIndex, int count)
-        //{
-        //    buffer.AppendInternal(value, startIndex, count);
-        //    return this;
-        //}
-
-        //IAppendable IAppendable.Append(StringBuilder? value)
-        //{
-        //    buffer.AppendInternal(value);
-        //    return this;
-        //}
-
-        //IAppendable IAppendable.Append(StringBuilder? value, int startIndex, int count)
-        //{
-        //    buffer.AppendInternal(value, startIndex, count);
-        //    return this;
-        //}
-
-        //IAppendable IAppendable.Append(char[]? value)
-        //{
-        //    buffer.AppendInternal(value);
-        //    return this;
-        //}
-
-        //IAppendable IAppendable.Append(char[]? value, int startIndex, int count)
-        //{
-        //    buffer.AppendInternal(value, startIndex, count);
-        //    return this;
-        //}
-
-        //IAppendable IAppendable.Append(ICharSequence? value)
-        //{
-        //    buffer.AppendInternal(value);
-        //    return this;
-        //}
-
-        //IAppendable IAppendable.Append(ICharSequence? value, int startIndex, int count)
-        //{
-        //    buffer.AppendInternal(value, startIndex, count);
-        //    return this;
-        //}
-
-        //#endregion IAppendable Members
-
         #region ICharSequence Members
 
         bool ICharSequence.HasValue => true;
 
         #endregion ICharSequence Members
-
-
-        // ChunkEnumerator supports both the IEnumerable and IEnumerator pattern so foreach
-        // works (see GetChunks).  It needs to be public (so the compiler can use it
-        // when building a foreach statement) but users typically don't use it explicitly.
-        // (which is why it is a nested type).
-
-        /// <summary>
-        /// Supports simple iteration over the chunks of an <see cref="MutableTextBuffer"/> instance.
-        /// </summary>
-        /// <remarks>
-        /// A <see cref="ChunkEnumerator"/> is returned by the <see cref="GetChunks()"/> method. It supports both the
-        /// <see cref="System.Collections.IEnumerable"/> and <see cref="System.Collections.IEnumerator"/> patterns so
-        /// that the chunks can be enumerated with foreach in C# or For Each in Visual Basic.
-        /// <para/>
-        /// <see cref="ChunkEnumerator"/> is a public structure so that language compilers can use it to build a
-        /// foreach statement. However, developers typically don't use it explicitly (which is why it is a nested type).
-        /// </remarks>
-        public struct ChunkEnumerator
-        {
-            private readonly MutableTextBuffer _firstChunk;
-            private MutableTextBuffer? _currentChunk;
-
-            /// <summary>
-            /// Provides an <see cref="System.Collections.IEnumerable.GetEnumerator()"/> implementation that
-            /// returns <c>this</c> as the <see cref="System.Collections.IEnumerator"/>.
-            /// </summary>
-            /// <returns>An enumerator object that can be used to iterate through the chunks.</returns>
-            [EditorBrowsable(EditorBrowsableState.Never)] // Only here to make foreach work
-#pragma warning disable IDE0251 // Make member 'readonly'
-            public ChunkEnumerator GetEnumerator() => this;
-#pragma warning restore IDE0251 // Make member 'readonly'
-
-            /// <summary>
-            /// Advances the enumerator to the next chunk in the collection.
-            /// </summary>
-            /// <returns><c>true</c> if the enumerator was successfully advanced to the next element;
-            /// <c>false</c> if the enumerator has passed the end of the collection.</returns>
-            public bool MoveNext()
-            {
-                if (_currentChunk == _firstChunk)
-                {
-                    return false;
-                }
-
-                _currentChunk = _firstChunk;
-                return true;
-            }
-
-            /// <summary>
-            /// Gets the chunk and the current position of the collection.
-            /// </summary>
-            /// <value>The chunk at the current position of the collection.</value>
-            public ReadOnlyMemory<char> Current
-            {
-                get
-                {
-                    if (_currentChunk == null)
-                        ThrowHelper.ThrowInvalidOperationException_InvalidOperation_EnumOpCantHappen();
-
-                    return new ReadOnlyMemory<char>(_currentChunk.m_Chars, 0, _currentChunk.m_Position);
-                }
-            }
-
-            internal ChunkEnumerator(MutableTextBuffer stringBuilder)
-            {
-                Debug.Assert(stringBuilder != null);
-                _firstChunk = stringBuilder!;
-                _currentChunk = null;   // MoveNext will find the last chunk if we do this.
-            }
-        }
-
-        /// <summary>
-        /// 
-        ///  Returns an object that can be used to iterate through the chunks of characters represented in a
-        ///  <see cref="ReadOnlyMemory{Char}" /> created from this <see cref="SynchronizedTextBuilder" /> instance.
-        /// 
-        /// </summary>
-        /// <returns>
-        /// An enumerator for the chunks in the <see cref="ReadOnlyMemory{Char}" />.
-        /// </returns>
-        /// <remarks>
-        /// This API is for compatibility with <c>StringBuilder.GetChuncks()</c> method.
-        ///  <see cref="SynchronizedTextBuilder" /> will never have more than a single chunk of memory so it is generally more efficient
-        ///  to use <see cref="SynchronizedTextBuilderExtensions.AsSpan(SynchronizedTextBuilder?)" /> or
-        ///  <see cref="SynchronizedTextBuilderExtensions.AsMemory(SynchronizedTextBuilder?)" /> when you need to access the underlying memory.
-        /// </remarks>
-        public ChunkEnumerator GetChunks() => new(buffer);
 
         /// <summary>
         /// Gets an object that can be used to synchronize access to the <see cref="SynchronizedTextBuilder"/>.
