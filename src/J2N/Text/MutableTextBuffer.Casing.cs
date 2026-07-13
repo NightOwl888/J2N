@@ -25,32 +25,26 @@ namespace J2N.Text
 {
     public partial class MutableTextBuffer
     {
-        ///// <summary>
-        ///// Appends the upper case string representation of a specified string
-        ///// to this instance using the casing rules from the specified culture.
-        ///// </summary>
-        ///// <param name="value">The string to append.</param>
-        ///// <param name="culture">An object that supplies culture-specific casing rules.</param>
-        ///// <remarks>
-        ///// The capacity of this instance is adjusted as needed.
-        ///// <para/>
-        ///// If <paramref name="culture"/> is <see langword="null"/>, <see cref="CultureInfo.CurrentCulture"/> will be used.
-        ///// </remarks>
+        /// <summary>
+        /// Appends the upper-case representation of a string.
+        /// </summary>
+        /// <remarks>
+        /// The public API and full documentation live in
+        /// <see cref="MutableTextBufferExtensions.AppendUpper{TBuilder}(TBuilder, string?, CultureInfo?)"/>.
+        /// Update that documentation if the behavior changes.
+        /// </remarks>
         [CodeGenerationExtensionImplementation]
         internal void AppendUpperInternal(string? value, CultureInfo? culture)
             => AppendUpperInternal(value.AsSpan(), culture);
 
-        ///// <summary>
-        ///// Appends the upper case string representation of a specified read-only character
-        ///// span to this instance using the casing rules from the specified culture.
-        ///// </summary>
-        ///// <param name="value">The read-only character span to append.</param>
-        ///// <param name="culture">An object that supplies culture-specific casing rules.</param>
-        ///// <remarks>
-        ///// The capacity of this instance is adjusted as needed.
-        ///// <para/>
-        ///// If <paramref name="culture"/> is <see langword="null"/>, <see cref="CultureInfo.CurrentCulture"/> will be used.
-        ///// </remarks>
+        /// <summary>
+        /// Appends the upper-case representation of a string.
+        /// </summary>
+        /// <remarks>
+        /// The public API and full documentation live in
+        /// <see cref="MutableTextBufferExtensions.AppendUpper{TBuilder}(TBuilder, ReadOnlySpan{char}, CultureInfo?)"/>.
+        /// Update that documentation if the behavior changes.
+        /// </remarks>
         [CodeGenerationExtensionImplementation]
         internal void AppendUpperInternal(ReadOnlySpan<char> value, CultureInfo? culture)
         {
@@ -75,28 +69,26 @@ namespace J2N.Text
             m_Position += length;
         }
 
-        ///// <summary>
-        ///// Appends the lower case string representation of a specified string
-        ///// to this instance using the casing rules from the specified culture.
-        ///// </summary>
-        ///// <param name="value">The string to append.</param>
-        ///// <param name="culture">An object that supplies culture-specific casing rules.</param>
-        ///// <remarks>
-        ///// The capacity of this instance is adjusted as needed.
-        ///// <para/>
-        ///// If <paramref name="culture"/> is <see langword="null"/>, <see cref="CultureInfo.CurrentCulture"/> will be used.
-        ///// </remarks>
+        /// <summary>
+        /// Appends the lower-case representation of a string.
+        /// </summary>
+        /// <remarks>
+        /// The public API and full documentation live in
+        /// <see cref="MutableTextBufferExtensions.AppendLower{TBuilder}(TBuilder, string?, CultureInfo?)"/>.
+        /// Update that documentation if the behavior changes.
+        /// </remarks>
         [CodeGenerationExtensionImplementation]
         internal void AppendLowerInternal(string? value, CultureInfo? culture)
             => AppendLowerInternal(value.AsSpan(), culture);
 
-        ///// <summary>
-        ///// Appends the lower case string representation of a specified read-only character
-        ///// span to this instance using the casing rules from the specified culture.
-        ///// </summary>
-        ///// <param name="value">The read-only character span to append.</param>
-        ///// <param name="culture">An object that supplies culture-specific casing rules.</param>
-        ///// <remarks>The capacity of this instance is adjusted as needed.</remarks>
+        /// <summary>
+        /// Appends the lower-case representation of a string.
+        /// </summary>
+        /// <remarks>
+        /// The public API and full documentation live in
+        /// <see cref="MutableTextBufferExtensions.AppendLower{TBuilder}(TBuilder, ReadOnlySpan{char}, CultureInfo?)"/>.
+        /// Update that documentation if the behavior changes.
+        /// </remarks>
         [CodeGenerationExtensionImplementation]
         internal void AppendLowerInternal(ReadOnlySpan<char> value, CultureInfo? culture)
         {
@@ -121,22 +113,26 @@ namespace J2N.Text
             m_Position += length;
         }
 
-        ///// <summary>
-        ///// Appends the upper case string representation of a specified string
-        ///// to this instance using the casing rules from the invariant culture.
-        ///// </summary>
-        ///// <param name="value">The string to append.</param>
-        ///// <remarks>The capacity of this instance is adjusted as needed.</remarks>
+        /// <summary>
+        /// Appends the upper-case representation of a string.
+        /// </summary>
+        /// <remarks>
+        /// The public API and full documentation live in
+        /// <see cref="MutableTextBufferExtensions.AppendUpperInvariant{TBuilder}(TBuilder, string?)"/>.
+        /// Update that documentation if the behavior changes.
+        /// </remarks>
         [CodeGenerationExtensionImplementation]
         internal void AppendUpperInvariantInternal(string? value)
             => AppendUpperInvariantInternal(value.AsSpan());
 
-        ///// <summary>
-        ///// Appends the upper case string representation of a specified read-only character
-        ///// span to this instance using the casing rules from the invariant culture.
-        ///// </summary>
-        ///// <param name="value">The read-only character span to append.</param>
-        ///// <remarks>The capacity of this instance is adjusted as needed.</remarks>
+        /// <summary>
+        /// Appends the upper-case representation of a string.
+        /// </summary>
+        /// <remarks>
+        /// The public API and full documentation live in
+        /// <see cref="MutableTextBufferExtensions.AppendUpperInvariant{TBuilder}(TBuilder, ReadOnlySpan{char})"/>.
+        /// Update that documentation if the behavior changes.
+        /// </remarks>
         [CodeGenerationExtensionImplementation]
         internal void AppendUpperInvariantInternal(ReadOnlySpan<char> value)
         {
@@ -155,22 +151,26 @@ namespace J2N.Text
             m_Position += length;
         }
 
-        ///// <summary>
-        ///// Appends the lower case string representation of a specified string
-        ///// to this instance using the casing rules from the invariant culture.
-        ///// </summary>
-        ///// <param name="value">The string to append.</param>
-        ///// <remarks>The capacity of this instance is adjusted as needed.</remarks>
+        /// <summary>
+        /// Appends the lower-case representation of a string.
+        /// </summary>
+        /// <remarks>
+        /// The public API and full documentation live in
+        /// <see cref="MutableTextBufferExtensions.AppendLowerInvariant{TBuilder}(TBuilder, string?)"/>.
+        /// Update that documentation if the behavior changes.
+        /// </remarks>
         [CodeGenerationExtensionImplementation]
         internal void AppendLowerInvariantInternal(string? value)
             => AppendLowerInvariantInternal(value.AsSpan());
 
-        ///// <summary>
-        ///// Appends the lower case string representation of a specified read-only character
-        ///// span to this instance using the casing rules from the invariant culture.
-        ///// </summary>
-        ///// <param name="value">The read-only character span to append.</param>
-        ///// <remarks>The capacity of this instance is adjusted as needed.</remarks>
+        /// <summary>
+        /// Appends the lower-case representation of a string.
+        /// </summary>
+        /// <remarks>
+        /// The public API and full documentation live in
+        /// <see cref="MutableTextBufferExtensions.AppendLowerInvariant{TBuilder}(TBuilder, ReadOnlySpan{char})"/>.
+        /// Update that documentation if the behavior changes.
+        /// </remarks>
         [CodeGenerationExtensionImplementation]
         internal void AppendLowerInvariantInternal(ReadOnlySpan<char> value)
         {

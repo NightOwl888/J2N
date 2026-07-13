@@ -13,33 +13,14 @@ namespace J2N.Text
     {
         #region Append Number
 
-        ///// <summary>
-        ///// Appends the string representation of a specified 8-bit signed integer to this instance
-        ///// with the specified numeric format and culture-specific format information.
-        ///// <para/>
-        ///// Unless otherwise specified, formatting is performed in the invariant culture, which
-        ///// is similar to how the JDK formats numbers.
-        ///// </summary>
-        ///// <param name="value">The value to format and append.</param>
-        ///// <param name="format">A standard or custom numeric format string.</param>
-        ///// <param name="provider">An object that supplies culture-specific formatting information.</param>
-        ///// <returns>A reference to this instance after the append operation has completed.</returns>
-        ///// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
-        ///// <remarks>
-        ///// This method allows similar options as the <c>AppendFormat</c> methods, but has better performance because
-        ///// the value being formatted is not boxed.
-        ///// <para/>
-        ///// The capacity of this instance is adjusted as needed.
-        ///// <para/>
-        ///// <b>Notes to Callers</b>
-        ///// <para/>
-        ///// When you instantiate a <see cref="MutableTextBuffer"/> object by calling <see cref="MutableTextBuffer.Initialize(int, int)"/>,
-        ///// both the length and the capacity of the <see cref="MutableTextBuffer"/> instance can grow beyond
-        ///// the value of its <see cref="MutableTextBuffer.MaxCapacity"/> property. This can occur particularly when you call the <see cref="MutableTextBuffer.Append(string?)"/>
-        ///// and <see cref="MutableTextBuffer.AppendFormat(string, object?)"/> methods to append small strings.
-        ///// </remarks>
-        ///// <seealso cref="sbyte"/>
-        //[CLSCompliant(false)]
+        /// <summary>
+        /// Appends the string representation of a specified numeric type to this instance.
+        /// </summary>
+        /// <remarks>
+        /// The public API and full documentation live in
+        /// <see cref="MutableTextBufferExtensions.Append{TBuilder}(TBuilder, sbyte, string?, IFormatProvider?)"/>.
+        /// Update that documentation if the behavior changes.
+        /// </remarks>
         [CodeGenerationExtensionImplementation]
         internal void AppendInternal(sbyte value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
@@ -48,32 +29,14 @@ namespace J2N.Text
             => AppendNumberCore<sbyte, SByteFormatter>(3, value, format, provider);
 #endif
 
-        ///// <summary>
-        ///// Appends the string representation of a specified 8-bit unsigned integer to this instance
-        ///// with the specified numeric format and culture-specific format information.
-        ///// <para/>
-        ///// Unless otherwise specified, formatting is performed in the invariant culture, which
-        ///// is similar to how the JDK formats numbers.
-        ///// </summary>
-        ///// <param name="value">The value to format and append.</param>
-        ///// <param name="format">A standard or custom numeric format string.</param>
-        ///// <param name="provider">An object that supplies culture-specific formatting information.</param>
-        ///// <returns>A reference to this instance after the append operation has completed.</returns>
-        ///// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
-        ///// <remarks>
-        ///// This method allows similar options as the <c>AppendFormat</c> methods, but has better performance because
-        ///// the value being formatted is not boxed.
-        ///// <para/>
-        ///// The capacity of this instance is adjusted as needed.
-        ///// <para/>
-        ///// <b>Notes to Callers</b>
-        ///// <para/>
-        ///// When you instantiate a <see cref="MutableTextBuffer"/> object by calling <see cref="MutableTextBuffer.Initialize(int, int)"/>,
-        ///// both the length and the capacity of the <see cref="MutableTextBuffer"/> instance can grow beyond
-        ///// the value of its <see cref="MutableTextBuffer.MaxCapacity"/> property. This can occur particularly when you call the <see cref="MutableTextBuffer.Append(string?)"/>
-        ///// and <see cref="MutableTextBuffer.AppendFormat(string, object?)"/> methods to append small strings.
-        ///// </remarks>
-        ///// <seealso cref="byte"/>
+        /// <summary>
+        /// Appends the string representation of a specified numeric type to this instance.
+        /// </summary>
+        /// <remarks>
+        /// The public API and full documentation live in
+        /// <see cref="MutableTextBufferExtensions.Append{TBuilder}(TBuilder, byte, string?, IFormatProvider?)"/>.
+        /// Update that documentation if the behavior changes.
+        /// </remarks>
         [CodeGenerationExtensionImplementation]
         internal void AppendInternal(byte value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
@@ -82,32 +45,14 @@ namespace J2N.Text
             => AppendNumberCore<byte, ByteFormatter>(4, value, format, provider);
 #endif
 
-        ///// <summary>
-        ///// Appends the string representation of a specified 16-bit signed integer to this instance
-        ///// with the specified numeric format and culture-specific format information.
-        ///// <para/>
-        ///// Unless otherwise specified, formatting is performed in the invariant culture, which
-        ///// is similar to how the JDK formats numbers.
-        ///// </summary>
-        ///// <param name="value">The value to format and append.</param>
-        ///// <param name="format">A standard or custom numeric format string.</param>
-        ///// <param name="provider">An object that supplies culture-specific formatting information.</param>
-        ///// <returns>A reference to this instance after the append operation has completed.</returns>
-        ///// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
-        ///// <remarks>
-        ///// This method allows similar options as the <c>AppendFormat</c> methods, but has better performance because
-        ///// the value being formatted is not boxed.
-        ///// <para/>
-        ///// The capacity of this instance is adjusted as needed.
-        ///// <para/>
-        ///// <b>Notes to Callers</b>
-        ///// <para/>
-        ///// When you instantiate a <see cref="MutableTextBuffer"/> object by calling <see cref="MutableTextBuffer.Initialize(int, int)"/>,
-        ///// both the length and the capacity of the <see cref="MutableTextBuffer"/> instance can grow beyond
-        ///// the value of its <see cref="MutableTextBuffer.MaxCapacity"/> property. This can occur particularly when you call the <see cref="MutableTextBuffer.Append(string?)"/>
-        ///// and <see cref="MutableTextBuffer.AppendFormat(string, object?)"/> methods to append small strings.
-        ///// </remarks>
-        ///// <seealso cref="short"/>
+        /// <summary>
+        /// Appends the string representation of a specified numeric type to this instance.
+        /// </summary>
+        /// <remarks>
+        /// The public API and full documentation live in
+        /// <see cref="MutableTextBufferExtensions.Append{TBuilder}(TBuilder, short, string?, IFormatProvider?)"/>.
+        /// Update that documentation if the behavior changes.
+        /// </remarks>
         [CodeGenerationExtensionImplementation]
         internal void AppendInternal(short value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
@@ -116,32 +61,14 @@ namespace J2N.Text
             => AppendNumberCore<short, Int16Formatter>(4, value, format, provider);
 #endif
 
-        ///// <summary>
-        ///// Appends the string representation of a specified 32-bit signed integer to this instance
-        ///// with the specified numeric format and culture-specific format information.
-        ///// <para/>
-        ///// Unless otherwise specified, formatting is performed in the invariant culture, which
-        ///// is similar to how the JDK formats numbers.
-        ///// </summary>
-        ///// <param name="value">The value to format and append.</param>
-        ///// <param name="format">A standard or custom numeric format string.</param>
-        ///// <param name="provider">An object that supplies culture-specific formatting information.</param>
-        ///// <returns>A reference to this instance after the append operation has completed.</returns>
-        ///// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
-        ///// <remarks>
-        ///// This method allows similar options as the <c>AppendFormat</c> methods, but has better performance because
-        ///// the value being formatted is not boxed.
-        ///// <para/>
-        ///// The capacity of this instance is adjusted as needed.
-        ///// <para/>
-        ///// <b>Notes to Callers</b>
-        ///// <para/>
-        ///// When you instantiate a <see cref="MutableTextBuffer"/> object by calling <see cref="MutableTextBuffer.Initialize(int, int)"/>,
-        ///// both the length and the capacity of the <see cref="MutableTextBuffer"/> instance can grow beyond
-        ///// the value of its <see cref="MutableTextBuffer.MaxCapacity"/> property. This can occur particularly when you call the <see cref="MutableTextBuffer.Append(string?)"/>
-        ///// and <see cref="MutableTextBuffer.AppendFormat(string, object?)"/> methods to append small strings.
-        ///// </remarks>
-        ///// <seealso cref="int"/>
+        /// <summary>
+        /// Appends the string representation of a specified numeric type to this instance.
+        /// </summary>
+        /// <remarks>
+        /// The public API and full documentation live in
+        /// <see cref="MutableTextBufferExtensions.Append{TBuilder}(TBuilder, int, string?, IFormatProvider?)"/>.
+        /// Update that documentation if the behavior changes.
+        /// </remarks>
         [CodeGenerationExtensionImplementation]
         internal void AppendInternal(int value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
@@ -150,32 +77,14 @@ namespace J2N.Text
             => AppendNumberCore<int, Int32Formatter>(6, value, format, provider);
 #endif
 
-        ///// <summary>
-        ///// Appends the string representation of a specified 64-bit signed integer to this instance
-        ///// with the specified numeric format and culture-specific format information.
-        ///// <para/>
-        ///// Unless otherwise specified, formatting is performed in the invariant culture, which
-        ///// is similar to how the JDK formats numbers.
-        ///// </summary>
-        ///// <param name="value">The value to format and append.</param>
-        ///// <param name="format">A standard or custom numeric format string.</param>
-        ///// <param name="provider">An object that supplies culture-specific formatting information.</param>
-        ///// <returns>A reference to this instance after the append operation has completed.</returns>
-        ///// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
-        ///// <remarks>
-        ///// This method allows similar options as the <c>AppendFormat</c> methods, but has better performance because
-        ///// the value being formatted is not boxed.
-        ///// <para/>
-        ///// The capacity of this instance is adjusted as needed.
-        ///// <para/>
-        ///// <b>Notes to Callers</b>
-        ///// <para/>
-        ///// When you instantiate a <see cref="MutableTextBuffer"/> object by calling <see cref="MutableTextBuffer.Initialize(int, int)"/>,
-        ///// both the length and the capacity of the <see cref="MutableTextBuffer"/> instance can grow beyond
-        ///// the value of its <see cref="MutableTextBuffer.MaxCapacity"/> property. This can occur particularly when you call the <see cref="MutableTextBuffer.Append(string?)"/>
-        ///// and <see cref="MutableTextBuffer.AppendFormat(string, object?)"/> methods to append small strings.
-        ///// </remarks>
-        ///// <seealso cref="long"/>
+        /// <summary>
+        /// Appends the string representation of a specified numeric type to this instance.
+        /// </summary>
+        /// <remarks>
+        /// The public API and full documentation live in
+        /// <see cref="MutableTextBufferExtensions.Append{TBuilder}(TBuilder, long, string?, IFormatProvider?)"/>.
+        /// Update that documentation if the behavior changes.
+        /// </remarks>
         [CodeGenerationExtensionImplementation]
         internal void AppendInternal(long value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
@@ -183,92 +92,39 @@ namespace J2N.Text
 #else
             => AppendNumberCore<long, Int64Formatter>(10, value, format, provider);
 #endif
-        ///// <summary>
-        ///// Appends the string representation of a specified single-precision floating-point number to this instance
-        ///// with the specified numeric format and culture-specific format information.
-        ///// <para/>
-        ///// Unless otherwise specified, formatting is performed in the invariant culture using the "J" format, which
-        ///// is similar to how the JDK formats numbers.
-        ///// </summary>
-        ///// <param name="value">The value to format and append.</param>
-        ///// <param name="format">A standard or custom numeric format string.</param>
-        ///// <param name="provider">An object that supplies culture-specific formatting information.</param>
-        ///// <returns>A reference to this instance after the append operation has completed.</returns>
-        ///// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
-        ///// <remarks>
-        ///// This method allows similar options as the <c>AppendFormat</c> methods, but has better performance because
-        ///// the value being formatted is not boxed.
-        ///// <para/>
-        ///// The capacity of this instance is adjusted as needed.
-        ///// <para/>
-        ///// <b>Notes to Callers</b>
-        ///// <para/>
-        ///// When you instantiate a <see cref="MutableTextBuffer"/> object by calling <see cref="MutableTextBuffer.Initialize(int, int)"/>,
-        ///// both the length and the capacity of the <see cref="MutableTextBuffer"/> instance can grow beyond
-        ///// the value of its <see cref="MutableTextBuffer.MaxCapacity"/> property. This can occur particularly when you call the <see cref="MutableTextBuffer.Append(string?)"/>
-        ///// and <see cref="MutableTextBuffer.AppendFormat(string, object?)"/> methods to append small strings.
-        ///// </remarks>
-        ///// <seealso cref="float"/>
+
+        /// <summary>
+        /// Appends the string representation of a specified numeric type to this instance.
+        /// </summary>
+        /// <remarks>
+        /// The public API and full documentation live in
+        /// <see cref="MutableTextBufferExtensions.Append{TBuilder}(TBuilder, float, string?, IFormatProvider?)"/>.
+        /// Update that documentation if the behavior changes.
+        /// </remarks>
         [CodeGenerationExtensionImplementation]
         internal void AppendInternal(float value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
             => AppendNumberCore<float, SingleFormatter>(6, value, format, provider);
 
-        ///// <summary>
-        ///// Appends the string representation of a specified double-precision floating-point number to this instance
-        ///// with the specified numeric format and culture-specific format information.
-        ///// <para/>
-        ///// Unless otherwise specified, formatting is performed in the invariant culture using the "J" format, which
-        ///// is similar to how the JDK formats numbers.
-        ///// </summary>
-        ///// <param name="value">The value to format and append.</param>
-        ///// <param name="format">A standard or custom numeric format string.</param>
-        ///// <param name="provider">An object that supplies culture-specific formatting information.</param>
-        ///// <returns>A reference to this instance after the append operation has completed.</returns>
-        ///// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
-        ///// <remarks>
-        ///// This method allows similar options as the <c>AppendFormat</c> methods, but has better performance because
-        ///// the value being formatted is not boxed.
-        ///// <para/>
-        ///// The capacity of this instance is adjusted as needed.
-        ///// <para/>
-        ///// <b>Notes to Callers</b>
-        ///// <para/>
-        ///// When you instantiate a <see cref="MutableTextBuffer"/> object by calling <see cref="MutableTextBuffer.Initialize(int, int)"/>,
-        ///// both the length and the capacity of the <see cref="MutableTextBuffer"/> instance can grow beyond
-        ///// the value of its <see cref="MutableTextBuffer.MaxCapacity"/> property. This can occur particularly when you call the <see cref="MutableTextBuffer.Append(string?)"/>
-        ///// and <see cref="MutableTextBuffer.AppendFormat(string, object?)"/> methods to append small strings.
-        ///// </remarks>
-        ///// <seealso cref="double"/>
+        /// <summary>
+        /// Appends the string representation of a specified numeric type to this instance.
+        /// </summary>
+        /// <remarks>
+        /// The public API and full documentation live in
+        /// <see cref="MutableTextBufferExtensions.Append{TBuilder}(TBuilder, double, string?, IFormatProvider?)"/>.
+        /// Update that documentation if the behavior changes.
+        /// </remarks>
         [CodeGenerationExtensionImplementation]
         internal void AppendInternal(double value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
             => AppendNumberCore<double, DoubleFormatter>(14, value, format, provider);
 
-        ///// <summary>
-        ///// Appends the string representation of a specified decimal to this instance
-        ///// with the specified numeric format and culture-specific format information.
-        ///// <para/>
-        ///// Unless otherwise specified, formatting is performed in the invariant culture, which
-        ///// is similar to how the JDK formats numbers.
-        ///// </summary>
-        ///// <param name="value">The value to format and append.</param>
-        ///// <param name="format">A standard or custom numeric format string.</param>
-        ///// <param name="provider">An object that supplies culture-specific formatting information.</param>
-        ///// <returns>A reference to this instance after the append operation has completed.</returns>
-        ///// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
-        ///// <remarks>
-        ///// This method allows similar options as the <c>AppendFormat</c> methods, but has better performance because
-        ///// the value being formatted is not boxed.
-        ///// <para/>
-        ///// The capacity of this instance is adjusted as needed.
-        ///// <para/>
-        ///// <b>Notes to Callers</b>
-        ///// <para/>
-        ///// When you instantiate a <see cref="MutableTextBuffer"/> object by calling <see cref="MutableTextBuffer.Initialize(int, int)"/>,
-        ///// both the length and the capacity of the <see cref="MutableTextBuffer"/> instance can grow beyond
-        ///// the value of its <see cref="MutableTextBuffer.MaxCapacity"/> property. This can occur particularly when you call the <see cref="MutableTextBuffer.Append(string?)"/>
-        ///// and <see cref="MutableTextBuffer.AppendFormat(string, object?)"/> methods to append small strings.
-        ///// </remarks>
-        ///// <seealso cref="decimal"/>
+        /// <summary>
+        /// Appends the string representation of a specified numeric type to this instance.
+        /// </summary>
+        /// <remarks>
+        /// The public API and full documentation live in
+        /// <see cref="MutableTextBufferExtensions.Append{TBuilder}(TBuilder, decimal, string?, IFormatProvider?)"/>.
+        /// Update that documentation if the behavior changes.
+        /// </remarks>
         // J2N TODO: Since BigDecimal in Java doesn't use the same default format as this, we will need to change the default before this can be made public
         [CodeGenerationExtensionImplementation]
         internal void AppendInternal(decimal value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
@@ -278,33 +134,14 @@ namespace J2N.Text
             => AppendInternal(value.ToString(format, provider ?? NumberFormatInfo.InvariantInfo));
 #endif
 
-        ///// <summary>
-        ///// Appends the string representation of a specified 16-bit unsigned integer to this instance
-        ///// with the specified numeric format and culture-specific format information.
-        ///// <para/>
-        ///// Unless otherwise specified, formatting is performed in the invariant culture, which
-        ///// is similar to how the JDK formats numbers.
-        ///// </summary>
-        ///// <param name="value">The value to format and append.</param>
-        ///// <param name="format">A standard or custom numeric format string.</param>
-        ///// <param name="provider">An object that supplies culture-specific formatting information.</param>
-        ///// <returns>A reference to this instance after the append operation has completed.</returns>
-        ///// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
-        ///// <remarks>
-        ///// This method allows similar options as the <c>AppendFormat</c> methods, but has better performance because
-        ///// the value being formatted is not boxed.
-        ///// <para/>
-        ///// The capacity of this instance is adjusted as needed.
-        ///// <para/>
-        ///// <b>Notes to Callers</b>
-        ///// <para/>
-        ///// When you instantiate a <see cref="MutableTextBuffer"/> object by calling <see cref="MutableTextBuffer.Initialize(int, int)"/>,
-        ///// both the length and the capacity of the <see cref="MutableTextBuffer"/> instance can grow beyond
-        ///// the value of its <see cref="MutableTextBuffer.MaxCapacity"/> property. This can occur particularly when you call the <see cref="MutableTextBuffer.Append(string?)"/>
-        ///// and <see cref="MutableTextBuffer.AppendFormat(string, object?)"/> methods to append small strings.
-        ///// </remarks>
-        ///// <seealso cref="ushort"/>
-        //[CLSCompliant(false)]
+        /// <summary>
+        /// Appends the string representation of a specified numeric type to this instance.
+        /// </summary>
+        /// <remarks>
+        /// The public API and full documentation live in
+        /// <see cref="MutableTextBufferExtensions.Append{TBuilder}(TBuilder, ushort, string?, IFormatProvider?)"/>.
+        /// Update that documentation if the behavior changes.
+        /// </remarks>
         [CodeGenerationExtensionImplementation]
         internal void AppendInternal(ushort value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
@@ -312,33 +149,15 @@ namespace J2N.Text
 #else
             => AppendNumberCore<ushort, UInt16Formatter>(4, value, format, provider);
 #endif
-        ///// <summary>
-        ///// Appends the string representation of a specified 32-bit unsigned integer to this instance
-        ///// with the specified numeric format and culture-specific format information.
-        ///// <para/>
-        ///// Unless otherwise specified, formatting is performed in the invariant culture, which
-        ///// is similar to how the JDK formats numbers.
-        ///// </summary>
-        ///// <param name="value">The value to format and append.</param>
-        ///// <param name="format">A standard or custom numeric format string.</param>
-        ///// <param name="provider">An object that supplies culture-specific formatting information.</param>
-        ///// <returns>A reference to this instance after the append operation has completed.</returns>
-        ///// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
-        ///// <remarks>
-        ///// This method allows similar options as the <c>AppendFormat</c> methods, but has better performance because
-        ///// the value being formatted is not boxed.
-        ///// <para/>
-        ///// The capacity of this instance is adjusted as needed.
-        ///// <para/>
-        ///// <b>Notes to Callers</b>
-        ///// <para/>
-        ///// When you instantiate a <see cref="MutableTextBuffer"/> object by calling <see cref="MutableTextBuffer.Initialize(int, int)"/>,
-        ///// both the length and the capacity of the <see cref="MutableTextBuffer"/> instance can grow beyond
-        ///// the value of its <see cref="MutableTextBuffer.MaxCapacity"/> property. This can occur particularly when you call the <see cref="MutableTextBuffer.Append(string?)"/>
-        ///// and <see cref="MutableTextBuffer.AppendFormat(string, object?)"/> methods to append small strings.
-        ///// </remarks>
-        ///// <seealso cref="uint"/>
-        //[CLSCompliant(false)]
+
+        /// <summary>
+        /// Appends the string representation of a specified numeric type to this instance.
+        /// </summary>
+        /// <remarks>
+        /// The public API and full documentation live in
+        /// <see cref="MutableTextBufferExtensions.Append{TBuilder}(TBuilder, uint, string?, IFormatProvider?)"/>.
+        /// Update that documentation if the behavior changes.
+        /// </remarks>
         [CodeGenerationExtensionImplementation]
         internal void AppendInternal(uint value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
@@ -347,33 +166,14 @@ namespace J2N.Text
             => AppendNumberCore<uint, UInt32Formatter>(6, value, format, provider);
 #endif
 
-        ///// <summary>
-        ///// Appends the string representation of a specified 64-bit unsigned integer to this instance
-        ///// with the specified numeric format and culture-specific format information.
-        ///// <para/>
-        ///// Unless otherwise specified, formatting is performed in the invariant culture, which
-        ///// is similar to how the JDK formats numbers.
-        ///// </summary>
-        ///// <param name="value">The value to format and append.</param>
-        ///// <param name="format">A standard or custom numeric format string.</param>
-        ///// <param name="provider">An object that supplies culture-specific formatting information.</param>
-        ///// <returns>A reference to this instance after the append operation has completed.</returns>
-        ///// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
-        ///// <remarks>
-        ///// This method allows similar options as the <c>AppendFormat</c> methods, but has better performance because
-        ///// the value being formatted is not boxed.
-        ///// <para/>
-        ///// The capacity of this instance is adjusted as needed.
-        ///// <para/>
-        ///// <b>Notes to Callers</b>
-        ///// <para/>
-        ///// When you instantiate a <see cref="MutableTextBuffer"/> object by calling <see cref="MutableTextBuffer.Initialize(int, int)"/>,
-        ///// both the length and the capacity of the <see cref="MutableTextBuffer"/> instance can grow beyond
-        ///// the value of its <see cref="MutableTextBuffer.MaxCapacity"/> property. This can occur particularly when you call the <see cref="MutableTextBuffer.Append(string?)"/>
-        ///// and <see cref="MutableTextBuffer.AppendFormat(string, object?)"/> methods to append small strings.
-        ///// </remarks>
-        ///// <seealso cref="ulong"/>
-        //[CLSCompliant(false)]
+        /// <summary>
+        /// Appends the string representation of a specified numeric type to this instance.
+        /// </summary>
+        /// <remarks>
+        /// The public API and full documentation live in
+        /// <see cref="MutableTextBufferExtensions.Append{TBuilder}(TBuilder, ulong, string?, IFormatProvider?)"/>.
+        /// Update that documentation if the behavior changes.
+        /// </remarks>
         [CodeGenerationExtensionImplementation]
         internal void AppendInternal(ulong value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
@@ -456,32 +256,15 @@ namespace J2N.Text
 
         #region Insert Number
 
-        ///// <summary>
-        ///// Inserts the string representation of a specified 8-bit signed integer to this instance
-        ///// with the specified numeric format and culture-specific format information.
-        ///// <para/>
-        ///// Unless otherwise specified, formatting is performed in the invariant culture, which
-        ///// is similar to how the JDK formats numbers.
-        ///// </summary>
-        ///// <param name="index">The position in this instance where insertion begins.</param>
-        ///// <param name="value">The value to format and append.</param>
-        ///// <param name="format">A standard or custom numeric format string.</param>
-        ///// <param name="provider">An object that supplies culture-specific formatting information.</param>
-        ///// <returns>A reference to this instance after the append operation has completed.</returns>
-        ///// <exception cref="ArgumentOutOfRangeException">
-        ///// <paramref name="index"/> is less than zero or greater than the current length of this instance.
-        ///// <para/>
-        ///// -or-
-        ///// <para/>
-        ///// The current length of this <see cref="MutableTextBuffer"/> object plus the length of
-        ///// <paramref name="value"/> exceeds <see cref="MutableTextBuffer.MaxCapacity"/>.
-        ///// </exception>
-        ///// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
-        ///// <remarks>
-        ///// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
-        ///// </remarks>
-        ///// <seealso cref="sbyte"/>
-        //[CLSCompliant(false)]
+        /// <summary>
+        /// Inserts the string representation of a specified numeric type to this instance
+        /// at the specified position.
+        /// </summary>
+        /// <remarks>
+        /// The public API and full documentation live in
+        /// <see cref="MutableTextBufferExtensions.Insert{TBuilder}(TBuilder, int, sbyte, string?, IFormatProvider?)"/>.
+        /// Update that documentation if the behavior changes.
+        /// </remarks>
         [CodeGenerationExtensionImplementation]
         internal void InsertInternal(int index, sbyte value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
@@ -490,31 +273,15 @@ namespace J2N.Text
             => InsertNumberCore<sbyte, SByteFormatter>(index, value, format, provider);
 #endif
 
-        ///// <summary>
-        ///// Inserts the string representation of a specified 8-bit unsigned integer to this instance
-        ///// with the specified numeric format and culture-specific format information.
-        ///// <para/>
-        ///// Unless otherwise specified, formatting is performed in the invariant culture, which
-        ///// is similar to how the JDK formats numbers.
-        ///// </summary>
-        ///// <param name="index">The position in this instance where insertion begins.</param>
-        ///// <param name="value">The value to format and append.</param>
-        ///// <param name="format">A standard or custom numeric format string.</param>
-        ///// <param name="provider">An object that supplies culture-specific formatting information.</param>
-        ///// <returns>A reference to this instance after the append operation has completed.</returns>
-        ///// <exception cref="ArgumentOutOfRangeException">
-        ///// <paramref name="index"/> is less than zero or greater than the current length of this instance.
-        ///// <para/>
-        ///// -or-
-        ///// <para/>
-        ///// The current length of this <see cref="MutableTextBuffer"/> object plus the length of
-        ///// <paramref name="value"/> exceeds <see cref="MutableTextBuffer.MaxCapacity"/>.
-        ///// </exception>
-        ///// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
-        ///// <remarks>
-        ///// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
-        ///// </remarks>
-        ///// <seealso cref="byte"/>
+        /// <summary>
+        /// Inserts the string representation of a specified numeric type to this instance
+        /// at the specified position.
+        /// </summary>
+        /// <remarks>
+        /// The public API and full documentation live in
+        /// <see cref="MutableTextBufferExtensions.Insert{TBuilder}(TBuilder, int, byte, string?, IFormatProvider?)"/>.
+        /// Update that documentation if the behavior changes.
+        /// </remarks>
         [CodeGenerationExtensionImplementation]
         internal void InsertInternal(int index, byte value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
@@ -523,31 +290,15 @@ namespace J2N.Text
             => InsertNumberCore<byte, ByteFormatter>(index, value, format, provider);
 #endif
 
-        ///// <summary>
-        ///// Inserts the string representation of a specified 16-bit signed integer to this instance
-        ///// with the specified numeric format and culture-specific format information.
-        ///// <para/>
-        ///// Unless otherwise specified, formatting is performed in the invariant culture, which
-        ///// is similar to how the JDK formats numbers.
-        ///// </summary>
-        ///// <param name="index">The position in this instance where insertion begins.</param>
-        ///// <param name="value">The value to format and append.</param>
-        ///// <param name="format">A standard or custom numeric format string.</param>
-        ///// <param name="provider">An object that supplies culture-specific formatting information.</param>
-        ///// <returns>A reference to this instance after the append operation has completed.</returns>
-        ///// <exception cref="ArgumentOutOfRangeException">
-        ///// <paramref name="index"/> is less than zero or greater than the current length of this instance.
-        ///// <para/>
-        ///// -or-
-        ///// <para/>
-        ///// The current length of this <see cref="MutableTextBuffer"/> object plus the length of
-        ///// <paramref name="value"/> exceeds <see cref="MutableTextBuffer.MaxCapacity"/>.
-        ///// </exception>
-        ///// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
-        ///// <remarks>
-        ///// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
-        ///// </remarks>
-        ///// <seealso cref="short"/>
+        /// <summary>
+        /// Inserts the string representation of a specified numeric type to this instance
+        /// at the specified position.
+        /// </summary>
+        /// <remarks>
+        /// The public API and full documentation live in
+        /// <see cref="MutableTextBufferExtensions.Insert{TBuilder}(TBuilder, int, short, string?, IFormatProvider?)"/>.
+        /// Update that documentation if the behavior changes.
+        /// </remarks>
         [CodeGenerationExtensionImplementation]
         internal void InsertInternal(int index, short value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
@@ -556,31 +307,15 @@ namespace J2N.Text
             => InsertNumberCore<short, Int16Formatter>(index, value, format, provider);
 #endif
 
-        ///// <summary>
-        ///// Inserts the string representation of a specified 32-bit signed integer to this instance
-        ///// with the specified numeric format and culture-specific format information.
-        ///// <para/>
-        ///// Unless otherwise specified, formatting is performed in the invariant culture, which
-        ///// is similar to how the JDK formats numbers.
-        ///// </summary>
-        ///// <param name="index">The position in this instance where insertion begins.</param>
-        ///// <param name="value">The value to format and append.</param>
-        ///// <param name="format">A standard or custom numeric format string.</param>
-        ///// <param name="provider">An object that supplies culture-specific formatting information.</param>
-        ///// <exception cref="ArgumentOutOfRangeException">
-        ///// <paramref name="index"/> is less than zero or greater than the current length of this instance.
-        ///// <para/>
-        ///// -or-
-        ///// <para/>
-        ///// The current length of this <see cref="MutableTextBuffer"/> object plus the length of
-        ///// <paramref name="value"/> exceeds <see cref="MutableTextBuffer.MaxCapacity"/>.
-        ///// </exception>
-        ///// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
-        ///// <returns>A reference to this instance after the append operation has completed.</returns>
-        ///// <remarks>
-        ///// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
-        ///// </remarks>
-        ///// <seealso cref="int"/>
+        /// <summary>
+        /// Inserts the string representation of a specified numeric type to this instance
+        /// at the specified position.
+        /// </summary>
+        /// <remarks>
+        /// The public API and full documentation live in
+        /// <see cref="MutableTextBufferExtensions.Insert{TBuilder}(TBuilder, int, int, string?, IFormatProvider?)"/>.
+        /// Update that documentation if the behavior changes.
+        /// </remarks>
         [CodeGenerationExtensionImplementation]
         internal void InsertInternal(int index, int value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
@@ -589,31 +324,15 @@ namespace J2N.Text
             => InsertNumberCore<int, Int32Formatter>(index, value, format, provider);
 #endif
 
-        ///// <summary>
-        ///// Inserts the string representation of a specified 64-bit signed integer to this instance
-        ///// with the specified numeric format and culture-specific format information.
-        ///// <para/>
-        ///// Unless otherwise specified, formatting is performed in the invariant culture, which
-        ///// is similar to how the JDK formats numbers.
-        ///// </summary>
-        ///// <param name="index">The position in this instance where insertion begins.</param>
-        ///// <param name="value">The value to format and append.</param>
-        ///// <param name="format">A standard or custom numeric format string.</param>
-        ///// <param name="provider">An object that supplies culture-specific formatting information.</param>
-        ///// <returns>A reference to this instance after the append operation has completed.</returns>
-        ///// <exception cref="ArgumentOutOfRangeException">
-        ///// <paramref name="index"/> is less than zero or greater than the current length of this instance.
-        ///// <para/>
-        ///// -or-
-        ///// <para/>
-        ///// The current length of this <see cref="MutableTextBuffer"/> object plus the length of
-        ///// <paramref name="value"/> exceeds <see cref="MutableTextBuffer.MaxCapacity"/>.
-        ///// </exception>
-        ///// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
-        ///// <remarks>
-        ///// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
-        ///// </remarks>
-        ///// <seealso cref="long"/>
+        /// <summary>
+        /// Inserts the string representation of a specified numeric type to this instance
+        /// at the specified position.
+        /// </summary>
+        /// <remarks>
+        /// The public API and full documentation live in
+        /// <see cref="MutableTextBufferExtensions.Insert{TBuilder}(TBuilder, int, long, string?, IFormatProvider?)"/>.
+        /// Update that documentation if the behavior changes.
+        /// </remarks>
         [CodeGenerationExtensionImplementation]
         internal void InsertInternal(int index, long value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
@@ -622,89 +341,41 @@ namespace J2N.Text
             => InsertNumberCore<long, Int64Formatter>(index, value, format, provider);
 #endif
 
-        ///// <summary>
-        ///// Inserts the string representation of a specified single-precision floating-point number to this instance
-        ///// with the specified numeric format and culture-specific format information.
-        ///// <para/>
-        ///// Unless otherwise specified, formatting is performed in the invariant culture using the "J" format, which
-        ///// is similar to how the JDK formats numbers.
-        ///// </summary>
-        ///// <param name="index">The position in this instance where insertion begins.</param>
-        ///// <param name="value">The value to format and append.</param>
-        ///// <param name="format">A standard or custom numeric format string.</param>
-        ///// <param name="provider">An object that supplies culture-specific formatting information.</param>
-        ///// <returns>A reference to this instance after the append operation has completed.</returns>
-        ///// <exception cref="ArgumentOutOfRangeException">
-        ///// <paramref name="index"/> is less than zero or greater than the current length of this instance.
-        ///// <para/>
-        ///// -or-
-        ///// <para/>
-        ///// The current length of this <see cref="MutableTextBuffer"/> object plus the length of
-        ///// <paramref name="value"/> exceeds <see cref="MutableTextBuffer.MaxCapacity"/>.
-        ///// </exception>
-        ///// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
-        ///// <remarks>
-        ///// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
-        ///// </remarks>
-        ///// <seealso cref="float"/>
+        /// <summary>
+        /// Inserts the string representation of a specified numeric type to this instance
+        /// at the specified position.
+        /// </summary>
+        /// <remarks>
+        /// The public API and full documentation live in
+        /// <see cref="MutableTextBufferExtensions.Insert{TBuilder}(TBuilder, int, float, string?, IFormatProvider?)"/>.
+        /// Update that documentation if the behavior changes.
+        /// </remarks>
         [CodeGenerationExtensionImplementation]
         internal void InsertInternal(int index, float value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
             => InsertNumberCore<float, SingleFormatter>(index, value, format, provider);
 
-        ///// <summary>
-        ///// Inserts the string representation of a specified double-precision floating-point number to this instance
-        ///// with the specified numeric format and culture-specific format information.
-        ///// <para/>
-        ///// Unless otherwise specified, formatting is performed in the invariant culture using the "J" format, which
-        ///// is similar to how the JDK formats numbers.
-        ///// </summary>
-        ///// <param name="index">The position in this instance where insertion begins.</param>
-        ///// <param name="value">The value to format and append.</param>
-        ///// <param name="format">A standard or custom numeric format string.</param>
-        ///// <param name="provider">An object that supplies culture-specific formatting information.</param>
-        ///// <returns>A reference to this instance after the append operation has completed.</returns>
-        ///// <exception cref="ArgumentOutOfRangeException">
-        ///// <paramref name="index"/> is less than zero or greater than the current length of this instance.
-        ///// <para/>
-        ///// -or-
-        ///// <para/>
-        ///// The current length of this <see cref="MutableTextBuffer"/> object plus the length of
-        ///// <paramref name="value"/> exceeds <see cref="MutableTextBuffer.MaxCapacity"/>.
-        ///// </exception>
-        ///// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
-        ///// <remarks>
-        ///// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
-        ///// </remarks>
-        ///// <seealso cref="double"/>
+        /// <summary>
+        /// Inserts the string representation of a specified numeric type to this instance
+        /// at the specified position.
+        /// </summary>
+        /// <remarks>
+        /// The public API and full documentation live in
+        /// <see cref="MutableTextBufferExtensions.Insert{TBuilder}(TBuilder, int, double, string?, IFormatProvider?)"/>.
+        /// Update that documentation if the behavior changes.
+        /// </remarks>
         [CodeGenerationExtensionImplementation]
         internal void InsertInternal(int index, double value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
             => InsertNumberCore<double, DoubleFormatter>(index, value, format, provider);
 
-        ///// <summary>
-        ///// Inserts the string representation of a specified decimal to this instance
-        ///// with the specified numeric format and culture-specific format information.
-        ///// <para/>
-        ///// Unless otherwise specified, formatting is performed in the invariant culture, which
-        ///// is similar to how the JDK formats numbers.
-        ///// </summary>
-        ///// <param name="index">The position in this instance where insertion begins.</param>
-        ///// <param name="value">The value to format and append.</param>
-        ///// <param name="format">A standard or custom numeric format string.</param>
-        ///// <param name="provider">An object that supplies culture-specific formatting information.</param>
-        ///// <returns>A reference to this instance after the append operation has completed.</returns>
-        ///// <exception cref="ArgumentOutOfRangeException">
-        ///// <paramref name="index"/> is less than zero or greater than the current length of this instance.
-        ///// <para/>
-        ///// -or-
-        ///// <para/>
-        ///// The current length of this <see cref="MutableTextBuffer"/> object plus the length of
-        ///// <paramref name="value"/> exceeds <see cref="MutableTextBuffer.MaxCapacity"/>.
-        ///// </exception>
-        ///// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
-        ///// <remarks>
-        ///// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
-        ///// </remarks>
-        ///// <seealso cref="decimal"/>
+        /// <summary>
+        /// Inserts the string representation of a specified numeric type to this instance
+        /// at the specified position.
+        /// </summary>
+        /// <remarks>
+        /// The public API and full documentation live in
+        /// <see cref="MutableTextBufferExtensions.Insert{TBuilder}(TBuilder, int, decimal, string?, IFormatProvider?)"/>.
+        /// Update that documentation if the behavior changes.
+        /// </remarks>
         // J2N TODO: Since BigDecimal in Java doesn't use the same default format as this, we will need to change the default before this can be made public
         [CodeGenerationExtensionImplementation]
         internal void InsertInternal(int index, decimal value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
@@ -714,32 +385,15 @@ namespace J2N.Text
             => InsertInternal(index, value.ToString(format, provider ?? NumberFormatInfo.InvariantInfo), 1);
 #endif
 
-        ///// <summary>
-        ///// Inserts the string representation of a specified 16-bit unsigned integer to this instance
-        ///// with the specified numeric format and culture-specific format information.
-        ///// <para/>
-        ///// Unless otherwise specified, formatting is performed in the invariant culture, which
-        ///// is similar to how the JDK formats numbers.
-        ///// </summary>
-        ///// <param name="index">The position in this instance where insertion begins.</param>
-        ///// <param name="value">The value to format and append.</param>
-        ///// <param name="format">A standard or custom numeric format string.</param>
-        ///// <param name="provider">An object that supplies culture-specific formatting information.</param>
-        ///// <returns>A reference to this instance after the append operation has completed.</returns>
-        ///// <exception cref="ArgumentOutOfRangeException">
-        ///// <paramref name="index"/> is less than zero or greater than the current length of this instance.
-        ///// <para/>
-        ///// -or-
-        ///// <para/>
-        ///// The current length of this <see cref="MutableTextBuffer"/> object plus the length of
-        ///// <paramref name="value"/> exceeds <see cref="MutableTextBuffer.MaxCapacity"/>.
-        ///// </exception>
-        ///// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
-        ///// <remarks>
-        ///// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
-        ///// </remarks>
-        ///// <seealso cref="ushort"/>
-        //[CLSCompliant(false)]
+        /// <summary>
+        /// Inserts the string representation of a specified numeric type to this instance
+        /// at the specified position.
+        /// </summary>
+        /// <remarks>
+        /// The public API and full documentation live in
+        /// <see cref="MutableTextBufferExtensions.Insert{TBuilder}(TBuilder, int, ushort, string?, IFormatProvider?)"/>.
+        /// Update that documentation if the behavior changes.
+        /// </remarks>
         [CodeGenerationExtensionImplementation]
         internal void InsertInternal(int index, ushort value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
@@ -748,32 +402,15 @@ namespace J2N.Text
             => InsertNumberCore<ushort, UInt16Formatter>(index, value, format, provider);
 #endif
 
-        ///// <summary>
-        ///// Inserts the string representation of a specified 32-bit unsigned integer to this instance
-        ///// with the specified numeric format and culture-specific format information.
-        ///// <para/>
-        ///// Unless otherwise specified, formatting is performed in the invariant culture, which
-        ///// is similar to how the JDK formats numbers.
-        ///// </summary>
-        ///// <param name="index">The position in this instance where insertion begins.</param>
-        ///// <param name="value">The value to format and append.</param>
-        ///// <param name="format">A standard or custom numeric format string.</param>
-        ///// <param name="provider">An object that supplies culture-specific formatting information.</param>
-        ///// <returns>A reference to this instance after the append operation has completed.</returns>
-        ///// <exception cref="ArgumentOutOfRangeException">
-        ///// <paramref name="index"/> is less than zero or greater than the current length of this instance.
-        ///// <para/>
-        ///// -or-
-        ///// <para/>
-        ///// The current length of this <see cref="MutableTextBuffer"/> object plus the length of
-        ///// <paramref name="value"/> exceeds <see cref="MutableTextBuffer.MaxCapacity"/>.
-        ///// </exception>
-        ///// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
-        ///// <remarks>
-        ///// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
-        ///// </remarks>
-        ///// <seealso cref="uint"/>
-        //[CLSCompliant(false)]
+        /// <summary>
+        /// Inserts the string representation of a specified numeric type to this instance
+        /// at the specified position.
+        /// </summary>
+        /// <remarks>
+        /// The public API and full documentation live in
+        /// <see cref="MutableTextBufferExtensions.Insert{TBuilder}(TBuilder, int, uint, string?, IFormatProvider?)"/>.
+        /// Update that documentation if the behavior changes.
+        /// </remarks>
         [CodeGenerationExtensionImplementation]
         internal void InsertInternal(int index, uint value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
@@ -782,32 +419,15 @@ namespace J2N.Text
             => InsertNumberCore<uint, UInt32Formatter>(index, value, format, provider);
 #endif
 
-        ///// <summary>
-        ///// Inserts the string representation of a specified 64-bit unsigned integer to this instance
-        ///// with the specified numeric format and culture-specific format information.
-        ///// <para/>
-        ///// Unless otherwise specified, formatting is performed in the invariant culture, which
-        ///// is similar to how the JDK formats numbers.
-        ///// </summary>
-        ///// <param name="index">The position in this instance where insertion begins.</param>
-        ///// <param name="value">The value to format and append.</param>
-        ///// <param name="format">A standard or custom numeric format string.</param>
-        ///// <param name="provider">An object that supplies culture-specific formatting information.</param>
-        ///// <returns>A reference to this instance after the append operation has completed.</returns>
-        ///// <exception cref="ArgumentOutOfRangeException">
-        ///// <paramref name="index"/> is less than zero or greater than the current length of this instance.
-        ///// <para/>
-        ///// -or-
-        ///// <para/>
-        ///// The current length of this <see cref="MutableTextBuffer"/> object plus the length of
-        ///// <paramref name="value"/> exceeds <see cref="MutableTextBuffer.MaxCapacity"/>.
-        ///// </exception>
-        ///// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
-        ///// <remarks>
-        ///// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
-        ///// </remarks>
-        ///// <seealso cref="ulong"/>
-        //[CLSCompliant(false)]
+        /// <summary>
+        /// Inserts the string representation of a specified numeric type to this instance
+        /// at the specified position.
+        /// </summary>
+        /// <remarks>
+        /// The public API and full documentation live in
+        /// <see cref="MutableTextBufferExtensions.Insert{TBuilder}(TBuilder, int, ulong, string?, IFormatProvider?)"/>.
+        /// Update that documentation if the behavior changes.
+        /// </remarks>
         [CodeGenerationExtensionImplementation]
         internal void InsertInternal(int index, ulong value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE

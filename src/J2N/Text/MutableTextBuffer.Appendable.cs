@@ -1,6 +1,5 @@
 ﻿using J2N.CodeGeneration;
 using System;
-using System.Text;
 
 namespace J2N.Text
 {
@@ -8,16 +7,14 @@ namespace J2N.Text
     {
         #region Append ICharSequence
 
-        ///// <summary>
-        ///// Appends the string representation of the Unicode characters in a specified sequence to this instance.
-        ///// <para/>
-        ///// NOTE: Unlike the Java implementation, this method does not add the word <c>"null"</c> to the <see cref="MutableTextBuffer"/>
-        ///// if <paramref name="value"/> is <see langword="null"/>. Instead, no operation is performed.
-        ///// </summary>
-        ///// <param name="value">The sequence of characters to append.</param>
-        ///// <returns>A reference to this instance after the append operation has completed.</returns>
-        ///// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed <see cref="MutableTextBuffer.MaxCapacity"/>.</exception>
-        ///// <seealso cref="ICharSequence"/>
+        /// <summary>
+        /// Appends the string representation of the Unicode characters in a specified sequence to this instance.
+        /// </summary>
+        /// <remarks>
+        /// The public API and full documentation live in
+        /// <see cref="MutableTextBufferExtensions.Append{TBuilder}(TBuilder, ICharSequence?)"/>.
+        /// Update that documentation if the behavior changes.
+        /// </remarks>
         [CodeGenerationExtensionImplementation]
         internal void AppendInternal(ICharSequence? value)
         {
@@ -64,31 +61,14 @@ namespace J2N.Text
             m_Position += count;
         }
 
-        ///// <summary>
-        ///// Appends the string representation of a specified subarray of Unicode characters to this instance.
-        ///// </summary>
-        ///// <param name="value">The UTF-16-encoded code unit to append.</param>
-        ///// <param name="startIndex">The starting position in <paramref name="value"/>.</param>
-        ///// <param name="count">The number of characters to append.</param>
-        ///// <returns>A reference to this instance after the append operation has completed.</returns>
-        ///// <exception cref="ArgumentNullException"><paramref name="value"/> is <see langword="null"/>, and
-        ///// <paramref name="startIndex"/> and <paramref name="count"/> are not zero.</exception>
-        ///// <exception cref="ArgumentOutOfRangeException">
-        ///// <paramref name="count"/> is less than zero.
-        ///// <para/>
-        ///// -or-
-        ///// <para/>
-        ///// <paramref name="startIndex"/> is less than zero.
-        ///// <para/>
-        ///// -or-
-        ///// <para/>
-        ///// <paramref name="startIndex"/> + <paramref name="count"/> is greater than the length of <paramref name="value"/>.
-        ///// <para/>
-        ///// -or-
-        ///// <para/>
-        ///// Enlarging the value of this instance would exceed <see cref="MutableTextBuffer.MaxCapacity"/>.
-        ///// </exception>
-        ///// <seealso cref="ICharSequence"/>
+        /// <summary>
+        /// Appends the string representation of a specified subarray of Unicode characters to this instance.
+        /// </summary>
+        /// <remarks>
+        /// The public API and full documentation live in
+        /// <see cref="MutableTextBufferExtensions.Append{TBuilder}(TBuilder, ICharSequence?, int, int)"/>.
+        /// Update that documentation if the behavior changes.
+        /// </remarks>
         [CodeGenerationExtensionImplementation]
         internal void AppendInternal(ICharSequence? value, int startIndex, int count)
         {
@@ -160,19 +140,14 @@ namespace J2N.Text
 
         #region Insert ICharSequence
 
-        ///// <summary>
-        ///// Inserts the string representation of a specified sequence of Unicode characters into this instance at the specified character position.
-        ///// </summary>
-        ///// <param name="index">The position in this instance where insertion begins.</param>
-        ///// <param name="value">The character sequence to insert.</param>
-        ///// <returns>A reference to this instance after the operation has completed.</returns>
-        ///// <exception cref="ArgumentOutOfRangeException">
-        ///// <paramref name="index"/> is less than zero or greater than the length of this instance.
-        ///// <para/>
-        ///// -or-
-        ///// <para/>
-        ///// Enlarging the value of this instance would exceed <see cref="MutableTextBuffer.MaxCapacity"/>.
-        /// </exception>
+        /// <summary>
+        /// Inserts the string representation of a specified sequence of Unicode characters into this instance at the specified character position.
+        /// </summary>
+        /// <remarks>
+        /// The public API and full documentation live in
+        /// <see cref="MutableTextBufferExtensions.Insert{TBuilder}(TBuilder, int, ICharSequence?)"/>.
+        /// Update that documentation if the behavior changes.
+        /// </remarks>
         [CodeGenerationExtensionImplementation]
         internal void InsertInternal(int index, ICharSequence? value)
         {
@@ -211,32 +186,14 @@ namespace J2N.Text
             }
         }
 
-        ///// <summary>
-        ///// Inserts the string representation of a specified subarray of Unicode characters into this instance at the specified character position.
-        ///// <para/>
-        ///// IMPORTANT: This method has .NET semantics. That is, the fourth parameter is a count, not an exclusive end index as would be the
-        ///// case in Java. To translate from Java, use <c>end - start</c> to resolve <paramref name="count"/>.
-        ///// </summary>
-        ///// <param name="index">The position in this instance where insertion begins.</param>
-        ///// <param name="value">The character sequence to insert.</param>
-        ///// <param name="startIndex">The starting index within <paramref name="value"/>.</param>
-        ///// <param name="count">The number of characters to insert.</param>
-        ///// <returns>A reference to this instance after the operation has completed.</returns>
-        ///// <exception cref="ArgumentOutOfRangeException">
-        ///// <paramref name="index"/>, <paramref name="startIndex"/> or <paramref name="count"/> is less than zero.
-        ///// <para/>
-        ///// -or-
-        ///// <para/>
-        ///// <paramref name="index"/> is greater than the length of this instance.
-        ///// <para/>
-        ///// -or-
-        ///// <para/>
-        ///// <paramref name="startIndex"/> plus <paramref name="count"/> is not a position within <paramref name="value"/>.
-        ///// <para/>
-        ///// -or-
-        ///// <para/>
-        ///// Enlarging the value of this instance would exceed <see cref="MutableTextBuffer.MaxCapacity"/>.
-        ///// </exception>
+        /// <summary>
+        /// Inserts the string representation of a specified subarray of Unicode characters into this instance at the specified character position.
+        /// </summary>
+        /// <remarks>
+        /// The public API and full documentation live in
+        /// <see cref="MutableTextBufferExtensions.Insert{TBuilder}(TBuilder, int, ICharSequence?, int, int)"/>.
+        /// Update that documentation if the behavior changes.
+        /// </remarks>
         [CodeGenerationExtensionImplementation]
         internal void InsertInternal(int index, ICharSequence? value, int startIndex, int count)
         {
@@ -300,72 +257,5 @@ namespace J2N.Text
         }
 
         #endregion Insert ICharSequence
-
-        //#region ISpanAppendable Members
-
-        //ISpanAppendable ISpanAppendable.Append(ReadOnlySpan<char> value)
-        //{
-        //    AppendInternal(value);
-        //    return this;
-        //}
-
-        //#endregion ISpanAppendable Members
-
-        //#region IAppendable Members
-        //IAppendable IAppendable.Append(char value)
-        //{
-        //    AppendInternal(value);
-        //    return this;
-        //}
-
-        //IAppendable IAppendable.Append(string? value)
-        //{
-        //    AppendInternal(value);
-        //    return this;
-        //}
-
-        //IAppendable IAppendable.Append(string? value, int startIndex, int count)
-        //{
-        //    AppendInternal(value, startIndex, count);
-        //    return this;
-        //}
-
-        //IAppendable IAppendable.Append(StringBuilder? value)
-        //{
-        //    AppendInternal(value);
-        //    return this;
-        //}
-
-        //IAppendable IAppendable.Append(StringBuilder? value, int startIndex, int count)
-        //{
-        //    AppendInternal(value, startIndex, count);
-        //    return this;
-        //}
-
-        //IAppendable IAppendable.Append(char[]? value)
-        //{
-        //    AppendInternal(value);
-        //    return this;
-        //}
-
-        //IAppendable IAppendable.Append(char[]? value, int startIndex, int count)
-        //{
-        //    AppendInternal(value, startIndex, count);
-        //    return this;
-        //}
-
-        //IAppendable IAppendable.Append(ICharSequence? value)
-        //{
-        //    AppendInternal(value);
-        //    return this;
-        //}
-
-        //IAppendable IAppendable.Append(ICharSequence? value, int startIndex, int count)
-        //{
-        //    AppendInternal(value, startIndex, count);
-        //    return this;
-        //}
-
-        //#endregion IAppendable Members
     }
 }
