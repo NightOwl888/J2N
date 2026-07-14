@@ -1064,6 +1064,174 @@ namespace J2N.Text
             return text;
         }
 
+        /// <summary>
+        /// Appends the upper case string representation of a specified string
+        /// to this instance using the casing rules from the specified culture.
+        /// </summary>
+        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
+        /// <param name="text">The target builder.</param>
+        /// <param name="value">The string to append.</param>
+        /// <param name="culture">An object that supplies culture-specific casing rules.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <remarks>
+        /// The capacity of this instance is adjusted as needed.
+        /// <para/>
+        /// If <paramref name="culture"/> is <see langword="null"/>, <see cref="CultureInfo.CurrentCulture"/> will be used.
+        /// </remarks>
+        public static TBuilder AppendUpper<TBuilder>(this TBuilder text, string? value, CultureInfo? culture)
+            where TBuilder : TextBuilder
+        {
+            if (text is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
+
+            text.buffer.AppendUpperInternal(value, culture);
+            return text;
+        }
+
+        /// <summary>
+        /// Appends the upper case string representation of a specified read-only character
+        /// span to this instance using the casing rules from the specified culture.
+        /// </summary>
+        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
+        /// <param name="text">The target builder.</param>
+        /// <param name="value">The read-only character span to append.</param>
+        /// <param name="culture">An object that supplies culture-specific casing rules.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <remarks>
+        /// The capacity of this instance is adjusted as needed.
+        /// <para/>
+        /// If <paramref name="culture"/> is <see langword="null"/>, <see cref="CultureInfo.CurrentCulture"/> will be used.
+        /// </remarks>
+        public static TBuilder AppendUpper<TBuilder>(this TBuilder text, ReadOnlySpan<char> value, CultureInfo? culture)
+            where TBuilder : TextBuilder
+        {
+            if (text is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
+
+            text.buffer.AppendUpperInternal(value, culture);
+            return text;
+        }
+
+        /// <summary>
+        /// Appends the upper case string representation of a specified string
+        /// to this instance using the casing rules from the invariant culture.
+        /// </summary>
+        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
+        /// <param name="text">The target builder.</param>
+        /// <param name="value">The string to append.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <remarks>The capacity of this instance is adjusted as needed.</remarks>
+        public static TBuilder AppendUpperInvariant<TBuilder>(this TBuilder text, string? value)
+            where TBuilder : TextBuilder
+        {
+            if (text is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
+
+            text.buffer.AppendUpperInvariantInternal(value);
+            return text;
+        }
+
+        /// <summary>
+        /// Appends the upper case string representation of a specified read-only character
+        /// span to this instance using the casing rules from the invariant culture.
+        /// </summary>
+        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
+        /// <param name="text">The target builder.</param>
+        /// <param name="value">The read-only character span to append.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <remarks>The capacity of this instance is adjusted as needed.</remarks>
+        public static TBuilder AppendUpperInvariant<TBuilder>(this TBuilder text, ReadOnlySpan<char> value)
+            where TBuilder : TextBuilder
+        {
+            if (text is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
+
+            text.buffer.AppendUpperInvariantInternal(value);
+            return text;
+        }
+
+        /// <summary>
+        /// Appends the lower case string representation of a specified string
+        /// to this instance using the casing rules from the specified culture.
+        /// </summary>
+        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
+        /// <param name="text">The target builder.</param>
+        /// <param name="value">The string to append.</param>
+        /// <param name="culture">An object that supplies culture-specific casing rules.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <remarks>
+        /// The capacity of this instance is adjusted as needed.
+        /// <para/>
+        /// If <paramref name="culture"/> is <see langword="null"/>, <see cref="CultureInfo.CurrentCulture"/> will be used.
+        /// </remarks>
+        public static TBuilder AppendLower<TBuilder>(this TBuilder text, string? value, CultureInfo? culture)
+            where TBuilder : TextBuilder
+        {
+            if (text is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
+
+            text.buffer.AppendLowerInternal(value, culture);
+            return text;
+        }
+
+        /// <summary>
+        /// Appends the lower case string representation of a specified read-only character
+        /// span to this instance using the casing rules from the specified culture.
+        /// </summary>
+        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
+        /// <param name="text">The target builder.</param>
+        /// <param name="value">The read-only character span to append.</param>
+        /// <param name="culture">An object that supplies culture-specific casing rules.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <remarks>The capacity of this instance is adjusted as needed.</remarks>
+        public static TBuilder AppendLower<TBuilder>(this TBuilder text, ReadOnlySpan<char> value, CultureInfo? culture)
+            where TBuilder : TextBuilder
+        {
+            if (text is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
+
+            text.buffer.AppendLowerInternal(value, culture);
+            return text;
+        }
+
+        /// <summary>
+        /// Appends the lower case string representation of a specified string
+        /// to this instance using the casing rules from the invariant culture.
+        /// </summary>
+        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
+        /// <param name="text">The target builder.</param>
+        /// <param name="value">The string to append.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <remarks>The capacity of this instance is adjusted as needed.</remarks>
+        public static TBuilder AppendLowerInvariant<TBuilder>(this TBuilder text, string? value)
+            where TBuilder : TextBuilder
+        {
+            if (text is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
+
+            text.buffer.AppendLowerInvariantInternal(value);
+            return text;
+        }
+
+        /// <summary>
+        /// Appends the lower case string representation of a specified read-only character
+        /// span to this instance using the casing rules from the invariant culture.
+        /// </summary>
+        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
+        /// <param name="text">The target builder.</param>
+        /// <param name="value">The read-only character span to append.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <remarks>The capacity of this instance is adjusted as needed.</remarks>
+        public static TBuilder AppendLowerInvariant<TBuilder>(this TBuilder text, ReadOnlySpan<char> value)
+            where TBuilder : TextBuilder
+        {
+            if (text is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
+
+            text.buffer.AppendLowerInvariantInternal(value);
+            return text;
+        }
+
         /// <summary>Creates a new readonly span over the portion of the target string.</summary>
         /// <param name="text">The target string.</param>
         /// <returns>The read-only span representation of the string.</returns>
@@ -1552,174 +1720,6 @@ namespace J2N.Text
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
 
             text.buffer.InsertInternal(index, value, startIndex, count);
-            return text;
-        }
-
-        /// <summary>
-        /// Appends the upper case string representation of a specified string
-        /// to this instance using the casing rules from the specified culture.
-        /// </summary>
-        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
-        /// <param name="text">The target builder.</param>
-        /// <param name="value">The string to append.</param>
-        /// <param name="culture">An object that supplies culture-specific casing rules.</param>
-        /// <returns>A reference to this instance after the operation has completed.</returns>
-        /// <remarks>
-        /// The capacity of this instance is adjusted as needed.
-        /// <para/>
-        /// If <paramref name="culture"/> is <see langword="null"/>, <see cref="CultureInfo.CurrentCulture"/> will be used.
-        /// </remarks>
-        public static TBuilder AppendUpper<TBuilder>(this TBuilder text, string? value, CultureInfo? culture)
-            where TBuilder : TextBuilder
-        {
-            if (text is null)
-                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
-
-            text.buffer.AppendUpperInternal(value, culture);
-            return text;
-        }
-
-        /// <summary>
-        /// Appends the upper case string representation of a specified read-only character
-        /// span to this instance using the casing rules from the specified culture.
-        /// </summary>
-        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
-        /// <param name="text">The target builder.</param>
-        /// <param name="value">The read-only character span to append.</param>
-        /// <param name="culture">An object that supplies culture-specific casing rules.</param>
-        /// <returns>A reference to this instance after the operation has completed.</returns>
-        /// <remarks>
-        /// The capacity of this instance is adjusted as needed.
-        /// <para/>
-        /// If <paramref name="culture"/> is <see langword="null"/>, <see cref="CultureInfo.CurrentCulture"/> will be used.
-        /// </remarks>
-        public static TBuilder AppendUpper<TBuilder>(this TBuilder text, ReadOnlySpan<char> value, CultureInfo? culture)
-            where TBuilder : TextBuilder
-        {
-            if (text is null)
-                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
-
-            text.buffer.AppendUpperInternal(value, culture);
-            return text;
-        }
-
-        /// <summary>
-        /// Appends the lower case string representation of a specified string
-        /// to this instance using the casing rules from the specified culture.
-        /// </summary>
-        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
-        /// <param name="text">The target builder.</param>
-        /// <param name="value">The string to append.</param>
-        /// <param name="culture">An object that supplies culture-specific casing rules.</param>
-        /// <returns>A reference to this instance after the operation has completed.</returns>
-        /// <remarks>
-        /// The capacity of this instance is adjusted as needed.
-        /// <para/>
-        /// If <paramref name="culture"/> is <see langword="null"/>, <see cref="CultureInfo.CurrentCulture"/> will be used.
-        /// </remarks>
-        public static TBuilder AppendLower<TBuilder>(this TBuilder text, string? value, CultureInfo? culture)
-            where TBuilder : TextBuilder
-        {
-            if (text is null)
-                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
-
-            text.buffer.AppendLowerInternal(value, culture);
-            return text;
-        }
-
-        /// <summary>
-        /// Appends the lower case string representation of a specified read-only character
-        /// span to this instance using the casing rules from the specified culture.
-        /// </summary>
-        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
-        /// <param name="text">The target builder.</param>
-        /// <param name="value">The read-only character span to append.</param>
-        /// <param name="culture">An object that supplies culture-specific casing rules.</param>
-        /// <returns>A reference to this instance after the operation has completed.</returns>
-        /// <remarks>The capacity of this instance is adjusted as needed.</remarks>
-        public static TBuilder AppendLower<TBuilder>(this TBuilder text, ReadOnlySpan<char> value, CultureInfo? culture)
-            where TBuilder : TextBuilder
-        {
-            if (text is null)
-                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
-
-            text.buffer.AppendLowerInternal(value, culture);
-            return text;
-        }
-
-        /// <summary>
-        /// Appends the upper case string representation of a specified string
-        /// to this instance using the casing rules from the invariant culture.
-        /// </summary>
-        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
-        /// <param name="text">The target builder.</param>
-        /// <param name="value">The string to append.</param>
-        /// <returns>A reference to this instance after the operation has completed.</returns>
-        /// <remarks>The capacity of this instance is adjusted as needed.</remarks>
-        public static TBuilder AppendUpperInvariant<TBuilder>(this TBuilder text, string? value)
-            where TBuilder : TextBuilder
-        {
-            if (text is null)
-                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
-
-            text.buffer.AppendUpperInvariantInternal(value);
-            return text;
-        }
-
-        /// <summary>
-        /// Appends the upper case string representation of a specified read-only character
-        /// span to this instance using the casing rules from the invariant culture.
-        /// </summary>
-        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
-        /// <param name="text">The target builder.</param>
-        /// <param name="value">The read-only character span to append.</param>
-        /// <returns>A reference to this instance after the operation has completed.</returns>
-        /// <remarks>The capacity of this instance is adjusted as needed.</remarks>
-        public static TBuilder AppendUpperInvariant<TBuilder>(this TBuilder text, ReadOnlySpan<char> value)
-            where TBuilder : TextBuilder
-        {
-            if (text is null)
-                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
-
-            text.buffer.AppendUpperInvariantInternal(value);
-            return text;
-        }
-
-        /// <summary>
-        /// Appends the lower case string representation of a specified string
-        /// to this instance using the casing rules from the invariant culture.
-        /// </summary>
-        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
-        /// <param name="text">The target builder.</param>
-        /// <param name="value">The string to append.</param>
-        /// <returns>A reference to this instance after the operation has completed.</returns>
-        /// <remarks>The capacity of this instance is adjusted as needed.</remarks>
-        public static TBuilder AppendLowerInvariant<TBuilder>(this TBuilder text, string? value)
-            where TBuilder : TextBuilder
-        {
-            if (text is null)
-                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
-
-            text.buffer.AppendLowerInvariantInternal(value);
-            return text;
-        }
-
-        /// <summary>
-        /// Appends the lower case string representation of a specified read-only character
-        /// span to this instance using the casing rules from the invariant culture.
-        /// </summary>
-        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
-        /// <param name="text">The target builder.</param>
-        /// <param name="value">The read-only character span to append.</param>
-        /// <returns>A reference to this instance after the operation has completed.</returns>
-        /// <remarks>The capacity of this instance is adjusted as needed.</remarks>
-        public static TBuilder AppendLowerInvariant<TBuilder>(this TBuilder text, ReadOnlySpan<char> value)
-            where TBuilder : TextBuilder
-        {
-            if (text is null)
-                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
-
-            text.buffer.AppendLowerInvariantInternal(value);
             return text;
         }
 
