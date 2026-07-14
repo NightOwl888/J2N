@@ -386,6 +386,25 @@ namespace J2N.Text
         }
 
         /// <summary>
+        /// Sets the capacity of a <see cref="TextBuilder"/> object to the actual number of characters
+        /// it contains.
+        /// </summary>
+        /// <remarks>
+        /// This method is similar to <c>trimToSize()</c> in the JDK.
+        /// <para/>
+        /// You can use the <see cref="TrimExcess()"/> method to minimize a <see cref="TextBuilder"/> object's
+        /// memory overhead once it is known that no new characters will be added. To completely clear an
+        /// <see cref="TextBuilder"/> object and release all memory referenced by it, call this method
+        /// after calling the <see cref="TextBuilderExtensions.Clear{TBuilder}(TBuilder)"/> method or setting <see cref="Length"/> property to 0.
+        /// <para/>
+        /// If the capacity is already equal to the current length, this method has no effect.
+        /// </remarks>
+        public void TrimExcess()
+        {
+            buffer.TrimExcess();
+        }
+
+        /// <summary>
         /// Copies the characters from a specified segment of this instance to a specified segment of a destination
         /// <see cref="char"/> array.
         /// </summary>
@@ -578,25 +597,6 @@ namespace J2N.Text
         public string ToString(int startIndex, int length)
         {
             return buffer.ToString(startIndex, length);
-        }
-
-        /// <summary>
-        /// Sets the capacity of a <see cref="TextBuilder"/> object to the actual number of characters
-        /// it contains.
-        /// </summary>
-        /// <remarks>
-        /// This method is similar to <c>trimToSize()</c> in the JDK.
-        /// <para/>
-        /// You can use the <see cref="TrimExcess()"/> method to minimize a <see cref="TextBuilder"/> object's
-        /// memory overhead once it is known that no new characters will be added. To completely clear an
-        /// <see cref="TextBuilder"/> object and release all memory referenced by it, call this method
-        /// after calling the <see cref="TextBuilderExtensions.Clear{TBuilder}(TBuilder)"/> method or setting <see cref="Length"/> property to 0.
-        /// <para/>
-        /// If the capacity is already equal to the current length, this method has no effect.
-        /// </remarks>
-        public void TrimExcess()
-        {
-            buffer.TrimExcess();
         }
 
         /// <summary>

@@ -113,6 +113,8 @@ namespace J2N.Text
         [CodeGenerationIgnore]
         public Span<char> RawChars => m_Chars;
 
+        #region Buffer Capacity
+
         /// <summary>
         /// Gets or sets the maximum number of characters that can be contained in the memory allocated by the current instance.
         /// </summary>
@@ -204,6 +206,32 @@ namespace J2N.Text
         }
 
         /// <summary>
+        /// Sets the capacity of a <see cref="MutableTextBuffer"/> object to the actual number of characters
+        /// it contains.
+        /// </summary>
+        /// <remarks>
+        /// This method is similar to <c>trimToSize()</c> in the JDK.
+        /// <para/>
+        /// You can use the <see cref="TrimExcess()"/> method to minimize a <see cref="MutableTextBuffer"/> object's
+        /// memory overhead once it is known that no new characters will be added. To completely clear an
+        /// <see cref="MutableTextBuffer"/> object and release all memory referenced by it, call this method
+        /// after calling the <see cref="MutableTextBufferExtensions.Clear{TBuilder}(TBuilder)"/> method or setting <see cref="Length"/> property to 0.
+        /// <para/>
+        /// If the capacity is already equal to the current length, this method has no effect.
+        /// </remarks>
+        public void TrimExcess() // Coverage for the JDK
+        {
+            if (m_Position < m_Chars.Length)
+            {
+                ReplaceBuffer(m_Position);
+            }
+        }
+
+        #endregion Buffer Capacity
+
+        #region Buffer Length
+
+        /// <summary>
         /// Removes all characters from the current instance.
         /// </summary>
         /// <remarks>
@@ -267,6 +295,10 @@ namespace J2N.Text
                 }
             }
         }
+
+        #endregion Buffer Length
+
+        #region this[index]
 
         /// <summary>
         /// Gets or sets the character at the specified character position in this instance.
@@ -346,6 +378,8 @@ namespace J2N.Text
                 m_Chars[index] = value;
             }
         }
+
+        #endregion this[index]
 
         #region Custom Append
 
@@ -1243,28 +1277,6 @@ namespace J2N.Text
         internal void ReverseInternal() // Coverage for the JDK
         {
             m_Chars.AsSpan(0, m_Position).ReverseText();
-        }
-
-        /// <summary>
-        /// Sets the capacity of a <see cref="MutableTextBuffer"/> object to the actual number of characters
-        /// it contains.
-        /// </summary>
-        /// <remarks>
-        /// This method is similar to <c>trimToSize()</c> in the JDK.
-        /// <para/>
-        /// You can use the <see cref="TrimExcess()"/> method to minimize a <see cref="MutableTextBuffer"/> object's
-        /// memory overhead once it is known that no new characters will be added. To completely clear an
-        /// <see cref="MutableTextBuffer"/> object and release all memory referenced by it, call this method
-        /// after calling the <see cref="MutableTextBufferExtensions.Clear{TBuilder}(TBuilder)"/> method or setting <see cref="Length"/> property to 0.
-        /// <para/>
-        /// If the capacity is already equal to the current length, this method has no effect.
-        /// </remarks>
-        public void TrimExcess() // Coverage for the JDK
-        {
-            if (m_Position < m_Chars.Length)
-            {
-                ReplaceBuffer(m_Position);
-            }
         }
 
         /// <summary>
