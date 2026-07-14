@@ -2674,6 +2674,99 @@ namespace J2N.Text
         }
 
         /// <summary>
+        /// Deletes a sequence of characters specified by <paramref name="startIndex"/> and <paramref name="count"/>.
+        /// Shifts any remaining characters to the left.
+        /// <para/>
+        /// IMPORTANT: This method has .NET semantics. That is, the <paramref name="count"/> parameter is a count rather than
+        /// an exclusive end index. To translate from Java, use <c>end - start</c> for <paramref name="count"/>.
+        /// <para/>
+        /// This method differs from <see cref="Remove{TBuilder}(TBuilder, int, int)"/> in that it will automatically
+        /// adjust the <paramref name="count"/> if <c><paramref name="startIndex"/> + <paramref name="count"/> > <see cref="SynchronizedTextBuilder.Length"/></c>
+        /// to <c><see cref="SynchronizedTextBuilder.Length"/> - <paramref name="startIndex"/>.</c>, provided it is not bounded by <see cref="SynchronizedTextBuilder.MaxCapacity"/>.
+        /// </summary>
+        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
+        /// <param name="text">The target builder.</param>
+        /// <param name="startIndex">The start index.</param>
+        /// <param name="count">The number of characters to delete.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="startIndex"/> or <paramref name="count"/> is less than zero.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="startIndex"/> is greater than <see cref="SynchronizedTextBuilder.Length"/>.
+        /// </exception>
+        public static TBuilder Delete<TBuilder>(this TBuilder text, int startIndex, int count)
+            where TBuilder : SynchronizedTextBuilder
+        {
+            if (text is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
+
+            lock (text.SyncRoot)
+            {
+                text.buffer.DeleteInternal(startIndex, count);
+                return text;
+            }
+        }
+
+        /// <summary>Removes the character at the specified index from this instance.</summary>
+        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
+        /// <param name="text">The target builder.</param>
+        /// <param name="index">The zero-based position in this instance of the character to remove.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="index"/> is less than zero or
+        /// greater than or equal to the length of this instance.
+        /// </exception>
+        /// <remarks>
+        /// The current method removes the specified character from the current instance. The characters at
+        /// (<paramref name="index"/> + 1) are moved to <paramref name="index"/>, and
+        /// the string value of the current instance is shortened by 1. The capacity of the
+        /// current instance is unaffected.
+        /// </remarks>
+        public static TBuilder RemoveAt<TBuilder>(this TBuilder text, int index)
+            where TBuilder : SynchronizedTextBuilder
+        {
+            if (text is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
+
+            lock (text.SyncRoot)
+            {
+                text.buffer.RemoveAtInternal(index);
+                return text;
+            }
+        }
+
+        /// <summary>Removes the specified range of characters from this instance.</summary>
+        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
+        /// <param name="text">The target builder.</param>
+        /// <param name="startIndex">The zero-based position in this instance where removal begins.</param>
+        /// <param name="length">The number of characters to remove.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// If <paramref name="startIndex"/> or <paramref name="length"/> is less than zero,
+        /// or <paramref name="startIndex"/> + <paramref name="length"/> is greater than the length of this instance.
+        /// </exception>
+        /// <remarks>
+        /// The current method removes the specified range of characters from the current instance. The characters at
+        /// (<paramref name="startIndex"/> + <paramref name="length"/>) are moved to <paramref name="startIndex"/>, and
+        /// the string value of the current instance is shortened by <paramref name="length"/>. The capacity of the
+        /// current instance is unaffected.
+        /// </remarks>
+        public static TBuilder Remove<TBuilder>(this TBuilder text, int startIndex, int length)
+            where TBuilder : SynchronizedTextBuilder
+        {
+            if (text is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
+
+            lock (text.SyncRoot)
+            {
+                text.buffer.RemoveInternal(startIndex, length);
+                return text;
+            }
+        }
+
+        /// <summary>
         /// Appends the string representation of the Unicode characters in a specified sequence to this instance.
         /// <para/>
         /// NOTE: Unlike the Java implementation, this method does not add the word <c>"null"</c> to the <see cref="SynchronizedTextBuilder"/>
@@ -3467,63 +3560,6 @@ namespace J2N.Text
             lock (text.SyncRoot)
             {
                 text.buffer.InsertInternal(index, value, repeatCount);
-                return text;
-            }
-        }
-
-        /// <summary>Removes the specified range of characters from this instance.</summary>
-        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
-        /// <param name="text">The target builder.</param>
-        /// <param name="startIndex">The zero-based position in this instance where removal begins.</param>
-        /// <param name="length">The number of characters to remove.</param>
-        /// <returns>A reference to this instance after the operation has completed.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// If <paramref name="startIndex"/> or <paramref name="length"/> is less than zero,
-        /// or <paramref name="startIndex"/> + <paramref name="length"/> is greater than the length of this instance.
-        /// </exception>
-        /// <remarks>
-        /// The current method removes the specified range of characters from the current instance. The characters at
-        /// (<paramref name="startIndex"/> + <paramref name="length"/>) are moved to <paramref name="startIndex"/>, and
-        /// the string value of the current instance is shortened by <paramref name="length"/>. The capacity of the
-        /// current instance is unaffected.
-        /// </remarks>
-        public static TBuilder Remove<TBuilder>(this TBuilder text, int startIndex, int length)
-            where TBuilder : SynchronizedTextBuilder
-        {
-            if (text is null)
-                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
-
-            lock (text.SyncRoot)
-            {
-                text.buffer.RemoveInternal(startIndex, length);
-                return text;
-            }
-        }
-
-        /// <summary>Removes the character at the specified index from this instance.</summary>
-        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
-        /// <param name="text">The target builder.</param>
-        /// <param name="index">The zero-based position in this instance of the character to remove.</param>
-        /// <returns>A reference to this instance after the operation has completed.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// <paramref name="index"/> is less than zero or
-        /// greater than or equal to the length of this instance.
-        /// </exception>
-        /// <remarks>
-        /// The current method removes the specified character from the current instance. The characters at
-        /// (<paramref name="index"/> + 1) are moved to <paramref name="index"/>, and
-        /// the string value of the current instance is shortened by 1. The capacity of the
-        /// current instance is unaffected.
-        /// </remarks>
-        public static TBuilder RemoveAt<TBuilder>(this TBuilder text, int index)
-            where TBuilder : SynchronizedTextBuilder
-        {
-            if (text is null)
-                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
-
-            lock (text.SyncRoot)
-            {
-                text.buffer.RemoveAtInternal(index);
                 return text;
             }
         }
@@ -4416,42 +4452,6 @@ namespace J2N.Text
             lock (text.SyncRoot)
             {
                 text.buffer.InsertInternal(index, value, valueCount);
-                return text;
-            }
-        }
-
-        /// <summary>
-        /// Deletes a sequence of characters specified by <paramref name="startIndex"/> and <paramref name="count"/>.
-        /// Shifts any remaining characters to the left.
-        /// <para/>
-        /// IMPORTANT: This method has .NET semantics. That is, the <paramref name="count"/> parameter is a count rather than
-        /// an exclusive end index. To translate from Java, use <c>end - start</c> for <paramref name="count"/>.
-        /// <para/>
-        /// This method differs from <see cref="Remove{TBuilder}(TBuilder, int, int)"/> in that it will automatically
-        /// adjust the <paramref name="count"/> if <c><paramref name="startIndex"/> + <paramref name="count"/> > <see cref="SynchronizedTextBuilder.Length"/></c>
-        /// to <c><see cref="SynchronizedTextBuilder.Length"/> - <paramref name="startIndex"/>.</c>, provided it is not bounded by <see cref="SynchronizedTextBuilder.MaxCapacity"/>.
-        /// </summary>
-        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
-        /// <param name="text">The target builder.</param>
-        /// <param name="startIndex">The start index.</param>
-        /// <param name="count">The number of characters to delete.</param>
-        /// <returns>A reference to this instance after the operation has completed.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// <paramref name="startIndex"/> or <paramref name="count"/> is less than zero.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// <paramref name="startIndex"/> is greater than <see cref="SynchronizedTextBuilder.Length"/>.
-        /// </exception>
-        public static TBuilder Delete<TBuilder>(this TBuilder text, int startIndex, int count)
-            where TBuilder : SynchronizedTextBuilder
-        {
-            if (text is null)
-                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
-
-            lock (text.SyncRoot)
-            {
-                text.buffer.DeleteInternal(startIndex, count);
                 return text;
             }
         }
