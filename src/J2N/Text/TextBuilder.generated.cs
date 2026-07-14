@@ -22,11 +22,11 @@ using System.Collections.Generic;
 using System.Globalization;
 using J2N.Buffers;
 using J2N.Collections;
-using J2N.Collections.Generic;
 using System.Buffers;
-using System.ComponentModel;
 using System.Text;
+using System.ComponentModel;
 using J2N.Numerics.Formatters;
+using J2N.Collections.Generic;
 
 namespace J2N.Text
 {
