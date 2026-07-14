@@ -194,6 +194,8 @@ namespace J2N.Text.CodeGen.Roslyn
 
                         DefaultValueExpression =
                             p.Default?.Value.ToString(),
+
+                        Attributes = ExtractAttributes(p.AttributeLists),
                     };
                 }).ToList();
 
@@ -348,6 +350,8 @@ namespace J2N.Text.CodeGen.Roslyn
 
                         DefaultValueExpression =
                             p.Default?.Value.ToString(),
+
+                        Attributes = ExtractAttributes(p.AttributeLists),
                     };
                 }).ToList();
 
@@ -552,26 +556,6 @@ namespace J2N.Text.CodeGen.Roslyn
                             $"Unsupported XML documentation attribute syntax '{attribute.GetType().Name}'.");
                 }
             }
-        }
-
-        private static string? GetElementInnerXml(
-            IEnumerable<XmlDocumentationElementModel> elements,
-            string elementName)
-        {
-            return elements
-                .FirstOrDefault(e =>
-                    e.ElementName == elementName)?
-                .InnerXml;
-        }
-
-        private static List<XmlDocumentationElementModel> GetElements(
-            IEnumerable<XmlDocumentationElementModel> elements,
-            string elementName)
-        {
-            return elements
-                .Where(e =>
-                    e.ElementName == elementName)
-                .ToList();
         }
 
         private static string NormalizeDocumentationContent(

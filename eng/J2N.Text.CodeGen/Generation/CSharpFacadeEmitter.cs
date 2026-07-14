@@ -367,22 +367,14 @@ namespace J2N.Text.CodeGen.Generation
         private static void EmitAttributes(
             StringBuilder sb,
             IEnumerable<AttributeModel> attributes,
-            string indent)
+            string indent = "        ")
         {
             foreach (AttributeModel attribute in attributes
                 .Where(a =>
                     !a.Name.StartsWith("CodeGeneration", StringComparison.Ordinal)))
             {
-                if (attribute.Arguments.Count == 0)
-                {
-                    sb.AppendLine($"{indent}[{attribute.Name}]");
-                }
-                else
-                {
-                    string args = string.Join(", ", attribute.Arguments);
-
-                    sb.AppendLine($"{indent}[{attribute.Name}({args})]");
-                }
+                sb.Append(indent);
+                sb.AppendLine(FormatAttribute(attribute));
             }
         }
 
@@ -436,6 +428,13 @@ namespace J2N.Text.CodeGen.Generation
 
         private static string FormatParameter(ParameterModel parameter)
         {
+            string attributes =
+                parameter.Attributes.Count == 0
+                    ? ""
+                    : string.Join(
+                        " ",
+                        parameter.Attributes.Select(FormatAttribute)) + " ";
+
             string modifier =
                 string.IsNullOrWhiteSpace(parameter.Modifier)
                     ? ""
@@ -447,7 +446,18 @@ namespace J2N.Text.CodeGen.Generation
                     : $" = {parameter.DefaultValueExpression}";
 
             return
-                $"{modifier}{parameter.TypeName} {parameter.Name}{defaultValue}";
+                $"{attributes}{modifier}{parameter.TypeName} {parameter.Name}{defaultValue}";
+        }
+
+        private static string FormatAttribute(AttributeModel attribute)
+        {
+            if (attribute.Arguments.Count == 0)
+            {
+                return $"[{attribute.Name}]";
+            }
+
+            return
+                $"[{attribute.Name}({string.Join(", ", attribute.Arguments)})]";
         }
     }
 }

@@ -13,5 +13,7 @@
         public string? Modifier { get; init; }
 
         public string? DefaultValueExpression { get; init; }
+
+        public List<AttributeModel> Attributes { get; init; } = [];
     }
 }
