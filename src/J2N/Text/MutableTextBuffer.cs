@@ -103,59 +103,6 @@ namespace J2N.Text
             init => clearExposedBuffers = value;
         }
 
-        private void MakeRoom(int index, int count)
-        {
-            //AssertInvariants();
-            Debug.Assert(count > 0);
-            Debug.Assert(index >= 0);
-            Debug.Assert(index <= m_Position);
-
-            if (count + Length > m_MaxCapacity || count + Length < count)
-            {
-                throw new ArgumentOutOfRangeException("requiredLength", SR.ArgumentOutOfRange_SmallCapacity);
-            }
-
-            // Cool, we have some space in this block, and we don't have to copy much to get at it, so go ahead and use it.
-            // This typically happens when someone repeatedly inserts small strings at a spot (usually the absolute front) of the buffer.
-            if (m_Chars.Length - m_Position >= count)
-            {
-                new ReadOnlySpan<char>(m_Chars, index, m_Position - index)
-                    .CopyTo(m_Chars.AsSpan(index + count));
-
-                m_Position += count;
-                return;
-            }
-
-            // Allocate the new array
-            char[] newArray = allocator.Allocate(CalculateNewArrayLength(count));
-
-            if (m_Position > 0)
-            {
-                // Copy the head of the current buffer to the new buffer.
-                int copyCount1 = index; //Math.Min(count, index);
-                if (copyCount1 > 0)
-                {
-                    new ReadOnlySpan<char>(m_Chars, 0, copyCount1).CopyTo(newArray);
-                }
-
-                // Copy the tail of the current buffer to the new buffer, leaving a gap of length count.
-                int copyCount2 = copyCount1 + count;
-                if (copyCount2 > 0)
-                {
-                    new ReadOnlySpan<char>(m_Chars, copyCount1, m_Position - copyCount1).CopyTo(newArray.AsSpan(copyCount2));
-                }
-            }
-
-            // We are done with the old array
-            allocator.Return(m_Chars);
-
-            // Wire in the new array
-            m_Chars = newArray;
-            m_Position += count;
-
-            //AssertInvariants();
-        }
-
         /// <summary>
         /// Gets the underlying storage of the builder.
         /// </summary>
@@ -1116,6 +1063,65 @@ namespace J2N.Text
 #endif
 
             index += count;
+        }
+
+        /// <summary>
+        /// Creates a gap at a logical index with the specified count,
+        /// allocating new buffer if necessary.
+        /// </summary>
+        /// <param name="index">The logical index in this builder.</param>
+        /// <param name="count">The number of characters in the gap.</param>
+        private void MakeRoom(int index, int count)
+        {
+            //AssertInvariants();
+            Debug.Assert(count > 0);
+            Debug.Assert(index >= 0);
+            Debug.Assert(index <= m_Position);
+
+            if (count + Length > m_MaxCapacity || count + Length < count)
+            {
+                throw new ArgumentOutOfRangeException("requiredLength", SR.ArgumentOutOfRange_SmallCapacity);
+            }
+
+            // Cool, we have some space in this block, and we don't have to copy much to get at it, so go ahead and use it.
+            // This typically happens when someone repeatedly inserts small strings at a spot (usually the absolute front) of the buffer.
+            if (m_Chars.Length - m_Position >= count)
+            {
+                new ReadOnlySpan<char>(m_Chars, index, m_Position - index)
+                    .CopyTo(m_Chars.AsSpan(index + count));
+
+                m_Position += count;
+                return;
+            }
+
+            // Allocate the new array
+            char[] newArray = allocator.Allocate(CalculateNewArrayLength(count));
+
+            if (m_Position > 0)
+            {
+                // Copy the head of the current buffer to the new buffer.
+                int copyCount1 = index; //Math.Min(count, index);
+                if (copyCount1 > 0)
+                {
+                    new ReadOnlySpan<char>(m_Chars, 0, copyCount1).CopyTo(newArray);
+                }
+
+                // Copy the tail of the current buffer to the new buffer, leaving a gap of length count.
+                int copyCount2 = copyCount1 + count;
+                if (copyCount2 > 0)
+                {
+                    new ReadOnlySpan<char>(m_Chars, copyCount1, m_Position - copyCount1).CopyTo(newArray.AsSpan(copyCount2));
+                }
+            }
+
+            // We are done with the old array
+            allocator.Return(m_Chars);
+
+            // Wire in the new array
+            m_Chars = newArray;
+            m_Position += count;
+
+            //AssertInvariants();
         }
 
         /// <summary>
