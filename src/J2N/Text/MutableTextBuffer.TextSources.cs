@@ -939,6 +939,8 @@ namespace J2N.Text
         [MethodImpl(MethodImplOptions.NoInlining)]
         private void AppendOverlapping(int sourceOffset, int valueCount)
         {
+            // J2N TODO: Add Debug.Asserts here for invariants
+
             // If the append fits in the existing array, Memmove already
             // supports overlap perfectly.
             if ((uint)m_Position + (uint)valueCount <= (uint)m_Chars.Length)
@@ -973,6 +975,8 @@ namespace J2N.Text
 
         private void InsertOverlapping(int index, int sourceOffset, int count)
         {
+            // J2N TODO: Add Debug.Asserts here for invariants
+
             bool entirelyWithinLiveBuffer =
                 (uint)sourceOffset <= (uint)m_Position &&
                 (uint)sourceOffset + (uint)count <= (uint)m_Position;
