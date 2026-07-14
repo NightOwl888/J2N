@@ -3442,7 +3442,7 @@ namespace J2N.Text.Tests
             Assert.Equal(expected, builder.ToString());
         }
 
-        public IEnumerable<object?[]> Append_StringBuilder_TestData()
+        public IEnumerable<object?[]> Append_MutableTextBuffer_TestData()
         {
             string mediumString = new string('a', 30);
             string largeString = new string('b', 1000);
@@ -3472,20 +3472,20 @@ namespace J2N.Text.Tests
         }
 
         [Fact]
-        public void Test_Append_StringBuilder()
+        public void Test_Append_MutableTextBuffer()
         {
-            foreach (var testData in Append_StringBuilder_TestData())
+            foreach (var testData in Append_MutableTextBuffer_TestData())
             {
-                Append_StringBuilder((MutableTextBuffer)testData[0]!, (MutableTextBuffer?)testData[1], (string)testData[2]!);
+                Append_MutableTextBuffer((MutableTextBuffer)testData[0]!, (MutableTextBuffer?)testData[1], (string)testData[2]!);
             }
         }
 
-        private static void Append_StringBuilder(MutableTextBuffer s1, MutableTextBuffer? s2, string s)
+        private static void Append_MutableTextBuffer(MutableTextBuffer s1, MutableTextBuffer? s2, string s)
         {
             Assert.Equal(s, s1.Apply((sb) => sb.Append(s2)).ToString());
         }
 
-        public IEnumerable<object?[]> Append_StringBuilder_Substring_TestData()
+        public IEnumerable<object?[]> Append_MutableTextBuffer_Substring_TestData()
         {
             string mediumString = new string('a', 30);
             string largeString = new string('b', 1000);
@@ -3520,15 +3520,121 @@ namespace J2N.Text.Tests
         }
 
         [Fact]
+        public void Test_Append_MutableTextBuffer_Substring()
+        {
+            foreach (var testData in Append_MutableTextBuffer_Substring_TestData())
+            {
+                Append_MutableTextBuffer_Substring((MutableTextBuffer)testData[0]!, (MutableTextBuffer?)testData[1], (int)testData[2]!, (int)testData[3]!, (string)testData[4]!);
+            }
+        }
+
+        public static void Append_MutableTextBuffer_Substring(MutableTextBuffer s1, MutableTextBuffer? s2, int startIndex, int count, string s)
+        {
+            Assert.Equal(s, s1.Apply((sb) => sb.Append(s2.AsSpan(startIndex, count))).ToString());
+        }
+
+        [Fact]
+        public void Append_MutableTextBuffer_InvalidInput()
+        {
+            MutableTextBuffer sb = MutableTextBufferFactory(5, 5).Apply((sb) => sb.Append("Hello"));
+
+            Assert.Throws<ArgumentOutOfRangeException>(() => sb.Append(sb.AsSpan(-1, 0)));
+            Assert.Throws<ArgumentOutOfRangeException>(() => sb.Append(sb.AsSpan(0, -1)));
+            Assert.Throws<ArgumentOutOfRangeException>(() => sb.Append(sb.AsSpan(4, 5)));
+
+            Assert.Throws<ArgumentOutOfRangeException>(() => MutableTextBufferFactory(3, 6).Apply((sb) => sb.Append("Hello")).Apply((sb) => sb.Append(sb)));
+            Assert.Throws<ArgumentOutOfRangeException>(() => MutableTextBufferFactory(3, 6).Apply((sb) => sb.Append("Hello")).Apply((sb) => sb.Append("Hello")));
+
+            Assert.Throws<ArgumentOutOfRangeException>(() => sb.Append(sb));
+        }
+
+        public IEnumerable<object?[]> Append_StringBuilder_TestData()
+        {
+            string mediumString = new string('a', 30);
+            string largeString = new string('b', 1000);
+
+            var sb1 = new StringBuilder("Hello");
+            var sb2 = new StringBuilder("one");
+            var sb3 = new StringBuilder(20).Append(mediumString);
+
+            yield return new object?[] { MutableTextBufferFactory("Hello"), sb1, "HelloHello" };
+            yield return new object?[] { MutableTextBufferFactory("Hello"), sb2, "Helloone" };
+            yield return new object?[] { MutableTextBufferFactory("Hello"), new StringBuilder(), "Hello" };
+
+            yield return new object?[] { MutableTextBufferFactory("one"), sb3, "one" + mediumString };
+
+            yield return new object?[] { MutableTextBufferFactory(20).Apply((sb) => sb.Append(mediumString)), sb3, mediumString + mediumString };
+            yield return new object?[] { MutableTextBufferFactory(10).Apply((sb) => sb.Append(mediumString)), sb3, mediumString + mediumString };
+
+            yield return new object?[] { MutableTextBufferFactory(20).Apply((sb) => sb.Append(largeString)), sb3, largeString + mediumString };
+            yield return new object?[] { MutableTextBufferFactory(10).Apply((sb) => sb.Append(largeString)), sb3, largeString + mediumString };
+
+            yield return new object?[] { MutableTextBufferFactory(10), sb3, mediumString };
+            yield return new object?[] { MutableTextBufferFactory(30), sb3, mediumString };
+            yield return new object?[] { MutableTextBufferFactory(10), new StringBuilder(20), string.Empty };
+
+            yield return new object?[] { MutableTextBufferFactory("Hello"), null, "Hello" };
+            yield return new object?[] { MutableTextBufferFactory("Hello"), sb1, "HelloHello" };
+        }
+
+        [Fact]
+        public void Test_Append_StringBuilder()
+        {
+            foreach (var testData in Append_StringBuilder_TestData())
+            {
+                Append_StringBuilder((MutableTextBuffer)testData[0]!, (StringBuilder?)testData[1], (string)testData[2]!);
+            }
+        }
+
+        private static void Append_StringBuilder(MutableTextBuffer s1, StringBuilder? s2, string s)
+        {
+            Assert.Equal(s, s1.Apply((sb) => sb.Append(s2)).ToString());
+        }
+
+        public IEnumerable<object?[]> Append_StringBuilder_Substring_TestData()
+        {
+            string mediumString = new string('a', 30);
+            string largeString = new string('b', 1000);
+
+            var sb1 = new StringBuilder("Hello");
+            var sb2 = new StringBuilder("one");
+            var sb3 = new StringBuilder(20).Append(mediumString);
+
+            yield return new object?[] { MutableTextBufferFactory("Hello"), sb1, 0, 5, "HelloHello" };
+            yield return new object?[] { MutableTextBufferFactory("Hello"), sb1, 0, 0, "Hello" };
+            yield return new object?[] { MutableTextBufferFactory("Hello"), sb1, 2, 3, "Hellollo" };
+            yield return new object?[] { MutableTextBufferFactory("Hello"), sb1, 2, 2, "Helloll" };
+            yield return new object?[] { MutableTextBufferFactory("Hello"), sb1, 2, 0, "Hello" };
+            yield return new object?[] { MutableTextBufferFactory("Hello"), new StringBuilder(), 0, 0, "Hello" };
+            yield return new object?[] { MutableTextBufferFactory("Hello"), null, 0, 0, "Hello" };
+            yield return new object?[] { MutableTextBufferFactory(), new StringBuilder("Hello"), 2, 3, "llo" };
+            yield return new object?[] { MutableTextBufferFactory("Hello"), sb2, 0, 3, "Helloone" };
+
+            yield return new object?[] { MutableTextBufferFactory("one"), sb3, 5, 25, "one" + new string('a', 25) };
+            yield return new object?[] { MutableTextBufferFactory("one"), sb3, 5, 20, "one" + new string('a', 20) };
+            yield return new object?[] { MutableTextBufferFactory("one"), sb3, 10, 10, "one" + new string('a', 10) };
+
+            yield return new object?[] { MutableTextBufferFactory(20).Apply((sb) => sb.Append(mediumString)), sb3, 20, 10, new string('a', 40) };
+            yield return new object?[] { MutableTextBufferFactory(10).Apply((sb) => sb.Append(mediumString)), sb3, 10, 10, new string('a', 40) };
+
+            yield return new object?[] { MutableTextBufferFactory(20).Apply((sb) => sb.Append(largeString)), new StringBuilder(20).Append(largeString), 100, 50, largeString + new string('b', 50) };
+            yield return new object?[] { MutableTextBufferFactory(10).Apply((sb) => sb.Append(mediumString)), new StringBuilder(20).Append(largeString), 20, 10, mediumString + new string('b', 10) };
+            yield return new object?[] { MutableTextBufferFactory(10).Apply((sb) => sb.Append(mediumString)), new StringBuilder(20).Append(largeString), 100, 50, mediumString + new string('b', 50) };
+
+            yield return new object?[] { MutableTextBufferFactory("Hello"), sb1, 2, 3, "Hellollo" };
+            yield return new object?[] { MutableTextBufferFactory("one"), sb2, 2, 0, "one" };
+        }
+
+        [Fact]
         public void Test_Append_StringBuilder_Substring()
         {
             foreach (var testData in Append_StringBuilder_Substring_TestData())
             {
-                Append_StringBuilder_Substring((MutableTextBuffer)testData[0]!, (MutableTextBuffer?)testData[1], (int)testData[2]!, (int)testData[3]!, (string)testData[4]!);
+                Append_StringBuilder_Substring((MutableTextBuffer)testData[0]!, (StringBuilder?)testData[1], (int)testData[2]!, (int)testData[3]!, (string)testData[4]!);
             }
         }
 
-        public static void Append_StringBuilder_Substring(MutableTextBuffer s1, MutableTextBuffer? s2, int startIndex, int count, string s)
+        public static void Append_StringBuilder_Substring(MutableTextBuffer s1, StringBuilder? s2, int startIndex, int count, string s)
         {
             Assert.Equal(s, s1.Apply((sb) => sb.Append(s2, startIndex, count)).ToString());
         }
@@ -3536,18 +3642,19 @@ namespace J2N.Text.Tests
         [Fact]
         public void Append_StringBuilder_InvalidInput()
         {
-            MutableTextBuffer sb = MutableTextBufferFactory(5, 5).Apply((sb) => sb.Append("Hello"));
+            MutableTextBuffer mtb = MutableTextBufferFactory(5, 5).Apply((mtb) => mtb.Append("Hello"));
+            StringBuilder sb = new StringBuilder(5, 5).Append("Hello");
 
-            Assert.Throws<ArgumentOutOfRangeException>(() => sb.Append(sb, -1, 0));
-            Assert.Throws<ArgumentOutOfRangeException>(() => sb.Append(sb, 0, -1));
-            Assert.Throws<ArgumentOutOfRangeException>(() => sb.Append(sb, 4, 5));
+            Assert.Throws<ArgumentOutOfRangeException>(() => mtb.Append(sb, -1, 0));
+            Assert.Throws<ArgumentOutOfRangeException>(() => mtb.Append(sb, 0, -1));
+            Assert.Throws<ArgumentOutOfRangeException>(() => mtb.Append(sb, 4, 5));
 
-            Assert.Throws<ArgumentNullException>(() => sb.Append((MutableTextBuffer?)null, 2, 2));
-            Assert.Throws<ArgumentNullException>(() => sb.Append((MutableTextBuffer?)null, 2, 3));
+            Assert.Throws<ArgumentNullException>(() => mtb.Append((StringBuilder?)null, 2, 2));
+            Assert.Throws<ArgumentNullException>(() => mtb.Append((StringBuilder?)null, 2, 3));
             Assert.Throws<ArgumentOutOfRangeException>(() => MutableTextBufferFactory(3, 6).Apply((sb) => sb.Append("Hello")).Apply((sb) => sb.Append(sb)));
             Assert.Throws<ArgumentOutOfRangeException>(() => MutableTextBufferFactory(3, 6).Apply((sb) => sb.Append("Hello")).Apply((sb) => sb.Append("Hello")));
 
-            Assert.Throws<ArgumentOutOfRangeException>(() => sb.Append(sb));
+            Assert.Throws<ArgumentOutOfRangeException>(() => mtb.Append(sb));
         }
 
         public IEnumerable<object[]> Equals_String_TestData()

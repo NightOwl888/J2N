@@ -1405,26 +1405,6 @@ namespace J2N.Text
             return text;
         }
 
-        public static TBuilder Append<TBuilder>(this TBuilder text, TextBuilder? value)
-            where TBuilder : TextBuilder
-        {
-            if (text is null)
-                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
-
-            text.buffer.AppendInternal(value);
-            return text;
-        }
-
-        public static TBuilder Append<TBuilder>(this TBuilder text, TextBuilder? value, int startIndex, int count)
-            where TBuilder : TextBuilder
-        {
-            if (text is null)
-                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
-
-            text.buffer.AppendInternal(value, startIndex, count);
-            return text;
-        }
-
         /// <summary>Appends the default line terminator to the end of the current <see cref="TextBuilder"/> object.</summary>
         /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
         /// <param name="text">The target builder.</param>

@@ -404,7 +404,9 @@ namespace J2N.Text
             if (other is null)
                 return !HasValue;
 
-            if (other is string otherString)
+            if (other is ISpannable<char> spannable)
+                return Equals(spannable.AsSpan());
+            else if (other is string otherString)
                 return Equals(otherString);
             else if (other is StringBuilder otherStringBuilder)
                 return Equals(otherStringBuilder);
@@ -549,7 +551,9 @@ namespace J2N.Text
             if (this.Value is null) return (other is null) ? 0 : -1;
             if (other is null) return 1;
 
-            if (other is string otherString)
+            if (other is ISpannable<char> spannable)
+                return CompareTo(spannable.AsSpan());
+            else if (other is string otherString)
                 return CompareTo(otherString);
             else if (other is StringBuilder otherStringBuilder)
                 return CompareTo(otherStringBuilder);

@@ -2322,15 +2322,15 @@ namespace J2N.Text
         {
             const string fixture = "0123456789";
             TextBuilder sb = StringBuilderFactory(fixture);
-            ICharSequence ss = sb.Subsequence(0, 5);
+            ICharSequence ss = sb.AsCharSequence().Subsequence(0, 5);
             assertEquals("01234", ss.ToString());
 
-            ss = sb.Subsequence(0, 0);
+            ss = sb.AsCharSequence().Subsequence(0, 0);
             assertEquals("", ss.ToString());
 
             try
             {
-                sb.Subsequence(-1, 1 - -1);
+                sb.AsCharSequence().Subsequence(-1, 1 - -1);
                 fail("No IOOBE, negative start.");
             }
             catch (ArgumentOutOfRangeException) //IndexOutOfBoundsException
@@ -2340,7 +2340,7 @@ namespace J2N.Text
 
             try
             {
-                sb.Subsequence(0, -1 - 0);
+                sb.AsCharSequence().Subsequence(0, -1 - 0);
                 fail("No IOOBE, negative end.");
             }
             catch (ArgumentOutOfRangeException) //IndexOutOfBoundsException
@@ -2350,7 +2350,7 @@ namespace J2N.Text
 
             try
             {
-                sb.Subsequence(0, fixture.Length + 1 - 0);
+                sb.AsCharSequence().Subsequence(0, fixture.Length + 1 - 0);
                 fail("No IOOBE, end > length.");
             }
             catch (ArgumentOutOfRangeException) //IndexOutOfBoundsException
@@ -2360,7 +2360,7 @@ namespace J2N.Text
 
             try
             {
-                sb.Subsequence(3, 2 - 3);
+                sb.AsCharSequence().Subsequence(3, 2 - 3);
                 fail("No IOOBE, start > end.");
             }
             catch (ArgumentOutOfRangeException) //IndexOutOfBoundsException

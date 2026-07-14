@@ -40,7 +40,7 @@ namespace J2N.Text
     ///     </description></item>
     /// </list>
     /// </remarks>
-    public partial class MutableTextBuffer : ICharSequence, IBufferWriter<char>,
+    public partial class MutableTextBuffer : IBufferWriter<char>,
         ISpannable<char>, ICopyable<char>, ISpanCopyable<char>, IDisposable
         //, IEnumerable<char> // ICU4N TODO: Implement?
     {
@@ -380,74 +380,6 @@ namespace J2N.Text
         }
 
         #endregion this[index]
-
-        #region Custom Append
-
-        [CodeGenerationExtensionImplementation]
-        internal void AppendInternal(MutableTextBuffer? value)
-        {
-            if (value != null && value.Length != 0)
-            {
-                AppendCore(value, 0, value.Length);
-            }
-        }
-
-        [CodeGenerationExtensionImplementation]
-        internal void AppendInternal(MutableTextBuffer? value, int startIndex, int count)
-        {
-            if (startIndex < 0)
-                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(startIndex, ExceptionArgument.startIndex);
-            if (count < 0)
-                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(count, ExceptionArgument.count);
-
-            if (value == null)
-            {
-                if (startIndex == 0 && count == 0)
-                {
-                    return;
-                }
-                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.value);
-            }
-
-            if (count == 0)
-            {
-                return;
-            }
-
-            if (count > value.Length - startIndex)
-            {
-                ThrowHelper.ThrowArgumentOutOfRange_IndexMustBeLessOrEqualException(startIndex, ExceptionArgument.startIndex);
-            }
-
-            AppendCore(value, startIndex, count);
-        }
-
-        private void AppendCore(MutableTextBuffer value, int startIndex, int count)
-        {
-            if (value == this)
-            {
-                AppendInternal(value.AsSpan(startIndex, count));
-                return;
-            }
-
-            uint newLength = (uint)Length + (uint)count;
-
-            if (newLength > (uint)m_MaxCapacity)
-            {
-                ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.Capacity, ExceptionResource.ArgumentOutOfRange_Capacity);
-            }
-
-            int pos = m_Position;
-            if (pos > m_Chars.Length - count)
-            {
-                Grow(count);
-            }
-
-            value.CopyTo(startIndex, m_Chars, m_Position, count);
-            m_Position += count;
-        }
-
-        #endregion Custom Append
 
         #region AppendLine
 
@@ -1131,6 +1063,19 @@ namespace J2N.Text
         }
 
         #endregion Dispose
+
+        #region Operator Overrides
+
+        /// <summary>
+        /// Defines an implicit conversion of a given <see cref="MutableTextBuffer"/> to a read-only span of characters.
+        /// </summary>
+        /// <param name="value">A <see cref="MutableTextBuffer"/> to implicitly convert.</param>
+        [CodeGenerationIgnore]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static implicit operator ReadOnlySpan<char>(MutableTextBuffer? value) =>
+            value != null ? value.AsSpan() : default;
+
+        #endregion Operator Overrides
 
         /// <summary>Appends a specified number of chars starting from the specified reference.</summary>
         private void Append(ref char value, int valueCount)

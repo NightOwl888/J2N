@@ -1507,32 +1507,6 @@ namespace J2N.Text
             }
         }
 
-        public static TBuilder Append<TBuilder>(this TBuilder text, SynchronizedTextBuilder? value)
-            where TBuilder : SynchronizedTextBuilder
-        {
-            if (text is null)
-                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
-
-            lock (text.SyncRoot)
-            {
-                text.buffer.AppendInternal(value);
-                return text;
-            }
-        }
-
-        public static TBuilder Append<TBuilder>(this TBuilder text, SynchronizedTextBuilder? value, int startIndex, int count)
-            where TBuilder : SynchronizedTextBuilder
-        {
-            if (text is null)
-                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
-
-            lock (text.SyncRoot)
-            {
-                text.buffer.AppendInternal(value, startIndex, count);
-                return text;
-            }
-        }
-
         /// <summary>Appends the default line terminator to the end of the current <see cref="SynchronizedTextBuilder"/> object.</summary>
         /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
         /// <param name="text">The target builder.</param>

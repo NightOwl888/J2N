@@ -35,7 +35,7 @@ namespace J2N.Text
     ///     </description></item>
     /// </list>
     /// </remarks>
-    public partial class SynchronizedTextBuilder : ICharSequence, IBufferWriter<char>,
+    public partial class SynchronizedTextBuilder : IBufferWriter<char>,
         ICopyable<char>, ISpanCopyable<char>
     {
         private readonly object syncRoot = new();
@@ -324,12 +324,6 @@ namespace J2N.Text
             get => buffer.UseInvariantDefaults;
             init => buffer.useInvariantDefaults = value;
         }
-
-        #region ICharSequence Members
-
-        bool ICharSequence.HasValue => true;
-
-        #endregion ICharSequence Members
 
         /// <summary>
         /// Gets an object that can be used to synchronize access to the <see cref="SynchronizedTextBuilder"/>.

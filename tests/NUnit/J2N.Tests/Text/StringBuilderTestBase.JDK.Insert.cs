@@ -42,8 +42,8 @@ namespace J2N.Text
             // 8254082 made the String variant cause an AIOOBE, fixed in 8257511
             assertEquals("efabc", StringBuilderFactory("abc").Insert(0, "def", 1, 3 - 1).ToString()); // J2N: Corrected 2nd parameter
             assertEquals("efabc", StringBuilderFactory("abc".AsCharSequence()).Insert(0, "def".AsCharSequence(), 1, 3 - 1).ToString()); // J2N: Corrected 2nd parameter
-            assertEquals("efabc", StringBuilderFactory("abc").Insert(0, StringBuilderFactory("def"), 1, 3 - 1).ToString()); // J2N: Corrected 4th parameter
-            assertEquals("efabc", StringBuilderFactory("abc".AsCharSequence()).Insert(0, StringBuilderFactory("def".AsCharSequence()), 1, 3 - 1).ToString()); // J2N: Corrected 4th parameter
+            assertEquals("efabc", StringBuilderFactory("abc").Insert(0, StringBuilderFactory("def").AsSpan(1, 3 - 1)).ToString()); // J2N: Corrected 4th parameter
+            assertEquals("efabc", StringBuilderFactory("abc".AsCharSequence()).Insert(0, StringBuilderFactory("def".AsCharSequence()).AsSpan(1, 3 - 1)).ToString()); // J2N: Corrected 4th parameter
             // insert(I[CII) and insert(ILjava/lang/CharSequence;II) are inconsistently specified
             assertEquals("efabc", StringBuilderFactory("abc").Insert(0, new char[] { 'd', 'e', 'f' }, 1, 2).ToString()); // J2N: Checked 4th parameter
             assertEquals("efabc", StringBuilderFactory("abc".AsCharSequence()).Insert(0, new char[] { 'd', 'e', 'f' }.AsCharSequence(), 1, 2).ToString()); // J2N: Checked 4th parameter

@@ -55,7 +55,7 @@ namespace J2N.Text
     ///     </description></item>
     /// </list>
     /// </remarks>
-    public sealed partial class PooledTextBuilder : TextBuilder, ICharSequence, IBufferWriter<char>,
+    public sealed partial class PooledTextBuilder : TextBuilder, IBufferWriter<char>,
         ISpannable<char>, ICopyable<char>, ISpanCopyable<char>, IDisposable
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

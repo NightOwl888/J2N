@@ -140,36 +140,6 @@ namespace J2N.Text
 
         #endregion Append/Insert bool
 
-        #region Append MutableTextBuffer
-
-#pragma warning disable CS1591 // J2N TODO: Finish docs
-
-        [CodeGenerationGenerateForwarder]
-        public static TBuilder Append<TBuilder>(this TBuilder text, MutableTextBuffer? value)
-            where TBuilder : MutableTextBuffer
-        {
-            if (text is null)
-                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
-
-            text.AppendInternal(value);
-            return text;
-        }
-
-        [CodeGenerationGenerateForwarder]
-        public static TBuilder Append<TBuilder>(this TBuilder text, MutableTextBuffer? value, int startIndex, int count)
-            where TBuilder : MutableTextBuffer
-        {
-            if (text is null)
-                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
-
-            text.AppendInternal(value, startIndex, count);
-            return text;
-        }
-
-#pragma warning restore CS1591 // J2N TODO: Finish docs
-
-        #endregion Append MutableTextBuffer
-
         #region AppendLine
 
         /// <summary>Appends the default line terminator to the end of the current <see cref="MutableTextBuffer"/> object.</summary>

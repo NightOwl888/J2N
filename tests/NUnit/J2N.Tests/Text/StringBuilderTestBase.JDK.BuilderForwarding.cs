@@ -47,7 +47,7 @@ namespace J2N.Text
         {
             // three different flavors of CharSequence
             ICharSequence aString = A_STRING_VAL.AsCharSequence();
-            ICharSequence aStringBuilder = StringBuilderFactory(A_STRING_BUILDER_VAL);
+            ICharSequence aStringBuilder = StringBuilderFactory(A_STRING_BUILDER_VAL).AsCharSequence();
             ICharSequence aStringBuffer = new StringBuffer(A_STRING_BUFFER_VAL);
 
             assertEquals( /*actual*/ StringBuilderFactory().Append(aString).ToString(), /*expected*/ A_STRING_VAL);
@@ -121,7 +121,7 @@ namespace J2N.Text
             const string initString = "012345";
             // three different flavors of CharSequence
             ICharSequence aString = A_STRING_VAL.AsCharSequence();
-            ICharSequence aStringBuilder = StringBuilderFactory(A_STRING_BUILDER_VAL);
+            ICharSequence aStringBuilder = StringBuilderFactory(A_STRING_BUILDER_VAL).AsCharSequence();
             ICharSequence aStringBuffer = new StringBuffer(A_STRING_BUFFER_VAL);
 
             assertEquals(StringBuilderFactory(initString).Insert(2, aString).ToString(), "01" + A_STRING_VAL + "2345");

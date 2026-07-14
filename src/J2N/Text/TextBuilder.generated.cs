@@ -233,31 +233,6 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// Retrieves a sub-sequence from this instance.
-        /// The sub-sequence starts at a specified character position and has a specified length.
-        /// <para/>
-        /// IMPORTANT: This method has .NET semantics, that is, the second parameter is a length,
-        /// not an exclusive end index as it would be in Java.
-        /// </summary>
-        /// <param name="startIndex">
-        /// The start index of the sub-sequence. It is inclusive, that
-        /// is, the index of the first character that is included in the
-        /// sub-sequence.
-        /// </param>
-        /// <param name="length">The number of characters to return in the sub-sequence.</param>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// <paramref name="startIndex"/> plus <paramref name="length"/> indicates a position not within this instance.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// <paramref name="startIndex"/> or <paramref name="length"/> is less than zero.
-        /// </exception>
-        public ICharSequence Subsequence(int startIndex, int length)
-        {
-            return buffer.Subsequence(startIndex, length);
-        }
-
-        /// <summary>
         /// Returns the code point at <paramref name="index"/> in the specified sequence of
         /// character units. If the unit at <paramref name="index"/> is a high-surrogate unit,
         /// <c><paramref name="index"/> + 1</c> is less than the length of the sequence and the unit at

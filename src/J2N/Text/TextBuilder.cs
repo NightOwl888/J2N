@@ -32,7 +32,7 @@ namespace J2N.Text
     ///     </description></item>
     /// </list>
     /// </remarks>
-    public partial class TextBuilder : ICharSequence, IBufferWriter<char>,
+    public partial class TextBuilder : IBufferWriter<char>,
         ISpannable<char>, ICopyable<char>, ISpanCopyable<char>
     {
         internal readonly MutableTextBuffer buffer;
@@ -321,10 +321,8 @@ namespace J2N.Text
 
 
         /// <summary>
-        /// 
         /// Gets or sets a flag indicating to use invariant default settings when not otherwise specified by the user.
         /// This setting affects culture-aware features such as formatting and comparing.
-        /// 
         /// </summary>
         public bool UseInvariantDefaults
         {
@@ -332,11 +330,17 @@ namespace J2N.Text
             init => buffer.useInvariantDefaults = value;
         }
 
-        #region ICharSequence Members
+        #region Operator Overrides
 
-        bool ICharSequence.HasValue => true;
+        /// <summary>
+        /// Defines an implicit conversion of a given <see cref="TextBuilder"/> to a read-only span of characters.
+        /// </summary>
+        /// <param name="value">A <see cref="TextBuilder"/> to implicitly convert.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static implicit operator ReadOnlySpan<char>(TextBuilder? value) =>
+            value != null ? value.AsSpan() : default;
 
-        #endregion ICharSequence Members
+        #endregion Operator Overrides
 
         #region ISpannable<char> Members
 
