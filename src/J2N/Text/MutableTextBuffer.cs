@@ -649,34 +649,6 @@ namespace J2N.Text
             m_Chars.AsSpan(sourceIndex, count).CopyTo(destination);
         }
 
-        private void RemoveCore(int startIndex, int length)
-        {
-            Debug.Assert(length >= 0);
-            Debug.Assert(startIndex >= 0);
-            Debug.Assert(length <= m_Position - startIndex);
-
-            if (m_Position == length && startIndex == 0)
-            {
-                m_Position = 0;
-                return;
-            }
-
-            if (length > 0)
-            {
-                int endIndex = startIndex + length;
-                m_Chars.AsSpan(endIndex).CopyTo(m_Chars.AsSpan(startIndex));
-                m_Position -= length;
-            }
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private Span<char> GetClearedWritableSpan(int start, int length)
-        {
-            Span<char> span = m_Chars.AsSpan(start, length);
-            span.Fill('\0');
-            return span;
-        }
-
         /// <summary>
         /// Appends the string representation of a specified Boolean value to this instance.
         /// </summary>
@@ -1005,6 +977,34 @@ namespace J2N.Text
             // title casing (.NET) or lower casing (Java).
             format == BooleanFormat.Lowercase ? StringFormatter.FormatBoolean(value) : value.ToString();
 
+
+        private void RemoveCore(int startIndex, int length)
+        {
+            Debug.Assert(length >= 0);
+            Debug.Assert(startIndex >= 0);
+            Debug.Assert(length <= m_Position - startIndex);
+
+            if (m_Position == length && startIndex == 0)
+            {
+                m_Position = 0;
+                return;
+            }
+
+            if (length > 0)
+            {
+                int endIndex = startIndex + length;
+                m_Chars.AsSpan(endIndex).CopyTo(m_Chars.AsSpan(startIndex));
+                m_Position -= length;
+            }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private Span<char> GetClearedWritableSpan(int start, int length)
+        {
+            Span<char> span = m_Chars.AsSpan(start, length);
+            span.Fill('\0');
+            return span;
+        }
 
         private void ReplaceInPlace(ref int index, ref char value, int count)
         {
