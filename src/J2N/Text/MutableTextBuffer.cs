@@ -1096,6 +1096,28 @@ namespace J2N.Text
             m_Position++;
         }
 
+        private void ReplaceInPlace(ref int index, ref char value, int count)
+        {
+            if (count == 0)
+                return;
+
+#if FEATURE_MEMORYMARSHAL_CREATESPAN
+            MemoryMarshal.CreateSpan(ref value, count)
+                .CopyTo(m_Chars.AsSpan(index));
+#else
+            unsafe
+            {
+                fixed (char* pSource = &value)
+                {
+                    new ReadOnlySpan<char>(pSource, count)
+                        .CopyTo(m_Chars.AsSpan(index));
+                }
+            }
+#endif
+
+            index += count;
+        }
+
         /// <summary>
         /// Resize the internal buffer either by doubling current buffer size or
         /// by adding <paramref name="additionalCapacityBeyondPos"/> to
