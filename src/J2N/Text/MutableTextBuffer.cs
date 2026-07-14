@@ -726,6 +726,133 @@ namespace J2N.Text
 
         #endregion Append/Insert object
 
+        #region InsertFromSelf
+
+#if FEATURE_INDEX_RANGE
+        /// <summary>
+        /// Inserts a copy of the specified range from this buffer at the specified index.
+        /// </summary>
+        /// <remarks>
+        /// The public API and full documentation live in
+        /// <see cref="MutableTextBufferExtensions.InsertFromSelf{TBuilder}(TBuilder, int, Range)"/>.
+        /// Update that documentation if the behavior changes.
+        /// </remarks>
+        [CodeGenerationExtensionImplementation]
+        internal void InsertFromSelfInternal(int index, Range range)
+        {
+            var (startIndex, count) = range.GetOffsetAndLength(Length);
+            InsertFromSelfInternal(index, startIndex, count);
+        }
+#endif
+
+        /// <summary>
+        /// Inserts a copy of the specified range of characters from this buffer at the specified index.
+        /// </summary>
+        /// <remarks>
+        /// The public API and full documentation live in
+        /// <see cref="MutableTextBufferExtensions.InsertFromSelf{TBuilder}(TBuilder, int, int, int)"/>.
+        /// Update that documentation if the behavior changes.
+        /// </remarks>
+        [CodeGenerationExtensionImplementation]
+        internal void InsertFromSelfInternal(int index, int startIndex, int count)
+        {
+            if (count < 0)
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(count, ExceptionArgument.count);
+
+            int pos = m_Position;
+
+            if ((uint)index > (uint)pos)
+                ThrowHelper.ThrowArgumentOutOfRange_IndexMustBeLessOrEqualException(index, ExceptionArgument.index);
+            if ((uint)startIndex > (uint)pos)
+                ThrowHelper.ThrowArgumentOutOfRange_IndexMustBeLessOrEqualException(startIndex, ExceptionArgument.startIndex);
+
+            // Combination validation
+            if (count > pos - startIndex)
+                ThrowHelper.ThrowArgumentException(ExceptionResource.Arg_LongerThanSrcString);
+
+            // Fast path
+            if (count == 0)
+                return;
+
+            if ((uint)pos + (uint)count > m_Chars.Length)
+            {
+                Grow(count);
+            }
+
+#if FEATURE_MEMORYMARSHAL_GETARRAYDATAREFERENCE
+            ref char chars = ref MemoryMarshal.GetArrayDataReference(m_Chars);
+#else
+            ref char chars = ref MemoryMarshal.GetReference(m_Chars);
+#endif
+
+            int tailCount = pos - index;
+
+            //
+            // STEP 1:
+            // Shift tail right to open insertion gap.
+            //
+
+            if (tailCount > 0)
+            {
+#if FEATURE_MEMORYMARSHAL_CREATEREADONLYSPAN
+                MemoryMarshal.CreateReadOnlySpan(ref Unsafe.Add(ref chars, index), tailCount)
+                    .CopyTo(MemoryMarshal.CreateSpan(ref Unsafe.Add(ref chars, index + count), tailCount));
+#else
+                BufferHelper.Memmove(
+                    ref Unsafe.Add(ref chars, index + count),
+                    ref Unsafe.Add(ref chars, index),
+                    (nuint)tailCount);
+#endif
+            }
+
+            //
+            // STEP 2:
+            // Source shifts if insertion before source.
+            //
+
+            if (index < startIndex)
+            {
+                startIndex += count;
+            }
+
+            //
+            // STEP 3:
+            // Copy source into insertion gap.
+            //
+
+#if FEATURE_MEMORYMARSHAL_CREATEREADONLYSPAN
+            MemoryMarshal.CreateReadOnlySpan(ref Unsafe.Add(ref chars, startIndex), count)
+                .CopyTo(MemoryMarshal.CreateSpan(ref Unsafe.Add(ref chars, index), count));
+#else
+            BufferHelper.Memmove(
+                ref Unsafe.Add(ref chars, index),
+                ref Unsafe.Add(ref chars, startIndex),
+                (nuint)count);
+#endif
+
+            m_Position += count;
+        }
+
+        #endregion InsertFromSelf
+
+        #region Reverse
+
+        /// <summary>
+        /// Causes this character sequence to be replaced by the reverse of the sequence.
+        /// </summary>
+        /// <remarks>
+        /// The public API and full documentation live in
+        /// <see cref="MutableTextBufferExtensions.Reverse{TBuilder}(TBuilder)"/>.
+        /// Update that documentation if the behavior changes.
+        /// </remarks>
+        [CodeGenerationExtensionImplementation]
+        internal void ReverseInternal() // Coverage for the JDK
+        {
+            m_Chars.AsSpan(0, m_Position).ReverseText();
+        }
+
+        #endregion Reverse
+
         #region Equals
 
         /// <summary>
@@ -1266,20 +1393,6 @@ namespace J2N.Text
         internal char[] RawArray => m_Chars;
 
         /// <summary>
-        /// Causes this character sequence to be replaced by the reverse of the sequence.
-        /// </summary>
-        /// <remarks>
-        /// The public API and full documentation live in
-        /// <see cref="MutableTextBufferExtensions.Reverse{TBuilder}(TBuilder)"/>.
-        /// Update that documentation if the behavior changes.
-        /// </remarks>
-        [CodeGenerationExtensionImplementation]
-        internal void ReverseInternal() // Coverage for the JDK
-        {
-            m_Chars.AsSpan(0, m_Position).ReverseText();
-        }
-
-        /// <summary>
         /// Appends and returns a writable <see cref="Span{Char}"/> of the specified length to this builder.
         /// Writes to the returned span will update the value of this instance.
         /// </summary>
@@ -1339,111 +1452,6 @@ namespace J2N.Text
             }
             m_Position += length;
             return buffer;
-        }
-
-#if FEATURE_INDEX_RANGE
-        /// <summary>
-        /// Inserts a copy of the specified range from this buffer at the specified index.
-        /// </summary>
-        /// <remarks>
-        /// The public API and full documentation live in
-        /// <see cref="MutableTextBufferExtensions.InsertFromSelf{TBuilder}(TBuilder, int, Range)"/>.
-        /// Update that documentation if the behavior changes.
-        /// </remarks>
-        [CodeGenerationExtensionImplementation]
-        internal void InsertFromSelfInternal(int index, Range range)
-        {
-            var (startIndex, count) = range.GetOffsetAndLength(Length);
-            InsertFromSelfInternal(index, startIndex, count);
-        }
-#endif
-
-        /// <summary>
-        /// Inserts a copy of the specified range of characters from this buffer at the specified index.
-        /// </summary>
-        /// <remarks>
-        /// The public API and full documentation live in
-        /// <see cref="MutableTextBufferExtensions.InsertFromSelf{TBuilder}(TBuilder, int, int, int)"/>.
-        /// Update that documentation if the behavior changes.
-        /// </remarks>
-        [CodeGenerationExtensionImplementation]
-        internal void InsertFromSelfInternal(int index, int startIndex, int count)
-        {
-            if (count < 0)
-                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(count, ExceptionArgument.count);
-
-            int pos = m_Position;
-
-            if ((uint)index > (uint)pos)
-                ThrowHelper.ThrowArgumentOutOfRange_IndexMustBeLessOrEqualException(index, ExceptionArgument.index);
-            if ((uint)startIndex > (uint)pos)
-                ThrowHelper.ThrowArgumentOutOfRange_IndexMustBeLessOrEqualException(startIndex, ExceptionArgument.startIndex);
-
-            // Combination validation
-            if (count > pos - startIndex)
-                ThrowHelper.ThrowArgumentException(ExceptionResource.Arg_LongerThanSrcString);
-
-            // Fast path
-            if (count == 0)
-                return;
-
-            if ((uint)pos + (uint)count > m_Chars.Length)
-            {
-                Grow(count);
-            }
-
-#if FEATURE_MEMORYMARSHAL_GETARRAYDATAREFERENCE
-            ref char chars = ref MemoryMarshal.GetArrayDataReference(m_Chars);
-#else
-            ref char chars = ref MemoryMarshal.GetReference(m_Chars);
-#endif
-
-            int tailCount = pos - index;
-
-            //
-            // STEP 1:
-            // Shift tail right to open insertion gap.
-            //
-
-            if (tailCount > 0)
-            {
-#if FEATURE_MEMORYMARSHAL_CREATEREADONLYSPAN
-                MemoryMarshal.CreateReadOnlySpan(ref Unsafe.Add(ref chars, index), tailCount)
-                    .CopyTo(MemoryMarshal.CreateSpan(ref Unsafe.Add(ref chars, index + count), tailCount));
-#else
-                BufferHelper.Memmove(
-                    ref Unsafe.Add(ref chars, index + count),
-                    ref Unsafe.Add(ref chars, index),
-                    (nuint)tailCount);
-#endif
-            }
-
-            //
-            // STEP 2:
-            // Source shifts if insertion before source.
-            //
-
-            if (index < startIndex)
-            {
-                startIndex += count;
-            }
-
-            //
-            // STEP 3:
-            // Copy source into insertion gap.
-            //
-
-#if FEATURE_MEMORYMARSHAL_CREATEREADONLYSPAN
-            MemoryMarshal.CreateReadOnlySpan(ref Unsafe.Add(ref chars, startIndex), count)
-                .CopyTo(MemoryMarshal.CreateSpan(ref Unsafe.Add(ref chars, index), count));
-#else
-            BufferHelper.Memmove(
-                ref Unsafe.Add(ref chars, index),
-                ref Unsafe.Add(ref chars, startIndex),
-                (nuint)count);
-#endif
-
-            m_Position += count;
         }
 
         #region ISpannable<char> Members
