@@ -1232,6 +1232,69 @@ namespace J2N.Text
             return text;
         }
 
+        /// <summary>
+        /// Appends the string representation of the <paramref name="codePoint"/>
+        /// argument to this sequence.
+        /// <para>
+        /// The argument is appended to the contents of this sequence.
+        /// The length of this sequence increases by <see cref="Character.CharCount(int)"/>.
+        /// </para>
+        /// <para>
+        /// The overall effect is exactly as if the argument were
+        /// converted to a <see cref="char"/> array by the method
+        /// <see cref="Character.ToChars(int)"/> and the character in that array
+        /// were then appended to this <see cref="TextBuilder"/>.
+        /// </para>
+        /// </summary>
+        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
+        /// <param name="text">The target builder.</param>
+        /// <param name="codePoint">A Unicode code point.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="ArgumentException"><paramref name="codePoint"/> is not a valid Unicode code point.</exception>
+        public static TBuilder AppendCodePoint<TBuilder>(this TBuilder text, int codePoint)
+            where TBuilder : TextBuilder
+        {
+            if (text is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
+
+            text.buffer.AppendCodePointInternal(codePoint);
+            return text;
+        }
+
+        /// <summary>
+        /// Insert the string representation of the <paramref name="codePoint"/>
+        /// argument to this sequence at <paramref name="index"/>.
+        /// <para>
+        /// The argument is inserted into to the contents of this sequence.
+        /// The length of this sequence increases by <see cref="Character.CharCount(int)"/>.
+        /// </para>
+        /// <para>
+        /// The overall effect is exactly as if the argument were
+        /// converted to a <see cref="char"/> array by the method
+        /// <see cref="Character.ToChars(int)"/> and the character in that array
+        /// were then inserted into this <see cref="TextBuilder"/>.
+        /// </para>
+        /// </summary>
+        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
+        /// <param name="text">The target builder.</param>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="codePoint">A Unicode code point.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="index"/> is less than zero or greater
+        /// than the length of this instance.
+        /// </exception>
+        /// <exception cref="ArgumentException"><paramref name="codePoint"/> is not a valid Unicode code point.</exception>
+        public static TBuilder InsertCodePoint<TBuilder>(this TBuilder text, int index, int codePoint)
+            where TBuilder : TextBuilder
+        {
+            if (text is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
+
+            text.buffer.InsertCodePointInternal(index, codePoint);
+            return text;
+        }
+
         /// <summary>Creates a new readonly span over the portion of the target string.</summary>
         /// <param name="text">The target string.</param>
         /// <returns>The read-only span representation of the string.</returns>
@@ -1720,69 +1783,6 @@ namespace J2N.Text
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
 
             text.buffer.InsertInternal(index, value, startIndex, count);
-            return text;
-        }
-
-        /// <summary>
-        /// Appends the string representation of the <paramref name="codePoint"/>
-        /// argument to this sequence.
-        /// <para>
-        /// The argument is appended to the contents of this sequence.
-        /// The length of this sequence increases by <see cref="Character.CharCount(int)"/>.
-        /// </para>
-        /// <para>
-        /// The overall effect is exactly as if the argument were
-        /// converted to a <see cref="char"/> array by the method
-        /// <see cref="Character.ToChars(int)"/> and the character in that array
-        /// were then appended to this <see cref="TextBuilder"/>.
-        /// </para>
-        /// </summary>
-        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
-        /// <param name="text">The target builder.</param>
-        /// <param name="codePoint">A Unicode code point.</param>
-        /// <returns>A reference to this instance after the operation has completed.</returns>
-        /// <exception cref="ArgumentException"><paramref name="codePoint"/> is not a valid Unicode code point.</exception>
-        public static TBuilder AppendCodePoint<TBuilder>(this TBuilder text, int codePoint)
-            where TBuilder : TextBuilder
-        {
-            if (text is null)
-                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
-
-            text.buffer.AppendCodePointInternal(codePoint);
-            return text;
-        }
-
-        /// <summary>
-        /// Insert the string representation of the <paramref name="codePoint"/>
-        /// argument to this sequence at <paramref name="index"/>.
-        /// <para>
-        /// The argument is inserted into to the contents of this sequence.
-        /// The length of this sequence increases by <see cref="Character.CharCount(int)"/>.
-        /// </para>
-        /// <para>
-        /// The overall effect is exactly as if the argument were
-        /// converted to a <see cref="char"/> array by the method
-        /// <see cref="Character.ToChars(int)"/> and the character in that array
-        /// were then inserted into this <see cref="TextBuilder"/>.
-        /// </para>
-        /// </summary>
-        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
-        /// <param name="text">The target builder.</param>
-        /// <param name="index">The position in this instance where insertion begins.</param>
-        /// <param name="codePoint">A Unicode code point.</param>
-        /// <returns>A reference to this instance after the operation has completed.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// <paramref name="index"/> is less than zero or greater
-        /// than the length of this instance.
-        /// </exception>
-        /// <exception cref="ArgumentException"><paramref name="codePoint"/> is not a valid Unicode code point.</exception>
-        public static TBuilder InsertCodePoint<TBuilder>(this TBuilder text, int index, int codePoint)
-            where TBuilder : TextBuilder
-        {
-            if (text is null)
-                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
-
-            text.buffer.InsertCodePointInternal(index, codePoint);
             return text;
         }
 
