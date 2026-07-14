@@ -1797,6 +1797,883 @@ namespace J2N.Text
 #endif
 
         /// <summary>
+        /// Appends the string representation of a specified 8-bit signed integer to this instance
+        /// with the specified numeric format and culture-specific format information.
+        /// <para/>
+        /// Unless otherwise specified, formatting is performed in the invariant culture, which
+        /// is similar to how the JDK formats numbers.
+        /// </summary>
+        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
+        /// <param name="text">The target builder.</param>
+        /// <param name="value">The value to format and append.</param>
+        /// <param name="format">A standard or custom numeric format string.</param>
+        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
+        /// <remarks>
+        /// This method allows similar options as the <c>AppendFormat</c> methods, but has better performance because
+        /// the value being formatted is not boxed.
+        /// <para/>
+        /// The capacity of this instance is adjusted as needed.
+        /// <para/>
+        /// <b>Notes to Callers</b>
+        /// <para/>
+        /// When you instantiate a <see cref="SynchronizedTextBuilder"/> object by calling <see cref="SynchronizedTextBuilder(int, int)"/>,
+        /// both the length and the capacity of the <see cref="SynchronizedTextBuilder"/> instance can grow beyond
+        /// the value of its <see cref="SynchronizedTextBuilder.MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append{TBuilder}(TBuilder, string?)"/>
+        /// and <see cref="AppendFormat{TBuilder}(TBuilder, string, object?)"/> methods to append small strings.
+        /// </remarks>
+        /// <seealso cref="sbyte" />
+        [CLSCompliant(false)]
+        public static TBuilder Append<TBuilder>(this TBuilder text, sbyte value, string? format = null, IFormatProvider? provider = null)
+            where TBuilder : SynchronizedTextBuilder
+        {
+            if (text is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
+
+            lock (text.SyncRoot)
+            {
+                text.buffer.AppendInternal(value, format, provider);
+                return text;
+            }
+        }
+
+        /// <summary>
+        /// Appends the string representation of a specified 8-bit unsigned integer to this instance
+        /// with the specified numeric format and culture-specific format information.
+        /// <para/>
+        /// Unless otherwise specified, formatting is performed in the invariant culture, which
+        /// is similar to how the JDK formats numbers.
+        /// </summary>
+        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
+        /// <param name="text">The target builder.</param>
+        /// <param name="value">The value to format and append.</param>
+        /// <param name="format">A standard or custom numeric format string.</param>
+        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
+        /// <remarks>
+        /// This method allows similar options as the <c>AppendFormat</c> methods, but has better performance because
+        /// the value being formatted is not boxed.
+        /// <para/>
+        /// The capacity of this instance is adjusted as needed.
+        /// <para/>
+        /// <b>Notes to Callers</b>
+        /// <para/>
+        /// When you instantiate a <see cref="SynchronizedTextBuilder"/> object by calling <see cref="SynchronizedTextBuilder(int, int)"/>,
+        /// both the length and the capacity of the <see cref="SynchronizedTextBuilder"/> instance can grow beyond
+        /// the value of its <see cref="SynchronizedTextBuilder.MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append{TBuilder}(TBuilder, string?)"/>
+        /// and <see cref="AppendFormat{TBuilder}(TBuilder, string, object?)"/> methods to append small strings.
+        /// </remarks>
+        /// <seealso cref="byte" />
+        public static TBuilder Append<TBuilder>(this TBuilder text, byte value, string? format = null, IFormatProvider? provider = null)
+            where TBuilder : SynchronizedTextBuilder
+        {
+            if (text is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
+
+            lock (text.SyncRoot)
+            {
+                text.buffer.AppendInternal(value, format, provider);
+                return text;
+            }
+        }
+
+        /// <summary>
+        /// Appends the string representation of a specified 16-bit signed integer to this instance
+        /// with the specified numeric format and culture-specific format information.
+        /// <para/>
+        /// Unless otherwise specified, formatting is performed in the invariant culture, which
+        /// is similar to how the JDK formats numbers.
+        /// </summary>
+        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
+        /// <param name="text">The target builder.</param>
+        /// <param name="value">The value to format and append.</param>
+        /// <param name="format">A standard or custom numeric format string.</param>
+        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
+        /// <remarks>
+        /// This method allows similar options as the <c>AppendFormat</c> methods, but has better performance because
+        /// the value being formatted is not boxed.
+        /// <para/>
+        /// The capacity of this instance is adjusted as needed.
+        /// <para/>
+        /// <b>Notes to Callers</b>
+        /// <para/>
+        /// When you instantiate a <see cref="SynchronizedTextBuilder"/> object by calling <see cref="SynchronizedTextBuilder(int, int)"/>,
+        /// both the length and the capacity of the <see cref="SynchronizedTextBuilder"/> instance can grow beyond
+        /// the value of its <see cref="SynchronizedTextBuilder.MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append{TBuilder}(TBuilder, string?)"/>
+        /// and <see cref="AppendFormat{TBuilder}(TBuilder, string, object?)"/> methods to append small strings.
+        /// </remarks>
+        /// <seealso cref="short" />
+        public static TBuilder Append<TBuilder>(this TBuilder text, short value, string? format = null, IFormatProvider? provider = null)
+            where TBuilder : SynchronizedTextBuilder
+        {
+            if (text is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
+
+            lock (text.SyncRoot)
+            {
+                text.buffer.AppendInternal(value, format, provider);
+                return text;
+            }
+        }
+
+        /// <summary>
+        /// Appends the string representation of a specified 32-bit signed integer to this instance
+        /// with the specified numeric format and culture-specific format information.
+        /// <para/>
+        /// Unless otherwise specified, formatting is performed in the invariant culture, which
+        /// is similar to how the JDK formats numbers.
+        /// </summary>
+        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
+        /// <param name="text">The target builder.</param>
+        /// <param name="value">The value to format and append.</param>
+        /// <param name="format">A standard or custom numeric format string.</param>
+        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
+        /// <remarks>
+        /// This method allows similar options as the <c>AppendFormat</c> methods, but has better performance because
+        /// the value being formatted is not boxed.
+        /// <para/>
+        /// The capacity of this instance is adjusted as needed.
+        /// <para/>
+        /// <b>Notes to Callers</b>
+        /// <para/>
+        /// When you instantiate a <see cref="SynchronizedTextBuilder"/> object by calling <see cref="SynchronizedTextBuilder(int, int)"/>,
+        /// both the length and the capacity of the <see cref="SynchronizedTextBuilder"/> instance can grow beyond
+        /// the value of its <see cref="SynchronizedTextBuilder.MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append{TBuilder}(TBuilder, string?)"/>
+        /// and <see cref="AppendFormat{TBuilder}(TBuilder, string, object?)"/> methods to append small strings.
+        /// </remarks>
+        /// <seealso cref="int" />
+        public static TBuilder Append<TBuilder>(this TBuilder text, int value, string? format = null, IFormatProvider? provider = null)
+            where TBuilder : SynchronizedTextBuilder
+        {
+            if (text is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
+
+            lock (text.SyncRoot)
+            {
+                text.buffer.AppendInternal(value, format, provider);
+                return text;
+            }
+        }
+
+        /// <summary>
+        /// Appends the string representation of a specified 64-bit signed integer to this instance
+        /// with the specified numeric format and culture-specific format information.
+        /// <para/>
+        /// Unless otherwise specified, formatting is performed in the invariant culture, which
+        /// is similar to how the JDK formats numbers.
+        /// </summary>
+        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
+        /// <param name="text">The target builder.</param>
+        /// <param name="value">The value to format and append.</param>
+        /// <param name="format">A standard or custom numeric format string.</param>
+        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
+        /// <remarks>
+        /// This method allows similar options as the <c>AppendFormat</c> methods, but has better performance because
+        /// the value being formatted is not boxed.
+        /// <para/>
+        /// The capacity of this instance is adjusted as needed.
+        /// <para/>
+        /// <b>Notes to Callers</b>
+        /// <para/>
+        /// When you instantiate a <see cref="SynchronizedTextBuilder"/> object by calling <see cref="SynchronizedTextBuilder(int, int)"/>,
+        /// both the length and the capacity of the <see cref="SynchronizedTextBuilder"/> instance can grow beyond
+        /// the value of its <see cref="SynchronizedTextBuilder.MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append{TBuilder}(TBuilder, string?)"/>
+        /// and <see cref="AppendFormat{TBuilder}(TBuilder, string, object?)"/> methods to append small strings.
+        /// </remarks>
+        /// <seealso cref="long" />
+        public static TBuilder Append<TBuilder>(this TBuilder text, long value, string? format = null, IFormatProvider? provider = null)
+            where TBuilder : SynchronizedTextBuilder
+        {
+            if (text is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
+
+            lock (text.SyncRoot)
+            {
+                text.buffer.AppendInternal(value, format, provider);
+                return text;
+            }
+        }
+
+        /// <summary>
+        /// Appends the string representation of a specified single-precision floating-point number to this instance
+        /// with the specified numeric format and culture-specific format information.
+        /// <para/>
+        /// Unless otherwise specified, formatting is performed in the invariant culture using the "J" format, which
+        /// is similar to how the JDK formats numbers.
+        /// </summary>
+        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
+        /// <param name="text">The target builder.</param>
+        /// <param name="value">The value to format and append.</param>
+        /// <param name="format">A standard or custom numeric format string.</param>
+        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
+        /// <remarks>
+        /// This method allows similar options as the <c>AppendFormat</c> methods, but has better performance because
+        /// the value being formatted is not boxed.
+        /// <para/>
+        /// The capacity of this instance is adjusted as needed.
+        /// <para/>
+        /// <b>Notes to Callers</b>
+        /// <para/>
+        /// When you instantiate a <see cref="SynchronizedTextBuilder"/> object by calling <see cref="SynchronizedTextBuilder(int, int)"/>,
+        /// both the length and the capacity of the <see cref="SynchronizedTextBuilder"/> instance can grow beyond
+        /// the value of its <see cref="SynchronizedTextBuilder.MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append{TBuilder}(TBuilder, string?)"/>
+        /// and <see cref="AppendFormat{TBuilder}(TBuilder, string, object?)"/> methods to append small strings.
+        /// </remarks>
+        /// <seealso cref="float" />
+        public static TBuilder Append<TBuilder>(this TBuilder text, float value, string? format = null, IFormatProvider? provider = null)
+            where TBuilder : SynchronizedTextBuilder
+        {
+            if (text is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
+
+            lock (text.SyncRoot)
+            {
+                text.buffer.AppendInternal(value, format, provider);
+                return text;
+            }
+        }
+
+        /// <summary>
+        /// Appends the string representation of a specified double-precision floating-point number to this instance
+        /// with the specified numeric format and culture-specific format information.
+        /// <para/>
+        /// Unless otherwise specified, formatting is performed in the invariant culture using the "J" format, which
+        /// is similar to how the JDK formats numbers.
+        /// </summary>
+        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
+        /// <param name="text">The target builder.</param>
+        /// <param name="value">The value to format and append.</param>
+        /// <param name="format">A standard or custom numeric format string.</param>
+        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
+        /// <remarks>
+        /// This method allows similar options as the <c>AppendFormat</c> methods, but has better performance because
+        /// the value being formatted is not boxed.
+        /// <para/>
+        /// The capacity of this instance is adjusted as needed.
+        /// <para/>
+        /// <b>Notes to Callers</b>
+        /// <para/>
+        /// When you instantiate a <see cref="SynchronizedTextBuilder"/> object by calling <see cref="SynchronizedTextBuilder(int, int)"/>,
+        /// both the length and the capacity of the <see cref="SynchronizedTextBuilder"/> instance can grow beyond
+        /// the value of its <see cref="SynchronizedTextBuilder.MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append{TBuilder}(TBuilder, string?)"/>
+        /// and <see cref="AppendFormat{TBuilder}(TBuilder, string, object?)"/> methods to append small strings.
+        /// </remarks>
+        /// <seealso cref="double" />
+        public static TBuilder Append<TBuilder>(this TBuilder text, double value, string? format = null, IFormatProvider? provider = null)
+            where TBuilder : SynchronizedTextBuilder
+        {
+            if (text is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
+
+            lock (text.SyncRoot)
+            {
+                text.buffer.AppendInternal(value, format, provider);
+                return text;
+            }
+        }
+
+        /// <summary>
+        /// Appends the string representation of a specified decimal to this instance
+        /// with the specified numeric format and culture-specific format information.
+        /// <para/>
+        /// Unless otherwise specified, formatting is performed in the invariant culture, which
+        /// is similar to how the JDK formats numbers.
+        /// </summary>
+        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
+        /// <param name="text">The target builder.</param>
+        /// <param name="value">The value to format and append.</param>
+        /// <param name="format">A standard or custom numeric format string.</param>
+        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
+        /// <remarks>
+        /// This method allows similar options as the <c>AppendFormat</c> methods, but has better performance because
+        /// the value being formatted is not boxed.
+        /// <para/>
+        /// The capacity of this instance is adjusted as needed.
+        /// <para/>
+        /// <b>Notes to Callers</b>
+        /// <para/>
+        /// When you instantiate a <see cref="SynchronizedTextBuilder"/> object by calling <see cref="SynchronizedTextBuilder(int, int)"/>,
+        /// both the length and the capacity of the <see cref="SynchronizedTextBuilder"/> instance can grow beyond
+        /// the value of its <see cref="SynchronizedTextBuilder.MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append{TBuilder}(TBuilder, string?)"/>
+        /// and <see cref="AppendFormat{TBuilder}(TBuilder, string, object?)"/> methods to append small strings.
+        /// </remarks>
+        /// <seealso cref="decimal" />
+        public static TBuilder Append<TBuilder>(this TBuilder text, decimal value, string? format = null, IFormatProvider? provider = null)
+            where TBuilder : SynchronizedTextBuilder
+        {
+            if (text is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
+
+            lock (text.SyncRoot)
+            {
+                text.buffer.AppendInternal(value, format, provider);
+                return text;
+            }
+        }
+
+        /// <summary>
+        /// Appends the string representation of a specified 16-bit unsigned integer to this instance
+        /// with the specified numeric format and culture-specific format information.
+        /// <para/>
+        /// Unless otherwise specified, formatting is performed in the invariant culture, which
+        /// is similar to how the JDK formats numbers.
+        /// </summary>
+        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
+        /// <param name="text">The target builder.</param>
+        /// <param name="value">The value to format and append.</param>
+        /// <param name="format">A standard or custom numeric format string.</param>
+        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
+        /// <remarks>
+        /// This method allows similar options as the <c>AppendFormat</c> methods, but has better performance because
+        /// the value being formatted is not boxed.
+        /// <para/>
+        /// The capacity of this instance is adjusted as needed.
+        /// <para/>
+        /// <b>Notes to Callers</b>
+        /// <para/>
+        /// When you instantiate a <see cref="SynchronizedTextBuilder"/> object by calling <see cref="SynchronizedTextBuilder(int, int)"/>,
+        /// both the length and the capacity of the <see cref="SynchronizedTextBuilder"/> instance can grow beyond
+        /// the value of its <see cref="SynchronizedTextBuilder.MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append{TBuilder}(TBuilder, string?)"/>
+        /// and <see cref="AppendFormat{TBuilder}(TBuilder, string, object?)"/> methods to append small strings.
+        /// </remarks>
+        /// <seealso cref="ushort" />
+        [CLSCompliant(false)]
+        public static TBuilder Append<TBuilder>(this TBuilder text, ushort value, string? format = null, IFormatProvider? provider = null)
+            where TBuilder : SynchronizedTextBuilder
+        {
+            if (text is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
+
+            lock (text.SyncRoot)
+            {
+                text.buffer.AppendInternal(value, format, provider);
+                return text;
+            }
+        }
+
+        /// <summary>
+        /// Appends the string representation of a specified 32-bit unsigned integer to this instance
+        /// with the specified numeric format and culture-specific format information.
+        /// <para/>
+        /// Unless otherwise specified, formatting is performed in the invariant culture, which
+        /// is similar to how the JDK formats numbers.
+        /// </summary>
+        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
+        /// <param name="text">The target builder.</param>
+        /// <param name="value">The value to format and append.</param>
+        /// <param name="format">A standard or custom numeric format string.</param>
+        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
+        /// <remarks>
+        /// This method allows similar options as the <c>AppendFormat</c> methods, but has better performance because
+        /// the value being formatted is not boxed.
+        /// <para/>
+        /// The capacity of this instance is adjusted as needed.
+        /// <para/>
+        /// <b>Notes to Callers</b>
+        /// <para/>
+        /// When you instantiate a <see cref="SynchronizedTextBuilder"/> object by calling <see cref="SynchronizedTextBuilder(int, int)"/>,
+        /// both the length and the capacity of the <see cref="SynchronizedTextBuilder"/> instance can grow beyond
+        /// the value of its <see cref="SynchronizedTextBuilder.MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append{TBuilder}(TBuilder, string?)"/>
+        /// and <see cref="AppendFormat{TBuilder}(TBuilder, string, object?)"/> methods to append small strings.
+        /// </remarks>
+        /// <seealso cref="uint" />
+        [CLSCompliant(false)]
+        public static TBuilder Append<TBuilder>(this TBuilder text, uint value, string? format = null, IFormatProvider? provider = null)
+            where TBuilder : SynchronizedTextBuilder
+        {
+            if (text is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
+
+            lock (text.SyncRoot)
+            {
+                text.buffer.AppendInternal(value, format, provider);
+                return text;
+            }
+        }
+
+        /// <summary>
+        /// Appends the string representation of a specified 64-bit unsigned integer to this instance
+        /// with the specified numeric format and culture-specific format information.
+        /// <para/>
+        /// Unless otherwise specified, formatting is performed in the invariant culture, which
+        /// is similar to how the JDK formats numbers.
+        /// </summary>
+        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
+        /// <param name="text">The target builder.</param>
+        /// <param name="value">The value to format and append.</param>
+        /// <param name="format">A standard or custom numeric format string.</param>
+        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
+        /// <remarks>
+        /// This method allows similar options as the <c>AppendFormat</c> methods, but has better performance because
+        /// the value being formatted is not boxed.
+        /// <para/>
+        /// The capacity of this instance is adjusted as needed.
+        /// <para/>
+        /// <b>Notes to Callers</b>
+        /// <para/>
+        /// When you instantiate a <see cref="SynchronizedTextBuilder"/> object by calling <see cref="SynchronizedTextBuilder(int, int)"/>,
+        /// both the length and the capacity of the <see cref="SynchronizedTextBuilder"/> instance can grow beyond
+        /// the value of its <see cref="SynchronizedTextBuilder.MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append{TBuilder}(TBuilder, string?)"/>
+        /// and <see cref="AppendFormat{TBuilder}(TBuilder, string, object?)"/> methods to append small strings.
+        /// </remarks>
+        /// <seealso cref="ulong" />
+        [CLSCompliant(false)]
+        public static TBuilder Append<TBuilder>(this TBuilder text, ulong value, string? format = null, IFormatProvider? provider = null)
+            where TBuilder : SynchronizedTextBuilder
+        {
+            if (text is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
+
+            lock (text.SyncRoot)
+            {
+                text.buffer.AppendInternal(value, format, provider);
+                return text;
+            }
+        }
+
+        /// <summary>
+        /// Inserts the string representation of a specified 8-bit signed integer to this instance
+        /// with the specified numeric format and culture-specific format information.
+        /// <para/>
+        /// Unless otherwise specified, formatting is performed in the invariant culture, which
+        /// is similar to how the JDK formats numbers.
+        /// </summary>
+        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
+        /// <param name="text">The target builder.</param>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">The value to format and append.</param>
+        /// <param name="format">A standard or custom numeric format string.</param>
+        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="index"/> is less than zero or greater than the current length of this instance.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// The current length of this <see cref="SynchronizedTextBuilder"/> object plus the length of
+        /// <paramref name="value"/> exceeds <see cref="SynchronizedTextBuilder.MaxCapacity"/>.
+        /// </exception>
+        /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
+        /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
+        /// <seealso cref="sbyte" />
+        [CLSCompliant(false)]
+        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, sbyte value, string? format = null, IFormatProvider? provider = null)
+            where TBuilder : SynchronizedTextBuilder
+        {
+            if (text is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
+
+            lock (text.SyncRoot)
+            {
+                text.buffer.InsertInternal(index, value, format, provider);
+                return text;
+            }
+        }
+
+        /// <summary>
+        /// Inserts the string representation of a specified 8-bit unsigned integer to this instance
+        /// with the specified numeric format and culture-specific format information.
+        /// <para/>
+        /// Unless otherwise specified, formatting is performed in the invariant culture, which
+        /// is similar to how the JDK formats numbers.
+        /// </summary>
+        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
+        /// <param name="text">The target builder.</param>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">The value to format and append.</param>
+        /// <param name="format">A standard or custom numeric format string.</param>
+        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="index"/> is less than zero or greater than the current length of this instance.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// The current length of this <see cref="SynchronizedTextBuilder"/> object plus the length of
+        /// <paramref name="value"/> exceeds <see cref="SynchronizedTextBuilder.MaxCapacity"/>.
+        /// </exception>
+        /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
+        /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
+        /// <seealso cref="byte" />
+        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, byte value, string? format = null, IFormatProvider? provider = null)
+            where TBuilder : SynchronizedTextBuilder
+        {
+            if (text is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
+
+            lock (text.SyncRoot)
+            {
+                text.buffer.InsertInternal(index, value, format, provider);
+                return text;
+            }
+        }
+
+        /// <summary>
+        /// Inserts the string representation of a specified 16-bit signed integer to this instance
+        /// with the specified numeric format and culture-specific format information.
+        /// <para/>
+        /// Unless otherwise specified, formatting is performed in the invariant culture, which
+        /// is similar to how the JDK formats numbers.
+        /// </summary>
+        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
+        /// <param name="text">The target builder.</param>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">The value to format and append.</param>
+        /// <param name="format">A standard or custom numeric format string.</param>
+        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="index"/> is less than zero or greater than the current length of this instance.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// The current length of this <see cref="SynchronizedTextBuilder"/> object plus the length of
+        /// <paramref name="value"/> exceeds <see cref="SynchronizedTextBuilder.MaxCapacity"/>.
+        /// </exception>
+        /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
+        /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
+        /// <seealso cref="short" />
+        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, short value, string? format = null, IFormatProvider? provider = null)
+            where TBuilder : SynchronizedTextBuilder
+        {
+            if (text is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
+
+            lock (text.SyncRoot)
+            {
+                text.buffer.InsertInternal(index, value, format, provider);
+                return text;
+            }
+        }
+
+        /// <summary>
+        /// Inserts the string representation of a specified 32-bit signed integer to this instance
+        /// with the specified numeric format and culture-specific format information.
+        /// <para/>
+        /// Unless otherwise specified, formatting is performed in the invariant culture, which
+        /// is similar to how the JDK formats numbers.
+        /// </summary>
+        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
+        /// <param name="text">The target builder.</param>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">The value to format and append.</param>
+        /// <param name="format">A standard or custom numeric format string.</param>
+        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="index"/> is less than zero or greater than the current length of this instance.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// The current length of this <see cref="SynchronizedTextBuilder"/> object plus the length of
+        /// <paramref name="value"/> exceeds <see cref="SynchronizedTextBuilder.MaxCapacity"/>.
+        /// </exception>
+        /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
+        /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
+        /// <seealso cref="int" />
+        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, int value, string? format = null, IFormatProvider? provider = null)
+            where TBuilder : SynchronizedTextBuilder
+        {
+            if (text is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
+
+            lock (text.SyncRoot)
+            {
+                text.buffer.InsertInternal(index, value, format, provider);
+                return text;
+            }
+        }
+
+        /// <summary>
+        /// Inserts the string representation of a specified 64-bit signed integer to this instance
+        /// with the specified numeric format and culture-specific format information.
+        /// <para/>
+        /// Unless otherwise specified, formatting is performed in the invariant culture, which
+        /// is similar to how the JDK formats numbers.
+        /// </summary>
+        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
+        /// <param name="text">The target builder.</param>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">The value to format and append.</param>
+        /// <param name="format">A standard or custom numeric format string.</param>
+        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="index"/> is less than zero or greater than the current length of this instance.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// The current length of this <see cref="SynchronizedTextBuilder"/> object plus the length of
+        /// <paramref name="value"/> exceeds <see cref="SynchronizedTextBuilder.MaxCapacity"/>.
+        /// </exception>
+        /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
+        /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
+        /// <seealso cref="long" />
+        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, long value, string? format = null, IFormatProvider? provider = null)
+            where TBuilder : SynchronizedTextBuilder
+        {
+            if (text is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
+
+            lock (text.SyncRoot)
+            {
+                text.buffer.InsertInternal(index, value, format, provider);
+                return text;
+            }
+        }
+
+        /// <summary>
+        /// Inserts the string representation of a specified single-precision floating-point number to this instance
+        /// with the specified numeric format and culture-specific format information.
+        /// <para/>
+        /// Unless otherwise specified, formatting is performed in the invariant culture using the "J" format, which
+        /// is similar to how the JDK formats numbers.
+        /// </summary>
+        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
+        /// <param name="text">The target builder.</param>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">The value to format and append.</param>
+        /// <param name="format">A standard or custom numeric format string.</param>
+        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="index"/> is less than zero or greater than the current length of this instance.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// The current length of this <see cref="SynchronizedTextBuilder"/> object plus the length of
+        /// <paramref name="value"/> exceeds <see cref="SynchronizedTextBuilder.MaxCapacity"/>.
+        /// </exception>
+        /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
+        /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
+        /// <seealso cref="float" />
+        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, float value, string? format = null, IFormatProvider? provider = null)
+            where TBuilder : SynchronizedTextBuilder
+        {
+            if (text is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
+
+            lock (text.SyncRoot)
+            {
+                text.buffer.InsertInternal(index, value, format, provider);
+                return text;
+            }
+        }
+
+        /// <summary>
+        /// Inserts the string representation of a specified double-precision floating-point number to this instance
+        /// with the specified numeric format and culture-specific format information.
+        /// <para/>
+        /// Unless otherwise specified, formatting is performed in the invariant culture using the "J" format, which
+        /// is similar to how the JDK formats numbers.
+        /// </summary>
+        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
+        /// <param name="text">The target builder.</param>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">The value to format and append.</param>
+        /// <param name="format">A standard or custom numeric format string.</param>
+        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="index"/> is less than zero or greater than the current length of this instance.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// The current length of this <see cref="SynchronizedTextBuilder"/> object plus the length of
+        /// <paramref name="value"/> exceeds <see cref="SynchronizedTextBuilder.MaxCapacity"/>.
+        /// </exception>
+        /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
+        /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
+        /// <seealso cref="double" />
+        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, double value, string? format = null, IFormatProvider? provider = null)
+            where TBuilder : SynchronizedTextBuilder
+        {
+            if (text is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
+
+            lock (text.SyncRoot)
+            {
+                text.buffer.InsertInternal(index, value, format, provider);
+                return text;
+            }
+        }
+
+        /// <summary>
+        /// Inserts the string representation of a specified decimal to this instance
+        /// with the specified numeric format and culture-specific format information.
+        /// <para/>
+        /// Unless otherwise specified, formatting is performed in the invariant culture, which
+        /// is similar to how the JDK formats numbers.
+        /// </summary>
+        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
+        /// <param name="text">The target builder.</param>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">The value to format and append.</param>
+        /// <param name="format">A standard or custom numeric format string.</param>
+        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="index"/> is less than zero or greater than the current length of this instance.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// The current length of this <see cref="SynchronizedTextBuilder"/> object plus the length of
+        /// <paramref name="value"/> exceeds <see cref="SynchronizedTextBuilder.MaxCapacity"/>.
+        /// </exception>
+        /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
+        /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
+        /// <seealso cref="decimal" />
+        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, decimal value, string? format = null, IFormatProvider? provider = null)
+            where TBuilder : SynchronizedTextBuilder
+        {
+            if (text is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
+
+            lock (text.SyncRoot)
+            {
+                text.buffer.InsertInternal(index, value, format, provider);
+                return text;
+            }
+        }
+
+        /// <summary>
+        /// Inserts the string representation of a specified 16-bit unsigned integer to this instance
+        /// with the specified numeric format and culture-specific format information.
+        /// <para/>
+        /// Unless otherwise specified, formatting is performed in the invariant culture, which
+        /// is similar to how the JDK formats numbers.
+        /// </summary>
+        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
+        /// <param name="text">The target builder.</param>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">The value to format and append.</param>
+        /// <param name="format">A standard or custom numeric format string.</param>
+        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="index"/> is less than zero or greater than the current length of this instance.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// The current length of this <see cref="SynchronizedTextBuilder"/> object plus the length of
+        /// <paramref name="value"/> exceeds <see cref="SynchronizedTextBuilder.MaxCapacity"/>.
+        /// </exception>
+        /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
+        /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
+        /// <seealso cref="ushort" />
+        [CLSCompliant(false)]
+        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, ushort value, string? format = null, IFormatProvider? provider = null)
+            where TBuilder : SynchronizedTextBuilder
+        {
+            if (text is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
+
+            lock (text.SyncRoot)
+            {
+                text.buffer.InsertInternal(index, value, format, provider);
+                return text;
+            }
+        }
+
+        /// <summary>
+        /// Inserts the string representation of a specified 32-bit unsigned integer to this instance
+        /// with the specified numeric format and culture-specific format information.
+        /// <para/>
+        /// Unless otherwise specified, formatting is performed in the invariant culture, which
+        /// is similar to how the JDK formats numbers.
+        /// </summary>
+        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
+        /// <param name="text">The target builder.</param>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">The value to format and append.</param>
+        /// <param name="format">A standard or custom numeric format string.</param>
+        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="index"/> is less than zero or greater than the current length of this instance.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// The current length of this <see cref="SynchronizedTextBuilder"/> object plus the length of
+        /// <paramref name="value"/> exceeds <see cref="SynchronizedTextBuilder.MaxCapacity"/>.
+        /// </exception>
+        /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
+        /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
+        /// <seealso cref="uint" />
+        [CLSCompliant(false)]
+        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, uint value, string? format = null, IFormatProvider? provider = null)
+            where TBuilder : SynchronizedTextBuilder
+        {
+            if (text is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
+
+            lock (text.SyncRoot)
+            {
+                text.buffer.InsertInternal(index, value, format, provider);
+                return text;
+            }
+        }
+
+        /// <summary>
+        /// Inserts the string representation of a specified 64-bit unsigned integer to this instance
+        /// with the specified numeric format and culture-specific format information.
+        /// <para/>
+        /// Unless otherwise specified, formatting is performed in the invariant culture, which
+        /// is similar to how the JDK formats numbers.
+        /// </summary>
+        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
+        /// <param name="text">The target builder.</param>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">The value to format and append.</param>
+        /// <param name="format">A standard or custom numeric format string.</param>
+        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="index"/> is less than zero or greater than the current length of this instance.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// The current length of this <see cref="SynchronizedTextBuilder"/> object plus the length of
+        /// <paramref name="value"/> exceeds <see cref="SynchronizedTextBuilder.MaxCapacity"/>.
+        /// </exception>
+        /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
+        /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
+        /// <seealso cref="ulong" />
+        [CLSCompliant(false)]
+        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, ulong value, string? format = null, IFormatProvider? provider = null)
+            where TBuilder : SynchronizedTextBuilder
+        {
+            if (text is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
+
+            lock (text.SyncRoot)
+            {
+                text.buffer.InsertInternal(index, value, format, provider);
+                return text;
+            }
+        }
+
+        /// <summary>
         /// Appends the string representation of the Unicode characters in a specified sequence to this instance.
         /// <para/>
         /// NOTE: Unlike the Java implementation, this method does not add the word <c>"null"</c> to the <see cref="SynchronizedTextBuilder"/>
@@ -3702,883 +4579,6 @@ namespace J2N.Text
             lock (text.SyncRoot)
             {
                 text.buffer.InsertFromSelfInternal(index, startIndex, count);
-                return text;
-            }
-        }
-
-        /// <summary>
-        /// Appends the string representation of a specified 8-bit signed integer to this instance
-        /// with the specified numeric format and culture-specific format information.
-        /// <para/>
-        /// Unless otherwise specified, formatting is performed in the invariant culture, which
-        /// is similar to how the JDK formats numbers.
-        /// </summary>
-        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
-        /// <param name="text">The target builder.</param>
-        /// <param name="value">The value to format and append.</param>
-        /// <param name="format">A standard or custom numeric format string.</param>
-        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
-        /// <returns>A reference to this instance after the operation has completed.</returns>
-        /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
-        /// <remarks>
-        /// This method allows similar options as the <c>AppendFormat</c> methods, but has better performance because
-        /// the value being formatted is not boxed.
-        /// <para/>
-        /// The capacity of this instance is adjusted as needed.
-        /// <para/>
-        /// <b>Notes to Callers</b>
-        /// <para/>
-        /// When you instantiate a <see cref="SynchronizedTextBuilder"/> object by calling <see cref="SynchronizedTextBuilder(int, int)"/>,
-        /// both the length and the capacity of the <see cref="SynchronizedTextBuilder"/> instance can grow beyond
-        /// the value of its <see cref="SynchronizedTextBuilder.MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append{TBuilder}(TBuilder, string?)"/>
-        /// and <see cref="AppendFormat{TBuilder}(TBuilder, string, object?)"/> methods to append small strings.
-        /// </remarks>
-        /// <seealso cref="sbyte" />
-        [CLSCompliant(false)]
-        public static TBuilder Append<TBuilder>(this TBuilder text, sbyte value, string? format = null, IFormatProvider? provider = null)
-            where TBuilder : SynchronizedTextBuilder
-        {
-            if (text is null)
-                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
-
-            lock (text.SyncRoot)
-            {
-                text.buffer.AppendInternal(value, format, provider);
-                return text;
-            }
-        }
-
-        /// <summary>
-        /// Appends the string representation of a specified 8-bit unsigned integer to this instance
-        /// with the specified numeric format and culture-specific format information.
-        /// <para/>
-        /// Unless otherwise specified, formatting is performed in the invariant culture, which
-        /// is similar to how the JDK formats numbers.
-        /// </summary>
-        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
-        /// <param name="text">The target builder.</param>
-        /// <param name="value">The value to format and append.</param>
-        /// <param name="format">A standard or custom numeric format string.</param>
-        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
-        /// <returns>A reference to this instance after the operation has completed.</returns>
-        /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
-        /// <remarks>
-        /// This method allows similar options as the <c>AppendFormat</c> methods, but has better performance because
-        /// the value being formatted is not boxed.
-        /// <para/>
-        /// The capacity of this instance is adjusted as needed.
-        /// <para/>
-        /// <b>Notes to Callers</b>
-        /// <para/>
-        /// When you instantiate a <see cref="SynchronizedTextBuilder"/> object by calling <see cref="SynchronizedTextBuilder(int, int)"/>,
-        /// both the length and the capacity of the <see cref="SynchronizedTextBuilder"/> instance can grow beyond
-        /// the value of its <see cref="SynchronizedTextBuilder.MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append{TBuilder}(TBuilder, string?)"/>
-        /// and <see cref="AppendFormat{TBuilder}(TBuilder, string, object?)"/> methods to append small strings.
-        /// </remarks>
-        /// <seealso cref="byte" />
-        public static TBuilder Append<TBuilder>(this TBuilder text, byte value, string? format = null, IFormatProvider? provider = null)
-            where TBuilder : SynchronizedTextBuilder
-        {
-            if (text is null)
-                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
-
-            lock (text.SyncRoot)
-            {
-                text.buffer.AppendInternal(value, format, provider);
-                return text;
-            }
-        }
-
-        /// <summary>
-        /// Appends the string representation of a specified 16-bit signed integer to this instance
-        /// with the specified numeric format and culture-specific format information.
-        /// <para/>
-        /// Unless otherwise specified, formatting is performed in the invariant culture, which
-        /// is similar to how the JDK formats numbers.
-        /// </summary>
-        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
-        /// <param name="text">The target builder.</param>
-        /// <param name="value">The value to format and append.</param>
-        /// <param name="format">A standard or custom numeric format string.</param>
-        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
-        /// <returns>A reference to this instance after the operation has completed.</returns>
-        /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
-        /// <remarks>
-        /// This method allows similar options as the <c>AppendFormat</c> methods, but has better performance because
-        /// the value being formatted is not boxed.
-        /// <para/>
-        /// The capacity of this instance is adjusted as needed.
-        /// <para/>
-        /// <b>Notes to Callers</b>
-        /// <para/>
-        /// When you instantiate a <see cref="SynchronizedTextBuilder"/> object by calling <see cref="SynchronizedTextBuilder(int, int)"/>,
-        /// both the length and the capacity of the <see cref="SynchronizedTextBuilder"/> instance can grow beyond
-        /// the value of its <see cref="SynchronizedTextBuilder.MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append{TBuilder}(TBuilder, string?)"/>
-        /// and <see cref="AppendFormat{TBuilder}(TBuilder, string, object?)"/> methods to append small strings.
-        /// </remarks>
-        /// <seealso cref="short" />
-        public static TBuilder Append<TBuilder>(this TBuilder text, short value, string? format = null, IFormatProvider? provider = null)
-            where TBuilder : SynchronizedTextBuilder
-        {
-            if (text is null)
-                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
-
-            lock (text.SyncRoot)
-            {
-                text.buffer.AppendInternal(value, format, provider);
-                return text;
-            }
-        }
-
-        /// <summary>
-        /// Appends the string representation of a specified 32-bit signed integer to this instance
-        /// with the specified numeric format and culture-specific format information.
-        /// <para/>
-        /// Unless otherwise specified, formatting is performed in the invariant culture, which
-        /// is similar to how the JDK formats numbers.
-        /// </summary>
-        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
-        /// <param name="text">The target builder.</param>
-        /// <param name="value">The value to format and append.</param>
-        /// <param name="format">A standard or custom numeric format string.</param>
-        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
-        /// <returns>A reference to this instance after the operation has completed.</returns>
-        /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
-        /// <remarks>
-        /// This method allows similar options as the <c>AppendFormat</c> methods, but has better performance because
-        /// the value being formatted is not boxed.
-        /// <para/>
-        /// The capacity of this instance is adjusted as needed.
-        /// <para/>
-        /// <b>Notes to Callers</b>
-        /// <para/>
-        /// When you instantiate a <see cref="SynchronizedTextBuilder"/> object by calling <see cref="SynchronizedTextBuilder(int, int)"/>,
-        /// both the length and the capacity of the <see cref="SynchronizedTextBuilder"/> instance can grow beyond
-        /// the value of its <see cref="SynchronizedTextBuilder.MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append{TBuilder}(TBuilder, string?)"/>
-        /// and <see cref="AppendFormat{TBuilder}(TBuilder, string, object?)"/> methods to append small strings.
-        /// </remarks>
-        /// <seealso cref="int" />
-        public static TBuilder Append<TBuilder>(this TBuilder text, int value, string? format = null, IFormatProvider? provider = null)
-            where TBuilder : SynchronizedTextBuilder
-        {
-            if (text is null)
-                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
-
-            lock (text.SyncRoot)
-            {
-                text.buffer.AppendInternal(value, format, provider);
-                return text;
-            }
-        }
-
-        /// <summary>
-        /// Appends the string representation of a specified 64-bit signed integer to this instance
-        /// with the specified numeric format and culture-specific format information.
-        /// <para/>
-        /// Unless otherwise specified, formatting is performed in the invariant culture, which
-        /// is similar to how the JDK formats numbers.
-        /// </summary>
-        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
-        /// <param name="text">The target builder.</param>
-        /// <param name="value">The value to format and append.</param>
-        /// <param name="format">A standard or custom numeric format string.</param>
-        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
-        /// <returns>A reference to this instance after the operation has completed.</returns>
-        /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
-        /// <remarks>
-        /// This method allows similar options as the <c>AppendFormat</c> methods, but has better performance because
-        /// the value being formatted is not boxed.
-        /// <para/>
-        /// The capacity of this instance is adjusted as needed.
-        /// <para/>
-        /// <b>Notes to Callers</b>
-        /// <para/>
-        /// When you instantiate a <see cref="SynchronizedTextBuilder"/> object by calling <see cref="SynchronizedTextBuilder(int, int)"/>,
-        /// both the length and the capacity of the <see cref="SynchronizedTextBuilder"/> instance can grow beyond
-        /// the value of its <see cref="SynchronizedTextBuilder.MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append{TBuilder}(TBuilder, string?)"/>
-        /// and <see cref="AppendFormat{TBuilder}(TBuilder, string, object?)"/> methods to append small strings.
-        /// </remarks>
-        /// <seealso cref="long" />
-        public static TBuilder Append<TBuilder>(this TBuilder text, long value, string? format = null, IFormatProvider? provider = null)
-            where TBuilder : SynchronizedTextBuilder
-        {
-            if (text is null)
-                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
-
-            lock (text.SyncRoot)
-            {
-                text.buffer.AppendInternal(value, format, provider);
-                return text;
-            }
-        }
-
-        /// <summary>
-        /// Appends the string representation of a specified single-precision floating-point number to this instance
-        /// with the specified numeric format and culture-specific format information.
-        /// <para/>
-        /// Unless otherwise specified, formatting is performed in the invariant culture using the "J" format, which
-        /// is similar to how the JDK formats numbers.
-        /// </summary>
-        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
-        /// <param name="text">The target builder.</param>
-        /// <param name="value">The value to format and append.</param>
-        /// <param name="format">A standard or custom numeric format string.</param>
-        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
-        /// <returns>A reference to this instance after the operation has completed.</returns>
-        /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
-        /// <remarks>
-        /// This method allows similar options as the <c>AppendFormat</c> methods, but has better performance because
-        /// the value being formatted is not boxed.
-        /// <para/>
-        /// The capacity of this instance is adjusted as needed.
-        /// <para/>
-        /// <b>Notes to Callers</b>
-        /// <para/>
-        /// When you instantiate a <see cref="SynchronizedTextBuilder"/> object by calling <see cref="SynchronizedTextBuilder(int, int)"/>,
-        /// both the length and the capacity of the <see cref="SynchronizedTextBuilder"/> instance can grow beyond
-        /// the value of its <see cref="SynchronizedTextBuilder.MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append{TBuilder}(TBuilder, string?)"/>
-        /// and <see cref="AppendFormat{TBuilder}(TBuilder, string, object?)"/> methods to append small strings.
-        /// </remarks>
-        /// <seealso cref="float" />
-        public static TBuilder Append<TBuilder>(this TBuilder text, float value, string? format = null, IFormatProvider? provider = null)
-            where TBuilder : SynchronizedTextBuilder
-        {
-            if (text is null)
-                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
-
-            lock (text.SyncRoot)
-            {
-                text.buffer.AppendInternal(value, format, provider);
-                return text;
-            }
-        }
-
-        /// <summary>
-        /// Appends the string representation of a specified double-precision floating-point number to this instance
-        /// with the specified numeric format and culture-specific format information.
-        /// <para/>
-        /// Unless otherwise specified, formatting is performed in the invariant culture using the "J" format, which
-        /// is similar to how the JDK formats numbers.
-        /// </summary>
-        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
-        /// <param name="text">The target builder.</param>
-        /// <param name="value">The value to format and append.</param>
-        /// <param name="format">A standard or custom numeric format string.</param>
-        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
-        /// <returns>A reference to this instance after the operation has completed.</returns>
-        /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
-        /// <remarks>
-        /// This method allows similar options as the <c>AppendFormat</c> methods, but has better performance because
-        /// the value being formatted is not boxed.
-        /// <para/>
-        /// The capacity of this instance is adjusted as needed.
-        /// <para/>
-        /// <b>Notes to Callers</b>
-        /// <para/>
-        /// When you instantiate a <see cref="SynchronizedTextBuilder"/> object by calling <see cref="SynchronizedTextBuilder(int, int)"/>,
-        /// both the length and the capacity of the <see cref="SynchronizedTextBuilder"/> instance can grow beyond
-        /// the value of its <see cref="SynchronizedTextBuilder.MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append{TBuilder}(TBuilder, string?)"/>
-        /// and <see cref="AppendFormat{TBuilder}(TBuilder, string, object?)"/> methods to append small strings.
-        /// </remarks>
-        /// <seealso cref="double" />
-        public static TBuilder Append<TBuilder>(this TBuilder text, double value, string? format = null, IFormatProvider? provider = null)
-            where TBuilder : SynchronizedTextBuilder
-        {
-            if (text is null)
-                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
-
-            lock (text.SyncRoot)
-            {
-                text.buffer.AppendInternal(value, format, provider);
-                return text;
-            }
-        }
-
-        /// <summary>
-        /// Appends the string representation of a specified decimal to this instance
-        /// with the specified numeric format and culture-specific format information.
-        /// <para/>
-        /// Unless otherwise specified, formatting is performed in the invariant culture, which
-        /// is similar to how the JDK formats numbers.
-        /// </summary>
-        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
-        /// <param name="text">The target builder.</param>
-        /// <param name="value">The value to format and append.</param>
-        /// <param name="format">A standard or custom numeric format string.</param>
-        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
-        /// <returns>A reference to this instance after the operation has completed.</returns>
-        /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
-        /// <remarks>
-        /// This method allows similar options as the <c>AppendFormat</c> methods, but has better performance because
-        /// the value being formatted is not boxed.
-        /// <para/>
-        /// The capacity of this instance is adjusted as needed.
-        /// <para/>
-        /// <b>Notes to Callers</b>
-        /// <para/>
-        /// When you instantiate a <see cref="SynchronizedTextBuilder"/> object by calling <see cref="SynchronizedTextBuilder(int, int)"/>,
-        /// both the length and the capacity of the <see cref="SynchronizedTextBuilder"/> instance can grow beyond
-        /// the value of its <see cref="SynchronizedTextBuilder.MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append{TBuilder}(TBuilder, string?)"/>
-        /// and <see cref="AppendFormat{TBuilder}(TBuilder, string, object?)"/> methods to append small strings.
-        /// </remarks>
-        /// <seealso cref="decimal" />
-        public static TBuilder Append<TBuilder>(this TBuilder text, decimal value, string? format = null, IFormatProvider? provider = null)
-            where TBuilder : SynchronizedTextBuilder
-        {
-            if (text is null)
-                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
-
-            lock (text.SyncRoot)
-            {
-                text.buffer.AppendInternal(value, format, provider);
-                return text;
-            }
-        }
-
-        /// <summary>
-        /// Appends the string representation of a specified 16-bit unsigned integer to this instance
-        /// with the specified numeric format and culture-specific format information.
-        /// <para/>
-        /// Unless otherwise specified, formatting is performed in the invariant culture, which
-        /// is similar to how the JDK formats numbers.
-        /// </summary>
-        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
-        /// <param name="text">The target builder.</param>
-        /// <param name="value">The value to format and append.</param>
-        /// <param name="format">A standard or custom numeric format string.</param>
-        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
-        /// <returns>A reference to this instance after the operation has completed.</returns>
-        /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
-        /// <remarks>
-        /// This method allows similar options as the <c>AppendFormat</c> methods, but has better performance because
-        /// the value being formatted is not boxed.
-        /// <para/>
-        /// The capacity of this instance is adjusted as needed.
-        /// <para/>
-        /// <b>Notes to Callers</b>
-        /// <para/>
-        /// When you instantiate a <see cref="SynchronizedTextBuilder"/> object by calling <see cref="SynchronizedTextBuilder(int, int)"/>,
-        /// both the length and the capacity of the <see cref="SynchronizedTextBuilder"/> instance can grow beyond
-        /// the value of its <see cref="SynchronizedTextBuilder.MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append{TBuilder}(TBuilder, string?)"/>
-        /// and <see cref="AppendFormat{TBuilder}(TBuilder, string, object?)"/> methods to append small strings.
-        /// </remarks>
-        /// <seealso cref="ushort" />
-        [CLSCompliant(false)]
-        public static TBuilder Append<TBuilder>(this TBuilder text, ushort value, string? format = null, IFormatProvider? provider = null)
-            where TBuilder : SynchronizedTextBuilder
-        {
-            if (text is null)
-                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
-
-            lock (text.SyncRoot)
-            {
-                text.buffer.AppendInternal(value, format, provider);
-                return text;
-            }
-        }
-
-        /// <summary>
-        /// Appends the string representation of a specified 32-bit unsigned integer to this instance
-        /// with the specified numeric format and culture-specific format information.
-        /// <para/>
-        /// Unless otherwise specified, formatting is performed in the invariant culture, which
-        /// is similar to how the JDK formats numbers.
-        /// </summary>
-        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
-        /// <param name="text">The target builder.</param>
-        /// <param name="value">The value to format and append.</param>
-        /// <param name="format">A standard or custom numeric format string.</param>
-        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
-        /// <returns>A reference to this instance after the operation has completed.</returns>
-        /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
-        /// <remarks>
-        /// This method allows similar options as the <c>AppendFormat</c> methods, but has better performance because
-        /// the value being formatted is not boxed.
-        /// <para/>
-        /// The capacity of this instance is adjusted as needed.
-        /// <para/>
-        /// <b>Notes to Callers</b>
-        /// <para/>
-        /// When you instantiate a <see cref="SynchronizedTextBuilder"/> object by calling <see cref="SynchronizedTextBuilder(int, int)"/>,
-        /// both the length and the capacity of the <see cref="SynchronizedTextBuilder"/> instance can grow beyond
-        /// the value of its <see cref="SynchronizedTextBuilder.MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append{TBuilder}(TBuilder, string?)"/>
-        /// and <see cref="AppendFormat{TBuilder}(TBuilder, string, object?)"/> methods to append small strings.
-        /// </remarks>
-        /// <seealso cref="uint" />
-        [CLSCompliant(false)]
-        public static TBuilder Append<TBuilder>(this TBuilder text, uint value, string? format = null, IFormatProvider? provider = null)
-            where TBuilder : SynchronizedTextBuilder
-        {
-            if (text is null)
-                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
-
-            lock (text.SyncRoot)
-            {
-                text.buffer.AppendInternal(value, format, provider);
-                return text;
-            }
-        }
-
-        /// <summary>
-        /// Appends the string representation of a specified 64-bit unsigned integer to this instance
-        /// with the specified numeric format and culture-specific format information.
-        /// <para/>
-        /// Unless otherwise specified, formatting is performed in the invariant culture, which
-        /// is similar to how the JDK formats numbers.
-        /// </summary>
-        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
-        /// <param name="text">The target builder.</param>
-        /// <param name="value">The value to format and append.</param>
-        /// <param name="format">A standard or custom numeric format string.</param>
-        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
-        /// <returns>A reference to this instance after the operation has completed.</returns>
-        /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
-        /// <remarks>
-        /// This method allows similar options as the <c>AppendFormat</c> methods, but has better performance because
-        /// the value being formatted is not boxed.
-        /// <para/>
-        /// The capacity of this instance is adjusted as needed.
-        /// <para/>
-        /// <b>Notes to Callers</b>
-        /// <para/>
-        /// When you instantiate a <see cref="SynchronizedTextBuilder"/> object by calling <see cref="SynchronizedTextBuilder(int, int)"/>,
-        /// both the length and the capacity of the <see cref="SynchronizedTextBuilder"/> instance can grow beyond
-        /// the value of its <see cref="SynchronizedTextBuilder.MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append{TBuilder}(TBuilder, string?)"/>
-        /// and <see cref="AppendFormat{TBuilder}(TBuilder, string, object?)"/> methods to append small strings.
-        /// </remarks>
-        /// <seealso cref="ulong" />
-        [CLSCompliant(false)]
-        public static TBuilder Append<TBuilder>(this TBuilder text, ulong value, string? format = null, IFormatProvider? provider = null)
-            where TBuilder : SynchronizedTextBuilder
-        {
-            if (text is null)
-                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
-
-            lock (text.SyncRoot)
-            {
-                text.buffer.AppendInternal(value, format, provider);
-                return text;
-            }
-        }
-
-        /// <summary>
-        /// Inserts the string representation of a specified 8-bit signed integer to this instance
-        /// with the specified numeric format and culture-specific format information.
-        /// <para/>
-        /// Unless otherwise specified, formatting is performed in the invariant culture, which
-        /// is similar to how the JDK formats numbers.
-        /// </summary>
-        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
-        /// <param name="text">The target builder.</param>
-        /// <param name="index">The position in this instance where insertion begins.</param>
-        /// <param name="value">The value to format and append.</param>
-        /// <param name="format">A standard or custom numeric format string.</param>
-        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
-        /// <returns>A reference to this instance after the operation has completed.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// <paramref name="index"/> is less than zero or greater than the current length of this instance.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// The current length of this <see cref="SynchronizedTextBuilder"/> object plus the length of
-        /// <paramref name="value"/> exceeds <see cref="SynchronizedTextBuilder.MaxCapacity"/>.
-        /// </exception>
-        /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
-        /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
-        /// <seealso cref="sbyte" />
-        [CLSCompliant(false)]
-        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, sbyte value, string? format = null, IFormatProvider? provider = null)
-            where TBuilder : SynchronizedTextBuilder
-        {
-            if (text is null)
-                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
-
-            lock (text.SyncRoot)
-            {
-                text.buffer.InsertInternal(index, value, format, provider);
-                return text;
-            }
-        }
-
-        /// <summary>
-        /// Inserts the string representation of a specified 8-bit unsigned integer to this instance
-        /// with the specified numeric format and culture-specific format information.
-        /// <para/>
-        /// Unless otherwise specified, formatting is performed in the invariant culture, which
-        /// is similar to how the JDK formats numbers.
-        /// </summary>
-        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
-        /// <param name="text">The target builder.</param>
-        /// <param name="index">The position in this instance where insertion begins.</param>
-        /// <param name="value">The value to format and append.</param>
-        /// <param name="format">A standard or custom numeric format string.</param>
-        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
-        /// <returns>A reference to this instance after the operation has completed.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// <paramref name="index"/> is less than zero or greater than the current length of this instance.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// The current length of this <see cref="SynchronizedTextBuilder"/> object plus the length of
-        /// <paramref name="value"/> exceeds <see cref="SynchronizedTextBuilder.MaxCapacity"/>.
-        /// </exception>
-        /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
-        /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
-        /// <seealso cref="byte" />
-        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, byte value, string? format = null, IFormatProvider? provider = null)
-            where TBuilder : SynchronizedTextBuilder
-        {
-            if (text is null)
-                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
-
-            lock (text.SyncRoot)
-            {
-                text.buffer.InsertInternal(index, value, format, provider);
-                return text;
-            }
-        }
-
-        /// <summary>
-        /// Inserts the string representation of a specified 16-bit signed integer to this instance
-        /// with the specified numeric format and culture-specific format information.
-        /// <para/>
-        /// Unless otherwise specified, formatting is performed in the invariant culture, which
-        /// is similar to how the JDK formats numbers.
-        /// </summary>
-        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
-        /// <param name="text">The target builder.</param>
-        /// <param name="index">The position in this instance where insertion begins.</param>
-        /// <param name="value">The value to format and append.</param>
-        /// <param name="format">A standard or custom numeric format string.</param>
-        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
-        /// <returns>A reference to this instance after the operation has completed.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// <paramref name="index"/> is less than zero or greater than the current length of this instance.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// The current length of this <see cref="SynchronizedTextBuilder"/> object plus the length of
-        /// <paramref name="value"/> exceeds <see cref="SynchronizedTextBuilder.MaxCapacity"/>.
-        /// </exception>
-        /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
-        /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
-        /// <seealso cref="short" />
-        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, short value, string? format = null, IFormatProvider? provider = null)
-            where TBuilder : SynchronizedTextBuilder
-        {
-            if (text is null)
-                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
-
-            lock (text.SyncRoot)
-            {
-                text.buffer.InsertInternal(index, value, format, provider);
-                return text;
-            }
-        }
-
-        /// <summary>
-        /// Inserts the string representation of a specified 32-bit signed integer to this instance
-        /// with the specified numeric format and culture-specific format information.
-        /// <para/>
-        /// Unless otherwise specified, formatting is performed in the invariant culture, which
-        /// is similar to how the JDK formats numbers.
-        /// </summary>
-        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
-        /// <param name="text">The target builder.</param>
-        /// <param name="index">The position in this instance where insertion begins.</param>
-        /// <param name="value">The value to format and append.</param>
-        /// <param name="format">A standard or custom numeric format string.</param>
-        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
-        /// <returns>A reference to this instance after the operation has completed.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// <paramref name="index"/> is less than zero or greater than the current length of this instance.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// The current length of this <see cref="SynchronizedTextBuilder"/> object plus the length of
-        /// <paramref name="value"/> exceeds <see cref="SynchronizedTextBuilder.MaxCapacity"/>.
-        /// </exception>
-        /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
-        /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
-        /// <seealso cref="int" />
-        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, int value, string? format = null, IFormatProvider? provider = null)
-            where TBuilder : SynchronizedTextBuilder
-        {
-            if (text is null)
-                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
-
-            lock (text.SyncRoot)
-            {
-                text.buffer.InsertInternal(index, value, format, provider);
-                return text;
-            }
-        }
-
-        /// <summary>
-        /// Inserts the string representation of a specified 64-bit signed integer to this instance
-        /// with the specified numeric format and culture-specific format information.
-        /// <para/>
-        /// Unless otherwise specified, formatting is performed in the invariant culture, which
-        /// is similar to how the JDK formats numbers.
-        /// </summary>
-        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
-        /// <param name="text">The target builder.</param>
-        /// <param name="index">The position in this instance where insertion begins.</param>
-        /// <param name="value">The value to format and append.</param>
-        /// <param name="format">A standard or custom numeric format string.</param>
-        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
-        /// <returns>A reference to this instance after the operation has completed.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// <paramref name="index"/> is less than zero or greater than the current length of this instance.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// The current length of this <see cref="SynchronizedTextBuilder"/> object plus the length of
-        /// <paramref name="value"/> exceeds <see cref="SynchronizedTextBuilder.MaxCapacity"/>.
-        /// </exception>
-        /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
-        /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
-        /// <seealso cref="long" />
-        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, long value, string? format = null, IFormatProvider? provider = null)
-            where TBuilder : SynchronizedTextBuilder
-        {
-            if (text is null)
-                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
-
-            lock (text.SyncRoot)
-            {
-                text.buffer.InsertInternal(index, value, format, provider);
-                return text;
-            }
-        }
-
-        /// <summary>
-        /// Inserts the string representation of a specified single-precision floating-point number to this instance
-        /// with the specified numeric format and culture-specific format information.
-        /// <para/>
-        /// Unless otherwise specified, formatting is performed in the invariant culture using the "J" format, which
-        /// is similar to how the JDK formats numbers.
-        /// </summary>
-        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
-        /// <param name="text">The target builder.</param>
-        /// <param name="index">The position in this instance where insertion begins.</param>
-        /// <param name="value">The value to format and append.</param>
-        /// <param name="format">A standard or custom numeric format string.</param>
-        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
-        /// <returns>A reference to this instance after the operation has completed.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// <paramref name="index"/> is less than zero or greater than the current length of this instance.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// The current length of this <see cref="SynchronizedTextBuilder"/> object plus the length of
-        /// <paramref name="value"/> exceeds <see cref="SynchronizedTextBuilder.MaxCapacity"/>.
-        /// </exception>
-        /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
-        /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
-        /// <seealso cref="float" />
-        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, float value, string? format = null, IFormatProvider? provider = null)
-            where TBuilder : SynchronizedTextBuilder
-        {
-            if (text is null)
-                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
-
-            lock (text.SyncRoot)
-            {
-                text.buffer.InsertInternal(index, value, format, provider);
-                return text;
-            }
-        }
-
-        /// <summary>
-        /// Inserts the string representation of a specified double-precision floating-point number to this instance
-        /// with the specified numeric format and culture-specific format information.
-        /// <para/>
-        /// Unless otherwise specified, formatting is performed in the invariant culture using the "J" format, which
-        /// is similar to how the JDK formats numbers.
-        /// </summary>
-        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
-        /// <param name="text">The target builder.</param>
-        /// <param name="index">The position in this instance where insertion begins.</param>
-        /// <param name="value">The value to format and append.</param>
-        /// <param name="format">A standard or custom numeric format string.</param>
-        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
-        /// <returns>A reference to this instance after the operation has completed.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// <paramref name="index"/> is less than zero or greater than the current length of this instance.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// The current length of this <see cref="SynchronizedTextBuilder"/> object plus the length of
-        /// <paramref name="value"/> exceeds <see cref="SynchronizedTextBuilder.MaxCapacity"/>.
-        /// </exception>
-        /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
-        /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
-        /// <seealso cref="double" />
-        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, double value, string? format = null, IFormatProvider? provider = null)
-            where TBuilder : SynchronizedTextBuilder
-        {
-            if (text is null)
-                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
-
-            lock (text.SyncRoot)
-            {
-                text.buffer.InsertInternal(index, value, format, provider);
-                return text;
-            }
-        }
-
-        /// <summary>
-        /// Inserts the string representation of a specified decimal to this instance
-        /// with the specified numeric format and culture-specific format information.
-        /// <para/>
-        /// Unless otherwise specified, formatting is performed in the invariant culture, which
-        /// is similar to how the JDK formats numbers.
-        /// </summary>
-        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
-        /// <param name="text">The target builder.</param>
-        /// <param name="index">The position in this instance where insertion begins.</param>
-        /// <param name="value">The value to format and append.</param>
-        /// <param name="format">A standard or custom numeric format string.</param>
-        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
-        /// <returns>A reference to this instance after the operation has completed.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// <paramref name="index"/> is less than zero or greater than the current length of this instance.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// The current length of this <see cref="SynchronizedTextBuilder"/> object plus the length of
-        /// <paramref name="value"/> exceeds <see cref="SynchronizedTextBuilder.MaxCapacity"/>.
-        /// </exception>
-        /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
-        /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
-        /// <seealso cref="decimal" />
-        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, decimal value, string? format = null, IFormatProvider? provider = null)
-            where TBuilder : SynchronizedTextBuilder
-        {
-            if (text is null)
-                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
-
-            lock (text.SyncRoot)
-            {
-                text.buffer.InsertInternal(index, value, format, provider);
-                return text;
-            }
-        }
-
-        /// <summary>
-        /// Inserts the string representation of a specified 16-bit unsigned integer to this instance
-        /// with the specified numeric format and culture-specific format information.
-        /// <para/>
-        /// Unless otherwise specified, formatting is performed in the invariant culture, which
-        /// is similar to how the JDK formats numbers.
-        /// </summary>
-        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
-        /// <param name="text">The target builder.</param>
-        /// <param name="index">The position in this instance where insertion begins.</param>
-        /// <param name="value">The value to format and append.</param>
-        /// <param name="format">A standard or custom numeric format string.</param>
-        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
-        /// <returns>A reference to this instance after the operation has completed.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// <paramref name="index"/> is less than zero or greater than the current length of this instance.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// The current length of this <see cref="SynchronizedTextBuilder"/> object plus the length of
-        /// <paramref name="value"/> exceeds <see cref="SynchronizedTextBuilder.MaxCapacity"/>.
-        /// </exception>
-        /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
-        /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
-        /// <seealso cref="ushort" />
-        [CLSCompliant(false)]
-        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, ushort value, string? format = null, IFormatProvider? provider = null)
-            where TBuilder : SynchronizedTextBuilder
-        {
-            if (text is null)
-                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
-
-            lock (text.SyncRoot)
-            {
-                text.buffer.InsertInternal(index, value, format, provider);
-                return text;
-            }
-        }
-
-        /// <summary>
-        /// Inserts the string representation of a specified 32-bit unsigned integer to this instance
-        /// with the specified numeric format and culture-specific format information.
-        /// <para/>
-        /// Unless otherwise specified, formatting is performed in the invariant culture, which
-        /// is similar to how the JDK formats numbers.
-        /// </summary>
-        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
-        /// <param name="text">The target builder.</param>
-        /// <param name="index">The position in this instance where insertion begins.</param>
-        /// <param name="value">The value to format and append.</param>
-        /// <param name="format">A standard or custom numeric format string.</param>
-        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
-        /// <returns>A reference to this instance after the operation has completed.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// <paramref name="index"/> is less than zero or greater than the current length of this instance.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// The current length of this <see cref="SynchronizedTextBuilder"/> object plus the length of
-        /// <paramref name="value"/> exceeds <see cref="SynchronizedTextBuilder.MaxCapacity"/>.
-        /// </exception>
-        /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
-        /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
-        /// <seealso cref="uint" />
-        [CLSCompliant(false)]
-        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, uint value, string? format = null, IFormatProvider? provider = null)
-            where TBuilder : SynchronizedTextBuilder
-        {
-            if (text is null)
-                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
-
-            lock (text.SyncRoot)
-            {
-                text.buffer.InsertInternal(index, value, format, provider);
-                return text;
-            }
-        }
-
-        /// <summary>
-        /// Inserts the string representation of a specified 64-bit unsigned integer to this instance
-        /// with the specified numeric format and culture-specific format information.
-        /// <para/>
-        /// Unless otherwise specified, formatting is performed in the invariant culture, which
-        /// is similar to how the JDK formats numbers.
-        /// </summary>
-        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
-        /// <param name="text">The target builder.</param>
-        /// <param name="index">The position in this instance where insertion begins.</param>
-        /// <param name="value">The value to format and append.</param>
-        /// <param name="format">A standard or custom numeric format string.</param>
-        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
-        /// <returns>A reference to this instance after the operation has completed.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// <paramref name="index"/> is less than zero or greater than the current length of this instance.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// The current length of this <see cref="SynchronizedTextBuilder"/> object plus the length of
-        /// <paramref name="value"/> exceeds <see cref="SynchronizedTextBuilder.MaxCapacity"/>.
-        /// </exception>
-        /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
-        /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
-        /// <seealso cref="ulong" />
-        [CLSCompliant(false)]
-        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, ulong value, string? format = null, IFormatProvider? provider = null)
-            where TBuilder : SynchronizedTextBuilder
-        {
-            if (text is null)
-                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
-
-            lock (text.SyncRoot)
-            {
-                text.buffer.InsertInternal(index, value, format, provider);
                 return text;
             }
         }
