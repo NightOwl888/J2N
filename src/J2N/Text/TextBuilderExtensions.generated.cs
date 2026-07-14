@@ -16,6 +16,7 @@ using J2N.CodeGeneration;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -25,7 +26,6 @@ using J2N.Collections;
 using J2N.Collections.Generic;
 using J2N.Numerics;
 using System.Buffers;
-using System.Collections.Generic;
 using System.ComponentModel;
 using J2N.Numerics.Formatters;
 
@@ -961,6 +961,106 @@ namespace J2N.Text
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
 
             text.buffer.AppendFormatInternal(provider, format, args);
+            return text;
+        }
+
+        public static TBuilder AppendJoin<TBuilder>(this TBuilder text, string? separator, params object?[] values)
+            where TBuilder : TextBuilder
+        {
+            if (text is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
+
+            text.buffer.AppendJoinInternal(separator, values);
+            return text;
+        }
+
+        public static TBuilder AppendJoin<TBuilder>(this TBuilder text, string? separator, params ReadOnlySpan<object?> values)
+            where TBuilder : TextBuilder
+        {
+            if (text is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
+
+            text.buffer.AppendJoinInternal(separator, values);
+            return text;
+        }
+
+        public static TBuilder AppendJoin<TBuilder, T>(this TBuilder text, string? separator, IEnumerable<T> values)
+            where TBuilder : TextBuilder
+        {
+            if (text is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
+
+            text.buffer.AppendJoinInternal(separator, values);
+            return text;
+        }
+
+        public static TBuilder AppendJoin<TBuilder>(this TBuilder text, string? separator, params string?[] values)
+            where TBuilder : TextBuilder
+        {
+            if (text is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
+
+            text.buffer.AppendJoinInternal(separator, values);
+            return text;
+        }
+
+        public static TBuilder AppendJoin<TBuilder>(this TBuilder text, string? separator, params ReadOnlySpan<string?> values)
+            where TBuilder : TextBuilder
+        {
+            if (text is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
+
+            text.buffer.AppendJoinInternal(separator, values);
+            return text;
+        }
+
+        public static TBuilder AppendJoin<TBuilder>(this TBuilder text, char separator, params object?[] values)
+            where TBuilder : TextBuilder
+        {
+            if (text is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
+
+            text.buffer.AppendJoinInternal(separator, values);
+            return text;
+        }
+
+        public static TBuilder AppendJoin<TBuilder>(this TBuilder text, char separator, params ReadOnlySpan<object?> values)
+            where TBuilder : TextBuilder
+        {
+            if (text is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
+
+            text.buffer.AppendJoinInternal(separator, values);
+            return text;
+        }
+
+        public static TBuilder AppendJoin<TBuilder, T>(this TBuilder text, char separator, IEnumerable<T> values)
+            where TBuilder : TextBuilder
+        {
+            if (text is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
+
+            text.buffer.AppendJoinInternal(separator, values);
+            return text;
+        }
+
+        public static TBuilder AppendJoin<TBuilder>(this TBuilder text, char separator, params string?[] values)
+            where TBuilder : TextBuilder
+        {
+            if (text is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
+
+            text.buffer.AppendJoinInternal(separator, values);
+            return text;
+        }
+
+        public static TBuilder AppendJoin<TBuilder>(this TBuilder text, char separator, params ReadOnlySpan<string?> values)
+            where TBuilder : TextBuilder
+        {
+            if (text is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
+
+            text.buffer.AppendJoinInternal(separator, values);
             return text;
         }
 
@@ -2520,106 +2620,6 @@ namespace J2N.Text
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
 
             text.buffer.AppendInternal(value);
-            return text;
-        }
-
-        public static TBuilder AppendJoin<TBuilder>(this TBuilder text, string? separator, params object?[] values)
-            where TBuilder : TextBuilder
-        {
-            if (text is null)
-                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
-
-            text.buffer.AppendJoinInternal(separator, values);
-            return text;
-        }
-
-        public static TBuilder AppendJoin<TBuilder>(this TBuilder text, string? separator, params ReadOnlySpan<object?> values)
-            where TBuilder : TextBuilder
-        {
-            if (text is null)
-                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
-
-            text.buffer.AppendJoinInternal(separator, values);
-            return text;
-        }
-
-        public static TBuilder AppendJoin<TBuilder, T>(this TBuilder text, string? separator, IEnumerable<T> values)
-            where TBuilder : TextBuilder
-        {
-            if (text is null)
-                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
-
-            text.buffer.AppendJoinInternal(separator, values);
-            return text;
-        }
-
-        public static TBuilder AppendJoin<TBuilder>(this TBuilder text, string? separator, params string?[] values)
-            where TBuilder : TextBuilder
-        {
-            if (text is null)
-                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
-
-            text.buffer.AppendJoinInternal(separator, values);
-            return text;
-        }
-
-        public static TBuilder AppendJoin<TBuilder>(this TBuilder text, string? separator, params ReadOnlySpan<string?> values)
-            where TBuilder : TextBuilder
-        {
-            if (text is null)
-                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
-
-            text.buffer.AppendJoinInternal(separator, values);
-            return text;
-        }
-
-        public static TBuilder AppendJoin<TBuilder>(this TBuilder text, char separator, params object?[] values)
-            where TBuilder : TextBuilder
-        {
-            if (text is null)
-                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
-
-            text.buffer.AppendJoinInternal(separator, values);
-            return text;
-        }
-
-        public static TBuilder AppendJoin<TBuilder>(this TBuilder text, char separator, params ReadOnlySpan<object?> values)
-            where TBuilder : TextBuilder
-        {
-            if (text is null)
-                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
-
-            text.buffer.AppendJoinInternal(separator, values);
-            return text;
-        }
-
-        public static TBuilder AppendJoin<TBuilder, T>(this TBuilder text, char separator, IEnumerable<T> values)
-            where TBuilder : TextBuilder
-        {
-            if (text is null)
-                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
-
-            text.buffer.AppendJoinInternal(separator, values);
-            return text;
-        }
-
-        public static TBuilder AppendJoin<TBuilder>(this TBuilder text, char separator, params string?[] values)
-            where TBuilder : TextBuilder
-        {
-            if (text is null)
-                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
-
-            text.buffer.AppendJoinInternal(separator, values);
-            return text;
-        }
-
-        public static TBuilder AppendJoin<TBuilder>(this TBuilder text, char separator, params ReadOnlySpan<string?> values)
-            where TBuilder : TextBuilder
-        {
-            if (text is null)
-                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
-
-            text.buffer.AppendJoinInternal(separator, values);
             return text;
         }
 
