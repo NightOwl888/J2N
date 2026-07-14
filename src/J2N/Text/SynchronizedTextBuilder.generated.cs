@@ -569,7 +569,7 @@ namespace J2N.Text
         /// <see cref="SynchronizedTextBuilder"/> objects are the same. To determine equality, the
         /// <see cref="Equals(SynchronizedTextBuilder)"/> method uses ordinal comparison.
         /// </remarks>
-        public bool Equals(SynchronizedTextBuilder? sb)
+        public bool Equals([NotNullWhen(true)] SynchronizedTextBuilder? sb)
         {
             lock (syncRoot)
             {
@@ -592,7 +592,7 @@ namespace J2N.Text
         /// The <see cref="Equals(StringBuilder)"/> method performs an ordinal comparison to determine
         /// whether the characters in the current instance and span are equal.
         /// </remarks>
-        public bool Equals(StringBuilder? sb)
+        public bool Equals([NotNullWhen(true)] StringBuilder? sb)
         {
             lock (syncRoot)
             {

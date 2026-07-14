@@ -484,7 +484,7 @@ namespace J2N.Text
         /// <see cref="TextBuilder"/> objects are the same. To determine equality, the
         /// <see cref="Equals(TextBuilder)"/> method uses ordinal comparison.
         /// </remarks>
-        public bool Equals(TextBuilder? sb)
+        public bool Equals([NotNullWhen(true)] TextBuilder? sb)
         {
             return buffer.Equals(sb?.buffer);
         }
@@ -504,7 +504,7 @@ namespace J2N.Text
         /// The <see cref="Equals(StringBuilder)"/> method performs an ordinal comparison to determine
         /// whether the characters in the current instance and span are equal.
         /// </remarks>
-        public bool Equals(StringBuilder? sb)
+        public bool Equals([NotNullWhen(true)] StringBuilder? sb)
         {
             return buffer.Equals(sb);
         }
