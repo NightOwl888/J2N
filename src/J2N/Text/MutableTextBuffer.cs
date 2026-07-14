@@ -733,35 +733,6 @@ namespace J2N.Text
                 AppendInternal(value.ToString());
         }
 
-
-        // J2N TODO: API - String interpolation for J2N formatters
-
-        ///// <summary>Appends the specified interpolated string to this instance.</summary>
-        ///// <param name="handler">The interpolated string to append.</param>
-        ///// <returns>A reference to this instance after the append operation has completed.</returns>
-        //[CodeGenerationExtensionImplementation]
-        //internal void AppendInternal([InterpolatedStringHandlerArgument("")] ref AppendInterpolatedStringHandler handler) => this;
-
-        ///// <summary>Appends the specified interpolated string to this instance.</summary>
-        ///// <param name="provider">An object that supplies culture-specific formatting information.</param>
-        ///// <param name="handler">The interpolated string to append.</param>
-        ///// <returns>A reference to this instance after the append operation has completed.</returns>
-        //[CodeGenerationExtensionImplementation]
-        //internal void AppendInternal(IFormatProvider? provider, [InterpolatedStringHandlerArgument("", nameof(provider))] ref AppendInterpolatedStringHandler handler) => this;
-
-        ///// <summary>Appends the specified interpolated string followed by the default line terminator to the end of the current MutableTextBuffer object.</summary>
-        ///// <param name="handler">The interpolated string to append.</param>
-        ///// <returns>A reference to this instance after the append operation has completed.</returns>
-        //[CodeGenerationExtensionImplementation]
-        //internal void AppendLineInternal([InterpolatedStringHandlerArgument("")] ref AppendInterpolatedStringHandler handler) => AppendLine();
-
-        ///// <summary>Appends the specified interpolated string followed by the default line terminator to the end of the current MutableTextBuffer object.</summary>
-        ///// <param name="provider">An object that supplies culture-specific formatting information.</param>
-        ///// <param name="handler">The interpolated string to append.</param>
-        ///// <returns>A reference to this instance after the append operation has completed.</returns>
-        //[CodeGenerationExtensionImplementation]
-        //internal void AppendLineInernal(IFormatProvider? provider, [InterpolatedStringHandlerArgument("", nameof(provider))] ref AppendInterpolatedStringHandler handler) => AppendLine();
-
         /// <summary>
         /// Inserts the string representation of a specified Boolean value to this instance
         /// at the specified character position.
