@@ -38,6 +38,14 @@ namespace J2N.Text
             }
         }
 
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private void AppendWithExpansion(char value)
+        {
+            Grow(1);
+            m_Chars[m_Position] = value;
+            m_Position++;
+        }
+
         #endregion Append char
 
         #region Append char[]

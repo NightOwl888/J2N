@@ -1035,14 +1035,6 @@ namespace J2N.Text
             format == BooleanFormat.Lowercase ? StringFormatter.FormatBoolean(value) : value.ToString();
 
 
-        [MethodImpl(MethodImplOptions.NoInlining)]
-        private void AppendWithExpansion(char value)
-        {
-            Grow(1);
-            m_Chars[m_Position] = value;
-            m_Position++;
-        }
-
         private void ReplaceInPlace(ref int index, ref char value, int count)
         {
             if (count == 0)
