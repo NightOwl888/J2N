@@ -3237,19 +3237,40 @@ namespace J2N.Text
             }
         }
 
-        /// <summary>
-        /// Appends the string representation of the Unicode characters in a specified sequence to this instance.
-        /// <para/>
-        /// NOTE: Unlike the Java implementation, this method does not add the word <c>"null"</c> to the <see cref="SynchronizedTextBuilder"/>
-        /// if <paramref name="value"/> is <see langword="null"/>. Instead, no operation is performed.
-        /// </summary>
+        /// <summary>Appends the string representation of a specified <see cref="char"/> object to this instance.</summary>
         /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
         /// <param name="text">The target builder.</param>
-        /// <param name="value">The sequence of characters to append.</param>
+        /// <param name="value">The UTF-16-encoded code unit to append.</param>
         /// <returns>A reference to this instance after the operation has completed.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed <see cref="SynchronizedTextBuilder.MaxCapacity"/>.</exception>
-        /// <seealso cref="ICharSequence" />
-        public static TBuilder Append<TBuilder>(this TBuilder text, ICharSequence? value)
+        /// <remarks>
+        /// The <see cref="Append{TBuilder}(TBuilder, char)"/> method modifies the existing instance of this class;
+        /// it does not return a new class instance. Because of this, you can call a method or property
+        /// on the existing reference and you do not have to assign the return value to a <see cref="SynchronizedTextBuilder"/>
+        /// object, as the following example illustrates.
+        /// <code>
+        /// string str = "Characters in a string.";
+        /// J2N.Text.SynchronizedTextBuilder sb = new J2N.Text.SynchronizedTextBuilder();
+        /// foreach (var ch in str)
+        ///    sb.Append(" '").Append(ch).Append("' ");
+        /// 
+        /// Console.WriteLine("Characters in the string:");
+        /// Console.WriteLine("  {0}", sb);
+        /// // The example displays the following output:
+        /// //    Characters in the string:
+        /// //       'C'  'h'  'a'  'r'  'a'  'c'  't'  'e'  'r'  's'  ' '  'i'  'n'  ' '  'a'  ' '  's'  't' 'r'  'i'  'n'  'g'  '.'
+        /// </code>
+        /// <para/>
+        /// The capacity of this instance is adjusted as needed.
+        /// <para/>
+        /// <b>Notes to Callers</b>
+        /// <para/>
+        /// When you instantiate a <see cref="SynchronizedTextBuilder"/> object by calling <see cref="SynchronizedTextBuilder(int, int)"/>,
+        /// both the length and the capacity of the <see cref="SynchronizedTextBuilder"/> instance can grow beyond
+        /// the value of its <see cref="SynchronizedTextBuilder.MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append{TBuilder}(TBuilder, string?)"/>
+        /// and <see cref="AppendFormat{TBuilder}(TBuilder, string, object?)"/> methods to append small strings.
+        /// </remarks>
+        /// <seealso cref="char" />
+        public static TBuilder Append<TBuilder>(this TBuilder text, char value)
             where TBuilder : SynchronizedTextBuilder
         {
             if (text is null)
@@ -3262,122 +3283,40 @@ namespace J2N.Text
             }
         }
 
-        /// <summary>Appends the string representation of a specified subarray of Unicode characters to this instance.</summary>
+        /// <summary>Appends the string representation of the Unicode characters in a specified array to this instance.</summary>
         /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
         /// <param name="text">The target builder.</param>
-        /// <param name="value">The UTF-16-encoded code unit to append.</param>
-        /// <param name="startIndex">The starting position in <paramref name="value"/>.</param>
-        /// <param name="count">The number of characters to append.</param>
+        /// <param name="value">The array of characters to append.</param>
         /// <returns>A reference to this instance after the operation has completed.</returns>
-        /// <exception cref="ArgumentNullException">
-        /// <paramref name="value"/> is <see langword="null"/>, and
-        /// <paramref name="startIndex"/> and <paramref name="count"/> are not zero.
-        /// </exception>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// <paramref name="count"/> is less than zero.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// <paramref name="startIndex"/> is less than zero.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// <paramref name="startIndex"/> + <paramref name="count"/> is greater than the length of <paramref name="value"/>.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// Enlarging the value of this instance would exceed <see cref="SynchronizedTextBuilder.MaxCapacity"/>.
-        /// </exception>
-        /// <seealso cref="ICharSequence" />
-        public static TBuilder Append<TBuilder>(this TBuilder text, ICharSequence? value, int startIndex, int count)
-            where TBuilder : SynchronizedTextBuilder
-        {
-            if (text is null)
-                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
-
-            lock (text.SyncRoot)
-            {
-                text.buffer.AppendInternal(value, startIndex, count);
-                return text;
-            }
-        }
-
-        /// <summary>Inserts the string representation of a specified sequence of Unicode characters into this instance at the specified character position.</summary>
-        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
-        /// <param name="text">The target builder.</param>
-        /// <param name="index">The position in this instance where insertion begins.</param>
-        /// <param name="value">The character sequence to insert.</param>
-        /// <returns>A reference to this instance after the operation has completed.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// <paramref name="index"/> is less than zero or greater than the length of this instance.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// Enlarging the value of this instance would exceed <see cref="SynchronizedTextBuilder.MaxCapacity"/>.
-        /// </exception>
-        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, ICharSequence? value)
-            where TBuilder : SynchronizedTextBuilder
-        {
-            if (text is null)
-                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
-
-            lock (text.SyncRoot)
-            {
-                text.buffer.InsertInternal(index, value);
-                return text;
-            }
-        }
-
-        /// <summary>
-        /// Inserts the string representation of a specified subarray of Unicode characters into this instance at the specified character position.
-        /// <para/>
-        /// IMPORTANT: This method has .NET semantics. That is, the fourth parameter is a count, not an exclusive end index as would be the
-        /// case in Java. To translate from Java, use <c>end - start</c> to resolve <paramref name="count"/>.
-        /// </summary>
-        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
-        /// <param name="text">The target builder.</param>
-        /// <param name="index">The position in this instance where insertion begins.</param>
-        /// <param name="value">The character sequence to insert.</param>
-        /// <param name="startIndex">The starting index within <paramref name="value"/>.</param>
-        /// <param name="count">The number of characters to insert.</param>
-        /// <returns>A reference to this instance after the operation has completed.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// <paramref name="index"/>, <paramref name="startIndex"/> or <paramref name="count"/> is less than zero.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// <paramref name="index"/> is greater than the length of this instance.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// <paramref name="startIndex"/> plus <paramref name="count"/> is not a position within <paramref name="value"/>.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// Enlarging the value of this instance would exceed <see cref="SynchronizedTextBuilder.MaxCapacity"/>.
-        /// </exception>
-        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, ICharSequence? value, int startIndex, int count)
-            where TBuilder : SynchronizedTextBuilder
-        {
-            if (text is null)
-                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
-
-            lock (text.SyncRoot)
-            {
-                text.buffer.InsertInternal(index, value, startIndex, count);
-                return text;
-            }
-        }
-
-        /// <summary>Removes all characters from the current <see cref="SynchronizedTextBuilder"/> instance.</summary>
-        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
-        /// <param name="text">The target builder.</param>
-        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed <see cref="SynchronizedTextBuilder.MaxCapacity"/>.</exception>
         /// <remarks>
-        /// <see cref="Clear"/> is a convenience method that is equivalent to setting
-        /// the <see cref="SynchronizedTextBuilder.Length"/> property of the current instance to 0 (zero).
+        /// This method appends the characters in the specified array to the current instance in the same order they
+        /// appear in value. If <paramref name="value"/> is <see langword="null"/>, no changes are made.
+        /// <para/>
+        /// The <see cref="Append{TBuilder}(TBuilder, char[])"/> method modifies the existing instance of this class; it does not
+        /// return a new class instance. Because of this, you can call a method or property on the existing
+        /// reference and you do not have to assign the return value to a <see cref="SynchronizedTextBuilder"/> object,
+        /// as the following example illustrates.
+        /// <code>
+        /// char[] chars = { 'a', 'e', 'i', 'o', 'u' };
+        /// J2N.Text.SynchronizedTextBuilder sb = new J2N.Text.SynchronizedTextBuilder();
+        /// sb.Append("The characters in the array: ").Append(chars);
+        /// Console.WriteLine(sb);
+        /// // The example displays the following output:
+        /// //      The characters in the array: aeiou
+        /// </code>
+        /// <para/>
+        /// The capacity of this instance is adjusted as needed.
+        /// <para/>
+        /// <b>Notes to Callers</b>
+        /// <para/>
+        /// When you instantiate a <see cref="SynchronizedTextBuilder"/> object by calling <see cref="SynchronizedTextBuilder(int, int)"/>,
+        /// both the length and the capacity of the <see cref="SynchronizedTextBuilder"/> instance can grow beyond
+        /// the value of its <see cref="SynchronizedTextBuilder.MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append{TBuilder}(TBuilder, string?)"/>
+        /// and <see cref="AppendFormat{TBuilder}(TBuilder, string, object?)"/> methods to append small strings.
         /// </remarks>
-        public static TBuilder Clear<TBuilder>(this TBuilder text)
+        /// <seealso cref="char" />
+        public static TBuilder Append<TBuilder>(this TBuilder text, char[]? value)
             where TBuilder : SynchronizedTextBuilder
         {
             if (text is null)
@@ -3385,7 +3324,7 @@ namespace J2N.Text
 
             lock (text.SyncRoot)
             {
-                text.buffer.ClearInternal();
+                text.buffer.AppendInternal(value);
                 return text;
             }
         }
@@ -3459,6 +3398,51 @@ namespace J2N.Text
             lock (text.SyncRoot)
             {
                 text.buffer.AppendInternal(value, startIndex, charCount);
+                return text;
+            }
+        }
+
+        /// <summary>Appends an array of Unicode characters starting at a specified address to this instance.</summary>
+        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
+        /// <param name="text">The target builder.</param>
+        /// <param name="value">A pointer to an array of characters.</param>
+        /// <param name="valueCount">The number of characters in the array.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="valueCount"/> is less than zero.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// Enlarging the value of this instance would exceed <see cref="SynchronizedTextBuilder.MaxCapacity"/>.
+        /// </exception>
+        /// <exception cref="NullReferenceException"><paramref name="value"/> is a null pointer.</exception>
+        /// <remarks>
+        /// This method appends <paramref name="valueCount"/> characters starting at address <paramref name="value"/>
+        /// to the current instance.
+        /// <para/>
+        /// The <see cref="Append{TBuilder}(TBuilder, char*, int)"/> method modifies the existing instance of this class; it does
+        /// not return a new class instance. Because of this, you can call a method or property on the existing
+        /// reference and you do not have to assign the return value to a <see cref="SynchronizedTextBuilder"/> object.
+        /// <para/>
+        /// The capacity of this instance is adjusted as needed.
+        /// <para/>
+        /// <b>Notes to Callers</b>
+        /// <para/>
+        /// When you instantiate a <see cref="SynchronizedTextBuilder"/> object by calling <see cref="SynchronizedTextBuilder(int, int)"/>,
+        /// both the length and the capacity of the <see cref="SynchronizedTextBuilder"/> instance can grow beyond
+        /// the value of its <see cref="SynchronizedTextBuilder.MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append{TBuilder}(TBuilder, string?)"/>
+        /// and <see cref="AppendFormat{TBuilder}(TBuilder, string, object?)"/> methods to append small strings.
+        /// </remarks>
+        [CLSCompliant(false)]
+        public static unsafe TBuilder Append<TBuilder>(this TBuilder text, char* value, int valueCount)
+            where TBuilder : SynchronizedTextBuilder
+        {
+            if (text is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
+
+            lock (text.SyncRoot)
+            {
+                text.buffer.AppendInternal(value, valueCount);
                 return text;
             }
         }
@@ -3586,6 +3570,44 @@ namespace J2N.Text
             }
         }
 
+        /// <summary>Appends the string representation of a specified read-only character span to this instance.</summary>
+        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
+        /// <param name="text">The target builder.</param>
+        /// <param name="value">The read-only character span to append.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <seealso cref="ReadOnlySpan{Char}" />
+        public static TBuilder Append<TBuilder>(this TBuilder text, ReadOnlySpan<char> value)
+            where TBuilder : SynchronizedTextBuilder
+        {
+            if (text is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
+
+            lock (text.SyncRoot)
+            {
+                text.buffer.AppendInternal(value);
+                return text;
+            }
+        }
+
+        /// <summary>Appends the string representation of a specified read-only character memory region to this instance.</summary>
+        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
+        /// <param name="text">The target builder.</param>
+        /// <param name="value">The read-only character memory region to append.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <seealso cref="ReadOnlyMemory{Char}" />
+        public static TBuilder Append<TBuilder>(this TBuilder text, ReadOnlyMemory<char> value)
+            where TBuilder : SynchronizedTextBuilder
+        {
+            if (text is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
+
+            lock (text.SyncRoot)
+            {
+                text.buffer.AppendInternal(value);
+                return text;
+            }
+        }
+
         /// <summary>Appends the string representation of a specified string builder to this instance.</summary>
         /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
         /// <param name="text">The target builder.</param>
@@ -3697,6 +3719,474 @@ namespace J2N.Text
             lock (text.SyncRoot)
             {
                 text.buffer.AppendInternal(value, startIndex, count);
+                return text;
+            }
+        }
+
+        /// <summary>
+        /// Appends the string representation of the Unicode characters in a specified sequence to this instance.
+        /// <para/>
+        /// NOTE: Unlike the Java implementation, this method does not add the word <c>"null"</c> to the <see cref="SynchronizedTextBuilder"/>
+        /// if <paramref name="value"/> is <see langword="null"/>. Instead, no operation is performed.
+        /// </summary>
+        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
+        /// <param name="text">The target builder.</param>
+        /// <param name="value">The sequence of characters to append.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed <see cref="SynchronizedTextBuilder.MaxCapacity"/>.</exception>
+        /// <seealso cref="ICharSequence" />
+        public static TBuilder Append<TBuilder>(this TBuilder text, ICharSequence? value)
+            where TBuilder : SynchronizedTextBuilder
+        {
+            if (text is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
+
+            lock (text.SyncRoot)
+            {
+                text.buffer.AppendInternal(value);
+                return text;
+            }
+        }
+
+        /// <summary>Appends the string representation of a specified subarray of Unicode characters to this instance.</summary>
+        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
+        /// <param name="text">The target builder.</param>
+        /// <param name="value">The UTF-16-encoded code unit to append.</param>
+        /// <param name="startIndex">The starting position in <paramref name="value"/>.</param>
+        /// <param name="count">The number of characters to append.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="value"/> is <see langword="null"/>, and
+        /// <paramref name="startIndex"/> and <paramref name="count"/> are not zero.
+        /// </exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="count"/> is less than zero.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="startIndex"/> is less than zero.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="startIndex"/> + <paramref name="count"/> is greater than the length of <paramref name="value"/>.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// Enlarging the value of this instance would exceed <see cref="SynchronizedTextBuilder.MaxCapacity"/>.
+        /// </exception>
+        /// <seealso cref="ICharSequence" />
+        public static TBuilder Append<TBuilder>(this TBuilder text, ICharSequence? value, int startIndex, int count)
+            where TBuilder : SynchronizedTextBuilder
+        {
+            if (text is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
+
+            lock (text.SyncRoot)
+            {
+                text.buffer.AppendInternal(value, startIndex, count);
+                return text;
+            }
+        }
+
+        /// <summary>Inserts the string representation of a specified Unicode character into this instance at the specified character position.</summary>
+        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
+        /// <param name="text">The target builder.</param>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">The value to insert.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="index"/> is less than zero or greater than the current length of this instance.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// The current length of this <see cref="SynchronizedTextBuilder"/> object plus the length of
+        /// <paramref name="value"/> exceeds <see cref="SynchronizedTextBuilder.MaxCapacity"/>.
+        /// </exception>
+        /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
+        /// <seealso cref="char" />
+        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, char value)
+            where TBuilder : SynchronizedTextBuilder
+        {
+            if (text is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
+
+            lock (text.SyncRoot)
+            {
+                text.buffer.InsertInternal(index, value);
+                return text;
+            }
+        }
+
+        /// <summary>
+        /// Inserts the string representation of a specified array of Unicode characters into this
+        /// instance at the specified character position.
+        /// </summary>
+        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
+        /// <param name="text">The target builder.</param>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">The character array to insert.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="index"/> is less than zero or greater than the current length of this instance.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// The current length of this <see cref="SynchronizedTextBuilder"/> object plus the length of
+        /// <paramref name="value"/> exceeds <see cref="SynchronizedTextBuilder.MaxCapacity"/>.
+        /// </exception>
+        /// <remarks>
+        /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
+        /// <para/>
+        /// If <paramref name="value"/> is <see langword="null"/>, the <see cref="SynchronizedTextBuilder"/> is not changed.
+        /// </remarks>
+        /// <seealso cref="char" />
+        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, char[]? value)
+            where TBuilder : SynchronizedTextBuilder
+        {
+            if (text is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
+
+            lock (text.SyncRoot)
+            {
+                text.buffer.InsertInternal(index, value);
+                return text;
+            }
+        }
+
+        /// <summary>
+        /// Inserts the string representation of a specified subarray of Unicode characters
+        /// into this instance at the specified character position.
+        /// </summary>
+        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
+        /// <param name="text">The target builder.</param>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">A character array.</param>
+        /// <param name="startIndex">The starting index within <paramref name="value"/>.</param>
+        /// <param name="charCount">The number of characters to insert.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="value"/> is <see langword="null"/>, and <paramref name="startIndex"/>
+        /// and <paramref name="charCount"/> are not zero.
+        /// </exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="index"/>, <paramref name="startIndex"/>, or <paramref name="charCount"/> is less than zero.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="index"/> is greater than the length of this instance.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="startIndex"/> plus <paramref name="charCount"/> is not a position within <paramref name="value"/>.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// Enlarging the value of this instance would exceed <see cref="SynchronizedTextBuilder.MaxCapacity"/>.
+        /// </exception>
+        /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
+        /// <seealso cref="char" />
+        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, char[]? value, int startIndex, int charCount)
+            where TBuilder : SynchronizedTextBuilder
+        {
+            if (text is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
+
+            lock (text.SyncRoot)
+            {
+                text.buffer.InsertInternal(index, value, startIndex, charCount);
+                return text;
+            }
+        }
+
+        /// <summary>Inserts an array of Unicode characters starting at a specified address into this instance.</summary>
+        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
+        /// <param name="text">The target builder.</param>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">A pointer to an array of characters.</param>
+        /// <param name="valueCount">The number of characters in the array.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="index"/> or <paramref name="valueCount"/> is less than zero.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="index"/> is greater than the length of this instance.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// Enlarging the value of this instance would exceed <see cref="SynchronizedTextBuilder.MaxCapacity"/>.
+        /// </exception>
+        /// <exception cref="NullReferenceException"><paramref name="value"/> is a null pointer.</exception>
+        /// <remarks>
+        /// This method inserts <paramref name="valueCount"/> characters starting at address <paramref name="value"/>
+        /// to the current instance.
+        /// <para/>
+        /// Existing characters are shifted to make room for the new text. The capacity is adjusted as needed.
+        /// </remarks>
+        [CLSCompliant(false)]
+        public static unsafe TBuilder Insert<TBuilder>(this TBuilder text, int index, char* value, int valueCount)
+            where TBuilder : SynchronizedTextBuilder
+        {
+            if (text is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
+
+            lock (text.SyncRoot)
+            {
+                text.buffer.InsertInternal(index, value, valueCount);
+                return text;
+            }
+        }
+
+        /// <summary>Inserts a string into this instance at the specified character position.</summary>
+        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
+        /// <param name="text">The target builder.</param>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">The string to insert.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="index"/> is less than zero or greater than the current length of this instance.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// The current length of this <see cref="SynchronizedTextBuilder"/> object plus the length of
+        /// <paramref name="value"/> exceeds <see cref="SynchronizedTextBuilder.MaxCapacity"/>.
+        /// </exception>
+        /// <remarks>
+        /// Existing characters are shifted to make room for the new text. The capacity is adjusted as needed.
+        /// <para/>
+        /// This instance of <see cref="SynchronizedTextBuilder"/> is not changed if <paramref name="value"/> is <see langword="null"/>,
+        /// or <paramref name="value"/> is not <see langword="null"/> but its length is zero.
+        /// </remarks>
+        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, string? value)
+            where TBuilder : SynchronizedTextBuilder
+        {
+            if (text is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
+
+            lock (text.SyncRoot)
+            {
+                text.buffer.InsertInternal(index, value);
+                return text;
+            }
+        }
+
+        /// <summary>Inserts the specified substring into this instance at the specified character position.</summary>
+        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
+        /// <param name="text">The target builder.</param>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">A character array.</param>
+        /// <param name="startIndex">The starting index within <paramref name="value"/>.</param>
+        /// <param name="count">The number of characters to insert.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="value"/> is <see langword="null"/>, and <paramref name="startIndex"/>
+        /// and <paramref name="count"/> are not zero.
+        /// </exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="index"/>, <paramref name="startIndex"/>, or <paramref name="count"/> is less than zero.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="index"/> is greater than the length of this instance.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="startIndex"/> plus <paramref name="count"/> is not a position within <paramref name="value"/>.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// Enlarging the value of this instance would exceed <see cref="SynchronizedTextBuilder.MaxCapacity"/>.
+        /// </exception>
+        /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
+        /// <seealso cref="char" />
+        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, string? value, int startIndex, int count)
+            where TBuilder : SynchronizedTextBuilder
+        {
+            if (text is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
+
+            lock (text.SyncRoot)
+            {
+                text.buffer.InsertInternal(index, value, startIndex, count);
+                return text;
+            }
+        }
+
+        /// <summary>Inserts the sequence of characters into this instance at the specified character position.</summary>
+        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
+        /// <param name="text">The target builder.</param>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">The character span to insert.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <remarks>
+        /// The existing characters are shifted to make room for the character sequence in the
+        /// <paramref name="value"/> to insert it. The capacity is adjusted as needed.
+        /// </remarks>
+        /// <seealso cref="ReadOnlySpan{Char}" />
+        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, ReadOnlySpan<char> value)
+            where TBuilder : SynchronizedTextBuilder
+        {
+            if (text is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
+
+            lock (text.SyncRoot)
+            {
+                text.buffer.InsertInternal(index, value);
+                return text;
+            }
+        }
+
+        /// <summary>Inserts a <see cref="StringBuilder"/> into this instance at the specified character position.</summary>
+        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
+        /// <param name="text">The target builder.</param>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">The value to insert.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="index"/> is less than zero or greater than the length of this instance.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// Enlarging the value of this instance would exceed <see cref="SynchronizedTextBuilder.MaxCapacity"/>.
+        /// </exception>
+        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, StringBuilder? value)
+            where TBuilder : SynchronizedTextBuilder
+        {
+            if (text is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
+
+            lock (text.SyncRoot)
+            {
+                text.buffer.InsertInternal(index, value);
+                return text;
+            }
+        }
+
+        /// <summary>
+        /// Inserts the string representation of a specified subarray of Unicode characters into this instance at the specified character position.
+        /// <para/>
+        /// IMPORTANT: This method has .NET semantics. That is, the fourth parameter is a count, not an exclusive end index as would be the
+        /// case in Java. To translate from Java, use <c>end - start</c> to resolve <paramref name="count"/>.
+        /// </summary>
+        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
+        /// <param name="text">The target builder.</param>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">The value to insert.</param>
+        /// <param name="startIndex">The starting index within <paramref name="value"/>.</param>
+        /// <param name="count">The number of characters to insert.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="index"/>, <paramref name="startIndex"/> or <paramref name="count"/> is less than zero.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="index"/> is greater than the length of this instance.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="startIndex"/> plus <paramref name="count"/> is not a position within <paramref name="value"/>.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// Enlarging the value of this instance would exceed <see cref="SynchronizedTextBuilder.MaxCapacity"/>.
+        /// </exception>
+        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, StringBuilder? value, int startIndex, int count)
+            where TBuilder : SynchronizedTextBuilder
+        {
+            if (text is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
+
+            lock (text.SyncRoot)
+            {
+                text.buffer.InsertInternal(index, value, startIndex, count);
+                return text;
+            }
+        }
+
+        /// <summary>Inserts the string representation of a specified sequence of Unicode characters into this instance at the specified character position.</summary>
+        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
+        /// <param name="text">The target builder.</param>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">The character sequence to insert.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="index"/> is less than zero or greater than the length of this instance.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// Enlarging the value of this instance would exceed <see cref="SynchronizedTextBuilder.MaxCapacity"/>.
+        /// </exception>
+        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, ICharSequence? value)
+            where TBuilder : SynchronizedTextBuilder
+        {
+            if (text is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
+
+            lock (text.SyncRoot)
+            {
+                text.buffer.InsertInternal(index, value);
+                return text;
+            }
+        }
+
+        /// <summary>
+        /// Inserts the string representation of a specified subarray of Unicode characters into this instance at the specified character position.
+        /// <para/>
+        /// IMPORTANT: This method has .NET semantics. That is, the fourth parameter is a count, not an exclusive end index as would be the
+        /// case in Java. To translate from Java, use <c>end - start</c> to resolve <paramref name="count"/>.
+        /// </summary>
+        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
+        /// <param name="text">The target builder.</param>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">The character sequence to insert.</param>
+        /// <param name="startIndex">The starting index within <paramref name="value"/>.</param>
+        /// <param name="count">The number of characters to insert.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="index"/>, <paramref name="startIndex"/> or <paramref name="count"/> is less than zero.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="index"/> is greater than the length of this instance.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="startIndex"/> plus <paramref name="count"/> is not a position within <paramref name="value"/>.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// Enlarging the value of this instance would exceed <see cref="SynchronizedTextBuilder.MaxCapacity"/>.
+        /// </exception>
+        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, ICharSequence? value, int startIndex, int count)
+            where TBuilder : SynchronizedTextBuilder
+        {
+            if (text is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
+
+            lock (text.SyncRoot)
+            {
+                text.buffer.InsertInternal(index, value, startIndex, count);
+                return text;
+            }
+        }
+
+        /// <summary>Removes all characters from the current <see cref="SynchronizedTextBuilder"/> instance.</summary>
+        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
+        /// <param name="text">The target builder.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <remarks>
+        /// <see cref="Clear"/> is a convenience method that is equivalent to setting
+        /// the <see cref="SynchronizedTextBuilder.Length"/> property of the current instance to 0 (zero).
+        /// </remarks>
+        public static TBuilder Clear<TBuilder>(this TBuilder text)
+            where TBuilder : SynchronizedTextBuilder
+        {
+            if (text is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
+
+            lock (text.SyncRoot)
+            {
+                text.buffer.ClearInternal();
                 return text;
             }
         }
@@ -3892,236 +4382,6 @@ namespace J2N.Text
             }
         }
 
-        /// <summary>Appends the string representation of a specified <see cref="char"/> object to this instance.</summary>
-        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
-        /// <param name="text">The target builder.</param>
-        /// <param name="value">The UTF-16-encoded code unit to append.</param>
-        /// <returns>A reference to this instance after the operation has completed.</returns>
-        /// <remarks>
-        /// The <see cref="Append{TBuilder}(TBuilder, char)"/> method modifies the existing instance of this class;
-        /// it does not return a new class instance. Because of this, you can call a method or property
-        /// on the existing reference and you do not have to assign the return value to a <see cref="SynchronizedTextBuilder"/>
-        /// object, as the following example illustrates.
-        /// <code>
-        /// string str = "Characters in a string.";
-        /// J2N.Text.SynchronizedTextBuilder sb = new J2N.Text.SynchronizedTextBuilder();
-        /// foreach (var ch in str)
-        ///    sb.Append(" '").Append(ch).Append("' ");
-        /// 
-        /// Console.WriteLine("Characters in the string:");
-        /// Console.WriteLine("  {0}", sb);
-        /// // The example displays the following output:
-        /// //    Characters in the string:
-        /// //       'C'  'h'  'a'  'r'  'a'  'c'  't'  'e'  'r'  's'  ' '  'i'  'n'  ' '  'a'  ' '  's'  't' 'r'  'i'  'n'  'g'  '.'
-        /// </code>
-        /// <para/>
-        /// The capacity of this instance is adjusted as needed.
-        /// <para/>
-        /// <b>Notes to Callers</b>
-        /// <para/>
-        /// When you instantiate a <see cref="SynchronizedTextBuilder"/> object by calling <see cref="SynchronizedTextBuilder(int, int)"/>,
-        /// both the length and the capacity of the <see cref="SynchronizedTextBuilder"/> instance can grow beyond
-        /// the value of its <see cref="SynchronizedTextBuilder.MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append{TBuilder}(TBuilder, string?)"/>
-        /// and <see cref="AppendFormat{TBuilder}(TBuilder, string, object?)"/> methods to append small strings.
-        /// </remarks>
-        /// <seealso cref="char" />
-        public static TBuilder Append<TBuilder>(this TBuilder text, char value)
-            where TBuilder : SynchronizedTextBuilder
-        {
-            if (text is null)
-                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
-
-            lock (text.SyncRoot)
-            {
-                text.buffer.AppendInternal(value);
-                return text;
-            }
-        }
-
-        /// <summary>Appends the string representation of the Unicode characters in a specified array to this instance.</summary>
-        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
-        /// <param name="text">The target builder.</param>
-        /// <param name="value">The array of characters to append.</param>
-        /// <returns>A reference to this instance after the operation has completed.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed <see cref="SynchronizedTextBuilder.MaxCapacity"/>.</exception>
-        /// <remarks>
-        /// This method appends the characters in the specified array to the current instance in the same order they
-        /// appear in value. If <paramref name="value"/> is <see langword="null"/>, no changes are made.
-        /// <para/>
-        /// The <see cref="Append{TBuilder}(TBuilder, char[])"/> method modifies the existing instance of this class; it does not
-        /// return a new class instance. Because of this, you can call a method or property on the existing
-        /// reference and you do not have to assign the return value to a <see cref="SynchronizedTextBuilder"/> object,
-        /// as the following example illustrates.
-        /// <code>
-        /// char[] chars = { 'a', 'e', 'i', 'o', 'u' };
-        /// J2N.Text.SynchronizedTextBuilder sb = new J2N.Text.SynchronizedTextBuilder();
-        /// sb.Append("The characters in the array: ").Append(chars);
-        /// Console.WriteLine(sb);
-        /// // The example displays the following output:
-        /// //      The characters in the array: aeiou
-        /// </code>
-        /// <para/>
-        /// The capacity of this instance is adjusted as needed.
-        /// <para/>
-        /// <b>Notes to Callers</b>
-        /// <para/>
-        /// When you instantiate a <see cref="SynchronizedTextBuilder"/> object by calling <see cref="SynchronizedTextBuilder(int, int)"/>,
-        /// both the length and the capacity of the <see cref="SynchronizedTextBuilder"/> instance can grow beyond
-        /// the value of its <see cref="SynchronizedTextBuilder.MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append{TBuilder}(TBuilder, string?)"/>
-        /// and <see cref="AppendFormat{TBuilder}(TBuilder, string, object?)"/> methods to append small strings.
-        /// </remarks>
-        /// <seealso cref="char" />
-        public static TBuilder Append<TBuilder>(this TBuilder text, char[]? value)
-            where TBuilder : SynchronizedTextBuilder
-        {
-            if (text is null)
-                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
-
-            lock (text.SyncRoot)
-            {
-                text.buffer.AppendInternal(value);
-                return text;
-            }
-        }
-
-        /// <summary>Appends the string representation of a specified read-only character span to this instance.</summary>
-        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
-        /// <param name="text">The target builder.</param>
-        /// <param name="value">The read-only character span to append.</param>
-        /// <returns>A reference to this instance after the operation has completed.</returns>
-        /// <seealso cref="ReadOnlySpan{Char}" />
-        public static TBuilder Append<TBuilder>(this TBuilder text, ReadOnlySpan<char> value)
-            where TBuilder : SynchronizedTextBuilder
-        {
-            if (text is null)
-                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
-
-            lock (text.SyncRoot)
-            {
-                text.buffer.AppendInternal(value);
-                return text;
-            }
-        }
-
-        /// <summary>Appends the string representation of a specified read-only character memory region to this instance.</summary>
-        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
-        /// <param name="text">The target builder.</param>
-        /// <param name="value">The read-only character memory region to append.</param>
-        /// <returns>A reference to this instance after the operation has completed.</returns>
-        /// <seealso cref="ReadOnlyMemory{Char}" />
-        public static TBuilder Append<TBuilder>(this TBuilder text, ReadOnlyMemory<char> value)
-            where TBuilder : SynchronizedTextBuilder
-        {
-            if (text is null)
-                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
-
-            lock (text.SyncRoot)
-            {
-                text.buffer.AppendInternal(value);
-                return text;
-            }
-        }
-
-        /// <summary>Inserts a string into this instance at the specified character position.</summary>
-        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
-        /// <param name="text">The target builder.</param>
-        /// <param name="index">The position in this instance where insertion begins.</param>
-        /// <param name="value">The string to insert.</param>
-        /// <returns>A reference to this instance after the operation has completed.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// <paramref name="index"/> is less than zero or greater than the current length of this instance.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// The current length of this <see cref="SynchronizedTextBuilder"/> object plus the length of
-        /// <paramref name="value"/> exceeds <see cref="SynchronizedTextBuilder.MaxCapacity"/>.
-        /// </exception>
-        /// <remarks>
-        /// Existing characters are shifted to make room for the new text. The capacity is adjusted as needed.
-        /// <para/>
-        /// This instance of <see cref="SynchronizedTextBuilder"/> is not changed if <paramref name="value"/> is <see langword="null"/>,
-        /// or <paramref name="value"/> is not <see langword="null"/> but its length is zero.
-        /// </remarks>
-        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, string? value)
-            where TBuilder : SynchronizedTextBuilder
-        {
-            if (text is null)
-                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
-
-            lock (text.SyncRoot)
-            {
-                text.buffer.InsertInternal(index, value);
-                return text;
-            }
-        }
-
-        /// <summary>Inserts a <see cref="StringBuilder"/> into this instance at the specified character position.</summary>
-        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
-        /// <param name="text">The target builder.</param>
-        /// <param name="index">The position in this instance where insertion begins.</param>
-        /// <param name="value">The value to insert.</param>
-        /// <returns>A reference to this instance after the operation has completed.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// <paramref name="index"/> is less than zero or greater than the length of this instance.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// Enlarging the value of this instance would exceed <see cref="SynchronizedTextBuilder.MaxCapacity"/>.
-        /// </exception>
-        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, StringBuilder? value)
-            where TBuilder : SynchronizedTextBuilder
-        {
-            if (text is null)
-                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
-
-            lock (text.SyncRoot)
-            {
-                text.buffer.InsertInternal(index, value);
-                return text;
-            }
-        }
-
-        /// <summary>
-        /// Inserts the string representation of a specified subarray of Unicode characters into this instance at the specified character position.
-        /// <para/>
-        /// IMPORTANT: This method has .NET semantics. That is, the fourth parameter is a count, not an exclusive end index as would be the
-        /// case in Java. To translate from Java, use <c>end - start</c> to resolve <paramref name="count"/>.
-        /// </summary>
-        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
-        /// <param name="text">The target builder.</param>
-        /// <param name="index">The position in this instance where insertion begins.</param>
-        /// <param name="value">The value to insert.</param>
-        /// <param name="startIndex">The starting index within <paramref name="value"/>.</param>
-        /// <param name="count">The number of characters to insert.</param>
-        /// <returns>A reference to this instance after the operation has completed.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// <paramref name="index"/>, <paramref name="startIndex"/> or <paramref name="count"/> is less than zero.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// <paramref name="index"/> is greater than the length of this instance.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// <paramref name="startIndex"/> plus <paramref name="count"/> is not a position within <paramref name="value"/>.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// Enlarging the value of this instance would exceed <see cref="SynchronizedTextBuilder.MaxCapacity"/>.
-        /// </exception>
-        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, StringBuilder? value, int startIndex, int count)
-            where TBuilder : SynchronizedTextBuilder
-        {
-            if (text is null)
-                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
-
-            lock (text.SyncRoot)
-            {
-                text.buffer.InsertInternal(index, value, startIndex, count);
-                return text;
-            }
-        }
-
         /// <summary>
         /// Inserts the string representation of a specified Boolean value to this instance
         /// in lowercase at the specifed character position.
@@ -4192,266 +4452,6 @@ namespace J2N.Text
             lock (text.SyncRoot)
             {
                 text.buffer.InsertInternal(index, value, format);
-                return text;
-            }
-        }
-
-        /// <summary>Inserts the string representation of a specified Unicode character into this instance at the specified character position.</summary>
-        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
-        /// <param name="text">The target builder.</param>
-        /// <param name="index">The position in this instance where insertion begins.</param>
-        /// <param name="value">The value to insert.</param>
-        /// <returns>A reference to this instance after the operation has completed.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// <paramref name="index"/> is less than zero or greater than the current length of this instance.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// The current length of this <see cref="SynchronizedTextBuilder"/> object plus the length of
-        /// <paramref name="value"/> exceeds <see cref="SynchronizedTextBuilder.MaxCapacity"/>.
-        /// </exception>
-        /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
-        /// <seealso cref="char" />
-        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, char value)
-            where TBuilder : SynchronizedTextBuilder
-        {
-            if (text is null)
-                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
-
-            lock (text.SyncRoot)
-            {
-                text.buffer.InsertInternal(index, value);
-                return text;
-            }
-        }
-
-        /// <summary>
-        /// Inserts the string representation of a specified array of Unicode characters into this
-        /// instance at the specified character position.
-        /// </summary>
-        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
-        /// <param name="text">The target builder.</param>
-        /// <param name="index">The position in this instance where insertion begins.</param>
-        /// <param name="value">The character array to insert.</param>
-        /// <returns>A reference to this instance after the operation has completed.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// <paramref name="index"/> is less than zero or greater than the current length of this instance.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// The current length of this <see cref="SynchronizedTextBuilder"/> object plus the length of
-        /// <paramref name="value"/> exceeds <see cref="SynchronizedTextBuilder.MaxCapacity"/>.
-        /// </exception>
-        /// <remarks>
-        /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
-        /// <para/>
-        /// If <paramref name="value"/> is <see langword="null"/>, the <see cref="SynchronizedTextBuilder"/> is not changed.
-        /// </remarks>
-        /// <seealso cref="char" />
-        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, char[]? value)
-            where TBuilder : SynchronizedTextBuilder
-        {
-            if (text is null)
-                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
-
-            lock (text.SyncRoot)
-            {
-                text.buffer.InsertInternal(index, value);
-                return text;
-            }
-        }
-
-        /// <summary>
-        /// Inserts the string representation of a specified subarray of Unicode characters
-        /// into this instance at the specified character position.
-        /// </summary>
-        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
-        /// <param name="text">The target builder.</param>
-        /// <param name="index">The position in this instance where insertion begins.</param>
-        /// <param name="value">A character array.</param>
-        /// <param name="startIndex">The starting index within <paramref name="value"/>.</param>
-        /// <param name="charCount">The number of characters to insert.</param>
-        /// <returns>A reference to this instance after the operation has completed.</returns>
-        /// <exception cref="ArgumentNullException">
-        /// <paramref name="value"/> is <see langword="null"/>, and <paramref name="startIndex"/>
-        /// and <paramref name="charCount"/> are not zero.
-        /// </exception>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// <paramref name="index"/>, <paramref name="startIndex"/>, or <paramref name="charCount"/> is less than zero.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// <paramref name="index"/> is greater than the length of this instance.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// <paramref name="startIndex"/> plus <paramref name="charCount"/> is not a position within <paramref name="value"/>.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// Enlarging the value of this instance would exceed <see cref="SynchronizedTextBuilder.MaxCapacity"/>.
-        /// </exception>
-        /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
-        /// <seealso cref="char" />
-        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, char[]? value, int startIndex, int charCount)
-            where TBuilder : SynchronizedTextBuilder
-        {
-            if (text is null)
-                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
-
-            lock (text.SyncRoot)
-            {
-                text.buffer.InsertInternal(index, value, startIndex, charCount);
-                return text;
-            }
-        }
-
-        /// <summary>Inserts the specified substring into this instance at the specified character position.</summary>
-        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
-        /// <param name="text">The target builder.</param>
-        /// <param name="index">The position in this instance where insertion begins.</param>
-        /// <param name="value">A character array.</param>
-        /// <param name="startIndex">The starting index within <paramref name="value"/>.</param>
-        /// <param name="count">The number of characters to insert.</param>
-        /// <returns>A reference to this instance after the operation has completed.</returns>
-        /// <exception cref="ArgumentNullException">
-        /// <paramref name="value"/> is <see langword="null"/>, and <paramref name="startIndex"/>
-        /// and <paramref name="count"/> are not zero.
-        /// </exception>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// <paramref name="index"/>, <paramref name="startIndex"/>, or <paramref name="count"/> is less than zero.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// <paramref name="index"/> is greater than the length of this instance.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// <paramref name="startIndex"/> plus <paramref name="count"/> is not a position within <paramref name="value"/>.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// Enlarging the value of this instance would exceed <see cref="SynchronizedTextBuilder.MaxCapacity"/>.
-        /// </exception>
-        /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
-        /// <seealso cref="char" />
-        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, string? value, int startIndex, int count)
-            where TBuilder : SynchronizedTextBuilder
-        {
-            if (text is null)
-                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
-
-            lock (text.SyncRoot)
-            {
-                text.buffer.InsertInternal(index, value, startIndex, count);
-                return text;
-            }
-        }
-
-        /// <summary>Inserts the sequence of characters into this instance at the specified character position.</summary>
-        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
-        /// <param name="text">The target builder.</param>
-        /// <param name="index">The position in this instance where insertion begins.</param>
-        /// <param name="value">The character span to insert.</param>
-        /// <returns>A reference to this instance after the operation has completed.</returns>
-        /// <remarks>
-        /// The existing characters are shifted to make room for the character sequence in the
-        /// <paramref name="value"/> to insert it. The capacity is adjusted as needed.
-        /// </remarks>
-        /// <seealso cref="ReadOnlySpan{Char}" />
-        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, ReadOnlySpan<char> value)
-            where TBuilder : SynchronizedTextBuilder
-        {
-            if (text is null)
-                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
-
-            lock (text.SyncRoot)
-            {
-                text.buffer.InsertInternal(index, value);
-                return text;
-            }
-        }
-
-        /// <summary>Appends an array of Unicode characters starting at a specified address to this instance.</summary>
-        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
-        /// <param name="text">The target builder.</param>
-        /// <param name="value">A pointer to an array of characters.</param>
-        /// <param name="valueCount">The number of characters in the array.</param>
-        /// <returns>A reference to this instance after the operation has completed.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// <paramref name="valueCount"/> is less than zero.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// Enlarging the value of this instance would exceed <see cref="SynchronizedTextBuilder.MaxCapacity"/>.
-        /// </exception>
-        /// <exception cref="NullReferenceException"><paramref name="value"/> is a null pointer.</exception>
-        /// <remarks>
-        /// This method appends <paramref name="valueCount"/> characters starting at address <paramref name="value"/>
-        /// to the current instance.
-        /// <para/>
-        /// The <see cref="Append{TBuilder}(TBuilder, char*, int)"/> method modifies the existing instance of this class; it does
-        /// not return a new class instance. Because of this, you can call a method or property on the existing
-        /// reference and you do not have to assign the return value to a <see cref="SynchronizedTextBuilder"/> object.
-        /// <para/>
-        /// The capacity of this instance is adjusted as needed.
-        /// <para/>
-        /// <b>Notes to Callers</b>
-        /// <para/>
-        /// When you instantiate a <see cref="SynchronizedTextBuilder"/> object by calling <see cref="SynchronizedTextBuilder(int, int)"/>,
-        /// both the length and the capacity of the <see cref="SynchronizedTextBuilder"/> instance can grow beyond
-        /// the value of its <see cref="SynchronizedTextBuilder.MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append{TBuilder}(TBuilder, string?)"/>
-        /// and <see cref="AppendFormat{TBuilder}(TBuilder, string, object?)"/> methods to append small strings.
-        /// </remarks>
-        [CLSCompliant(false)]
-        public static unsafe TBuilder Append<TBuilder>(this TBuilder text, char* value, int valueCount)
-            where TBuilder : SynchronizedTextBuilder
-        {
-            if (text is null)
-                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
-
-            lock (text.SyncRoot)
-            {
-                text.buffer.AppendInternal(value, valueCount);
-                return text;
-            }
-        }
-
-        /// <summary>Inserts an array of Unicode characters starting at a specified address into this instance.</summary>
-        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
-        /// <param name="text">The target builder.</param>
-        /// <param name="index">The position in this instance where insertion begins.</param>
-        /// <param name="value">A pointer to an array of characters.</param>
-        /// <param name="valueCount">The number of characters in the array.</param>
-        /// <returns>A reference to this instance after the operation has completed.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// <paramref name="index"/> or <paramref name="valueCount"/> is less than zero.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// <paramref name="index"/> is greater than the length of this instance.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// Enlarging the value of this instance would exceed <see cref="SynchronizedTextBuilder.MaxCapacity"/>.
-        /// </exception>
-        /// <exception cref="NullReferenceException"><paramref name="value"/> is a null pointer.</exception>
-        /// <remarks>
-        /// This method inserts <paramref name="valueCount"/> characters starting at address <paramref name="value"/>
-        /// to the current instance.
-        /// <para/>
-        /// Existing characters are shifted to make room for the new text. The capacity is adjusted as needed.
-        /// </remarks>
-        [CLSCompliant(false)]
-        public static unsafe TBuilder Insert<TBuilder>(this TBuilder text, int index, char* value, int valueCount)
-            where TBuilder : SynchronizedTextBuilder
-        {
-            if (text is null)
-                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
-
-            lock (text.SyncRoot)
-            {
-                text.buffer.InsertInternal(index, value, valueCount);
                 return text;
             }
         }
