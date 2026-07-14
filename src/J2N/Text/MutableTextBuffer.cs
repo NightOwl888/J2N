@@ -415,6 +415,8 @@ namespace J2N.Text
 
         #endregion Custom Append
 
+        #region AppendLine
+
         /// <summary>
         /// Appends the default line terminator to the end of the current instance.
         /// </summary>
@@ -455,6 +457,10 @@ namespace J2N.Text
             AppendInternal(value);
             AppendInternal(Environment.NewLine);
         }
+
+        #endregion AppendLine
+
+        #region CopyTo
 
         /// <summary>
         /// Copies the characters from a specified segment of this instance to a specified segment of a destination
@@ -553,6 +559,10 @@ namespace J2N.Text
             m_Chars.AsSpan(sourceIndex, count).CopyTo(destination);
         }
 
+        #endregion CopyTo
+
+        #region Append/Insert bool
+
         /// <summary>
         /// Appends the string representation of a specified Boolean value to this instance.
         /// </summary>
@@ -577,36 +587,6 @@ namespace J2N.Text
         {
             string text = FormatBoolean(value, format);
             Append(ref MemoryMarshal.GetReference(text.AsSpan()), text.Length);
-        }
-
-        /// <summary>
-        /// Appends the string representation of a specified object to this instance.
-        /// </summary>
-        /// <remarks>
-        /// The public API and full documentation live in
-        /// <see cref="J2N.MutableTextBufferExtensions.Append{TBuilder}(TBuilder, object?, string?, IFormatProvider?)"/>.
-        /// Update that documentation if the behavior changes.
-        /// </remarks>
-        [CodeGenerationExtensionImplementation]
-        internal void AppendInternal(object? value, string? format, IFormatProvider? provider)
-        {
-            if (value is null)
-                return; // no-op
-#if FEATURE_SPANFORMATTABLE
-            else if (value is ISpanFormattable spanFormattable) // J2N: Check for ISpanFormattable reference types, as this will improve performance.
-                AppendSpanFormattable(spanFormattable, format, provider);
-#else
-            else if (value is Number number) // J2N: Check for Number-derived reference types, as this will improve performance.
-                AppendSpanFormattable(number, format, provider);
-#endif
-            else if (value is IStructuralFormattable structuralFormattable)
-                AppendInternal(structuralFormattable.ToString(format, provider));
-            else if (value is IFormattable formattable)
-                AppendInternal(formattable.ToString(format, provider));
-            else if (value is ICharSequence csq)
-                AppendInternal(csq); // doesn't support format providers
-            else
-                AppendInternal(value.ToString());
         }
 
         /// <summary>
@@ -639,6 +619,46 @@ namespace J2N.Text
             InsertInternal(index, text.AsSpan(), 1);
         }
 
+        private static string FormatBoolean(bool value, BooleanFormat format) =>
+            // J2N: System.Boolean ignores the IFormatProvider that is passed to it,
+            // so we are using a boolean flag for users to be able to specify whether to use
+            // title casing (.NET) or lower casing (Java).
+            format == BooleanFormat.Lowercase ? StringFormatter.FormatBoolean(value) : value.ToString();
+
+        #endregion Append/Insert bool
+
+        #region Append/Insert object
+
+        /// <summary>
+        /// Appends the string representation of a specified object to this instance.
+        /// </summary>
+        /// <remarks>
+        /// The public API and full documentation live in
+        /// <see cref="J2N.MutableTextBufferExtensions.Append{TBuilder}(TBuilder, object?, string?, IFormatProvider?)"/>.
+        /// Update that documentation if the behavior changes.
+        /// </remarks>
+        [CodeGenerationExtensionImplementation]
+        internal void AppendInternal(object? value, string? format, IFormatProvider? provider)
+        {
+            if (value is null)
+                return; // no-op
+#if FEATURE_SPANFORMATTABLE
+            else if (value is ISpanFormattable spanFormattable) // J2N: Check for ISpanFormattable reference types, as this will improve performance.
+                AppendSpanFormattable(spanFormattable, format, provider);
+#else
+            else if (value is Number number) // J2N: Check for Number-derived reference types, as this will improve performance.
+                AppendSpanFormattable(number, format, provider);
+#endif
+            else if (value is IStructuralFormattable structuralFormattable)
+                AppendInternal(structuralFormattable.ToString(format, provider));
+            else if (value is IFormattable formattable)
+                AppendInternal(formattable.ToString(format, provider));
+            else if (value is ICharSequence csq)
+                AppendInternal(csq); // doesn't support format providers
+            else
+                AppendInternal(value.ToString());
+        }
+
         /// <summary>
         /// Inserts the string representation of a specified object into this instance
         /// at the specified character position.
@@ -669,6 +689,8 @@ namespace J2N.Text
             else
                 InsertInternal(index, value.ToString(), 1);
         }
+
+        #endregion Append/Insert object
 
         #region Equals
 
@@ -1040,13 +1062,6 @@ namespace J2N.Text
                 ReplaceInPlace(ref index, ref value, valueCount);
             }
         }
-
-        private static string FormatBoolean(bool value, BooleanFormat format) =>
-            // J2N: System.Boolean ignores the IFormatProvider that is passed to it,
-            // so we are using a boolean flag for users to be able to specify whether to use
-            // title casing (.NET) or lower casing (Java).
-            format == BooleanFormat.Lowercase ? StringFormatter.FormatBoolean(value) : value.ToString();
-
 
         private void RemoveCore(int startIndex, int length)
         {
