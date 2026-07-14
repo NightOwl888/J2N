@@ -2230,7 +2230,7 @@ namespace J2N.Text
         /// </remarks>
         /// <seealso cref="sbyte" />
         [CLSCompliant(false)]
-        public static TBuilder Append<TBuilder>(this TBuilder text, sbyte value, string? format = null, IFormatProvider? provider = null)
+        public static TBuilder Append<TBuilder>(this TBuilder text, sbyte value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
             where TBuilder : SynchronizedTextBuilder
         {
             if (text is null)
@@ -2271,7 +2271,7 @@ namespace J2N.Text
         /// and <see cref="AppendFormat{TBuilder}(TBuilder, string, object?)"/> methods to append small strings.
         /// </remarks>
         /// <seealso cref="byte" />
-        public static TBuilder Append<TBuilder>(this TBuilder text, byte value, string? format = null, IFormatProvider? provider = null)
+        public static TBuilder Append<TBuilder>(this TBuilder text, byte value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
             where TBuilder : SynchronizedTextBuilder
         {
             if (text is null)
@@ -2312,7 +2312,7 @@ namespace J2N.Text
         /// and <see cref="AppendFormat{TBuilder}(TBuilder, string, object?)"/> methods to append small strings.
         /// </remarks>
         /// <seealso cref="short" />
-        public static TBuilder Append<TBuilder>(this TBuilder text, short value, string? format = null, IFormatProvider? provider = null)
+        public static TBuilder Append<TBuilder>(this TBuilder text, short value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
             where TBuilder : SynchronizedTextBuilder
         {
             if (text is null)
@@ -2353,7 +2353,7 @@ namespace J2N.Text
         /// and <see cref="AppendFormat{TBuilder}(TBuilder, string, object?)"/> methods to append small strings.
         /// </remarks>
         /// <seealso cref="int" />
-        public static TBuilder Append<TBuilder>(this TBuilder text, int value, string? format = null, IFormatProvider? provider = null)
+        public static TBuilder Append<TBuilder>(this TBuilder text, int value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
             where TBuilder : SynchronizedTextBuilder
         {
             if (text is null)
@@ -2394,7 +2394,7 @@ namespace J2N.Text
         /// and <see cref="AppendFormat{TBuilder}(TBuilder, string, object?)"/> methods to append small strings.
         /// </remarks>
         /// <seealso cref="long" />
-        public static TBuilder Append<TBuilder>(this TBuilder text, long value, string? format = null, IFormatProvider? provider = null)
+        public static TBuilder Append<TBuilder>(this TBuilder text, long value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
             where TBuilder : SynchronizedTextBuilder
         {
             if (text is null)
@@ -2435,7 +2435,7 @@ namespace J2N.Text
         /// and <see cref="AppendFormat{TBuilder}(TBuilder, string, object?)"/> methods to append small strings.
         /// </remarks>
         /// <seealso cref="float" />
-        public static TBuilder Append<TBuilder>(this TBuilder text, float value, string? format = null, IFormatProvider? provider = null)
+        public static TBuilder Append<TBuilder>(this TBuilder text, float value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
             where TBuilder : SynchronizedTextBuilder
         {
             if (text is null)
@@ -2476,7 +2476,7 @@ namespace J2N.Text
         /// and <see cref="AppendFormat{TBuilder}(TBuilder, string, object?)"/> methods to append small strings.
         /// </remarks>
         /// <seealso cref="double" />
-        public static TBuilder Append<TBuilder>(this TBuilder text, double value, string? format = null, IFormatProvider? provider = null)
+        public static TBuilder Append<TBuilder>(this TBuilder text, double value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
             where TBuilder : SynchronizedTextBuilder
         {
             if (text is null)
@@ -2517,7 +2517,7 @@ namespace J2N.Text
         /// and <see cref="AppendFormat{TBuilder}(TBuilder, string, object?)"/> methods to append small strings.
         /// </remarks>
         /// <seealso cref="decimal" />
-        public static TBuilder Append<TBuilder>(this TBuilder text, decimal value, string? format = null, IFormatProvider? provider = null)
+        public static TBuilder Append<TBuilder>(this TBuilder text, decimal value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
             where TBuilder : SynchronizedTextBuilder
         {
             if (text is null)
@@ -2559,7 +2559,7 @@ namespace J2N.Text
         /// </remarks>
         /// <seealso cref="ushort" />
         [CLSCompliant(false)]
-        public static TBuilder Append<TBuilder>(this TBuilder text, ushort value, string? format = null, IFormatProvider? provider = null)
+        public static TBuilder Append<TBuilder>(this TBuilder text, ushort value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
             where TBuilder : SynchronizedTextBuilder
         {
             if (text is null)
@@ -2601,7 +2601,7 @@ namespace J2N.Text
         /// </remarks>
         /// <seealso cref="uint" />
         [CLSCompliant(false)]
-        public static TBuilder Append<TBuilder>(this TBuilder text, uint value, string? format = null, IFormatProvider? provider = null)
+        public static TBuilder Append<TBuilder>(this TBuilder text, uint value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
             where TBuilder : SynchronizedTextBuilder
         {
             if (text is null)
@@ -2643,7 +2643,7 @@ namespace J2N.Text
         /// </remarks>
         /// <seealso cref="ulong" />
         [CLSCompliant(false)]
-        public static TBuilder Append<TBuilder>(this TBuilder text, ulong value, string? format = null, IFormatProvider? provider = null)
+        public static TBuilder Append<TBuilder>(this TBuilder text, ulong value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
             where TBuilder : SynchronizedTextBuilder
         {
             if (text is null)
@@ -2682,7 +2682,7 @@ namespace J2N.Text
         /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
         /// <seealso cref="sbyte" />
         [CLSCompliant(false)]
-        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, sbyte value, string? format = null, IFormatProvider? provider = null)
+        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, sbyte value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
             where TBuilder : SynchronizedTextBuilder
         {
             if (text is null)
@@ -2720,7 +2720,7 @@ namespace J2N.Text
         /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
         /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
         /// <seealso cref="byte" />
-        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, byte value, string? format = null, IFormatProvider? provider = null)
+        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, byte value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
             where TBuilder : SynchronizedTextBuilder
         {
             if (text is null)
@@ -2758,7 +2758,7 @@ namespace J2N.Text
         /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
         /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
         /// <seealso cref="short" />
-        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, short value, string? format = null, IFormatProvider? provider = null)
+        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, short value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
             where TBuilder : SynchronizedTextBuilder
         {
             if (text is null)
@@ -2796,7 +2796,7 @@ namespace J2N.Text
         /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
         /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
         /// <seealso cref="int" />
-        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, int value, string? format = null, IFormatProvider? provider = null)
+        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, int value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
             where TBuilder : SynchronizedTextBuilder
         {
             if (text is null)
@@ -2834,7 +2834,7 @@ namespace J2N.Text
         /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
         /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
         /// <seealso cref="long" />
-        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, long value, string? format = null, IFormatProvider? provider = null)
+        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, long value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
             where TBuilder : SynchronizedTextBuilder
         {
             if (text is null)
@@ -2872,7 +2872,7 @@ namespace J2N.Text
         /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
         /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
         /// <seealso cref="float" />
-        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, float value, string? format = null, IFormatProvider? provider = null)
+        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, float value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
             where TBuilder : SynchronizedTextBuilder
         {
             if (text is null)
@@ -2910,7 +2910,7 @@ namespace J2N.Text
         /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
         /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
         /// <seealso cref="double" />
-        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, double value, string? format = null, IFormatProvider? provider = null)
+        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, double value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
             where TBuilder : SynchronizedTextBuilder
         {
             if (text is null)
@@ -2948,7 +2948,7 @@ namespace J2N.Text
         /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
         /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
         /// <seealso cref="decimal" />
-        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, decimal value, string? format = null, IFormatProvider? provider = null)
+        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, decimal value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
             where TBuilder : SynchronizedTextBuilder
         {
             if (text is null)
@@ -2987,7 +2987,7 @@ namespace J2N.Text
         /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
         /// <seealso cref="ushort" />
         [CLSCompliant(false)]
-        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, ushort value, string? format = null, IFormatProvider? provider = null)
+        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, ushort value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
             where TBuilder : SynchronizedTextBuilder
         {
             if (text is null)
@@ -3026,7 +3026,7 @@ namespace J2N.Text
         /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
         /// <seealso cref="uint" />
         [CLSCompliant(false)]
-        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, uint value, string? format = null, IFormatProvider? provider = null)
+        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, uint value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
             where TBuilder : SynchronizedTextBuilder
         {
             if (text is null)
@@ -3065,7 +3065,7 @@ namespace J2N.Text
         /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
         /// <seealso cref="ulong" />
         [CLSCompliant(false)]
-        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, ulong value, string? format = null, IFormatProvider? provider = null)
+        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, ulong value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
             where TBuilder : SynchronizedTextBuilder
         {
             if (text is null)

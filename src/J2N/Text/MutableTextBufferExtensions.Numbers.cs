@@ -18,6 +18,7 @@
 
 using J2N.CodeGeneration;
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace J2N.Text
 {
@@ -53,7 +54,7 @@ namespace J2N.Text
         /// <seealso cref="sbyte" />
         [CLSCompliant(false)]
         [CodeGenerationGenerateForwarder]
-        public static TBuilder Append<TBuilder>(this TBuilder text, sbyte value, string? format = null, IFormatProvider? provider = null)
+        public static TBuilder Append<TBuilder>(this TBuilder text, sbyte value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
             where TBuilder : MutableTextBuffer
         {
             if (text is null)
@@ -92,7 +93,7 @@ namespace J2N.Text
         /// </remarks>
         /// <seealso cref="byte" />
         [CodeGenerationGenerateForwarder]
-        public static TBuilder Append<TBuilder>(this TBuilder text, byte value, string? format = null, IFormatProvider? provider = null)
+        public static TBuilder Append<TBuilder>(this TBuilder text, byte value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
             where TBuilder : MutableTextBuffer
         {
             if (text is null)
@@ -131,7 +132,7 @@ namespace J2N.Text
         /// </remarks>
         /// <seealso cref="short" />
         [CodeGenerationGenerateForwarder]
-        public static TBuilder Append<TBuilder>(this TBuilder text, short value, string? format = null, IFormatProvider? provider = null)
+        public static TBuilder Append<TBuilder>(this TBuilder text, short value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
             where TBuilder : MutableTextBuffer
         {
             if (text is null)
@@ -170,7 +171,7 @@ namespace J2N.Text
         /// </remarks>
         /// <seealso cref="int" />
         [CodeGenerationGenerateForwarder]
-        public static TBuilder Append<TBuilder>(this TBuilder text, int value, string? format = null, IFormatProvider? provider = null)
+        public static TBuilder Append<TBuilder>(this TBuilder text, int value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
             where TBuilder : MutableTextBuffer
         {
             if (text is null)
@@ -209,7 +210,7 @@ namespace J2N.Text
         /// </remarks>
         /// <seealso cref="long" />
         [CodeGenerationGenerateForwarder]
-        public static TBuilder Append<TBuilder>(this TBuilder text, long value, string? format = null, IFormatProvider? provider = null)
+        public static TBuilder Append<TBuilder>(this TBuilder text, long value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
             where TBuilder : MutableTextBuffer
         {
             if (text is null)
@@ -248,7 +249,7 @@ namespace J2N.Text
         /// </remarks>
         /// <seealso cref="float" />
         [CodeGenerationGenerateForwarder]
-        public static TBuilder Append<TBuilder>(this TBuilder text, float value, string? format = null, IFormatProvider? provider = null)
+        public static TBuilder Append<TBuilder>(this TBuilder text, float value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
             where TBuilder : MutableTextBuffer
         {
             if (text is null)
@@ -287,7 +288,7 @@ namespace J2N.Text
         /// </remarks>
         /// <seealso cref="double" />
         [CodeGenerationGenerateForwarder]
-        public static TBuilder Append<TBuilder>(this TBuilder text, double value, string? format = null, IFormatProvider? provider = null)
+        public static TBuilder Append<TBuilder>(this TBuilder text, double value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
             where TBuilder : MutableTextBuffer
         {
             if (text is null)
@@ -326,7 +327,7 @@ namespace J2N.Text
         /// </remarks>
         /// <seealso cref="decimal" />
         [CodeGenerationGenerateForwarder] // J2N TODO: We either need to complete this or make it internal because the JDK format is not implemented yet.
-        public static TBuilder Append<TBuilder>(this TBuilder text, decimal value, string? format = null, IFormatProvider? provider = null)
+        public static TBuilder Append<TBuilder>(this TBuilder text, decimal value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
             where TBuilder : MutableTextBuffer
         {
             if (text is null)
@@ -366,7 +367,7 @@ namespace J2N.Text
         /// <seealso cref="ushort" />
         [CLSCompliant(false)]
         [CodeGenerationGenerateForwarder]
-        public static TBuilder Append<TBuilder>(this TBuilder text, ushort value, string? format = null, IFormatProvider? provider = null)
+        public static TBuilder Append<TBuilder>(this TBuilder text, ushort value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
             where TBuilder : MutableTextBuffer
         {
             if (text is null)
@@ -406,7 +407,7 @@ namespace J2N.Text
         /// <seealso cref="uint" />
         [CLSCompliant(false)]
         [CodeGenerationGenerateForwarder]
-        public static TBuilder Append<TBuilder>(this TBuilder text, uint value, string? format = null, IFormatProvider? provider = null)
+        public static TBuilder Append<TBuilder>(this TBuilder text, uint value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
             where TBuilder : MutableTextBuffer
         {
             if (text is null)
@@ -446,7 +447,7 @@ namespace J2N.Text
         /// <seealso cref="ulong" />
         [CLSCompliant(false)]
         [CodeGenerationGenerateForwarder]
-        public static TBuilder Append<TBuilder>(this TBuilder text, ulong value, string? format = null, IFormatProvider? provider = null)
+        public static TBuilder Append<TBuilder>(this TBuilder text, ulong value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
             where TBuilder : MutableTextBuffer
         {
             if (text is null)
@@ -483,7 +484,7 @@ namespace J2N.Text
         /// <seealso cref="sbyte" />
         [CLSCompliant(false)]
         [CodeGenerationGenerateForwarder]
-        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, sbyte value, string? format = null, IFormatProvider? provider = null)
+        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, sbyte value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
             where TBuilder : MutableTextBuffer
         {
             if (text is null)
@@ -519,7 +520,7 @@ namespace J2N.Text
         /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
         /// <seealso cref="byte" />
         [CodeGenerationGenerateForwarder]
-        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, byte value, string? format = null, IFormatProvider? provider = null)
+        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, byte value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
             where TBuilder : MutableTextBuffer
         {
             if (text is null)
@@ -555,7 +556,7 @@ namespace J2N.Text
         /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
         /// <seealso cref="short" />
         [CodeGenerationGenerateForwarder]
-        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, short value, string? format = null, IFormatProvider? provider = null)
+        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, short value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
             where TBuilder : MutableTextBuffer
         {
             if (text is null)
@@ -591,7 +592,7 @@ namespace J2N.Text
         /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
         /// <seealso cref="int" />
         [CodeGenerationGenerateForwarder]
-        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, int value, string? format = null, IFormatProvider? provider = null)
+        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, int value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
             where TBuilder : MutableTextBuffer
         {
             if (text is null)
@@ -627,7 +628,7 @@ namespace J2N.Text
         /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
         /// <seealso cref="long" />
         [CodeGenerationGenerateForwarder]
-        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, long value, string? format = null, IFormatProvider? provider = null)
+        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, long value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
             where TBuilder : MutableTextBuffer
         {
             if (text is null)
@@ -663,7 +664,7 @@ namespace J2N.Text
         /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
         /// <seealso cref="float" />
         [CodeGenerationGenerateForwarder]
-        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, float value, string? format = null, IFormatProvider? provider = null)
+        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, float value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
             where TBuilder : MutableTextBuffer
         {
             if (text is null)
@@ -699,7 +700,7 @@ namespace J2N.Text
         /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
         /// <seealso cref="double" />
         [CodeGenerationGenerateForwarder]
-        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, double value, string? format = null, IFormatProvider? provider = null)
+        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, double value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
             where TBuilder : MutableTextBuffer
         {
             if (text is null)
@@ -735,7 +736,7 @@ namespace J2N.Text
         /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
         /// <seealso cref="decimal" />
         [CodeGenerationGenerateForwarder] // J2N TODO: We either need to complete this or make it internal because the JDK format is not implemented yet.
-        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, decimal value, string? format = null, IFormatProvider? provider = null)
+        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, decimal value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
             where TBuilder : MutableTextBuffer
         {
             if (text is null)
@@ -772,7 +773,7 @@ namespace J2N.Text
         /// <seealso cref="ushort" />
         [CLSCompliant(false)]
         [CodeGenerationGenerateForwarder]
-        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, ushort value, string? format = null, IFormatProvider? provider = null)
+        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, ushort value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
             where TBuilder : MutableTextBuffer
         {
             if (text is null)
@@ -809,7 +810,7 @@ namespace J2N.Text
         /// <seealso cref="uint" />
         [CLSCompliant(false)]
         [CodeGenerationGenerateForwarder]
-        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, uint value, string? format = null, IFormatProvider? provider = null)
+        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, uint value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
             where TBuilder : MutableTextBuffer
         {
             if (text is null)
@@ -846,7 +847,7 @@ namespace J2N.Text
         /// <seealso cref="ulong" />
         [CLSCompliant(false)]
         [CodeGenerationGenerateForwarder]
-        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, ulong value, string? format = null, IFormatProvider? provider = null)
+        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, ulong value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
             where TBuilder : MutableTextBuffer
         {
             if (text is null)
