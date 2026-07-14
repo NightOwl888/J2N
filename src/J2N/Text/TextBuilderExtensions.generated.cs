@@ -2561,6 +2561,190 @@ namespace J2N.Text
             return text;
         }
 
+        /// <summary>Appends a specified number of copies of the string representation of a Unicode character to this instance.</summary>
+        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
+        /// <param name="text">The target builder.</param>
+        /// <param name="value">The character to append.</param>
+        /// <param name="repeatCount">The number of times to append value.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="repeatCount"/> is less than zero.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// Enlarging the value of this instance would exceed <see cref="TextBuilder.MaxCapacity"/>.
+        /// </exception>
+        /// <exception cref="OutOfMemoryException">Out of memory.</exception>
+        /// <remarks>
+        /// The <see cref="Append{TBuilder}(TBuilder, char, int)"/> method modifies the existing instance of this class;
+        /// it does not return a new class instance. Because of this, you can call a method or property
+        /// on the existing reference and you do not have to assign the return value to an
+        /// <see cref="TextBuilder"/> object, as the following example illustrates.
+        /// <code>
+        /// decimal value = 1346.19m;
+        /// J2N.Text.TextBuilder sb = new J2N.Text.TextBuilder();
+        /// sb.Append('*', 5).AppendFormat("{0:C2}", value).Append('*', 5);
+        /// Console.WriteLine(sb);
+        /// // The example displays the following output:
+        /// //       *****$1,346.19*****
+        /// </code>
+        /// <para/>
+        /// The capacity of this instance is adjusted as needed.
+        /// <para/>
+        /// <b>Notes to Callers</b>
+        /// <para/>
+        /// When you instantiate a <see cref="TextBuilder"/> object by calling <see cref="TextBuilder(int, int)"/>,
+        /// both the length and the capacity of the <see cref="TextBuilder"/> instance can grow beyond
+        /// the value of its <see cref="TextBuilder.MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append{TBuilder}(TBuilder, string?)"/>
+        /// and <see cref="AppendFormat{TBuilder}(TBuilder, string, object?)"/> methods to append small strings.
+        /// </remarks>
+        /// <seealso cref="char" />
+        public static TBuilder Append<TBuilder>(this TBuilder text, char value, int repeatCount)
+            where TBuilder : TextBuilder
+        {
+            if (text is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
+
+            text.buffer.AppendInternal(value, repeatCount);
+            return text;
+        }
+
+        /// <summary>Inserts one or more copies of a specified string into this instance at the specified character position.</summary>
+        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
+        /// <param name="text">The target builder.</param>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">The string to insert.</param>
+        /// <param name="repeatCount">The number of times to insert <paramref name="value"/>.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="index"/> is less than zero or greater than the current length of this instance.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="repeatCount"/> is less than zero.
+        /// </exception>
+        /// <exception cref="OutOfMemoryException">
+        /// The current length of this <see cref="TextBuilder"/> object plus the length of <paramref name="value"/>
+        /// times <paramref name="repeatCount"/> exceeds <see cref="TextBuilder.MaxCapacity"/>.
+        /// </exception>
+        /// <remarks>
+        /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
+        /// <para/>
+        /// This <see cref="TextBuilder"/> object is not changed if <paramref name="value"/> is <see langword="null"/>,
+        /// <paramref name="value"/> is not <see langword="null"/> but its length is zero, or <paramref name="repeatCount"/> is zero.
+        /// </remarks>
+        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, string? value, int repeatCount)
+            where TBuilder : TextBuilder
+        {
+            if (text is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
+
+            text.buffer.InsertInternal(index, value, repeatCount);
+            return text;
+        }
+
+        /// <summary>Inserts one or more copies of a specified sequence of characters into this instance at the specified character position.</summary>
+        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
+        /// <param name="text">The target builder.</param>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">The sequence of characters to insert.</param>
+        /// <param name="repeatCount">The number of times to insert <paramref name="value"/>.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="index"/> is less than zero or greater than the current length of this instance.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="repeatCount"/> is less than zero.
+        /// </exception>
+        /// <exception cref="OutOfMemoryException">
+        /// The current length of this <see cref="TextBuilder"/> object plus the length of <paramref name="value"/>
+        /// times <paramref name="repeatCount"/> exceeds <see cref="TextBuilder.MaxCapacity"/>.
+        /// </exception>
+        /// <remarks>
+        /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
+        /// <para/>
+        /// This <see cref="TextBuilder"/> object is not changed if the length of <paramref name="value"/> is zero or
+        /// <paramref name="repeatCount"/> is zero.
+        /// </remarks>
+        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, ReadOnlySpan<char> value, int repeatCount)
+            where TBuilder : TextBuilder
+        {
+            if (text is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
+
+            text.buffer.InsertInternal(index, value, repeatCount);
+            return text;
+        }
+
+        /// <summary>Inserts one or more copies of a specified sequence of characters into this instance at the specified character position.</summary>
+        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
+        /// <param name="text">The target builder.</param>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">The sequence of characters to insert.</param>
+        /// <param name="repeatCount">The number of times to insert <paramref name="value"/>.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="index"/> is less than zero or greater than the current length of this instance.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="repeatCount"/> is less than zero.
+        /// </exception>
+        /// <exception cref="OutOfMemoryException">
+        /// The current length of this <see cref="TextBuilder"/> object plus the length of <paramref name="value"/>
+        /// times <paramref name="repeatCount"/> exceeds <see cref="TextBuilder.MaxCapacity"/>.
+        /// </exception>
+        /// <remarks>
+        /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
+        /// <para/>
+        /// This <see cref="TextBuilder"/> object is not changed if the length of <paramref name="value"/> is zero or
+        /// <paramref name="repeatCount"/> is zero.
+        /// </remarks>
+        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, StringBuilder? value, int repeatCount)
+            where TBuilder : TextBuilder
+        {
+            if (text is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
+
+            text.buffer.InsertInternal(index, value, repeatCount);
+            return text;
+        }
+
+        /// <summary>Inserts one or more copies of a specified sequence of characters into this instance at the specified character position.</summary>
+        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
+        /// <param name="text">The target builder.</param>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">The sequence of characters to insert.</param>
+        /// <param name="repeatCount">The number of times to insert <paramref name="value"/>.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="index"/> is less than zero or greater than the current length of this instance.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="repeatCount"/> is less than zero.
+        /// </exception>
+        /// <exception cref="OutOfMemoryException">
+        /// The current length of this <see cref="TextBuilder"/> object plus the length of <paramref name="value"/>
+        /// times <paramref name="repeatCount"/> exceeds <see cref="TextBuilder.MaxCapacity"/>.
+        /// </exception>
+        /// <remarks>
+        /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
+        /// <para/>
+        /// This <see cref="TextBuilder"/> object is not changed if the length of <paramref name="value"/> is zero or
+        /// <paramref name="repeatCount"/> is zero.
+        /// </remarks>
+        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, ICharSequence? value, int repeatCount)
+            where TBuilder : TextBuilder
+        {
+            if (text is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
+
+            text.buffer.InsertInternal(index, value, repeatCount);
+            return text;
+        }
+
         /// <summary>
         /// Appends the string representation of the Unicode characters in a specified sequence to this instance.
         /// <para/>
@@ -2696,54 +2880,6 @@ namespace J2N.Text
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
 
             text.buffer.ClearInternal();
-            return text;
-        }
-
-        /// <summary>Appends a specified number of copies of the string representation of a Unicode character to this instance.</summary>
-        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
-        /// <param name="text">The target builder.</param>
-        /// <param name="value">The character to append.</param>
-        /// <param name="repeatCount">The number of times to append value.</param>
-        /// <returns>A reference to this instance after the operation has completed.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// <paramref name="repeatCount"/> is less than zero.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// Enlarging the value of this instance would exceed <see cref="TextBuilder.MaxCapacity"/>.
-        /// </exception>
-        /// <exception cref="OutOfMemoryException">Out of memory.</exception>
-        /// <remarks>
-        /// The <see cref="Append{TBuilder}(TBuilder, char, int)"/> method modifies the existing instance of this class;
-        /// it does not return a new class instance. Because of this, you can call a method or property
-        /// on the existing reference and you do not have to assign the return value to an
-        /// <see cref="TextBuilder"/> object, as the following example illustrates.
-        /// <code>
-        /// decimal value = 1346.19m;
-        /// J2N.Text.TextBuilder sb = new J2N.Text.TextBuilder();
-        /// sb.Append('*', 5).AppendFormat("{0:C2}", value).Append('*', 5);
-        /// Console.WriteLine(sb);
-        /// // The example displays the following output:
-        /// //       *****$1,346.19*****
-        /// </code>
-        /// <para/>
-        /// The capacity of this instance is adjusted as needed.
-        /// <para/>
-        /// <b>Notes to Callers</b>
-        /// <para/>
-        /// When you instantiate a <see cref="TextBuilder"/> object by calling <see cref="TextBuilder(int, int)"/>,
-        /// both the length and the capacity of the <see cref="TextBuilder"/> instance can grow beyond
-        /// the value of its <see cref="TextBuilder.MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append{TBuilder}(TBuilder, string?)"/>
-        /// and <see cref="AppendFormat{TBuilder}(TBuilder, string, object?)"/> methods to append small strings.
-        /// </remarks>
-        /// <seealso cref="char" />
-        public static TBuilder Append<TBuilder>(this TBuilder text, char value, int repeatCount)
-            where TBuilder : TextBuilder
-        {
-            if (text is null)
-                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
-
-            text.buffer.AppendInternal(value, repeatCount);
             return text;
         }
 
@@ -3160,142 +3296,6 @@ namespace J2N.Text
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
 
             text.buffer.AppendLineInternal(value);
-            return text;
-        }
-
-        /// <summary>Inserts one or more copies of a specified string into this instance at the specified character position.</summary>
-        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
-        /// <param name="text">The target builder.</param>
-        /// <param name="index">The position in this instance where insertion begins.</param>
-        /// <param name="value">The string to insert.</param>
-        /// <param name="repeatCount">The number of times to insert <paramref name="value"/>.</param>
-        /// <returns>A reference to this instance after the operation has completed.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// <paramref name="index"/> is less than zero or greater than the current length of this instance.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// <paramref name="repeatCount"/> is less than zero.
-        /// </exception>
-        /// <exception cref="OutOfMemoryException">
-        /// The current length of this <see cref="TextBuilder"/> object plus the length of <paramref name="value"/>
-        /// times <paramref name="repeatCount"/> exceeds <see cref="TextBuilder.MaxCapacity"/>.
-        /// </exception>
-        /// <remarks>
-        /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
-        /// <para/>
-        /// This <see cref="TextBuilder"/> object is not changed if <paramref name="value"/> is <see langword="null"/>,
-        /// <paramref name="value"/> is not <see langword="null"/> but its length is zero, or <paramref name="repeatCount"/> is zero.
-        /// </remarks>
-        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, string? value, int repeatCount)
-            where TBuilder : TextBuilder
-        {
-            if (text is null)
-                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
-
-            text.buffer.InsertInternal(index, value, repeatCount);
-            return text;
-        }
-
-        /// <summary>Inserts one or more copies of a specified sequence of characters into this instance at the specified character position.</summary>
-        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
-        /// <param name="text">The target builder.</param>
-        /// <param name="index">The position in this instance where insertion begins.</param>
-        /// <param name="value">The sequence of characters to insert.</param>
-        /// <param name="repeatCount">The number of times to insert <paramref name="value"/>.</param>
-        /// <returns>A reference to this instance after the operation has completed.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// <paramref name="index"/> is less than zero or greater than the current length of this instance.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// <paramref name="repeatCount"/> is less than zero.
-        /// </exception>
-        /// <exception cref="OutOfMemoryException">
-        /// The current length of this <see cref="TextBuilder"/> object plus the length of <paramref name="value"/>
-        /// times <paramref name="repeatCount"/> exceeds <see cref="TextBuilder.MaxCapacity"/>.
-        /// </exception>
-        /// <remarks>
-        /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
-        /// <para/>
-        /// This <see cref="TextBuilder"/> object is not changed if the length of <paramref name="value"/> is zero or
-        /// <paramref name="repeatCount"/> is zero.
-        /// </remarks>
-        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, ReadOnlySpan<char> value, int repeatCount)
-            where TBuilder : TextBuilder
-        {
-            if (text is null)
-                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
-
-            text.buffer.InsertInternal(index, value, repeatCount);
-            return text;
-        }
-
-        /// <summary>Inserts one or more copies of a specified sequence of characters into this instance at the specified character position.</summary>
-        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
-        /// <param name="text">The target builder.</param>
-        /// <param name="index">The position in this instance where insertion begins.</param>
-        /// <param name="value">The sequence of characters to insert.</param>
-        /// <param name="repeatCount">The number of times to insert <paramref name="value"/>.</param>
-        /// <returns>A reference to this instance after the operation has completed.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// <paramref name="index"/> is less than zero or greater than the current length of this instance.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// <paramref name="repeatCount"/> is less than zero.
-        /// </exception>
-        /// <exception cref="OutOfMemoryException">
-        /// The current length of this <see cref="TextBuilder"/> object plus the length of <paramref name="value"/>
-        /// times <paramref name="repeatCount"/> exceeds <see cref="TextBuilder.MaxCapacity"/>.
-        /// </exception>
-        /// <remarks>
-        /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
-        /// <para/>
-        /// This <see cref="TextBuilder"/> object is not changed if the length of <paramref name="value"/> is zero or
-        /// <paramref name="repeatCount"/> is zero.
-        /// </remarks>
-        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, StringBuilder? value, int repeatCount)
-            where TBuilder : TextBuilder
-        {
-            if (text is null)
-                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
-
-            text.buffer.InsertInternal(index, value, repeatCount);
-            return text;
-        }
-
-        /// <summary>Inserts one or more copies of a specified sequence of characters into this instance at the specified character position.</summary>
-        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
-        /// <param name="text">The target builder.</param>
-        /// <param name="index">The position in this instance where insertion begins.</param>
-        /// <param name="value">The sequence of characters to insert.</param>
-        /// <param name="repeatCount">The number of times to insert <paramref name="value"/>.</param>
-        /// <returns>A reference to this instance after the operation has completed.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// <paramref name="index"/> is less than zero or greater than the current length of this instance.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// <paramref name="repeatCount"/> is less than zero.
-        /// </exception>
-        /// <exception cref="OutOfMemoryException">
-        /// The current length of this <see cref="TextBuilder"/> object plus the length of <paramref name="value"/>
-        /// times <paramref name="repeatCount"/> exceeds <see cref="TextBuilder.MaxCapacity"/>.
-        /// </exception>
-        /// <remarks>
-        /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
-        /// <para/>
-        /// This <see cref="TextBuilder"/> object is not changed if the length of <paramref name="value"/> is zero or
-        /// <paramref name="repeatCount"/> is zero.
-        /// </remarks>
-        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, ICharSequence? value, int repeatCount)
-            where TBuilder : TextBuilder
-        {
-            if (text is null)
-                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
-
-            text.buffer.InsertInternal(index, value, repeatCount);
             return text;
         }
 
