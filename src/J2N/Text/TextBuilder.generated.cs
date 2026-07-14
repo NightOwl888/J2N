@@ -385,78 +385,6 @@ namespace J2N.Text
             return buffer.EnsureCapacity(capacity);
         }
 
-        /// <summary>Converts the value of this instance to a <see cref="string"/>.</summary>
-        /// <returns>A string whose value is the same as this instance.</returns>
-        /// <remarks>
-        /// This method causes a heap allocation. As an allocation-free alternative,
-        /// you may call the <see cref="TextBuilderExtensions.AsSpan(TextBuilder?)"/> method
-        /// to get a <see cref="ReadOnlySpan{T}"/> representing the characters of this
-        /// <see cref="TextBuilder"/> instance.
-        /// <para/>
-        /// Call the <see cref="ToString()"/> method to convert the
-        /// <see cref="TextBuilder"/> object to a <see cref="string"/> object before
-        /// you can pass the string represented by the <see cref="TextBuilder"/> object to
-        /// a method that has a <see cref="string"/> parameter or display it in the user interface.
-        /// </remarks>
-        public override string ToString()
-        {
-            return buffer.ToString();
-        }
-
-        /// <summary>Converts the value of a substring of this instance to a <see cref="string"/>.</summary>
-        /// <param name="startIndex">The starting position of the substring in this instance.</param>
-        /// <returns>
-        /// A string whose value is the same as the specified substring of this instance.
-        /// That is, from <paramref name="startIndex"/> to the end of the string.
-        /// </returns>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// <paramref name="startIndex"/> is less than 0 or greater than
-        /// <see cref="Length"/>.
-        /// </exception>
-        /// <remarks>
-        /// This method causes a heap allocation. As an allocation-free alternative,
-        /// you may call the <see cref="TextBuilderExtensions.AsSpan(TextBuilder?, int)"/> method
-        /// to get a <see cref="ReadOnlySpan{T}"/> representing the characters of the substring of this
-        /// <see cref="TextBuilder"/> instance.
-        /// <para/>
-        /// Call the <see cref="ToString(int)"/> method to convert the
-        /// <see cref="TextBuilder"/> object to a <see cref="string"/> object before
-        /// you can pass the string represented by the <see cref="TextBuilder"/> object to
-        /// a method that has a <see cref="string"/> parameter or display it in the user interface.
-        /// </remarks>
-        public string ToString(int startIndex)
-        {
-            return buffer.ToString(startIndex);
-        }
-
-        /// <summary>Converts the value of a substring of this instance to a <see cref="string"/>.</summary>
-        /// <param name="startIndex">The starting position of the substring in this instance.</param>
-        /// <param name="length">The length of the substring.</param>
-        /// <returns>A string whose value is the same as the specified substring of this instance.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// <paramref name="startIndex"/> or <paramref name="length"/> is less than zero.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// The sum of <paramref name="startIndex"/> and <paramref name="length"/> is greater than the length
-        /// of the current instance.
-        /// </exception>
-        /// <remarks>
-        /// This method causes a heap allocation. As an allocation-free alternative,
-        /// you may call the <see cref="TextBuilderExtensions.AsSpan(TextBuilder?, int, int)"/> method
-        /// to get a <see cref="ReadOnlySpan{T}"/> representing the characters of the substring of this
-        /// <see cref="TextBuilder"/> instance.
-        /// <para/>
-        /// Call the <see cref="ToString(int)"/> method to convert the
-        /// <see cref="TextBuilder"/> object to a <see cref="string"/> object before
-        /// you can pass the string represented by the <see cref="TextBuilder"/> object to
-        /// a method that has a <see cref="string"/> parameter or display it in the user interface.
-        /// </remarks>
-        public string ToString(int startIndex, int length)
-        {
-            return buffer.ToString(startIndex, length);
-        }
-
         /// <summary>
         /// Copies the characters from a specified segment of this instance to a specified segment of a destination
         /// <see cref="char"/> array.
@@ -578,6 +506,78 @@ namespace J2N.Text
         public bool Equals(ReadOnlySpan<char> span)
         {
             return buffer.Equals(span);
+        }
+
+        /// <summary>Converts the value of this instance to a <see cref="string"/>.</summary>
+        /// <returns>A string whose value is the same as this instance.</returns>
+        /// <remarks>
+        /// This method causes a heap allocation. As an allocation-free alternative,
+        /// you may call the <see cref="TextBuilderExtensions.AsSpan(TextBuilder?)"/> method
+        /// to get a <see cref="ReadOnlySpan{T}"/> representing the characters of this
+        /// <see cref="TextBuilder"/> instance.
+        /// <para/>
+        /// Call the <see cref="ToString()"/> method to convert the
+        /// <see cref="TextBuilder"/> object to a <see cref="string"/> object before
+        /// you can pass the string represented by the <see cref="TextBuilder"/> object to
+        /// a method that has a <see cref="string"/> parameter or display it in the user interface.
+        /// </remarks>
+        public override string ToString()
+        {
+            return buffer.ToString();
+        }
+
+        /// <summary>Converts the value of a substring of this instance to a <see cref="string"/>.</summary>
+        /// <param name="startIndex">The starting position of the substring in this instance.</param>
+        /// <returns>
+        /// A string whose value is the same as the specified substring of this instance.
+        /// That is, from <paramref name="startIndex"/> to the end of the string.
+        /// </returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="startIndex"/> is less than 0 or greater than
+        /// <see cref="Length"/>.
+        /// </exception>
+        /// <remarks>
+        /// This method causes a heap allocation. As an allocation-free alternative,
+        /// you may call the <see cref="TextBuilderExtensions.AsSpan(TextBuilder?, int)"/> method
+        /// to get a <see cref="ReadOnlySpan{T}"/> representing the characters of the substring of this
+        /// <see cref="TextBuilder"/> instance.
+        /// <para/>
+        /// Call the <see cref="ToString(int)"/> method to convert the
+        /// <see cref="TextBuilder"/> object to a <see cref="string"/> object before
+        /// you can pass the string represented by the <see cref="TextBuilder"/> object to
+        /// a method that has a <see cref="string"/> parameter or display it in the user interface.
+        /// </remarks>
+        public string ToString(int startIndex)
+        {
+            return buffer.ToString(startIndex);
+        }
+
+        /// <summary>Converts the value of a substring of this instance to a <see cref="string"/>.</summary>
+        /// <param name="startIndex">The starting position of the substring in this instance.</param>
+        /// <param name="length">The length of the substring.</param>
+        /// <returns>A string whose value is the same as the specified substring of this instance.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="startIndex"/> or <paramref name="length"/> is less than zero.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// The sum of <paramref name="startIndex"/> and <paramref name="length"/> is greater than the length
+        /// of the current instance.
+        /// </exception>
+        /// <remarks>
+        /// This method causes a heap allocation. As an allocation-free alternative,
+        /// you may call the <see cref="TextBuilderExtensions.AsSpan(TextBuilder?, int, int)"/> method
+        /// to get a <see cref="ReadOnlySpan{T}"/> representing the characters of the substring of this
+        /// <see cref="TextBuilder"/> instance.
+        /// <para/>
+        /// Call the <see cref="ToString(int)"/> method to convert the
+        /// <see cref="TextBuilder"/> object to a <see cref="string"/> object before
+        /// you can pass the string represented by the <see cref="TextBuilder"/> object to
+        /// a method that has a <see cref="string"/> parameter or display it in the user interface.
+        /// </remarks>
+        public string ToString(int startIndex, int length)
+        {
+            return buffer.ToString(startIndex, length);
         }
 
         /// <summary>

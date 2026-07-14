@@ -204,102 +204,6 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// Converts the value of this instance to a <see cref="string"/>.
-        /// </summary>
-        /// <returns>A string whose value is the same as this instance.</returns>
-        /// <remarks>
-        /// This method causes a heap allocation. As an allocation-free alternative,
-        /// you may call the <see cref="MutableTextBufferExtensions.AsSpan(MutableTextBuffer?)"/> method
-        /// to get a <see cref="ReadOnlySpan{T}"/> representing the characters of this
-        /// <see cref="MutableTextBuffer"/> instance.
-        /// <para/>
-        /// Call the <see cref="ToString()"/> method to convert the
-        /// <see cref="MutableTextBuffer"/> object to a <see cref="string"/> object before
-        /// you can pass the string represented by the <see cref="MutableTextBuffer"/> object to
-        /// a method that has a <see cref="string"/> parameter or display it in the user interface.
-        /// </remarks>
-        public override string ToString()
-        {
-            //AssertInvariants();
-
-            if (Length == 0)
-            {
-                return string.Empty;
-            }
-
-            return m_Chars.AsSpan(0, m_Position).ToString();
-        }
-
-        /// <summary>
-        /// Converts the value of a substring of this instance to a <see cref="string"/>.
-        /// </summary>
-        /// <param name="startIndex">The starting position of the substring in this instance.</param>
-        /// <returns>A string whose value is the same as the specified substring of this instance.
-        /// That is, from <paramref name="startIndex"/> to the end of the string.</returns>
-        /// <exception cref="ArgumentOutOfRangeException"><paramref name="startIndex"/> is less than 0 or greater than
-        /// <see cref="Length"/>.</exception>
-        /// <remarks>
-        /// This method causes a heap allocation. As an allocation-free alternative,
-        /// you may call the <see cref="MutableTextBufferExtensions.AsSpan(MutableTextBuffer?, int)"/> method
-        /// to get a <see cref="ReadOnlySpan{T}"/> representing the characters of the substring of this
-        /// <see cref="MutableTextBuffer"/> instance.
-        /// <para/>
-        /// Call the <see cref="ToString(int)"/> method to convert the
-        /// <see cref="MutableTextBuffer"/> object to a <see cref="string"/> object before
-        /// you can pass the string represented by the <see cref="MutableTextBuffer"/> object to
-        /// a method that has a <see cref="string"/> parameter or display it in the user interface.
-        /// </remarks>
-        public string ToString(int startIndex)
-        {
-            if ((uint)startIndex > (uint)Length)
-                ThrowHelper.ThrowStartIndexArgumentOutOfRange_ArgumentOutOfRange_IndexMustBeLessOrEqual();
-
-            //AssertInvariants();
-            return m_Chars.AsSpan(startIndex, m_Position - startIndex).ToString();
-        }
-
-        /// <summary>
-        /// Converts the value of a substring of this instance to a <see cref="string"/>.
-        /// </summary>
-        /// <param name="startIndex">The starting position of the substring in this instance.</param>
-        /// <param name="length">The length of the substring.</param>
-        /// <returns>A string whose value is the same as the specified substring of this instance.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// <paramref name="startIndex"/> or <paramref name="length"/> is less than zero.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// The sum of <paramref name="startIndex"/> and <paramref name="length"/> is greater than the length
-        /// of the current instance.
-        /// </exception>
-        /// <remarks>
-        /// This method causes a heap allocation. As an allocation-free alternative,
-        /// you may call the <see cref="MutableTextBufferExtensions.AsSpan(MutableTextBuffer?, int, int)"/> method
-        /// to get a <see cref="ReadOnlySpan{T}"/> representing the characters of the substring of this
-        /// <see cref="MutableTextBuffer"/> instance.
-        /// <para/>
-        /// Call the <see cref="ToString(int)"/> method to convert the
-        /// <see cref="MutableTextBuffer"/> object to a <see cref="string"/> object before
-        /// you can pass the string represented by the <see cref="MutableTextBuffer"/> object to
-        /// a method that has a <see cref="string"/> parameter or display it in the user interface.
-        /// </remarks>
-        public string ToString(int startIndex, int length)
-        {
-            int currentLength = Length;
-            if (startIndex < 0)
-                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(startIndex, ExceptionArgument.startIndex);
-            if (startIndex > currentLength)
-                ThrowHelper.ThrowArgumentOutOfRangeException(startIndex, ExceptionArgument.startIndex, ExceptionResource.ArgumentOutOfRange_StartIndexLargerThanLength);
-            if (length < 0)
-                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(length, ExceptionArgument.length);
-            if (startIndex > currentLength - length)
-                ThrowHelper.ThrowArgumentOutOfRange_IndexLengthString(startIndex, length);
-
-            //AssertInvariants();
-            return m_Chars.AsSpan(startIndex, length).ToString();
-        }
-
-        /// <summary>
         /// Removes all characters from the current instance.
         /// </summary>
         /// <remarks>
@@ -879,6 +783,172 @@ namespace J2N.Text
 
         #endregion
 
+        #region ToString
+
+        /// <summary>
+        /// Converts the value of this instance to a <see cref="string"/>.
+        /// </summary>
+        /// <returns>A string whose value is the same as this instance.</returns>
+        /// <remarks>
+        /// This method causes a heap allocation. As an allocation-free alternative,
+        /// you may call the <see cref="MutableTextBufferExtensions.AsSpan(MutableTextBuffer?)"/> method
+        /// to get a <see cref="ReadOnlySpan{T}"/> representing the characters of this
+        /// <see cref="MutableTextBuffer"/> instance.
+        /// <para/>
+        /// Call the <see cref="ToString()"/> method to convert the
+        /// <see cref="MutableTextBuffer"/> object to a <see cref="string"/> object before
+        /// you can pass the string represented by the <see cref="MutableTextBuffer"/> object to
+        /// a method that has a <see cref="string"/> parameter or display it in the user interface.
+        /// </remarks>
+        public override string ToString()
+        {
+            //AssertInvariants();
+
+            if (Length == 0)
+            {
+                return string.Empty;
+            }
+
+            return m_Chars.AsSpan(0, m_Position).ToString();
+        }
+
+        /// <summary>
+        /// Converts the value of a substring of this instance to a <see cref="string"/>.
+        /// </summary>
+        /// <param name="startIndex">The starting position of the substring in this instance.</param>
+        /// <returns>A string whose value is the same as the specified substring of this instance.
+        /// That is, from <paramref name="startIndex"/> to the end of the string.</returns>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="startIndex"/> is less than 0 or greater than
+        /// <see cref="Length"/>.</exception>
+        /// <remarks>
+        /// This method causes a heap allocation. As an allocation-free alternative,
+        /// you may call the <see cref="MutableTextBufferExtensions.AsSpan(MutableTextBuffer?, int)"/> method
+        /// to get a <see cref="ReadOnlySpan{T}"/> representing the characters of the substring of this
+        /// <see cref="MutableTextBuffer"/> instance.
+        /// <para/>
+        /// Call the <see cref="ToString(int)"/> method to convert the
+        /// <see cref="MutableTextBuffer"/> object to a <see cref="string"/> object before
+        /// you can pass the string represented by the <see cref="MutableTextBuffer"/> object to
+        /// a method that has a <see cref="string"/> parameter or display it in the user interface.
+        /// </remarks>
+        public string ToString(int startIndex)
+        {
+            if ((uint)startIndex > (uint)Length)
+                ThrowHelper.ThrowStartIndexArgumentOutOfRange_ArgumentOutOfRange_IndexMustBeLessOrEqual();
+
+            //AssertInvariants();
+            return m_Chars.AsSpan(startIndex, m_Position - startIndex).ToString();
+        }
+
+        /// <summary>
+        /// Converts the value of a substring of this instance to a <see cref="string"/>.
+        /// </summary>
+        /// <param name="startIndex">The starting position of the substring in this instance.</param>
+        /// <param name="length">The length of the substring.</param>
+        /// <returns>A string whose value is the same as the specified substring of this instance.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="startIndex"/> or <paramref name="length"/> is less than zero.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// The sum of <paramref name="startIndex"/> and <paramref name="length"/> is greater than the length
+        /// of the current instance.
+        /// </exception>
+        /// <remarks>
+        /// This method causes a heap allocation. As an allocation-free alternative,
+        /// you may call the <see cref="MutableTextBufferExtensions.AsSpan(MutableTextBuffer?, int, int)"/> method
+        /// to get a <see cref="ReadOnlySpan{T}"/> representing the characters of the substring of this
+        /// <see cref="MutableTextBuffer"/> instance.
+        /// <para/>
+        /// Call the <see cref="ToString(int)"/> method to convert the
+        /// <see cref="MutableTextBuffer"/> object to a <see cref="string"/> object before
+        /// you can pass the string represented by the <see cref="MutableTextBuffer"/> object to
+        /// a method that has a <see cref="string"/> parameter or display it in the user interface.
+        /// </remarks>
+        public string ToString(int startIndex, int length)
+        {
+            int currentLength = Length;
+            if (startIndex < 0)
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(startIndex, ExceptionArgument.startIndex);
+            if (startIndex > currentLength)
+                ThrowHelper.ThrowArgumentOutOfRangeException(startIndex, ExceptionArgument.startIndex, ExceptionResource.ArgumentOutOfRange_StartIndexLargerThanLength);
+            if (length < 0)
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(length, ExceptionArgument.length);
+            if (startIndex > currentLength - length)
+                ThrowHelper.ThrowArgumentOutOfRange_IndexLengthString(startIndex, length);
+
+            //AssertInvariants();
+            return m_Chars.AsSpan(startIndex, length).ToString();
+        }
+
+        #endregion ToString
+
+        #region Dispose
+
+        /// <summary>
+        /// Releases ownership of the underlying character buffer back to the
+        /// <see cref="IArrayAllocator{T}"/> provided to this instance.
+        /// </summary>
+        /// <remarks>
+        /// Once this method has been called, the current instance no longer owns
+        /// the underlying buffer and further use of the instance is unsupported.
+        /// <para/>
+        /// Depending on the allocator implementation, the underlying array may be:
+        /// <list type="bullet">
+        ///     <item>
+        ///         <description>Returned to an array pool for reuse.</description>
+        ///     </item>
+        ///     <item>
+        ///         <description>Cleared before reuse.</description>
+        ///     </item>
+        ///     <item>
+        ///         <description>Left uncleared for performance reasons.</description>
+        ///     </item>
+        ///     <item>
+        ///         <description>Ignored entirely for non-pooled allocators.</description>
+        ///     </item>
+        /// </list>
+        /// <para/>
+        /// This method may be called multiple times safely.
+        /// </remarks>
+        [CodeGenerationIgnore]
+        public void Dispose()
+        {
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// Releases resources owned by the current instance.
+        /// </summary>
+        /// <param name="disposing">
+        /// <see langword="true"/> to release managed resources; otherwise, <see langword="false"/>.
+        /// </param>
+        /// <remarks>
+        /// Derived classes overriding this method should release any managed state
+        /// when <paramref name="disposing"/> is <see langword="true"/>, and then call the base
+        /// implementation.
+        /// <para/>
+        /// This implementation releases ownership of the underlying character buffer
+        /// back to the configured <see cref="IArrayAllocator{T}"/>.
+        /// </remarks>
+        [CodeGenerationIgnore]
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                char[]? array = m_Chars;
+
+                if (array.Length != 0)
+                {
+                    m_Chars = Arrays.Empty<char>();
+                    allocator.Return(array);
+                }
+            }
+        }
+
+        #endregion Dispose
+
         /// <summary>Appends a specified number of chars starting from the specified reference.</summary>
         private void Append(ref char value, int valueCount)
         {
@@ -1136,68 +1206,6 @@ namespace J2N.Text
             oldBuffer.AsSpan(0, m_Position).CopyTo(newBuffer);
             allocator.Return(oldBuffer);
             m_Chars = newBuffer;
-        }
-
-        /// <summary>
-        /// Releases ownership of the underlying character buffer back to the
-        /// <see cref="IArrayAllocator{T}"/> provided to this instance.
-        /// </summary>
-        /// <remarks>
-        /// Once this method has been called, the current instance no longer owns
-        /// the underlying buffer and further use of the instance is unsupported.
-        /// <para/>
-        /// Depending on the allocator implementation, the underlying array may be:
-        /// <list type="bullet">
-        ///     <item>
-        ///         <description>Returned to an array pool for reuse.</description>
-        ///     </item>
-        ///     <item>
-        ///         <description>Cleared before reuse.</description>
-        ///     </item>
-        ///     <item>
-        ///         <description>Left uncleared for performance reasons.</description>
-        ///     </item>
-        ///     <item>
-        ///         <description>Ignored entirely for non-pooled allocators.</description>
-        ///     </item>
-        /// </list>
-        /// <para/>
-        /// This method may be called multiple times safely.
-        /// </remarks>
-        [CodeGenerationIgnore]
-        public void Dispose()
-        {
-            Dispose(disposing: true);
-            GC.SuppressFinalize(this);
-        }
-
-        /// <summary>
-        /// Releases resources owned by the current instance.
-        /// </summary>
-        /// <param name="disposing">
-        /// <see langword="true"/> to release managed resources; otherwise, <see langword="false"/>.
-        /// </param>
-        /// <remarks>
-        /// Derived classes overriding this method should release any managed state
-        /// when <paramref name="disposing"/> is <see langword="true"/>, and then call the base
-        /// implementation.
-        /// <para/>
-        /// This implementation releases ownership of the underlying character buffer
-        /// back to the configured <see cref="IArrayAllocator{T}"/>.
-        /// </remarks>
-        [CodeGenerationIgnore]
-        protected virtual void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                char[]? array = m_Chars;
-
-                if (array.Length != 0)
-                {
-                    m_Chars = Arrays.Empty<char>();
-                    allocator.Return(array);
-                }
-            }
         }
 
         // J2N-specific methods
