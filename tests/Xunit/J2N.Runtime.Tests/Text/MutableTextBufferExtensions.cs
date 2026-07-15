@@ -12,5 +12,10 @@ namespace J2N.Text.Tests
             action(buffer);
             return buffer;
         }
+
+        public static char[] ToCharArray(this MutableTextBuffer buffer)
+        {
+            return buffer.AsSpan().ToArray();
+        }
     }
 }

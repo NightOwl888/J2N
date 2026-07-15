@@ -1321,14 +1321,6 @@ namespace J2N.Text
             m_Chars = newBuffer;
         }
 
-        // J2N-specific methods
-
-        // For testing
-        internal char[] ToCharArray() => m_Position == m_Chars.Length ? m_Chars : m_Chars.AsSpan(0, m_Position).ToArray();
-
-        // For testing
-        internal char[] RawArray => m_Chars;
-
         #region ISpannable<char> Members
 
         ReadOnlySpan<char> ISpannable<char>.AsSpan() => this.AsSpan();
