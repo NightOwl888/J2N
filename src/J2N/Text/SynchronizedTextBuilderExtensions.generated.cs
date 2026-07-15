@@ -100,7 +100,7 @@ namespace J2N.Text
         /// the value of its <see cref="SynchronizedTextBuilder.MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append{TBuilder}(TBuilder, string?)"/>
         /// and <see cref="AppendFormat{TBuilder}(TBuilder, string, object?)"/> methods to append small strings.
         /// </remarks>
-        public static TBuilder AppendFormat<TBuilder>(this TBuilder text, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, object? arg0)
+        internal static TBuilder AppendFormat<TBuilder>(this TBuilder text, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, object? arg0)
             where TBuilder : SynchronizedTextBuilder
         {
             if (text is null)
@@ -189,7 +189,7 @@ namespace J2N.Text
         /// the value of its <see cref="SynchronizedTextBuilder.MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append{TBuilder}(TBuilder, string?)"/>
         /// and <see cref="AppendFormat{TBuilder}(TBuilder, string, object?)"/> methods to append small strings.
         /// </remarks>
-        public static TBuilder AppendFormat<TBuilder>(this TBuilder text, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, object? arg0, object? arg1)
+        internal static TBuilder AppendFormat<TBuilder>(this TBuilder text, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, object? arg0, object? arg1)
             where TBuilder : SynchronizedTextBuilder
         {
             if (text is null)
@@ -280,7 +280,7 @@ namespace J2N.Text
         /// the value of its <see cref="SynchronizedTextBuilder.MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append{TBuilder}(TBuilder, string?)"/>
         /// and <see cref="AppendFormat{TBuilder}(TBuilder, string, object?)"/> methods to append small strings.
         /// </remarks>
-        public static TBuilder AppendFormat<TBuilder>(this TBuilder text, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, object? arg0, object? arg1, object? arg2)
+        internal static TBuilder AppendFormat<TBuilder>(this TBuilder text, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, object? arg0, object? arg1, object? arg2)
             where TBuilder : SynchronizedTextBuilder
         {
             if (text is null)
@@ -368,7 +368,7 @@ namespace J2N.Text
         /// the value of its <see cref="SynchronizedTextBuilder.MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append{TBuilder}(TBuilder, string?)"/>
         /// and <see cref="AppendFormat{TBuilder}(TBuilder, string, object?)"/> methods to append small strings.
         /// </remarks>
-        public static TBuilder AppendFormat<TBuilder>(this TBuilder text, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, params object?[] args)
+        internal static TBuilder AppendFormat<TBuilder>(this TBuilder text, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, params object?[] args)
             where TBuilder : SynchronizedTextBuilder
         {
             if (text is null)
@@ -456,7 +456,7 @@ namespace J2N.Text
         /// the value of its <see cref="SynchronizedTextBuilder.MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append{TBuilder}(TBuilder, string?)"/>
         /// and <see cref="AppendFormat{TBuilder}(TBuilder, string, object?)"/> methods to append small strings.
         /// </remarks>
-        public static TBuilder AppendFormat<TBuilder>(this TBuilder text, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, params ReadOnlySpan<object?> args)
+        internal static TBuilder AppendFormat<TBuilder>(this TBuilder text, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, params ReadOnlySpan<object?> args)
             where TBuilder : SynchronizedTextBuilder
         {
             if (text is null)
@@ -559,7 +559,7 @@ namespace J2N.Text
         /// the value of its <see cref="SynchronizedTextBuilder.MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append{TBuilder}(TBuilder, string?)"/>
         /// and <see cref="AppendFormat{TBuilder}(TBuilder, string, object?)"/> methods to append small strings.
         /// </remarks>
-        public static TBuilder AppendFormat<TBuilder>(this TBuilder text, IFormatProvider? provider, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, object? arg0)
+        internal static TBuilder AppendFormat<TBuilder>(this TBuilder text, IFormatProvider? provider, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, object? arg0)
             where TBuilder : SynchronizedTextBuilder
         {
             if (text is null)
@@ -662,7 +662,7 @@ namespace J2N.Text
         /// the value of its <see cref="SynchronizedTextBuilder.MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append{TBuilder}(TBuilder, string?)"/>
         /// and <see cref="AppendFormat{TBuilder}(TBuilder, string, object?)"/> methods to append small strings.
         /// </remarks>
-        public static TBuilder AppendFormat<TBuilder>(this TBuilder text, IFormatProvider? provider, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, object? arg0, object? arg1)
+        internal static TBuilder AppendFormat<TBuilder>(this TBuilder text, IFormatProvider? provider, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, object? arg0, object? arg1)
             where TBuilder : SynchronizedTextBuilder
         {
             if (text is null)
@@ -767,7 +767,7 @@ namespace J2N.Text
         /// the value of its <see cref="SynchronizedTextBuilder.MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append{TBuilder}(TBuilder, string?)"/>
         /// and <see cref="AppendFormat{TBuilder}(TBuilder, string, object?)"/> methods to append small strings.
         /// </remarks>
-        public static TBuilder AppendFormat<TBuilder>(this TBuilder text, IFormatProvider? provider, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, object? arg0, object? arg1, object? arg2)
+        internal static TBuilder AppendFormat<TBuilder>(this TBuilder text, IFormatProvider? provider, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, object? arg0, object? arg1, object? arg2)
             where TBuilder : SynchronizedTextBuilder
         {
             if (text is null)
@@ -870,7 +870,7 @@ namespace J2N.Text
         /// the value of its <see cref="SynchronizedTextBuilder.MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append{TBuilder}(TBuilder, string?)"/>
         /// and <see cref="AppendFormat{TBuilder}(TBuilder, string, object?)"/> methods to append small strings.
         /// </remarks>
-        public static TBuilder AppendFormat<TBuilder>(this TBuilder text, IFormatProvider? provider, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, params object?[] args)
+        internal static TBuilder AppendFormat<TBuilder>(this TBuilder text, IFormatProvider? provider, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, params object?[] args)
             where TBuilder : SynchronizedTextBuilder
         {
             if (text is null)
@@ -973,7 +973,7 @@ namespace J2N.Text
         /// the value of its <see cref="SynchronizedTextBuilder.MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append{TBuilder}(TBuilder, string?)"/>
         /// and <see cref="AppendFormat{TBuilder}(TBuilder, string, object?)"/> methods to append small strings.
         /// </remarks>
-        public static TBuilder AppendFormat<TBuilder>(this TBuilder text, IFormatProvider? provider, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, params ReadOnlySpan<object?> args)
+        internal static TBuilder AppendFormat<TBuilder>(this TBuilder text, IFormatProvider? provider, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, params ReadOnlySpan<object?> args)
             where TBuilder : SynchronizedTextBuilder
         {
             if (text is null)
@@ -986,7 +986,7 @@ namespace J2N.Text
             }
         }
 
-        public static TBuilder AppendJoin<TBuilder>(this TBuilder text, string? separator, params object?[] values)
+        internal static TBuilder AppendJoin<TBuilder>(this TBuilder text, string? separator, params object?[] values)
             where TBuilder : SynchronizedTextBuilder
         {
             if (text is null)
@@ -999,7 +999,7 @@ namespace J2N.Text
             }
         }
 
-        public static TBuilder AppendJoin<TBuilder>(this TBuilder text, string? separator, params ReadOnlySpan<object?> values)
+        internal static TBuilder AppendJoin<TBuilder>(this TBuilder text, string? separator, params ReadOnlySpan<object?> values)
             where TBuilder : SynchronizedTextBuilder
         {
             if (text is null)
@@ -1012,7 +1012,7 @@ namespace J2N.Text
             }
         }
 
-        public static TBuilder AppendJoin<TBuilder, T>(this TBuilder text, string? separator, IEnumerable<T> values)
+        internal static TBuilder AppendJoin<TBuilder, T>(this TBuilder text, string? separator, IEnumerable<T> values)
             where TBuilder : SynchronizedTextBuilder
         {
             if (text is null)
@@ -1025,7 +1025,7 @@ namespace J2N.Text
             }
         }
 
-        public static TBuilder AppendJoin<TBuilder>(this TBuilder text, string? separator, params string?[] values)
+        internal static TBuilder AppendJoin<TBuilder>(this TBuilder text, string? separator, params string?[] values)
             where TBuilder : SynchronizedTextBuilder
         {
             if (text is null)
@@ -1038,7 +1038,7 @@ namespace J2N.Text
             }
         }
 
-        public static TBuilder AppendJoin<TBuilder>(this TBuilder text, string? separator, params ReadOnlySpan<string?> values)
+        internal static TBuilder AppendJoin<TBuilder>(this TBuilder text, string? separator, params ReadOnlySpan<string?> values)
             where TBuilder : SynchronizedTextBuilder
         {
             if (text is null)
@@ -1051,7 +1051,7 @@ namespace J2N.Text
             }
         }
 
-        public static TBuilder AppendJoin<TBuilder>(this TBuilder text, char separator, params object?[] values)
+        internal static TBuilder AppendJoin<TBuilder>(this TBuilder text, char separator, params object?[] values)
             where TBuilder : SynchronizedTextBuilder
         {
             if (text is null)
@@ -1064,7 +1064,7 @@ namespace J2N.Text
             }
         }
 
-        public static TBuilder AppendJoin<TBuilder>(this TBuilder text, char separator, params ReadOnlySpan<object?> values)
+        internal static TBuilder AppendJoin<TBuilder>(this TBuilder text, char separator, params ReadOnlySpan<object?> values)
             where TBuilder : SynchronizedTextBuilder
         {
             if (text is null)
@@ -1077,7 +1077,7 @@ namespace J2N.Text
             }
         }
 
-        public static TBuilder AppendJoin<TBuilder, T>(this TBuilder text, char separator, IEnumerable<T> values)
+        internal static TBuilder AppendJoin<TBuilder, T>(this TBuilder text, char separator, IEnumerable<T> values)
             where TBuilder : SynchronizedTextBuilder
         {
             if (text is null)
@@ -1090,7 +1090,7 @@ namespace J2N.Text
             }
         }
 
-        public static TBuilder AppendJoin<TBuilder>(this TBuilder text, char separator, params string?[] values)
+        internal static TBuilder AppendJoin<TBuilder>(this TBuilder text, char separator, params string?[] values)
             where TBuilder : SynchronizedTextBuilder
         {
             if (text is null)
@@ -1103,7 +1103,7 @@ namespace J2N.Text
             }
         }
 
-        public static TBuilder AppendJoin<TBuilder>(this TBuilder text, char separator, params ReadOnlySpan<string?> values)
+        internal static TBuilder AppendJoin<TBuilder>(this TBuilder text, char separator, params ReadOnlySpan<string?> values)
             where TBuilder : SynchronizedTextBuilder
         {
             if (text is null)

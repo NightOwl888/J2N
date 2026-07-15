@@ -101,7 +101,7 @@ namespace J2N.Text
         /// and <see cref="AppendFormat{TBuilder}(TBuilder, string, object?)"/> methods to append small strings.
         /// </remarks>
         [CodeGenerationGenerateForwarder]
-        public static TBuilder AppendFormat<TBuilder>(this TBuilder text, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, object? arg0)
+        internal static TBuilder AppendFormat<TBuilder>(this TBuilder text, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, object? arg0)
             where TBuilder : MutableTextBuffer
         {
             if (text is null)
@@ -188,7 +188,7 @@ namespace J2N.Text
         /// and <see cref="AppendFormat{TBuilder}(TBuilder, string, object?)"/> methods to append small strings.
         /// </remarks>
         [CodeGenerationGenerateForwarder]
-        public static TBuilder AppendFormat<TBuilder>(this TBuilder text, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, object? arg0, object? arg1)
+        internal static TBuilder AppendFormat<TBuilder>(this TBuilder text, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, object? arg0, object? arg1)
             where TBuilder : MutableTextBuffer
         {
             if (text is null)
@@ -277,7 +277,7 @@ namespace J2N.Text
         /// and <see cref="AppendFormat{TBuilder}(TBuilder, string, object?)"/> methods to append small strings.
         /// </remarks>
         [CodeGenerationGenerateForwarder]
-        public static TBuilder AppendFormat<TBuilder>(this TBuilder text, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, object? arg0, object? arg1, object? arg2)
+        internal static TBuilder AppendFormat<TBuilder>(this TBuilder text, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, object? arg0, object? arg1, object? arg2)
             where TBuilder : MutableTextBuffer
         {
             if (text is null)
@@ -363,7 +363,7 @@ namespace J2N.Text
         /// and <see cref="AppendFormat{TBuilder}(TBuilder, string, object?)"/> methods to append small strings.
         /// </remarks>
         [CodeGenerationGenerateForwarder]
-        public static TBuilder AppendFormat<TBuilder>(this TBuilder text, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, params object?[] args)
+        internal static TBuilder AppendFormat<TBuilder>(this TBuilder text, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, params object?[] args)
             where TBuilder : MutableTextBuffer
         {
             if (text is null)
@@ -449,7 +449,7 @@ namespace J2N.Text
         /// and <see cref="AppendFormat{TBuilder}(TBuilder, string, object?)"/> methods to append small strings.
         /// </remarks>
         [CodeGenerationGenerateForwarder]
-        public static TBuilder AppendFormat<TBuilder>(this TBuilder text, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, params ReadOnlySpan<object?> args)
+        internal static TBuilder AppendFormat<TBuilder>(this TBuilder text, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, params ReadOnlySpan<object?> args)
             where TBuilder : MutableTextBuffer
         {
             if (text is null)
@@ -550,7 +550,7 @@ namespace J2N.Text
         /// and <see cref="AppendFormat{TBuilder}(TBuilder, string, object?)"/> methods to append small strings.
         /// </remarks>
         [CodeGenerationGenerateForwarder]
-        public static TBuilder AppendFormat<TBuilder>(this TBuilder text, IFormatProvider? provider, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, object? arg0)
+        internal static TBuilder AppendFormat<TBuilder>(this TBuilder text, IFormatProvider? provider, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, object? arg0)
             where TBuilder : MutableTextBuffer
         {
             if (text is null)
@@ -651,7 +651,7 @@ namespace J2N.Text
         /// and <see cref="AppendFormat{TBuilder}(TBuilder, string, object?)"/> methods to append small strings.
         /// </remarks>
         [CodeGenerationGenerateForwarder]
-        public static TBuilder AppendFormat<TBuilder>(this TBuilder text, IFormatProvider? provider, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, object? arg0, object? arg1)
+        internal static TBuilder AppendFormat<TBuilder>(this TBuilder text, IFormatProvider? provider, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, object? arg0, object? arg1)
             where TBuilder : MutableTextBuffer
         {
             if (text is null)
@@ -754,7 +754,7 @@ namespace J2N.Text
         /// and <see cref="AppendFormat{TBuilder}(TBuilder, string, object?)"/> methods to append small strings.
         /// </remarks>
         [CodeGenerationGenerateForwarder]
-        public static TBuilder AppendFormat<TBuilder>(this TBuilder text, IFormatProvider? provider, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, object? arg0, object? arg1, object? arg2)
+        internal static TBuilder AppendFormat<TBuilder>(this TBuilder text, IFormatProvider? provider, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, object? arg0, object? arg1, object? arg2)
             where TBuilder : MutableTextBuffer
         {
             if (text is null)
@@ -855,7 +855,7 @@ namespace J2N.Text
         /// and <see cref="AppendFormat{TBuilder}(TBuilder, string, object?)"/> methods to append small strings.
         /// </remarks>
         [CodeGenerationGenerateForwarder]
-        public static TBuilder AppendFormat<TBuilder>(this TBuilder text, IFormatProvider? provider, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, params object?[] args)
+        internal static TBuilder AppendFormat<TBuilder>(this TBuilder text, IFormatProvider? provider, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, params object?[] args)
             where TBuilder : MutableTextBuffer
         {
             if (text is null)
@@ -956,7 +956,7 @@ namespace J2N.Text
         /// and <see cref="AppendFormat{TBuilder}(TBuilder, string, object?)"/> methods to append small strings.
         /// </remarks>
         [CodeGenerationGenerateForwarder]
-        public static TBuilder AppendFormat<TBuilder>(this TBuilder text, IFormatProvider? provider, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, params ReadOnlySpan<object?> args)
+        internal static TBuilder AppendFormat<TBuilder>(this TBuilder text, IFormatProvider? provider, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, params ReadOnlySpan<object?> args)
             where TBuilder : MutableTextBuffer
         {
             if (text is null)

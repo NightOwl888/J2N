@@ -27,7 +27,7 @@ namespace J2N.Text
 #pragma warning disable CS1591 // J2N TODO: Finish docs
 
         [CodeGenerationGenerateForwarder]
-        public static TBuilder AppendJoin<TBuilder>(this TBuilder text, string? separator, params object?[] values)
+        internal static TBuilder AppendJoin<TBuilder>(this TBuilder text, string? separator, params object?[] values)
             where TBuilder : MutableTextBuffer
         {
             if (text is null)
@@ -38,7 +38,7 @@ namespace J2N.Text
         }
 
         [CodeGenerationGenerateForwarder]
-        public static TBuilder AppendJoin<TBuilder>(this TBuilder text, string? separator, params ReadOnlySpan<object?> values)
+        internal static TBuilder AppendJoin<TBuilder>(this TBuilder text, string? separator, params ReadOnlySpan<object?> values)
             where TBuilder : MutableTextBuffer
         {
             if (text is null)
@@ -49,7 +49,7 @@ namespace J2N.Text
         }
 
         [CodeGenerationGenerateForwarder]
-        public static TBuilder AppendJoin<TBuilder, T>(this TBuilder text, string? separator, IEnumerable<T> values)
+        internal static TBuilder AppendJoin<TBuilder, T>(this TBuilder text, string? separator, IEnumerable<T> values)
             where TBuilder : MutableTextBuffer
         {
             if (text is null)
@@ -60,7 +60,7 @@ namespace J2N.Text
         }
 
         [CodeGenerationGenerateForwarder]
-        public static TBuilder AppendJoin<TBuilder>(this TBuilder text, string? separator, params string?[] values)
+        internal static TBuilder AppendJoin<TBuilder>(this TBuilder text, string? separator, params string?[] values)
             where TBuilder : MutableTextBuffer
         {
             if (text is null)
@@ -71,7 +71,7 @@ namespace J2N.Text
         }
 
         [CodeGenerationGenerateForwarder]
-        public static TBuilder AppendJoin<TBuilder>(this TBuilder text, string? separator, params ReadOnlySpan<string?> values)
+        internal static TBuilder AppendJoin<TBuilder>(this TBuilder text, string? separator, params ReadOnlySpan<string?> values)
             where TBuilder : MutableTextBuffer
         {
             if (text is null)
@@ -82,7 +82,7 @@ namespace J2N.Text
         }
 
         [CodeGenerationGenerateForwarder]
-        public static TBuilder AppendJoin<TBuilder>(this TBuilder text, char separator, params object?[] values)
+        internal static TBuilder AppendJoin<TBuilder>(this TBuilder text, char separator, params object?[] values)
             where TBuilder : MutableTextBuffer
         {
             if (text is null)
@@ -93,7 +93,7 @@ namespace J2N.Text
         }
 
         [CodeGenerationGenerateForwarder]
-        public static TBuilder AppendJoin<TBuilder>(this TBuilder text, char separator, params ReadOnlySpan<object?> values)
+        internal static TBuilder AppendJoin<TBuilder>(this TBuilder text, char separator, params ReadOnlySpan<object?> values)
             where TBuilder : MutableTextBuffer
         {
             if (text is null)
@@ -104,7 +104,7 @@ namespace J2N.Text
         }
 
         [CodeGenerationGenerateForwarder]
-        public static TBuilder AppendJoin<TBuilder, T>(this TBuilder text, char separator, IEnumerable<T> values)
+        internal static TBuilder AppendJoin<TBuilder, T>(this TBuilder text, char separator, IEnumerable<T> values)
             where TBuilder : MutableTextBuffer
         {
             if (text is null)
@@ -115,7 +115,7 @@ namespace J2N.Text
         }
 
         [CodeGenerationGenerateForwarder]
-        public static TBuilder AppendJoin<TBuilder>(this TBuilder text, char separator, params string?[] values)
+        internal static TBuilder AppendJoin<TBuilder>(this TBuilder text, char separator, params string?[] values)
             where TBuilder : MutableTextBuffer
         {
             if (text is null)
@@ -126,7 +126,7 @@ namespace J2N.Text
         }
 
         [CodeGenerationGenerateForwarder]
-        public static TBuilder AppendJoin<TBuilder>(this TBuilder text, char separator, params ReadOnlySpan<string?> values)
+        internal static TBuilder AppendJoin<TBuilder>(this TBuilder text, char separator, params ReadOnlySpan<string?> values)
             where TBuilder : MutableTextBuffer
         {
             if (text is null)
