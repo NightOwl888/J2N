@@ -1,5 +1,6 @@
 ﻿using J2N.Text.CodeGen.Metadata;
 using J2N.Text.CodeGen.Projection;
+using Microsoft.CodeAnalysis;
 using System.Text;
 
 namespace J2N.Text.CodeGen.Generation
@@ -180,6 +181,8 @@ namespace J2N.Text.CodeGen.Generation
                     ? facadeName
                     : method.ReturnType;
 
+            string accessibility =
+                FormatAccessibility(method.DeclaredAccessibility);
             string unsafeModifier = method.IsUnsafe ? " unsafe" : "";
             string modifier = IsObjectMethod(method) ? " override" : "";
 
@@ -187,7 +190,7 @@ namespace J2N.Text.CodeGen.Generation
                 wrapMembersInLock
                 && !method.SkipSynchronization;
 
-            sb.AppendLine($"        public{modifier}{unsafeModifier} {returnType} {method.Name}{genericParameterList}({parameterList})");
+            sb.AppendLine($"        {accessibility}{modifier}{unsafeModifier} {returnType} {method.Name}{genericParameterList}({parameterList})");
             foreach (GenericParameterModel parameter in method.GenericParameters)
             {
                 if (parameter.Constraints.Count == 0)
@@ -458,6 +461,20 @@ namespace J2N.Text.CodeGen.Generation
 
             return
                 $"[{attribute.Name}({string.Join(", ", attribute.Arguments)})]";
+        }
+
+        private static string FormatAccessibility(Accessibility accessibility)
+        {
+            return accessibility switch
+            {
+                Accessibility.Public => "public",
+                Accessibility.Internal => "internal",
+                Accessibility.Private => "private",
+                Accessibility.Protected => "protected",
+                Accessibility.ProtectedOrInternal => "protected internal",
+                Accessibility.ProtectedAndInternal => "private protected",
+                _ => "private"
+            };
         }
     }
 }

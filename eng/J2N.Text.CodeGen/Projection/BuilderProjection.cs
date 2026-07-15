@@ -59,6 +59,8 @@ namespace J2N.Text.CodeGen.Projection
             {
                 Name = method.Name,
 
+                DeclaredAccessibility = method.DeclaredAccessibility,
+
                 ReturnType =
                     method.ReturnsSelf
                         ? facadeName

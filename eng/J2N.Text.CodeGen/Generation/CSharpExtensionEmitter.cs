@@ -1,5 +1,6 @@
 ﻿using J2N.Text.CodeGen.Metadata;
 using J2N.Text.CodeGen.Projection;
+using Microsoft.CodeAnalysis;
 using System.Text;
 
 namespace J2N.Text.CodeGen.Generation
@@ -113,6 +114,9 @@ namespace J2N.Text.CodeGen.Generation
                     ? " unsafe"
                     : "";
 
+            string accessibility =
+                FormatAccessibility(method.DeclaredAccessibility);
+
             string parameterList =
                 string.Join(
                     ", ",
@@ -129,7 +133,7 @@ namespace J2N.Text.CodeGen.Generation
                 && !method.SkipSynchronization;
 
             sb.AppendLine(
-                $"        public static{unsafeModifier} {method.ReturnType} {method.Name}{genericParameters}({parameterList})");
+                $"        {accessibility} static{unsafeModifier} {method.ReturnType} {method.Name}{genericParameters}({parameterList})");
 
             EmitConstraints(
                 sb,
@@ -181,6 +185,20 @@ namespace J2N.Text.CodeGen.Generation
 
             return
                 $"[{attribute.Name}({string.Join(", ", attribute.Arguments)})]";
+        }
+
+        private static string FormatAccessibility(Accessibility accessibility)
+        {
+            return accessibility switch
+            {
+                Accessibility.Public => "public",
+                Accessibility.Internal => "internal",
+                Accessibility.Private => "private",
+                Accessibility.Protected => "protected",
+                Accessibility.ProtectedOrInternal => "protected internal",
+                Accessibility.ProtectedAndInternal => "private protected",
+                _ => "private"
+            };
         }
 
         private static void EmitConstraints(
