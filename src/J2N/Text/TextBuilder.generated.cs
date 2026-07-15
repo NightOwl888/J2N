@@ -55,7 +55,9 @@ namespace J2N.Text
         /// </remarks>
         public int Capacity
         {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get => buffer.Capacity;
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             set => buffer.Capacity = value;
         }
 
@@ -76,6 +78,7 @@ namespace J2N.Text
         /// </remarks>
         public int MaxCapacity
         {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get => buffer.MaxCapacity;
         }
 
@@ -104,7 +107,9 @@ namespace J2N.Text
         /// </remarks>
         public int Length
         {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get => buffer.Length;
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             set => buffer.Length = value;
         }
 
@@ -170,7 +175,9 @@ namespace J2N.Text
         [IndexerName("Chars")]
         public char this[int index]
         {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get => buffer[index];
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             set => buffer[index] = value;
         }
 
@@ -204,6 +211,7 @@ namespace J2N.Text
         /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="TextBuilderExtensions.Append{TBuilder}(TBuilder, string?)"/>
         /// and <see cref="TextBuilderExtensions.AppendFormat{TBuilder}(TBuilder, string, object?)"/> methods to append small strings.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Span<char> GetSpan(int sizeHint = 0)
         {
             return buffer.GetSpan(sizeHint);
@@ -239,6 +247,7 @@ namespace J2N.Text
         /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="TextBuilderExtensions.Append{TBuilder}(TBuilder, string?)"/>
         /// and <see cref="TextBuilderExtensions.AppendFormat{TBuilder}(TBuilder, string, object?)"/> methods to append small strings.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Memory<char> GetMemory(int sizeHint = 0)
         {
             return buffer.GetMemory(sizeHint);
@@ -291,6 +300,7 @@ namespace J2N.Text
         /// <para/>
         /// <paramref name="index"/> is less than zero.
         /// </exception>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public int CodePointAt(int index)
         {
             return buffer.CodePointAt(index);
@@ -316,6 +326,7 @@ namespace J2N.Text
         /// If the <paramref name="index"/> is less than
         /// 1 or greater than <see cref="Length"/>.
         /// </exception>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public int CodePointBefore(int index)
         {
             return buffer.CodePointBefore(index);
@@ -342,6 +353,7 @@ namespace J2N.Text
         /// <para/>
         /// <paramref name="startIndex"/> or <paramref name="length"/> is less than zero.
         /// </exception>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public int CodePointCount(int startIndex, int length)
         {
             return buffer.CodePointCount(startIndex, length);
@@ -371,6 +383,7 @@ namespace J2N.Text
         /// <paramref name="codePointOffset"/> is negative and the subsequence before <paramref name="index"/>
         /// has fewer than the absolute value of <paramref name="codePointOffset"/> code points.
         /// </exception>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public int OffsetByCodePoints(int index, int codePointOffset)
         {
             return buffer.OffsetByCodePoints(index, codePointOffset);
@@ -391,6 +404,7 @@ namespace J2N.Text
         /// memory for this instance is reallocated to hold at least <paramref name="capacity"/> number
         /// of characters; otherwise, no memory is changed.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public int EnsureCapacity(int capacity)
         {
             return buffer.EnsureCapacity(capacity);
@@ -410,6 +424,7 @@ namespace J2N.Text
         /// <para/>
         /// If the capacity is already equal to the current length, this method has no effect.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void TrimExcess()
         {
             buffer.TrimExcess();
@@ -452,6 +467,7 @@ namespace J2N.Text
         /// To access the characters for processing without allocating any heap memory, better alternatives are to use
         /// <see cref="this[int]"/>, <see cref="TextBuilderExtensions.AsSpan(TextBuilder?, int, int)"/> or <see cref="CopyTo(int, Span{char}, int)"/>.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void CopyTo(int sourceIndex, char[] destination, int destinationIndex, int count)
         {
             buffer.CopyTo(sourceIndex, destination, destinationIndex, count);
@@ -479,6 +495,7 @@ namespace J2N.Text
         /// To access the characters for processing without alocating any heap memory, better alternatives are to use
         /// <see cref="this[int]"/> or <see cref="TextBuilderExtensions.AsSpan(TextBuilder?, int, int)"/>.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void CopyTo(int sourceIndex, Span<char> destination, int count)
         {
             buffer.CopyTo(sourceIndex, destination, count);
@@ -516,6 +533,7 @@ namespace J2N.Text
         /// The <see cref="Equals(StringBuilder)"/> method performs an ordinal comparison to determine
         /// whether the characters in the current instance and span are equal.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Equals([NotNullWhen(true)] StringBuilder? sb)
         {
             return buffer.Equals(sb);
@@ -553,6 +571,7 @@ namespace J2N.Text
         /// you can pass the string represented by the <see cref="TextBuilder"/> object to
         /// a method that has a <see cref="string"/> parameter or display it in the user interface.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override string ToString()
         {
             return buffer.ToString();
@@ -579,6 +598,7 @@ namespace J2N.Text
         /// you can pass the string represented by the <see cref="TextBuilder"/> object to
         /// a method that has a <see cref="string"/> parameter or display it in the user interface.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public string ToString(int startIndex)
         {
             return buffer.ToString(startIndex);
@@ -607,6 +627,7 @@ namespace J2N.Text
         /// you can pass the string represented by the <see cref="TextBuilder"/> object to
         /// a method that has a <see cref="string"/> parameter or display it in the user interface.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public string ToString(int startIndex, int length)
         {
             return buffer.ToString(startIndex, length);
