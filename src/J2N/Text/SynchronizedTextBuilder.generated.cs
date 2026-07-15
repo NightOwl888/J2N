@@ -230,7 +230,21 @@ namespace J2N.Text
         /// </returns>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="sizeHint"/> is less than zero.</exception>
         /// <remarks>
+        /// The capacity is adjusted as needed.
+        /// <para/>
         /// This method never returns <see cref="Span{Char}.Empty"/>.
+        /// <para/>
+        /// The returned <see cref="Span{Char}"/> allows writing characters directly to the buffer of
+        /// <see cref="SynchronizedTextBuilder"/>. This can be used for more complex and low-level business
+        /// logic to be applied when either the number of characters is unknown or the number of separate
+        /// operations would be prohibitively costly.
+        /// <para/>
+        /// <b>Notes to Callers</b>
+        /// <para/>
+        /// When you instantiate a <see cref="SynchronizedTextBuilder"/> object by calling <see cref="SynchronizedTextBuilder(int, int)"/>,
+        /// both the length and the capacity of the <see cref="SynchronizedTextBuilder"/> instance can grow beyond
+        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="SynchronizedTextBuilderExtensions.Append{TBuilder}(TBuilder, string?)"/>
+        /// and <see cref="SynchronizedTextBuilderExtensions.AppendFormat{TBuilder}(TBuilder, string, object?)"/> methods to append small strings.
         /// <para/>
         /// The returned span provides direct access to the underlying memory of the <see cref="SynchronizedTextBuilder"/>.
         /// Callers must synchronize externally using <see cref="SynchronizedTextBuilder.SyncRoot"/> for the duration of the
@@ -255,7 +269,21 @@ namespace J2N.Text
         /// </returns>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="sizeHint"/> is less than zero.</exception>
         /// <remarks>
+        /// The capacity is adjusted as needed.
+        /// <para/>
         /// This method never returns <see cref="Memory{Char}.Empty"/>.
+        /// <para/>
+        /// The returned <see cref="Memory{Char}"/> allows writing characters directly to the buffer of
+        /// <see cref="SynchronizedTextBuilder"/>. This can be used for more complex and low-level business
+        /// logic to be applied when either the number of characters is unknown or the number of separate
+        /// operations would be prohibitively costly.
+        /// <para/>
+        /// <b>Notes to Callers</b>
+        /// <para/>
+        /// When you instantiate a <see cref="SynchronizedTextBuilder"/> object by calling <see cref="SynchronizedTextBuilder(int, int)"/>,
+        /// both the length and the capacity of the <see cref="SynchronizedTextBuilder"/> instance can grow beyond
+        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="SynchronizedTextBuilderExtensions.Append{TBuilder}(TBuilder, string?)"/>
+        /// and <see cref="SynchronizedTextBuilderExtensions.AppendFormat{TBuilder}(TBuilder, string, object?)"/> methods to append small strings.
         /// <para/>
         /// The returned memory provides direct access to the underlying memory of the <see cref="SynchronizedTextBuilder"/>.
         /// Callers must synchronize externally using <see cref="SynchronizedTextBuilder.SyncRoot"/> for the duration of the
@@ -268,7 +296,8 @@ namespace J2N.Text
 
         /// <summary>
         /// Notifies the <see cref="SynchronizedTextBuilder"/> that <paramref name="count"/> items were
-        /// written to the output <see cref="Span{Char}"/> or <see cref="Memory{Char}"/>.
+        /// written to the output <see cref="Span{Char}"/> of a prior call to <see cref="GetSpan(int)"/>
+        /// or <see cref="Memory{Char}"/> of a prior call to <see cref="GetMemory(int)"/>.
         /// </summary>
         /// <param name="count">The number of items written.</param>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="count"/> is less than zero.</exception>
@@ -279,6 +308,9 @@ namespace J2N.Text
         /// <remarks>
         /// You must request a new buffer after calling <see cref="Advance(int)"/> to continue writing more data
         /// and cannot write to a previously acquired buffer.
+        /// <para/>
+        /// Calling <see cref="Advance(int)"/> is effictively the same operation as adding <paramref name="count"/>
+        /// to the existing <see cref="Length"/>.
         /// <para/>
         /// This method is intended to be used in conjunction with either <see cref="GetSpan(int)"/> or <see cref="GetMemory(int)"/>.
         /// If concurrent mutation is possible, this method should be synchronized externally by the caller with either of those two
