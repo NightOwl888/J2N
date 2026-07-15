@@ -18,6 +18,7 @@
 
 using J2N.CodeGeneration;
 using System;
+using System.Runtime.CompilerServices;
 
 namespace J2N.Text
 {
@@ -38,6 +39,7 @@ namespace J2N.Text
         /// <paramref name="oldValue"/> are removed.
         /// </remarks>
         /// <seealso cref="Remove{TBuilder}(TBuilder, int, int)" />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationGenerateForwarder]
         public static TBuilder Replace<TBuilder>(this TBuilder text, string oldValue, string? newValue)
             where TBuilder : MutableTextBuffer
@@ -62,6 +64,7 @@ namespace J2N.Text
         /// current instance. If <paramref name="newValue"/> is empty, all occurrences of <paramref name="oldValue"/> are removed.
         /// </remarks>
         /// <seealso cref="Remove{TBuilder}(TBuilder, int, int)" />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationGenerateForwarder]
         public static TBuilder Replace<TBuilder>(this TBuilder text, ReadOnlySpan<char> oldValue, ReadOnlySpan<char> newValue)
             where TBuilder : MutableTextBuffer
@@ -100,6 +103,7 @@ namespace J2N.Text
         /// all occurrences of <paramref name="oldValue"/> in the specified range are removed.
         /// </remarks>
         /// <seealso cref="Remove{TBuilder}(TBuilder, int, int)" />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationGenerateForwarder]
         public static TBuilder Replace<TBuilder>(this TBuilder text, string oldValue, string? newValue, int startIndex, int count)
             where TBuilder : MutableTextBuffer
@@ -137,6 +141,7 @@ namespace J2N.Text
         /// in the specified range are removed.
         /// </remarks>
         /// <seealso cref="Remove{TBuilder}(TBuilder, int, int)" />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationGenerateForwarder]
         public static TBuilder Replace<TBuilder>(this TBuilder text, ReadOnlySpan<char> oldValue, ReadOnlySpan<char> newValue, int startIndex, int count)
             where TBuilder : MutableTextBuffer
@@ -159,6 +164,7 @@ namespace J2N.Text
         /// <paramref name="oldChar"/> in the current instance. The size of the current
         /// <see cref="MutableTextBuffer"/> instance is unchanged after the replacement.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationGenerateForwarder]
         public static TBuilder Replace<TBuilder>(this TBuilder text, char oldChar, char newChar)
             where TBuilder : MutableTextBuffer
@@ -190,6 +196,7 @@ namespace J2N.Text
         /// <paramref name="oldChar"/> in the current instance within the specified substring. The size of the current
         /// <see cref="MutableTextBuffer"/> instance is unchanged after the replacement.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationGenerateForwarder]
         public static TBuilder Replace<TBuilder>(this TBuilder text, char oldChar, char newChar, int startIndex, int count)
             where TBuilder : MutableTextBuffer
@@ -229,6 +236,7 @@ namespace J2N.Text
         /// <para/>
         /// <paramref name="startIndex"/> is greater than or equal to <see cref="MutableTextBuffer.Length"/>.
         /// </exception>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationGenerateForwarder]
         public static TBuilder Replace<TBuilder>(this TBuilder text, int startIndex, int count, string newValue)
             where TBuilder : MutableTextBuffer
@@ -268,6 +276,7 @@ namespace J2N.Text
         /// <paramref name="startIndex"/> is greater than or equal to <see cref="MutableTextBuffer.Length"/>.
         /// </exception>
         /// <remarks>This method allows <paramref name="newValue"/> to be this instance or a slice of this instance.</remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationGenerateForwarder]
         public static TBuilder Replace<TBuilder>(this TBuilder text, int startIndex, int count, ReadOnlySpan<char> newValue)
             where TBuilder : MutableTextBuffer

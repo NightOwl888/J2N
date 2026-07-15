@@ -6,6 +6,7 @@ using System.Buffers;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.Runtime.CompilerServices;
 
 namespace J2N.Text
 {
@@ -21,6 +22,7 @@ namespace J2N.Text
         /// <see cref="MutableTextBufferExtensions.Append{TBuilder}(TBuilder, sbyte, string?, IFormatProvider?)"/>.
         /// Update that documentation if the behavior changes.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationExtensionImplementation]
         internal void AppendInternal(sbyte value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
@@ -37,6 +39,7 @@ namespace J2N.Text
         /// <see cref="MutableTextBufferExtensions.Append{TBuilder}(TBuilder, byte, string?, IFormatProvider?)"/>.
         /// Update that documentation if the behavior changes.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationExtensionImplementation]
         internal void AppendInternal(byte value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
@@ -53,6 +56,7 @@ namespace J2N.Text
         /// <see cref="MutableTextBufferExtensions.Append{TBuilder}(TBuilder, short, string?, IFormatProvider?)"/>.
         /// Update that documentation if the behavior changes.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationExtensionImplementation]
         internal void AppendInternal(short value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
@@ -69,6 +73,7 @@ namespace J2N.Text
         /// <see cref="MutableTextBufferExtensions.Append{TBuilder}(TBuilder, int, string?, IFormatProvider?)"/>.
         /// Update that documentation if the behavior changes.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationExtensionImplementation]
         internal void AppendInternal(int value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
@@ -85,6 +90,7 @@ namespace J2N.Text
         /// <see cref="MutableTextBufferExtensions.Append{TBuilder}(TBuilder, long, string?, IFormatProvider?)"/>.
         /// Update that documentation if the behavior changes.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationExtensionImplementation]
         internal void AppendInternal(long value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
@@ -101,6 +107,7 @@ namespace J2N.Text
         /// <see cref="MutableTextBufferExtensions.Append{TBuilder}(TBuilder, float, string?, IFormatProvider?)"/>.
         /// Update that documentation if the behavior changes.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationExtensionImplementation]
         internal void AppendInternal(float value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
             => AppendNumberCore<float, SingleFormatter>(6, value, format, provider);
@@ -113,6 +120,7 @@ namespace J2N.Text
         /// <see cref="MutableTextBufferExtensions.Append{TBuilder}(TBuilder, double, string?, IFormatProvider?)"/>.
         /// Update that documentation if the behavior changes.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationExtensionImplementation]
         internal void AppendInternal(double value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
             => AppendNumberCore<double, DoubleFormatter>(14, value, format, provider);
@@ -126,6 +134,7 @@ namespace J2N.Text
         /// Update that documentation if the behavior changes.
         /// </remarks>
         // J2N TODO: Since BigDecimal in Java doesn't use the same default format as this, we will need to change the default before this can be made public
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationExtensionImplementation]
         internal void AppendInternal(decimal value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
@@ -142,6 +151,7 @@ namespace J2N.Text
         /// <see cref="MutableTextBufferExtensions.Append{TBuilder}(TBuilder, ushort, string?, IFormatProvider?)"/>.
         /// Update that documentation if the behavior changes.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationExtensionImplementation]
         internal void AppendInternal(ushort value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
@@ -158,6 +168,7 @@ namespace J2N.Text
         /// <see cref="MutableTextBufferExtensions.Append{TBuilder}(TBuilder, uint, string?, IFormatProvider?)"/>.
         /// Update that documentation if the behavior changes.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationExtensionImplementation]
         internal void AppendInternal(uint value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
@@ -174,6 +185,7 @@ namespace J2N.Text
         /// <see cref="MutableTextBufferExtensions.Append{TBuilder}(TBuilder, ulong, string?, IFormatProvider?)"/>.
         /// Update that documentation if the behavior changes.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationExtensionImplementation]
         internal void AppendInternal(ulong value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
@@ -265,6 +277,7 @@ namespace J2N.Text
         /// <see cref="MutableTextBufferExtensions.Insert{TBuilder}(TBuilder, int, sbyte, string?, IFormatProvider?)"/>.
         /// Update that documentation if the behavior changes.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationExtensionImplementation]
         internal void InsertInternal(int index, sbyte value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
@@ -282,6 +295,7 @@ namespace J2N.Text
         /// <see cref="MutableTextBufferExtensions.Insert{TBuilder}(TBuilder, int, byte, string?, IFormatProvider?)"/>.
         /// Update that documentation if the behavior changes.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationExtensionImplementation]
         internal void InsertInternal(int index, byte value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
@@ -299,6 +313,7 @@ namespace J2N.Text
         /// <see cref="MutableTextBufferExtensions.Insert{TBuilder}(TBuilder, int, short, string?, IFormatProvider?)"/>.
         /// Update that documentation if the behavior changes.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationExtensionImplementation]
         internal void InsertInternal(int index, short value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
@@ -316,6 +331,7 @@ namespace J2N.Text
         /// <see cref="MutableTextBufferExtensions.Insert{TBuilder}(TBuilder, int, int, string?, IFormatProvider?)"/>.
         /// Update that documentation if the behavior changes.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationExtensionImplementation]
         internal void InsertInternal(int index, int value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
@@ -333,6 +349,7 @@ namespace J2N.Text
         /// <see cref="MutableTextBufferExtensions.Insert{TBuilder}(TBuilder, int, long, string?, IFormatProvider?)"/>.
         /// Update that documentation if the behavior changes.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationExtensionImplementation]
         internal void InsertInternal(int index, long value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
@@ -350,6 +367,7 @@ namespace J2N.Text
         /// <see cref="MutableTextBufferExtensions.Insert{TBuilder}(TBuilder, int, float, string?, IFormatProvider?)"/>.
         /// Update that documentation if the behavior changes.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationExtensionImplementation]
         internal void InsertInternal(int index, float value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
             => InsertNumberCore<float, SingleFormatter>(index, value, format, provider);
@@ -363,6 +381,7 @@ namespace J2N.Text
         /// <see cref="MutableTextBufferExtensions.Insert{TBuilder}(TBuilder, int, double, string?, IFormatProvider?)"/>.
         /// Update that documentation if the behavior changes.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationExtensionImplementation]
         internal void InsertInternal(int index, double value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
             => InsertNumberCore<double, DoubleFormatter>(index, value, format, provider);
@@ -377,6 +396,7 @@ namespace J2N.Text
         /// Update that documentation if the behavior changes.
         /// </remarks>
         // J2N TODO: Since BigDecimal in Java doesn't use the same default format as this, we will need to change the default before this can be made public
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationExtensionImplementation]
         internal void InsertInternal(int index, decimal value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
@@ -394,6 +414,7 @@ namespace J2N.Text
         /// <see cref="MutableTextBufferExtensions.Insert{TBuilder}(TBuilder, int, ushort, string?, IFormatProvider?)"/>.
         /// Update that documentation if the behavior changes.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationExtensionImplementation]
         internal void InsertInternal(int index, ushort value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
@@ -411,6 +432,7 @@ namespace J2N.Text
         /// <see cref="MutableTextBufferExtensions.Insert{TBuilder}(TBuilder, int, uint, string?, IFormatProvider?)"/>.
         /// Update that documentation if the behavior changes.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationExtensionImplementation]
         internal void InsertInternal(int index, uint value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
@@ -428,6 +450,7 @@ namespace J2N.Text
         /// <see cref="MutableTextBufferExtensions.Insert{TBuilder}(TBuilder, int, ulong, string?, IFormatProvider?)"/>.
         /// Update that documentation if the behavior changes.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationExtensionImplementation]
         internal void InsertInternal(int index, ulong value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE

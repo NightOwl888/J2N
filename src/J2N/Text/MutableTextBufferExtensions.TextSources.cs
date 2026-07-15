@@ -18,6 +18,7 @@
 
 using J2N.CodeGeneration;
 using System;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace J2N.Text
@@ -59,6 +60,7 @@ namespace J2N.Text
         /// and <see cref="AppendFormat{TBuilder}(TBuilder, string, object?)"/> methods to append small strings.
         /// </remarks>
         /// <seealso cref="char" />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationGenerateForwarder]
         public static TBuilder Append<TBuilder>(this TBuilder text, char value)
             where TBuilder : MutableTextBuffer
@@ -107,6 +109,7 @@ namespace J2N.Text
         /// and <see cref="AppendFormat{TBuilder}(TBuilder, string, object?)"/> methods to append small strings.
         /// </remarks>
         /// <seealso cref="char" />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationGenerateForwarder]
         public static TBuilder Append<TBuilder>(this TBuilder text, char[]? value)
             where TBuilder : MutableTextBuffer
@@ -178,6 +181,7 @@ namespace J2N.Text
         /// and <see cref="AppendFormat{TBuilder}(TBuilder, string, object?)"/> methods to append small strings.
         /// </remarks>
         /// <seealso cref="char" />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationGenerateForwarder]
         public static TBuilder Append<TBuilder>(this TBuilder text, char[]? value, int startIndex, int charCount)
             where TBuilder : MutableTextBuffer
@@ -225,6 +229,7 @@ namespace J2N.Text
         /// and <see cref="AppendFormat{TBuilder}(TBuilder, string, object?)"/> methods to append small strings.
         /// </remarks>
         [CLSCompliant(false)]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationGenerateForwarder]
         public static unsafe TBuilder Append<TBuilder>(this TBuilder text, char* value, int valueCount)
             where TBuilder : MutableTextBuffer
@@ -272,6 +277,7 @@ namespace J2N.Text
         /// and <see cref="AppendFormat{TBuilder}(TBuilder, string, object?)"/> methods to append small strings.
         /// </remarks>
         /// <seealso cref="string" />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationGenerateForwarder]
         public static TBuilder Append<TBuilder>(this TBuilder text, string? value)
             where TBuilder : MutableTextBuffer
@@ -348,6 +354,7 @@ namespace J2N.Text
         /// methods to append small strings.
         /// </remarks>
         /// <seealso cref="string" />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationGenerateForwarder]
         public static TBuilder Append<TBuilder>(this TBuilder text, string? value, int startIndex, int count)
             where TBuilder : MutableTextBuffer
@@ -369,6 +376,7 @@ namespace J2N.Text
         /// <param name="value">The read-only character span to append.</param>
         /// <returns>A reference to this instance after the operation has completed.</returns>
         /// <seealso cref="ReadOnlySpan{Char}" />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationGenerateForwarder]
         public static TBuilder Append<TBuilder>(this TBuilder text, ReadOnlySpan<char> value)
             where TBuilder : MutableTextBuffer
@@ -390,6 +398,7 @@ namespace J2N.Text
         /// <param name="value">The read-only character memory region to append.</param>
         /// <returns>A reference to this instance after the operation has completed.</returns>
         /// <seealso cref="ReadOnlyMemory{Char}" />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationGenerateForwarder]
         public static TBuilder Append<TBuilder>(this TBuilder text, ReadOnlyMemory<char> value)
             where TBuilder : MutableTextBuffer
@@ -429,6 +438,7 @@ namespace J2N.Text
         /// and <see cref="AppendFormat{TBuilder}(TBuilder, string, object?)"/> methods to append small strings.
         /// </remarks>
         /// <seealso cref="StringBuilder" />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationGenerateForwarder]
         public static TBuilder Append<TBuilder>(this TBuilder text, StringBuilder? value)
             where TBuilder : MutableTextBuffer
@@ -505,6 +515,7 @@ namespace J2N.Text
         /// and <see cref="AppendFormat{TBuilder}(TBuilder, string, object?)"/> methods to append small strings.
         /// </remarks>
         /// <seealso cref="StringBuilder" />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationGenerateForwarder]
         public static TBuilder Append<TBuilder>(this TBuilder text, StringBuilder? value, int startIndex, int count)
             where TBuilder : MutableTextBuffer
@@ -532,6 +543,7 @@ namespace J2N.Text
         /// <returns>A reference to this instance after the operation has completed.</returns>
         /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed <see cref="MutableTextBuffer.MaxCapacity"/>.</exception>
         /// <seealso cref="ICharSequence" />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationGenerateForwarder]
         public static TBuilder Append<TBuilder>(this TBuilder text, ICharSequence? value)
             where TBuilder : MutableTextBuffer
@@ -570,6 +582,7 @@ namespace J2N.Text
         /// Enlarging the value of this instance would exceed <see cref="MutableTextBuffer.MaxCapacity"/>.
         /// </exception>
         /// <seealso cref="ICharSequence" />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationGenerateForwarder]
         public static TBuilder Append<TBuilder>(this TBuilder text, ICharSequence? value, int startIndex, int count)
             where TBuilder : MutableTextBuffer
@@ -602,6 +615,7 @@ namespace J2N.Text
         /// </exception>
         /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
         /// <seealso cref="char" />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationGenerateForwarder]
         public static TBuilder Insert<TBuilder>(this TBuilder text, int index, char value)
             where TBuilder : MutableTextBuffer
@@ -640,6 +654,7 @@ namespace J2N.Text
         /// If <paramref name="value"/> is <see langword="null"/>, the <see cref="MutableTextBuffer"/> is not changed.
         /// </remarks>
         /// <seealso cref="char" />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationGenerateForwarder]
         public static TBuilder Insert<TBuilder>(this TBuilder text, int index, char[]? value)
             where TBuilder : MutableTextBuffer
@@ -683,6 +698,7 @@ namespace J2N.Text
         /// </exception>
         /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
         /// <seealso cref="char" />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationGenerateForwarder]
         public static TBuilder Insert<TBuilder>(this TBuilder text, int index, char[]? value, int startIndex, int charCount)
             where TBuilder : MutableTextBuffer
@@ -724,6 +740,7 @@ namespace J2N.Text
         /// Existing characters are shifted to make room for the new text. The capacity is adjusted as needed.
         /// </remarks>
         [CLSCompliant(false)]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationGenerateForwarder]
         public static unsafe TBuilder Insert<TBuilder>(this TBuilder text, int index, char* value, int valueCount)
             where TBuilder : MutableTextBuffer
@@ -759,6 +776,7 @@ namespace J2N.Text
         /// This instance of <see cref="MutableTextBuffer"/> is not changed if <paramref name="value"/> is <see langword="null"/>,
         /// or <paramref name="value"/> is not <see langword="null"/> but its length is zero.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationGenerateForwarder]
         public static TBuilder Insert<TBuilder>(this TBuilder text, int index, string? value)
             where TBuilder : MutableTextBuffer
@@ -801,6 +819,7 @@ namespace J2N.Text
         /// </exception>
         /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
         /// <seealso cref="char" />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationGenerateForwarder]
         public static TBuilder Insert<TBuilder>(this TBuilder text, int index, string? value, int startIndex, int count)
             where TBuilder : MutableTextBuffer
@@ -827,6 +846,7 @@ namespace J2N.Text
         /// <paramref name="value"/> to insert it. The capacity is adjusted as needed.
         /// </remarks>
         /// <seealso cref="ReadOnlySpan{Char}" />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationGenerateForwarder]
         public static TBuilder Insert<TBuilder>(this TBuilder text, int index, ReadOnlySpan<char> value)
             where TBuilder : MutableTextBuffer
@@ -855,6 +875,7 @@ namespace J2N.Text
         /// <para/>
         /// Enlarging the value of this instance would exceed <see cref="MutableTextBuffer.MaxCapacity"/>.
         /// </exception>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationGenerateForwarder]
         public static TBuilder Insert<TBuilder>(this TBuilder text, int index, StringBuilder? value)
             where TBuilder : MutableTextBuffer
@@ -894,6 +915,7 @@ namespace J2N.Text
         /// <para/>
         /// Enlarging the value of this instance would exceed <see cref="MutableTextBuffer.MaxCapacity"/>.
         /// </exception>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationGenerateForwarder]
         public static TBuilder Insert<TBuilder>(this TBuilder text, int index, StringBuilder? value, int startIndex, int count)
             where TBuilder : MutableTextBuffer
@@ -922,6 +944,7 @@ namespace J2N.Text
         /// <para/>
         /// Enlarging the value of this instance would exceed <see cref="MutableTextBuffer.MaxCapacity"/>.
         /// </exception>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationGenerateForwarder]
         public static TBuilder Insert<TBuilder>(this TBuilder text, int index, ICharSequence? value)
             where TBuilder : MutableTextBuffer
@@ -961,6 +984,7 @@ namespace J2N.Text
         /// <para/>
         /// Enlarging the value of this instance would exceed <see cref="MutableTextBuffer.MaxCapacity"/>.
         /// </exception>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationGenerateForwarder]
         public static TBuilder Insert<TBuilder>(this TBuilder text, int index, ICharSequence? value, int startIndex, int count)
             where TBuilder : MutableTextBuffer

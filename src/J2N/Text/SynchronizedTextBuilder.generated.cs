@@ -573,6 +573,7 @@ namespace J2N.Text
         /// <see cref="SynchronizedTextBuilder"/> objects are the same. To determine equality, the
         /// <see cref="Equals(SynchronizedTextBuilder)"/> method uses ordinal comparison.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Equals([NotNullWhen(true)] SynchronizedTextBuilder? sb)
         {
             lock (syncRoot)
@@ -617,6 +618,7 @@ namespace J2N.Text
         /// The <see cref="Equals(SynchronizedTextBuilder)"/> method performs an ordinal comparison to determine
         /// whether the characters in the current instance and span are equal.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Equals(ReadOnlySpan<char> span)
         {
             lock (syncRoot)
@@ -721,6 +723,7 @@ namespace J2N.Text
         /// This method performs an ordinal (culture-insensitive) search, where a character is considered
         /// equivalent to another character only if their Unicode scalar values are the same.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public int IndexOf(char value)
         {
             lock (syncRoot)
@@ -747,6 +750,7 @@ namespace J2N.Text
         /// To match the behavior of the JDK, this method allows searches for the empty string, which will
         /// always return 0.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public int IndexOf(string value)
         {
             lock (syncRoot)
@@ -772,6 +776,7 @@ namespace J2N.Text
         /// To match the behavior of the JDK, this method allows searches for the empty span, which will
         /// always return 0.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public int IndexOf(ReadOnlySpan<char> value)
         {
             lock (syncRoot)
@@ -810,6 +815,7 @@ namespace J2N.Text
         /// If <paramref name="startIndex"/> is less than zero, it is treated as zero. If it is greater
         /// than <see cref="Length"/>, it is treated as equal to <see cref="Length"/>.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public int IndexOf(string value, int startIndex)
         {
             lock (syncRoot)
@@ -847,6 +853,7 @@ namespace J2N.Text
         /// If <paramref name="startIndex"/> is less than zero, it is treated as zero. If it is greater
         /// than <see cref="Length"/>, it is treated as equal to <see cref="Length"/>.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public int IndexOf(ReadOnlySpan<char> value, int startIndex)
         {
             lock (syncRoot)
@@ -881,6 +888,7 @@ namespace J2N.Text
         /// On older platforms than .NET Core, this overload provides optimizations for
         /// <see cref="StringComparison.OrdinalIgnoreCase"/> over and above the System.Memory package.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public int IndexOf(string value, StringComparison comparisonType)
         {
             lock (syncRoot)
@@ -915,6 +923,7 @@ namespace J2N.Text
         /// On older platforms than .NET Core, this overload provides optimizations for
         /// <see cref="StringComparison.OrdinalIgnoreCase"/> over and above the System.Memory package.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public int IndexOf(ReadOnlySpan<char> value, StringComparison comparisonType)
         {
             lock (syncRoot)
@@ -965,6 +974,7 @@ namespace J2N.Text
         /// On older platforms than .NET Core, this overload provides optimizations for
         /// <see cref="StringComparison.OrdinalIgnoreCase"/> over and above the System.Memory package.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public int IndexOf(string value, int startIndex, StringComparison comparisonType)
         {
             lock (syncRoot)
@@ -1013,6 +1023,7 @@ namespace J2N.Text
         /// On older platforms than .NET Core, this overload provides optimizations for
         /// <see cref="StringComparison.OrdinalIgnoreCase"/> over and above the System.Memory package.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public int IndexOf(ReadOnlySpan<char> value, int startIndex, StringComparison comparisonType)
         {
             lock (syncRoot)
@@ -1042,6 +1053,7 @@ namespace J2N.Text
         /// considered equivalent to another character only if their Unicode scalar values are
         /// the same.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public int LastIndexOf(char value)
         {
             lock (syncRoot)
@@ -1076,6 +1088,7 @@ namespace J2N.Text
         /// To match the behavior of the JDK, this method allows searches for the empty string, which will
         /// always return <see cref="Length"/>.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public int LastIndexOf(string value)
         {
             lock (syncRoot)
@@ -1109,6 +1122,7 @@ namespace J2N.Text
         /// To match the behavior of the JDK, this method allows searches for the empty span, which will
         /// always return <see cref="Length"/>.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public int LastIndexOf(ReadOnlySpan<char> value)
         {
             lock (syncRoot)
@@ -1156,6 +1170,7 @@ namespace J2N.Text
         /// If <paramref name="startIndex"/> is less than zero, the method returns -1. If it is greater than
         /// <see cref="Length"/>, it is treated as equal to <see cref="Length"/>.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public int LastIndexOf(string value, int startIndex)
         {
             lock (syncRoot)
@@ -1202,6 +1217,7 @@ namespace J2N.Text
         /// If <paramref name="startIndex"/> is less than zero, the method returns -1. If it is greater than
         /// <see cref="Length"/>, it is treated as equal to <see cref="Length"/>.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public int LastIndexOf(ReadOnlySpan<char> value, int startIndex)
         {
             lock (syncRoot)
@@ -1247,6 +1263,7 @@ namespace J2N.Text
         /// On older platforms than .NET Core, this overload provides optimizations for
         /// <see cref="StringComparison.OrdinalIgnoreCase"/> over and above the System.Memory package.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public int LastIndexOf(string value, StringComparison comparisonType)
         {
             lock (syncRoot)
@@ -1291,6 +1308,7 @@ namespace J2N.Text
         /// On older platforms than .NET Core, this overload provides optimizations for
         /// <see cref="StringComparison.OrdinalIgnoreCase"/> over and above the System.Memory package.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public int LastIndexOf(ReadOnlySpan<char> value, StringComparison comparisonType)
         {
             lock (syncRoot)
@@ -1349,6 +1367,7 @@ namespace J2N.Text
         /// On older platforms than .NET Core, this overload provides optimizations for
         /// <see cref="StringComparison.OrdinalIgnoreCase"/> over and above the System.Memory package.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public int LastIndexOf(string value, int startIndex, StringComparison comparisonType)
         {
             lock (syncRoot)
@@ -1406,6 +1425,7 @@ namespace J2N.Text
         /// On older platforms than .NET Core, this overload provides optimizations for
         /// <see cref="StringComparison.OrdinalIgnoreCase"/> over and above the System.Memory package.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public int LastIndexOf(ReadOnlySpan<char> value, int startIndex, StringComparison comparisonType)
         {
             lock (syncRoot)

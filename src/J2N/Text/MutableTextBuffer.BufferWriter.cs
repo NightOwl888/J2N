@@ -175,6 +175,7 @@ namespace J2N.Text
             return span;
         }
 
+        [MethodImpl(MethodImplOptions.NoInlining)]
         [DoesNotReturn]
         private static void ThrowInvalidOperationException_AdvancedTooFar(int capacity)
         {

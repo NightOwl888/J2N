@@ -20,6 +20,7 @@ using J2N.CodeGeneration;
 using System;
 using System.Diagnostics;
 using System.Globalization;
+using System.Runtime.CompilerServices;
 
 namespace J2N.Text
 {
@@ -33,6 +34,7 @@ namespace J2N.Text
         /// <see cref="MutableTextBufferExtensions.AppendUpper{TBuilder}(TBuilder, string?, CultureInfo?)"/>.
         /// Update that documentation if the behavior changes.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationExtensionImplementation]
         internal void AppendUpperInternal(string? value, CultureInfo? culture)
             => AppendUpperInternal(value.AsSpan(), culture);
@@ -45,6 +47,7 @@ namespace J2N.Text
         /// <see cref="MutableTextBufferExtensions.AppendUpper{TBuilder}(TBuilder, ReadOnlySpan{char}, CultureInfo?)"/>.
         /// Update that documentation if the behavior changes.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationExtensionImplementation]
         internal void AppendUpperInternal(ReadOnlySpan<char> value, CultureInfo? culture)
         {
@@ -77,6 +80,7 @@ namespace J2N.Text
         /// <see cref="MutableTextBufferExtensions.AppendLower{TBuilder}(TBuilder, string?, CultureInfo?)"/>.
         /// Update that documentation if the behavior changes.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationExtensionImplementation]
         internal void AppendLowerInternal(string? value, CultureInfo? culture)
             => AppendLowerInternal(value.AsSpan(), culture);
@@ -89,6 +93,7 @@ namespace J2N.Text
         /// <see cref="MutableTextBufferExtensions.AppendLower{TBuilder}(TBuilder, ReadOnlySpan{char}, CultureInfo?)"/>.
         /// Update that documentation if the behavior changes.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationExtensionImplementation]
         internal void AppendLowerInternal(ReadOnlySpan<char> value, CultureInfo? culture)
         {
@@ -121,6 +126,7 @@ namespace J2N.Text
         /// <see cref="MutableTextBufferExtensions.AppendUpperInvariant{TBuilder}(TBuilder, string?)"/>.
         /// Update that documentation if the behavior changes.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationExtensionImplementation]
         internal void AppendUpperInvariantInternal(string? value)
             => AppendUpperInvariantInternal(value.AsSpan());
@@ -133,6 +139,7 @@ namespace J2N.Text
         /// <see cref="MutableTextBufferExtensions.AppendUpperInvariant{TBuilder}(TBuilder, ReadOnlySpan{char})"/>.
         /// Update that documentation if the behavior changes.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationExtensionImplementation]
         internal void AppendUpperInvariantInternal(ReadOnlySpan<char> value)
         {
@@ -159,6 +166,7 @@ namespace J2N.Text
         /// <see cref="MutableTextBufferExtensions.AppendLowerInvariant{TBuilder}(TBuilder, string?)"/>.
         /// Update that documentation if the behavior changes.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationExtensionImplementation]
         internal void AppendLowerInvariantInternal(string? value)
             => AppendLowerInvariantInternal(value.AsSpan());
@@ -171,6 +179,7 @@ namespace J2N.Text
         /// <see cref="MutableTextBufferExtensions.AppendLowerInvariant{TBuilder}(TBuilder, ReadOnlySpan{char})"/>.
         /// Update that documentation if the behavior changes.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationExtensionImplementation]
         internal void AppendLowerInvariantInternal(ReadOnlySpan<char> value)
         {

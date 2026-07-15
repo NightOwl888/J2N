@@ -239,6 +239,7 @@ namespace J2N.Text
         /// <see cref="MutableTextBufferExtensions.Clear{TBuilder}(TBuilder)"/>.
         /// Update that documentation if the behavior changes.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationExtensionImplementation]
         internal void ClearInternal()
         {
@@ -270,6 +271,7 @@ namespace J2N.Text
         /// </remarks>
         public int Length
         {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get => m_Position;
             set
             {
@@ -360,6 +362,7 @@ namespace J2N.Text
         [IndexerName("Chars")]
         public char this[int index]
         {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get
             {
                 if ((uint)index >= (uint)m_Position)
@@ -369,6 +372,7 @@ namespace J2N.Text
 
                 return m_Chars[index];
             }
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             set
             {
                 if ((uint)index >= (uint)m_Position)
@@ -391,6 +395,7 @@ namespace J2N.Text
         /// <see cref="MutableTextBufferExtensions.AppendLine{TBuilder}(TBuilder)"/>.
         /// Update that documentation if the behavior changes.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationExtensionImplementation]
         internal void AppendLineInternal() => AppendInternal(Environment.NewLine);
 
@@ -402,6 +407,7 @@ namespace J2N.Text
         /// <see cref="MutableTextBufferExtensions.AppendLine{TBuilder}(TBuilder, string?)"/>.
         /// Update that documentation if the behavior changes.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationExtensionImplementation]
         internal void AppendLineInternal(string? value)
         {
@@ -417,6 +423,7 @@ namespace J2N.Text
         /// <see cref="MutableTextBufferExtensions.AppendLine{TBuilder}(TBuilder, ReadOnlySpan{char})"/>.
         /// Update that documentation if the behavior changes.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationExtensionImplementation]
         internal void AppendLineInternal(ReadOnlySpan<char> value)
         {
@@ -537,6 +544,7 @@ namespace J2N.Text
         /// <see cref="MutableTextBufferExtensions.Append{TBuilder}(TBuilder, bool)"/>.
         /// Update that documentation if the behavior changes.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationExtensionImplementation]
         internal void AppendInternal(bool value) => AppendInternal(value, format: BooleanFormat.Lowercase);
 
@@ -548,6 +556,7 @@ namespace J2N.Text
         /// <see cref="MutableTextBufferExtensions.Append{TBuilder}(TBuilder, bool, BooleanFormat)"/>.
         /// Update that documentation if the behavior changes.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationExtensionImplementation]
         internal void AppendInternal(bool value, BooleanFormat format)
         {
@@ -564,6 +573,7 @@ namespace J2N.Text
         /// <see cref="MutableTextBufferExtensions.Insert{TBuilder}(TBuilder, int, bool)"/>.
         /// Update that documentation if the behavior changes.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationExtensionImplementation]
         internal void InsertInternal(int index, bool value) => InsertInternal(index, value, BooleanFormat.Lowercase);
 
@@ -576,6 +586,7 @@ namespace J2N.Text
         /// <see cref="MutableTextBufferExtensions.Insert{TBuilder}(TBuilder, int, bool, BooleanFormat)"/>.
         /// Update that documentation if the behavior changes.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationExtensionImplementation]
         internal void InsertInternal(int index, bool value, BooleanFormat format)
         {
@@ -585,6 +596,7 @@ namespace J2N.Text
             InsertInternal(index, text.AsSpan(), 1);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static string FormatBoolean(bool value, BooleanFormat format) =>
             // J2N: System.Boolean ignores the IFormatProvider that is passed to it,
             // so we are using a boolean flag for users to be able to specify whether to use
@@ -669,6 +681,7 @@ namespace J2N.Text
         /// <see cref="MutableTextBufferExtensions.InsertFromSelf{TBuilder}(TBuilder, int, Range)"/>.
         /// Update that documentation if the behavior changes.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationExtensionImplementation]
         internal void InsertFromSelfInternal(int index, Range range)
         {
@@ -798,6 +811,7 @@ namespace J2N.Text
         /// <see cref="MutableTextBuffer"/> objects are the same. To determine equality, the
         /// <see cref="Equals(MutableTextBuffer)"/> method uses ordinal comparison.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Equals([NotNullWhen(true)] MutableTextBuffer? sb)
         {
             if (sb == null)
@@ -886,6 +900,7 @@ namespace J2N.Text
         /// The <see cref="Equals(MutableTextBuffer)"/> method performs an ordinal comparison to determine
         /// whether the characters in the current instance and span are equal.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Equals(ReadOnlySpan<char> span)
         {
             if (span.Length != Length)
@@ -1158,6 +1173,7 @@ namespace J2N.Text
         /// <param name="index">The index to insert in this builder.</param>
         /// <param name="value">The reference to the start of the buffer.</param>
         /// <param name="valueCount">The number of characters in the buffer.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void Insert(int index, ref char value, int valueCount)
         {
             Debug.Assert((uint)index <= (uint)Length, "Callers should check that index is a legal value.");
@@ -1169,6 +1185,7 @@ namespace J2N.Text
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void RemoveCore(int startIndex, int length)
         {
             Debug.Assert(length >= 0);
@@ -1189,6 +1206,7 @@ namespace J2N.Text
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void ReplaceInPlace(ref int index, ref char value, int count)
         {
             if (count == 0)

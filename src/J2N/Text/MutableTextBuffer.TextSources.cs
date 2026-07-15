@@ -23,6 +23,7 @@ namespace J2N.Text
         /// <see cref="MutableTextBufferExtensions.Append{TBuilder}(TBuilder, char)"/>.
         /// Update that documentation if the behavior changes.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationExtensionImplementation]
         internal void AppendInternal(char value)
         {
@@ -58,6 +59,7 @@ namespace J2N.Text
         /// <see cref="MutableTextBufferExtensions.Append{TBuilder}(TBuilder, char[])"/>.
         /// Update that documentation if the behavior changes.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationExtensionImplementation]
         internal void AppendInternal(char[]? value)
         {
@@ -118,6 +120,7 @@ namespace J2N.Text
         /// <see cref="MutableTextBufferExtensions.Append{TBuilder}(TBuilder, char*, int)"/>.
         /// Update that documentation if the behavior changes.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationExtensionImplementation]
         internal unsafe void AppendInternal(char* value, int valueCount)
         {
@@ -149,6 +152,7 @@ namespace J2N.Text
         /// <see cref="MutableTextBufferExtensions.Append{TBuilder}(TBuilder, string?)"/>.
         /// Update that documentation if the behavior changes.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationExtensionImplementation]
         internal void AppendInternal(string? value)
         {
@@ -206,6 +210,7 @@ namespace J2N.Text
         /// <see cref="MutableTextBufferExtensions.Append{TBuilder}(TBuilder, ReadOnlySpan{char})"/>.
         /// Update that documentation if the behavior changes.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationExtensionImplementation]
         internal void AppendInternal(ReadOnlySpan<char> value)
         {
@@ -233,6 +238,7 @@ namespace J2N.Text
         /// <see cref="MutableTextBufferExtensions.Append{TBuilder}(TBuilder, ReadOnlyMemory{char})"/>.
         /// Update that documentation if the behavior changes.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationExtensionImplementation]
         internal void AppendInternal(ReadOnlyMemory<char> value) => AppendInternal(value.Span);
 
@@ -248,6 +254,7 @@ namespace J2N.Text
         /// <see cref="MutableTextBufferExtensions.Append{TBuilder}(TBuilder, StringBuilder?)"/>.
         /// Update that documentation if the behavior changes.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationExtensionImplementation]
         internal void AppendInternal(StringBuilder? value)
         {
@@ -461,6 +468,7 @@ namespace J2N.Text
         /// <see cref="MutableTextBufferExtensions.Insert{TBuilder}(TBuilder, int, char)"/>.
         /// Update that documentation if the behavior changes.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationExtensionImplementation]
         internal void InsertInternal(int index, char value)
         {
@@ -485,6 +493,7 @@ namespace J2N.Text
         /// <see cref="MutableTextBufferExtensions.Insert{TBuilder}(TBuilder, int, char[])"/>.
         /// Update that documentation if the behavior changes.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationExtensionImplementation]
         internal void InsertInternal(int index, char[]? value)
         {
@@ -604,6 +613,7 @@ namespace J2N.Text
         /// <see cref="MutableTextBufferExtensions.Insert{TBuilder}(TBuilder, int, string?)"/>.
         /// Update that documentation if the behavior changes.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationExtensionImplementation]
         internal void InsertInternal(int index, string? value)
         {
@@ -677,6 +687,7 @@ namespace J2N.Text
         /// <see cref="MutableTextBufferExtensions.Insert{TBuilder}(TBuilder, int, ReadOnlySpan{char})"/>.
         /// Update that documentation if the behavior changes.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationExtensionImplementation]
         internal void InsertInternal(int index, ReadOnlySpan<char> value) // J2N NOTE: Weird that upstream they made an overload of ReadOnlyMemory<char> for Append, but not Insert.
         {
@@ -710,6 +721,7 @@ namespace J2N.Text
         /// <see cref="MutableTextBufferExtensions.Insert{TBuilder}(TBuilder, int, StringBuilder?)"/>.
         /// Update that documentation if the behavior changes.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationExtensionImplementation]
         internal void InsertInternal(int index, StringBuilder? value)
         {
@@ -973,6 +985,7 @@ namespace J2N.Text
             }
         }
 
+        [MethodImpl(MethodImplOptions.NoInlining)]
         private void InsertOverlapping(int index, int sourceOffset, int count)
         {
             // J2N TODO: Add Debug.Asserts here for invariants

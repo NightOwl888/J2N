@@ -18,6 +18,7 @@
 
 using J2N.CodeGeneration;
 using System;
+using System.Runtime.CompilerServices;
 
 namespace J2N.Text
 {
@@ -46,6 +47,7 @@ namespace J2N.Text
         /// <para/>
         /// <paramref name="startIndex"/> is greater than <see cref="MutableTextBuffer.Length"/>.
         /// </exception>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationGenerateForwarder]
         public static TBuilder Delete<TBuilder>(this TBuilder text, int startIndex, int count)
             where TBuilder : MutableTextBuffer
@@ -72,6 +74,7 @@ namespace J2N.Text
         /// the string value of the current instance is shortened by 1. The capacity of the
         /// current instance is unaffected.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationGenerateForwarder]
         public static TBuilder RemoveAt<TBuilder>(this TBuilder text, int index)
             where TBuilder : MutableTextBuffer
@@ -99,6 +102,7 @@ namespace J2N.Text
         /// the string value of the current instance is shortened by <paramref name="length"/>. The capacity of the
         /// current instance is unaffected.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationGenerateForwarder]
         public static TBuilder Remove<TBuilder>(this TBuilder text, int startIndex, int length)
             where TBuilder : MutableTextBuffer

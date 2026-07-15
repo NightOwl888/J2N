@@ -18,6 +18,7 @@
 
 using J2N.CodeGeneration;
 using System;
+using System.Runtime.CompilerServices;
 
 namespace J2N.Text
 {
@@ -42,6 +43,7 @@ namespace J2N.Text
         /// <param name="codePoint">A Unicode code point.</param>
         /// <returns>A reference to this instance after the operation has completed.</returns>
         /// <exception cref="ArgumentException"><paramref name="codePoint"/> is not a valid Unicode code point.</exception>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationGenerateForwarder]
         public static TBuilder AppendCodePoint<TBuilder>(this TBuilder text, int codePoint)
             where TBuilder : MutableTextBuffer
@@ -77,6 +79,7 @@ namespace J2N.Text
         /// than the length of this instance.
         /// </exception>
         /// <exception cref="ArgumentException"><paramref name="codePoint"/> is not a valid Unicode code point.</exception>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationGenerateForwarder]
         public static TBuilder InsertCodePoint<TBuilder>(this TBuilder text, int index, int codePoint)
             where TBuilder : MutableTextBuffer

@@ -1,4 +1,5 @@
 ﻿using J2N.CodeGeneration;
+using System.Runtime.CompilerServices;
 
 namespace J2N.Text
 {
@@ -12,6 +13,7 @@ namespace J2N.Text
         /// <see cref="MutableTextBufferExtensions.Delete{TBuilder}(TBuilder, int, int)"/>.
         /// Update that documentation if the behavior changes.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationExtensionImplementation]
         internal void DeleteInternal(int startIndex, int count) // Coverage for the JDK
         {
@@ -35,6 +37,7 @@ namespace J2N.Text
         /// <see cref="MutableTextBufferExtensions.RemoveAt{TBuilder}(TBuilder, int)"/>.
         /// Update that documentation if the behavior changes.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationExtensionImplementation]
         internal void RemoveAtInternal(int index) // Coverage for the JDK (deleteCharAt)
         {
@@ -58,6 +61,7 @@ namespace J2N.Text
         /// <see cref="MutableTextBufferExtensions.Remove{TBuilder}(TBuilder, int, int)"/>.
         /// Update that documentation if the behavior changes.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationExtensionImplementation]
         internal void RemoveInternal(int startIndex, int length)
         {

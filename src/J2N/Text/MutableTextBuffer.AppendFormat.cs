@@ -24,6 +24,7 @@ namespace J2N.Text
         /// <see cref="MutableTextBufferExtensions.AppendFormat{TBuilder}(TBuilder, string, object?)"/>.
         /// Update that documentation if the behavior changes.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationExtensionImplementation]
         internal void AppendFormatInternal([StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, object? arg0)
         {
@@ -43,6 +44,7 @@ namespace J2N.Text
         /// <see cref="MutableTextBufferExtensions.AppendFormat{TBuilder}(TBuilder, string, object?, object?)"/>.
         /// Update that documentation if the behavior changes.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationExtensionImplementation]
         internal void AppendFormatInternal([StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, object? arg0, object? arg1)
         {
@@ -63,6 +65,7 @@ namespace J2N.Text
         /// <see cref="MutableTextBufferExtensions.AppendFormat{TBuilder}(TBuilder, string, object?, object?, object?)"/>.
         /// Update that documentation if the behavior changes.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationExtensionImplementation]
         internal void AppendFormatInternal([StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, object? arg0, object? arg1, object? arg2)
         {
@@ -83,6 +86,7 @@ namespace J2N.Text
         /// <see cref="MutableTextBufferExtensions.AppendFormat{TBuilder}(TBuilder, string, object?[])"/>.
         /// Update that documentation if the behavior changes.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationExtensionImplementation]
         internal void AppendFormatInternal([StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, params object?[] args)
         {
@@ -105,6 +109,7 @@ namespace J2N.Text
         /// <see cref="MutableTextBufferExtensions.AppendFormat{TBuilder}(TBuilder, string, ReadOnlySpan{object?})"/>.
         /// Update that documentation if the behavior changes.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationExtensionImplementation]
         internal void AppendFormatInternal([StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, params ReadOnlySpan<object?> args)
         {
@@ -120,6 +125,7 @@ namespace J2N.Text
         /// <see cref="MutableTextBufferExtensions.AppendFormat{TBuilder}(TBuilder, IFormatProvider?, string, object?)"/>.
         /// Update that documentation if the behavior changes.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationExtensionImplementation]
         internal void AppendFormatInternal(IFormatProvider? provider, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, object? arg0)
         {
@@ -139,6 +145,7 @@ namespace J2N.Text
         /// <see cref="MutableTextBufferExtensions.AppendFormat{TBuilder}(TBuilder, IFormatProvider?, string, object?, object?)"/>.
         /// Update that documentation if the behavior changes.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationExtensionImplementation]
         internal void AppendFormatInternal(IFormatProvider? provider, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, object? arg0, object? arg1)
         {
@@ -159,6 +166,7 @@ namespace J2N.Text
         /// <see cref="MutableTextBufferExtensions.AppendFormat{TBuilder}(TBuilder, IFormatProvider?, string, object?, object?, object?)"/>.
         /// Update that documentation if the behavior changes.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationExtensionImplementation]
         internal void AppendFormatInternal(IFormatProvider? provider, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, object? arg0, object? arg1, object? arg2)
         {
@@ -179,6 +187,7 @@ namespace J2N.Text
         /// <see cref="MutableTextBufferExtensions.AppendFormat{TBuilder}(TBuilder, IFormatProvider?, string, object?[])"/>.
         /// Update that documentation if the behavior changes.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationExtensionImplementation]
         internal void AppendFormatInternal(IFormatProvider? provider, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, params object?[] args)
         {

@@ -18,6 +18,7 @@
 
 using J2N.CodeGeneration;
 using System;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace J2N.Text
@@ -62,6 +63,7 @@ namespace J2N.Text
         /// and <see cref="AppendFormat{TBuilder}(TBuilder, string, object?)"/> methods to append small strings.
         /// </remarks>
         /// <seealso cref="char" />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationGenerateForwarder]
         public static TBuilder Append<TBuilder>(this TBuilder text, char value, int repeatCount)
             where TBuilder : MutableTextBuffer
@@ -97,6 +99,7 @@ namespace J2N.Text
         /// This <see cref="MutableTextBuffer"/> object is not changed if <paramref name="value"/> is <see langword="null"/>,
         /// <paramref name="value"/> is not <see langword="null"/> but its length is zero, or <paramref name="repeatCount"/> is zero.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationGenerateForwarder]
         public static TBuilder Insert<TBuilder>(this TBuilder text, int index, string? value, int repeatCount)
             where TBuilder : MutableTextBuffer
@@ -132,6 +135,7 @@ namespace J2N.Text
         /// This <see cref="MutableTextBuffer"/> object is not changed if the length of <paramref name="value"/> is zero or
         /// <paramref name="repeatCount"/> is zero.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationGenerateForwarder]
         public static TBuilder Insert<TBuilder>(this TBuilder text, int index, ReadOnlySpan<char> value, int repeatCount)
             where TBuilder : MutableTextBuffer
@@ -167,6 +171,7 @@ namespace J2N.Text
         /// This <see cref="MutableTextBuffer"/> object is not changed if the length of <paramref name="value"/> is zero or
         /// <paramref name="repeatCount"/> is zero.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationGenerateForwarder]
         public static TBuilder Insert<TBuilder>(this TBuilder text, int index, StringBuilder? value, int repeatCount)
             where TBuilder : MutableTextBuffer
@@ -202,6 +207,7 @@ namespace J2N.Text
         /// This <see cref="MutableTextBuffer"/> object is not changed if the length of <paramref name="value"/> is zero or
         /// <paramref name="repeatCount"/> is zero.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationGenerateForwarder]
         public static TBuilder Insert<TBuilder>(this TBuilder text, int index, ICharSequence? value, int repeatCount)
             where TBuilder : MutableTextBuffer

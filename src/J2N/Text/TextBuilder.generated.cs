@@ -495,6 +495,7 @@ namespace J2N.Text
         /// <see cref="TextBuilder"/> objects are the same. To determine equality, the
         /// <see cref="Equals(TextBuilder)"/> method uses ordinal comparison.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Equals([NotNullWhen(true)] TextBuilder? sb)
         {
             return buffer.Equals(sb?.buffer);
@@ -533,6 +534,7 @@ namespace J2N.Text
         /// The <see cref="Equals(TextBuilder)"/> method performs an ordinal comparison to determine
         /// whether the characters in the current instance and span are equal.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Equals(ReadOnlySpan<char> span)
         {
             return buffer.Equals(span);
@@ -625,6 +627,7 @@ namespace J2N.Text
         /// This method performs an ordinal (culture-insensitive) search, where a character is considered
         /// equivalent to another character only if their Unicode scalar values are the same.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public int IndexOf(char value)
         {
             return buffer.IndexOf(value);
@@ -648,6 +651,7 @@ namespace J2N.Text
         /// To match the behavior of the JDK, this method allows searches for the empty string, which will
         /// always return 0.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public int IndexOf(string value)
         {
             return buffer.IndexOf(value);
@@ -670,6 +674,7 @@ namespace J2N.Text
         /// To match the behavior of the JDK, this method allows searches for the empty span, which will
         /// always return 0.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public int IndexOf(ReadOnlySpan<char> value)
         {
             return buffer.IndexOf(value);
@@ -705,6 +710,7 @@ namespace J2N.Text
         /// If <paramref name="startIndex"/> is less than zero, it is treated as zero. If it is greater
         /// than <see cref="Length"/>, it is treated as equal to <see cref="Length"/>.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public int IndexOf(string value, int startIndex)
         {
             return buffer.IndexOf(value, startIndex);
@@ -739,6 +745,7 @@ namespace J2N.Text
         /// If <paramref name="startIndex"/> is less than zero, it is treated as zero. If it is greater
         /// than <see cref="Length"/>, it is treated as equal to <see cref="Length"/>.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public int IndexOf(ReadOnlySpan<char> value, int startIndex)
         {
             return buffer.IndexOf(value, startIndex);
@@ -770,6 +777,7 @@ namespace J2N.Text
         /// On older platforms than .NET Core, this overload provides optimizations for
         /// <see cref="StringComparison.OrdinalIgnoreCase"/> over and above the System.Memory package.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public int IndexOf(string value, StringComparison comparisonType)
         {
             return buffer.IndexOf(value, comparisonType);
@@ -801,6 +809,7 @@ namespace J2N.Text
         /// On older platforms than .NET Core, this overload provides optimizations for
         /// <see cref="StringComparison.OrdinalIgnoreCase"/> over and above the System.Memory package.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public int IndexOf(ReadOnlySpan<char> value, StringComparison comparisonType)
         {
             return buffer.IndexOf(value, comparisonType);
@@ -848,6 +857,7 @@ namespace J2N.Text
         /// On older platforms than .NET Core, this overload provides optimizations for
         /// <see cref="StringComparison.OrdinalIgnoreCase"/> over and above the System.Memory package.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public int IndexOf(string value, int startIndex, StringComparison comparisonType)
         {
             return buffer.IndexOf(value, startIndex, comparisonType);
@@ -893,6 +903,7 @@ namespace J2N.Text
         /// On older platforms than .NET Core, this overload provides optimizations for
         /// <see cref="StringComparison.OrdinalIgnoreCase"/> over and above the System.Memory package.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public int IndexOf(ReadOnlySpan<char> value, int startIndex, StringComparison comparisonType)
         {
             return buffer.IndexOf(value, startIndex, comparisonType);
@@ -919,6 +930,7 @@ namespace J2N.Text
         /// considered equivalent to another character only if their Unicode scalar values are
         /// the same.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public int LastIndexOf(char value)
         {
             return buffer.LastIndexOf(value);
@@ -950,6 +962,7 @@ namespace J2N.Text
         /// To match the behavior of the JDK, this method allows searches for the empty string, which will
         /// always return <see cref="Length"/>.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public int LastIndexOf(string value)
         {
             return buffer.LastIndexOf(value);
@@ -980,6 +993,7 @@ namespace J2N.Text
         /// To match the behavior of the JDK, this method allows searches for the empty span, which will
         /// always return <see cref="Length"/>.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public int LastIndexOf(ReadOnlySpan<char> value)
         {
             return buffer.LastIndexOf(value);
@@ -1024,6 +1038,7 @@ namespace J2N.Text
         /// If <paramref name="startIndex"/> is less than zero, the method returns -1. If it is greater than
         /// <see cref="Length"/>, it is treated as equal to <see cref="Length"/>.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public int LastIndexOf(string value, int startIndex)
         {
             return buffer.LastIndexOf(value, startIndex);
@@ -1067,6 +1082,7 @@ namespace J2N.Text
         /// If <paramref name="startIndex"/> is less than zero, the method returns -1. If it is greater than
         /// <see cref="Length"/>, it is treated as equal to <see cref="Length"/>.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public int LastIndexOf(ReadOnlySpan<char> value, int startIndex)
         {
             return buffer.LastIndexOf(value, startIndex);
@@ -1109,6 +1125,7 @@ namespace J2N.Text
         /// On older platforms than .NET Core, this overload provides optimizations for
         /// <see cref="StringComparison.OrdinalIgnoreCase"/> over and above the System.Memory package.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public int LastIndexOf(string value, StringComparison comparisonType)
         {
             return buffer.LastIndexOf(value, comparisonType);
@@ -1150,6 +1167,7 @@ namespace J2N.Text
         /// On older platforms than .NET Core, this overload provides optimizations for
         /// <see cref="StringComparison.OrdinalIgnoreCase"/> over and above the System.Memory package.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public int LastIndexOf(ReadOnlySpan<char> value, StringComparison comparisonType)
         {
             return buffer.LastIndexOf(value, comparisonType);
@@ -1205,6 +1223,7 @@ namespace J2N.Text
         /// On older platforms than .NET Core, this overload provides optimizations for
         /// <see cref="StringComparison.OrdinalIgnoreCase"/> over and above the System.Memory package.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public int LastIndexOf(string value, int startIndex, StringComparison comparisonType)
         {
             return buffer.LastIndexOf(value, startIndex, comparisonType);
@@ -1259,6 +1278,7 @@ namespace J2N.Text
         /// On older platforms than .NET Core, this overload provides optimizations for
         /// <see cref="StringComparison.OrdinalIgnoreCase"/> over and above the System.Memory package.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public int LastIndexOf(ReadOnlySpan<char> value, int startIndex, StringComparison comparisonType)
         {
             return buffer.LastIndexOf(value, startIndex, comparisonType);

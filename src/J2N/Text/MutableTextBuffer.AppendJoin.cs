@@ -23,6 +23,7 @@ namespace J2N.Text
         /// <see cref="MutableTextBufferExtensions.AppendJoin{TBuilder}(TBuilder, string?, object?[])"/>.
         /// Update that documentation if the behavior changes.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationExtensionImplementation]
         internal void AppendJoinInternal(string? separator, params object?[] values)
         {
@@ -44,6 +45,7 @@ namespace J2N.Text
         /// <see cref="MutableTextBufferExtensions.AppendJoin{TBuilder}(TBuilder, string?, ReadOnlySpan{object?})"/>.
         /// Update that documentation if the behavior changes.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationExtensionImplementation]
         internal void AppendJoinInternal(string? separator, params ReadOnlySpan<object?> values)
         {
@@ -60,6 +62,7 @@ namespace J2N.Text
         /// <see cref="MutableTextBufferExtensions.AppendJoin{TBuilder, T}(TBuilder, string?, IEnumerable{T})"/>.
         /// Update that documentation if the behavior changes.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationExtensionImplementation]
         internal void AppendJoinInternal<T>(string? separator, IEnumerable<T> values)
         {
@@ -81,6 +84,7 @@ namespace J2N.Text
         /// <see cref="MutableTextBufferExtensions.AppendJoin{TBuilder}(TBuilder, string?, string?[])"/>.
         /// Update that documentation if the behavior changes.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationExtensionImplementation]
         internal void AppendJoinInternal(string? separator, params string?[] values)
         {
@@ -102,6 +106,7 @@ namespace J2N.Text
         /// <see cref="MutableTextBufferExtensions.AppendJoin{TBuilder}(TBuilder, string?, ReadOnlySpan{string?})"/>.
         /// Update that documentation if the behavior changes.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationExtensionImplementation]
         internal void AppendJoinInternal(string? separator, params ReadOnlySpan<string?> values)
         {
@@ -118,6 +123,7 @@ namespace J2N.Text
         /// <see cref="MutableTextBufferExtensions.AppendJoin{TBuilder}(TBuilder, char, object?[])"/>.
         /// Update that documentation if the behavior changes.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationExtensionImplementation]
         internal void AppendJoinInternal(char separator, params object?[] values)
         {
@@ -138,6 +144,7 @@ namespace J2N.Text
         /// <see cref="MutableTextBufferExtensions.AppendJoin{TBuilder}(TBuilder, char, ReadOnlySpan{object?})"/>.
         /// Update that documentation if the behavior changes.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationExtensionImplementation]
         internal void AppendJoinInternal(char separator, params ReadOnlySpan<object?> values) =>
             AppendJoinCore(ref separator, 1, values);
@@ -151,6 +158,7 @@ namespace J2N.Text
         /// <see cref="MutableTextBufferExtensions.AppendJoin{TBuilder, T}(TBuilder, char, IEnumerable{T})"/>.
         /// Update that documentation if the behavior changes.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationExtensionImplementation]
         internal void AppendJoinInternal<T>(char separator, IEnumerable<T> values)
         {
@@ -171,6 +179,7 @@ namespace J2N.Text
         /// <see cref="MutableTextBufferExtensions.AppendJoin{TBuilder}(TBuilder, char, string?[])"/>.
         /// Update that documentation if the behavior changes.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationExtensionImplementation]
         internal void AppendJoinInternal(char separator, params string?[] values)
         {
@@ -191,6 +200,7 @@ namespace J2N.Text
         /// <see cref="MutableTextBufferExtensions.AppendJoin{TBuilder}(TBuilder, char, ReadOnlySpan{string?})"/>.
         /// Update that documentation if the behavior changes.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationExtensionImplementation]
         internal void AppendJoinInternal(char separator, params ReadOnlySpan<string?> values) =>
             AppendJoinCore(ref separator, 1, values);

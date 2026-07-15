@@ -23,6 +23,7 @@ namespace J2N.Text
         ///// <summary>Appends the specified interpolated string to this instance.</summary>
         ///// <param name="handler">The interpolated string to append.</param>
         ///// <returns>A reference to this instance after the append operation has completed.</returns>
+        //[MethodImpl(MethodImplOptions.AggressiveInlining)]
         //[CodeGenerationGenerateForwarder]
         //public static TBuilder Append<TBuilder>(this TBuilder text, [InterpolatedStringHandlerArgument("")] ref AppendInterpolatedStringHandler handler)
         //    where TBuilder : MutableTextBuffer
@@ -38,6 +39,7 @@ namespace J2N.Text
         ///// <param name="provider">An object that supplies culture-specific formatting information.</param>
         ///// <param name="handler">The interpolated string to append.</param>
         ///// <returns>A reference to this instance after the append operation has completed.</returns>
+        //[MethodImpl(MethodImplOptions.AggressiveInlining)]
         //[CodeGenerationGenerateForwarder]
         //public static TBuilder Append<TBuilder>(this TBuilder text, IFormatProvider? provider, [InterpolatedStringHandlerArgument("", nameof(provider))] ref AppendInterpolatedStringHandler handler)
         //    where TBuilder : MutableTextBuffer
@@ -52,6 +54,7 @@ namespace J2N.Text
         ///// <summary>Appends the specified interpolated string followed by the default line terminator to the end of the current MutableTextBuffer object.</summary>
         ///// <param name="handler">The interpolated string to append.</param>
         ///// <returns>A reference to this instance after the append operation has completed.</returns>
+        //[MethodImpl(MethodImplOptions.AggressiveInlining)]
         //[CodeGenerationGenerateForwarder]
         //public static TBuilder AppendLine<TBuilder>(this TBuilder text, [InterpolatedStringHandlerArgument("")] ref AppendInterpolatedStringHandler handler)
         //    where TBuilder : MutableTextBuffer
@@ -67,6 +70,7 @@ namespace J2N.Text
         ///// <param name="provider">An object that supplies culture-specific formatting information.</param>
         ///// <param name="handler">The interpolated string to append.</param>
         ///// <returns>A reference to this instance after the append operation has completed.</returns>
+        //[MethodImpl(MethodImplOptions.AggressiveInlining)]
         //[CodeGenerationGenerateForwarder]
         //public static TBuilder AppendLine<TBuilder>(this TBuilder text, IFormatProvider? provider, [InterpolatedStringHandlerArgument("", nameof(provider))] ref AppendInterpolatedStringHandler handler)
         //    where TBuilder : MutableTextBuffer

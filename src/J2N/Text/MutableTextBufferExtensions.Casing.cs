@@ -19,6 +19,7 @@
 using J2N.CodeGeneration;
 using System;
 using System.Globalization;
+using System.Runtime.CompilerServices;
 
 namespace J2N.Text
 {
@@ -38,6 +39,7 @@ namespace J2N.Text
         /// <para/>
         /// If <paramref name="culture"/> is <see langword="null"/>, <see cref="CultureInfo.CurrentCulture"/> will be used.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationGenerateForwarder]
         public static TBuilder AppendUpper<TBuilder>(this TBuilder text, string? value, CultureInfo? culture)
             where TBuilder : MutableTextBuffer
@@ -63,6 +65,7 @@ namespace J2N.Text
         /// <para/>
         /// If <paramref name="culture"/> is <see langword="null"/>, <see cref="CultureInfo.CurrentCulture"/> will be used.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationGenerateForwarder]
         public static TBuilder AppendUpper<TBuilder>(this TBuilder text, ReadOnlySpan<char> value, CultureInfo? culture)
             where TBuilder : MutableTextBuffer
@@ -83,6 +86,7 @@ namespace J2N.Text
         /// <param name="value">The string to append.</param>
         /// <returns>A reference to this instance after the operation has completed.</returns>
         /// <remarks>The capacity of this instance is adjusted as needed.</remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationGenerateForwarder]
         public static TBuilder AppendUpperInvariant<TBuilder>(this TBuilder text, string? value)
             where TBuilder : MutableTextBuffer
@@ -103,6 +107,7 @@ namespace J2N.Text
         /// <param name="value">The read-only character span to append.</param>
         /// <returns>A reference to this instance after the operation has completed.</returns>
         /// <remarks>The capacity of this instance is adjusted as needed.</remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationGenerateForwarder]
         public static TBuilder AppendUpperInvariant<TBuilder>(this TBuilder text, ReadOnlySpan<char> value)
             where TBuilder : MutableTextBuffer
@@ -128,6 +133,7 @@ namespace J2N.Text
         /// <para/>
         /// If <paramref name="culture"/> is <see langword="null"/>, <see cref="CultureInfo.CurrentCulture"/> will be used.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationGenerateForwarder]
         public static TBuilder AppendLower<TBuilder>(this TBuilder text, string? value, CultureInfo? culture)
             where TBuilder : MutableTextBuffer
@@ -149,6 +155,7 @@ namespace J2N.Text
         /// <param name="culture">An object that supplies culture-specific casing rules.</param>
         /// <returns>A reference to this instance after the operation has completed.</returns>
         /// <remarks>The capacity of this instance is adjusted as needed.</remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationGenerateForwarder]
         public static TBuilder AppendLower<TBuilder>(this TBuilder text, ReadOnlySpan<char> value, CultureInfo? culture)
             where TBuilder : MutableTextBuffer
@@ -169,6 +176,7 @@ namespace J2N.Text
         /// <param name="value">The string to append.</param>
         /// <returns>A reference to this instance after the operation has completed.</returns>
         /// <remarks>The capacity of this instance is adjusted as needed.</remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationGenerateForwarder]
         public static TBuilder AppendLowerInvariant<TBuilder>(this TBuilder text, string? value)
             where TBuilder : MutableTextBuffer
@@ -189,6 +197,7 @@ namespace J2N.Text
         /// <param name="value">The read-only character span to append.</param>
         /// <returns>A reference to this instance after the operation has completed.</returns>
         /// <remarks>The capacity of this instance is adjusted as needed.</remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationGenerateForwarder]
         public static TBuilder AppendLowerInvariant<TBuilder>(this TBuilder text, ReadOnlySpan<char> value)
             where TBuilder : MutableTextBuffer

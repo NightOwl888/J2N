@@ -5,6 +5,7 @@ using J2N.CodeGeneration;
 using System;
 using System.Buffers;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace J2N.Text
@@ -51,6 +52,7 @@ namespace J2N.Text
             //AssertInvariants();
         }
 
+        [MethodImpl(MethodImplOptions.NoInlining)]
         private void AppendWithExpansion(char value, int repeatCount)
         {
             Debug.Assert(repeatCount > 0, "Invalid length; should have been validated by caller.");
@@ -78,6 +80,7 @@ namespace J2N.Text
         /// <see cref="MutableTextBufferExtensions.Insert{TBuilder}(TBuilder, int, string?, int)"/>.
         /// Update that documentation if the behavior changes.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationExtensionImplementation]
         internal void InsertInternal(int index, string? value, int repeatCount) => InsertInternal(index, value.AsSpan(), repeatCount);
 
@@ -132,6 +135,7 @@ namespace J2N.Text
             InsertRepeated(index, value, destinationLength);
         }
 
+        [MethodImpl(MethodImplOptions.NoInlining)]
         private void InsertOverlappingRepeated(int index, ReadOnlySpan<char> value, int destinationLength, int repeatCount)
         {
             char[]? buffer = null;
@@ -152,6 +156,7 @@ namespace J2N.Text
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void InsertRepeated(int index, ReadOnlySpan<char> value, int destinationLength)
         {
             MakeRoom(index, destinationLength);

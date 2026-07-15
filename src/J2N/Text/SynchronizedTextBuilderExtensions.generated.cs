@@ -16,8 +16,8 @@ using J2N.CodeGeneration;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
-using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -100,6 +100,7 @@ namespace J2N.Text
         /// the value of its <see cref="SynchronizedTextBuilder.MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append{TBuilder}(TBuilder, string?)"/>
         /// and <see cref="AppendFormat{TBuilder}(TBuilder, string, object?)"/> methods to append small strings.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static TBuilder AppendFormat<TBuilder>(this TBuilder text, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, object? arg0)
             where TBuilder : SynchronizedTextBuilder
         {
@@ -189,6 +190,7 @@ namespace J2N.Text
         /// the value of its <see cref="SynchronizedTextBuilder.MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append{TBuilder}(TBuilder, string?)"/>
         /// and <see cref="AppendFormat{TBuilder}(TBuilder, string, object?)"/> methods to append small strings.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static TBuilder AppendFormat<TBuilder>(this TBuilder text, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, object? arg0, object? arg1)
             where TBuilder : SynchronizedTextBuilder
         {
@@ -280,6 +282,7 @@ namespace J2N.Text
         /// the value of its <see cref="SynchronizedTextBuilder.MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append{TBuilder}(TBuilder, string?)"/>
         /// and <see cref="AppendFormat{TBuilder}(TBuilder, string, object?)"/> methods to append small strings.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static TBuilder AppendFormat<TBuilder>(this TBuilder text, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, object? arg0, object? arg1, object? arg2)
             where TBuilder : SynchronizedTextBuilder
         {
@@ -368,6 +371,7 @@ namespace J2N.Text
         /// the value of its <see cref="SynchronizedTextBuilder.MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append{TBuilder}(TBuilder, string?)"/>
         /// and <see cref="AppendFormat{TBuilder}(TBuilder, string, object?)"/> methods to append small strings.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static TBuilder AppendFormat<TBuilder>(this TBuilder text, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, params object?[] args)
             where TBuilder : SynchronizedTextBuilder
         {
@@ -456,6 +460,7 @@ namespace J2N.Text
         /// the value of its <see cref="SynchronizedTextBuilder.MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append{TBuilder}(TBuilder, string?)"/>
         /// and <see cref="AppendFormat{TBuilder}(TBuilder, string, object?)"/> methods to append small strings.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static TBuilder AppendFormat<TBuilder>(this TBuilder text, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, params ReadOnlySpan<object?> args)
             where TBuilder : SynchronizedTextBuilder
         {
@@ -559,6 +564,7 @@ namespace J2N.Text
         /// the value of its <see cref="SynchronizedTextBuilder.MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append{TBuilder}(TBuilder, string?)"/>
         /// and <see cref="AppendFormat{TBuilder}(TBuilder, string, object?)"/> methods to append small strings.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static TBuilder AppendFormat<TBuilder>(this TBuilder text, IFormatProvider? provider, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, object? arg0)
             where TBuilder : SynchronizedTextBuilder
         {
@@ -662,6 +668,7 @@ namespace J2N.Text
         /// the value of its <see cref="SynchronizedTextBuilder.MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append{TBuilder}(TBuilder, string?)"/>
         /// and <see cref="AppendFormat{TBuilder}(TBuilder, string, object?)"/> methods to append small strings.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static TBuilder AppendFormat<TBuilder>(this TBuilder text, IFormatProvider? provider, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, object? arg0, object? arg1)
             where TBuilder : SynchronizedTextBuilder
         {
@@ -767,6 +774,7 @@ namespace J2N.Text
         /// the value of its <see cref="SynchronizedTextBuilder.MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append{TBuilder}(TBuilder, string?)"/>
         /// and <see cref="AppendFormat{TBuilder}(TBuilder, string, object?)"/> methods to append small strings.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static TBuilder AppendFormat<TBuilder>(this TBuilder text, IFormatProvider? provider, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, object? arg0, object? arg1, object? arg2)
             where TBuilder : SynchronizedTextBuilder
         {
@@ -870,6 +878,7 @@ namespace J2N.Text
         /// the value of its <see cref="SynchronizedTextBuilder.MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append{TBuilder}(TBuilder, string?)"/>
         /// and <see cref="AppendFormat{TBuilder}(TBuilder, string, object?)"/> methods to append small strings.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static TBuilder AppendFormat<TBuilder>(this TBuilder text, IFormatProvider? provider, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, params object?[] args)
             where TBuilder : SynchronizedTextBuilder
         {
@@ -973,6 +982,7 @@ namespace J2N.Text
         /// the value of its <see cref="SynchronizedTextBuilder.MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append{TBuilder}(TBuilder, string?)"/>
         /// and <see cref="AppendFormat{TBuilder}(TBuilder, string, object?)"/> methods to append small strings.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static TBuilder AppendFormat<TBuilder>(this TBuilder text, IFormatProvider? provider, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, params ReadOnlySpan<object?> args)
             where TBuilder : SynchronizedTextBuilder
         {
@@ -986,6 +996,7 @@ namespace J2N.Text
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static TBuilder AppendJoin<TBuilder>(this TBuilder text, string? separator, params object?[] values)
             where TBuilder : SynchronizedTextBuilder
         {
@@ -999,6 +1010,7 @@ namespace J2N.Text
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static TBuilder AppendJoin<TBuilder>(this TBuilder text, string? separator, params ReadOnlySpan<object?> values)
             where TBuilder : SynchronizedTextBuilder
         {
@@ -1012,6 +1024,7 @@ namespace J2N.Text
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static TBuilder AppendJoin<TBuilder, T>(this TBuilder text, string? separator, IEnumerable<T> values)
             where TBuilder : SynchronizedTextBuilder
         {
@@ -1025,6 +1038,7 @@ namespace J2N.Text
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static TBuilder AppendJoin<TBuilder>(this TBuilder text, string? separator, params string?[] values)
             where TBuilder : SynchronizedTextBuilder
         {
@@ -1038,6 +1052,7 @@ namespace J2N.Text
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static TBuilder AppendJoin<TBuilder>(this TBuilder text, string? separator, params ReadOnlySpan<string?> values)
             where TBuilder : SynchronizedTextBuilder
         {
@@ -1051,6 +1066,7 @@ namespace J2N.Text
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static TBuilder AppendJoin<TBuilder>(this TBuilder text, char separator, params object?[] values)
             where TBuilder : SynchronizedTextBuilder
         {
@@ -1064,6 +1080,7 @@ namespace J2N.Text
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static TBuilder AppendJoin<TBuilder>(this TBuilder text, char separator, params ReadOnlySpan<object?> values)
             where TBuilder : SynchronizedTextBuilder
         {
@@ -1077,6 +1094,7 @@ namespace J2N.Text
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static TBuilder AppendJoin<TBuilder, T>(this TBuilder text, char separator, IEnumerable<T> values)
             where TBuilder : SynchronizedTextBuilder
         {
@@ -1090,6 +1108,7 @@ namespace J2N.Text
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static TBuilder AppendJoin<TBuilder>(this TBuilder text, char separator, params string?[] values)
             where TBuilder : SynchronizedTextBuilder
         {
@@ -1103,6 +1122,7 @@ namespace J2N.Text
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static TBuilder AppendJoin<TBuilder>(this TBuilder text, char separator, params ReadOnlySpan<string?> values)
             where TBuilder : SynchronizedTextBuilder
         {
@@ -1130,6 +1150,7 @@ namespace J2N.Text
         /// <para/>
         /// If <paramref name="culture"/> is <see langword="null"/>, <see cref="CultureInfo.CurrentCulture"/> will be used.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TBuilder AppendUpper<TBuilder>(this TBuilder text, string? value, CultureInfo? culture)
             where TBuilder : SynchronizedTextBuilder
         {
@@ -1157,6 +1178,7 @@ namespace J2N.Text
         /// <para/>
         /// If <paramref name="culture"/> is <see langword="null"/>, <see cref="CultureInfo.CurrentCulture"/> will be used.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TBuilder AppendUpper<TBuilder>(this TBuilder text, ReadOnlySpan<char> value, CultureInfo? culture)
             where TBuilder : SynchronizedTextBuilder
         {
@@ -1179,6 +1201,7 @@ namespace J2N.Text
         /// <param name="value">The string to append.</param>
         /// <returns>A reference to this instance after the operation has completed.</returns>
         /// <remarks>The capacity of this instance is adjusted as needed.</remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TBuilder AppendUpperInvariant<TBuilder>(this TBuilder text, string? value)
             where TBuilder : SynchronizedTextBuilder
         {
@@ -1201,6 +1224,7 @@ namespace J2N.Text
         /// <param name="value">The read-only character span to append.</param>
         /// <returns>A reference to this instance after the operation has completed.</returns>
         /// <remarks>The capacity of this instance is adjusted as needed.</remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TBuilder AppendUpperInvariant<TBuilder>(this TBuilder text, ReadOnlySpan<char> value)
             where TBuilder : SynchronizedTextBuilder
         {
@@ -1228,6 +1252,7 @@ namespace J2N.Text
         /// <para/>
         /// If <paramref name="culture"/> is <see langword="null"/>, <see cref="CultureInfo.CurrentCulture"/> will be used.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TBuilder AppendLower<TBuilder>(this TBuilder text, string? value, CultureInfo? culture)
             where TBuilder : SynchronizedTextBuilder
         {
@@ -1251,6 +1276,7 @@ namespace J2N.Text
         /// <param name="culture">An object that supplies culture-specific casing rules.</param>
         /// <returns>A reference to this instance after the operation has completed.</returns>
         /// <remarks>The capacity of this instance is adjusted as needed.</remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TBuilder AppendLower<TBuilder>(this TBuilder text, ReadOnlySpan<char> value, CultureInfo? culture)
             where TBuilder : SynchronizedTextBuilder
         {
@@ -1273,6 +1299,7 @@ namespace J2N.Text
         /// <param name="value">The string to append.</param>
         /// <returns>A reference to this instance after the operation has completed.</returns>
         /// <remarks>The capacity of this instance is adjusted as needed.</remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TBuilder AppendLowerInvariant<TBuilder>(this TBuilder text, string? value)
             where TBuilder : SynchronizedTextBuilder
         {
@@ -1295,6 +1322,7 @@ namespace J2N.Text
         /// <param name="value">The read-only character span to append.</param>
         /// <returns>A reference to this instance after the operation has completed.</returns>
         /// <remarks>The capacity of this instance is adjusted as needed.</remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TBuilder AppendLowerInvariant<TBuilder>(this TBuilder text, ReadOnlySpan<char> value)
             where TBuilder : SynchronizedTextBuilder
         {
@@ -1327,6 +1355,7 @@ namespace J2N.Text
         /// <param name="codePoint">A Unicode code point.</param>
         /// <returns>A reference to this instance after the operation has completed.</returns>
         /// <exception cref="ArgumentException"><paramref name="codePoint"/> is not a valid Unicode code point.</exception>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TBuilder AppendCodePoint<TBuilder>(this TBuilder text, int codePoint)
             where TBuilder : SynchronizedTextBuilder
         {
@@ -1364,6 +1393,7 @@ namespace J2N.Text
         /// than the length of this instance.
         /// </exception>
         /// <exception cref="ArgumentException"><paramref name="codePoint"/> is not a valid Unicode code point.</exception>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TBuilder InsertCodePoint<TBuilder>(this TBuilder text, int index, int codePoint)
             where TBuilder : SynchronizedTextBuilder
         {
@@ -1392,6 +1422,7 @@ namespace J2N.Text
         /// The capacity of this instance is adjusted as needed.
         /// </remarks>
         /// <seealso cref="bool" />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TBuilder Append<TBuilder>(this TBuilder text, bool value)
             where TBuilder : SynchronizedTextBuilder
         {
@@ -1420,6 +1451,7 @@ namespace J2N.Text
         /// <remarks>The capacity of this instance is adjusted as needed.</remarks>
         /// <seealso cref="bool" />
         /// <seealso cref="BooleanFormat" />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TBuilder Append<TBuilder>(this TBuilder text, bool value, BooleanFormat format)
             where TBuilder : SynchronizedTextBuilder
         {
@@ -1457,6 +1489,7 @@ namespace J2N.Text
         /// Existing characters are shifted to make room for the new text. The capacity is adjusted as needed.
         /// </remarks>
         /// <seealso cref="bool" />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TBuilder Insert<TBuilder>(this TBuilder text, int index, bool value)
             where TBuilder : SynchronizedTextBuilder
         {
@@ -1494,6 +1527,7 @@ namespace J2N.Text
         /// <remarks>Existing characters are shifted to make room for the new text. The capacity is adjusted as needed.</remarks>
         /// <seealso cref="bool" />
         /// <seealso cref="BooleanFormat" />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TBuilder Insert<TBuilder>(this TBuilder text, int index, bool value, BooleanFormat format)
             where TBuilder : SynchronizedTextBuilder
         {
@@ -1527,6 +1561,7 @@ namespace J2N.Text
         /// the value of its <see cref="SynchronizedTextBuilder.MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append{TBuilder}(TBuilder, string?)"/>
         /// and <see cref="AppendFormat{TBuilder}(TBuilder, string, object?)"/> methods to append small strings.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TBuilder AppendLine<TBuilder>(this TBuilder text)
             where TBuilder : SynchronizedTextBuilder
         {
@@ -1565,6 +1600,7 @@ namespace J2N.Text
         /// and <see cref="AppendFormat{TBuilder}(TBuilder, string, object?)"/> methods to append small strings.
         /// </remarks>
         /// <seealso cref="string" />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TBuilder AppendLine<TBuilder>(this TBuilder text, string? value)
             where TBuilder : SynchronizedTextBuilder
         {
@@ -1603,6 +1639,7 @@ namespace J2N.Text
         /// and <see cref="AppendFormat{TBuilder}(TBuilder, string, object?)"/> methods to append small strings.
         /// </remarks>
         /// <seealso cref="ReadOnlySpan{Char}" />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TBuilder AppendLine<TBuilder>(this TBuilder text, ReadOnlySpan<char> value)
             where TBuilder : SynchronizedTextBuilder
         {
@@ -1632,6 +1669,7 @@ namespace J2N.Text
         /// Callers must synchronize externally using <see cref = "SynchronizedTextBuilder.SyncRoot" /> property for the
         /// entire duration of memory usage if concurrent mutation is possible.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ReadOnlyMemory<char> AsMemory(this SynchronizedTextBuilder? text)
         {
             if (text is null)
@@ -2035,6 +2073,7 @@ namespace J2N.Text
         /// <see cref="Clear"/> is a convenience method that is equivalent to setting
         /// the <see cref="SynchronizedTextBuilder.Length"/> property of the current instance to 0 (zero).
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TBuilder Clear<TBuilder>(this TBuilder text)
             where TBuilder : SynchronizedTextBuilder
         {
@@ -2071,6 +2110,7 @@ namespace J2N.Text
         /// <para/>
         /// <paramref name="index"/> refers to the original buffer before insertion takes place.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TBuilder InsertFromSelf<TBuilder>(this TBuilder text, int index, Range range)
             where TBuilder : SynchronizedTextBuilder
         {
@@ -2115,6 +2155,7 @@ namespace J2N.Text
         /// <paramref name="index"/> refers to the original buffer before insertion
         /// takes place.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TBuilder InsertFromSelf<TBuilder>(this TBuilder text, int index, int startIndex, int count)
             where TBuilder : SynchronizedTextBuilder
         {
@@ -2162,6 +2203,7 @@ namespace J2N.Text
         /// <seealso cref="StringExtensions.ReverseText(string)" />
         /// <seealso cref="MemoryExtensions.ReverseText(Span{char})" />
         /// <seealso cref="StringBuilderExtensions.Reverse(StringBuilder)" />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TBuilder Reverse<TBuilder>(this TBuilder text)
             where TBuilder : SynchronizedTextBuilder
         {
@@ -2204,6 +2246,7 @@ namespace J2N.Text
         /// </remarks>
         /// <seealso cref="sbyte" />
         [CLSCompliant(false)]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TBuilder Append<TBuilder>(this TBuilder text, sbyte value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
             where TBuilder : SynchronizedTextBuilder
         {
@@ -2245,6 +2288,7 @@ namespace J2N.Text
         /// and <see cref="AppendFormat{TBuilder}(TBuilder, string, object?)"/> methods to append small strings.
         /// </remarks>
         /// <seealso cref="byte" />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TBuilder Append<TBuilder>(this TBuilder text, byte value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
             where TBuilder : SynchronizedTextBuilder
         {
@@ -2286,6 +2330,7 @@ namespace J2N.Text
         /// and <see cref="AppendFormat{TBuilder}(TBuilder, string, object?)"/> methods to append small strings.
         /// </remarks>
         /// <seealso cref="short" />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TBuilder Append<TBuilder>(this TBuilder text, short value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
             where TBuilder : SynchronizedTextBuilder
         {
@@ -2327,6 +2372,7 @@ namespace J2N.Text
         /// and <see cref="AppendFormat{TBuilder}(TBuilder, string, object?)"/> methods to append small strings.
         /// </remarks>
         /// <seealso cref="int" />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TBuilder Append<TBuilder>(this TBuilder text, int value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
             where TBuilder : SynchronizedTextBuilder
         {
@@ -2368,6 +2414,7 @@ namespace J2N.Text
         /// and <see cref="AppendFormat{TBuilder}(TBuilder, string, object?)"/> methods to append small strings.
         /// </remarks>
         /// <seealso cref="long" />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TBuilder Append<TBuilder>(this TBuilder text, long value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
             where TBuilder : SynchronizedTextBuilder
         {
@@ -2409,6 +2456,7 @@ namespace J2N.Text
         /// and <see cref="AppendFormat{TBuilder}(TBuilder, string, object?)"/> methods to append small strings.
         /// </remarks>
         /// <seealso cref="float" />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TBuilder Append<TBuilder>(this TBuilder text, float value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
             where TBuilder : SynchronizedTextBuilder
         {
@@ -2450,6 +2498,7 @@ namespace J2N.Text
         /// and <see cref="AppendFormat{TBuilder}(TBuilder, string, object?)"/> methods to append small strings.
         /// </remarks>
         /// <seealso cref="double" />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TBuilder Append<TBuilder>(this TBuilder text, double value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
             where TBuilder : SynchronizedTextBuilder
         {
@@ -2491,6 +2540,7 @@ namespace J2N.Text
         /// and <see cref="AppendFormat{TBuilder}(TBuilder, string, object?)"/> methods to append small strings.
         /// </remarks>
         /// <seealso cref="decimal" />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TBuilder Append<TBuilder>(this TBuilder text, decimal value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
             where TBuilder : SynchronizedTextBuilder
         {
@@ -2533,6 +2583,7 @@ namespace J2N.Text
         /// </remarks>
         /// <seealso cref="ushort" />
         [CLSCompliant(false)]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TBuilder Append<TBuilder>(this TBuilder text, ushort value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
             where TBuilder : SynchronizedTextBuilder
         {
@@ -2575,6 +2626,7 @@ namespace J2N.Text
         /// </remarks>
         /// <seealso cref="uint" />
         [CLSCompliant(false)]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TBuilder Append<TBuilder>(this TBuilder text, uint value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
             where TBuilder : SynchronizedTextBuilder
         {
@@ -2617,6 +2669,7 @@ namespace J2N.Text
         /// </remarks>
         /// <seealso cref="ulong" />
         [CLSCompliant(false)]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TBuilder Append<TBuilder>(this TBuilder text, ulong value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
             where TBuilder : SynchronizedTextBuilder
         {
@@ -2656,6 +2709,7 @@ namespace J2N.Text
         /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
         /// <seealso cref="sbyte" />
         [CLSCompliant(false)]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TBuilder Insert<TBuilder>(this TBuilder text, int index, sbyte value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
             where TBuilder : SynchronizedTextBuilder
         {
@@ -2694,6 +2748,7 @@ namespace J2N.Text
         /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
         /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
         /// <seealso cref="byte" />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TBuilder Insert<TBuilder>(this TBuilder text, int index, byte value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
             where TBuilder : SynchronizedTextBuilder
         {
@@ -2732,6 +2787,7 @@ namespace J2N.Text
         /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
         /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
         /// <seealso cref="short" />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TBuilder Insert<TBuilder>(this TBuilder text, int index, short value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
             where TBuilder : SynchronizedTextBuilder
         {
@@ -2770,6 +2826,7 @@ namespace J2N.Text
         /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
         /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
         /// <seealso cref="int" />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TBuilder Insert<TBuilder>(this TBuilder text, int index, int value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
             where TBuilder : SynchronizedTextBuilder
         {
@@ -2808,6 +2865,7 @@ namespace J2N.Text
         /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
         /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
         /// <seealso cref="long" />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TBuilder Insert<TBuilder>(this TBuilder text, int index, long value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
             where TBuilder : SynchronizedTextBuilder
         {
@@ -2846,6 +2904,7 @@ namespace J2N.Text
         /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
         /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
         /// <seealso cref="float" />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TBuilder Insert<TBuilder>(this TBuilder text, int index, float value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
             where TBuilder : SynchronizedTextBuilder
         {
@@ -2884,6 +2943,7 @@ namespace J2N.Text
         /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
         /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
         /// <seealso cref="double" />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TBuilder Insert<TBuilder>(this TBuilder text, int index, double value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
             where TBuilder : SynchronizedTextBuilder
         {
@@ -2922,6 +2982,7 @@ namespace J2N.Text
         /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
         /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
         /// <seealso cref="decimal" />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TBuilder Insert<TBuilder>(this TBuilder text, int index, decimal value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
             where TBuilder : SynchronizedTextBuilder
         {
@@ -2961,6 +3022,7 @@ namespace J2N.Text
         /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
         /// <seealso cref="ushort" />
         [CLSCompliant(false)]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TBuilder Insert<TBuilder>(this TBuilder text, int index, ushort value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
             where TBuilder : SynchronizedTextBuilder
         {
@@ -3000,6 +3062,7 @@ namespace J2N.Text
         /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
         /// <seealso cref="uint" />
         [CLSCompliant(false)]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TBuilder Insert<TBuilder>(this TBuilder text, int index, uint value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
             where TBuilder : SynchronizedTextBuilder
         {
@@ -3039,6 +3102,7 @@ namespace J2N.Text
         /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
         /// <seealso cref="ulong" />
         [CLSCompliant(false)]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TBuilder Insert<TBuilder>(this TBuilder text, int index, ulong value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
             where TBuilder : SynchronizedTextBuilder
         {
@@ -3075,6 +3139,7 @@ namespace J2N.Text
         /// <para/>
         /// <paramref name="startIndex"/> is greater than <see cref="SynchronizedTextBuilder.Length"/>.
         /// </exception>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TBuilder Delete<TBuilder>(this TBuilder text, int startIndex, int count)
             where TBuilder : SynchronizedTextBuilder
         {
@@ -3103,6 +3168,7 @@ namespace J2N.Text
         /// the string value of the current instance is shortened by 1. The capacity of the
         /// current instance is unaffected.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TBuilder RemoveAt<TBuilder>(this TBuilder text, int index)
             where TBuilder : SynchronizedTextBuilder
         {
@@ -3132,6 +3198,7 @@ namespace J2N.Text
         /// the string value of the current instance is shortened by <paramref name="length"/>. The capacity of the
         /// current instance is unaffected.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TBuilder Remove<TBuilder>(this TBuilder text, int startIndex, int length)
             where TBuilder : SynchronizedTextBuilder
         {
@@ -3183,6 +3250,7 @@ namespace J2N.Text
         /// and <see cref="AppendFormat{TBuilder}(TBuilder, string, object?)"/> methods to append small strings.
         /// </remarks>
         /// <seealso cref="char" />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TBuilder Append<TBuilder>(this TBuilder text, char value, int repeatCount)
             where TBuilder : SynchronizedTextBuilder
         {
@@ -3220,6 +3288,7 @@ namespace J2N.Text
         /// This <see cref="SynchronizedTextBuilder"/> object is not changed if <paramref name="value"/> is <see langword="null"/>,
         /// <paramref name="value"/> is not <see langword="null"/> but its length is zero, or <paramref name="repeatCount"/> is zero.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TBuilder Insert<TBuilder>(this TBuilder text, int index, string? value, int repeatCount)
             where TBuilder : SynchronizedTextBuilder
         {
@@ -3257,6 +3326,7 @@ namespace J2N.Text
         /// This <see cref="SynchronizedTextBuilder"/> object is not changed if the length of <paramref name="value"/> is zero or
         /// <paramref name="repeatCount"/> is zero.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TBuilder Insert<TBuilder>(this TBuilder text, int index, ReadOnlySpan<char> value, int repeatCount)
             where TBuilder : SynchronizedTextBuilder
         {
@@ -3294,6 +3364,7 @@ namespace J2N.Text
         /// This <see cref="SynchronizedTextBuilder"/> object is not changed if the length of <paramref name="value"/> is zero or
         /// <paramref name="repeatCount"/> is zero.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TBuilder Insert<TBuilder>(this TBuilder text, int index, StringBuilder? value, int repeatCount)
             where TBuilder : SynchronizedTextBuilder
         {
@@ -3331,6 +3402,7 @@ namespace J2N.Text
         /// This <see cref="SynchronizedTextBuilder"/> object is not changed if the length of <paramref name="value"/> is zero or
         /// <paramref name="repeatCount"/> is zero.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TBuilder Insert<TBuilder>(this TBuilder text, int index, ICharSequence? value, int repeatCount)
             where TBuilder : SynchronizedTextBuilder
         {
@@ -3359,6 +3431,7 @@ namespace J2N.Text
         /// <paramref name="oldValue"/> are removed.
         /// </remarks>
         /// <seealso cref="Remove{TBuilder}(TBuilder, int, int)" />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TBuilder Replace<TBuilder>(this TBuilder text, string oldValue, string? newValue)
             where TBuilder : SynchronizedTextBuilder
         {
@@ -3385,6 +3458,7 @@ namespace J2N.Text
         /// current instance. If <paramref name="newValue"/> is empty, all occurrences of <paramref name="oldValue"/> are removed.
         /// </remarks>
         /// <seealso cref="Remove{TBuilder}(TBuilder, int, int)" />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TBuilder Replace<TBuilder>(this TBuilder text, ReadOnlySpan<char> oldValue, ReadOnlySpan<char> newValue)
             where TBuilder : SynchronizedTextBuilder
         {
@@ -3425,6 +3499,7 @@ namespace J2N.Text
         /// all occurrences of <paramref name="oldValue"/> in the specified range are removed.
         /// </remarks>
         /// <seealso cref="Remove{TBuilder}(TBuilder, int, int)" />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TBuilder Replace<TBuilder>(this TBuilder text, string oldValue, string? newValue, int startIndex, int count)
             where TBuilder : SynchronizedTextBuilder
         {
@@ -3464,6 +3539,7 @@ namespace J2N.Text
         /// in the specified range are removed.
         /// </remarks>
         /// <seealso cref="Remove{TBuilder}(TBuilder, int, int)" />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TBuilder Replace<TBuilder>(this TBuilder text, ReadOnlySpan<char> oldValue, ReadOnlySpan<char> newValue, int startIndex, int count)
             where TBuilder : SynchronizedTextBuilder
         {
@@ -3488,6 +3564,7 @@ namespace J2N.Text
         /// <paramref name="oldChar"/> in the current instance. The size of the current
         /// <see cref="SynchronizedTextBuilder"/> instance is unchanged after the replacement.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TBuilder Replace<TBuilder>(this TBuilder text, char oldChar, char newChar)
             where TBuilder : SynchronizedTextBuilder
         {
@@ -3521,6 +3598,7 @@ namespace J2N.Text
         /// <paramref name="oldChar"/> in the current instance within the specified substring. The size of the current
         /// <see cref="SynchronizedTextBuilder"/> instance is unchanged after the replacement.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TBuilder Replace<TBuilder>(this TBuilder text, char oldChar, char newChar, int startIndex, int count)
             where TBuilder : SynchronizedTextBuilder
         {
@@ -3562,6 +3640,7 @@ namespace J2N.Text
         /// <para/>
         /// <paramref name="startIndex"/> is greater than or equal to <see cref="SynchronizedTextBuilder.Length"/>.
         /// </exception>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TBuilder Replace<TBuilder>(this TBuilder text, int startIndex, int count, string newValue)
             where TBuilder : SynchronizedTextBuilder
         {
@@ -3603,6 +3682,7 @@ namespace J2N.Text
         /// <paramref name="startIndex"/> is greater than or equal to <see cref="SynchronizedTextBuilder.Length"/>.
         /// </exception>
         /// <remarks>This method allows <paramref name="newValue"/> to be this instance or a slice of this instance.</remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TBuilder Replace<TBuilder>(this TBuilder text, int startIndex, int count, ReadOnlySpan<char> newValue)
             where TBuilder : SynchronizedTextBuilder
         {
@@ -3649,6 +3729,7 @@ namespace J2N.Text
         /// and <see cref="AppendFormat{TBuilder}(TBuilder, string, object?)"/> methods to append small strings.
         /// </remarks>
         /// <seealso cref="char" />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TBuilder Append<TBuilder>(this TBuilder text, char value)
             where TBuilder : SynchronizedTextBuilder
         {
@@ -3695,6 +3776,7 @@ namespace J2N.Text
         /// and <see cref="AppendFormat{TBuilder}(TBuilder, string, object?)"/> methods to append small strings.
         /// </remarks>
         /// <seealso cref="char" />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TBuilder Append<TBuilder>(this TBuilder text, char[]? value)
             where TBuilder : SynchronizedTextBuilder
         {
@@ -3768,6 +3850,7 @@ namespace J2N.Text
         /// and <see cref="AppendFormat{TBuilder}(TBuilder, string, object?)"/> methods to append small strings.
         /// </remarks>
         /// <seealso cref="char" />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TBuilder Append<TBuilder>(this TBuilder text, char[]? value, int startIndex, int charCount)
             where TBuilder : SynchronizedTextBuilder
         {
@@ -3813,6 +3896,7 @@ namespace J2N.Text
         /// and <see cref="AppendFormat{TBuilder}(TBuilder, string, object?)"/> methods to append small strings.
         /// </remarks>
         [CLSCompliant(false)]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static unsafe TBuilder Append<TBuilder>(this TBuilder text, char* value, int valueCount)
             where TBuilder : SynchronizedTextBuilder
         {
@@ -3858,6 +3942,7 @@ namespace J2N.Text
         /// and <see cref="AppendFormat{TBuilder}(TBuilder, string, object?)"/> methods to append small strings.
         /// </remarks>
         /// <seealso cref="string" />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TBuilder Append<TBuilder>(this TBuilder text, string? value)
             where TBuilder : SynchronizedTextBuilder
         {
@@ -3936,6 +4021,7 @@ namespace J2N.Text
         /// methods to append small strings.
         /// </remarks>
         /// <seealso cref="string" />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TBuilder Append<TBuilder>(this TBuilder text, string? value, int startIndex, int count)
             where TBuilder : SynchronizedTextBuilder
         {
@@ -3955,6 +4041,7 @@ namespace J2N.Text
         /// <param name="value">The read-only character span to append.</param>
         /// <returns>A reference to this instance after the operation has completed.</returns>
         /// <seealso cref="ReadOnlySpan{Char}" />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TBuilder Append<TBuilder>(this TBuilder text, ReadOnlySpan<char> value)
             where TBuilder : SynchronizedTextBuilder
         {
@@ -3974,6 +4061,7 @@ namespace J2N.Text
         /// <param name="value">The read-only character memory region to append.</param>
         /// <returns>A reference to this instance after the operation has completed.</returns>
         /// <seealso cref="ReadOnlyMemory{Char}" />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TBuilder Append<TBuilder>(this TBuilder text, ReadOnlyMemory<char> value)
             where TBuilder : SynchronizedTextBuilder
         {
@@ -4011,6 +4099,7 @@ namespace J2N.Text
         /// and <see cref="AppendFormat{TBuilder}(TBuilder, string, object?)"/> methods to append small strings.
         /// </remarks>
         /// <seealso cref="StringBuilder" />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TBuilder Append<TBuilder>(this TBuilder text, StringBuilder? value)
             where TBuilder : SynchronizedTextBuilder
         {
@@ -4089,6 +4178,7 @@ namespace J2N.Text
         /// and <see cref="AppendFormat{TBuilder}(TBuilder, string, object?)"/> methods to append small strings.
         /// </remarks>
         /// <seealso cref="StringBuilder" />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TBuilder Append<TBuilder>(this TBuilder text, StringBuilder? value, int startIndex, int count)
             where TBuilder : SynchronizedTextBuilder
         {
@@ -4114,6 +4204,7 @@ namespace J2N.Text
         /// <returns>A reference to this instance after the operation has completed.</returns>
         /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed <see cref="SynchronizedTextBuilder.MaxCapacity"/>.</exception>
         /// <seealso cref="ICharSequence" />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TBuilder Append<TBuilder>(this TBuilder text, ICharSequence? value)
             where TBuilder : SynchronizedTextBuilder
         {
@@ -4154,6 +4245,7 @@ namespace J2N.Text
         /// Enlarging the value of this instance would exceed <see cref="SynchronizedTextBuilder.MaxCapacity"/>.
         /// </exception>
         /// <seealso cref="ICharSequence" />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TBuilder Append<TBuilder>(this TBuilder text, ICharSequence? value, int startIndex, int count)
             where TBuilder : SynchronizedTextBuilder
         {
@@ -4183,6 +4275,7 @@ namespace J2N.Text
         /// </exception>
         /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
         /// <seealso cref="char" />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TBuilder Insert<TBuilder>(this TBuilder text, int index, char value)
             where TBuilder : SynchronizedTextBuilder
         {
@@ -4219,6 +4312,7 @@ namespace J2N.Text
         /// If <paramref name="value"/> is <see langword="null"/>, the <see cref="SynchronizedTextBuilder"/> is not changed.
         /// </remarks>
         /// <seealso cref="char" />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TBuilder Insert<TBuilder>(this TBuilder text, int index, char[]? value)
             where TBuilder : SynchronizedTextBuilder
         {
@@ -4264,6 +4358,7 @@ namespace J2N.Text
         /// </exception>
         /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
         /// <seealso cref="char" />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TBuilder Insert<TBuilder>(this TBuilder text, int index, char[]? value, int startIndex, int charCount)
             where TBuilder : SynchronizedTextBuilder
         {
@@ -4303,6 +4398,7 @@ namespace J2N.Text
         /// Existing characters are shifted to make room for the new text. The capacity is adjusted as needed.
         /// </remarks>
         [CLSCompliant(false)]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static unsafe TBuilder Insert<TBuilder>(this TBuilder text, int index, char* value, int valueCount)
             where TBuilder : SynchronizedTextBuilder
         {
@@ -4336,6 +4432,7 @@ namespace J2N.Text
         /// This instance of <see cref="SynchronizedTextBuilder"/> is not changed if <paramref name="value"/> is <see langword="null"/>,
         /// or <paramref name="value"/> is not <see langword="null"/> but its length is zero.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TBuilder Insert<TBuilder>(this TBuilder text, int index, string? value)
             where TBuilder : SynchronizedTextBuilder
         {
@@ -4378,6 +4475,7 @@ namespace J2N.Text
         /// </exception>
         /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
         /// <seealso cref="char" />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TBuilder Insert<TBuilder>(this TBuilder text, int index, string? value, int startIndex, int count)
             where TBuilder : SynchronizedTextBuilder
         {
@@ -4402,6 +4500,7 @@ namespace J2N.Text
         /// <paramref name="value"/> to insert it. The capacity is adjusted as needed.
         /// </remarks>
         /// <seealso cref="ReadOnlySpan{Char}" />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TBuilder Insert<TBuilder>(this TBuilder text, int index, ReadOnlySpan<char> value)
             where TBuilder : SynchronizedTextBuilder
         {
@@ -4428,6 +4527,7 @@ namespace J2N.Text
         /// <para/>
         /// Enlarging the value of this instance would exceed <see cref="SynchronizedTextBuilder.MaxCapacity"/>.
         /// </exception>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TBuilder Insert<TBuilder>(this TBuilder text, int index, StringBuilder? value)
             where TBuilder : SynchronizedTextBuilder
         {
@@ -4469,6 +4569,7 @@ namespace J2N.Text
         /// <para/>
         /// Enlarging the value of this instance would exceed <see cref="SynchronizedTextBuilder.MaxCapacity"/>.
         /// </exception>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TBuilder Insert<TBuilder>(this TBuilder text, int index, StringBuilder? value, int startIndex, int count)
             where TBuilder : SynchronizedTextBuilder
         {
@@ -4495,6 +4596,7 @@ namespace J2N.Text
         /// <para/>
         /// Enlarging the value of this instance would exceed <see cref="SynchronizedTextBuilder.MaxCapacity"/>.
         /// </exception>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TBuilder Insert<TBuilder>(this TBuilder text, int index, ICharSequence? value)
             where TBuilder : SynchronizedTextBuilder
         {
@@ -4536,6 +4638,7 @@ namespace J2N.Text
         /// <para/>
         /// Enlarging the value of this instance would exceed <see cref="SynchronizedTextBuilder.MaxCapacity"/>.
         /// </exception>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TBuilder Insert<TBuilder>(this TBuilder text, int index, ICharSequence? value, int startIndex, int count)
             where TBuilder : SynchronizedTextBuilder
         {

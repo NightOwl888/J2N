@@ -5,6 +5,7 @@ using J2N.CodeGeneration;
 using J2N.Collections.Generic;
 using System;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace J2N.Text
@@ -21,6 +22,7 @@ namespace J2N.Text
         /// <see cref="MutableTextBufferExtensions.Replace{TBuilder}(TBuilder, string, string?)"/>.
         /// Update that documentation if the behavior changes.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationExtensionImplementation]
         internal void ReplaceInternal(string oldValue, string? newValue) => ReplaceInternal(oldValue, newValue, 0, Length);
 
@@ -32,6 +34,7 @@ namespace J2N.Text
         /// <see cref="MutableTextBufferExtensions.Replace{TBuilder}(TBuilder, ReadOnlySpan{char}, ReadOnlySpan{char})"/>.
         /// Update that documentation if the behavior changes.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationExtensionImplementation]
         internal void ReplaceInternal(ReadOnlySpan<char> oldValue, ReadOnlySpan<char> newValue) => ReplaceInternal(oldValue, newValue, 0, Length);
 
@@ -43,6 +46,7 @@ namespace J2N.Text
         /// <see cref="MutableTextBufferExtensions.Replace{TBuilder}(TBuilder, string, string?, int, int)"/>.
         /// Update that documentation if the behavior changes.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationExtensionImplementation]
         internal void ReplaceInternal(string oldValue, string? newValue, int startIndex, int count)
         {
@@ -184,6 +188,7 @@ namespace J2N.Text
         /// <see cref="MutableTextBufferExtensions.Replace{TBuilder}(TBuilder, char, char)"/>.
         /// Update that documentation if the behavior changes.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationExtensionImplementation]
         internal void ReplaceInternal(char oldChar, char newChar)
         {
@@ -198,6 +203,7 @@ namespace J2N.Text
         /// <see cref="MutableTextBufferExtensions.Replace{TBuilder}(TBuilder, char, char, int, int)"/>.
         /// Update that documentation if the behavior changes.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationExtensionImplementation]
         internal void ReplaceInternal(char oldChar, char newChar, int startIndex, int count)
         {
@@ -308,6 +314,7 @@ namespace J2N.Text
         /// <see cref="MutableTextBufferExtensions.Replace{TBuilder}(TBuilder, int, int, string)"/>.
         /// Update that documentation if the behavior changes.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationExtensionImplementation]
         internal void ReplaceInternal(int startIndex, int count, string newValue)
         {
@@ -329,6 +336,7 @@ namespace J2N.Text
         /// <see cref="MutableTextBufferExtensions.Replace{TBuilder}(TBuilder, int, int, ReadOnlySpan{char})"/>.
         /// Update that documentation if the behavior changes.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationExtensionImplementation]
         internal void ReplaceInternal(int startIndex, int count, ReadOnlySpan<char> newValue)
         {

@@ -19,6 +19,7 @@
 using J2N.CodeGeneration;
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 namespace J2N.Text
 {
@@ -26,6 +27,7 @@ namespace J2N.Text
     {
 #pragma warning disable CS1591 // J2N TODO: Finish docs
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationGenerateForwarder]
         internal static TBuilder AppendJoin<TBuilder>(this TBuilder text, string? separator, params object?[] values)
             where TBuilder : MutableTextBuffer
@@ -37,6 +39,7 @@ namespace J2N.Text
             return text;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationGenerateForwarder]
         internal static TBuilder AppendJoin<TBuilder>(this TBuilder text, string? separator, params ReadOnlySpan<object?> values)
             where TBuilder : MutableTextBuffer
@@ -48,6 +51,7 @@ namespace J2N.Text
             return text;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationGenerateForwarder]
         internal static TBuilder AppendJoin<TBuilder, T>(this TBuilder text, string? separator, IEnumerable<T> values)
             where TBuilder : MutableTextBuffer
@@ -59,6 +63,7 @@ namespace J2N.Text
             return text;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationGenerateForwarder]
         internal static TBuilder AppendJoin<TBuilder>(this TBuilder text, string? separator, params string?[] values)
             where TBuilder : MutableTextBuffer
@@ -70,6 +75,7 @@ namespace J2N.Text
             return text;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationGenerateForwarder]
         internal static TBuilder AppendJoin<TBuilder>(this TBuilder text, string? separator, params ReadOnlySpan<string?> values)
             where TBuilder : MutableTextBuffer
@@ -81,6 +87,7 @@ namespace J2N.Text
             return text;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationGenerateForwarder]
         internal static TBuilder AppendJoin<TBuilder>(this TBuilder text, char separator, params object?[] values)
             where TBuilder : MutableTextBuffer
@@ -92,6 +99,7 @@ namespace J2N.Text
             return text;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationGenerateForwarder]
         internal static TBuilder AppendJoin<TBuilder>(this TBuilder text, char separator, params ReadOnlySpan<object?> values)
             where TBuilder : MutableTextBuffer
@@ -103,6 +111,7 @@ namespace J2N.Text
             return text;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationGenerateForwarder]
         internal static TBuilder AppendJoin<TBuilder, T>(this TBuilder text, char separator, IEnumerable<T> values)
             where TBuilder : MutableTextBuffer
@@ -114,6 +123,7 @@ namespace J2N.Text
             return text;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationGenerateForwarder]
         internal static TBuilder AppendJoin<TBuilder>(this TBuilder text, char separator, params string?[] values)
             where TBuilder : MutableTextBuffer
@@ -125,6 +135,7 @@ namespace J2N.Text
             return text;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationGenerateForwarder]
         internal static TBuilder AppendJoin<TBuilder>(this TBuilder text, char separator, params ReadOnlySpan<string?> values)
             where TBuilder : MutableTextBuffer

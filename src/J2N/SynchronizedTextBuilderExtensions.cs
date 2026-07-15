@@ -19,6 +19,7 @@
 using J2N.Numerics;
 using J2N.Text;
 using System;
+using System.Runtime.CompilerServices;
 
 namespace J2N
 {
@@ -53,6 +54,7 @@ namespace J2N
         /// and <see cref="J2N.Text.SynchronizedTextBuilderExtensions.AppendFormat{TBuilder}(TBuilder, string, object?)"/> methods to append small strings.
         /// </remarks>
         /// <seealso cref="object" />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TBuilder Append<TBuilder>(this TBuilder text, object? value, string? format = null, IFormatProvider? provider = null)
             where TBuilder : SynchronizedTextBuilder
         {
@@ -85,6 +87,7 @@ namespace J2N
         /// If <paramref name="value"/> is <see langword="null"/>, the <see cref="SynchronizedTextBuilder"/> is not changed.
         /// </remarks>
         /// <seealso cref="object" />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TBuilder Insert<TBuilder>(this TBuilder text, int index, object? value, string? format = null, IFormatProvider? provider = null)
             where TBuilder : SynchronizedTextBuilder
         {
