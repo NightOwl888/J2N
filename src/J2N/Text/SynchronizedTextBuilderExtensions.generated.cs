@@ -2541,7 +2541,7 @@ namespace J2N.Text
         /// </remarks>
         /// <seealso cref="decimal" />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static TBuilder Append<TBuilder>(this TBuilder text, decimal value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
+        internal static TBuilder Append<TBuilder>(this TBuilder text, decimal value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
             where TBuilder : SynchronizedTextBuilder
         {
             if (text is null)
@@ -2983,7 +2983,7 @@ namespace J2N.Text
         /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
         /// <seealso cref="decimal" />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, decimal value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
+        internal static TBuilder Insert<TBuilder>(this TBuilder text, int index, decimal value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
             where TBuilder : SynchronizedTextBuilder
         {
             if (text is null)
