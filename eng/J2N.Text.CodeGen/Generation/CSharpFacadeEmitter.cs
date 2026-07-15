@@ -48,8 +48,6 @@ namespace J2N.Text.CodeGen.Generation
                     sb.AppendLine("#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member");
                 }
 
-                CSharpDocumentationEmitter.EmitDocumentation(sb, property.Documentation);
-                EmitAttributes(sb, property.Attributes, "        ");
                 EmitProperty(sb, property, backingFieldName, wrapMembersInLock);
 
                 if (suppressDocs)
@@ -91,15 +89,6 @@ namespace J2N.Text.CodeGen.Generation
                     sb.AppendLine(
                         "#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member");
                 }
-
-                CSharpDocumentationEmitter.EmitDocumentation(
-                    sb,
-                    method.Documentation);
-
-                EmitAttributes(
-                    sb,
-                    method.Attributes,
-                    "        ");
 
                 EmitMethod(
                     sb,
@@ -157,6 +146,15 @@ namespace J2N.Text.CodeGen.Generation
             string backingFieldName,
             bool wrapMembersInLock)
         {
+            CSharpDocumentationEmitter.EmitDocumentation(
+                sb,
+                method.Documentation);
+
+            EmitAttributes(
+                sb,
+                method.Attributes,
+                "        ");
+
             string parameterList =
                 string.Join(
                     ", ",
@@ -253,6 +251,15 @@ namespace J2N.Text.CodeGen.Generation
             string backingFieldName,
             bool wrapMembersInLock)
         {
+            CSharpDocumentationEmitter.EmitDocumentation(
+                sb,
+                property.Documentation);
+
+            EmitAttributes(
+                sb,
+                property.Attributes,
+                "        ");
+
             string unsafeModifier = property.IsUnsafe ? " unsafe" : "";
             bool wrapGetter =
                 wrapMembersInLock
@@ -268,6 +275,7 @@ namespace J2N.Text.CodeGen.Generation
 
                 if (property.HasGetter)
                 {
+                    EmitAttributes(sb, property.GetterAttributes, "            ");
                     if (wrapGetter)
                     {
                         sb.AppendLine("            get");
@@ -288,6 +296,7 @@ namespace J2N.Text.CodeGen.Generation
 
                 if (property.HasSetter)
                 {
+                    EmitAttributes(sb, property.SetterAttributes, "            ");
                     if (wrapSetter)
                     {
                         sb.AppendLine("            set");
@@ -325,6 +334,7 @@ namespace J2N.Text.CodeGen.Generation
 
             if (property.HasGetter)
             {
+                EmitAttributes(sb, property.GetterAttributes, "            ");
                 if (wrapGetter)
                 {
                     sb.AppendLine("            get");
@@ -345,6 +355,7 @@ namespace J2N.Text.CodeGen.Generation
 
             if (property.HasSetter)
             {
+                EmitAttributes(sb, property.GetterAttributes, "            ");
                 if (wrapSetter)
                 {
                     sb.AppendLine("            set");

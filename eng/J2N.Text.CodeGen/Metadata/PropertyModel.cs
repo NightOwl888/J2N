@@ -22,6 +22,10 @@
 
         public List<AttributeModel> Attributes { get; init; } = [];
 
+        public List<AttributeModel> GetterAttributes { get; init; } = [];
+
+        public List<AttributeModel> SetterAttributes { get; init; } = [];
+
         public bool Ignore { get; init; }
 
         public bool SkipGetterSynchronization { get; init; }

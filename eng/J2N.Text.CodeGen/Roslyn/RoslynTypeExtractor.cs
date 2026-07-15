@@ -254,6 +254,8 @@ namespace J2N.Text.CodeGen.Roslyn
 
             bool hasGetter = false;
             bool hasSetter = false;
+            List<AttributeModel> getterAttributes = [];
+            List<AttributeModel> setterAttributes = [];
 
             if (property.ExpressionBody is not null)
             {
@@ -267,10 +269,14 @@ namespace J2N.Text.CodeGen.Roslyn
                     {
                         case SyntaxKind.GetAccessorDeclaration:
                             hasGetter = true;
+                            getterAttributes.AddRange(
+                                ExtractAttributes(accessor.AttributeLists));
                             break;
 
                         case SyntaxKind.SetAccessorDeclaration:
                             hasSetter = true;
+                            setterAttributes.AddRange(
+                                ExtractAttributes(accessor.AttributeLists));
                             break;
                     }
                 }
@@ -302,6 +308,8 @@ namespace J2N.Text.CodeGen.Roslyn
                 Documentation = ExtractDocumentation(property),
 
                 Attributes = ExtractAttributes(property.AttributeLists),
+                GetterAttributes = getterAttributes,
+                SetterAttributes = setterAttributes,
 
                 Ignore =
                     propertySymbol.HasAttribute(
@@ -325,6 +333,35 @@ namespace J2N.Text.CodeGen.Roslyn
             {
                 throw new InvalidOperationException(
                     $"Unable to resolve symbol for indexer '{typeName}'.");
+            }
+
+            bool hasGetter = false;
+            bool hasSetter = false;
+
+            List<AttributeModel> getterAttributes = [];
+            List<AttributeModel> setterAttributes = [];
+
+            if (indexer.AccessorList is not null)
+            {
+                foreach (var accessor in indexer.AccessorList.Accessors)
+                {
+                    switch (accessor.Kind())
+                    {
+                        case SyntaxKind.GetAccessorDeclaration:
+
+                            hasGetter = true;
+                            getterAttributes.AddRange(
+                                ExtractAttributes(accessor.AttributeLists));
+                            break;
+
+                        case SyntaxKind.SetAccessorDeclaration:
+
+                            hasSetter = true;
+                            setterAttributes.AddRange(
+                                ExtractAttributes(accessor.AttributeLists));
+                            break;
+                    }
+                }
             }
 
             var parameters = indexer.ParameterList.Parameters
@@ -359,19 +396,19 @@ namespace J2N.Text.CodeGen.Roslyn
             {
                 Name = "this",
                 TypeName = typeName,
-                HasGetter =
-                    indexer.AccessorList?.Accessors
-                        .Any(a => a.Kind() == SyntaxKind.GetAccessorDeclaration) ?? false,
-                HasSetter =
-                    indexer.AccessorList?.Accessors
-                        .Any(a => a.Kind() == SyntaxKind.SetAccessorDeclaration) ?? false,
+                HasGetter = hasGetter,
+                HasSetter = hasSetter,
                 IsIndexer = true,
                 IsUnsafe =
                     IsUnsafeType(typeName)
                     || parameters.Any(p => IsUnsafeType(p.TypeName)),
                 Documentation = ExtractDocumentation(indexer),
                 IndexParameters = parameters,
+
                 Attributes = ExtractAttributes(indexer.AttributeLists),
+                GetterAttributes = getterAttributes,
+                SetterAttributes = setterAttributes,
+
                 Ignore =
                     indexerSymbol.HasAttribute(
                         CodeGenerationAttributeNames.Ignore),

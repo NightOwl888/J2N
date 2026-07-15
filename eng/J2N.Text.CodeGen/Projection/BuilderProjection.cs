@@ -55,7 +55,7 @@ namespace J2N.Text.CodeGen.Projection
             string facadeName,
             ProjectionOptions options)
         {
-            return new MethodModel
+            var projected = new MethodModel
             {
                 Name = method.Name,
 
@@ -140,6 +140,10 @@ namespace J2N.Text.CodeGen.Projection
                 SkipSynchronization =
                     method.SkipSynchronization,
             };
+
+            EnsureAggressiveInlining(projected.Attributes);
+
+            return projected;
         }
 
         private static PropertyModel ProjectProperty(
@@ -149,7 +153,7 @@ namespace J2N.Text.CodeGen.Projection
             string facadeName,
             ProjectionOptions options)
         {
-            return new PropertyModel
+            var projected = new PropertyModel
             {
                 Name = property.Name,
 
@@ -195,6 +199,16 @@ namespace J2N.Text.CodeGen.Projection
                         .Select(CloneAttribute)
                         .ToList(),
 
+                GetterAttributes =
+                    property.GetterAttributes
+                        .Select(CloneAttribute)
+                        .ToList(),
+
+                SetterAttributes =
+                    property.SetterAttributes
+                        .Select(CloneAttribute)
+                        .ToList(),
+
                 Documentation =
                     DocumentationRewriter.RewriteDocumentation(
                         property.Documentation,
@@ -213,6 +227,11 @@ namespace J2N.Text.CodeGen.Projection
                 SkipSetterSynchronization =
                     property.SkipSetterSynchronization,
             };
+
+            EnsureAggressiveInlining(projected.GetterAttributes);
+            EnsureAggressiveInlining(projected.SetterAttributes);
+
+            return projected;
         }
 
         private static string RewriteType(
@@ -241,6 +260,30 @@ namespace J2N.Text.CodeGen.Projection
                 Name = parameter.Name,
                 Constraints = parameter.Constraints.ToList()
             };
+        }
+
+        private static void EnsureAggressiveInlining(ICollection<AttributeModel> attributes)
+        {
+            if (attributes.Any(IsAggressiveInlining))
+                return;
+
+            attributes.Add(new AttributeModel
+            {
+                Name = "MethodImpl",
+                Arguments =
+                {
+                    "MethodImplOptions.AggressiveInlining"
+                }
+            });
+        }
+
+        private static bool IsAggressiveInlining(AttributeModel attribute)
+        {
+            if (!string.Equals(attribute.Name, "MethodImpl", StringComparison.Ordinal))
+                return false;
+
+            return attribute.Arguments.Any(a =>
+                a.Contains("MethodImplOptions.AggressiveInlining", StringComparison.Ordinal));
         }
     }
 }
