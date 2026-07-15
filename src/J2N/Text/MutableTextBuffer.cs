@@ -1189,14 +1189,6 @@ namespace J2N.Text
             }
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private Span<char> GetClearedWritableSpan(int start, int length)
-        {
-            Span<char> span = m_Chars.AsSpan(start, length);
-            span.Fill('\0');
-            return span;
-        }
-
         private void ReplaceInPlace(ref int index, ref char value, int count)
         {
             if (count == 0)
@@ -1336,68 +1328,6 @@ namespace J2N.Text
 
         // For testing
         internal char[] RawArray => m_Chars;
-
-        /// <summary>
-        /// Appends and returns a writable <see cref="Span{Char}"/> of the specified length to this builder.
-        /// Writes to the returned span will update the value of this instance.
-        /// </summary>
-        /// <param name="length">The number of characters to append to this instance.</param>
-        /// <returns>>A <see cref="Span{Char}"/> wrapping a block of memory that is appended to the existing
-        /// sequence of characters. The span may be written to by the caller to update this instance.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// <paramref name="length"/> is less than zero.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// <paramref name="length"/> plus the current length of this instance exceeds <see cref="MaxCapacity"/>.
-        /// </exception>
-        /// <remarks>
-        /// This method allows callers to append a block of a specific length to this instance that can be written
-        /// to after the fact. This is most useful for passing a span to an API that writes directly into a character buffer,
-        /// which can save a copy operation if the data fits in the returned span.
-        /// <para/>
-        /// The capacity is adjusted as needed.
-        /// <para/>
-        /// <b>Notes to Callers</b>
-        /// <para/>
-        /// When you instantiate a <see cref="MutableTextBuffer"/> object by calling <see cref="Initialize(int, int)"/>,
-        /// both the length and the capacity of the <see cref="MutableTextBuffer"/> instance can grow beyond
-        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="MutableTextBufferExtensions.Append{TBuilder}(TBuilder, string?)"/>
-        /// and <see cref="MutableTextBufferExtensions.AppendFormat{TBuilder}(TBuilder, string, object?)"/> methods to append small strings.
-        /// </remarks>
-        /// <synchronizationNote>
-        /// The returned span provides direct access to the underlying memory of the <see cref="SynchronizedTextBuilder"/>.
-        /// Callers must synchronize externally using <see cref="SynchronizedTextBuilder.SyncRoot"/> for the duration of the
-        /// span usage if concurrent mutation is possible.
-        /// </synchronizationNote>
-        // J2N TODO: This idea was borrowed from ValueStringBuilder, but is effectively the same operation as IBufferWriter<T>.GetSpan(int).
-        // There is a slight difference in that GetSpan() allows passing 0 to get a "default" buffer length and it does not move the m_Position -
-        // it reserves that operation for the Advance(int) method after the writes are completed.
-        [CodeGenerationSkipSynchronization]
-        public Span<char> AppendSpan(int length)
-        {
-            if (length < 0)
-                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(length, ExceptionArgument.length);
-
-            int pos = m_Position;
-            if (pos > m_Chars.Length - length)
-            {
-                Grow(length);
-            }
-            Span<char> buffer;
-
-            if (!clearExposedBuffers)
-            {
-                buffer = m_Chars.AsSpan(pos, length);
-            }
-            else
-            {
-                // Ensure the buffer doesn't contain any sensitive data before providing it to the user
-                buffer = GetClearedWritableSpan(pos, length);
-            }
-            m_Position += length;
-            return buffer;
-        }
 
         #region ISpannable<char> Members
 

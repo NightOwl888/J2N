@@ -611,41 +611,6 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// Appends and returns a writable <see cref="Span{Char}"/> of the specified length to this builder.
-        /// Writes to the returned span will update the value of this instance.
-        /// </summary>
-        /// <param name="length">The number of characters to append to this instance.</param>
-        /// <returns>
-        /// >A <see cref="Span{Char}"/> wrapping a block of memory that is appended to the existing
-        /// sequence of characters. The span may be written to by the caller to update this instance.
-        /// </returns>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// <paramref name="length"/> is less than zero.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// <paramref name="length"/> plus the current length of this instance exceeds <see cref="MaxCapacity"/>.
-        /// </exception>
-        /// <remarks>
-        /// This method allows callers to append a block of a specific length to this instance that can be written
-        /// to after the fact. This is most useful for passing a span to an API that writes directly into a character buffer,
-        /// which can save a copy operation if the data fits in the returned span.
-        /// <para/>
-        /// The capacity is adjusted as needed.
-        /// <para/>
-        /// <b>Notes to Callers</b>
-        /// <para/>
-        /// When you instantiate a <see cref="TextBuilder"/> object by calling <see cref="TextBuilder(int, int)"/>,
-        /// both the length and the capacity of the <see cref="TextBuilder"/> instance can grow beyond
-        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="TextBuilderExtensions.Append{TBuilder}(TBuilder, string?)"/>
-        /// and <see cref="TextBuilderExtensions.AppendFormat{TBuilder}(TBuilder, string, object?)"/> methods to append small strings.
-        /// </remarks>
-        public Span<char> AppendSpan(int length)
-        {
-            return buffer.AppendSpan(length);
-        }
-
-        /// <summary>
         /// Reports the zero-based index of the first occurrence of the specified Unicode character
         /// in this instance.
         /// </summary>

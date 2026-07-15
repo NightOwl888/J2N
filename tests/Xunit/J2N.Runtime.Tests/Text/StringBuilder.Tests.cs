@@ -3880,48 +3880,207 @@ namespace J2N.Text.Tests
         //}
 
 
-        [Fact] // J2N specific - copied over from ValueStringBuilder
-        public void AppendSpan_DataAppendedCorrectly()
+        #region IBufferWriter<char> Tests
+
+        [Fact]
+        public void GetSpan_DataAppendedCorrectly()
         {
-            var sb = new StringBuilder();
-            var osb = MutableTextBufferFactory();
+            var expected = new StringBuilder();
+            var actual = MutableTextBufferFactory();
 
             for (int i = 1; i <= 1000; i++)
             {
                 string s = i.ToString();
 
-                sb.Append(s);
+                expected.Append(s);
 
-                Span<char> span = osb.AppendSpan(s.Length);
-                Assert.Equal(sb.Length, osb.Length);
+                Span<char> span = actual.GetSpan(s.Length);
+                Assert.Equal(expected.Length - s.Length, actual.Length);
 
                 s.AsSpan().CopyTo(span);
+
+                actual.Advance(s.Length);
             }
 
-            Assert.Equal(sb.Length, osb.Length);
-            Assert.Equal(sb.ToString(), osb.ToString());
+            Assert.Equal(expected.Length, actual.Length);
+            Assert.Equal(expected.ToString(), actual.ToString());
         }
 
-        [Fact] // J2N specific
-        public void AppendSpan_DoesNotZeroBuffer()
+        [Fact]
+        public void GetMemory_DataAppendedCorrectly()
+        {
+            var expected = new StringBuilder();
+            var actual = MutableTextBufferFactory();
+
+            for (int i = 1; i <= 1000; i++)
+            {
+                string s = i.ToString();
+
+                expected.Append(s);
+
+                Memory<char> memory = actual.GetMemory(s.Length);
+
+                s.AsSpan().CopyTo(memory.Span);
+
+                actual.Advance(s.Length);
+            }
+
+            Assert.Equal(expected.ToString(), actual.ToString());
+        }
+
+        [Fact]
+        public void GetSpan_DoesNotChangeLengthUntilAdvance()
         {
             var builder = MutableTextBufferFactory();
-            builder.Append("Hello");
-            builder.Length = 0;
 
-            Span<char> span = builder.AppendSpan(5);
-            Assert.Equal("Hello", span.ToString());
+            builder.Append("Hello");
+
+            int length = builder.Length;
+
+            Span<char> span = builder.GetSpan(5);
+
+            Assert.Equal(length, builder.Length);
+
+            "World".AsSpan().CopyTo(span);
+
+            Assert.Equal(length, builder.Length);
+
+            builder.Advance(5);
+
+            Assert.Equal(length + 5, builder.Length);
+            Assert.Equal("HelloWorld", builder.ToString());
         }
 
-        [Fact] // J2N specific
-        public void AppendSpan_Invalid()
+        [Fact]
+        public void Advance_CanAdvanceLessThanRequested()
         {
-            var builder = MutableTextBufferFactory(0, 5);
+            var builder = MutableTextBufferFactory();
+
+            Span<char> span = builder.GetSpan(32);
+
+            "Hello".AsSpan().CopyTo(span);
+
+            builder.Advance(5);
+
+            Assert.Equal("Hello", builder.ToString());
+        }
+
+        [Fact]
+        public void GetSpan_SizeHintZero_ReturnsNonEmptySpan()
+        {
+            var builder = MutableTextBufferFactory();
+
+            Span<char> span = builder.GetSpan();
+
+            Assert.False(span.IsEmpty);
+        }
+
+        [Fact]
+        public void GetMemory_SizeHintZero_ReturnsNonEmptySpan()
+        {
+            var builder = MutableTextBufferFactory();
+
+            Memory<char> memory = builder.GetMemory();
+
+            Assert.False(memory.IsEmpty);
+        }
+
+        [Fact]
+        public void GetSpan_Invalid()
+        {
+            var builder = MutableTextBufferFactory();
+
+            AssertExtensions.Throws<ArgumentOutOfRangeException>(
+                "sizeHint",
+                () => builder.GetSpan(-1));
+        }
+
+        [Fact]
+        public void GetMemory_Invalid()
+        {
+            var builder = MutableTextBufferFactory();
+
+            AssertExtensions.Throws<ArgumentOutOfRangeException>(
+                "sizeHint",
+                () => builder.GetMemory(-1));
+        }
+
+        [Fact]
+        public void Advance_Negative_Throws()
+        {
+            var builder = MutableTextBufferFactory();
+
+            AssertExtensions.Throws<ArgumentOutOfRangeException>(
+                "count",
+                () => builder.Advance(-1));
+        }
+
+        [Fact]
+        public void Advance_PastCapacity_Throws()
+        {
+            var builder = MutableTextBufferFactory();
+
+            builder.GetSpan(10);
+
+            Assert.Throws<InvalidOperationException>(
+                () => builder.Advance(int.MaxValue));
+        }
+
+        [Fact]
+        public void Advance_ExactlyRequested_Succeeds()
+        {
+            var builder = MutableTextBufferFactory();
+
+            Span<char> span = builder.GetSpan(5);
+
+            "Hello".AsSpan().CopyTo(span);
+
+            builder.Advance(5);
+
+            Assert.Equal("Hello", builder.ToString());
+        }
+
+        [Fact]
+        public void GetSpan_MultipleWrites_WorkCorrectly()
+        {
+            var builder = MutableTextBufferFactory();
+
+            Span<char> span = builder.GetSpan(5);
+            "Hello".AsSpan().CopyTo(span);
+            builder.Advance(5);
+
+            span = builder.GetSpan(1);
+            span[0] = ' ';
+            builder.Advance(1);
+
+            span = builder.GetSpan(5);
+            "World".AsSpan().CopyTo(span);
+            builder.Advance(5);
+
+            Assert.Equal("Hello World", builder.ToString());
+        }
+
+        [Fact]
+        public void GetSpan_DoesNotModifyExistingContents()
+        {
+            var builder = MutableTextBufferFactory();
+
             builder.Append("Hello");
 
-            AssertExtensions.Throws<ArgumentOutOfRangeException>("length", () => builder.AppendSpan(-1)); // length < 0
-            AssertExtensions.Throws<ArgumentOutOfRangeException>("requiredLength", () => builder.AppendSpan(builder.Length)); // New length > builder.MaxCapacity
+            Span<char> span = builder.GetSpan(5);
+
+            Assert.Equal("Hello", builder.ToString());
+
+            "World".AsSpan().CopyTo(span);
+
+            Assert.Equal("Hello", builder.ToString());
+
+            builder.Advance(5);
+
+            Assert.Equal("HelloWorld", builder.ToString());
         }
+
+        #endregion
 
 
         #region InsertFromSelf Tests

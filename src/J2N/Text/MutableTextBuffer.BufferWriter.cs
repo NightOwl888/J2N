@@ -167,6 +167,14 @@ namespace J2N.Text
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private Span<char> GetClearedWritableSpan(int start, int length)
+        {
+            Span<char> span = m_Chars.AsSpan(start, length);
+            span.Fill('\0');
+            return span;
+        }
+
         [DoesNotReturn]
         private static void ThrowInvalidOperationException_AdvancedTooFar(int capacity)
         {
