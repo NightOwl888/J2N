@@ -11,6 +11,7 @@ namespace J2N.Text.CodeGen
     {
         static int Main(string[] args)
         {
+            string? j2nSourceDirectory = null;
             string? sourceDirectory = null;
             string? infrastructureDirectory = null;
             bool migration = false;
@@ -19,6 +20,10 @@ namespace J2N.Text.CodeGen
             {
                 switch (args[i])
                 {
+                    case "--j2n-source-directory":
+                        j2nSourceDirectory = args[++i];
+                        break;
+
                     case "--source-directory":
                         sourceDirectory = args[++i];
                         break;
@@ -33,15 +38,19 @@ namespace J2N.Text.CodeGen
                 }
             }
 
-            if (sourceDirectory is null || infrastructureDirectory is null)
+            if (j2nSourceDirectory is null || sourceDirectory is null || infrastructureDirectory is null)
             {
                 Console.Error.WriteLine(
                     "Usage: J2N.Text.CodeGen " +
+                    "--j2n-source-directory <path> " +
                     "--source-directory <path> " +
                     "--infrastructure-directory <path>");
 
                 return 1;
             }
+
+            j2nSourceDirectory =
+                Path.GetFullPath(j2nSourceDirectory);
 
             sourceDirectory =
                 Path.GetFullPath(sourceDirectory);
@@ -49,7 +58,8 @@ namespace J2N.Text.CodeGen
             infrastructureDirectory =
                 Path.GetFullPath(infrastructureDirectory);
 
-            Console.WriteLine($"Source directory: {sourceDirectory}");
+            Console.WriteLine($"J2N Source directory: {sourceDirectory}");
+            Console.WriteLine($"J2N.Text Source directory: {sourceDirectory}");
             Console.WriteLine($"Infrastructure directory: {infrastructureDirectory}");
 
             if (migration)
@@ -84,11 +94,23 @@ namespace J2N.Text.CodeGen
             // MutableTextBufferExtensions
             // ---------------------------------------------------------------------
 
+            List<string> j2nExtensionSourceTexts =
+                Directory.GetFiles(j2nSourceDirectory, "MutableTextBufferExtensions*.cs")
+                    .Where(f => !f.EndsWith(".generated.cs", StringComparison.OrdinalIgnoreCase))
+                    .Select(File.ReadAllText)
+                    .ToList();
+
             List<string> extensionSourceTexts =
                 Directory.GetFiles(sourceDirectory, "MutableTextBufferExtensions*.cs")
                     .Where(f => !f.EndsWith(".generated.cs", StringComparison.OrdinalIgnoreCase))
                     .Select(File.ReadAllText)
                     .ToList();
+
+            TypeModel j2nExtensionModel =
+                extractor.Extract(
+                    j2nExtensionSourceTexts,
+                    infrastructureTexts,
+                    "J2N.MutableTextBufferExtensions");
 
             TypeModel extensionModel =
                 extractor.Extract(
@@ -127,7 +149,15 @@ namespace J2N.Text.CodeGen
                 model);
 
             GenerateExtensions(
+                j2nSourceDirectory,
+                facadeNamespace: "J2N",
+                textBuilderOptions,
+                j2nExtensionModel,
+                implementationModel);
+
+            GenerateExtensions(
                 sourceDirectory,
+                facadeNamespace: "J2N.Text",
                 textBuilderOptions,
                 extensionModel,
                 implementationModel);
@@ -150,7 +180,15 @@ namespace J2N.Text.CodeGen
                 model);
 
             GenerateExtensions(
+                j2nSourceDirectory,
+                facadeNamespace: "J2N",
+                synchronizedTextBuilderOptions,
+                j2nExtensionModel,
+                implementationModel);
+
+            GenerateExtensions(
                 sourceDirectory,
+                facadeNamespace: "J2N.Text",
                 synchronizedTextBuilderOptions,
                 extensionModel,
                 implementationModel);
@@ -165,7 +203,7 @@ namespace J2N.Text.CodeGen
         }
 
         static void GenerateFacade(
-            string sourceDirectory,
+            string outputDirectory,
             FacadeGenerationOptions generationOptions,
             TypeModel model)
         {
@@ -196,7 +234,7 @@ namespace J2N.Text.CodeGen
 
             string facadePath =
                 Path.Combine(
-                    sourceDirectory,
+                    outputDirectory,
                     $"{generationOptions.FacadeName}.generated.cs");
 
             File.WriteAllText(
@@ -205,7 +243,8 @@ namespace J2N.Text.CodeGen
         }
 
         static void GenerateExtensions(
-            string sourceDirectory,
+            string outputDirectory,
+            string facadeNamespace,
             FacadeGenerationOptions generationOptions,
             TypeModel extensionModel,
             TypeModel implementationModel)
@@ -218,7 +257,7 @@ namespace J2N.Text.CodeGen
                     extensionModel,
                     implementationModel,
                     "MutableTextBuffer",
-                    facadeNamespace: "J2N.Text",
+                    facadeNamespace,
                     projectedBuilderType: generationOptions.FacadeName,
                     projectedTypeName: generationOptions.FacadeName + "Extensions",
                     options: new ProjectionOptions
@@ -237,7 +276,7 @@ namespace J2N.Text.CodeGen
 
             string extensionPath =
                 Path.Combine(
-                    sourceDirectory,
+                    outputDirectory,
                     $"{generationOptions.FacadeName}Extensions.generated.cs");
 
             File.WriteAllText(

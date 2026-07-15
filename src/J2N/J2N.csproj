@@ -148,7 +148,7 @@
          RemoveProperties="TargetFramework;TargetFrameworks"
          Properties="Configuration=$(Configuration)" />
 
-    <Exec Command='dotnet &quot;$(CodeGenAssembly)&quot; --source-directory &quot;$(MSBuildProjectDirectory)\Text&quot; --infrastructure-directory &quot;$(MSBuildProjectDirectory)\CodeGeneration&quot;' />
+    <Exec Command='dotnet &quot;$(CodeGenAssembly)&quot; --j2n-source-directory &quot;$(MSBuildProjectDirectory)&quot; --source-directory &quot;$(MSBuildProjectDirectory)\Text&quot; --infrastructure-directory &quot;$(MSBuildProjectDirectory)\CodeGeneration&quot;' />
     
     <Touch Files="$(CodeGenOutputStamp)"
            AlwaysCreate="true" />

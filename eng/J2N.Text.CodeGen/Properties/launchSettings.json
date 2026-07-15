@@ -2,8 +2,8 @@
   "profiles": {
     "J2N.Text.CodeGen": {
       "commandName": "Project",
-      "workingDirectory": "../../",
-      "commandLineArgs": "--source-directory src/J2N/Text --infrastructure-directory src/J2N/CodeGeneration"
+      "commandLineArgs": "--j2n-source-directory src/J2N --source-directory src/J2N/Text --infrastructure-directory src/J2N/CodeGeneration",
+      "workingDirectory": "../../"
     }
   }
 }
