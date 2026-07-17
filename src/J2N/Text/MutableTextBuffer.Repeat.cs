@@ -280,7 +280,7 @@ namespace J2N.Text
                 ThrowHelper.ThrowArgumentOutOfRange_IndexMustBeLessOrEqualException(index, ExceptionArgument.index);
             }
 
-            if (value is null || repeatCount == 0)
+            if (value is null || value.Length == 0 || repeatCount == 0)
             {
                 return;
             }
@@ -298,41 +298,40 @@ namespace J2N.Text
             if (destinationLength == 0)
                 return;
 
-            MakeRoom(index, destinationLength);
-
-            int copied = value.Length;
-
-            Span<char> destination =
-                m_Chars.AsSpan(index, destinationLength);
-
-            // We only copy from the source once. The remainder of the copies
-            // are from destination to destination. This allows for more opportunities
-            // for the BCL to optimize the copy.
-            if (value is ISpanCopyable<char> spanCopyable)
+            int count = value.Length;
+            char[]? arrayToReturn = null;
+            try
             {
-                spanCopyable.CopyTo(0, destination, copied);
-            }
-            else if (value is ICopyable<char> copyable)
-            {
-                copyable.CopyTo(0, m_Chars, index, copied);
-            }
-            else
-            {
-                for (int i = 0; i < copied; i++)
+                // If the source doesn't implement ISpannable<char>, we have no way to test
+                // whether the implementation overlaps our memory. So, the only safe approach
+                // is to always take a snapshot prior to moving any memory.
+
+                Span<char> temp = count <= CharStackBufferSize
+                    ? stackalloc char[count]
+                    : (arrayToReturn = allocator.Allocate(count)).AsSpan(0, count);
+
+                if (value is ISpanCopyable<char> spanCopyable)
                 {
-                    destination[i] = value[i];
+                    spanCopyable.CopyTo(0, temp, count);
                 }
+                else if (arrayToReturn is not null && value is ICopyable<char> copyable)
+                {
+                    copyable.CopyTo(0, arrayToReturn, 0, count);
+                }
+                else
+                {
+                    for (int i = 0; i < count; i++)
+                    {
+                        temp[i] = value[i];
+                    }
+                }
+
+                InsertRepeated(index, temp, destinationLength);
             }
-
-            while (copied < destinationLength)
+            finally
             {
-                int remaining = destinationLength - copied;
-                int copyLength = copied < remaining ? copied : remaining;
-
-                destination.Slice(0, copyLength)
-                    .CopyTo(destination.Slice(copied));
-
-                copied += copyLength;
+                if (arrayToReturn is not null)
+                    allocator.Return(arrayToReturn);
             }
         }
 
