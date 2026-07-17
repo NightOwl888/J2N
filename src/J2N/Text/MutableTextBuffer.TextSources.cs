@@ -347,35 +347,55 @@ namespace J2N.Text
                 return;
 
             int count = value.Length;
-            int pos = m_Position;
-            if ((uint)pos + (uint)count > (uint)m_Chars.Length)
+            char[]? arrayToReturn = null;
+            try
             {
-                // Check if the count will put us over m_MaxCapacity.
-                // Doing the check here prevents corruption of the StringBuilder.
-                int newLength = pos + count;
-                if (newLength > m_MaxCapacity || newLength < count)
+                // If the source doesn't implement ISpannable<char>, we have no way to test
+                // whether the implementation overlaps our memory. So, the only safe approach
+                // is to always take a snapshot prior to moving any memory.
+
+                Span<char> temp = count <= CharStackBufferSize
+                    ? stackalloc char[count]
+                    : (arrayToReturn = allocator.Allocate(count)).AsSpan(0, count);
+
+                if (value is ISpanCopyable<char> spanCopyable)
                 {
-                    ThrowHelper.ThrowArgumentOutOfRangeException(count, ExceptionArgument.valueCount, ExceptionResource.ArgumentOutOfRange_LengthGreaterThanCapacity);
+                    spanCopyable.CopyTo(0, temp, count);
+                }
+                else if (arrayToReturn is not null && value is ICopyable<char> copyable)
+                {
+                    copyable.CopyTo(0, arrayToReturn, 0, count);
+                }
+                else
+                {
+                    for (int i = 0; i < count; i++)
+                    {
+                        temp[i] = value[i];
+                    }
                 }
 
-                Grow(count);
+                int pos = m_Position;
+                if ((uint)pos + (uint)count > (uint)m_Chars.Length)
+                {
+                    // Check if the count will put us over m_MaxCapacity.
+                    // Doing the check here prevents corruption of the StringBuilder.
+                    int newLength = pos + count;
+                    if (newLength > m_MaxCapacity || newLength < count)
+                    {
+                        ThrowHelper.ThrowArgumentOutOfRangeException(count, ExceptionArgument.valueCount, ExceptionResource.ArgumentOutOfRange_LengthGreaterThanCapacity);
+                    }
+
+                    Grow(count);
+                }
+
+                temp.CopyTo(m_Chars.AsSpan(pos));
+            }
+            finally
+            {
+                if (arrayToReturn is not null)
+                    allocator.Return(arrayToReturn);
             }
 
-            if (value is ISpanCopyable<char> spanCopyable)
-            {
-                spanCopyable.CopyTo(0, m_Chars.AsSpan(pos), count);
-            }
-            else if (value is ICopyable<char> copyable)
-            {
-                copyable.CopyTo(0, m_Chars, pos, count);
-            }
-            else
-            {
-                for (int i = 0; i < count; i++)
-                {
-                    m_Chars[pos++] = value[i];
-                }
-            }
             m_Position += count;
         }
 
@@ -415,41 +435,62 @@ namespace J2N.Text
                     ThrowHelper.ThrowArgumentOutOfRange_IndexMustBeLessOrEqualException(startIndex, ExceptionArgument.startIndex);
                 }
 
-                int pos = m_Position;
-                if ((uint)pos + (uint)count > (uint)m_Chars.Length)
-                {
-                    // Check if the count will put us over m_MaxCapacity.
-                    // Doing the check here prevents corruption of the StringBuilder.
-                    int newLength = pos + count;
-                    if (newLength > m_MaxCapacity || newLength < count)
-                    {
-                        ThrowHelper.ThrowArgumentOutOfRangeException(count, ExceptionArgument.valueCount, ExceptionResource.ArgumentOutOfRange_LengthGreaterThanCapacity);
-                    }
-
-                    Grow(count);
-                }
-
                 // This not only makes it faster, it will call our other overload to handle inserting into self
                 if (value is ISpannable<char> spannable)
                 {
                     AppendInternal(spannable.AsSpan(startIndex, count));
                     return;
                 }
-                else if (value is ISpanCopyable<char> spanCopyable)
+
+                char[]? arrayToReturn = null;
+                try
                 {
-                    spanCopyable.CopyTo(startIndex, m_Chars.AsSpan(pos), count);
-                }
-                else if (value is ICopyable<char> copyable)
-                {
-                    copyable.CopyTo(startIndex, m_Chars, pos, count);
-                }
-                else
-                {
-                    for (int i = 0; i < count; i++)
+                    // If the source doesn't implement ISpannable<char>, we have no way to test
+                    // whether the implementation overlaps our memory. So, the only safe approach
+                    // is to always take a snapshot prior to moving any memory.
+
+                    Span<char> temp = count <= CharStackBufferSize
+                        ? stackalloc char[count]
+                        : (arrayToReturn = allocator.Allocate(count)).AsSpan(0, count);
+
+                    if (value is ISpanCopyable<char> spanCopyable)
                     {
-                        m_Chars[pos++] = value[i + startIndex];
+                        spanCopyable.CopyTo(startIndex, temp, count);
                     }
+                    else if (arrayToReturn is not null && value is ICopyable<char> copyable)
+                    {
+                        copyable.CopyTo(startIndex, arrayToReturn, 0, count);
+                    }
+                    else
+                    {
+                        for (int i = 0; i < count; i++)
+                        {
+                            temp[i] = value[startIndex + i];
+                        }
+                    }
+
+                    int pos = m_Position;
+                    if ((uint)pos + (uint)count > (uint)m_Chars.Length)
+                    {
+                        // Check if the count will put us over m_MaxCapacity.
+                        // Doing the check here prevents corruption of the StringBuilder.
+                        int newLength = pos + count;
+                        if (newLength > m_MaxCapacity || newLength < count)
+                        {
+                            ThrowHelper.ThrowArgumentOutOfRangeException(count, ExceptionArgument.valueCount, ExceptionResource.ArgumentOutOfRange_LengthGreaterThanCapacity);
+                        }
+
+                        Grow(count);
+                    }
+
+                    temp.CopyTo(m_Chars.AsSpan(pos));
                 }
+                finally
+                {
+                    if (arrayToReturn is not null)
+                        allocator.Return(arrayToReturn);
+                }
+
                 m_Position += count;
             }
         }

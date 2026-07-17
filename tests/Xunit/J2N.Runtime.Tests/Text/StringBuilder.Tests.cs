@@ -1340,6 +1340,93 @@ namespace J2N.Text.Tests
             AssertExtensions.Throws<ArgumentOutOfRangeException>("valueCount", () => builder.Append(new char[] { 'a' }.AsCharSequence(), 0, 1)); // New length > builder.MaxCapacity
         }
 
+        public static IEnumerable<object[]> Append_Overlapping_TestData()
+        {
+            yield return new object[] { "abcdefghijklmnopqrstuvwxyz", 0, 5, "abcdefghijklmnopqrstuvwxyzabcde" };
+            yield return new object[] { "abcdefghijklmnopqrstuvwxyz", 10, 5, "abcdefghijklmnopqrstuvwxyzklmno" };
+            yield return new object[] { "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz", 10, 5, "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzklmno" };
+            yield return new object[] { "abcdefghijklmnopqrstuvwxyz", 23, 3, "abcdefghijklmnopqrstuvwxyzxyz" };
+            yield return new object[] { "abcdefghijklmnopqrstuvwxyz", 5, 10, "abcdefghijklmnopqrstuvwxyzfghijklmno" };
+            yield return new object[] { "abcdefghijklmnopqrstuvwxyz", 8, 6, "abcdefghijklmnopqrstuvwxyzijklmn" };
+            yield return new object[] { "abcdefghijklmnopqrstuvwxyz", 0, 26, "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz" };
+            yield return new object[] { "abcdefghijklmnopqrstuvwxyz", 5, 0, "abcdefghijklmnopqrstuvwxyz" };
+            yield return new object[] { "", 0, 0, "" };
+        }
+
+        [Theory]
+        [MemberData(nameof(Append_Overlapping_TestData))]
+        public void Append_ICharSequence_Overlapping(string value, int sourceIndex, int sourceLength, string expected)
+        {
+            {
+                MutableTextBuffer builder = MutableTextBufferFactory(value);
+                ReadOnlyMemory<char> memory = builder.AsMemory(sourceIndex, sourceLength);
+                ICharSequence sequence = new SpannableCharSequence(memory);
+                builder.Append(sequence);
+                Assert.Equal(expected, builder.ToString());
+            }
+
+            {
+                MutableTextBuffer builder = MutableTextBufferFactory(value);
+                ReadOnlyMemory<char> memory = builder.AsMemory(sourceIndex, sourceLength);
+                ICharSequence sequence = new CopyableCharSequence(memory);
+                builder.Append(sequence);
+                Assert.Equal(expected, builder.ToString());
+            }
+
+            {
+                MutableTextBuffer builder = MutableTextBufferFactory(value);
+                ReadOnlyMemory<char> memory = builder.AsMemory(sourceIndex, sourceLength);
+                ICharSequence sequence = new SpanCopyableCharSequence(memory);
+                builder.Append(sequence);
+                Assert.Equal(expected, builder.ToString());
+            }
+
+            {
+                MutableTextBuffer builder = MutableTextBufferFactory(value);
+                ReadOnlyMemory<char> memory = builder.AsMemory(sourceIndex, sourceLength);
+                ICharSequence sequence = new SimpleCharSequence(memory);
+                builder.Append(sequence);
+                Assert.Equal(expected, builder.ToString());
+            }
+        }
+
+        [Theory]
+        [MemberData(nameof(Append_Overlapping_TestData))]
+        public void Append_ICharSequence_Int32_Int32_Overlapping(string value, int sourceIndex, int sourceLength, string expected)
+        {
+            {
+                MutableTextBuffer builder = MutableTextBufferFactory(value);
+                ReadOnlyMemory<char> memory = builder.AsMemory();
+                ICharSequence sequence = new SpannableCharSequence(memory);
+                builder.Append(sequence, sourceIndex, sourceLength);
+                Assert.Equal(expected, builder.ToString());
+            }
+
+            {
+                MutableTextBuffer builder = MutableTextBufferFactory(value);
+                ReadOnlyMemory<char> memory = builder.AsMemory();
+                ICharSequence sequence = new CopyableCharSequence(memory);
+                builder.Append(sequence, sourceIndex, sourceLength);
+                Assert.Equal(expected, builder.ToString());
+            }
+
+            {
+                MutableTextBuffer builder = MutableTextBufferFactory(value);
+                ReadOnlyMemory<char> memory = builder.AsMemory();
+                ICharSequence sequence = new SpanCopyableCharSequence(memory);
+                builder.Append(sequence, sourceIndex, sourceLength);
+                Assert.Equal(expected, builder.ToString());
+            }
+
+            {
+                MutableTextBuffer builder = MutableTextBufferFactory(value);
+                ReadOnlyMemory<char> memory = builder.AsMemory();
+                ICharSequence sequence = new SimpleCharSequence(memory);
+                builder.Append(sequence, sourceIndex, sourceLength);
+                Assert.Equal(expected, builder.ToString());
+            }
+        }
+
 #nullable disable
 
         public static IEnumerable<object[]> AppendFormat_TestData()
@@ -3172,6 +3259,16 @@ namespace J2N.Text.Tests
         {
             var builder = MutableTextBufferFactory(original);
             builder.Append(new ReadOnlySpan<char>(value));
+            Assert.Equal(expected, builder.ToString());
+        }
+
+        [Theory]
+        [MemberData(nameof(Append_Overlapping_TestData))]
+        public void Append_CharSpan_Overlapping(string value, int sourceIndex, int sourceLength, string expected)
+        {
+            MutableTextBuffer builder = MutableTextBufferFactory(value);
+            ReadOnlySpan<char> source = builder.AsSpan(sourceIndex, sourceLength);
+            builder.Append(source);
             Assert.Equal(expected, builder.ToString());
         }
 
