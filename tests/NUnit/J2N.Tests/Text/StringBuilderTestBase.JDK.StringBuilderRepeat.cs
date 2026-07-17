@@ -119,30 +119,28 @@ namespace J2N.Text
 
             // Codepoints
 
-            // J2N TODO: We currently have a gap here - there is no API where we can append code points repeatedly. It would be better to make the new API Repeat(int codePoint, int count) than to overload AppendCodePoint() and diverge from the JDK.
+            sb.Length = 0;
 
-            //sb.Length = 0;
+            sb.AppendCodePoint(0, 0);
+            sb.AppendCodePoint(0, 1);
+            sb.AppendCodePoint(0, 5);
 
-            //sb.AppendCodePoint(0, 0);
-            //sb.AppendCodePoint(0, 1);
-            //sb.AppendCodePoint(0, 5);
+            sb.AppendCodePoint((int)' ', 0);
+            sb.AppendCodePoint((int)' ', 1);
+            sb.AppendCodePoint((int)' ', 5);
 
-            //sb.AppendCodePoint((int)' ', 0);
-            //sb.AppendCodePoint((int)' ', 1);
-            //sb.AppendCodePoint((int)' ', 5);
+            sb.AppendCodePoint(0x2460, 0);
+            sb.AppendCodePoint(0x2461, 1);
+            sb.AppendCodePoint(0x2462, 5);
 
-            //sb.AppendCodePoint(0x2460, 0);
-            //sb.AppendCodePoint(0x2461, 1);
-            //sb.AppendCodePoint(0x2462, 5);
+            sb.AppendCodePoint(0x10FFFF, 0);
+            sb.AppendCodePoint(0x10FFFF, 1);
+            sb.AppendCodePoint(0x10FFFF, 5);
 
-            //sb.AppendCodePoint(0x10FFFF, 0);
-            //sb.AppendCodePoint(0x10FFFF, 1);
-            //sb.AppendCodePoint(0x10FFFF, 5);
+            expected =
+                "\u0000\u0000\u0000\u0000\u0000\u0000\u0020\u0020\u0020\u0020\u0020\u0020\u2461\u2462\u2462\u2462\u2462\u2462\udbff\udfff\udbff\udfff\udbff\udfff\udbff\udfff\udbff\udfff\udbff\udfff";
 
-            //expected =
-            //    "\u0000\u0000\u0000\u0000\u0000\u0000\u0020\u0020\u0020\u0020\u0020\u0020\u2461\u2462\u2462\u2462\u2462\u2462\udbff\udfff\udbff\udfff\udbff\udfff\udbff\udfff\udbff\udfff\udbff\udfff";
-
-            //Assert.That(sb.ToString(), Is.EqualTo(expected));
+            Assert.That(sb.ToString(), Is.EqualTo(expected));
         }
 
         [Test]
@@ -182,15 +180,20 @@ namespace J2N.Text
                 sb.Insert(sb.Length, MYCHARS, -1);
             });
 
-            //Assert.Throws<ArgumentOutOfRangeException>(() =>
-            //{
-            //    sb.AppendCodePoint(0x10FFFF + 1, -1);
-            //});
+            Assert.Throws<ArgumentException>(() =>
+            {
+                sb.AppendCodePoint(Character.MaxCodePoint + 1, 1);
+            });
 
-            //Assert.Throws<ArgumentOutOfRangeException>(() =>
-            //{
-            //    sb.AppendCodePoint(-1, -1);
-            //});
+            Assert.Throws<ArgumentException>(() =>
+            {
+                sb.AppendCodePoint(Character.MinCodePoint - 1, 1);
+            });
+
+            Assert.Throws<ArgumentOutOfRangeException>(() =>
+            {
+                sb.AppendCodePoint(0, -1);
+            });
         }
     }
 }

@@ -29,7 +29,7 @@ namespace J2N.Text
         /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
         /// <param name="text">The target builder.</param>
         /// <param name="value">The character to append.</param>
-        /// <param name="repeatCount">The number of times to append value.</param>
+        /// <param name="repeatCount">The number of times to append <paramref name="value"/>.</param>
         /// <returns>A reference to this instance after the operation has completed.</returns>
         /// <exception cref="ArgumentOutOfRangeException">
         /// <paramref name="repeatCount"/> is less than zero.
@@ -72,6 +72,35 @@ namespace J2N.Text
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
 
             text.AppendInternal(value, repeatCount);
+            return text;
+        }
+
+        /// <summary>
+        /// Appends a specified number of copies of the string representation of the <paramref name="codePoint"/>
+        /// argument to this sequence.
+        /// </summary>
+        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
+        /// <param name="text">The target builder.</param>
+        /// <param name="codePoint">A Unicode code point.</param>
+        /// <param name="repeatCount">The number of times to append the string representation of <paramref name="codePoint"/>.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="ArgumentException"><paramref name="codePoint"/> is not a valid Unicode code point.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="repeatCount"/> is less than zero.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// Appending <paramref name="repeatCount"/> * the length of the code point would result in a buffer size larger than <see cref="MutableTextBuffer.MaxCapacity"/>.
+        /// </exception>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [CodeGenerationGenerateForwarder]
+        public static TBuilder AppendCodePoint<TBuilder>(this TBuilder text, int codePoint, int repeatCount)
+            where TBuilder : MutableTextBuffer
+        {
+            if (text is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
+
+            text.AppendCodePointInternal(codePoint, repeatCount);
             return text;
         }
 
