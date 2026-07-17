@@ -2257,6 +2257,117 @@ namespace J2N.Text.Tests
             AssertExtensions.Throws<ArgumentOutOfRangeException>("count", () => builder.Insert(0, new char[0].AsCharSequence(), 0, -1)); // Char count < 0
         }
 
+        public static IEnumerable<object[]> Insert_Overlapping_TestData()
+        {
+            // source entirely before insertion point
+            yield return new object[] { "abcdefghijklmnopqrstuvwxyz", 10, 0, 5, "abcdefghijabcdeklmnopqrstuvwxyz" };
+            yield return new object[] { "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz", 10, 0, 5, "abcdefghijabcdeklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz" };
+
+            // source immediately before insertion point
+            yield return new object[] { "abcdefghijklmnopqrstuvwxyz", 5, 2, 3, "abcdecdefghijklmnopqrstuvwxyz" };
+
+            // source entirely after insertion point
+            yield return new object[] { "abcdefghijklmnopqrstuvwxyz", 5, 10, 5, "abcdeklmnofghijklmnopqrstuvwxyz" };
+
+            // source immediately after insertion point
+            yield return new object[] { "abcdefghijklmnopqrstuvwxyz", 5, 5, 3, "abcdefghfghijklmnopqrstuvwxyz" };
+
+            // insert at beginning from middle
+            yield return new object[] { "abcdefghijklmnopqrstuvwxyz", 0, 10, 5, "klmnoabcdefghijklmnopqrstuvwxyz" };
+
+            // insert at end from beginning
+            yield return new object[] { "abcdefghijklmnopqrstuvwxyz", 26, 0, 5, "abcdefghijklmnopqrstuvwxyzabcde" };
+
+            // source spans insertion point
+            yield return new object[] { "abcdefghijklmnopqrstuvwxyz", 10, 8, 6, "abcdefghijijklmnklmnopqrstuvwxyz" };
+
+            // insertion inside source
+            yield return new object[] { "abcdefghijklmnopqrstuvwxyz", 8, 5, 10, "abcdefghfghijklmnoijklmnopqrstuvwxyz" };
+
+            // whole buffer
+            yield return new object[] { "abcdefghijklmnopqrstuvwxyz", 26, 0, 26, "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz" };
+
+            // empty span
+            yield return new object[] { "abcdefghijklmnopqrstuvwxyz", 10, 5, 0, "abcdefghijklmnopqrstuvwxyz" };
+
+            // empty buffer
+            yield return new object[] { "", 0, 0, 0, "" };
+        }
+
+        [Theory]
+        [MemberData(nameof(Insert_Overlapping_TestData))]
+        public void Insert_ICharSequence_Overlapping(string value, int index, int sourceIndex, int sourceLength, string expected)
+        {
+            {
+                MutableTextBuffer builder = MutableTextBufferFactory(value);
+                ReadOnlyMemory<char> memory = builder.AsMemory(sourceIndex, sourceLength);
+                ICharSequence sequence = new SpannableCharSequence(memory);
+                builder.Insert(index, sequence);
+                Assert.Equal(expected, builder.ToString());
+            }
+
+            {
+                MutableTextBuffer builder = MutableTextBufferFactory(value);
+                ReadOnlyMemory<char> memory = builder.AsMemory(sourceIndex, sourceLength);
+                ICharSequence sequence = new CopyableCharSequence(memory);
+                builder.Insert(index, sequence);
+                Assert.Equal(expected, builder.ToString());
+            }
+
+            {
+                MutableTextBuffer builder = MutableTextBufferFactory(value);
+                ReadOnlyMemory<char> memory = builder.AsMemory(sourceIndex, sourceLength);
+                ICharSequence sequence = new SpanCopyableCharSequence(memory);
+                builder.Insert(index, sequence);
+                Assert.Equal(expected, builder.ToString());
+            }
+
+            {
+                MutableTextBuffer builder = MutableTextBufferFactory(value);
+                ReadOnlyMemory<char> memory = builder.AsMemory(sourceIndex, sourceLength);
+                ICharSequence sequence = new SimpleCharSequence(memory);
+                builder.Insert(index, sequence);
+                Assert.Equal(expected, builder.ToString());
+            }
+        }
+
+        [Theory]
+        [MemberData(nameof(Insert_Overlapping_TestData))]
+        public void Insert_ICharSequence_Int32_Int32_Overlapping(string value, int index, int sourceIndex, int sourceLength, string expected)
+        {
+            {
+                MutableTextBuffer builder = MutableTextBufferFactory(value);
+                ReadOnlyMemory<char> memory = builder.AsMemory();
+                ICharSequence sequence = new SpannableCharSequence(memory);
+                builder.Insert(index, sequence, sourceIndex, sourceLength);
+                Assert.Equal(expected, builder.ToString());
+            }
+
+            {
+                MutableTextBuffer builder = MutableTextBufferFactory(value);
+                ReadOnlyMemory<char> memory = builder.AsMemory();
+                ICharSequence sequence = new CopyableCharSequence(memory);
+                builder.Insert(index, sequence, sourceIndex, sourceLength);
+                Assert.Equal(expected, builder.ToString());
+            }
+
+            {
+                MutableTextBuffer builder = MutableTextBufferFactory(value);
+                ReadOnlyMemory<char> memory = builder.AsMemory();
+                ICharSequence sequence = new SpanCopyableCharSequence(memory);
+                builder.Insert(index, sequence, sourceIndex, sourceLength);
+                Assert.Equal(expected, builder.ToString());
+            }
+
+            {
+                MutableTextBuffer builder = MutableTextBufferFactory(value);
+                ReadOnlyMemory<char> memory = builder.AsMemory();
+                ICharSequence sequence = new SimpleCharSequence(memory);
+                builder.Insert(index, sequence, sourceIndex, sourceLength);
+                Assert.Equal(expected, builder.ToString());
+            }
+        }
+
         [Theory]
         [InlineData("Hello", 0, "\0", "\0Hello")]
         [InlineData("Hello", 3, "abc", "Helabclo")]
@@ -3319,6 +3430,16 @@ namespace J2N.Text.Tests
         {
             var builder = MutableTextBufferFactory(original);
             builder.Insert(index, new ReadOnlySpan<char>(value));
+            Assert.Equal(expected, builder.ToString());
+        }
+
+        [Theory]
+        [MemberData(nameof(Insert_Overlapping_TestData))]
+        public void Insert_CharSpan_Overlapping(string value, int index, int sourceIndex, int sourceLength, string expected)
+        {
+            MutableTextBuffer builder = MutableTextBufferFactory(value);
+            ReadOnlySpan<char> source = builder.AsSpan(sourceIndex, sourceLength);
+            builder.Insert(index, source);
             Assert.Equal(expected, builder.ToString());
         }
 

@@ -822,22 +822,40 @@ namespace J2N.Text
                 return;
 
             int count = value.Length;
-            MakeRoom(index, count);
+            char[]? arrayToReturn = null;
+            try
+            {
+                // If the source doesn't implement ISpannable<char>, we have no way to test
+                // whether the implementation overlaps our memory. So, the only safe approach
+                // is to always take a snapshot prior to moving any memory.
 
-            if (value is ISpanCopyable<char> spanCopyable)
-            {
-                spanCopyable.CopyTo(0, m_Chars.AsSpan(index), count);
-            }
-            else if (value is ICopyable<char> copyable)
-            {
-                copyable.CopyTo(0, m_Chars, index, count);
-            }
-            else
-            {
-                for (int i = 0; i < count; i++)
+                Span<char> temp = count <= CharStackBufferSize
+                    ? stackalloc char[count]
+                    : (arrayToReturn = allocator.Allocate(count)).AsSpan(0, count);
+
+                if (value is ISpanCopyable<char> spanCopyable)
                 {
-                    m_Chars[index++] = value[i];
+                    spanCopyable.CopyTo(0, temp, count);
                 }
+                else if (arrayToReturn is not null && value is ICopyable<char> copyable)
+                {
+                    copyable.CopyTo(0, arrayToReturn, 0, count);
+                }
+                else
+                {
+                    for (int i = 0; i < count; i++)
+                    {
+                        temp[i] = value[i];
+                    }
+                }
+
+                MakeRoom(index, count);
+                temp.CopyTo(m_Chars.AsSpan(index));
+            }
+            finally
+            {
+                if (arrayToReturn is not null)
+                    allocator.Return(arrayToReturn);
             }
         }
 
@@ -891,22 +909,40 @@ namespace J2N.Text
                     return;
                 }
 
-                MakeRoom(index, count);
+                char[]? arrayToReturn = null;
+                try
+                {
+                    // If the source doesn't implement ISpannable<char>, we have no way to test
+                    // whether the implementation overlaps our memory. So, the only safe approach
+                    // is to always take a snapshot prior to moving any memory.
 
-                if (value is ISpanCopyable<char> spanCopyable)
-                {
-                    spanCopyable.CopyTo(startIndex, m_Chars.AsSpan(index), count);
-                }
-                else if (value is ICopyable<char> copyable)
-                {
-                    copyable.CopyTo(startIndex, m_Chars, index, count);
-                }
-                else
-                {
-                    for (int i = 0; i < count; i++)
+                    Span<char> temp = count <= CharStackBufferSize
+                        ? stackalloc char[count]
+                        : (arrayToReturn = allocator.Allocate(count)).AsSpan(0, count);
+
+                    if (value is ISpanCopyable<char> spanCopyable)
                     {
-                        m_Chars[index++] = value[i + startIndex];
+                        spanCopyable.CopyTo(startIndex, temp, count);
                     }
+                    else if (arrayToReturn is not null && value is ICopyable<char> copyable)
+                    {
+                        copyable.CopyTo(startIndex, arrayToReturn, 0, count);
+                    }
+                    else
+                    {
+                        for (int i = 0; i < count; i++)
+                        {
+                            temp[i] = value[startIndex + i];
+                        }
+                    }
+
+                    MakeRoom(index, count);
+                    temp.CopyTo(m_Chars.AsSpan(index));
+                }
+                finally
+                {
+                    if (arrayToReturn is not null)
+                        allocator.Return(arrayToReturn);
                 }
             }
         }
