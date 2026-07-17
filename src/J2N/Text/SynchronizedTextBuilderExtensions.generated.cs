@@ -3619,7 +3619,7 @@ namespace J2N.Text
         /// to the end of the sequence if no such character exists. First the
         /// characters in the substring are removed and then the specified
         /// <paramref name="newValue"/> is inserted at <paramref name="startIndex"/>.
-        /// This <see cref="ValueStringBuilder"/> will be lengthened to accommodate the
+        /// This <see cref="SynchronizedTextBuilder"/> will be lengthened to accommodate the
         /// specified <paramref name="newValue"/> if necessary.
         /// <para/>
         /// IMPORTANT: This method has .NET semantics. That is, the <paramref name="count"/> parameter is a count rather than
@@ -3661,7 +3661,7 @@ namespace J2N.Text
         /// to the end of the sequence if no such character exists. First the
         /// characters in the substring are removed and then the specified
         /// <paramref name="newValue"/> is inserted at <paramref name="startIndex"/>.
-        /// This <see cref="ValueStringBuilder"/> will be lengthened to accommodate the
+        /// This <see cref="SynchronizedTextBuilder"/> will be lengthened to accommodate the
         /// specified <paramref name="newValue"/> if necessary.
         /// <para/>
         /// IMPORTANT: This method has .NET semantics. That is, the <paramref name="count"/> parameter is a count rather than
@@ -3683,6 +3683,90 @@ namespace J2N.Text
         /// <remarks>This method allows <paramref name="newValue"/> to be this instance or a slice of this instance.</remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TBuilder Replace<TBuilder>(this TBuilder text, int startIndex, int count, ReadOnlySpan<char> newValue)
+            where TBuilder : SynchronizedTextBuilder
+        {
+            if (text is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
+
+            lock (text.SyncRoot)
+            {
+                text.buffer.ReplaceInternal(startIndex, count, newValue);
+                return text;
+            }
+        }
+
+        /// <summary>
+        /// Replaces the specified substring in this builder with the specified
+        /// string builder, <paramref name="newValue"/>. The substring begins at the specified
+        /// <paramref name="startIndex"/> and ends to the character at
+        /// <c><paramref name="count"/> - <paramref name="startIndex"/></c> or
+        /// to the end of the sequence if no such character exists. First the
+        /// characters in the substring are removed and then the specified
+        /// <paramref name="newValue"/> is inserted at <paramref name="startIndex"/>.
+        /// This <see cref="SynchronizedTextBuilder"/> will be lengthened to accommodate the
+        /// specified <paramref name="newValue"/> if necessary.
+        /// <para/>
+        /// IMPORTANT: This method has .NET semantics. That is, the <paramref name="count"/> parameter is a count rather than
+        /// an exclusive end index. To translate from Java, use <c>end - start</c> for <paramref name="count"/>.
+        /// </summary>
+        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
+        /// <param name="text">The target builder.</param>
+        /// <param name="startIndex">The inclusive begin index in this builder.</param>
+        /// <param name="count">The number of characters to replace.</param>
+        /// <param name="newValue">The replacement string.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="newValue"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="startIndex"/> or <paramref name="count"/> is less than zero.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="startIndex"/> is greater than or equal to <see cref="SynchronizedTextBuilder.Length"/>.
+        /// </exception>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static TBuilder Replace<TBuilder>(this TBuilder text, int startIndex, int count, StringBuilder newValue)
+            where TBuilder : SynchronizedTextBuilder
+        {
+            if (text is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
+
+            lock (text.SyncRoot)
+            {
+                text.buffer.ReplaceInternal(startIndex, count, newValue);
+                return text;
+            }
+        }
+
+        /// <summary>
+        /// Replaces the specified substring in this builder with the specified
+        /// sequence of characters, <paramref name="newValue"/>. The substring begins at the specified
+        /// <paramref name="startIndex"/> and ends to the character at
+        /// <c><paramref name="count"/> - <paramref name="startIndex"/></c> or
+        /// to the end of the sequence if no such character exists. First the
+        /// characters in the substring are removed and then the specified
+        /// <paramref name="newValue"/> is inserted at <paramref name="startIndex"/>.
+        /// This <see cref="SynchronizedTextBuilder"/> will be lengthened to accommodate the
+        /// specified <paramref name="newValue"/> if necessary.
+        /// <para/>
+        /// IMPORTANT: This method has .NET semantics. That is, the <paramref name="count"/> parameter is a count rather than
+        /// an exclusive end index. To translate from Java, use <c>end - start</c> for <paramref name="count"/>.
+        /// </summary>
+        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
+        /// <param name="text">The target builder.</param>
+        /// <param name="startIndex">The inclusive begin index in this builder.</param>
+        /// <param name="count">The number of characters to replace.</param>
+        /// <param name="newValue">The replacement string.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="newValue"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="startIndex"/> or <paramref name="count"/> is less than zero.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="startIndex"/> is greater than or equal to <see cref="SynchronizedTextBuilder.Length"/>.
+        /// </exception>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static TBuilder Replace<TBuilder>(this TBuilder text, int startIndex, int count, ICharSequence newValue)
             where TBuilder : SynchronizedTextBuilder
         {
             if (text is null)

@@ -5,6 +5,8 @@
 using J2N.TestUtilities.Xunit;
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
+using System.Text;
 using Xunit;
 
 namespace J2N.Text.Tests
@@ -200,219 +202,305 @@ namespace J2N.Text.Tests
             AssertExtensions.Throws<ArgumentOutOfRangeException>("count", () => builder.Replace("a".AsSpan(), "b".AsSpan(), 4, 2)); // Count + start index > builder.Length
         }
 
-
-
-
-        //[Fact]
-        //public void Replace_SelfReferentialSpan_FromLaterRegion()
-        //{
-        //    var builder = MutableTextBufferFactory("abcdefghijklmnopqrstuvwxyz");
-
-        //    ReadOnlySpan<char> source = builder.AsSpan(10, 5);
-
-        //    builder.Replace(0, 3, source);
-
-        //    Assert.Equal("klmnodefghijklmnopqrstuvwxyz", builder.ToString());
-        //}
-
-        //[Fact]
-        //public void Replace_SelfReferentialSpan_FromEarlierRegion()
-        //{
-        //    var builder = MutableTextBufferFactory("abcdefghijklmnopqrstuvwxyz");
-
-        //    ReadOnlySpan<char> source = builder.AsSpan(0, 5);
-
-        //    builder.Replace(10, 3, source);
-
-        //    Assert.Equal("abcdefghijabcdenopqrstuvwxyz", builder.ToString());
-        //}
-
-        [Fact]
-        public void Replace_OverlappingSpan_SourceBeforeReplaceRegion()
+        public static IEnumerable<object[]> Replace_Int32_Int32_TestData()
         {
-            var builder = MutableTextBufferFactory("abcdefghijklmnopqrstuvwxyz");
+            yield return new object[] { "", 0, 0, "abc", "abc" };
+            yield return new object[] { "abcdef", 0, 0, "X", "Xabcdef" };
+            yield return new object[] { "abcdef", 6, 0, "X", "abcdefX" };
+            yield return new object[] { "abcdef", 2, 0, "XYZ", "abXYZcdef" };
 
-            ReadOnlySpan<char> source = builder.AsSpan(0, 5); // abcde
+            yield return new object[] { "abcdef", 0, 2, "XY", "XYcdef" };
+            yield return new object[] { "abcdef", 2, 2, "XY", "abXYef" };
+            yield return new object[] { "abcdef", 4, 2, "XY", "abcdXY" };
 
-            builder.Replace(10, 3, source);
+            yield return new object[] { "abcdef", 2, 2, "WXYZ", "abWXYZef" };
+            yield return new object[] { "abcdef", 2, 3, "Q", "abQf" };
+            yield return new object[] { "abcdef", 2, 3, "", "abf" };
 
-            Assert.Equal("abcdefghijabcdenopqrstuvwxyz", builder.ToString());
+            // Count extends past end (Harmony/JDK semantics)
+            yield return new object[] { "abcdef", 4, 100, "XYZ", "abcdXYZ" };
+            yield return new object[] { "abcdef", 6, 100, "XYZ", "abcdefXYZ" };
+
+            yield return new object[] { "0123456789", 3, 4, "abcdef", "012abcdef789" };
+            yield return new object[] { "The quick brown fox", 4, 5, "slow", "The slow brown fox" };
+        }
+
+        [Theory]
+        [MemberData(nameof(Replace_Int32_Int32_TestData))]
+        public void Replace_Int32_Int32_String(string value, int startIndex, int count, string newValue, string expected)
+        {
+            MutableTextBuffer builder = MutableTextBufferFactory(value);
+
+            builder.Replace(startIndex, count, newValue);
+
+            Assert.Equal(expected, builder.ToString());
+        }
+
+        [Theory]
+        [MemberData(nameof(Replace_Int32_Int32_TestData))]
+        public void Replace_Int32_Int32_CharSpan(string value, int startIndex, int count, string newValue, string expected)
+        {
+            MutableTextBuffer builder = MutableTextBufferFactory(value);
+
+            builder.Replace(startIndex, count, newValue.AsSpan());
+
+            Assert.Equal(expected, builder.ToString());
+        }
+
+        [Theory]
+        [MemberData(nameof(Replace_Int32_Int32_TestData))]
+        public void Replace_Int32_Int32_StringBuilder(string value, int startIndex, int count, string newValue, string expected)
+        {
+            MutableTextBuffer builder = MutableTextBufferFactory(value);
+
+            builder.Replace(startIndex, count, new StringBuilder(newValue));
+
+            Assert.Equal(expected, builder.ToString());
+        }
+
+        [Theory]
+        [MemberData(nameof(Replace_Int32_Int32_TestData))]
+        public void Replace_Int32_Int32_ICharSequence(string value, int startIndex, int count, string newValue, string expected)
+        {
+            {
+                MutableTextBuffer builder = MutableTextBufferFactory(value);
+                ICharSequence sequence = new SpannableCharSequence(newValue.AsMemory());
+                builder.Replace(startIndex, count, sequence);
+                Assert.Equal(expected, builder.ToString());
+            }
+
+            {
+                MutableTextBuffer builder = MutableTextBufferFactory(value);
+                ICharSequence sequence = new CopyableCharSequence(newValue.AsMemory());
+                builder.Replace(startIndex, count, sequence);
+                Assert.Equal(expected, builder.ToString());
+            }
+
+            {
+                MutableTextBuffer builder = MutableTextBufferFactory(value);
+                ICharSequence sequence = new SpanCopyableCharSequence(newValue.AsMemory());
+                builder.Replace(startIndex, count, sequence);
+                Assert.Equal(expected, builder.ToString());
+            }
+
+            {
+                MutableTextBuffer builder = MutableTextBufferFactory(value);
+                ICharSequence sequence = new SimpleCharSequence(newValue.AsMemory());
+                builder.Replace(startIndex, count, sequence);
+                Assert.Equal(expected, builder.ToString());
+            }
+        }
+
+        public static IEnumerable<object[]> Replace_Int32_Int32_Invalid_TestData()
+        {
+            // value, capacity, maxCapacity, startIndex, count, newValue,
+            // expectedExceptionType, expectedParamName
+
+            // null replacement
+            yield return new object[] { "Hello", 5, 100, 0, 0, null, typeof(ArgumentNullException), "newValue" };
+
+            // invalid start index
+            yield return new object[] { "Hello", 5, 100, -1, 0, "X", typeof(ArgumentOutOfRangeException), "startIndex" };
+            yield return new object[] { "Hello", 5, 100, 6, 0, "X", typeof(ArgumentOutOfRangeException), "startIndex" };
+
+            // invalid count
+            yield return new object[] { "Hello", 5, 100, 0, -1, "X", typeof(ArgumentOutOfRangeException), "count" };
+
+            // replacement would exceed MaxCapacity
+            yield return new object[] { "Hello", 5, 5, 4, 1, "ABCDE", typeof(ArgumentOutOfRangeException), "requiredLength" };
+        }
+
+        [Theory]
+        [MemberData(nameof(Replace_Int32_Int32_Invalid_TestData))]
+        public void Replace_Int32_Int32_String_Invalid(
+            string value,
+            int capacity,
+            int maxCapacity,
+            int startIndex,
+            int count,
+            string newValue,
+            Type exceptionType,
+            string paramName)
+        {
+            MutableTextBuffer builder = MutableTextBufferFactory(capacity, maxCapacity);
+            builder.Append(value);
+
+            AssertExtensions.Throws(exceptionType, paramName,
+                () => builder.Replace(startIndex, count, newValue));
+        }
+
+        [Theory]
+        [MemberData(nameof(Replace_Int32_Int32_Invalid_TestData))]
+        public void Replace_Int32_Int32_CharSpan_Invalid(
+            string value,
+            int capacity,
+            int maxCapacity,
+            int startIndex,
+            int count,
+            string newValue,
+            Type exceptionType,
+            string paramName)
+        {
+            // Span overload cannot receive null.
+            if (newValue is null)
+                return;
+
+            MutableTextBuffer builder = MutableTextBufferFactory(capacity, maxCapacity);
+            builder.Append(value);
+
+            AssertExtensions.Throws(exceptionType, paramName,
+                () => builder.Replace(startIndex, count, newValue.AsSpan()));
+        }
+
+        [Theory]
+        [MemberData(nameof(Replace_Int32_Int32_Invalid_TestData))]
+        public void Replace_Int32_Int32_StringBuilder_Invalid(
+            string value,
+            int capacity,
+            int maxCapacity,
+            int startIndex,
+            int count,
+            string newValue,
+            Type exceptionType,
+            string paramName)
+        {
+            MutableTextBuffer builder = MutableTextBufferFactory(capacity, maxCapacity);
+            builder.Append(value);
+
+            StringBuilder replacement = newValue is null ? null : new StringBuilder(newValue);
+
+            AssertExtensions.Throws(exceptionType, paramName,
+                () => builder.Replace(startIndex, count, replacement));
+        }
+
+        [Theory]
+        [MemberData(nameof(Replace_Int32_Int32_Invalid_TestData))]
+        public void Replace_Int32_Int32_ICharSequence_Invalid(
+            string value,
+            int capacity,
+            int maxCapacity,
+            int startIndex,
+            int count,
+            string newValue,
+            Type exceptionType,
+            string paramName)
+        {
+            MutableTextBuffer builder = MutableTextBufferFactory(capacity, maxCapacity);
+            builder.Append(value);
+
+            ICharSequence replacement = newValue is null ? null : new SimpleCharSequence(newValue.AsMemory());
+
+            AssertExtensions.Throws(exceptionType, paramName,
+                () => builder.Replace(startIndex, count, replacement));
+        }
+
+        public static IEnumerable<object[]> Replace_Int32_Int32_Overlapping_TestData()
+        {
+            yield return new object[] { "abcdefghijklmnopqrstuvwxyz", 10, 3, 0, 5, "abcdefghijabcdenopqrstuvwxyz" };
+            yield return new object[] { "abcdefghijklmnopqrstuvwxyz", 0, 3, 10, 5, "klmnodefghijklmnopqrstuvwxyz" };
+            yield return new object[] { "abcdefghijklmnopqrstuvwxyz", 0, 3, 10, 3, "klmdefghijklmnopqrstuvwxyz" };
+            yield return new object[] { "abcdefghijklmnopqrstuvwxyz", 10, 3, 0, 8, "abcdefghijabcdefghnopqrstuvwxyz" };
+            yield return new object[] { "abcdefghijklmnopqrstuvwxyz", 0, 3, 15, 8, "pqrstuvwdefghijklmnopqrstuvwxyz" };
+            yield return new object[] { "abcdefghijklmnopqrstuvwxyz", 10, 8, 0, 2, "abcdefghijabstuvwxyz" };
+            yield return new object[] { "abcdefghijklmnopqrstuvwxyz", 0, 8, 20, 2, "uvijklmnopqrstuvwxyz" };
+            yield return new object[] { "abcdefghijklmnopqrstuvwxyz", 0, 10, 5, 5, "fghijklmnopqrstuvwxyz" };
+            yield return new object[] { "abcdefghijklmnopqrstuvwxyz", 3, 2, 0, 10, "abcabcdefghijfghijklmnopqrstuvwxyz" };
+            yield return new object[] { "abcdefghijklmnopqrstuvwxyz", 10, 10, 5, 10, "abcdefghijfghijklmnouvwxyz" };
+            yield return new object[] { "abcdefghijklmnopqrstuvwxyz", 5, 10, 10, 10, "abcdeklmnopqrstpqrstuvwxyz" };
+
+            // Whole-buffer replacement (fast no-op)
+            yield return new object[] { "abcdefghijklmnopqrstuvwxyz", 0, 26, 0, 26, "abcdefghijklmnopqrstuvwxyz" };
+
+            // Empty spans (Overlaps() == false)
+            yield return new object[] { "abcdef", 2, 3, 1, 0, "abf" };
+            yield return new object[] { "abcdef", 0, 6, 2, 0, "" };
+            yield return new object[] { "abcdef", 4, 2, 0, 0, "abcd" };
+            yield return new object[] { "abcdef", 3, 0, 1, 0, "abcdef" };
+        }
+
+        [Theory]
+        [MemberData(nameof(Replace_Int32_Int32_Overlapping_TestData))]
+        public void Replace_Int32_Int32_CharSpan_Overlapping(
+            string value,
+            int startIndex,
+            int count,
+            int sourceIndex,
+            int sourceLength,
+            string expected)
+        {
+            MutableTextBuffer builder = MutableTextBufferFactory(value);
+
+            ReadOnlySpan<char> source = builder.AsSpan(sourceIndex, sourceLength);
+
+            builder.Replace(startIndex, count, source);
+
+            Assert.Equal(expected, builder.ToString());
+        }
+
+        [Theory]
+        [MemberData(nameof(Replace_Int32_Int32_Overlapping_TestData))]
+        public void Replace_Int32_Int32_ICharSequence_Overlapping(
+            string value,
+            int startIndex,
+            int count,
+            int sourceIndex,
+            int sourceLength,
+            string expected)
+        {
+            {
+                MutableTextBuffer builder = MutableTextBufferFactory(value);
+                ReadOnlyMemory<char> memory = builder.AsMemory(sourceIndex, sourceLength);
+                ICharSequence sequence = new SpannableCharSequence(memory);
+                builder.Replace(startIndex, count, sequence);
+                Assert.Equal(expected, builder.ToString());
+            }
+
+            {
+                MutableTextBuffer builder = MutableTextBufferFactory(value);
+                ReadOnlyMemory<char> memory = builder.AsMemory(sourceIndex, sourceLength);
+                ICharSequence sequence = new CopyableCharSequence(memory);
+                builder.Replace(startIndex, count, sequence);
+                Assert.Equal(expected, builder.ToString());
+            }
+
+            {
+                MutableTextBuffer builder = MutableTextBufferFactory(value);
+                ReadOnlyMemory<char> memory = builder.AsMemory(sourceIndex, sourceLength);
+                ICharSequence sequence = new SpanCopyableCharSequence(memory);
+                builder.Replace(startIndex, count, sequence);
+                Assert.Equal(expected, builder.ToString());
+            }
+
+            {
+                MutableTextBuffer builder = MutableTextBufferFactory(value);
+                ReadOnlyMemory<char> memory = builder.AsMemory(sourceIndex, sourceLength);
+                ICharSequence sequence = new SimpleCharSequence(memory);
+                builder.Replace(startIndex, count, sequence);
+                Assert.Equal(expected, builder.ToString());
+            }
         }
 
         [Fact]
-        public void Replace_OverlappingSpan_SourceAfterReplaceRegion()
+        public void Replace_Int32_Int32_ReadOnlySpan_Overlapping_SelfReplacement_NoOp()
         {
-            var builder = MutableTextBufferFactory("abcdefghijklmnopqrstuvwxyz");
+            MutableTextBuffer builder = MutableTextBufferFactory("abcdefghijklmnopqrstuvwxyz");
 
-            ReadOnlySpan<char> source = builder.AsSpan(10, 5); // klmno
-
-            builder.Replace(0, 3, source);
-
-            Assert.Equal("klmnodefghijklmnopqrstuvwxyz", builder.ToString());
-        }
-
-        [Fact]
-        public void Replace_OverlappingSpan_EqualLength()
-        {
-            var builder = MutableTextBufferFactory("abcdefghijklmnopqrstuvwxyz");
-
-            ReadOnlySpan<char> source = builder.AsSpan(10, 3); // klm
-
-            builder.Replace(0, 3, source);
-
-            Assert.Equal("klmdefghijklmnopqrstuvwxyz", builder.ToString());
-        }
-
-        [Fact]
-        public void Replace_OverlappingSpan_Grow_SourceBeforeRegion()
-        {
-            var builder = MutableTextBufferFactory("abcdefghijklmnopqrstuvwxyz");
-
-            ReadOnlySpan<char> source = builder.AsSpan(0, 8); // abcdefgh
-
-            builder.Replace(10, 3, source);
-
-            Assert.Equal("abcdefghijabcdefghnopqrstuvwxyz", builder.ToString());
-        }
-
-        [Fact]
-        public void Replace_OverlappingSpan_Grow_SourceAfterRegion()
-        {
-            var builder = MutableTextBufferFactory("abcdefghijklmnopqrstuvwxyz");
-
-            ReadOnlySpan<char> source = builder.AsSpan(15, 8); // pqrstuvw
-
-            builder.Replace(0, 3, source);
-
-            Assert.Equal("pqrstuvwdefghijklmnopqrstuvwxyz", builder.ToString());
-        }
-
-        [Fact]
-        public void Replace_OverlappingSpan_Shrink_SourceBeforeRegion()
-        {
-            var builder = MutableTextBufferFactory("abcdefghijklmnopqrstuvwxyz");
-
-            ReadOnlySpan<char> source = builder.AsSpan(0, 2); // ab
-
-            builder.Replace(10, 8, source);
-
-            Assert.Equal("abcdefghijabstuvwxyz", builder.ToString());
-        }
-
-        [Fact]
-        public void Replace_OverlappingSpan_Shrink_SourceAfterRegion()
-        {
-            var builder = MutableTextBufferFactory("abcdefghijklmnopqrstuvwxyz");
-
-            ReadOnlySpan<char> source = builder.AsSpan(20, 2); // uv
-
-            builder.Replace(0, 8, source);
-
-            Assert.Equal("uvijklmnopqrstuvwxyz", builder.ToString());
-        }
-
-        [Fact]
-        public void Replace_OverlappingSpan_SourceInsideReplaceRegion()
-        {
-            var builder = MutableTextBufferFactory("abcdefghijklmnopqrstuvwxyz");
-
-            ReadOnlySpan<char> source = builder.AsSpan(5, 5); // fghij
-
-            builder.Replace(0, 10, source);
-
-            Assert.Equal("fghijklmnopqrstuvwxyz", builder.ToString());
-        }
-
-        [Fact]
-        public void Replace_OverlappingSpan_ReplaceRegionInsideSource()
-        {
-            var builder = MutableTextBufferFactory("abcdefghijklmnopqrstuvwxyz");
-
-            ReadOnlySpan<char> source = builder.AsSpan(0, 10); // abcdefghij
-
-            builder.Replace(3, 2, source);
-
-            Assert.Equal("abcabcdefghijfghijklmnopqrstuvwxyz", builder.ToString());
-        }
-
-        [Fact]
-        public void Replace_OverlappingSpan_PartialOverlapLeft()
-        {
-            var builder = MutableTextBufferFactory("abcdefghijklmnopqrstuvwxyz");
-
-            ReadOnlySpan<char> source = builder.AsSpan(5, 10); // fghijklmno
-
-            builder.Replace(10, 10, source);
-
-            Assert.Equal("abcdefghijfghijklmnouvwxyz", builder.ToString());
-        }
-
-        [Fact]
-        public void Replace_OverlappingSpan_PartialOverlapRight()
-        {
-            var builder = MutableTextBufferFactory("abcdefghijklmnopqrstuvwxyz");
-
-            ReadOnlySpan<char> source = builder.AsSpan(10, 10); // klmnopqrst
-
-            builder.Replace(5, 10, source);
-
-            Assert.Equal("abcdeklmnopqrstpqrstuvwxyz", builder.ToString());
-        }
-
-        [Fact]
-        public void Replace_OverlappingSpan_WholeBuffer()
-        {
-            var builder = MutableTextBufferFactory("abcdefghijklmnopqrstuvwxyz");
-
-            ReadOnlySpan<char> source = builder.AsSpan();
-
-            builder.Replace(0, builder.Length, source);
+            builder.Replace(5, 10, builder.AsSpan(5, 10));
 
             Assert.Equal("abcdefghijklmnopqrstuvwxyz", builder.ToString());
         }
 
-        // Empty span from overlapping memory causes Overlaps() to return false,
-        // so these tests end up going down the main path instead of the overlapping
-        // path. The logic is the same, though because there is nothing to temporarily
-        // capture if the span is empty even if the source of the AsSpan() call is the same buffer.
         [Fact]
-        public void Replace_OverlappingSpan_EmptySpan_RemovesMiddle()
+        public void Replace_Int32_Int32_ICharSequence_Overlapping_SelfReplacement_NoOp()
         {
-            var builder = MutableTextBufferFactory("abcdef");
+            MutableTextBuffer builder = MutableTextBufferFactory("abcdefghijklmnopqrstuvwxyz");
 
-            builder.Replace(2, 3, builder.AsSpan(1, 0));
+            builder.Replace(
+                5,
+                10,
+                new SpannableCharSequence(builder.AsMemory(5, 10)));
 
-            Assert.Equal("abf", builder.ToString());
-        }
-
-        [Fact]
-        public void Replace_OverlappingSpan_EmptySpan_RemovesAll()
-        {
-            var builder = MutableTextBufferFactory("abcdef");
-
-            builder.Replace(0, builder.Length, builder.AsSpan(2, 0));
-
-            Assert.Equal("", builder.ToString());
-        }
-
-        [Fact]
-        public void Replace_OverlappingSpan_EmptySpan_RemoveTail()
-        {
-            var builder = MutableTextBufferFactory("abcdef");
-
-            builder.Replace(4, 2, builder.AsSpan(0, 0));
-
-            Assert.Equal("abcd", builder.ToString());
-        }
-
-        [Fact]
-        public void Replace_OverlappingSpan_EmptySpan_NoOp()
-        {
-            var builder = MutableTextBufferFactory("abcdef");
-
-            builder.Replace(3, 0, builder.AsSpan(1, 0));
-
-            Assert.Equal("abcdef", builder.ToString());
+            Assert.Equal("abcdefghijklmnopqrstuvwxyz", builder.ToString());
         }
     }
 }

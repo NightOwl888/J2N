@@ -7,6 +7,7 @@ using System;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Text;
 
 namespace J2N.Text
 {
@@ -445,6 +446,139 @@ namespace J2N.Text
                 }
 
                 temp.CopyTo(m_Chars.AsSpan(startIndex));
+            }
+            finally
+            {
+                if (arrayToReturn is not null)
+                    allocator.Return(arrayToReturn);
+            }
+        }
+
+        /// <summary>
+        /// Replaces the specified substring in this builder with the specified span.
+        /// </summary>
+        /// <remarks>
+        /// The public API and full documentation live in
+        /// <see cref="MutableTextBufferExtensions.Replace{TBuilder}(TBuilder, int, int, StringBuilder)"/>.
+        /// Update that documentation if the behavior changes.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [CodeGenerationExtensionImplementation]
+        internal void ReplaceInternal(int startIndex, int count, StringBuilder newValue)
+        {
+            if (newValue is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.newValue);
+            if ((uint)startIndex > (uint)m_Position)
+                ThrowHelper.ThrowStartIndexArgumentOutOfRange_ArgumentOutOfRange_IndexMustBeLessOrEqual(startIndex);
+            if (count < 0)
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(count, ExceptionArgument.count);
+
+
+            // Clamp to end of buffer (Harmony/JDK behavior)
+            int end = count > m_Position - startIndex
+                ? m_Position
+                : startIndex + count; // Overflow not possible here
+
+            int replacedLength = end - startIndex;
+            int delta = newValue.Length - replacedLength;
+            if (delta > 0)
+            {
+                // Need more space.
+                //
+                // Insert the additional space immediately after the replaced region.
+                // This preserves the replacement area while shifting only the tail.
+                MakeRoom(end, delta);
+            }
+            else if (delta < 0)
+            {
+                // Need less space.
+                //
+                // Remove only the excess characters after the replacement area.
+                RemoveCore(startIndex + newValue.Length, -delta);
+            }
+
+            // Overwrite the replacement area.
+            if (newValue.Length > 0)
+            {
+                newValue.CopyTo(0, m_Chars, startIndex, newValue.Length);
+            }
+        }
+
+        /// <summary>
+        /// Replaces the specified substring in this builder with the specified span.
+        /// </summary>
+        /// <remarks>
+        /// The public API and full documentation live in
+        /// <see cref="MutableTextBufferExtensions.Replace{TBuilder}(TBuilder, int, int, ICharSequence)"/>.
+        /// Update that documentation if the behavior changes.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [CodeGenerationExtensionImplementation]
+        internal void ReplaceInternal(int startIndex, int count, ICharSequence newValue)
+        {
+            if (newValue is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.newValue);
+            if ((uint)startIndex > (uint)m_Position)
+                ThrowHelper.ThrowStartIndexArgumentOutOfRange_ArgumentOutOfRange_IndexMustBeLessOrEqual(startIndex);
+            if (count < 0)
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(count, ExceptionArgument.count);
+
+            if (newValue is ISpannable<char> spannable)
+            {
+                ReplaceCore(startIndex, count, spannable.AsSpan());
+                return;
+            }
+
+            // Clamp to end of buffer (Harmony/JDK behavior)
+            int end = count > m_Position - startIndex
+                ? m_Position
+                : startIndex + count; // Overflow not possible here
+
+            int replacedLength = end - startIndex;
+            int newValueLength = newValue.Length;
+
+            char[]? arrayToReturn = null;
+            try
+            {
+                // If the source doesn't implement ISpannable<char>, we have no way to test
+                // whether the implmentation overlaps our memory. So, the only safe approach
+                // is to always take a snapshot prior to moving any memory.
+
+                Span<char> temp = newValueLength <= CharStackBufferSize
+                    ? stackalloc char[newValueLength]
+                    : (arrayToReturn = allocator.Allocate(newValueLength)).AsSpan(0, newValueLength);
+
+                if (newValue is ISpanCopyable<char> spanCopyable)
+                {
+                    spanCopyable.CopyTo(0, temp, newValueLength);
+                }
+                else if (arrayToReturn is not null && newValue is ICopyable<char> copyable)
+                {
+                    copyable.CopyTo(0, arrayToReturn, 0, newValueLength);
+                }
+                else
+                {
+                    for (int i = 0; i < newValueLength; i++)
+                    {
+                        temp[i] = newValue[i];
+                    }
+                }
+
+                int delta = newValueLength - replacedLength;
+
+                if (delta > 0)
+                {
+                    MakeRoom(end, delta);
+                }
+                else if (delta < 0)
+                {
+                    RemoveCore(startIndex + newValueLength, -delta);
+                }
+
+                if (newValueLength > 0)
+                {
+                    temp.CopyTo(m_Chars.AsSpan(startIndex));
+                }
             }
             finally
             {

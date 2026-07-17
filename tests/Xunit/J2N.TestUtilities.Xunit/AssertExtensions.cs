@@ -92,6 +92,15 @@ namespace J2N.TestUtilities.Xunit
             Assert.Equal(expectedParamName, exception.ParamName);
         }
 
+        public static Exception Throws(Type exceptionType, string? expectedParamName, Action action)
+        {
+            Exception exception = Assert.Throws(exceptionType, action);
+
+            Assert.Equal(expectedParamName, (exception as ArgumentException)?.ParamName);
+
+            return exception;
+        }
+
         public static T Throws<T>(string? expectedParamName, Action action)
             where T : ArgumentException
         {
