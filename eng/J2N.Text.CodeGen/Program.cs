@@ -151,6 +151,7 @@ namespace J2N.Text.CodeGen
             GenerateExtensions(
                 j2nSourceDirectory,
                 facadeNamespace: "J2N",
+                emitClassDocumentation: true,
                 textBuilderOptions,
                 j2nExtensionModel,
                 implementationModel);
@@ -158,6 +159,7 @@ namespace J2N.Text.CodeGen
             GenerateExtensions(
                 sourceDirectory,
                 facadeNamespace: "J2N.Text",
+                emitClassDocumentation: false,
                 textBuilderOptions,
                 extensionModel,
                 implementationModel);
@@ -182,6 +184,7 @@ namespace J2N.Text.CodeGen
             GenerateExtensions(
                 j2nSourceDirectory,
                 facadeNamespace: "J2N",
+                emitClassDocumentation: true,
                 synchronizedTextBuilderOptions,
                 j2nExtensionModel,
                 implementationModel);
@@ -189,6 +192,7 @@ namespace J2N.Text.CodeGen
             GenerateExtensions(
                 sourceDirectory,
                 facadeNamespace: "J2N.Text",
+                emitClassDocumentation: false,
                 synchronizedTextBuilderOptions,
                 extensionModel,
                 implementationModel);
@@ -245,6 +249,7 @@ namespace J2N.Text.CodeGen
         static void GenerateExtensions(
             string outputDirectory,
             string facadeNamespace,
+            bool emitClassDocumentation,
             FacadeGenerationOptions generationOptions,
             TypeModel extensionModel,
             TypeModel implementationModel)
@@ -272,6 +277,8 @@ namespace J2N.Text.CodeGen
                     options: new ExtensionEmitterOptions
                     {
                         WrapMembersInLock = generationOptions.IsSynchronized,
+                        EmitClassDocumentation = emitClassDocumentation,
+                        FacadeName = generationOptions.FacadeName,
                     });
 
             string extensionPath =

@@ -7,5 +7,7 @@ namespace J2N.Text.CodeGen.Generation
     public sealed class ExtensionEmitterOptions
     {
         public bool WrapMembersInLock { get; init; }
+        public bool EmitClassDocumentation { get; init; }
+        public string? FacadeName { get; init; }
     }
 }

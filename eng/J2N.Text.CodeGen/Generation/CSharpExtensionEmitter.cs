@@ -26,6 +26,12 @@ namespace J2N.Text.CodeGen.Generation
             sb.AppendLine($"namespace {model.Namespace}");
             sb.AppendLine("{");
 
+            if (options.EmitClassDocumentation)
+            {
+                sb.AppendLine("    /// <summary>");
+                sb.AppendLine($"    /// Extensions to <see cref=\"{options.FacadeName}\"/>.");
+                sb.AppendLine("    /// </summary>");
+            }
             sb.AppendLine($"    public static partial class {model.Name}");
             sb.AppendLine("    {");
 

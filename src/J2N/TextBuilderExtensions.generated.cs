@@ -19,6 +19,9 @@ using System.Runtime.CompilerServices;
 
 namespace J2N
 {
+    /// <summary>
+    /// Extensions to <see cref="TextBuilder"/>.
+    /// </summary>
     public static partial class TextBuilderExtensions
     {
         /// <summary>
