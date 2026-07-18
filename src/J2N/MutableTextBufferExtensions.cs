@@ -60,7 +60,8 @@ namespace J2N
         /// <seealso cref="object"/>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationGenerateForwarder]
-        public static TBuilder Append<TBuilder>(this TBuilder text, object? value, string? format = null, IFormatProvider? provider = null)
+        // J2N TODO: Mark public once we have fixed the ability to convert arbitrary objects to localized strings defaulting to Java formats.
+        internal static TBuilder Append<TBuilder>(this TBuilder text, object? value, string? format = null, IFormatProvider? provider = null)
             where TBuilder : MutableTextBuffer
         {
             if (text is null)
@@ -168,7 +169,8 @@ namespace J2N
         /// <seealso cref="object"/>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationGenerateForwarder]
-        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, object? value, string? format = null, IFormatProvider? provider = null)
+        // J2N TODO: Mark public once we have fixed the ability to convert arbitrary objects to localized strings defaulting to Java formats.
+        internal static TBuilder Insert<TBuilder>(this TBuilder text, int index, object? value, string? format = null, IFormatProvider? provider = null)
             where TBuilder : MutableTextBuffer
         {
             if (text is null)

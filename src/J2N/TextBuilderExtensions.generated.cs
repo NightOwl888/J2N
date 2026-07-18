@@ -50,7 +50,7 @@ namespace J2N
         /// </remarks>
         /// <seealso cref="object" />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static TBuilder Append<TBuilder>(this TBuilder text, object? value, string? format = null, IFormatProvider? provider = null)
+        internal static TBuilder Append<TBuilder>(this TBuilder text, object? value, string? format = null, IFormatProvider? provider = null)
             where TBuilder : TextBuilder
         {
             if (text is null)
@@ -142,7 +142,7 @@ namespace J2N
         /// </remarks>
         /// <seealso cref="object" />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, object? value, string? format = null, IFormatProvider? provider = null)
+        internal static TBuilder Insert<TBuilder>(this TBuilder text, int index, object? value, string? format = null, IFormatProvider? provider = null)
             where TBuilder : TextBuilder
         {
             if (text is null)
