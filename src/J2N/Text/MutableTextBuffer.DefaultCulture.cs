@@ -5,7 +5,7 @@ using System.Globalization;
 
 namespace J2N.Text
 {
-    public partial class MutableTextBuffer
+    internal partial class MutableTextBuffer
     {
         /// <summary>
         /// culture-aware default behavior. Particularly useful on APIs that do not

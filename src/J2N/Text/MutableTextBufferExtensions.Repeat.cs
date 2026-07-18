@@ -23,7 +23,7 @@ using System.Text;
 
 namespace J2N.Text
 {
-    public static partial class MutableTextBufferExtensions
+    internal static partial class MutableTextBufferExtensions
     {
         /// <summary>Appends a specified number of copies of the string representation of a Unicode character to this instance.</summary>
         /// <typeparam name="TBuilder">The type of the target builder.</typeparam>

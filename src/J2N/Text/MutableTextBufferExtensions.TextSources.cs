@@ -23,7 +23,8 @@ using System.Text;
 
 namespace J2N.Text
 {
-    public static partial class MutableTextBufferExtensions
+#pragma warning disable CS3019 // CLS compliance checking will not be performed because it is not visible from outside this assembly
+    internal static partial class MutableTextBufferExtensions
     {
         #region Append char
 

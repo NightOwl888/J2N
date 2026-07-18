@@ -24,7 +24,7 @@ using System.Runtime.CompilerServices;
 
 namespace J2N.Text
 {
-    public static partial class MutableTextBufferExtensions
+    internal static partial class MutableTextBufferExtensions
     {
         /// <summary>
         /// Appends the string returned by processing a composite format string, which contains zero or more format items,

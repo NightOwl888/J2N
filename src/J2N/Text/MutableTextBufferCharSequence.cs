@@ -7,7 +7,7 @@ namespace J2N.Text
     /// <summary>
     /// A wrapper class that represents a <see cref="MutableTextBuffer"/> and implements <see cref="ICharSequence"/>.
     /// </summary>
-    public sealed class MutableTextBufferCharSequence : ICharSequence, IAppendable, ISpanAppendable,
+    internal sealed class MutableTextBufferCharSequence : ICharSequence, IAppendable, ISpanAppendable,
         IEquatable<ICharSequence?>, IComparable<ICharSequence?>, ISpannable<char>, ICopyable<char>, ISpanCopyable<char>
     {
         /// <summary>

@@ -29,7 +29,7 @@ namespace J2N
     /// </summary>
     // NOTE: These methods are not in the J2N.Text namespace because we want to lower priority of object? and ICharSequence?
     // overloads in favor of the more specific overloads in J2N.Text.MutableTextBufferExtensions, such as ReadOnlySpan<char>.
-    public static class MutableTextBufferExtensions
+    internal static class MutableTextBufferExtensions
     {
         #region Append object
 

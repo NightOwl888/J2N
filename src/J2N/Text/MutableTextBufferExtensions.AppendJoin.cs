@@ -23,7 +23,7 @@ using System.Runtime.CompilerServices;
 
 namespace J2N.Text
 {
-    public static partial class MutableTextBufferExtensions
+    internal static partial class MutableTextBufferExtensions
     {
 #pragma warning disable CS1591 // J2N TODO: Finish docs
 

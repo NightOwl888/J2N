@@ -10,8 +10,6 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
 
-#pragma warning disable CS1591 // J2N TODO: Finish docs
-
 namespace J2N.Text
 {
     /// <summary>
@@ -40,7 +38,7 @@ namespace J2N.Text
     ///     </description></item>
     /// </list>
     /// </remarks>
-    public partial class MutableTextBuffer : IBufferWriter<char>,
+    internal partial class MutableTextBuffer : IBufferWriter<char>,
         ISpannable<char>, ICopyable<char>, ISpanCopyable<char>, IDisposable
         //, IEnumerable<char> // ICU4N TODO: Implement?
     {

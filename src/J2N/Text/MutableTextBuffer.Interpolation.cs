@@ -3,7 +3,7 @@
 
 namespace J2N.Text
 {
-    public partial class MutableTextBuffer
+    internal partial class MutableTextBuffer
     {
         // J2N TODO: API - String interpolation for J2N formatters
 

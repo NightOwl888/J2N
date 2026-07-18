@@ -23,7 +23,7 @@ using System.Text;
 
 namespace J2N.Text
 {
-    public static partial class MutableTextBufferExtensions
+    internal static partial class MutableTextBufferExtensions
     {
         /// <summary>Replaces all occurrences of a specified string in this instance with another specified string.</summary>
         /// <typeparam name="TBuilder">The type of the target builder.</typeparam>

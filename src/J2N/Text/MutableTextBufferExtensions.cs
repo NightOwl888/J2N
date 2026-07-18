@@ -12,7 +12,7 @@ namespace J2N.Text
     /// <summary>
     /// Extensions to <see cref="MutableTextBuffer"/>.
     /// </summary>
-    public static partial class MutableTextBufferExtensions
+    internal static partial class MutableTextBufferExtensions
     {
         #region Append/Insert bool
 

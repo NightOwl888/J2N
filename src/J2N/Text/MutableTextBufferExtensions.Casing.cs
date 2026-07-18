@@ -23,7 +23,7 @@ using System.Runtime.CompilerServices;
 
 namespace J2N.Text
 {
-    public static partial class MutableTextBufferExtensions
+    internal static partial class MutableTextBufferExtensions
     {
         /// <summary>
         /// Appends the upper case string representation of a specified string

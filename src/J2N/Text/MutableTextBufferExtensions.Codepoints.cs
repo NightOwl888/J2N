@@ -22,7 +22,7 @@ using System.Runtime.CompilerServices;
 
 namespace J2N.Text
 {
-    public static partial class MutableTextBufferExtensions
+    internal static partial class MutableTextBufferExtensions
     {
         /// <summary>
         /// Appends the string representation of the <paramref name="codePoint"/>

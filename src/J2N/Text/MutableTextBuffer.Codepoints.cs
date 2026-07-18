@@ -3,7 +3,7 @@ using System;
 
 namespace J2N.Text
 {
-    public partial class MutableTextBuffer
+    internal partial class MutableTextBuffer
     {
         /// <summary>
         /// Appends the string representation of the <paramref name="codePoint"/>.

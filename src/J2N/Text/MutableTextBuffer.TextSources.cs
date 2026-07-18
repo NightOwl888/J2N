@@ -11,7 +11,7 @@ using System.Text;
 
 namespace J2N.Text
 {
-    public partial class MutableTextBuffer
+    internal partial class MutableTextBuffer
     {
         #region Append char
 

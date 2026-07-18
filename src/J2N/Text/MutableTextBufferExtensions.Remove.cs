@@ -22,7 +22,7 @@ using System.Runtime.CompilerServices;
 
 namespace J2N.Text
 {
-    public static partial class MutableTextBufferExtensions
+    internal static partial class MutableTextBufferExtensions
     {
         /// <summary>
         /// Deletes a sequence of characters specified by <paramref name="startIndex"/> and <paramref name="count"/>.

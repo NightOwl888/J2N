@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 
 namespace J2N.Text
 {
-    public partial class MutableTextBuffer
+    internal partial class MutableTextBuffer
     {
         /// <summary>
         /// Deletes a sequence of characters specified by <paramref name="startIndex"/> and <paramref name="count"/>.

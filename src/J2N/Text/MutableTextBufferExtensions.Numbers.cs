@@ -23,7 +23,8 @@ using System.Runtime.CompilerServices;
 
 namespace J2N.Text
 {
-    public static partial class MutableTextBufferExtensions
+#pragma warning disable CS3019 // CLS compliance checking will not be performed because it is not visible from outside this assembly
+    internal static partial class MutableTextBufferExtensions
     {
         /// <summary>
         /// Appends the string representation of a specified 8-bit signed integer to this instance

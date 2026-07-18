@@ -18,7 +18,7 @@
 
 namespace J2N.Text
 {
-    public static partial class MutableTextBufferExtensions
+    internal static partial class MutableTextBufferExtensions
     {
         ///// <summary>Appends the specified interpolated string to this instance.</summary>
         ///// <param name="handler">The interpolated string to append.</param>
