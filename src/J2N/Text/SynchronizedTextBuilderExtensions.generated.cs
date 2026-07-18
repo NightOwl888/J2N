@@ -11,6 +11,7 @@
 //------------------------------------------------------------------------------
 #nullable enable
 
+#pragma warning disable CS3019 // CLS compliance checking will not be performed because it is not visible from outside this assembly
 using J2N.CodeGeneration;
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -22,7 +23,7 @@ using System.Text;
 
 namespace J2N.Text
 {
-    public static partial class SynchronizedTextBuilderExtensions
+    internal static partial class SynchronizedTextBuilderExtensions
     {
         /// <summary>
         /// Appends the string returned by processing a composite format string, which contains zero or more format items,

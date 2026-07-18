@@ -11,6 +11,7 @@
 //------------------------------------------------------------------------------
 #nullable enable
 
+#pragma warning disable CS3019 // CLS compliance checking will not be performed because it is not visible from outside this assembly
 using J2N.CodeGeneration;
 using J2N.Numerics;
 using System;
@@ -31,7 +32,7 @@ using J2N.Collections.Generic;
 namespace J2N.Text
 {
 
-    public partial class SynchronizedTextBuilder
+    internal partial class SynchronizedTextBuilder
     {
         /// <summary>Gets or sets the maximum number of characters that can be contained in the memory allocated by the current instance.</summary>
         /// <value>

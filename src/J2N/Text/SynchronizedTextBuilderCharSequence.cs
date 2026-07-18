@@ -9,7 +9,7 @@ namespace J2N.Text
     /// <summary>
     /// A wrapper class that represents a <see cref="SynchronizedTextBuilder"/> and implements <see cref="ICharSequence"/>.
     /// </summary>
-    public sealed class SynchronizedTextBuilderCharSequence : ICharSequence, IAppendable, ISpanAppendable,
+    internal sealed class SynchronizedTextBuilderCharSequence : ICharSequence, IAppendable, ISpanAppendable,
         IEquatable<ICharSequence?>, IComparable<ICharSequence?>, ISpannable<char>, ICopyable<char>, ISpanCopyable<char>
     {
         /// <summary>

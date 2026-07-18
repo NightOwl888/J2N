@@ -11,6 +11,7 @@
 //------------------------------------------------------------------------------
 #nullable enable
 
+#pragma warning disable CS3019 // CLS compliance checking will not be performed because it is not visible from outside this assembly
 using J2N.CodeGeneration;
 using J2N.Numerics;
 using J2N.Text;
@@ -22,7 +23,7 @@ namespace J2N
     /// <summary>
     /// Extensions to <see cref="SynchronizedTextBuilder"/>.
     /// </summary>
-    public static partial class SynchronizedTextBuilderExtensions
+    internal static partial class SynchronizedTextBuilderExtensions
     {
         /// <summary>
         /// Appends the string representation of a specified object to this instance using the specified format

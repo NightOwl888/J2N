@@ -35,7 +35,7 @@ namespace J2N.Text
     ///     </description></item>
     /// </list>
     /// </remarks>
-    public partial class SynchronizedTextBuilder : IBufferWriter<char>,
+    internal partial class SynchronizedTextBuilder : IBufferWriter<char>,
         ICopyable<char>, ISpanCopyable<char>
     {
         private readonly object syncRoot = new();

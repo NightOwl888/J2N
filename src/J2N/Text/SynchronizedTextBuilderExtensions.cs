@@ -23,7 +23,7 @@ namespace J2N.Text
     /// <summary>
     /// Extensions to <see cref="SynchronizedTextBuilder"/>.
     /// </summary>
-    public static partial class SynchronizedTextBuilderExtensions
+    internal static partial class SynchronizedTextBuilderExtensions
     {
         #region AsCharSequence
 
