@@ -529,72 +529,7 @@ namespace J2N.Text
 
         #endregion Append StringBuilder
 
-        #region Append ICharSequence
-
-        /// <summary>
-        /// Appends the string representation of the Unicode characters in a specified sequence to this instance.
-        /// <para/>
-        /// NOTE: Unlike the Java implementation, this method does not add the word <c>"null"</c> to the <see cref="MutableTextBuffer"/>
-        /// if <paramref name="value"/> is <see langword="null"/>. Instead, no operation is performed.
-        /// </summary>
-        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
-        /// <param name="text">The target builder.</param>
-        /// <param name="value">The sequence of characters to append.</param>
-        /// <returns>A reference to this instance after the operation has completed.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed <see cref="MutableTextBuffer.MaxCapacity"/>.</exception>
-        /// <seealso cref="ICharSequence" />
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        [CodeGenerationGenerateForwarder]
-        public static TBuilder Append<TBuilder>(this TBuilder text, ICharSequence? value)
-            where TBuilder : MutableTextBuffer
-        {
-            if (text is null)
-                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
-
-            text.AppendInternal(value);
-            return text;
-        }
-
-        /// <summary>Appends the string representation of a specified subarray of Unicode characters to this instance.</summary>
-        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
-        /// <param name="text">The target builder.</param>
-        /// <param name="value">The UTF-16-encoded code unit to append.</param>
-        /// <param name="startIndex">The starting position in <paramref name="value"/>.</param>
-        /// <param name="count">The number of characters to append.</param>
-        /// <returns>A reference to this instance after the operation has completed.</returns>
-        /// <exception cref="ArgumentNullException">
-        /// <paramref name="value"/> is <see langword="null"/>, and
-        /// <paramref name="startIndex"/> and <paramref name="count"/> are not zero.
-        /// </exception>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// <paramref name="count"/> is less than zero.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// <paramref name="startIndex"/> is less than zero.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// <paramref name="startIndex"/> + <paramref name="count"/> is greater than the length of <paramref name="value"/>.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// Enlarging the value of this instance would exceed <see cref="MutableTextBuffer.MaxCapacity"/>.
-        /// </exception>
-        /// <seealso cref="ICharSequence" />
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        [CodeGenerationGenerateForwarder]
-        public static TBuilder Append<TBuilder>(this TBuilder text, ICharSequence? value, int startIndex, int count)
-            where TBuilder : MutableTextBuffer
-        {
-            if (text is null)
-                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
-
-            text.AppendInternal(value, startIndex, count);
-            return text;
-        }
-
-        #endregion Append ICharSequence 
+        // J2N: Moved ICharSequence overloads to J2N namespace
 
 
         #region Insert char
@@ -929,73 +864,6 @@ namespace J2N.Text
 
         #endregion Insert StringBuilder
 
-        #region Insert ICharSequence
-
-        /// <summary>Inserts the string representation of a specified sequence of Unicode characters into this instance at the specified character position.</summary>
-        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
-        /// <param name="text">The target builder.</param>
-        /// <param name="index">The position in this instance where insertion begins.</param>
-        /// <param name="value">The character sequence to insert.</param>
-        /// <returns>A reference to this instance after the operation has completed.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// <paramref name="index"/> is less than zero or greater than the length of this instance.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// Enlarging the value of this instance would exceed <see cref="MutableTextBuffer.MaxCapacity"/>.
-        /// </exception>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        [CodeGenerationGenerateForwarder]
-        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, ICharSequence? value)
-            where TBuilder : MutableTextBuffer
-        {
-            if (text is null)
-                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
-
-            text.InsertInternal(index, value);
-            return text;
-        }
-
-        /// <summary>
-        /// Inserts the string representation of a specified subarray of Unicode characters into this instance at the specified character position.
-        /// <para/>
-        /// IMPORTANT: This method has .NET semantics. That is, the fourth parameter is a count, not an exclusive end index as would be the
-        /// case in Java. To translate from Java, use <c>end - start</c> to resolve <paramref name="count"/>.
-        /// </summary>
-        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
-        /// <param name="text">The target builder.</param>
-        /// <param name="index">The position in this instance where insertion begins.</param>
-        /// <param name="value">The character sequence to insert.</param>
-        /// <param name="startIndex">The starting index within <paramref name="value"/>.</param>
-        /// <param name="count">The number of characters to insert.</param>
-        /// <returns>A reference to this instance after the operation has completed.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// <paramref name="index"/>, <paramref name="startIndex"/> or <paramref name="count"/> is less than zero.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// <paramref name="index"/> is greater than the length of this instance.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// <paramref name="startIndex"/> plus <paramref name="count"/> is not a position within <paramref name="value"/>.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// Enlarging the value of this instance would exceed <see cref="MutableTextBuffer.MaxCapacity"/>.
-        /// </exception>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        [CodeGenerationGenerateForwarder]
-        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, ICharSequence? value, int startIndex, int count)
-            where TBuilder : MutableTextBuffer
-        {
-            if (text is null)
-                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
-
-            text.InsertInternal(index, value, startIndex, count);
-            return text;
-        }
-
-        #endregion Insert ICharSequence
+        // J2N: Moved ICharSequence overloads to J2N namespace
     }
 }

@@ -335,7 +335,7 @@ namespace J2N.Text
         /// </summary>
         /// <remarks>
         /// The public API and full documentation live in
-        /// <see cref="MutableTextBufferExtensions.Insert{TBuilder}(TBuilder, int, ICharSequence, int)"/>.
+        /// <see cref="J2N.MutableTextBufferExtensions.Insert{TBuilder}(TBuilder, int, ICharSequence, int)"/>.
         /// Update that documentation if the behavior changes.
         /// </remarks>
         [CodeGenerationExtensionImplementation]

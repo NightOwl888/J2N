@@ -212,40 +212,6 @@ namespace J2N.Text
             return text;
         }
 
-        /// <summary>Inserts one or more copies of a specified sequence of characters into this instance at the specified character position.</summary>
-        /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
-        /// <param name="text">The target builder.</param>
-        /// <param name="index">The position in this instance where insertion begins.</param>
-        /// <param name="value">The sequence of characters to insert.</param>
-        /// <param name="repeatCount">The number of times to insert <paramref name="value"/>.</param>
-        /// <returns>A reference to this instance after the operation has completed.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// <paramref name="index"/> is less than zero or greater than the current length of this instance.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// <paramref name="repeatCount"/> is less than zero.
-        /// </exception>
-        /// <exception cref="OutOfMemoryException">
-        /// The current length of this <see cref="MutableTextBuffer"/> object plus the length of <paramref name="value"/>
-        /// times <paramref name="repeatCount"/> exceeds <see cref="MutableTextBuffer.MaxCapacity"/>.
-        /// </exception>
-        /// <remarks>
-        /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
-        /// <para/>
-        /// This <see cref="MutableTextBuffer"/> object is not changed if the length of <paramref name="value"/> is zero or
-        /// <paramref name="repeatCount"/> is zero.
-        /// </remarks>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        [CodeGenerationGenerateForwarder]
-        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, ICharSequence? value, int repeatCount)
-            where TBuilder : MutableTextBuffer
-        {
-            if (text is null)
-                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
-
-            text.InsertInternal(index, value, repeatCount);
-            return text;
-        }
+        // J2N: Moved ICharSequence overload to J2N namespace
     }
 }

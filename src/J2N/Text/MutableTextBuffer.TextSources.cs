@@ -330,7 +330,7 @@ namespace J2N.Text
         /// </summary>
         /// <remarks>
         /// The public API and full documentation live in
-        /// <see cref="MutableTextBufferExtensions.Append{TBuilder}(TBuilder, ICharSequence?)"/>.
+        /// <see cref="J2N.MutableTextBufferExtensions.Append{TBuilder}(TBuilder, ICharSequence?)"/>.
         /// Update that documentation if the behavior changes.
         /// </remarks>
         [CodeGenerationExtensionImplementation]
@@ -404,7 +404,7 @@ namespace J2N.Text
         /// </summary>
         /// <remarks>
         /// The public API and full documentation live in
-        /// <see cref="MutableTextBufferExtensions.Append{TBuilder}(TBuilder, ICharSequence?, int, int)"/>.
+        /// <see cref="J2N.MutableTextBufferExtensions.Append{TBuilder}(TBuilder, ICharSequence?, int, int)"/>.
         /// Update that documentation if the behavior changes.
         /// </remarks>
         [CodeGenerationExtensionImplementation]
@@ -841,7 +841,7 @@ namespace J2N.Text
         /// </summary>
         /// <remarks>
         /// The public API and full documentation live in
-        /// <see cref="MutableTextBufferExtensions.Insert{TBuilder}(TBuilder, int, ICharSequence?)"/>.
+        /// <see cref="J2N.MutableTextBufferExtensions.Insert{TBuilder}(TBuilder, int, ICharSequence?)"/>.
         /// Update that documentation if the behavior changes.
         /// </remarks>
         [CodeGenerationExtensionImplementation]
@@ -905,7 +905,7 @@ namespace J2N.Text
         /// </summary>
         /// <remarks>
         /// The public API and full documentation live in
-        /// <see cref="MutableTextBufferExtensions.Insert{TBuilder}(TBuilder, int, ICharSequence?, int, int)"/>.
+        /// <see cref="J2N.MutableTextBufferExtensions.Insert{TBuilder}(TBuilder, int, ICharSequence?, int, int)"/>.
         /// Update that documentation if the behavior changes.
         /// </remarks>
         [CodeGenerationExtensionImplementation]

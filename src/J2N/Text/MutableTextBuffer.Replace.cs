@@ -509,7 +509,7 @@ namespace J2N.Text
         /// </summary>
         /// <remarks>
         /// The public API and full documentation live in
-        /// <see cref="MutableTextBufferExtensions.Replace{TBuilder}(TBuilder, int, int, ICharSequence)"/>.
+        /// <see cref="J2N.MutableTextBufferExtensions.Replace{TBuilder}(TBuilder, int, int, ICharSequence)"/>.
         /// Update that documentation if the behavior changes.
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
