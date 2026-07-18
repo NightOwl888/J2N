@@ -1,4 +1,6 @@
-﻿namespace J2N.Text.CodeGen.Generation
+﻿using Microsoft.CodeAnalysis;
+
+namespace J2N.Text.CodeGen.Generation
 {
     public sealed class FacadeGenerationOptions
     {
@@ -9,5 +11,7 @@
         public bool EmitSynchronizationNotes { get; init; }
 
         public bool IsSealed { get; init; }
+
+        public Accessibility ClassAccessibility { get; init; } = Accessibility.Public;
     }
 }

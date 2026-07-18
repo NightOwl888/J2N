@@ -138,6 +138,7 @@ namespace J2N.Text.CodeGen
             FacadeGenerationOptions textBuilderOptions = new()
             {
                 FacadeName = "TextBuilder",
+                ClassAccessibility = Accessibility.Public,
                 IsSynchronized = false,
                 EmitSynchronizationNotes = false,
                 IsSealed = false,
@@ -171,6 +172,7 @@ namespace J2N.Text.CodeGen
             FacadeGenerationOptions synchronizedTextBuilderOptions = new()
             {
                 FacadeName = "SynchronizedTextBuilder",
+                ClassAccessibility = Accessibility.Internal,
                 IsSynchronized = true,
                 EmitSynchronizationNotes = true,
                 IsSealed = false,
@@ -234,6 +236,7 @@ namespace J2N.Text.CodeGen
                         WrapMembersInLock = generationOptions.IsSynchronized,
                         EmitSynchronizationNotes = generationOptions.EmitSynchronizationNotes,
                         IsSealed = generationOptions.IsSealed,
+                        ClassAccessibility = generationOptions.ClassAccessibility,
                     });
 
             string facadePath =
@@ -279,6 +282,7 @@ namespace J2N.Text.CodeGen
                         WrapMembersInLock = generationOptions.IsSynchronized,
                         EmitClassDocumentation = emitClassDocumentation,
                         FacadeName = generationOptions.FacadeName,
+                        ClassAccessibility = generationOptions.ClassAccessibility,
                     });
 
             string extensionPath =

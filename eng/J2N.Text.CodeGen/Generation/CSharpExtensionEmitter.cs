@@ -19,6 +19,11 @@ namespace J2N.Text.CodeGen.Generation
 
             EmitHeader(sb);
 
+            if (options.ClassAccessibility != Accessibility.Public)
+            {
+                sb.AppendLine("#pragma warning disable CS3019 // CLS compliance checking will not be performed because it is not visible from outside this assembly");
+            }
+
             EmitUsings(sb, model.Source.Usings);
 
             sb.AppendLine();
@@ -32,7 +37,11 @@ namespace J2N.Text.CodeGen.Generation
                 sb.AppendLine($"    /// Extensions to <see cref=\"{options.FacadeName}\"/>.");
                 sb.AppendLine("    /// </summary>");
             }
-            sb.AppendLine($"    public static partial class {model.Name}");
+
+            string accessibility =
+                FormatAccessibility(options.ClassAccessibility);
+
+            sb.AppendLine($"    {accessibility} static partial class {model.Name}");
             sb.AppendLine("    {");
 
             string? activeConditional = null;

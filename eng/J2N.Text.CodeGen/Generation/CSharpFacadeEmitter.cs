@@ -20,6 +20,11 @@ namespace J2N.Text.CodeGen.Generation
 
             EmitHeader(sb);
 
+            if (options.ClassAccessibility != Accessibility.Public)
+            {
+                sb.AppendLine("#pragma warning disable CS3019 // CLS compliance checking will not be performed because it is not visible from outside this assembly");
+            }
+
             foreach (string @using in model.Source.Usings.Distinct())
             {
                 sb.AppendLine($"using {@using};");
@@ -31,10 +36,13 @@ namespace J2N.Text.CodeGen.Generation
             sb.AppendLine("{");
             sb.AppendLine();
 
+            string accessibility =
+                FormatAccessibility(options.ClassAccessibility);
+
             string sealedModifier =
                 options.IsSealed ? "sealed " : "";
 
-            sb.AppendLine($"    public {sealedModifier}partial class {model.Name}");
+            sb.AppendLine($"    {accessibility} {sealedModifier}partial class {model.Name}");
             sb.AppendLine("    {");
 
             foreach (PropertyModel property in model.Properties)
