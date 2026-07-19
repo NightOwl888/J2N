@@ -656,25 +656,25 @@ namespace J2N.Text.Tests
         }
 
         [Fact]
-        public void Test_Append_Bool()
+        public void Append_Bool()
         {
             foreach (var testdata in Append_Bool_TestData())
             {
                 if (((BooleanFormat)testdata[2]) == BooleanFormat.Lowercase)
-                    Append_Bool_Format((string)testdata[0], (bool)testdata[1], null, (string)testdata[3]);
+                    Test_Append_Bool_Format((string)testdata[0], (bool)testdata[1], null, (string)testdata[3]);
             }
         }
 
         [Fact]
-        public void Test_Append_Bool_Format()
+        public void Append_Bool_Format()
         {
             foreach (var testdata in Append_Bool_TestData())
             {
-                Append_Bool_Format((string)testdata[0], (bool)testdata[1], (BooleanFormat)testdata[2], (string)testdata[3]);
+                Test_Append_Bool_Format((string)testdata[0], (bool)testdata[1], (BooleanFormat)testdata[2], (string)testdata[3]);
             }
         }
 
-        private void Append_Bool_Format(string original, bool value, BooleanFormat? format, string expected)
+        private void Test_Append_Bool_Format(string original, bool value, BooleanFormat? format, string expected)
         {
             var builder = MutableTextBufferFactory(original);
             if (format is null)
@@ -701,18 +701,18 @@ namespace J2N.Text.Tests
         }
 
         [Fact]
-        public void Test_Append_Decimal()
+        public void Append_Decimal()
         {
             using (new ThreadCultureChange(CultureInfo.InvariantCulture))
             {
                 foreach (var testdata in Append_Decimal_TestData())
                 {
-                    Append_Decimal((string)testdata[0], (double)testdata[1], (string)testdata[2]);
+                    Test_Append_Decimal((string)testdata[0], (double)testdata[1], (string)testdata[2]);
                 }
             }
         }
 
-        private void Append_Decimal(string original, double doubleValue, string expected)
+        private void Test_Append_Decimal(string original, double doubleValue, string expected)
         {
             var builder = MutableTextBufferFactory(original);
             builder.Append(new decimal(doubleValue));
@@ -735,18 +735,18 @@ namespace J2N.Text.Tests
         }
 
         [Fact]
-        public void Test_Append_Double()
+        public void Append_Double()
         {
             using (new ThreadCultureChange(CultureInfo.InvariantCulture))
             {
                 foreach (var testdata in Append_Double_TestData())
                 {
-                    Append_Double((string)testdata[0], (double)testdata[1], (string)testdata[2]);
+                    Test_Append_Double((string)testdata[0], (double)testdata[1], (string)testdata[2]);
                 }
             }
         }
 
-        private void Append_Double(string original, double value, string expected)
+        private void Test_Append_Double(string original, double value, string expected)
         {
             var builder = MutableTextBufferFactory(original);
             builder.Append(value);
@@ -872,18 +872,18 @@ namespace J2N.Text.Tests
         }
 
         [Fact]
-        public void Test_Append_Float()
+        public void Append_Float()
         {
             using (new ThreadCultureChange(CultureInfo.InvariantCulture))
             {
                 foreach (var testdata in Append_Float_TestData())
                 {
-                    Append_Float((string)testdata[0], (float)testdata[1], (string)testdata[2]);
+                    Test_Append_Float((string)testdata[0], (float)testdata[1], (string)testdata[2]);
                 }
             }
         }
 
-        private void Append_Float(string? original, float value, string expected)
+        private void Test_Append_Float(string? original, float value, string expected)
         {
             var builder = MutableTextBufferFactory(original);
             builder.Append(value);
@@ -1970,11 +1970,11 @@ namespace J2N.Text.Tests
         {
             foreach (var testData in Equals_TestData())
             {
-                EqualsTest((MutableTextBuffer)testData[0]!, (MutableTextBuffer?)testData[1], (bool)testData[2]!);
+                Run_Test_Equals((MutableTextBuffer)testData[0]!, (MutableTextBuffer?)testData[1], (bool)testData[2]!);
             }
         }
 
-        private static void EqualsTest(MutableTextBuffer sb1, MutableTextBuffer? sb2, bool expected)
+        private static void Run_Test_Equals(MutableTextBuffer sb1, MutableTextBuffer? sb2, bool expected)
         {
             Assert.Equal(expected, sb1.Equals(sb2));
         }
@@ -2014,25 +2014,25 @@ namespace J2N.Text.Tests
         }
 
         [Fact]
-        public void Test_Insert_Bool()
+        public void Insert_Bool()
         {
             foreach (var testdata in Insert_Bool_TestData())
             {
                 if (((BooleanFormat)testdata[3]) == BooleanFormat.Lowercase)
-                    Insert_Bool_Format((string)testdata[0], (int)testdata[1], (bool)testdata[2], null, (string)testdata[4]);
+                    Test_Insert_Bool_Format((string)testdata[0], (int)testdata[1], (bool)testdata[2], null, (string)testdata[4]);
             }
         }
 
         [Fact]
-        public void Test_Insert_Bool_Format()
+        public void Insert_Bool_Format()
         {
             foreach (var testdata in Insert_Bool_TestData())
             {
-                Insert_Bool_Format((string)testdata[0], (int)testdata[1], (bool)testdata[2], (BooleanFormat)testdata[3], (string)testdata[4]);
+                Test_Insert_Bool_Format((string)testdata[0], (int)testdata[1], (bool)testdata[2], (BooleanFormat)testdata[3], (string)testdata[4]);
             }
         }
 
-        private void Insert_Bool_Format(string original, int index, bool value, BooleanFormat? format, string expected)
+        private void Test_Insert_Bool_Format(string original, int index, bool value, BooleanFormat? format, string expected)
         {
             var builder = MutableTextBufferFactory(original);
             if (format is null)
@@ -2234,18 +2234,18 @@ namespace J2N.Text.Tests
         }
 
         [Fact]
-        public void Test_Insert_Float()
+        public void Insert_Float()
         {
             using (new ThreadCultureChange(CultureInfo.InvariantCulture))
             {
                 foreach (var testdata in Insert_Float_TestData())
                 {
-                    Insert_Float((string)testdata[0], (int)testdata[1], (float)testdata[2], (string)testdata[3]);
+                    Test_Insert_Float((string)testdata[0], (int)testdata[1], (float)testdata[2], (string)testdata[3]);
                 }
             }
         }
 
-        private void Insert_Float(string original, int index, float value, string expected)
+        private void Test_Insert_Float(string original, int index, float value, string expected)
         {
             var builder = MutableTextBufferFactory(original);
             builder.Insert(index, value);
@@ -2559,18 +2559,18 @@ namespace J2N.Text.Tests
         }
 
         [Fact]
-        public void Test_Insert_Double()
+        public void Insert_Double()
         {
             using (new ThreadCultureChange(CultureInfo.InvariantCulture))
             {
                 foreach (var testdata in Insert_Double_TestData())
                 {
-                    Insert_Double((string)testdata[0], (int)testdata[1], (double)testdata[2], (string)testdata[3]);
+                    Test_Insert_Double((string)testdata[0], (int)testdata[1], (double)testdata[2], (string)testdata[3]);
                 }
             }
         }
 
-        private void Insert_Double(string original, int index, double value, string expected)
+        private void Test_Insert_Double(string original, int index, double value, string expected)
         {
             var builder = MutableTextBufferFactory(original);
             builder.Insert(index, value);
@@ -2596,18 +2596,18 @@ namespace J2N.Text.Tests
         }
 
         [Fact]
-        public void Test_Insert_Decimal()
+        public void Insert_Decimal()
         {
             using (new ThreadCultureChange(CultureInfo.InvariantCulture))
             {
                 foreach (var testdata in Test_Insert_Decimal_TestData())
                 {
-                    Insert_Decimal((string)testdata[0], (int)testdata[1], (double)testdata[2], (string)testdata[3]);
+                    Test_Insert_Decimal((string)testdata[0], (int)testdata[1], (double)testdata[2], (string)testdata[3]);
                 }
             }
         }
 
-        private void Insert_Decimal(string original, int index, double doubleValue, string expected)
+        private void Test_Insert_Decimal(string original, int index, double doubleValue, string expected)
         {
             var builder = MutableTextBufferFactory(original);
             builder.Insert(index, new decimal(doubleValue));
@@ -3783,15 +3783,15 @@ namespace J2N.Text.Tests
         }
 
         [Fact]
-        public void Test_Append_MutableTextBuffer()
+        public void Append_MutableTextBuffer()
         {
             foreach (var testData in Append_MutableTextBuffer_TestData())
             {
-                Append_MutableTextBuffer((MutableTextBuffer)testData[0]!, (MutableTextBuffer?)testData[1], (string)testData[2]!);
+                Test_Append_MutableTextBuffer((MutableTextBuffer)testData[0]!, (MutableTextBuffer?)testData[1], (string)testData[2]!);
             }
         }
 
-        private static void Append_MutableTextBuffer(MutableTextBuffer s1, MutableTextBuffer? s2, string s)
+        private static void Test_Append_MutableTextBuffer(MutableTextBuffer s1, MutableTextBuffer? s2, string s)
         {
             Assert.Equal(s, s1.Apply((sb) => sb.Append(s2)).ToString());
         }
@@ -3831,15 +3831,15 @@ namespace J2N.Text.Tests
         }
 
         [Fact]
-        public void Test_Append_MutableTextBuffer_Substring()
+        public void Append_MutableTextBuffer_Substring()
         {
             foreach (var testData in Append_MutableTextBuffer_Substring_TestData())
             {
-                Append_MutableTextBuffer_Substring((MutableTextBuffer)testData[0]!, (MutableTextBuffer?)testData[1], (int)testData[2]!, (int)testData[3]!, (string)testData[4]!);
+                Test_Append_MutableTextBuffer_Substring((MutableTextBuffer)testData[0]!, (MutableTextBuffer?)testData[1], (int)testData[2]!, (int)testData[3]!, (string)testData[4]!);
             }
         }
 
-        private static void Append_MutableTextBuffer_Substring(MutableTextBuffer s1, MutableTextBuffer? s2, int startIndex, int count, string s)
+        private static void Test_Append_MutableTextBuffer_Substring(MutableTextBuffer s1, MutableTextBuffer? s2, int startIndex, int count, string s)
         {
             Assert.Equal(s, s1.Apply((sb) => sb.Append(s2.AsSpan(startIndex, count))).ToString());
         }
@@ -3889,15 +3889,15 @@ namespace J2N.Text.Tests
         }
 
         [Fact]
-        public void Test_Append_StringBuilder()
+        public void Append_StringBuilder()
         {
             foreach (var testData in Append_StringBuilder_TestData())
             {
-                Append_StringBuilder((MutableTextBuffer)testData[0]!, (StringBuilder?)testData[1], (string)testData[2]!);
+                Test_Append_StringBuilder((MutableTextBuffer)testData[0]!, (StringBuilder?)testData[1], (string)testData[2]!);
             }
         }
 
-        private static void Append_StringBuilder(MutableTextBuffer s1, StringBuilder? s2, string s)
+        private static void Test_Append_StringBuilder(MutableTextBuffer s1, StringBuilder? s2, string s)
         {
             Assert.Equal(s, s1.Apply((sb) => sb.Append(s2)).ToString());
         }
@@ -3937,15 +3937,15 @@ namespace J2N.Text.Tests
         }
 
         [Fact]
-        public void Test_Append_StringBuilder_Substring()
+        public void Append_StringBuilder_Substring()
         {
             foreach (var testData in Append_StringBuilder_Substring_TestData())
             {
-                Append_StringBuilder_Substring((MutableTextBuffer)testData[0]!, (StringBuilder?)testData[1], (int)testData[2]!, (int)testData[3]!, (string)testData[4]!);
+                Test_Append_StringBuilder_Substring((MutableTextBuffer)testData[0]!, (StringBuilder?)testData[1], (int)testData[2]!, (int)testData[3]!, (string)testData[4]!);
             }
         }
 
-        private static void Append_StringBuilder_Substring(MutableTextBuffer s1, StringBuilder? s2, int startIndex, int count, string s)
+        private static void Test_Append_StringBuilder_Substring(MutableTextBuffer s1, StringBuilder? s2, int startIndex, int count, string s)
         {
             Assert.Equal(s, s1.Apply((sb) => sb.Append(s2, startIndex, count)).ToString());
         }
@@ -3996,15 +3996,15 @@ namespace J2N.Text.Tests
         }
 
         [Fact]
-        public void Test_Equals_String()
+        public void Equals_String()
         {
             foreach (var testData in Equals_String_TestData())
             {
-                Equals_String((MutableTextBuffer)testData[0]!, (string)testData[1]!, (bool)testData[2]!);
+                Test_Equals_String((MutableTextBuffer)testData[0]!, (string)testData[1]!, (bool)testData[2]!);
             }
         }
 
-        private static void Equals_String(MutableTextBuffer sb1, string value, bool expected)
+        private static void Test_Equals_String(MutableTextBuffer sb1, string value, bool expected)
         {
             Assert.Equal(expected, sb1.Equals(value.AsSpan()));
         }
