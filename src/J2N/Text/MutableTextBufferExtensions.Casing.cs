@@ -32,12 +32,14 @@ namespace J2N.Text
         /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
         /// <param name="text">The target builder.</param>
         /// <param name="value">The string to append.</param>
-        /// <param name="culture">An object that supplies culture-specific casing rules.</param>
+        /// <param name="culture">An object that supplies culture-specific casing rules, or <see langword="null"/>
+        /// to use the default culture of the current context.</param>
         /// <returns>A reference to this instance after the operation has completed.</returns>
         /// <remarks>
         /// The capacity of this instance is adjusted as needed.
         /// <para/>
-        /// If <paramref name="culture"/> is <see langword="null"/>, <see cref="CultureInfo.CurrentCulture"/> will be used.
+        /// If no <paramref name="culture"/> is expecitly specified, this method uses the default casing behavior
+        /// determined by the <see cref="MutableTextBuffer.UseInvariantDefaults"/> setting.
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationGenerateForwarder]
@@ -58,12 +60,14 @@ namespace J2N.Text
         /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
         /// <param name="text">The target builder.</param>
         /// <param name="value">The read-only character span to append.</param>
-        /// <param name="culture">An object that supplies culture-specific casing rules.</param>
+        /// <param name="culture">An object that supplies culture-specific casing rules, or <see langword="null"/>
+        /// to use the default culture of the current context.</param>
         /// <returns>A reference to this instance after the operation has completed.</returns>
         /// <remarks>
         /// The capacity of this instance is adjusted as needed.
         /// <para/>
-        /// If <paramref name="culture"/> is <see langword="null"/>, <see cref="CultureInfo.CurrentCulture"/> will be used.
+        /// If no <paramref name="culture"/> is expecitly specified, this method uses the default casing behavior
+        /// determined by the <see cref="MutableTextBuffer.UseInvariantDefaults"/> setting.
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationGenerateForwarder]
@@ -126,12 +130,14 @@ namespace J2N.Text
         /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
         /// <param name="text">The target builder.</param>
         /// <param name="value">The string to append.</param>
-        /// <param name="culture">An object that supplies culture-specific casing rules.</param>
+        /// <param name="culture">An object that supplies culture-specific casing rules, or <see langword="null"/>
+        /// to use the default culture of the current context.</param>
         /// <returns>A reference to this instance after the operation has completed.</returns>
         /// <remarks>
         /// The capacity of this instance is adjusted as needed.
         /// <para/>
-        /// If <paramref name="culture"/> is <see langword="null"/>, <see cref="CultureInfo.CurrentCulture"/> will be used.
+        /// If no <paramref name="culture"/> is expecitly specified, this method uses the default casing behavior
+        /// determined by the <see cref="MutableTextBuffer.UseInvariantDefaults"/> setting.
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationGenerateForwarder]
@@ -152,9 +158,15 @@ namespace J2N.Text
         /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
         /// <param name="text">The target builder.</param>
         /// <param name="value">The read-only character span to append.</param>
-        /// <param name="culture">An object that supplies culture-specific casing rules.</param>
+        /// <param name="culture">An object that supplies culture-specific casing rules, or <see langword="null"/>
+        /// to use the default culture of the current context.</param>
         /// <returns>A reference to this instance after the operation has completed.</returns>
-        /// <remarks>The capacity of this instance is adjusted as needed.</remarks>
+        /// <remarks>
+        /// The capacity of this instance is adjusted as needed.
+        /// <para/>
+        /// If no <paramref name="culture"/> is expecitly specified, this method uses the default casing behavior
+        /// determined by the <see cref="MutableTextBuffer.UseInvariantDefaults"/> setting.
+        /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationGenerateForwarder]
         public static TBuilder AppendLower<TBuilder>(this TBuilder text, ReadOnlySpan<char> value, CultureInfo? culture)

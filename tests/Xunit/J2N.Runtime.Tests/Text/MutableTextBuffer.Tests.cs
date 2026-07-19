@@ -14,44 +14,122 @@ namespace J2N.Text.Tests
             ArrayAllocator<char>.Default;
 #endif
 
-        private protected override MutableTextBuffer MutableTextBufferFactory()
-            => new MutableTextBuffer(DefaultAllocator).Initialize();
+        private protected override MutableTextBuffer MutableTextBufferFactory(MutableTextBufferTestOptions? options = null)
+        {
+            return new MutableTextBuffer(DefaultAllocator)
+            {
+                UseInvariantDefaults = options?.UseInvariantDefaults ?? false,
+                ClearExposedBuffers = options?.ClearExposedBuffers ?? true,
+            }.Initialize();
+        }
 
-        private protected override MutableTextBuffer MutableTextBufferFactory(int capacity)
-            => new MutableTextBuffer(DefaultAllocator).Initialize(capacity);
+        private protected override MutableTextBuffer MutableTextBufferFactory(int capacity, MutableTextBufferTestOptions? options = null)
+        {
+            return new MutableTextBuffer(DefaultAllocator)
+            {
+                UseInvariantDefaults = options?.UseInvariantDefaults ?? false,
+                ClearExposedBuffers = options?.ClearExposedBuffers ?? true,
+            }.Initialize(capacity);
+        }
 
-        private protected override MutableTextBuffer MutableTextBufferFactory(int capacity, int maxCapacity)
-            => new MutableTextBuffer(DefaultAllocator).Initialize(capacity, maxCapacity);
+        private protected override MutableTextBuffer MutableTextBufferFactory(int capacity, int maxCapacity, MutableTextBufferTestOptions? options = null)
+        {
+            return new MutableTextBuffer(DefaultAllocator)
+            {
+                UseInvariantDefaults = options?.UseInvariantDefaults ?? false,
+                ClearExposedBuffers = options?.ClearExposedBuffers ?? true,
+            }.Initialize(capacity, maxCapacity);
+        }
 
-        private protected override MutableTextBuffer MutableTextBufferFactory(string? value)
-            => new MutableTextBuffer(DefaultAllocator).Initialize(value);
+        private protected override MutableTextBuffer MutableTextBufferFactory(string? value, MutableTextBufferTestOptions? options = null)
+        {
+            return new MutableTextBuffer(DefaultAllocator)
+            {
+                UseInvariantDefaults = options?.UseInvariantDefaults ?? false,
+                ClearExposedBuffers = options?.ClearExposedBuffers ?? true,
+            }.Initialize(value);
+        }
 
-        private protected override MutableTextBuffer MutableTextBufferFactory(string? value, int startIndex, int length, int capacity)
-            => new MutableTextBuffer(DefaultAllocator).Initialize(value, startIndex, length, capacity);
+        private protected override MutableTextBuffer MutableTextBufferFactory(string? value, int startIndex, int length, int capacity, MutableTextBufferTestOptions? options = null)
+        {
+            return new MutableTextBuffer(DefaultAllocator)
+            {
+                UseInvariantDefaults = options?.UseInvariantDefaults ?? false,
+                ClearExposedBuffers = options?.ClearExposedBuffers ?? true,
+            }.Initialize(value, startIndex, length, capacity);
+        }
 
-        private protected override MutableTextBuffer MutableTextBufferFactory(string? value, int capacity)
-            => new MutableTextBuffer(DefaultAllocator).Initialize(value, capacity);
+        private protected override MutableTextBuffer MutableTextBufferFactory(string? value, int capacity, MutableTextBufferTestOptions? options = null)
+        {
+            return new MutableTextBuffer(DefaultAllocator)
+            {
+                UseInvariantDefaults = options?.UseInvariantDefaults ?? false,
+                ClearExposedBuffers = options?.ClearExposedBuffers ?? true,
+            }.Initialize(value, capacity);
+        }
 
-        private protected override MutableTextBuffer MutableTextBufferFactory(ReadOnlySpan<char> value)
-            => new MutableTextBuffer(DefaultAllocator).Initialize(value);
+        private protected override MutableTextBuffer MutableTextBufferFactory(ReadOnlySpan<char> value, MutableTextBufferTestOptions? options = null)
+        {
+            return new MutableTextBuffer(DefaultAllocator)
+            {
+                UseInvariantDefaults = options?.UseInvariantDefaults ?? false,
+                ClearExposedBuffers = options?.ClearExposedBuffers ?? true,
+            }.Initialize(value);
+        }
 
-        private protected override MutableTextBuffer MutableTextBufferFactory(ReadOnlySpan<char> value, int capacity)
-            => new MutableTextBuffer(DefaultAllocator).Initialize(value, capacity);
+        private protected override MutableTextBuffer MutableTextBufferFactory(ReadOnlySpan<char> value, int capacity, MutableTextBufferTestOptions? options = null)
+        {
+            return new MutableTextBuffer(DefaultAllocator)
+            {
+                UseInvariantDefaults = options?.UseInvariantDefaults ?? false,
+                ClearExposedBuffers = options?.ClearExposedBuffers ?? true,
+            }.Initialize(value, capacity);
+        }
 
-        private protected override MutableTextBuffer MutableTextBufferFactory(StringBuilder? value)
-            => new MutableTextBuffer(DefaultAllocator).Initialize(value);
+        private protected override MutableTextBuffer MutableTextBufferFactory(StringBuilder? value, MutableTextBufferTestOptions? options = null)
+        {
+            return new MutableTextBuffer(DefaultAllocator)
+            {
+                UseInvariantDefaults = options?.UseInvariantDefaults ?? false,
+                ClearExposedBuffers = options?.ClearExposedBuffers ?? true,
+            }.Initialize(value);
+        }
 
-        private protected override MutableTextBuffer MutableTextBufferFactory(StringBuilder? value, int capacity)
-            => new MutableTextBuffer(DefaultAllocator).Initialize(value, capacity);
+        private protected override MutableTextBuffer MutableTextBufferFactory(StringBuilder? value, int capacity, MutableTextBufferTestOptions? options = null)
+        {
+            return new MutableTextBuffer(DefaultAllocator)
+            {
+                UseInvariantDefaults = options?.UseInvariantDefaults ?? false,
+                ClearExposedBuffers = options?.ClearExposedBuffers ?? true,
+            }.Initialize(value, capacity);
+        }
 
-        private protected override MutableTextBuffer MutableTextBufferFactory(StringBuilder? value, int startIndex, int length, int capacity)
-            => new MutableTextBuffer(DefaultAllocator).Initialize(value, startIndex, length, capacity);
+        private protected override MutableTextBuffer MutableTextBufferFactory(StringBuilder? value, int startIndex, int length, int capacity, MutableTextBufferTestOptions? options = null)
+        {
+            return new MutableTextBuffer(DefaultAllocator)
+            {
+                UseInvariantDefaults = options?.UseInvariantDefaults ?? false,
+                ClearExposedBuffers = options?.ClearExposedBuffers ?? true,
+            }.Initialize(value, startIndex, length, capacity);
+        }
 
-        private protected override MutableTextBuffer MutableTextBufferFactory(ICharSequence? value)
-            => new MutableTextBuffer(DefaultAllocator).Initialize(value);
+        private protected override MutableTextBuffer MutableTextBufferFactory(ICharSequence? value, MutableTextBufferTestOptions? options = null)
+        {
+            return new MutableTextBuffer(DefaultAllocator)
+            {
+                UseInvariantDefaults = options?.UseInvariantDefaults ?? false,
+                ClearExposedBuffers = options?.ClearExposedBuffers ?? true,
+            }.Initialize(value);
+        }
 
-        private protected override MutableTextBuffer MutableTextBufferFactory(string? value, int capacity, IArrayAllocator<char> allocator)
-            => new MutableTextBuffer(allocator).Initialize(value, capacity);
+        private protected override MutableTextBuffer MutableTextBufferFactory(string? value, int capacity, IArrayAllocator<char> allocator, MutableTextBufferTestOptions? options = null)
+        {
+            return new MutableTextBuffer(allocator)
+            {
+                UseInvariantDefaults = options?.UseInvariantDefaults ?? false,
+                ClearExposedBuffers = options?.ClearExposedBuffers ?? true,
+            }.Initialize(value, capacity);
+        }
 
     }
 }

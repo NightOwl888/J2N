@@ -41,85 +41,91 @@ namespace J2N.Text.Tests
         internal static readonly string s_chunkSplitSource = new string('a', 30);
         //internal static StringBuilder StringBuilderWithMultipleChunks() => new StringBuilder(20).Append(s_chunkSplitSource);
 
+        internal sealed class MutableTextBufferTestOptions
+        {
+            public bool UseInvariantDefaults { get; init; } = false;
+            public bool ClearExposedBuffers { get; init; } = true;
+        }
+
         #region MutableTextBuffer Helper Methods
 
         /// <summary>
         /// Creates an instance of an <see cref="MutableTextBuffer"/> that can be used for testing.
         /// </summary>
         /// <returns>An instance of <see cref="MutableTextBuffer"/> that can be used for testing.</returns>
-        private protected abstract MutableTextBuffer MutableTextBufferFactory();
+        private protected abstract MutableTextBuffer MutableTextBufferFactory(MutableTextBufferTestOptions? options = null);
 
         /// <summary>
         /// Creates an instance of an <see cref="MutableTextBuffer"/> that can be used for testing.
         /// </summary>
         /// <returns>An instance of <see cref="MutableTextBuffer"/> that can be used for testing.</returns>
-        private protected abstract MutableTextBuffer MutableTextBufferFactory(int capacity);
+        private protected abstract MutableTextBuffer MutableTextBufferFactory(int capacity, MutableTextBufferTestOptions? options = null);
 
         /// <summary>
         /// Creates an instance of an <see cref="MutableTextBuffer"/> that can be used for testing.
         /// </summary>
         /// <returns>An instance of <see cref="MutableTextBuffer"/> that can be used for testing.</returns>
-        private protected abstract MutableTextBuffer MutableTextBufferFactory(int capacity, int maxCapacity);
+        private protected abstract MutableTextBuffer MutableTextBufferFactory(int capacity, int maxCapacity, MutableTextBufferTestOptions? options = null);
 
         /// <summary>
         /// Creates an instance of an <see cref="MutableTextBuffer"/> that can be used for testing.
         /// </summary>
         /// <returns>An instance of <see cref="MutableTextBuffer"/> that can be used for testing.</returns>
-        private protected abstract MutableTextBuffer MutableTextBufferFactory(string? value);
+        private protected abstract MutableTextBuffer MutableTextBufferFactory(string? value, MutableTextBufferTestOptions? options = null);
 
         /// <summary>
         /// Creates an instance of an <see cref="MutableTextBuffer"/> that can be used for testing.
         /// </summary>
         /// <returns>An instance of <see cref="MutableTextBuffer"/> that can be used for testing.</returns>
-        private protected abstract MutableTextBuffer MutableTextBufferFactory(string? value, int startIndex, int length, int capacity);
+        private protected abstract MutableTextBuffer MutableTextBufferFactory(string? value, int startIndex, int length, int capacity, MutableTextBufferTestOptions? options = null);
 
         /// <summary>
         /// Creates an instance of an <see cref="MutableTextBuffer"/> that can be used for testing.
         /// </summary>
         /// <returns>An instance of <see cref="MutableTextBuffer"/> that can be used for testing.</returns>
-        private protected abstract MutableTextBuffer MutableTextBufferFactory(string? value, int capacity);
+        private protected abstract MutableTextBuffer MutableTextBufferFactory(string? value, int capacity, MutableTextBufferTestOptions? options = null);
 
         /// <summary>
         /// Creates an instance of an <see cref="MutableTextBuffer"/> that can be used for testing.
         /// </summary>
         /// <returns>An instance of <see cref="MutableTextBuffer"/> that can be used for testing.</returns>
-        private protected abstract MutableTextBuffer MutableTextBufferFactory(ReadOnlySpan<char> value);
+        private protected abstract MutableTextBuffer MutableTextBufferFactory(ReadOnlySpan<char> value, MutableTextBufferTestOptions? options = null);
 
         /// <summary>
         /// Creates an instance of an <see cref="MutableTextBuffer"/> that can be used for testing.
         /// </summary>
         /// <returns>An instance of <see cref="MutableTextBuffer"/> that can be used for testing.</returns>
-        private protected abstract MutableTextBuffer MutableTextBufferFactory(ReadOnlySpan<char> value, int capacity);
+        private protected abstract MutableTextBuffer MutableTextBufferFactory(ReadOnlySpan<char> value, int capacity, MutableTextBufferTestOptions? options = null);
 
         /// <summary>
         /// Creates an instance of an <see cref="MutableTextBuffer"/> that can be used for testing.
         /// </summary>
         /// <returns>An instance of <see cref="MutableTextBuffer"/> that can be used for testing.</returns>
-        private protected abstract MutableTextBuffer MutableTextBufferFactory(StringBuilder? value);
+        private protected abstract MutableTextBuffer MutableTextBufferFactory(StringBuilder? value, MutableTextBufferTestOptions? options = null);
 
         /// <summary>
         /// Creates an instance of an <see cref="MutableTextBuffer"/> that can be used for testing.
         /// </summary>
         /// <returns>An instance of <see cref="MutableTextBuffer"/> that can be used for testing.</returns>
-        private protected abstract MutableTextBuffer MutableTextBufferFactory(StringBuilder? value, int capacity);
+        private protected abstract MutableTextBuffer MutableTextBufferFactory(StringBuilder? value, int capacity, MutableTextBufferTestOptions? options = null);
 
         /// <summary>
         /// Creates an instance of an <see cref="MutableTextBuffer"/> that can be used for testing.
         /// </summary>
         /// <returns>An instance of <see cref="MutableTextBuffer"/> that can be used for testing.</returns>
-        private protected abstract MutableTextBuffer MutableTextBufferFactory(StringBuilder? value, int startIndex, int length, int capacity);
+        private protected abstract MutableTextBuffer MutableTextBufferFactory(StringBuilder? value, int startIndex, int length, int capacity, MutableTextBufferTestOptions? options = null);
 
         /// <summary>
         /// Creates an instance of an <see cref="MutableTextBuffer"/> that can be used for testing.
         /// </summary>
         /// <returns>An instance of <see cref="MutableTextBuffer"/> that can be used for testing.</returns>
-        private protected abstract MutableTextBuffer MutableTextBufferFactory(ICharSequence? value);
+        private protected abstract MutableTextBuffer MutableTextBufferFactory(ICharSequence? value, MutableTextBufferTestOptions? options = null);
 
         /// <summary>
         /// Creates an instance of an <see cref="MutableTextBuffer"/> that can be used for testing.
         /// </summary>
         /// <returns>An instance of <see cref="MutableTextBuffer"/> that can be used for testing.</returns>
-        private protected abstract MutableTextBuffer MutableTextBufferFactory(string? value, int capacity, IArrayAllocator<char> allocator);
+        private protected abstract MutableTextBuffer MutableTextBufferFactory(string? value, int capacity, IArrayAllocator<char> allocator, MutableTextBufferTestOptions? options = null);
 
         private static readonly int MaxArrayLength =
             (int)typeof(Arrays)

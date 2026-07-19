@@ -16,6 +16,7 @@
  */
 #endregion
 
+using J2N.TestUtilities;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -50,20 +51,76 @@ namespace J2N.Text.Tests
 
         [Theory]
         [MemberData(nameof(Append_LowerCase_TestData))]
-        public void Test_AppendLower_ReadOnlySpan(string original, string input, string expected, CultureInfo culture)
+        public void AppendLower_CharSpan(string original, string input, string expected, CultureInfo culture)
         {
+            var ambientCulture = new ThreadCultureChange("tr-TR");
             var sb = MutableTextBufferFactory(original, 15);
             sb.AppendLower(input.AsSpan(), culture);
             Assert.Equal(expected, sb.ToString());
         }
 
+        [Fact]
+        public void AppendLower_CharSpan_UsesAmbientCulture_WhenInvariantDefaultsDisabled()
+        {
+            using var ambientCulture = new ThreadCultureChange("tr-TR");
+            var sb = MutableTextBufferFactory("", 16, new MutableTextBufferTestOptions { UseInvariantDefaults = false });
+            sb.AppendLower("I".AsSpan(), culture: null);
+            Assert.Equal("ı", sb.ToString());
+        }
+
+        [Fact]
+        public void AppendLower_CharSpan_UsesInvariantCulture_WhenInvariantDefaultsEnabled()
+        {
+            using var ambientCulture = new ThreadCultureChange("tr-TR");
+            var sb = MutableTextBufferFactory("", 16, new MutableTextBufferTestOptions { UseInvariantDefaults = true });
+            sb.AppendLower("I".AsSpan(), culture: null);
+            Assert.Equal("i", sb.ToString());
+        }
+
+        [Fact]
+        public void AppendLower_CharSpan_ExplicitCultureOverridesInvariantDefaults()
+        {
+            using var ambientCulture = new ThreadCultureChange("en-US");
+            var sb = MutableTextBufferFactory("", 16, new MutableTextBufferTestOptions { UseInvariantDefaults = true });
+            sb.AppendLower("I".AsSpan(), new CultureInfo("tr-TR"));
+            Assert.Equal("ı", sb.ToString());
+        }
+
         [Theory]
         [MemberData(nameof(Append_LowerCase_TestData))]
-        public void Test_AppendLower_String(string original, string input, string expected, CultureInfo culture)
+        public void AppendLower_String(string original, string input, string expected, CultureInfo culture)
         {
+            var ambientCulture = new ThreadCultureChange("tr-TR");
             var sb = MutableTextBufferFactory(original, 15);
             sb.AppendLower(input, culture);
             Assert.Equal(expected, sb.ToString());
+        }
+
+        [Fact]
+        public void AppendLower_String_UsesAmbientCulture_WhenInvariantDefaultsDisabled()
+        {
+            using var ambientCulture = new ThreadCultureChange("tr-TR");
+            var sb = MutableTextBufferFactory("", 16, new MutableTextBufferTestOptions { UseInvariantDefaults = false });
+            sb.AppendLower("I", culture: null);
+            Assert.Equal("ı", sb.ToString());
+        }
+
+        [Fact]
+        public void AppendLower_String_UsesInvariantCulture_WhenInvariantDefaultsEnabled()
+        {
+            using var ambientCulture = new ThreadCultureChange("tr-TR");
+            var sb = MutableTextBufferFactory("", 16, new MutableTextBufferTestOptions { UseInvariantDefaults = true });
+            sb.AppendLower("I", culture: null);
+            Assert.Equal("i", sb.ToString());
+        }
+
+        [Fact]
+        public void AppendLower_String_ExplicitCultureOverridesInvariantDefaults()
+        {
+            using var ambientCulture = new ThreadCultureChange("en-US");
+            var sb = MutableTextBufferFactory("", 16, new MutableTextBufferTestOptions { UseInvariantDefaults = true });
+            sb.AppendLower("I", new CultureInfo("tr-TR"));
+            Assert.Equal("ı", sb.ToString());
         }
 
         // ------------------------------
@@ -89,20 +146,76 @@ namespace J2N.Text.Tests
 
         [Theory]
         [MemberData(nameof(Append_UpperCase_TestData))]
-        public void Test_AppendUpper_ReadOnlySpan(string original, string input, string expected, CultureInfo culture)
+        public void AppendUpper_CharSpan(string original, string input, string expected, CultureInfo culture)
         {
+            var ambientCulture = new ThreadCultureChange("tr-TR");
             var sb = MutableTextBufferFactory(original, 15);
             sb.AppendUpper(input.AsSpan(), culture);
             Assert.Equal(expected, sb.ToString());
         }
 
+        [Fact]
+        public void AppendUpper_CharSpan_UsesAmbientCulture_WhenInvariantDefaultsDisabled()
+        {
+            using var ambientCulture = new ThreadCultureChange("tr-TR");
+            var sb = MutableTextBufferFactory("", 16, new MutableTextBufferTestOptions { UseInvariantDefaults = false });
+            sb.AppendUpper("i".AsSpan(), culture: null);
+            Assert.Equal("İ", sb.ToString());
+        }
+
+        [Fact]
+        public void AppendUpper_CharSpan_UsesInvariantCulture_WhenInvariantDefaultsEnabled()
+        {
+            using var ambientCulture = new ThreadCultureChange("tr-TR");
+            var sb = MutableTextBufferFactory("", 16, new MutableTextBufferTestOptions { UseInvariantDefaults = true });
+            sb.AppendUpper("i".AsSpan(), culture: null);
+            Assert.Equal("I", sb.ToString());
+        }
+
+        [Fact]
+        public void AppendUpper_CharSpan_ExplicitCultureOverridesInvariantDefaults()
+        {
+            using var ambientCulture = new ThreadCultureChange("en-US");
+            var sb = MutableTextBufferFactory("", 16, new MutableTextBufferTestOptions { UseInvariantDefaults = true });
+            sb.AppendUpper("i".AsSpan(), new CultureInfo("tr-TR"));
+            Assert.Equal("İ", sb.ToString());
+        }
+
         [Theory]
         [MemberData(nameof(Append_UpperCase_TestData))]
-        public void Test_AppendUpper_String(string original, string input, string expected, CultureInfo culture)
+        public void AppendUpper_String(string original, string input, string expected, CultureInfo culture)
         {
+            var ambientCulture = new ThreadCultureChange("tr-TR");
             var sb = MutableTextBufferFactory(original, 15);
             sb.AppendUpper(input, culture);
             Assert.Equal(expected, sb.ToString());
+        }
+
+        [Fact]
+        public void AppendUpper_String_UsesAmbientCulture_WhenInvariantDefaultsDisabled()
+        {
+            using var ambientCulture = new ThreadCultureChange("tr-TR");
+            var sb = MutableTextBufferFactory("", 16, new MutableTextBufferTestOptions { UseInvariantDefaults = false });
+            sb.AppendUpper("i", culture: null);
+            Assert.Equal("İ", sb.ToString());
+        }
+
+        [Fact]
+        public void AppendUpper_String_UsesInvariantCulture_WhenInvariantDefaultsEnabled()
+        {
+            using var ambientCulture = new ThreadCultureChange("tr-TR");
+            var sb = MutableTextBufferFactory("", 16, new MutableTextBufferTestOptions { UseInvariantDefaults = true });
+            sb.AppendUpper("i", culture: null);
+            Assert.Equal("I", sb.ToString());
+        }
+
+        [Fact]
+        public void AppendUpper_String_ExplicitCultureOverridesInvariantDefaults()
+        {
+            using var ambientCulture = new ThreadCultureChange("en-US");
+            var sb = MutableTextBufferFactory("", 16, new MutableTextBufferTestOptions { UseInvariantDefaults = true });
+            sb.AppendUpper("i", new CultureInfo("tr-TR"));
+            Assert.Equal("İ", sb.ToString());
         }
 
         // ------------------------------
@@ -118,7 +231,7 @@ namespace J2N.Text.Tests
 
         [Theory]
         [MemberData(nameof(AppendInvariant_LowerCase_TestData))]
-        public void Test_AppendLowerInvariant_ReadOnlySpan(string original, string input, string expected)
+        public void AppendLowerInvariant_CharSpan(string original, string input, string expected)
         {
             var sb = MutableTextBufferFactory(original, 15);
             sb.AppendLowerInvariant(input.AsSpan());
@@ -127,7 +240,7 @@ namespace J2N.Text.Tests
 
         [Theory]
         [MemberData(nameof(AppendInvariant_LowerCase_TestData))]
-        public void Test_AppendLowerInvariant_String(string original, string input, string expected)
+        public void AppendLowerInvariant_String(string original, string input, string expected)
         {
             var sb = MutableTextBufferFactory(original, 15);
             sb.AppendLowerInvariant(input);
@@ -147,7 +260,7 @@ namespace J2N.Text.Tests
 
         [Theory]
         [MemberData(nameof(AppendInvariant_UpperCase_TestData))]
-        public void Test_AppendUpperInvariant_ReadOnlySpan(string original, string input, string expected)
+        public void AppendUpperInvariant_CharSpan(string original, string input, string expected)
         {
             var sb = MutableTextBufferFactory(original, 15);
             sb.AppendUpperInvariant(input.AsSpan());
@@ -156,7 +269,7 @@ namespace J2N.Text.Tests
 
         [Theory]
         [MemberData(nameof(AppendInvariant_UpperCase_TestData))]
-        public void Test_AppendUpperInvariant_String(string original, string input, string expected)
+        public void AppendUpperInvariant_String(string original, string input, string expected)
         {
             var sb = MutableTextBufferFactory(original, 15);
             sb.AppendUpperInvariant(input);

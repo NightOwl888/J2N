@@ -51,7 +51,7 @@ namespace J2N.Text
         [CodeGenerationExtensionImplementation]
         internal void AppendUpperInternal(ReadOnlySpan<char> value, CultureInfo? culture)
         {
-            culture ??= CultureInfo.CurrentCulture;
+            culture ??= DefaultCulture;
 
             int valueLength = value.Length;
             if (valueLength == 0)
@@ -97,7 +97,7 @@ namespace J2N.Text
         [CodeGenerationExtensionImplementation]
         internal void AppendLowerInternal(ReadOnlySpan<char> value, CultureInfo? culture)
         {
-            culture ??= CultureInfo.CurrentCulture;
+            culture ??= DefaultCulture;
 
             int valueLength = value.Length;
             if (valueLength == 0)
