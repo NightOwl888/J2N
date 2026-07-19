@@ -7,43 +7,51 @@ namespace J2N.Text.Tests
 {
     public partial class MutableTextBuffer_Tests : StringBuilder_Tests
     {
+        public static readonly IArrayAllocator<char> DefaultAllocator =
+#if FEATURE_GC_ALLOCATEUNINITIALIZEDARRAY
+            UninitializedArrayAllocator<char>.Default;
+#else
+            ArrayAllocator<char>.Default;
+#endif
+
         private protected override MutableTextBuffer MutableTextBufferFactory()
-            => new MutableTextBuffer(UninitializedArrayAllocator<char>.Default).Initialize();
+            => new MutableTextBuffer(DefaultAllocator).Initialize();
 
         private protected override MutableTextBuffer MutableTextBufferFactory(int capacity)
-            => new MutableTextBuffer(UninitializedArrayAllocator<char>.Default).Initialize(capacity);
+            => new MutableTextBuffer(DefaultAllocator).Initialize(capacity);
 
         private protected override MutableTextBuffer MutableTextBufferFactory(int capacity, int maxCapacity)
-            => new MutableTextBuffer(UninitializedArrayAllocator<char>.Default).Initialize(capacity, maxCapacity);
+            => new MutableTextBuffer(DefaultAllocator).Initialize(capacity, maxCapacity);
 
         private protected override MutableTextBuffer MutableTextBufferFactory(string? value)
-            => new MutableTextBuffer(UninitializedArrayAllocator<char>.Default).Initialize(value);
+            => new MutableTextBuffer(DefaultAllocator).Initialize(value);
 
         private protected override MutableTextBuffer MutableTextBufferFactory(string? value, int startIndex, int length, int capacity)
-            => new MutableTextBuffer(UninitializedArrayAllocator<char>.Default).Initialize(value, startIndex, length, capacity);
+            => new MutableTextBuffer(DefaultAllocator).Initialize(value, startIndex, length, capacity);
 
         private protected override MutableTextBuffer MutableTextBufferFactory(string? value, int capacity)
-            => new MutableTextBuffer(UninitializedArrayAllocator<char>.Default).Initialize(value, capacity);
+            => new MutableTextBuffer(DefaultAllocator).Initialize(value, capacity);
 
         private protected override MutableTextBuffer MutableTextBufferFactory(ReadOnlySpan<char> value)
-            => new MutableTextBuffer(UninitializedArrayAllocator<char>.Default).Initialize(value);
+            => new MutableTextBuffer(DefaultAllocator).Initialize(value);
 
         private protected override MutableTextBuffer MutableTextBufferFactory(ReadOnlySpan<char> value, int capacity)
-            => new MutableTextBuffer(UninitializedArrayAllocator<char>.Default).Initialize(value, capacity);
+            => new MutableTextBuffer(DefaultAllocator).Initialize(value, capacity);
 
         private protected override MutableTextBuffer MutableTextBufferFactory(StringBuilder? value)
-            => new MutableTextBuffer(UninitializedArrayAllocator<char>.Default).Initialize(value);
+            => new MutableTextBuffer(DefaultAllocator).Initialize(value);
 
         private protected override MutableTextBuffer MutableTextBufferFactory(StringBuilder? value, int capacity)
-            => new MutableTextBuffer(UninitializedArrayAllocator<char>.Default).Initialize(value, capacity);
+            => new MutableTextBuffer(DefaultAllocator).Initialize(value, capacity);
 
         private protected override MutableTextBuffer MutableTextBufferFactory(StringBuilder? value, int startIndex, int length, int capacity)
-            => new MutableTextBuffer(UninitializedArrayAllocator<char>.Default).Initialize(value, startIndex, length, capacity);
+            => new MutableTextBuffer(DefaultAllocator).Initialize(value, startIndex, length, capacity);
 
         private protected override MutableTextBuffer MutableTextBufferFactory(ICharSequence? value)
-            => new MutableTextBuffer(UninitializedArrayAllocator<char>.Default).Initialize(value);
+            => new MutableTextBuffer(DefaultAllocator).Initialize(value);
 
         private protected override MutableTextBuffer MutableTextBufferFactory(string? value, int capacity, IArrayAllocator<char> allocator)
             => new MutableTextBuffer(allocator).Initialize(value, capacity);
+
     }
 }

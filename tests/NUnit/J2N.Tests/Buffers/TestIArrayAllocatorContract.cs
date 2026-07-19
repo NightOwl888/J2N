@@ -29,7 +29,9 @@ namespace J2N.Buffers
             ArrayAllocator<char>.Default,
             PooledArrayAllocator<char>.Default,
             PooledArrayAllocator<char>.Uncleared,
+#if FEATURE_GC_ALLOCATEUNINITIALIZEDARRAY
             UninitializedArrayAllocator<char>.Default,
+#endif
         };
 
         /**

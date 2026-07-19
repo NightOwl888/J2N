@@ -16,6 +16,8 @@
  */
 #endregion
 
+#if FEATURE_GC_ALLOCATEUNINITIALIZEDARRAY
+
 using NUnit.Framework;
 using System;
 using System.Runtime.CompilerServices;
@@ -25,9 +27,6 @@ namespace J2N.Buffers
     [TestFixture]
     public class TestUninitializedArrayAllocator
     {
-        /**
-         * @tests J2N.Buffers.UninitializedArrayAllocator<T>.Default
-         */
         [Test]
         public void Test_Default_ReturnsSingleton()
         {
@@ -37,9 +36,6 @@ namespace J2N.Buffers
             Assert.That(allocator1, Is.SameAs(allocator2));
         }
 
-        /**
-         * @tests J2N.Buffers.UninitializedArrayAllocator<T>.Allocate(int)
-         */
         [Test]
         public void Test_Allocate_ReturnsExactLength()
         {
@@ -51,9 +47,6 @@ namespace J2N.Buffers
             Assert.That(array.Length, Is.EqualTo(128));
         }
 
-        /**
-         * @tests J2N.Buffers.UninitializedArrayAllocator<T>.Allocate(int)
-         */
         [Test]
         public void Test_Allocate_ZeroLength()
         {
@@ -65,10 +58,6 @@ namespace J2N.Buffers
             Assert.That(array.Length, Is.EqualTo(0));
         }
 
-#if FEATURE_GC_ALLOCATEUNINITIALIZEDARRAY
-        /**
-         * @tests J2N.Buffers.UninitializedArrayAllocator<T>.GuaranteesClearedArrays
-         */
         [Test]
         public void Test_GuaranteesClearedArrays_ReturnsFalse_WhenSupported()
         {
@@ -76,22 +65,7 @@ namespace J2N.Buffers
                 UninitializedArrayAllocator<char>.Default.GuaranteesClearedArrays,
                 Is.False);
         }
-#else
-        /**
-         * @tests J2N.Buffers.UninitializedArrayAllocator<T>.GuaranteesClearedArrays
-         */
-        [Test]
-        public void Test_GuaranteesClearedArrays_ReturnsTrue_WhenFallbackingToNewArray()
-        {
-            Assert.That(
-                UninitializedArrayAllocator<char>.Default.GuaranteesClearedArrays,
-                Is.True);
-        }
-#endif
 
-        /**
-         * @tests J2N.Buffers.UninitializedArrayAllocator<T>.Return(T[])
-         */
         [Test]
         public void Test_Return_DoesNotThrow()
         {
@@ -102,9 +76,6 @@ namespace J2N.Buffers
             Assert.DoesNotThrow(() => allocator.Return(array));
         }
 
-        /**
-         * @tests J2N.Buffers.UninitializedArrayAllocator<T>.Allocate(int)
-         */
         [Test]
         public void Test_Allocate_NegativeLength_Throws()
         {
@@ -116,9 +87,6 @@ namespace J2N.Buffers
             });
         }
 
-        /**
-         * @tests J2N.Buffers.UninitializedArrayAllocator<T>.Allocate(int)
-         */
         [Test]
         public void Test_Allocate_MultipleIndependentArrays()
         {
@@ -132,3 +100,5 @@ namespace J2N.Buffers
         }
     }
 }
+
+#endif

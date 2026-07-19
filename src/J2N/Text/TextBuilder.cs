@@ -38,7 +38,12 @@ namespace J2N.Text
         internal readonly MutableTextBuffer buffer;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static MutableTextBuffer CreateBuffer() => new(UninitializedArrayAllocator<char>.Default)
+        private static MutableTextBuffer CreateBuffer()
+#if FEATURE_GC_ALLOCATEUNINITIALIZEDARRAY
+            => new(UninitializedArrayAllocator<char>.Default)
+#else
+            => new(ArrayAllocator<char>.Default)
+#endif
         {
             ClearExposedBuffers = true
         };

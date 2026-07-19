@@ -16,21 +16,25 @@
  */
 #endregion
 
+#if FEATURE_GC_ALLOCATEUNINITIALIZEDARRAY
+
 using System;
 
 namespace J2N.Buffers
 {
     /// <summary>
-    /// An allocator that serves uninitialized arrays if supported by the current platform.
+    /// An allocator that serves uninitialized arrays using <see cref="GC.AllocateUninitializedArray{T}(int, bool)"/>.
     /// </summary>
     /// <typeparam name="T">The type of array element.</typeparam>
-    internal sealed class UninitializedArrayAllocator<T> : IArrayAllocator<T>
+    public sealed class UninitializedArrayAllocator<T> : IArrayAllocator<T>
     {
         private UninitializedArrayAllocator() { }
 
+        /// <summary>
+        /// Gets the default instance of <see cref="UninitializedArrayAllocator{T}"/>.
+        /// </summary>
         public static UninitializedArrayAllocator<T> Default { get; } = new();
 
-#if FEATURE_GC_ALLOCATEUNINITIALIZEDARRAY
         /// <inheritdoc/>
         public bool GuaranteesClearedArrays => false;
 
@@ -43,19 +47,6 @@ namespace J2N.Buffers
         {
             // Intentionally blank
         }
-#else
-        /// <inheritdoc/>
-        public bool GuaranteesClearedArrays => true;
-
-        /// <inheritdoc/>
-        public T[] Allocate(int minimumLength)
-            => new T[minimumLength];
-
-        /// <inheritdoc/>
-        public void Return(T[] array)
-        {
-            // Intentionally blank
-        }
-#endif
     }
 }
+#endif
