@@ -8,7 +8,7 @@ using System.Threading;
 namespace J2N.Text
 {
     [TestFixture]
-    public abstract class CharSequenceTestBase<T>
+    internal abstract class CharSequenceTestBase<T>
         where T: ICharSequence, IComparable<ICharSequence?>, IEquatable<ICharSequence?>
     {
         protected static readonly string String1 = "This is a portriat of a Turkish czar";

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace J2N.Text
 {
-    public class TestSynchronizedTextBuilderCharSequence : CharSequenceTestBase<SynchronizedTextBuilderCharSequence>
+    internal class TestSynchronizedTextBuilderCharSequence : CharSequenceTestBase<SynchronizedTextBuilderCharSequence>
     {
         public override void SetUp()
         {

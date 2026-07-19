@@ -5,7 +5,7 @@ using System.Text;
 
 namespace J2N.Text
 {
-    public class TestCharArrayCharSequence : CharSequenceTestBase<CharArrayCharSequence>
+    internal class TestCharArrayCharSequence : CharSequenceTestBase<CharArrayCharSequence>
     {
         public override void SetUp()
         {

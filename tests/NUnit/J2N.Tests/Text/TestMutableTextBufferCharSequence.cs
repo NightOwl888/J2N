@@ -6,7 +6,7 @@ using System.Text;
 
 namespace J2N.Text
 {
-    public class TestMutableTextBufferCharSequence : CharSequenceTestBase<MutableTextBufferCharSequence>
+    internal class TestMutableTextBufferCharSequence : CharSequenceTestBase<MutableTextBufferCharSequence>
     {
         public override void SetUp()
         {
