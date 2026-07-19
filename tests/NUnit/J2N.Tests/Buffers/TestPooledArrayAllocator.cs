@@ -26,13 +26,13 @@ namespace J2N.Buffers
     public class TestPooledArrayAllocator
     {
         /**
-         * @tests J2N.Buffers.PooledArrayAllocator<T>.Default
+         * @tests J2N.Buffers.PooledArrayAllocator<T>.Cleared
          */
         [Test]
-        public void Test_Default_ReturnsSingleton()
+        public void Test_Cleared_ReturnsSingleton()
         {
-            var allocator1 = PooledArrayAllocator<char>.Default;
-            var allocator2 = PooledArrayAllocator<char>.Default;
+            var allocator1 = PooledArrayAllocator<char>.Cleared;
+            var allocator2 = PooledArrayAllocator<char>.Cleared;
 
             Assert.That(allocator1, Is.SameAs(allocator2));
         }
@@ -43,7 +43,7 @@ namespace J2N.Buffers
         [Test]
         public void Test_GuaranteesClearedArrays_ReturnsTrue()
         {
-            Assert.That(PooledArrayAllocator<char>.Default.GuaranteesClearedArrays, Is.True);
+            Assert.That(PooledArrayAllocator<char>.Cleared.GuaranteesClearedArrays, Is.True);
         }
 
         /**
@@ -52,7 +52,7 @@ namespace J2N.Buffers
         [Test]
         public void Test_Allocate_ReturnsAtLeastRequestedLength()
         {
-            var allocator = PooledArrayAllocator<char>.Default;
+            var allocator = PooledArrayAllocator<char>.Cleared;
 
             for (int i = 0; i < 4096; i++)
             {
@@ -71,7 +71,7 @@ namespace J2N.Buffers
         [Test]
         public void Test_Allocate_ZeroLength()
         {
-            var allocator = PooledArrayAllocator<char>.Default;
+            var allocator = PooledArrayAllocator<char>.Cleared;
 
             char[] array = allocator.Allocate(0);
 
@@ -87,7 +87,7 @@ namespace J2N.Buffers
         [Test]
         public void Test_Return_DoesNotThrow()
         {
-            var allocator = PooledArrayAllocator<char>.Default;
+            var allocator = PooledArrayAllocator<char>.Cleared;
 
             char[] array = allocator.Allocate(32);
 
@@ -100,7 +100,7 @@ namespace J2N.Buffers
         [Test]
         public void Test_Allocate_NegativeLength_Throws()
         {
-            var allocator = PooledArrayAllocator<char>.Default;
+            var allocator = PooledArrayAllocator<char>.Cleared;
 
             Assert.Throws<ArgumentOutOfRangeException>(() =>
             {
@@ -114,7 +114,7 @@ namespace J2N.Buffers
         [Test]
         public void Test_ReturnedArrayIsClearedBeforeReuse()
         {
-            var allocator = PooledArrayAllocator<char>.Default;
+            var allocator = PooledArrayAllocator<char>.Cleared;
 
             char[] array1 = allocator.Allocate(128);
 
@@ -167,7 +167,7 @@ namespace J2N.Buffers
         [Test]
         public void Test_Allocate_MultipleConcurrentRentReturnOperations()
         {
-            var allocator = PooledArrayAllocator<char>.Default;
+            var allocator = PooledArrayAllocator<char>.Cleared;
 
             Parallel.For(0, Environment.ProcessorCount * 8, _ =>
             {
@@ -190,7 +190,7 @@ namespace J2N.Buffers
         [Test]
         public void Test_Allocate_LargeBuffers()
         {
-            var allocator = PooledArrayAllocator<char>.Default;
+            var allocator = PooledArrayAllocator<char>.Cleared;
 
             int[] sizes =
             {
@@ -217,7 +217,7 @@ namespace J2N.Buffers
         [Test]
         public void Test_Return_Null_Throws()
         {
-            var allocator = PooledArrayAllocator<char>.Default;
+            var allocator = PooledArrayAllocator<char>.Cleared;
 
             Assert.Throws<ArgumentNullException>(() =>
             {

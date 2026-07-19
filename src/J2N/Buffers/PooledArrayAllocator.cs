@@ -39,36 +39,34 @@ namespace J2N.Buffers
         }
 
         /// <summary>
-        /// A holder for the uncleared array pool and allocator instances. Note that if the <see cref="Uncleared"/>
-        /// property is never called, these do not get instantiated.
+        /// A holder for the uncleared array pool allocator instance. Note that if the <see cref="Uncleared"/>
+        /// property is never called, this does not get instantiated.
         /// </summary>
         private static class UnclearedArrayPoolHolder
         {
-            private static readonly ArrayPool<T> pool = ArrayPool<T>.Create();
-            public static readonly PooledArrayAllocator<T> Instance = new(pool, clearArrays: false);
+            public static readonly PooledArrayAllocator<T> Instance = new(ArrayPool<T>.Create(), clearArrays: false);
         }
 
         /// <summary>
-        /// A holder for the cleared array pool and allocator instances. Note that if the <see cref="Default"/>
-        /// property is never called, these do not get instantiated.
+        /// A holder for the cleared array pool allocator instance. Note that if the <see cref="Cleared"/>
+        /// property is never called, this does not get instantiated.
         /// </summary>
         private static class ClearedArrayPoolHolder
         {
-            private static readonly ArrayPool<T> pool = ArrayPool<T>.Create();
-            public static readonly PooledArrayAllocator<T> Instance = new(pool, clearArrays: true);
+            public static readonly PooledArrayAllocator<T> Instance = new(ArrayPool<T>.Create(), clearArrays: true);
         }
 
         /// <summary>
         /// Gets the default instance of <see cref="PooledArrayAllocator{T}"/>.
-        /// This instance does not clear the array after reuse.
+        /// This instance does not clear the array after use.
         /// </summary>
-        internal static PooledArrayAllocator<T> Uncleared => UnclearedArrayPoolHolder.Instance;
+        public static PooledArrayAllocator<T> Uncleared => UnclearedArrayPoolHolder.Instance;
 
         /// <summary>
         /// Gets an instance of <see cref="PooledArrayAllocator{T}"/> that clears
         /// arrays as it returns them to the pool.
         /// </summary>
-        public static PooledArrayAllocator<T> Default => ClearedArrayPoolHolder.Instance;
+        public static PooledArrayAllocator<T> Cleared => ClearedArrayPoolHolder.Instance;
 
         /// <inheritdoc/>
         public bool GuaranteesClearedArrays => clearArrays;

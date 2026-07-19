@@ -27,7 +27,7 @@ namespace J2N.Buffers
         private static readonly IArrayAllocator<char>[] allocators =
         {
             ArrayAllocator<char>.Default,
-            PooledArrayAllocator<char>.Default,
+            PooledArrayAllocator<char>.Cleared,
             PooledArrayAllocator<char>.Uncleared,
 #if FEATURE_GC_ALLOCATEUNINITIALIZEDARRAY
             UninitializedArrayAllocator<char>.Default,
