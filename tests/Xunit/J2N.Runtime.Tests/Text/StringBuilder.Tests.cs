@@ -1766,6 +1766,42 @@ namespace J2N.Text.Tests
         }
 #nullable enable
 
+        [Fact]
+        public void AppendFormat_UsesAmbientCulture_WhenInvariantDefaultsDisabled()
+        {
+            using var ambientCulture = new ThreadCultureChange("de-DE");
+            var sb = MutableTextBufferFactory(new MutableTextBufferTestOptions { UseInvariantDefaults = false });
+            sb.AppendFormat("{0:N2}", 1234.5);
+            Assert.Equal("1.234,50", sb.ToString());
+        }
+
+        [Fact]
+        public void AppendFormat_UsesInvariantCulture_WhenInvariantDefaultsEnabled()
+        {
+            using var ambientCulture = new ThreadCultureChange("de-DE");
+            var sb = MutableTextBufferFactory(new MutableTextBufferTestOptions { UseInvariantDefaults = true });
+            sb.AppendFormat("{0:N2}", 1234.5);
+            Assert.Equal("1,234.50", sb.ToString());
+        }
+
+        [Fact]
+        public void AppendFormat_ExplicitProviderOverridesInvariantDefaults()
+        {
+            using var ambientCulture = new ThreadCultureChange("en-US");
+            var sb = MutableTextBufferFactory(new MutableTextBufferTestOptions { UseInvariantDefaults = true });
+            sb.AppendFormat(new CultureInfo("de-DE"), "{0:N2}", 1234.5);
+            Assert.Equal("1.234,50", sb.ToString());
+        }
+
+        [Fact]
+        public void AppendFormat_ExplicitInvariantProviderOverridesAmbientCulture()
+        {
+            using var ambientCulture = new ThreadCultureChange("de-DE");
+            var sb = MutableTextBufferFactory(new MutableTextBufferTestOptions { UseInvariantDefaults = false });
+            sb.AppendFormat(CultureInfo.InvariantCulture,"{0:N2}", 1234.5);
+            Assert.Equal("1,234.50", sb.ToString());
+        }
+
 #if FEATURE_SPANFORMATTABLE
         private readonly struct TooManyCharsWrittenSpanFormattable : ISpanFormattable
         {

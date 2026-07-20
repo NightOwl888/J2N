@@ -224,6 +224,9 @@ namespace J2N.Text
             // it needs to be used to transform all arguments.
             ICustomFormatter? cf = (ICustomFormatter?)provider?.GetFormat(typeof(ICustomFormatter));
 
+            // J2N: Override the default culture if not provided.
+            provider ??= DefaultCulture;
+
             // Repeatedly find the next hole and process it.
             int pos = 0;
             char ch;
@@ -502,6 +505,9 @@ namespace J2N.Text
             // Query the provider (if one was supplied) for an ICustomFormatter.  If there is one,
             // it needs to be used to transform all arguments.
             ICustomFormatter? cf = (ICustomFormatter?)provider?.GetFormat(typeof(ICustomFormatter));
+
+            // J2N: Override the default culture if not provided.
+            provider ??= DefaultCulture;
 
             // Repeatedly find the next hole and process it.
             int pos = 0;
