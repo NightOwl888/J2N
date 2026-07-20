@@ -201,7 +201,7 @@ namespace J2N.Text
             int ensureAdditionalCapacityBeyondPos, T value, ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
             where TFormatter : struct, INumberFormatter<T>
         {
-            provider ??= NumberFormatInfo.InvariantInfo; // For JDK-style formatting
+            provider ??= DefaultNumberFormatInfo; // Set by UseInvariantDefaults
 
             if ((uint)m_Position + (uint)ensureAdditionalCapacityBeyondPos > (uint)m_Chars.Length)
             {
@@ -243,7 +243,7 @@ namespace J2N.Text
         {
             Debug.Assert(typeof(T).Assembly.Equals(typeof(object).Assembly) || typeof(T).Assembly.Equals(typeof(Number).Assembly), "Implementation trusts the results of TryFormat because T is expected to be something known");
 
-            provider ??= NumberFormatInfo.InvariantInfo; // For JDK-style formatting
+            provider ??= DefaultNumberFormatInfo; // Set by UseInvariantDefaults
             int charsWritten;
             while (!value.TryFormat(m_Chars.AsSpan(m_Position), out charsWritten, format, provider))
             {
@@ -470,7 +470,7 @@ namespace J2N.Text
                 ThrowHelper.ThrowArgumentOutOfRange_IndexMustBeLessOrEqualException(index);
             }
 
-            provider ??= NumberFormatInfo.InvariantInfo; // For JDK-style formatting
+            provider ??= DefaultNumberFormatInfo; // Set by UseInvariantDefaults
             char[]? arrayToReturnToPool = null;
             Span<char> buffer = stackalloc char[CharStackBufferSize];
             int charsWritten = 0;
@@ -508,7 +508,7 @@ namespace J2N.Text
         {
             Debug.Assert(typeof(T).Assembly.Equals(typeof(object).Assembly) || typeof(T).Assembly.Equals(typeof(Number).Assembly), "Implementation trusts the results of TryFormat because T is expected to be something known");
 
-            provider ??= NumberFormatInfo.InvariantInfo; // For JDK-style formatting
+            provider ??= DefaultNumberFormatInfo; // Set by UseInvariantDefaults
 
             if ((uint)index > (uint)Length)
             {

@@ -762,6 +762,42 @@ namespace J2N.Text.Tests
             AssertExtensions.Throws<ArgumentOutOfRangeException>(s_noCapacityParamName, () => builder.Append((double)1));
         }
 
+        [Fact]
+        public void Append_Double_UsesAmbientCulture_WhenInvariantDefaultsDisabled()
+        {
+            using var ambientCulture = new ThreadCultureChange("fr-FR");
+            var sb = MutableTextBufferFactory("foo", new MutableTextBufferTestOptions { UseInvariantDefaults = false });
+            sb.Append(1.5d);
+            Assert.Equal("foo1,5", sb.ToString());
+        }
+
+        [Fact]
+        public void Append_Double_UsesInvariantCulture_WhenInvariantDefaultsEnabled()
+        {
+            using var ambientCulture = new ThreadCultureChange("fr-FR");
+            var sb = MutableTextBufferFactory("foo", new MutableTextBufferTestOptions { UseInvariantDefaults = true });
+            sb.Append(1.5d);
+            Assert.Equal("foo1.5", sb.ToString());
+        }
+
+        [Fact]
+        public void Append_Double_ExplicitProviderOverridesInvariantDefaults()
+        {
+            using var ambientCulture = new ThreadCultureChange("en-US");
+            var sb = MutableTextBufferFactory("foo", new MutableTextBufferTestOptions { UseInvariantDefaults = true });
+            sb.Append(1.5f, provider: new CultureInfo("fr-FR"));
+            Assert.Equal("foo1,5", sb.ToString());
+        }
+
+        [Fact]
+        public void Append_Double_ExplicitProviderOverridesAmbientCulture()
+        {
+            using var ambientCulture = new ThreadCultureChange("en-US");
+            var sb = MutableTextBufferFactory("foo", new MutableTextBufferTestOptions { UseInvariantDefaults = false });
+            sb.Append(1.5f, provider: new CultureInfo("fr-FR"));
+            Assert.Equal("foo1,5", sb.ToString());
+        }
+
         [Theory]
         [InlineData("Hello", (short)0, "Hello0")]
         [InlineData("Hello", (short)123, "Hello123")]
@@ -800,6 +836,42 @@ namespace J2N.Text.Tests
             builder.Append("Hello");
 
             AssertExtensions.Throws<ArgumentOutOfRangeException>(s_noCapacityParamName, () => builder.Append(1));
+        }
+
+        [Fact]
+        public void Append_Int_UsesAmbientCulture_WhenInvariantDefaultsDisabled()
+        {
+            using var ambientCulture = new ThreadCultureChange("ar-IQ");
+            var sb = MutableTextBufferFactory("foo", new MutableTextBufferTestOptions { UseInvariantDefaults = false });
+            sb.Append(-1);
+            Assert.Equal("foo\u061C\u002D1", sb.ToString());
+        }
+
+        [Fact]
+        public void Append_Int_UsesInvariantCulture_WhenInvariantDefaultsEnabled()
+        {
+            using var ambientCulture = new ThreadCultureChange("ar-IQ");
+            var sb = MutableTextBufferFactory("foo", new MutableTextBufferTestOptions { UseInvariantDefaults = true });
+            sb.Append(-1);
+            Assert.Equal("foo\u002D1", sb.ToString());
+        }
+
+        [Fact]
+        public void Append_Int_ExplicitProviderOverridesInvariantDefaults()
+        {
+            using var ambientCulture = new ThreadCultureChange("en-US");
+            var sb = MutableTextBufferFactory("foo", new MutableTextBufferTestOptions { UseInvariantDefaults = true });
+            sb.Append(-1, provider: new CultureInfo("ar-IQ"));
+            Assert.Equal("foo\u061C\u002D1", sb.ToString());
+        }
+
+        [Fact]
+        public void Append_Int_ExplicitProviderOverridesAmbientCulture()
+        {
+            using var ambientCulture = new ThreadCultureChange("en-US");
+            var sb = MutableTextBufferFactory("foo", new MutableTextBufferTestOptions { UseInvariantDefaults = false });
+            sb.Append(-1, provider: new CultureInfo("ar-IQ"));
+            Assert.Equal("foo\u061C\u002D1", sb.ToString());
         }
 
         [Theory]
@@ -2529,6 +2601,42 @@ namespace J2N.Text.Tests
             Assert.Throws<OutOfMemoryException>(() => builder.Insert(builder.Length, 1)); // New length > builder.MaxCapacity
         }
 
+        [Fact]
+        public void Insert_Int_UsesAmbientCulture_WhenInvariantDefaultsDisabled()
+        {
+            using var ambientCulture = new ThreadCultureChange("ar-IQ");
+            var sb = MutableTextBufferFactory("foo", new MutableTextBufferTestOptions { UseInvariantDefaults = false });
+            sb.Insert(0, -1);
+            Assert.Equal("\u061C\u002D1foo", sb.ToString());
+        }
+
+        [Fact]
+        public void Insert_Int_UsesInvariantCulture_WhenInvariantDefaultsEnabled()
+        {
+            using var ambientCulture = new ThreadCultureChange("ar-IQ");
+            var sb = MutableTextBufferFactory("foo", new MutableTextBufferTestOptions { UseInvariantDefaults = true });
+            sb.Insert(0, -1);
+            Assert.Equal("\u002D1foo", sb.ToString());
+        }
+
+        [Fact]
+        public void Insert_Int_ExplicitProviderOverridesInvariantDefaults()
+        {
+            using var ambientCulture = new ThreadCultureChange("en-US");
+            var sb = MutableTextBufferFactory("foo", new MutableTextBufferTestOptions { UseInvariantDefaults = true });
+            sb.Insert(0, -1, provider: new CultureInfo("ar-IQ"));
+            Assert.Equal("\u061C\u002D1foo", sb.ToString());
+        }
+
+        [Fact]
+        public void Insert_Int_ExplicitProviderOverridesAmbientCulture()
+        {
+            using var ambientCulture = new ThreadCultureChange("en-US");
+            var sb = MutableTextBufferFactory("foo", new MutableTextBufferTestOptions { UseInvariantDefaults = false });
+            sb.Insert(0, -1, provider: new CultureInfo("ar-IQ"));
+            Assert.Equal("\u061C\u002D1foo", sb.ToString());
+        }
+
         [Theory]
         [InlineData("Hello", 0, (short)0, "0Hello")]
         [InlineData("Hello", 3, (short)123, "Hel123lo")]
@@ -2586,6 +2694,42 @@ namespace J2N.Text.Tests
             AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => builder.Insert(-1, (double)1)); // Index < 0
             AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => builder.Insert(builder.Length + 1, (double)1)); // Index > builder.Length
             Assert.Throws<OutOfMemoryException>(() => builder.Insert(builder.Length, (double)1)); // New length > builder.MaxCapacity
+        }
+
+        [Fact]
+        public void Insert_Double_UsesAmbientCulture_WhenInvariantDefaultsDisabled()
+        {
+            using var ambientCulture = new ThreadCultureChange("fr-FR");
+            var sb = MutableTextBufferFactory("foo", new MutableTextBufferTestOptions { UseInvariantDefaults = false });
+            sb.Insert(0, 1.5d);
+            Assert.Equal("1,5foo", sb.ToString());
+        }
+
+        [Fact]
+        public void Insert_Double_UsesInvariantCulture_WhenInvariantDefaultsEnabled()
+        {
+            using var ambientCulture = new ThreadCultureChange("fr-FR");
+            var sb = MutableTextBufferFactory("foo", new MutableTextBufferTestOptions { UseInvariantDefaults = true });
+            sb.Insert(0, 1.5d);
+            Assert.Equal("1.5foo", sb.ToString());
+        }
+
+        [Fact]
+        public void Insert_Double_ExplicitProviderOverridesInvariantDefaults()
+        {
+            using var ambientCulture = new ThreadCultureChange("en-US");
+            var sb = MutableTextBufferFactory("foo", new MutableTextBufferTestOptions { UseInvariantDefaults = true });
+            sb.Insert(0, 1.5f, provider: new CultureInfo("fr-FR"));
+            Assert.Equal("1,5foo", sb.ToString());
+        }
+
+        [Fact]
+        public void Insert_Double_ExplicitProviderOverridesAmbientCulture()
+        {
+            using var ambientCulture = new ThreadCultureChange("en-US");
+            var sb = MutableTextBufferFactory("foo", new MutableTextBufferTestOptions { UseInvariantDefaults = false });
+            sb.Insert(0, 1.5f, provider: new CultureInfo("fr-FR"));
+            Assert.Equal("1,5foo", sb.ToString());
         }
 
         public static IEnumerable<object[]> Test_Insert_Decimal_TestData()
