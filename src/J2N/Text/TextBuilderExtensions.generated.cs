@@ -2093,6 +2093,9 @@ namespace J2N.Text
         /// <para/>
         /// The capacity of this instance is adjusted as needed.
         /// <para/>
+        /// If no format provider is explicitly specified, this method uses the default formatting behavior
+        /// determined by the <see cref="TextBuilder.UseInvariantDefaults"/> setting.
+        /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
         /// When you instantiate a <see cref="TextBuilder"/> object by calling <see cref="TextBuilder(int, int)"/>,
@@ -2133,6 +2136,9 @@ namespace J2N.Text
         /// <para/>
         /// The capacity of this instance is adjusted as needed.
         /// <para/>
+        /// If no format provider is explicitly specified, this method uses the default formatting behavior
+        /// determined by the <see cref="TextBuilder.UseInvariantDefaults"/> setting.
+        /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
         /// When you instantiate a <see cref="TextBuilder"/> object by calling <see cref="TextBuilder(int, int)"/>,
@@ -2172,6 +2178,9 @@ namespace J2N.Text
         /// <para/>
         /// The capacity of this instance is adjusted as needed.
         /// <para/>
+        /// If no format provider is explicitly specified, this method uses the default formatting behavior
+        /// determined by the <see cref="TextBuilder.UseInvariantDefaults"/> setting.
+        /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
         /// When you instantiate a <see cref="TextBuilder"/> object by calling <see cref="TextBuilder(int, int)"/>,
@@ -2210,6 +2219,9 @@ namespace J2N.Text
         /// the value being formatted is not boxed.
         /// <para/>
         /// The capacity of this instance is adjusted as needed.
+        /// <para/>
+        /// If no format provider is explicitly specified, this method uses the default formatting behavior
+        /// determined by the <see cref="TextBuilder.UseInvariantDefaults"/> setting.
         /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
@@ -2289,6 +2301,9 @@ namespace J2N.Text
         /// <para/>
         /// The capacity of this instance is adjusted as needed.
         /// <para/>
+        /// If no format provider is explicitly specified, this method uses the default formatting behavior
+        /// determined by the <see cref="TextBuilder.UseInvariantDefaults"/> setting.
+        /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
         /// When you instantiate a <see cref="TextBuilder"/> object by calling <see cref="TextBuilder(int, int)"/>,
@@ -2327,6 +2342,9 @@ namespace J2N.Text
         /// the value being formatted is not boxed.
         /// <para/>
         /// The capacity of this instance is adjusted as needed.
+        /// <para/>
+        /// If no format provider is explicitly specified, this method uses the default formatting behavior
+        /// determined by the <see cref="TextBuilder.UseInvariantDefaults"/> setting.
         /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
@@ -2367,6 +2385,9 @@ namespace J2N.Text
         /// <para/>
         /// The capacity of this instance is adjusted as needed.
         /// <para/>
+        /// If no format provider is explicitly specified, this method uses the default formatting behavior
+        /// determined by the <see cref="TextBuilder.UseInvariantDefaults"/> setting.
+        /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
         /// When you instantiate a <see cref="TextBuilder"/> object by calling <see cref="TextBuilder(int, int)"/>,
@@ -2405,6 +2426,9 @@ namespace J2N.Text
         /// the value being formatted is not boxed.
         /// <para/>
         /// The capacity of this instance is adjusted as needed.
+        /// <para/>
+        /// If no format provider is explicitly specified, this method uses the default formatting behavior
+        /// determined by the <see cref="TextBuilder.UseInvariantDefaults"/> setting.
         /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
@@ -2446,6 +2470,9 @@ namespace J2N.Text
         /// <para/>
         /// The capacity of this instance is adjusted as needed.
         /// <para/>
+        /// If no format provider is explicitly specified, this method uses the default formatting behavior
+        /// determined by the <see cref="TextBuilder.UseInvariantDefaults"/> setting.
+        /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
         /// When you instantiate a <see cref="TextBuilder"/> object by calling <see cref="TextBuilder(int, int)"/>,
@@ -2485,6 +2512,9 @@ namespace J2N.Text
         /// the value being formatted is not boxed.
         /// <para/>
         /// The capacity of this instance is adjusted as needed.
+        /// <para/>
+        /// If no format provider is explicitly specified, this method uses the default formatting behavior
+        /// determined by the <see cref="TextBuilder.UseInvariantDefaults"/> setting.
         /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
@@ -2529,7 +2559,12 @@ namespace J2N.Text
         /// <paramref name="value"/> exceeds <see cref="TextBuilder.MaxCapacity"/>.
         /// </exception>
         /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
-        /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
+        /// <remarks>
+        /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
+        /// <para/>
+        /// If no format provider is explicitly specified, this method uses the default formatting behavior
+        /// determined by the <see cref="TextBuilder.UseInvariantDefaults"/> setting.
+        /// </remarks>
         /// <seealso cref="sbyte" />
         [CLSCompliant(false)]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -2566,7 +2601,12 @@ namespace J2N.Text
         /// <paramref name="value"/> exceeds <see cref="TextBuilder.MaxCapacity"/>.
         /// </exception>
         /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
-        /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
+        /// <remarks>
+        /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
+        /// <para/>
+        /// If no format provider is explicitly specified, this method uses the default formatting behavior
+        /// determined by the <see cref="TextBuilder.UseInvariantDefaults"/> setting.
+        /// </remarks>
         /// <seealso cref="byte" />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TBuilder Insert<TBuilder>(this TBuilder text, int index, byte value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
@@ -2602,7 +2642,12 @@ namespace J2N.Text
         /// <paramref name="value"/> exceeds <see cref="TextBuilder.MaxCapacity"/>.
         /// </exception>
         /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
-        /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
+        /// <remarks>
+        /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
+        /// <para/>
+        /// If no format provider is explicitly specified, this method uses the default formatting behavior
+        /// determined by the <see cref="TextBuilder.UseInvariantDefaults"/> setting.
+        /// </remarks>
         /// <seealso cref="short" />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TBuilder Insert<TBuilder>(this TBuilder text, int index, short value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
@@ -2638,7 +2683,12 @@ namespace J2N.Text
         /// <paramref name="value"/> exceeds <see cref="TextBuilder.MaxCapacity"/>.
         /// </exception>
         /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
-        /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
+        /// <remarks>
+        /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
+        /// <para/>
+        /// If no format provider is explicitly specified, this method uses the default formatting behavior
+        /// determined by the <see cref="TextBuilder.UseInvariantDefaults"/> setting.
+        /// </remarks>
         /// <seealso cref="int" />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TBuilder Insert<TBuilder>(this TBuilder text, int index, int value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
@@ -2674,7 +2724,12 @@ namespace J2N.Text
         /// <paramref name="value"/> exceeds <see cref="TextBuilder.MaxCapacity"/>.
         /// </exception>
         /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
-        /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
+        /// <remarks>
+        /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
+        /// <para/>
+        /// If no format provider is explicitly specified, this method uses the default formatting behavior
+        /// determined by the <see cref="TextBuilder.UseInvariantDefaults"/> setting.
+        /// </remarks>
         /// <seealso cref="long" />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TBuilder Insert<TBuilder>(this TBuilder text, int index, long value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
@@ -2710,7 +2765,12 @@ namespace J2N.Text
         /// <paramref name="value"/> exceeds <see cref="TextBuilder.MaxCapacity"/>.
         /// </exception>
         /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
-        /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
+        /// <remarks>
+        /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
+        /// <para/>
+        /// If no format provider is explicitly specified, this method uses the default formatting behavior
+        /// determined by the <see cref="TextBuilder.UseInvariantDefaults"/> setting.
+        /// </remarks>
         /// <seealso cref="float" />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TBuilder Insert<TBuilder>(this TBuilder text, int index, float value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
@@ -2746,7 +2806,12 @@ namespace J2N.Text
         /// <paramref name="value"/> exceeds <see cref="TextBuilder.MaxCapacity"/>.
         /// </exception>
         /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
-        /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
+        /// <remarks>
+        /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
+        /// <para/>
+        /// If no format provider is explicitly specified, this method uses the default formatting behavior
+        /// determined by the <see cref="TextBuilder.UseInvariantDefaults"/> setting.
+        /// </remarks>
         /// <seealso cref="double" />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TBuilder Insert<TBuilder>(this TBuilder text, int index, double value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
@@ -2782,7 +2847,12 @@ namespace J2N.Text
         /// <paramref name="value"/> exceeds <see cref="TextBuilder.MaxCapacity"/>.
         /// </exception>
         /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
-        /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
+        /// <remarks>
+        /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
+        /// <para/>
+        /// If no format provider is explicitly specified, this method uses the default formatting behavior
+        /// determined by the <see cref="TextBuilder.UseInvariantDefaults"/> setting.
+        /// </remarks>
         /// <seealso cref="decimal" />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static TBuilder Insert<TBuilder>(this TBuilder text, int index, decimal value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
@@ -2818,7 +2888,12 @@ namespace J2N.Text
         /// <paramref name="value"/> exceeds <see cref="TextBuilder.MaxCapacity"/>.
         /// </exception>
         /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
-        /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
+        /// <remarks>
+        /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
+        /// <para/>
+        /// If no format provider is explicitly specified, this method uses the default formatting behavior
+        /// determined by the <see cref="TextBuilder.UseInvariantDefaults"/> setting.
+        /// </remarks>
         /// <seealso cref="ushort" />
         [CLSCompliant(false)]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -2855,7 +2930,12 @@ namespace J2N.Text
         /// <paramref name="value"/> exceeds <see cref="TextBuilder.MaxCapacity"/>.
         /// </exception>
         /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
-        /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
+        /// <remarks>
+        /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
+        /// <para/>
+        /// If no format provider is explicitly specified, this method uses the default formatting behavior
+        /// determined by the <see cref="TextBuilder.UseInvariantDefaults"/> setting.
+        /// </remarks>
         /// <seealso cref="uint" />
         [CLSCompliant(false)]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -2892,7 +2972,12 @@ namespace J2N.Text
         /// <paramref name="value"/> exceeds <see cref="TextBuilder.MaxCapacity"/>.
         /// </exception>
         /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
-        /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
+        /// <remarks>
+        /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
+        /// <para/>
+        /// If no format provider is explicitly specified, this method uses the default formatting behavior
+        /// determined by the <see cref="TextBuilder.UseInvariantDefaults"/> setting.
+        /// </remarks>
         /// <seealso cref="ulong" />
         [CLSCompliant(false)]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

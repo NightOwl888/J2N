@@ -46,6 +46,9 @@ namespace J2N.Text
         /// <para/>
         /// The capacity of this instance is adjusted as needed.
         /// <para/>
+        /// If no format provider is explicitly specified, this method uses the default formatting behavior
+        /// determined by the <see cref="MutableTextBuffer.UseInvariantDefaults"/> setting.
+        /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
         /// When you instantiate a <see cref="MutableTextBuffer"/> object by calling <see cref="MutableTextBuffer.Initialize(int, int)"/>,
@@ -87,6 +90,9 @@ namespace J2N.Text
         /// <para/>
         /// The capacity of this instance is adjusted as needed.
         /// <para/>
+        /// If no format provider is explicitly specified, this method uses the default formatting behavior
+        /// determined by the <see cref="MutableTextBuffer.UseInvariantDefaults"/> setting.
+        /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
         /// When you instantiate a <see cref="MutableTextBuffer"/> object by calling <see cref="MutableTextBuffer.Initialize(int, int)"/>,
@@ -127,6 +133,9 @@ namespace J2N.Text
         /// <para/>
         /// The capacity of this instance is adjusted as needed.
         /// <para/>
+        /// If no format provider is explicitly specified, this method uses the default formatting behavior
+        /// determined by the <see cref="MutableTextBuffer.UseInvariantDefaults"/> setting.
+        /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
         /// When you instantiate a <see cref="MutableTextBuffer"/> object by calling <see cref="MutableTextBuffer.Initialize(int, int)"/>,
@@ -166,6 +175,9 @@ namespace J2N.Text
         /// the value being formatted is not boxed.
         /// <para/>
         /// The capacity of this instance is adjusted as needed.
+        /// <para/>
+        /// If no format provider is explicitly specified, this method uses the default formatting behavior
+        /// determined by the <see cref="MutableTextBuffer.UseInvariantDefaults"/> setting.
         /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
@@ -247,6 +259,9 @@ namespace J2N.Text
         /// <para/>
         /// The capacity of this instance is adjusted as needed.
         /// <para/>
+        /// If no format provider is explicitly specified, this method uses the default formatting behavior
+        /// determined by the <see cref="MutableTextBuffer.UseInvariantDefaults"/> setting.
+        /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
         /// When you instantiate a <see cref="MutableTextBuffer"/> object by calling <see cref="MutableTextBuffer.Initialize(int, int)"/>,
@@ -286,6 +301,9 @@ namespace J2N.Text
         /// the value being formatted is not boxed.
         /// <para/>
         /// The capacity of this instance is adjusted as needed.
+        /// <para/>
+        /// If no format provider is explicitly specified, this method uses the default formatting behavior
+        /// determined by the <see cref="MutableTextBuffer.UseInvariantDefaults"/> setting.
         /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
@@ -327,6 +345,9 @@ namespace J2N.Text
         /// <para/>
         /// The capacity of this instance is adjusted as needed.
         /// <para/>
+        /// If no format provider is explicitly specified, this method uses the default formatting behavior
+        /// determined by the <see cref="MutableTextBuffer.UseInvariantDefaults"/> setting.
+        /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
         /// When you instantiate a <see cref="MutableTextBuffer"/> object by calling <see cref="MutableTextBuffer.Initialize(int, int)"/>,
@@ -366,6 +387,9 @@ namespace J2N.Text
         /// the value being formatted is not boxed.
         /// <para/>
         /// The capacity of this instance is adjusted as needed.
+        /// <para/>
+        /// If no format provider is explicitly specified, this method uses the default formatting behavior
+        /// determined by the <see cref="MutableTextBuffer.UseInvariantDefaults"/> setting.
         /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
@@ -408,6 +432,9 @@ namespace J2N.Text
         /// <para/>
         /// The capacity of this instance is adjusted as needed.
         /// <para/>
+        /// If no format provider is explicitly specified, this method uses the default formatting behavior
+        /// determined by the <see cref="MutableTextBuffer.UseInvariantDefaults"/> setting.
+        /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
         /// When you instantiate a <see cref="MutableTextBuffer"/> object by calling <see cref="MutableTextBuffer.Initialize(int, int)"/>,
@@ -448,6 +475,9 @@ namespace J2N.Text
         /// the value being formatted is not boxed.
         /// <para/>
         /// The capacity of this instance is adjusted as needed.
+        /// <para/>
+        /// If no format provider is explicitly specified, this method uses the default formatting behavior
+        /// determined by the <see cref="MutableTextBuffer.UseInvariantDefaults"/> setting.
         /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
@@ -493,7 +523,12 @@ namespace J2N.Text
         /// <paramref name="value"/> exceeds <see cref="MutableTextBuffer.MaxCapacity"/>.
         /// </exception>
         /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
-        /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
+        /// <remarks>
+        /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
+        /// <para/>
+        /// If no format provider is explicitly specified, this method uses the default formatting behavior
+        /// determined by the <see cref="MutableTextBuffer.UseInvariantDefaults"/> setting.
+        /// </remarks>
         /// <seealso cref="sbyte" />
         [CLSCompliant(false)]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -531,7 +566,12 @@ namespace J2N.Text
         /// <paramref name="value"/> exceeds <see cref="MutableTextBuffer.MaxCapacity"/>.
         /// </exception>
         /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
-        /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
+        /// <remarks>
+        /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
+        /// <para/>
+        /// If no format provider is explicitly specified, this method uses the default formatting behavior
+        /// determined by the <see cref="MutableTextBuffer.UseInvariantDefaults"/> setting.
+        /// </remarks>
         /// <seealso cref="byte" />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationGenerateForwarder]
@@ -568,7 +608,12 @@ namespace J2N.Text
         /// <paramref name="value"/> exceeds <see cref="MutableTextBuffer.MaxCapacity"/>.
         /// </exception>
         /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
-        /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
+        /// <remarks>
+        /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
+        /// <para/>
+        /// If no format provider is explicitly specified, this method uses the default formatting behavior
+        /// determined by the <see cref="MutableTextBuffer.UseInvariantDefaults"/> setting.
+        /// </remarks>
         /// <seealso cref="short" />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationGenerateForwarder]
@@ -605,7 +650,12 @@ namespace J2N.Text
         /// <paramref name="value"/> exceeds <see cref="MutableTextBuffer.MaxCapacity"/>.
         /// </exception>
         /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
-        /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
+        /// <remarks>
+        /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
+        /// <para/>
+        /// If no format provider is explicitly specified, this method uses the default formatting behavior
+        /// determined by the <see cref="MutableTextBuffer.UseInvariantDefaults"/> setting.
+        /// </remarks>
         /// <seealso cref="int" />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationGenerateForwarder]
@@ -642,7 +692,12 @@ namespace J2N.Text
         /// <paramref name="value"/> exceeds <see cref="MutableTextBuffer.MaxCapacity"/>.
         /// </exception>
         /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
-        /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
+        /// <remarks>
+        /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
+        /// <para/>
+        /// If no format provider is explicitly specified, this method uses the default formatting behavior
+        /// determined by the <see cref="MutableTextBuffer.UseInvariantDefaults"/> setting.
+        /// </remarks>
         /// <seealso cref="long" />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationGenerateForwarder]
@@ -679,7 +734,12 @@ namespace J2N.Text
         /// <paramref name="value"/> exceeds <see cref="MutableTextBuffer.MaxCapacity"/>.
         /// </exception>
         /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
-        /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
+        /// <remarks>
+        /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
+        /// <para/>
+        /// If no format provider is explicitly specified, this method uses the default formatting behavior
+        /// determined by the <see cref="MutableTextBuffer.UseInvariantDefaults"/> setting.
+        /// </remarks>
         /// <seealso cref="float" />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationGenerateForwarder]
@@ -716,7 +776,12 @@ namespace J2N.Text
         /// <paramref name="value"/> exceeds <see cref="MutableTextBuffer.MaxCapacity"/>.
         /// </exception>
         /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
-        /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
+        /// <remarks>
+        /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
+        /// <para/>
+        /// If no format provider is explicitly specified, this method uses the default formatting behavior
+        /// determined by the <see cref="MutableTextBuffer.UseInvariantDefaults"/> setting.
+        /// </remarks>
         /// <seealso cref="double" />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationGenerateForwarder]
@@ -753,7 +818,12 @@ namespace J2N.Text
         /// <paramref name="value"/> exceeds <see cref="MutableTextBuffer.MaxCapacity"/>.
         /// </exception>
         /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
-        /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
+        /// <remarks>
+        /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
+        /// <para/>
+        /// If no format provider is explicitly specified, this method uses the default formatting behavior
+        /// determined by the <see cref="MutableTextBuffer.UseInvariantDefaults"/> setting.
+        /// </remarks>
         /// <seealso cref="decimal" />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationGenerateForwarder] // J2N TODO: We either need to complete this or make it internal because the JDK format is not implemented yet.
@@ -790,7 +860,12 @@ namespace J2N.Text
         /// <paramref name="value"/> exceeds <see cref="MutableTextBuffer.MaxCapacity"/>.
         /// </exception>
         /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
-        /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
+        /// <remarks>
+        /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
+        /// <para/>
+        /// If no format provider is explicitly specified, this method uses the default formatting behavior
+        /// determined by the <see cref="MutableTextBuffer.UseInvariantDefaults"/> setting.
+        /// </remarks>
         /// <seealso cref="ushort" />
         [CLSCompliant(false)]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -828,7 +903,12 @@ namespace J2N.Text
         /// <paramref name="value"/> exceeds <see cref="MutableTextBuffer.MaxCapacity"/>.
         /// </exception>
         /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
-        /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
+        /// <remarks>
+        /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
+        /// <para/>
+        /// If no format provider is explicitly specified, this method uses the default formatting behavior
+        /// determined by the <see cref="MutableTextBuffer.UseInvariantDefaults"/> setting.
+        /// </remarks>
         /// <seealso cref="uint" />
         [CLSCompliant(false)]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -866,7 +946,12 @@ namespace J2N.Text
         /// <paramref name="value"/> exceeds <see cref="MutableTextBuffer.MaxCapacity"/>.
         /// </exception>
         /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
-        /// <remarks>Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.</remarks>
+        /// <remarks>
+        /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
+        /// <para/>
+        /// If no format provider is explicitly specified, this method uses the default formatting behavior
+        /// determined by the <see cref="MutableTextBuffer.UseInvariantDefaults"/> setting.
+        /// </remarks>
         /// <seealso cref="ulong" />
         [CLSCompliant(false)]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
