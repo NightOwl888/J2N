@@ -92,6 +92,9 @@ namespace J2N.Text
         /// and <paramref name="arg0"/> is an integer with the value 10, the return value will be "Thank you for your donation of 10 cans
         /// of food to our charitable organization."
         /// <para/>
+        /// If no format provider is explicitly specified, objects are formatted using the default formatting behavior determined by
+        /// the <see cref="TextBuilder.UseInvariantDefaults"/> setting.
+        /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
         /// When you instantiate a <see cref="TextBuilder"/> object by calling <see cref="TextBuilder(int, int)"/>,
@@ -178,6 +181,9 @@ namespace J2N.Text
         /// If the string assigned to format is "Thank you for your donation of {0:####} cans of food to our charitable organization."
         /// and <paramref name="arg0"/> is an integer with the value 10, the return value will be "Thank you for your donation of 10 cans
         /// of food to our charitable organization."
+        /// <para/>
+        /// If no format provider is explicitly specified, objects are formatted using the default formatting behavior determined by
+        /// the <see cref="TextBuilder.UseInvariantDefaults"/> setting.
         /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
@@ -268,6 +274,9 @@ namespace J2N.Text
         /// and <paramref name="arg0"/> is an integer with the value 10, the return value will be "Thank you for your donation of 10 cans
         /// of food to our charitable organization."
         /// <para/>
+        /// If no format provider is explicitly specified, objects are formatted using the default formatting behavior determined by
+        /// the <see cref="TextBuilder.UseInvariantDefaults"/> setting.
+        /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
         /// When you instantiate a <see cref="TextBuilder"/> object by calling <see cref="TextBuilder(int, int)"/>,
@@ -354,6 +363,9 @@ namespace J2N.Text
         /// and <c>args[0]</c> is an integer with the value 10, the return value will be "Thank you for your donation of 10 cans
         /// of food to our charitable organization."
         /// <para/>
+        /// If no format provider is explicitly specified, objects are formatted using the default formatting behavior determined by
+        /// the <see cref="TextBuilder.UseInvariantDefaults"/> setting.
+        /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
         /// When you instantiate a <see cref="TextBuilder"/> object by calling <see cref="TextBuilder(int, int)"/>,
@@ -439,6 +451,9 @@ namespace J2N.Text
         /// If the string assigned to format is "Thank you for your donation of {0:####} cans of food to our charitable organization."
         /// and <c>args[0]</c> is an integer with the value 10, the return value will be "Thank you for your donation of 10 cans
         /// of food to our charitable organization."
+        /// <para/>
+        /// If no format provider is explicitly specified, objects are formatted using the default formatting behavior determined by
+        /// the <see cref="TextBuilder.UseInvariantDefaults"/> setting.
         /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
@@ -541,6 +556,9 @@ namespace J2N.Text
         /// and <paramref name="arg0"/> implements the <see cref="IFormattable"/> interface, then <c>arg0.ToString(formatString, null)</c>
         /// defines the formatting. Otherwise, <c>arg0.ToString()</c> defines the formatting.
         /// <para/>
+        /// If no format provider is explicitly specified, objects are formatted using the default formatting behavior determined by
+        /// the <see cref="TextBuilder.UseInvariantDefaults"/> setting.
+        /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
         /// When you instantiate a <see cref="TextBuilder"/> object by calling <see cref="TextBuilder(int, int)"/>,
@@ -641,6 +659,9 @@ namespace J2N.Text
         /// with the string representation of the object that has the corresponding index. If the format item includes <c>formatString</c>
         /// and the corresponding argument implements the <see cref="IFormattable"/> interface, then the argument's <c>ToString(formatString, null)</c>
         /// defines the formatting. Otherwise, the argument's <c>ToString()</c> defines the formatting.
+        /// <para/>
+        /// If no format provider is explicitly specified, objects are formatted using the default formatting behavior determined by
+        /// the <see cref="TextBuilder.UseInvariantDefaults"/> setting.
         /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
@@ -745,6 +766,9 @@ namespace J2N.Text
         /// <see cref="IFormattable"/> interface, then the argument's <c>ToString(formatString, null)</c> defines the formatting. Otherwise,
         /// the argument's <c>ToString()</c> defines the formatting.
         /// <para/>
+        /// If no format provider is explicitly specified, objects are formatted using the default formatting behavior determined by
+        /// the <see cref="TextBuilder.UseInvariantDefaults"/> setting.
+        /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
         /// When you instantiate a <see cref="TextBuilder"/> object by calling <see cref="TextBuilder(int, int)"/>,
@@ -846,6 +870,9 @@ namespace J2N.Text
         /// <c>args[index].ToString(formatString, null)</c> defines the formatting. Otherwise, <c>args[index].ToString()</c>
         /// defines the formatting.
         /// <para/>
+        /// If no format provider is explicitly specified, objects are formatted using the default formatting behavior determined by
+        /// the <see cref="TextBuilder.UseInvariantDefaults"/> setting.
+        /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
         /// When you instantiate a <see cref="TextBuilder"/> object by calling <see cref="TextBuilder(int, int)"/>,
@@ -946,6 +973,9 @@ namespace J2N.Text
         /// <c>formatString</c> and the corresponding object in <paramref name="args"/> implements the <see cref="IFormattable"/> interface, then
         /// <c>args[index].ToString(formatString, null)</c> defines the formatting. Otherwise, <c>args[index].ToString()</c>
         /// defines the formatting.
+        /// <para/>
+        /// If no format provider is explicitly specified, objects are formatted using the default formatting behavior determined by
+        /// the <see cref="TextBuilder.UseInvariantDefaults"/> setting.
         /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
