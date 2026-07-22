@@ -1231,7 +1231,13 @@ namespace J2N.Numerics
             {
                 char fmt = ParseFormatSpecifier(format, out int digits);
                 char fmtUpper = (char)(fmt & 0xFFDF); // ensure fmt is upper-cased for purposes of comparison
-                if (fmtUpper == 'G' ? digits < 1 : fmtUpper == 'D')
+                if (fmtUpper == 'J')
+                {
+                    return value >= 0 ?
+                        TryUInt32ToDecStr((uint)value, digits: -1, destination, out charsWritten) :
+                        TryNegativeInt32ToDecStr(value, digits: -1, NumberFormatInfo.GetInstance(provider).NegativeSign, destination, out charsWritten);
+                }
+                else if (fmtUpper == 'G' ? digits < 1 : fmtUpper == 'D')
                 {
                     return value >= 0 ?
                         TryUInt32ToDecStr((uint)value, digits, destination, out charsWritten) :
@@ -1328,7 +1334,11 @@ namespace J2N.Numerics
             {
                 char fmt = ParseFormatSpecifier(format, out int digits);
                 char fmtUpper = (char)(fmt & 0xFFDF); // ensure fmt is upper-cased for purposes of comparison
-                if (fmtUpper == 'G' ? digits < 1 : fmtUpper == 'D')
+                if (fmtUpper == 'J')
+                {
+                    return TryUInt32ToDecStr(value, digits: -1, destination, out charsWritten);
+                }
+                else if (fmtUpper == 'G' ? digits < 1 : fmtUpper == 'D')
                 {
                     return TryUInt32ToDecStr(value, digits, destination, out charsWritten);
                 }
@@ -1429,7 +1439,13 @@ namespace J2N.Numerics
             {
                 char fmt = ParseFormatSpecifier(format, out int digits);
                 char fmtUpper = (char)(fmt & 0xFFDF); // ensure fmt is upper-cased for purposes of comparison
-                if (fmtUpper == 'G' ? digits < 1 : fmtUpper == 'D')
+                if (fmtUpper == 'J')
+                {
+                    return value >= 0 ?
+                        TryUInt64ToDecStr((ulong)value, digits: -1, destination, out charsWritten) :
+                        TryNegativeInt64ToDecStr(value, digits: -1, NumberFormatInfo.GetInstance(provider).NegativeSign, destination, out charsWritten);
+                }
+                else if (fmtUpper == 'G' ? digits < 1 : fmtUpper == 'D')
                 {
                     return value >= 0 ?
                         TryUInt64ToDecStr((ulong)value, digits, destination, out charsWritten) :
@@ -1526,7 +1542,11 @@ namespace J2N.Numerics
             {
                 char fmt = ParseFormatSpecifier(format, out int digits);
                 char fmtUpper = (char)(fmt & 0xFFDF); // ensure fmt is upper-cased for purposes of comparison
-                if (fmtUpper == 'G' ? digits < 1 : fmtUpper == 'D')
+                if (fmtUpper == 'J')
+                {
+                    return TryUInt64ToDecStr(value, digits: -1, destination, out charsWritten);
+                }
+                else if (fmtUpper == 'G' ? digits < 1 : fmtUpper == 'D')
                 {
                     return TryUInt64ToDecStr(value, digits, destination, out charsWritten);
                 }

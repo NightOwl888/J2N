@@ -25,11 +25,7 @@ namespace J2N.Text
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationExtensionImplementation]
         internal void AppendInternal(sbyte value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
-#if FEATURE_SPANFORMATTABLE
-            => AppendSpanFormattable(value, format, provider);
-#else
             => AppendNumberCore<sbyte, SByteFormatter>(3, value, format, provider);
-#endif
 
         /// <summary>
         /// Appends the string representation of a specified numeric type to this instance.
@@ -42,11 +38,7 @@ namespace J2N.Text
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationExtensionImplementation]
         internal void AppendInternal(byte value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
-#if FEATURE_SPANFORMATTABLE
-            => AppendSpanFormattable(value, format, provider);
-#else
             => AppendNumberCore<byte, ByteFormatter>(4, value, format, provider);
-#endif
 
         /// <summary>
         /// Appends the string representation of a specified numeric type to this instance.
@@ -59,11 +51,7 @@ namespace J2N.Text
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationExtensionImplementation]
         internal void AppendInternal(short value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
-#if FEATURE_SPANFORMATTABLE
-            => AppendSpanFormattable(value, format, provider);
-#else
             => AppendNumberCore<short, Int16Formatter>(4, value, format, provider);
-#endif
 
         /// <summary>
         /// Appends the string representation of a specified numeric type to this instance.
@@ -76,11 +64,7 @@ namespace J2N.Text
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationExtensionImplementation]
         internal void AppendInternal(int value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
-#if FEATURE_SPANFORMATTABLE
-            => AppendSpanFormattable(value, format, provider);
-#else
             => AppendNumberCore<int, Int32Formatter>(6, value, format, provider);
-#endif
 
         /// <summary>
         /// Appends the string representation of a specified numeric type to this instance.
@@ -93,11 +77,7 @@ namespace J2N.Text
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationExtensionImplementation]
         internal void AppendInternal(long value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
-#if FEATURE_SPANFORMATTABLE
-            => AppendSpanFormattable(value, format, provider);
-#else
             => AppendNumberCore<long, Int64Formatter>(10, value, format, provider);
-#endif
 
         /// <summary>
         /// Appends the string representation of a specified numeric type to this instance.
@@ -137,11 +117,7 @@ namespace J2N.Text
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationExtensionImplementation]
         internal void AppendInternal(decimal value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
-#if FEATURE_SPANFORMATTABLE
-            => AppendSpanFormattable(value, format, provider);
-#else
-            => AppendInternal(value.ToString(format.ToString(), provider ?? DefaultNumberFormatInfo));
-#endif
+            => AppendInternal(value.ToString(Number.ConvertFormatToString(format), provider ?? DefaultNumberFormatInfo));
 
         /// <summary>
         /// Appends the string representation of a specified numeric type to this instance.
@@ -154,11 +130,7 @@ namespace J2N.Text
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationExtensionImplementation]
         internal void AppendInternal(ushort value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
-#if FEATURE_SPANFORMATTABLE
-            => AppendSpanFormattable(value, format, provider);
-#else
             => AppendNumberCore<ushort, UInt16Formatter>(4, value, format, provider);
-#endif
 
         /// <summary>
         /// Appends the string representation of a specified numeric type to this instance.
@@ -171,11 +143,7 @@ namespace J2N.Text
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationExtensionImplementation]
         internal void AppendInternal(uint value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
-#if FEATURE_SPANFORMATTABLE
-            => AppendSpanFormattable(value, format, provider);
-#else
             => AppendNumberCore<uint, UInt32Formatter>(6, value, format, provider);
-#endif
 
         /// <summary>
         /// Appends the string representation of a specified numeric type to this instance.
@@ -188,11 +156,7 @@ namespace J2N.Text
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationExtensionImplementation]
         internal void AppendInternal(ulong value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
-#if FEATURE_SPANFORMATTABLE
-            => AppendSpanFormattable(value, format, provider);
-#else
             => AppendNumberCore<ulong, UInt64Formatter>(10, value, format, provider);
-#endif
 
         // J2N: Helper method for supported types so we don't need to duplicate all of this business logic
         // on every number type.
@@ -280,11 +244,7 @@ namespace J2N.Text
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationExtensionImplementation]
         internal void InsertInternal(int index, sbyte value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
-#if FEATURE_SPANFORMATTABLE
-            => InsertSpanFormattable(index, value, format, provider);
-#else
             => InsertNumberCore<sbyte, SByteFormatter>(index, value, format, provider);
-#endif
 
         /// <summary>
         /// Inserts the string representation of a specified numeric type to this instance
@@ -298,11 +258,7 @@ namespace J2N.Text
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationExtensionImplementation]
         internal void InsertInternal(int index, byte value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
-#if FEATURE_SPANFORMATTABLE
-            => InsertSpanFormattable(index, value, format, provider);
-#else
             => InsertNumberCore<byte, ByteFormatter>(index, value, format, provider);
-#endif
 
         /// <summary>
         /// Inserts the string representation of a specified numeric type to this instance
@@ -316,11 +272,7 @@ namespace J2N.Text
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationExtensionImplementation]
         internal void InsertInternal(int index, short value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
-#if FEATURE_SPANFORMATTABLE
-            => InsertSpanFormattable(index, value, format, provider);
-#else
             => InsertNumberCore<short, Int16Formatter>(index, value, format, provider);
-#endif
 
         /// <summary>
         /// Inserts the string representation of a specified numeric type to this instance
@@ -334,11 +286,7 @@ namespace J2N.Text
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationExtensionImplementation]
         internal void InsertInternal(int index, int value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
-#if FEATURE_SPANFORMATTABLE
-            => InsertSpanFormattable(index, value, format, provider);
-#else
             => InsertNumberCore<int, Int32Formatter>(index, value, format, provider);
-#endif
 
         /// <summary>
         /// Inserts the string representation of a specified numeric type to this instance
@@ -352,11 +300,7 @@ namespace J2N.Text
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationExtensionImplementation]
         internal void InsertInternal(int index, long value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
-#if FEATURE_SPANFORMATTABLE
-            => InsertSpanFormattable(index, value, format, provider);
-#else
             => InsertNumberCore<long, Int64Formatter>(index, value, format, provider);
-#endif
 
         /// <summary>
         /// Inserts the string representation of a specified numeric type to this instance
@@ -399,11 +343,7 @@ namespace J2N.Text
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationExtensionImplementation]
         internal void InsertInternal(int index, decimal value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
-#if FEATURE_SPANFORMATTABLE
-            => InsertSpanFormattable(index, value, format, provider);
-#else
-            => InsertInternal(index, value.ToString(format.ToString(), provider ?? DefaultNumberFormatInfo), 1);
-#endif
+            => InsertInternal(index, value.ToString(Number.ConvertFormatToString(format), provider ?? DefaultNumberFormatInfo), 1);
 
         /// <summary>
         /// Inserts the string representation of a specified numeric type to this instance
@@ -417,11 +357,7 @@ namespace J2N.Text
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationExtensionImplementation]
         internal void InsertInternal(int index, ushort value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
-#if FEATURE_SPANFORMATTABLE
-            => InsertSpanFormattable(index, value, format, provider);
-#else
             => InsertNumberCore<ushort, UInt16Formatter>(index, value, format, provider);
-#endif
 
         /// <summary>
         /// Inserts the string representation of a specified numeric type to this instance
@@ -435,11 +371,7 @@ namespace J2N.Text
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationExtensionImplementation]
         internal void InsertInternal(int index, uint value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
-#if FEATURE_SPANFORMATTABLE
-            => InsertSpanFormattable(index, value, format, provider);
-#else
             => InsertNumberCore<uint, UInt32Formatter>(index, value, format, provider);
-#endif
 
         /// <summary>
         /// Inserts the string representation of a specified numeric type to this instance
@@ -453,11 +385,7 @@ namespace J2N.Text
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationExtensionImplementation]
         internal void InsertInternal(int index, ulong value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
-#if FEATURE_SPANFORMATTABLE
-            => InsertSpanFormattable(index, value, format, provider);
-#else
             => InsertNumberCore<ulong, UInt64Formatter>(index, value, format, provider);
-#endif
 
         // J2N: Helper method for supported types so we don't need to duplicate all of this business logic
         // on every number type.

@@ -634,6 +634,19 @@ namespace J2N.Text.Tests
             Assert.Equal(expected, builder.ToString());
         }
 
+        [Theory]
+        [InlineData("Hello", (ushort)1, "J", "Hello1")]
+        [InlineData("Hello", (ushort)1, "j", "Hello1")]
+        [InlineData("Hello", (ushort)123, "j1", "Hello123")]
+        [InlineData("Hello", (ushort)1, "g", "Hello1")]
+        [InlineData("Hello", (ushort)123, "g1", "Hello1e+02")]
+        public void Append_UShort_Format(string original, ushort value, string format, string expected)
+        {
+            var builder = MutableTextBufferFactory(original);
+            builder.Append(value, format, CultureInfo.InvariantCulture);
+            Assert.Equal(expected, builder.ToString());
+        }
+
         [Fact]
         public void Append_UShort_NoSpareCapacity_ThrowsArgumentOutOfRangeException()
         {
@@ -700,6 +713,15 @@ namespace J2N.Text.Tests
             yield return new object[] { "", -4.56, "-4.56" };
         }
 
+        public static IEnumerable<object[]> Append_Decimal_Format_TestData()
+        {
+            yield return new object[] { "Hello", 1d, "J", "Hello1" }; // J2N TODO: Fix "J" format tests
+            yield return new object[] { "Hello", 1d, "j", "Hello1" }; // J2N TODO: Fix "J" format tests
+            yield return new object[] { "Hello", 123d, "j1", "Hello123" };
+            yield return new object[] { "Hello", 1d, "g", "Hello1" };
+            yield return new object[] { "Hello", 123d, "g1", "Hello1e+02" };
+        }
+
         [Fact]
         public void Append_Decimal()
         {
@@ -716,6 +738,22 @@ namespace J2N.Text.Tests
         {
             var builder = MutableTextBufferFactory(original);
             builder.Append(new decimal(doubleValue));
+            Assert.Equal(expected, builder.ToString());
+        }
+
+        [Fact]
+        public void Append_Decimal_Format()
+        {
+            foreach (var testdata in Append_Decimal_Format_TestData())
+            {
+                Test_Append_Decimal_Format((string)testdata[0], (double)testdata[1], (string)testdata[2], (string)testdata[3]);
+            }
+        }
+
+        public void Test_Append_Decimal_Format(string original, double doubleValue, string format, string expected)
+        {
+            var builder = MutableTextBufferFactory(original);
+            builder.Append(new decimal(doubleValue), format, CultureInfo.InvariantCulture);
             Assert.Equal(expected, builder.ToString());
         }
 
@@ -750,6 +788,19 @@ namespace J2N.Text.Tests
         {
             var builder = MutableTextBufferFactory(original);
             builder.Append(value);
+            Assert.Equal(expected, builder.ToString());
+        }
+
+        [Theory]
+        [InlineData("Hello", 1d, "J", "Hello1.0")]
+        [InlineData("Hello", 1d, "j", "Hello1.0")]
+        [InlineData("Hello", 123d, "j1", "Hello123.0")]
+        [InlineData("Hello", 1d, "g", "Hello1")]
+        [InlineData("Hello", 123d, "g1", "Hello1e+02")]
+        public void Append_Double_Format(string original, double value, string format, string expected)
+        {
+            var builder = MutableTextBufferFactory(original);
+            builder.Append(value, format, CultureInfo.InvariantCulture);
             Assert.Equal(expected, builder.ToString());
         }
 
@@ -809,6 +860,19 @@ namespace J2N.Text.Tests
             Assert.Equal(expected, builder.ToString());
         }
 
+        [Theory]
+        [InlineData("Hello", (short)1, "J", "Hello1")]
+        [InlineData("Hello", (short)1, "j", "Hello1")]
+        [InlineData("Hello", (short)123, "j1", "Hello123")]
+        [InlineData("Hello", (short)1, "g", "Hello1")]
+        [InlineData("Hello", (short)123, "g1", "Hello1e+02")]
+        public void Append_Short_Format(string original, short value, string format, string expected)
+        {
+            var builder = MutableTextBufferFactory(original);
+            builder.Append(value, format, CultureInfo.InvariantCulture);
+            Assert.Equal(expected, builder.ToString());
+        }
+
         [Fact]
         public void Append_Short_NoSpareCapacity_ThrowsArgumentOutOfRangeException()
         {
@@ -826,6 +890,19 @@ namespace J2N.Text.Tests
         {
             var builder = MutableTextBufferFactory(original);
             builder.Append(value);
+            Assert.Equal(expected, builder.ToString());
+        }
+
+        [Theory]
+        [InlineData("Hello", 1, "J", "Hello1")]
+        [InlineData("Hello", 1, "j", "Hello1")]
+        [InlineData("Hello", 123, "j1", "Hello123")]
+        [InlineData("Hello", 1, "g", "Hello1")]
+        [InlineData("Hello", 123, "g1", "Hello1e+02")]
+        public void Append_Int_Format(string original, int value, string format, string expected)
+        {
+            var builder = MutableTextBufferFactory(original);
+            builder.Append(value, format, CultureInfo.InvariantCulture);
             Assert.Equal(expected, builder.ToString());
         }
 
@@ -885,6 +962,19 @@ namespace J2N.Text.Tests
             Assert.Equal(expected, builder.ToString());
         }
 
+        [Theory]
+        [InlineData("Hello", 1L, "J", "Hello1")]
+        [InlineData("Hello", 1L, "j", "Hello1")]
+        [InlineData("Hello", 123L, "j1", "Hello123")]
+        [InlineData("Hello", 1L, "g", "Hello1")]
+        [InlineData("Hello", 123L, "g1", "Hello1e+02")]
+        public void Append_Long_Format(string original, long value, string format, string expected)
+        {
+            var builder = MutableTextBufferFactory(original);
+            builder.Append(value, format, CultureInfo.InvariantCulture);
+            Assert.Equal(expected, builder.ToString());
+        }
+
         [Fact]
         public void Append_Long_NoSpareCapacity_ThrowsArgumentOutOfRangeException()
         {
@@ -927,6 +1017,19 @@ namespace J2N.Text.Tests
             Assert.Equal(expected, builder.ToString());
         }
 
+        [Theory]
+        [InlineData("Hello", (sbyte)1, "J", "Hello1")]
+        [InlineData("Hello", (sbyte)1, "j", "Hello1")]
+        [InlineData("Hello", (sbyte)123, "j1", "Hello123")]
+        [InlineData("Hello", (sbyte)1, "g", "Hello1")]
+        [InlineData("Hello", (sbyte)123, "g1", "Hello1e+02")]
+        public void Append_SByte_Format(string original, sbyte value, string format, string expected)
+        {
+            var builder = MutableTextBufferFactory(original);
+            builder.Append(value, format, CultureInfo.InvariantCulture);
+            Assert.Equal(expected, builder.ToString());
+        }
+
         [Fact]
         public void Append_SByte_NoSpareCapacity_ThrowsArgumentOutOfRangeException()
         {
@@ -962,6 +1065,19 @@ namespace J2N.Text.Tests
             Assert.Equal(expected, builder.ToString());
         }
 
+        [Theory]
+        [InlineData("Hello", 1f, "J", "Hello1.0")]
+        [InlineData("Hello", 1f, "j", "Hello1.0")]
+        [InlineData("Hello", 123f, "j1", "Hello123.0")]
+        [InlineData("Hello", 1f, "g", "Hello1")]
+        [InlineData("Hello", 123f, "g1", "Hello1e+02")]
+        public void Append_Float_Format(string original, float value, string format, string expected)
+        {
+            var builder = MutableTextBufferFactory(original);
+            builder.Append(value, format, CultureInfo.InvariantCulture);
+            Assert.Equal(expected, builder.ToString());
+        }
+
         [Fact]
         public void Append_Float_NoSpareCapacity_ThrowsArgumentOutOfRangeException()
         {
@@ -979,6 +1095,19 @@ namespace J2N.Text.Tests
         {
             var builder = MutableTextBufferFactory(original);
             builder.Append(value);
+            Assert.Equal(expected, builder.ToString());
+        }
+
+        [Theory]
+        [InlineData("Hello", (byte)1, "J", "Hello1")]
+        [InlineData("Hello", (byte)1, "j", "Hello1")]
+        [InlineData("Hello", (byte)123, "j1", "Hello123")]
+        [InlineData("Hello", (byte)1, "g", "Hello1")]
+        [InlineData("Hello", (byte)123, "g1", "Hello1e+02")]
+        public void Append_Byte_Format(string original, byte value, string format, string expected)
+        {
+            var builder = MutableTextBufferFactory(original);
+            builder.Append(value, format, CultureInfo.InvariantCulture);
             Assert.Equal(expected, builder.ToString());
         }
 
@@ -1002,6 +1131,19 @@ namespace J2N.Text.Tests
             Assert.Equal(expected, builder.ToString());
         }
 
+        [Theory]
+        [InlineData("Hello", (uint)1, "J", "Hello1")]
+        [InlineData("Hello", (uint)1, "j", "Hello1")]
+        [InlineData("Hello", (uint)123, "j1", "Hello123")]
+        [InlineData("Hello", (uint)1, "g", "Hello1")]
+        [InlineData("Hello", (uint)123, "g1", "Hello1e+02")]
+        public void Append_UInt_Format(string original, uint value, string format, string expected)
+        {
+            var builder = MutableTextBufferFactory(original);
+            builder.Append(value, format, CultureInfo.InvariantCulture);
+            Assert.Equal(expected, builder.ToString());
+        }
+
         [Fact]
         public void Append_UInt_NoSpareCapacity_ThrowsArgumentOutOfRangeException()
         {
@@ -1019,6 +1161,19 @@ namespace J2N.Text.Tests
         {
             var builder = MutableTextBufferFactory(original);
             builder.Append(value);
+            Assert.Equal(expected, builder.ToString());
+        }
+
+        [Theory]
+        [InlineData("Hello", (ulong)1, "J", "Hello1")]
+        [InlineData("Hello", (ulong)1, "j", "Hello1")]
+        [InlineData("Hello", (ulong)123, "j1", "Hello123")]
+        [InlineData("Hello", (ulong)1, "g", "Hello1")]
+        [InlineData("Hello", (ulong)123, "g1", "Hello1e+02")]
+        public void Append_ULong_Format(string original, ulong value, string format, string expected)
+        {
+            var builder = MutableTextBufferFactory(original);
+            builder.Append(value, format, CultureInfo.InvariantCulture);
             Assert.Equal(expected, builder.ToString());
         }
 
@@ -2098,6 +2253,19 @@ namespace J2N.Text.Tests
             Assert.Equal(expected, builder.ToString());
         }
 
+        [Theory]
+        [InlineData("Hello", 0, (uint)1, "J", "1Hello")]
+        [InlineData("Hello", 0, (uint)1, "j", "1Hello")]
+        [InlineData("Hello", 0, (uint)123, "j1", "123Hello")]
+        [InlineData("Hello", 0, (uint)1, "g", "1Hello")]
+        [InlineData("Hello", 0, (uint)123, "g1", "1e+02Hello")]
+        public void Insert_UInt_Format(string original, int index, uint value, string format, string expected)
+        {
+            var builder = MutableTextBufferFactory(original);
+            builder.Insert(index, value, format, CultureInfo.InvariantCulture);
+            Assert.Equal(expected, builder.ToString());
+        }
+
         [Fact]
         public void Insert_UInt_Invalid()
         {
@@ -2172,6 +2340,19 @@ namespace J2N.Text.Tests
             Assert.Equal(expected, builder.ToString());
         }
 
+        [Theory]
+        [InlineData("Hello", 0, (byte)1, "J", "1Hello")]
+        [InlineData("Hello", 0, (byte)1, "j", "1Hello")]
+        [InlineData("Hello", 0, (byte)123, "j1", "123Hello")]
+        [InlineData("Hello", 0, (byte)1, "g", "1Hello")]
+        [InlineData("Hello", 0, (byte)123, "g1", "1e+02Hello")]
+        public void Insert_Byte_Format(string original, int index, byte value, string format, string expected)
+        {
+            var builder = MutableTextBufferFactory(original);
+            builder.Insert(index, value, format, CultureInfo.InvariantCulture);
+            Assert.Equal(expected, builder.ToString());
+        }
+
         [Fact]
         public void Insert_Byte_Invalid()
         {
@@ -2194,6 +2375,19 @@ namespace J2N.Text.Tests
             Assert.Equal(expected, builder.ToString());
         }
 
+        [Theory]
+        [InlineData("Hello", 0, (ulong)1, "J", "1Hello")]
+        [InlineData("Hello", 0, (ulong)1, "j", "1Hello")]
+        [InlineData("Hello", 0, (ulong)123, "j1", "123Hello")]
+        [InlineData("Hello", 0, (ulong)1, "g", "1Hello")]
+        [InlineData("Hello", 0, (ulong)123, "g1", "1e+02Hello")]
+        public void Insert_ULong_Format(string original, int index, ulong value, string format, string expected)
+        {
+            var builder = MutableTextBufferFactory(original);
+            builder.Insert(index, value, format, CultureInfo.InvariantCulture);
+            Assert.Equal(expected, builder.ToString());
+        }
+
         [Fact]
         public void Insert_ULong_Invalid()
         {
@@ -2213,6 +2407,19 @@ namespace J2N.Text.Tests
         {
             var builder = MutableTextBufferFactory(original);
             builder.Insert(index, value);
+            Assert.Equal(expected, builder.ToString());
+        }
+
+        [Theory]
+        [InlineData("Hello", 0, (ushort)1, "J", "1Hello")]
+        [InlineData("Hello", 0, (ushort)1, "j", "1Hello")]
+        [InlineData("Hello", 0, (ushort)123, "j1", "123Hello")]
+        [InlineData("Hello", 0, (ushort)1, "g", "1Hello")]
+        [InlineData("Hello", 0, (ushort)123, "g1", "1e+02Hello")]
+        public void Insert_UShort_Format(string original, int index, ushort value, string format, string expected)
+        {
+            var builder = MutableTextBufferFactory(original);
+            builder.Insert(index, value, format, CultureInfo.InvariantCulture);
             Assert.Equal(expected, builder.ToString());
         }
 
@@ -2357,6 +2564,19 @@ namespace J2N.Text.Tests
         {
             var builder = MutableTextBufferFactory(original);
             builder.Insert(index, value);
+            Assert.Equal(expected, builder.ToString());
+        }
+
+        [Theory]
+        [InlineData("Hello", 0, 1f, "J", "1.0Hello")]
+        [InlineData("Hello", 0, 1f, "j", "1.0Hello")]
+        [InlineData("Hello", 0, 123f, "j1", "123.0Hello")]
+        [InlineData("Hello", 0, 1f, "g", "1Hello")]
+        [InlineData("Hello", 0, 123f, "g1", "1e+02Hello")]
+        public void Insert_Float_Format(string original, int index, float value, string format, string expected)
+        {
+            var builder = MutableTextBufferFactory(original);
+            builder.Insert(index, value, format, CultureInfo.InvariantCulture);
             Assert.Equal(expected, builder.ToString());
         }
 
@@ -2604,6 +2824,19 @@ namespace J2N.Text.Tests
             Assert.Equal(expected, builder.ToString());
         }
 
+        [Theory]
+        [InlineData("Hello", 0, 1L, "J", "1Hello")]
+        [InlineData("Hello", 0, 1L, "j", "1Hello")]
+        [InlineData("Hello", 0, 123L, "j1", "123Hello")]
+        [InlineData("Hello", 0, 1L, "g", "1Hello")]
+        [InlineData("Hello", 0, 123L, "g1", "1e+02Hello")]
+        public void Insert_Long_Format(string original, int index, long value, string format, string expected)
+        {
+            var builder = MutableTextBufferFactory(original);
+            builder.Insert(index, value, format, CultureInfo.InvariantCulture);
+            Assert.Equal(expected, builder.ToString());
+        }
+
         [Fact]
         public void Insert_Long_Invalid()
         {
@@ -2623,6 +2856,19 @@ namespace J2N.Text.Tests
         {
             var builder = MutableTextBufferFactory(original);
             builder.Insert(index, value);
+            Assert.Equal(expected, builder.ToString());
+        }
+
+        [Theory]
+        [InlineData("Hello", 0, 1, "J", "1Hello")]
+        [InlineData("Hello", 0, 1, "j", "1Hello")]
+        [InlineData("Hello", 0, 123, "j1", "123Hello")]
+        [InlineData("Hello", 0, 1, "g", "1Hello")]
+        [InlineData("Hello", 0, 123, "g1", "1e+02Hello")]
+        public void Insert_Int_Format(string original, int index, int value, string format, string expected)
+        {
+            var builder = MutableTextBufferFactory(original);
+            builder.Insert(index, value, format, CultureInfo.InvariantCulture);
             Assert.Equal(expected, builder.ToString());
         }
 
@@ -2684,6 +2930,19 @@ namespace J2N.Text.Tests
             Assert.Equal(expected, builder.ToString());
         }
 
+        [Theory]
+        [InlineData("Hello", 0, (short)1, "J", "1Hello")]
+        [InlineData("Hello", 0, (short)1, "j", "1Hello")]
+        [InlineData("Hello", 0, (short)123, "j1", "123Hello")]
+        [InlineData("Hello", 0, (short)1, "g", "1Hello")]
+        [InlineData("Hello", 0, (short)123, "g1", "1e+02Hello")]
+        public void Insert_Short_Format(string original, int index, short value, string format, string expected)
+        {
+            var builder = MutableTextBufferFactory(original);
+            builder.Insert(index, value, format, CultureInfo.InvariantCulture);
+            Assert.Equal(expected, builder.ToString());
+        }
+
         [Fact]
         public void Insert_Short_Invalid()
         {
@@ -2718,6 +2977,19 @@ namespace J2N.Text.Tests
         {
             var builder = MutableTextBufferFactory(original);
             builder.Insert(index, value);
+            Assert.Equal(expected, builder.ToString());
+        }
+
+        [Theory]
+        [InlineData("Hello", 0, 1d, "J", "1.0Hello")]
+        [InlineData("Hello", 0, 1d, "j", "1.0Hello")]
+        [InlineData("Hello", 0, 123d, "j1", "123.0Hello")]
+        [InlineData("Hello", 0, 1d, "g", "1Hello")]
+        [InlineData("Hello", 0, 123d, "g1", "1e+02Hello")]
+        public void Insert_Double_Format(string original, int index, double value, string format, string expected)
+        {
+            var builder = MutableTextBufferFactory(original);
+            builder.Insert(index, value, format, CultureInfo.InvariantCulture);
             Assert.Equal(expected, builder.ToString());
         }
 
@@ -2775,6 +3047,15 @@ namespace J2N.Text.Tests
             yield return new object[] { "Hello", 5, -4.56, "Hello-4.56" };
         }
 
+        public static IEnumerable<object[]> Test_Insert_Decimal_Format_TestData()
+        {
+            yield return new object[] { "Hello", 0, 1d, "J", "1Hello" }; // J2N TODO: Fix "J" format tests
+            yield return new object[] { "Hello", 0, 1d, "j", "1Hello" }; // J2N TODO: Fix "J" format tests
+            yield return new object[] { "Hello", 0, 123d, "j1", "123Hello" };
+            yield return new object[] { "Hello", 0, 1d, "g", "1Hello" };
+            yield return new object[] { "Hello", 0, 123d, "g1", "1e+02Hello" };
+        }
+
         [Fact]
         public void Insert_Decimal()
         {
@@ -2791,6 +3072,22 @@ namespace J2N.Text.Tests
         {
             var builder = MutableTextBufferFactory(original);
             builder.Insert(index, new decimal(doubleValue));
+            Assert.Equal(expected, builder.ToString());
+        }
+
+        [Fact]
+        public void Insert_Decimal_Format()
+        {
+            foreach (var testdata in Test_Insert_Decimal_Format_TestData())
+            {
+                Test_Insert_Decimal_Format((string)testdata[0], (int)testdata[1], (double)testdata[2], (string)testdata[3], (string)testdata[4]);
+            }
+        }
+
+        public void Test_Insert_Decimal_Format(string original, int index, double doubleValue, string format, string expected)
+        {
+            var builder = MutableTextBufferFactory(original);
+            builder.Insert(index, new decimal(doubleValue), format, CultureInfo.InvariantCulture);
             Assert.Equal(expected, builder.ToString());
         }
 
@@ -2813,6 +3110,19 @@ namespace J2N.Text.Tests
         {
             var builder = MutableTextBufferFactory(original);
             builder.Insert(index, value);
+            Assert.Equal(expected, builder.ToString());
+        }
+
+        [Theory]
+        [InlineData("Hello", 0, (sbyte)1, "J", "1Hello")]
+        [InlineData("Hello", 0, (sbyte)1, "j", "1Hello")]
+        [InlineData("Hello", 0, (sbyte)123, "j1", "123Hello")]
+        [InlineData("Hello", 0, (sbyte)1, "g", "1Hello")]
+        [InlineData("Hello", 0, (sbyte)123, "g1", "1e+02Hello")]
+        public void Insert_SByte_Format(string original, int index, sbyte value, string format, string expected)
+        {
+            var builder = MutableTextBufferFactory(original);
+            builder.Insert(index, value, format, CultureInfo.InvariantCulture);
             Assert.Equal(expected, builder.ToString());
         }
 
