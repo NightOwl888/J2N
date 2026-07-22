@@ -60,7 +60,7 @@ namespace J2N.Text
         [CLSCompliant(false)]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationGenerateForwarder]
-        public static TBuilder Append<TBuilder>(this TBuilder text, sbyte value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
+        public static TBuilder Append<TBuilder>(this TBuilder text, sbyte value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
             where TBuilder : MutableTextBuffer
         {
             if (text is null)
@@ -103,7 +103,7 @@ namespace J2N.Text
         /// <seealso cref="byte" />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationGenerateForwarder]
-        public static TBuilder Append<TBuilder>(this TBuilder text, byte value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
+        public static TBuilder Append<TBuilder>(this TBuilder text, byte value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
             where TBuilder : MutableTextBuffer
         {
             if (text is null)
@@ -146,7 +146,7 @@ namespace J2N.Text
         /// <seealso cref="short" />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationGenerateForwarder]
-        public static TBuilder Append<TBuilder>(this TBuilder text, short value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
+        public static TBuilder Append<TBuilder>(this TBuilder text, short value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
             where TBuilder : MutableTextBuffer
         {
             if (text is null)
@@ -189,7 +189,7 @@ namespace J2N.Text
         /// <seealso cref="int" />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationGenerateForwarder]
-        public static TBuilder Append<TBuilder>(this TBuilder text, int value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
+        public static TBuilder Append<TBuilder>(this TBuilder text, int value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
             where TBuilder : MutableTextBuffer
         {
             if (text is null)
@@ -229,7 +229,7 @@ namespace J2N.Text
         /// <seealso cref="long" />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationGenerateForwarder]
-        public static TBuilder Append<TBuilder>(this TBuilder text, long value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
+        public static TBuilder Append<TBuilder>(this TBuilder text, long value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
             where TBuilder : MutableTextBuffer
         {
             if (text is null)
@@ -272,7 +272,7 @@ namespace J2N.Text
         /// <seealso cref="float" />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationGenerateForwarder]
-        public static TBuilder Append<TBuilder>(this TBuilder text, float value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
+        public static TBuilder Append<TBuilder>(this TBuilder text, float value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
             where TBuilder : MutableTextBuffer
         {
             if (text is null)
@@ -315,7 +315,7 @@ namespace J2N.Text
         /// <seealso cref="double" />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationGenerateForwarder]
-        public static TBuilder Append<TBuilder>(this TBuilder text, double value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
+        public static TBuilder Append<TBuilder>(this TBuilder text, double value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
             where TBuilder : MutableTextBuffer
         {
             if (text is null)
@@ -358,7 +358,7 @@ namespace J2N.Text
         /// <seealso cref="decimal" />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationGenerateForwarder] // J2N TODO: We either need to complete this or make it internal because the JDK format is not implemented yet.
-        internal static TBuilder Append<TBuilder>(this TBuilder text, decimal value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
+        internal static TBuilder Append<TBuilder>(this TBuilder text, decimal value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
             where TBuilder : MutableTextBuffer
         {
             if (text is null)
@@ -402,7 +402,7 @@ namespace J2N.Text
         [CLSCompliant(false)]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationGenerateForwarder]
-        public static TBuilder Append<TBuilder>(this TBuilder text, ushort value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
+        public static TBuilder Append<TBuilder>(this TBuilder text, ushort value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
             where TBuilder : MutableTextBuffer
         {
             if (text is null)
@@ -446,7 +446,7 @@ namespace J2N.Text
         [CLSCompliant(false)]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationGenerateForwarder]
-        public static TBuilder Append<TBuilder>(this TBuilder text, uint value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
+        public static TBuilder Append<TBuilder>(this TBuilder text, uint value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
             where TBuilder : MutableTextBuffer
         {
             if (text is null)
@@ -490,7 +490,7 @@ namespace J2N.Text
         [CLSCompliant(false)]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationGenerateForwarder]
-        public static TBuilder Append<TBuilder>(this TBuilder text, ulong value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
+        public static TBuilder Append<TBuilder>(this TBuilder text, ulong value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
             where TBuilder : MutableTextBuffer
         {
             if (text is null)
@@ -533,7 +533,7 @@ namespace J2N.Text
         [CLSCompliant(false)]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationGenerateForwarder]
-        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, sbyte value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
+        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, sbyte value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
             where TBuilder : MutableTextBuffer
         {
             if (text is null)
@@ -575,7 +575,7 @@ namespace J2N.Text
         /// <seealso cref="byte" />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationGenerateForwarder]
-        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, byte value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
+        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, byte value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
             where TBuilder : MutableTextBuffer
         {
             if (text is null)
@@ -617,7 +617,7 @@ namespace J2N.Text
         /// <seealso cref="short" />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationGenerateForwarder]
-        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, short value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
+        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, short value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
             where TBuilder : MutableTextBuffer
         {
             if (text is null)
@@ -659,7 +659,7 @@ namespace J2N.Text
         /// <seealso cref="int" />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationGenerateForwarder]
-        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, int value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
+        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, int value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
             where TBuilder : MutableTextBuffer
         {
             if (text is null)
@@ -701,7 +701,7 @@ namespace J2N.Text
         /// <seealso cref="long" />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationGenerateForwarder]
-        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, long value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
+        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, long value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
             where TBuilder : MutableTextBuffer
         {
             if (text is null)
@@ -743,7 +743,7 @@ namespace J2N.Text
         /// <seealso cref="float" />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationGenerateForwarder]
-        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, float value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
+        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, float value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
             where TBuilder : MutableTextBuffer
         {
             if (text is null)
@@ -785,7 +785,7 @@ namespace J2N.Text
         /// <seealso cref="double" />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationGenerateForwarder]
-        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, double value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
+        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, double value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
             where TBuilder : MutableTextBuffer
         {
             if (text is null)
@@ -827,7 +827,7 @@ namespace J2N.Text
         /// <seealso cref="decimal" />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationGenerateForwarder] // J2N TODO: We either need to complete this or make it internal because the JDK format is not implemented yet.
-        internal static TBuilder Insert<TBuilder>(this TBuilder text, int index, decimal value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
+        internal static TBuilder Insert<TBuilder>(this TBuilder text, int index, decimal value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
             where TBuilder : MutableTextBuffer
         {
             if (text is null)
@@ -870,7 +870,7 @@ namespace J2N.Text
         [CLSCompliant(false)]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationGenerateForwarder]
-        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, ushort value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
+        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, ushort value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
             where TBuilder : MutableTextBuffer
         {
             if (text is null)
@@ -913,7 +913,7 @@ namespace J2N.Text
         [CLSCompliant(false)]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationGenerateForwarder]
-        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, uint value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
+        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, uint value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
             where TBuilder : MutableTextBuffer
         {
             if (text is null)
@@ -956,7 +956,7 @@ namespace J2N.Text
         [CLSCompliant(false)]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationGenerateForwarder]
-        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, ulong value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
+        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, ulong value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
             where TBuilder : MutableTextBuffer
         {
             if (text is null)

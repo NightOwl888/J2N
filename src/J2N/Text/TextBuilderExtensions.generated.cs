@@ -2136,7 +2136,7 @@ namespace J2N.Text
         /// <seealso cref="sbyte" />
         [CLSCompliant(false)]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static TBuilder Append<TBuilder>(this TBuilder text, sbyte value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
+        public static TBuilder Append<TBuilder>(this TBuilder text, sbyte value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
             where TBuilder : TextBuilder
         {
             if (text is null)
@@ -2178,7 +2178,7 @@ namespace J2N.Text
         /// </remarks>
         /// <seealso cref="byte" />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static TBuilder Append<TBuilder>(this TBuilder text, byte value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
+        public static TBuilder Append<TBuilder>(this TBuilder text, byte value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
             where TBuilder : TextBuilder
         {
             if (text is null)
@@ -2220,7 +2220,7 @@ namespace J2N.Text
         /// </remarks>
         /// <seealso cref="short" />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static TBuilder Append<TBuilder>(this TBuilder text, short value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
+        public static TBuilder Append<TBuilder>(this TBuilder text, short value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
             where TBuilder : TextBuilder
         {
             if (text is null)
@@ -2262,7 +2262,7 @@ namespace J2N.Text
         /// </remarks>
         /// <seealso cref="int" />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static TBuilder Append<TBuilder>(this TBuilder text, int value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
+        public static TBuilder Append<TBuilder>(this TBuilder text, int value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
             where TBuilder : TextBuilder
         {
             if (text is null)
@@ -2301,7 +2301,7 @@ namespace J2N.Text
         /// </remarks>
         /// <seealso cref="long" />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static TBuilder Append<TBuilder>(this TBuilder text, long value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
+        public static TBuilder Append<TBuilder>(this TBuilder text, long value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
             where TBuilder : TextBuilder
         {
             if (text is null)
@@ -2343,7 +2343,7 @@ namespace J2N.Text
         /// </remarks>
         /// <seealso cref="float" />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static TBuilder Append<TBuilder>(this TBuilder text, float value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
+        public static TBuilder Append<TBuilder>(this TBuilder text, float value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
             where TBuilder : TextBuilder
         {
             if (text is null)
@@ -2385,7 +2385,7 @@ namespace J2N.Text
         /// </remarks>
         /// <seealso cref="double" />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static TBuilder Append<TBuilder>(this TBuilder text, double value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
+        public static TBuilder Append<TBuilder>(this TBuilder text, double value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
             where TBuilder : TextBuilder
         {
             if (text is null)
@@ -2427,7 +2427,7 @@ namespace J2N.Text
         /// </remarks>
         /// <seealso cref="decimal" />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static TBuilder Append<TBuilder>(this TBuilder text, decimal value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
+        internal static TBuilder Append<TBuilder>(this TBuilder text, decimal value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
             where TBuilder : TextBuilder
         {
             if (text is null)
@@ -2470,7 +2470,7 @@ namespace J2N.Text
         /// <seealso cref="ushort" />
         [CLSCompliant(false)]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static TBuilder Append<TBuilder>(this TBuilder text, ushort value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
+        public static TBuilder Append<TBuilder>(this TBuilder text, ushort value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
             where TBuilder : TextBuilder
         {
             if (text is null)
@@ -2513,7 +2513,7 @@ namespace J2N.Text
         /// <seealso cref="uint" />
         [CLSCompliant(false)]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static TBuilder Append<TBuilder>(this TBuilder text, uint value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
+        public static TBuilder Append<TBuilder>(this TBuilder text, uint value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
             where TBuilder : TextBuilder
         {
             if (text is null)
@@ -2556,7 +2556,7 @@ namespace J2N.Text
         /// <seealso cref="ulong" />
         [CLSCompliant(false)]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static TBuilder Append<TBuilder>(this TBuilder text, ulong value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
+        public static TBuilder Append<TBuilder>(this TBuilder text, ulong value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
             where TBuilder : TextBuilder
         {
             if (text is null)
@@ -2598,7 +2598,7 @@ namespace J2N.Text
         /// <seealso cref="sbyte" />
         [CLSCompliant(false)]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, sbyte value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
+        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, sbyte value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
             where TBuilder : TextBuilder
         {
             if (text is null)
@@ -2639,7 +2639,7 @@ namespace J2N.Text
         /// </remarks>
         /// <seealso cref="byte" />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, byte value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
+        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, byte value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
             where TBuilder : TextBuilder
         {
             if (text is null)
@@ -2680,7 +2680,7 @@ namespace J2N.Text
         /// </remarks>
         /// <seealso cref="short" />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, short value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
+        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, short value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
             where TBuilder : TextBuilder
         {
             if (text is null)
@@ -2721,7 +2721,7 @@ namespace J2N.Text
         /// </remarks>
         /// <seealso cref="int" />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, int value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
+        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, int value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
             where TBuilder : TextBuilder
         {
             if (text is null)
@@ -2762,7 +2762,7 @@ namespace J2N.Text
         /// </remarks>
         /// <seealso cref="long" />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, long value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
+        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, long value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
             where TBuilder : TextBuilder
         {
             if (text is null)
@@ -2803,7 +2803,7 @@ namespace J2N.Text
         /// </remarks>
         /// <seealso cref="float" />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, float value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
+        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, float value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
             where TBuilder : TextBuilder
         {
             if (text is null)
@@ -2844,7 +2844,7 @@ namespace J2N.Text
         /// </remarks>
         /// <seealso cref="double" />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, double value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
+        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, double value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
             where TBuilder : TextBuilder
         {
             if (text is null)
@@ -2885,7 +2885,7 @@ namespace J2N.Text
         /// </remarks>
         /// <seealso cref="decimal" />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static TBuilder Insert<TBuilder>(this TBuilder text, int index, decimal value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
+        internal static TBuilder Insert<TBuilder>(this TBuilder text, int index, decimal value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
             where TBuilder : TextBuilder
         {
             if (text is null)
@@ -2927,7 +2927,7 @@ namespace J2N.Text
         /// <seealso cref="ushort" />
         [CLSCompliant(false)]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, ushort value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
+        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, ushort value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
             where TBuilder : TextBuilder
         {
             if (text is null)
@@ -2969,7 +2969,7 @@ namespace J2N.Text
         /// <seealso cref="uint" />
         [CLSCompliant(false)]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, uint value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
+        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, uint value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
             where TBuilder : TextBuilder
         {
             if (text is null)
@@ -3011,7 +3011,7 @@ namespace J2N.Text
         /// <seealso cref="ulong" />
         [CLSCompliant(false)]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, ulong value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
+        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, ulong value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
             where TBuilder : TextBuilder
         {
             if (text is null)
