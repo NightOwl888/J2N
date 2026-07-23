@@ -47,13 +47,21 @@ namespace J2N.Text
     ///         <see cref="ReadOnlySpan{T}"/>. So, no allocation is necessary to read the results.
     ///     </description></item>
     ///     <item><description>
+    ///         <see cref="PooledTextBuilder"/> is implicitly convertible to <see cref="ReadOnlySpan{Char}"/> to allow
+    ///         passing the builder to low-level APIs without needing custom overloads, similar to <see cref="T:char[]"/>
+    ///         and <see cref="string"/>.
+    ///     </description></item>
+    ///     <item><description>
     ///         Indexing through <see cref="TextBuilder.this[int]"/> is significantly faster than with <see cref="StringBuilder"/>.
     ///     </description></item>
     ///     <item><description>
     ///         Rather than optimizing for operations that require moving or copying characters,
-    ///         this implementation optimizes for memory reuse, reducing array allocations.
+    ///         this implementation optimizes for memory reuse and reducing array allocations.
     ///     </description></item>
     /// </list>
+    /// <para/>
+    /// By default, <see cref="PooledTextBuilder"/> follows typical .NET culture-sensitive behavior. When porting Java applications,
+    /// consider setting <see cref="TextBuilder.UseInvariantDefaults"/> during construction to use invariant defaults for culture-sensitive operations.
     /// </remarks>
     public sealed partial class PooledTextBuilder : TextBuilder, IBufferWriter<char>,
         ISpannable<char>, ICopyable<char>, ISpanCopyable<char>, IDisposable

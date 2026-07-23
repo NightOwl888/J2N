@@ -2271,7 +2271,7 @@ namespace J2N.Text
         /// Appends the string representation of a specified 8-bit signed integer to this instance
         /// with the specified numeric format and culture-specific format information.
         /// <para/>
-        /// Unless otherwise specified, formatting is performed in the invariant culture, which
+        /// Unless otherwise specified, formatting is performed using the "J" format, which
         /// is similar to how the JDK formats numbers.
         /// </summary>
         /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
@@ -2287,8 +2287,11 @@ namespace J2N.Text
         /// <para/>
         /// The capacity of this instance is adjusted as needed.
         /// <para/>
-        /// If no format provider is explicitly specified, this method uses the default formatting behavior
-        /// determined by the <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> setting.
+        /// If no <paramref name="provider"/> is explicitly specified, this method uses the default formatting behavior
+        /// determined by the <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> setting. To obtain locale-independent
+        /// formatting that is consistent with typical JDK behavior, either specify an invariant format provider explictly
+        /// or set <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> to <see langword="true"/> when constructing the
+        /// <see cref="SynchronizedTextBuilder"/>.
         /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
@@ -2317,7 +2320,7 @@ namespace J2N.Text
         /// Appends the string representation of a specified 8-bit unsigned integer to this instance
         /// with the specified numeric format and culture-specific format information.
         /// <para/>
-        /// Unless otherwise specified, formatting is performed in the invariant culture, which
+        /// Unless otherwise specified, formatting is performed using the "J" format, which
         /// is similar to how the JDK formats numbers.
         /// </summary>
         /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
@@ -2333,8 +2336,11 @@ namespace J2N.Text
         /// <para/>
         /// The capacity of this instance is adjusted as needed.
         /// <para/>
-        /// If no format provider is explicitly specified, this method uses the default formatting behavior
-        /// determined by the <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> setting.
+        /// If no <paramref name="provider"/> is explicitly specified, this method uses the default formatting behavior
+        /// determined by the <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> setting. To obtain locale-independent
+        /// formatting that is consistent with typical JDK behavior, either specify an invariant format provider explictly
+        /// or set <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> to <see langword="true"/> when constructing the
+        /// <see cref="SynchronizedTextBuilder"/>.
         /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
@@ -2362,7 +2368,7 @@ namespace J2N.Text
         /// Appends the string representation of a specified 16-bit signed integer to this instance
         /// with the specified numeric format and culture-specific format information.
         /// <para/>
-        /// Unless otherwise specified, formatting is performed in the invariant culture, which
+        /// Unless otherwise specified, formatting is performed using the "J" format, which
         /// is similar to how the JDK formats numbers.
         /// </summary>
         /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
@@ -2378,8 +2384,11 @@ namespace J2N.Text
         /// <para/>
         /// The capacity of this instance is adjusted as needed.
         /// <para/>
-        /// If no format provider is explicitly specified, this method uses the default formatting behavior
-        /// determined by the <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> setting.
+        /// If no <paramref name="provider"/> is explicitly specified, this method uses the default formatting behavior
+        /// determined by the <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> setting. To obtain locale-independent
+        /// formatting that is consistent with typical JDK behavior, either specify an invariant format provider explictly
+        /// or set <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> to <see langword="true"/> when constructing the
+        /// <see cref="SynchronizedTextBuilder"/>.
         /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
@@ -2407,7 +2416,7 @@ namespace J2N.Text
         /// Appends the string representation of a specified 32-bit signed integer to this instance
         /// with the specified numeric format and culture-specific format information.
         /// <para/>
-        /// Unless otherwise specified, formatting is performed in the invariant culture, which
+        /// Unless otherwise specified, formatting is performed using the "J" format, which
         /// is similar to how the JDK formats numbers.
         /// </summary>
         /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
@@ -2423,8 +2432,11 @@ namespace J2N.Text
         /// <para/>
         /// The capacity of this instance is adjusted as needed.
         /// <para/>
-        /// If no format provider is explicitly specified, this method uses the default formatting behavior
-        /// determined by the <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> setting.
+        /// If no <paramref name="provider"/> is explicitly specified, this method uses the default formatting behavior
+        /// determined by the <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> setting. To obtain locale-independent
+        /// formatting that is consistent with typical JDK behavior, either specify an invariant format provider explictly
+        /// or set <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> to <see langword="true"/> when constructing the
+        /// <see cref="SynchronizedTextBuilder"/>.
         /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
@@ -2452,7 +2464,7 @@ namespace J2N.Text
         /// Appends the string representation of a specified 64-bit signed integer to this instance
         /// with the specified numeric format and culture-specific format information.
         /// <para/>
-        /// Unless otherwise specified, formatting is performed in the invariant culture, which
+        /// Unless otherwise specified, formatting is performed using the "J" format, which
         /// is similar to how the JDK formats numbers.
         /// </summary>
         /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
@@ -2467,6 +2479,12 @@ namespace J2N.Text
         /// the value being formatted is not boxed.
         /// <para/>
         /// The capacity of this instance is adjusted as needed.
+        /// <para/>
+        /// If no <paramref name="provider"/> is explicitly specified, this method uses the default formatting behavior
+        /// determined by the <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> setting. To obtain locale-independent
+        /// formatting that is consistent with typical JDK behavior, either specify an invariant format provider explictly
+        /// or set <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> to <see langword="true"/> when constructing the
+        /// <see cref="SynchronizedTextBuilder"/>.
         /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
@@ -2494,7 +2512,7 @@ namespace J2N.Text
         /// Appends the string representation of a specified single-precision floating-point number to this instance
         /// with the specified numeric format and culture-specific format information.
         /// <para/>
-        /// Unless otherwise specified, formatting is performed in the invariant culture using the "J" format, which
+        /// Unless otherwise specified, formatting is performed using the "J" format, which
         /// is similar to how the JDK formats numbers.
         /// </summary>
         /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
@@ -2510,8 +2528,11 @@ namespace J2N.Text
         /// <para/>
         /// The capacity of this instance is adjusted as needed.
         /// <para/>
-        /// If no format provider is explicitly specified, this method uses the default formatting behavior
-        /// determined by the <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> setting.
+        /// If no <paramref name="provider"/> is explicitly specified, this method uses the default formatting behavior
+        /// determined by the <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> setting. To obtain locale-independent
+        /// formatting that is consistent with typical JDK behavior, either specify an invariant format provider explictly
+        /// or set <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> to <see langword="true"/> when constructing the
+        /// <see cref="SynchronizedTextBuilder"/>.
         /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
@@ -2539,7 +2560,7 @@ namespace J2N.Text
         /// Appends the string representation of a specified double-precision floating-point number to this instance
         /// with the specified numeric format and culture-specific format information.
         /// <para/>
-        /// Unless otherwise specified, formatting is performed in the invariant culture using the "J" format, which
+        /// Unless otherwise specified, formatting is performed using the "J" format, which
         /// is similar to how the JDK formats numbers.
         /// </summary>
         /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
@@ -2555,8 +2576,11 @@ namespace J2N.Text
         /// <para/>
         /// The capacity of this instance is adjusted as needed.
         /// <para/>
-        /// If no format provider is explicitly specified, this method uses the default formatting behavior
-        /// determined by the <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> setting.
+        /// If no <paramref name="provider"/> is explicitly specified, this method uses the default formatting behavior
+        /// determined by the <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> setting. To obtain locale-independent
+        /// formatting that is consistent with typical JDK behavior, either specify an invariant format provider explictly
+        /// or set <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> to <see langword="true"/> when constructing the
+        /// <see cref="SynchronizedTextBuilder"/>.
         /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
@@ -2584,7 +2608,7 @@ namespace J2N.Text
         /// Appends the string representation of a specified decimal to this instance
         /// with the specified numeric format and culture-specific format information.
         /// <para/>
-        /// Unless otherwise specified, formatting is performed in the invariant culture, which
+        /// Unless otherwise specified, formatting is performed using the "J" format, which
         /// is similar to how the JDK formats numbers.
         /// </summary>
         /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
@@ -2600,8 +2624,11 @@ namespace J2N.Text
         /// <para/>
         /// The capacity of this instance is adjusted as needed.
         /// <para/>
-        /// If no format provider is explicitly specified, this method uses the default formatting behavior
-        /// determined by the <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> setting.
+        /// If no <paramref name="provider"/> is explicitly specified, this method uses the default formatting behavior
+        /// determined by the <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> setting. To obtain locale-independent
+        /// formatting that is consistent with typical JDK behavior, either specify an invariant format provider explictly
+        /// or set <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> to <see langword="true"/> when constructing the
+        /// <see cref="SynchronizedTextBuilder"/>.
         /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
@@ -2629,7 +2656,7 @@ namespace J2N.Text
         /// Appends the string representation of a specified 16-bit unsigned integer to this instance
         /// with the specified numeric format and culture-specific format information.
         /// <para/>
-        /// Unless otherwise specified, formatting is performed in the invariant culture, which
+        /// Unless otherwise specified, formatting is performed using the "J" format, which
         /// is similar to how the JDK formats numbers.
         /// </summary>
         /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
@@ -2645,8 +2672,11 @@ namespace J2N.Text
         /// <para/>
         /// The capacity of this instance is adjusted as needed.
         /// <para/>
-        /// If no format provider is explicitly specified, this method uses the default formatting behavior
-        /// determined by the <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> setting.
+        /// If no <paramref name="provider"/> is explicitly specified, this method uses the default formatting behavior
+        /// determined by the <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> setting. To obtain locale-independent
+        /// formatting that is consistent with typical JDK behavior, either specify an invariant format provider explictly
+        /// or set <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> to <see langword="true"/> when constructing the
+        /// <see cref="SynchronizedTextBuilder"/>.
         /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
@@ -2675,7 +2705,7 @@ namespace J2N.Text
         /// Appends the string representation of a specified 32-bit unsigned integer to this instance
         /// with the specified numeric format and culture-specific format information.
         /// <para/>
-        /// Unless otherwise specified, formatting is performed in the invariant culture, which
+        /// Unless otherwise specified, formatting is performed using the "J" format, which
         /// is similar to how the JDK formats numbers.
         /// </summary>
         /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
@@ -2691,8 +2721,11 @@ namespace J2N.Text
         /// <para/>
         /// The capacity of this instance is adjusted as needed.
         /// <para/>
-        /// If no format provider is explicitly specified, this method uses the default formatting behavior
-        /// determined by the <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> setting.
+        /// If no <paramref name="provider"/> is explicitly specified, this method uses the default formatting behavior
+        /// determined by the <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> setting. To obtain locale-independent
+        /// formatting that is consistent with typical JDK behavior, either specify an invariant format provider explictly
+        /// or set <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> to <see langword="true"/> when constructing the
+        /// <see cref="SynchronizedTextBuilder"/>.
         /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
@@ -2721,7 +2754,7 @@ namespace J2N.Text
         /// Appends the string representation of a specified 64-bit unsigned integer to this instance
         /// with the specified numeric format and culture-specific format information.
         /// <para/>
-        /// Unless otherwise specified, formatting is performed in the invariant culture, which
+        /// Unless otherwise specified, formatting is performed using the "J" format, which
         /// is similar to how the JDK formats numbers.
         /// </summary>
         /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
@@ -2737,8 +2770,11 @@ namespace J2N.Text
         /// <para/>
         /// The capacity of this instance is adjusted as needed.
         /// <para/>
-        /// If no format provider is explicitly specified, this method uses the default formatting behavior
-        /// determined by the <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> setting.
+        /// If no <paramref name="provider"/> is explicitly specified, this method uses the default formatting behavior
+        /// determined by the <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> setting. To obtain locale-independent
+        /// formatting that is consistent with typical JDK behavior, either specify an invariant format provider explictly
+        /// or set <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> to <see langword="true"/> when constructing the
+        /// <see cref="SynchronizedTextBuilder"/>.
         /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
@@ -2767,7 +2803,7 @@ namespace J2N.Text
         /// Inserts the string representation of a specified 8-bit signed integer to this instance
         /// with the specified numeric format and culture-specific format information.
         /// <para/>
-        /// Unless otherwise specified, formatting is performed in the invariant culture, which
+        /// Unless otherwise specified, formatting is performed using the "J" format, which
         /// is similar to how the JDK formats numbers.
         /// </summary>
         /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
@@ -2789,8 +2825,11 @@ namespace J2N.Text
         /// <remarks>
         /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
         /// <para/>
-        /// If no format provider is explicitly specified, this method uses the default formatting behavior
-        /// determined by the <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> setting.
+        /// If no <paramref name="provider"/> is explicitly specified, this method uses the default formatting behavior
+        /// determined by the <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> setting. To obtain locale-independent
+        /// formatting that is consistent with typical JDK behavior, either specify an invariant format provider explictly
+        /// or set <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> to <see langword="true"/> when constructing the
+        /// <see cref="SynchronizedTextBuilder"/>.
         /// </remarks>
         /// <seealso cref="sbyte" />
         [CLSCompliant(false)]
@@ -2812,7 +2851,7 @@ namespace J2N.Text
         /// Inserts the string representation of a specified 8-bit unsigned integer to this instance
         /// with the specified numeric format and culture-specific format information.
         /// <para/>
-        /// Unless otherwise specified, formatting is performed in the invariant culture, which
+        /// Unless otherwise specified, formatting is performed using the "J" format, which
         /// is similar to how the JDK formats numbers.
         /// </summary>
         /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
@@ -2834,8 +2873,11 @@ namespace J2N.Text
         /// <remarks>
         /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
         /// <para/>
-        /// If no format provider is explicitly specified, this method uses the default formatting behavior
-        /// determined by the <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> setting.
+        /// If no <paramref name="provider"/> is explicitly specified, this method uses the default formatting behavior
+        /// determined by the <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> setting. To obtain locale-independent
+        /// formatting that is consistent with typical JDK behavior, either specify an invariant format provider explictly
+        /// or set <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> to <see langword="true"/> when constructing the
+        /// <see cref="SynchronizedTextBuilder"/>.
         /// </remarks>
         /// <seealso cref="byte" />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -2856,7 +2898,7 @@ namespace J2N.Text
         /// Inserts the string representation of a specified 16-bit signed integer to this instance
         /// with the specified numeric format and culture-specific format information.
         /// <para/>
-        /// Unless otherwise specified, formatting is performed in the invariant culture, which
+        /// Unless otherwise specified, formatting is performed using the "J" format, which
         /// is similar to how the JDK formats numbers.
         /// </summary>
         /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
@@ -2878,8 +2920,11 @@ namespace J2N.Text
         /// <remarks>
         /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
         /// <para/>
-        /// If no format provider is explicitly specified, this method uses the default formatting behavior
-        /// determined by the <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> setting.
+        /// If no <paramref name="provider"/> is explicitly specified, this method uses the default formatting behavior
+        /// determined by the <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> setting. To obtain locale-independent
+        /// formatting that is consistent with typical JDK behavior, either specify an invariant format provider explictly
+        /// or set <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> to <see langword="true"/> when constructing the
+        /// <see cref="SynchronizedTextBuilder"/>.
         /// </remarks>
         /// <seealso cref="short" />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -2900,7 +2945,7 @@ namespace J2N.Text
         /// Inserts the string representation of a specified 32-bit signed integer to this instance
         /// with the specified numeric format and culture-specific format information.
         /// <para/>
-        /// Unless otherwise specified, formatting is performed in the invariant culture, which
+        /// Unless otherwise specified, formatting is performed using the "J" format, which
         /// is similar to how the JDK formats numbers.
         /// </summary>
         /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
@@ -2922,8 +2967,11 @@ namespace J2N.Text
         /// <remarks>
         /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
         /// <para/>
-        /// If no format provider is explicitly specified, this method uses the default formatting behavior
-        /// determined by the <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> setting.
+        /// If no <paramref name="provider"/> is explicitly specified, this method uses the default formatting behavior
+        /// determined by the <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> setting. To obtain locale-independent
+        /// formatting that is consistent with typical JDK behavior, either specify an invariant format provider explictly
+        /// or set <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> to <see langword="true"/> when constructing the
+        /// <see cref="SynchronizedTextBuilder"/>.
         /// </remarks>
         /// <seealso cref="int" />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -2944,7 +2992,7 @@ namespace J2N.Text
         /// Inserts the string representation of a specified 64-bit signed integer to this instance
         /// with the specified numeric format and culture-specific format information.
         /// <para/>
-        /// Unless otherwise specified, formatting is performed in the invariant culture, which
+        /// Unless otherwise specified, formatting is performed using the "J" format, which
         /// is similar to how the JDK formats numbers.
         /// </summary>
         /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
@@ -2966,8 +3014,11 @@ namespace J2N.Text
         /// <remarks>
         /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
         /// <para/>
-        /// If no format provider is explicitly specified, this method uses the default formatting behavior
-        /// determined by the <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> setting.
+        /// If no <paramref name="provider"/> is explicitly specified, this method uses the default formatting behavior
+        /// determined by the <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> setting. To obtain locale-independent
+        /// formatting that is consistent with typical JDK behavior, either specify an invariant format provider explictly
+        /// or set <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> to <see langword="true"/> when constructing the
+        /// <see cref="SynchronizedTextBuilder"/>.
         /// </remarks>
         /// <seealso cref="long" />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -2988,7 +3039,7 @@ namespace J2N.Text
         /// Inserts the string representation of a specified single-precision floating-point number to this instance
         /// with the specified numeric format and culture-specific format information.
         /// <para/>
-        /// Unless otherwise specified, formatting is performed in the invariant culture using the "J" format, which
+        /// Unless otherwise specified, formatting is performed using the "J" format, which
         /// is similar to how the JDK formats numbers.
         /// </summary>
         /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
@@ -3010,8 +3061,11 @@ namespace J2N.Text
         /// <remarks>
         /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
         /// <para/>
-        /// If no format provider is explicitly specified, this method uses the default formatting behavior
-        /// determined by the <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> setting.
+        /// If no <paramref name="provider"/> is explicitly specified, this method uses the default formatting behavior
+        /// determined by the <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> setting. To obtain locale-independent
+        /// formatting that is consistent with typical JDK behavior, either specify an invariant format provider explictly
+        /// or set <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> to <see langword="true"/> when constructing the
+        /// <see cref="SynchronizedTextBuilder"/>.
         /// </remarks>
         /// <seealso cref="float" />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -3032,7 +3086,7 @@ namespace J2N.Text
         /// Inserts the string representation of a specified double-precision floating-point number to this instance
         /// with the specified numeric format and culture-specific format information.
         /// <para/>
-        /// Unless otherwise specified, formatting is performed in the invariant culture using the "J" format, which
+        /// Unless otherwise specified, formatting is performed using the "J" format, which
         /// is similar to how the JDK formats numbers.
         /// </summary>
         /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
@@ -3054,8 +3108,11 @@ namespace J2N.Text
         /// <remarks>
         /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
         /// <para/>
-        /// If no format provider is explicitly specified, this method uses the default formatting behavior
-        /// determined by the <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> setting.
+        /// If no <paramref name="provider"/> is explicitly specified, this method uses the default formatting behavior
+        /// determined by the <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> setting. To obtain locale-independent
+        /// formatting that is consistent with typical JDK behavior, either specify an invariant format provider explictly
+        /// or set <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> to <see langword="true"/> when constructing the
+        /// <see cref="SynchronizedTextBuilder"/>.
         /// </remarks>
         /// <seealso cref="double" />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -3076,7 +3133,7 @@ namespace J2N.Text
         /// Inserts the string representation of a specified decimal to this instance
         /// with the specified numeric format and culture-specific format information.
         /// <para/>
-        /// Unless otherwise specified, formatting is performed in the invariant culture, which
+        /// Unless otherwise specified, formatting is performed using the "J" format, which
         /// is similar to how the JDK formats numbers.
         /// </summary>
         /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
@@ -3098,8 +3155,11 @@ namespace J2N.Text
         /// <remarks>
         /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
         /// <para/>
-        /// If no format provider is explicitly specified, this method uses the default formatting behavior
-        /// determined by the <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> setting.
+        /// If no <paramref name="provider"/> is explicitly specified, this method uses the default formatting behavior
+        /// determined by the <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> setting. To obtain locale-independent
+        /// formatting that is consistent with typical JDK behavior, either specify an invariant format provider explictly
+        /// or set <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> to <see langword="true"/> when constructing the
+        /// <see cref="SynchronizedTextBuilder"/>.
         /// </remarks>
         /// <seealso cref="decimal" />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -3120,7 +3180,7 @@ namespace J2N.Text
         /// Inserts the string representation of a specified 16-bit unsigned integer to this instance
         /// with the specified numeric format and culture-specific format information.
         /// <para/>
-        /// Unless otherwise specified, formatting is performed in the invariant culture, which
+        /// Unless otherwise specified, formatting is performed using the "J" format, which
         /// is similar to how the JDK formats numbers.
         /// </summary>
         /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
@@ -3142,8 +3202,11 @@ namespace J2N.Text
         /// <remarks>
         /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
         /// <para/>
-        /// If no format provider is explicitly specified, this method uses the default formatting behavior
-        /// determined by the <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> setting.
+        /// If no <paramref name="provider"/> is explicitly specified, this method uses the default formatting behavior
+        /// determined by the <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> setting. To obtain locale-independent
+        /// formatting that is consistent with typical JDK behavior, either specify an invariant format provider explictly
+        /// or set <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> to <see langword="true"/> when constructing the
+        /// <see cref="SynchronizedTextBuilder"/>.
         /// </remarks>
         /// <seealso cref="ushort" />
         [CLSCompliant(false)]
@@ -3165,7 +3228,7 @@ namespace J2N.Text
         /// Inserts the string representation of a specified 32-bit unsigned integer to this instance
         /// with the specified numeric format and culture-specific format information.
         /// <para/>
-        /// Unless otherwise specified, formatting is performed in the invariant culture, which
+        /// Unless otherwise specified, formatting is performed using the "J" format, which
         /// is similar to how the JDK formats numbers.
         /// </summary>
         /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
@@ -3187,8 +3250,11 @@ namespace J2N.Text
         /// <remarks>
         /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
         /// <para/>
-        /// If no format provider is explicitly specified, this method uses the default formatting behavior
-        /// determined by the <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> setting.
+        /// If no <paramref name="provider"/> is explicitly specified, this method uses the default formatting behavior
+        /// determined by the <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> setting. To obtain locale-independent
+        /// formatting that is consistent with typical JDK behavior, either specify an invariant format provider explictly
+        /// or set <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> to <see langword="true"/> when constructing the
+        /// <see cref="SynchronizedTextBuilder"/>.
         /// </remarks>
         /// <seealso cref="uint" />
         [CLSCompliant(false)]
@@ -3210,7 +3276,7 @@ namespace J2N.Text
         /// Inserts the string representation of a specified 64-bit unsigned integer to this instance
         /// with the specified numeric format and culture-specific format information.
         /// <para/>
-        /// Unless otherwise specified, formatting is performed in the invariant culture, which
+        /// Unless otherwise specified, formatting is performed using the "J" format, which
         /// is similar to how the JDK formats numbers.
         /// </summary>
         /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
@@ -3232,8 +3298,11 @@ namespace J2N.Text
         /// <remarks>
         /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
         /// <para/>
-        /// If no format provider is explicitly specified, this method uses the default formatting behavior
-        /// determined by the <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> setting.
+        /// If no <paramref name="provider"/> is explicitly specified, this method uses the default formatting behavior
+        /// determined by the <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> setting. To obtain locale-independent
+        /// formatting that is consistent with typical JDK behavior, either specify an invariant format provider explictly
+        /// or set <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> to <see langword="true"/> when constructing the
+        /// <see cref="SynchronizedTextBuilder"/>.
         /// </remarks>
         /// <seealso cref="ulong" />
         [CLSCompliant(false)]

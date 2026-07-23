@@ -15,9 +15,31 @@ namespace J2N.Text
         internal bool useInvariantDefaults = false;
 
         /// <summary>
-        /// Gets or sets a flag indicating to use invariant default settings when not otherwise specified by the user.
-        /// This setting affects culture-aware features such as formatting and comparing.
+        /// Gets or sets a value indicating whether culture-sensitive operations use
+        /// invariant defaults when the caller does not explicitly specify culture-
+        /// specific behavior.
         /// </summary>
+        /// <value>
+        /// <see langword="false"/> to use the .NET default behavior of using the current
+        /// culture for culture-sensitive operations; <see langword="true"/> to use
+        /// invariant defaults instead. The default is <see langword="false"/>.
+        /// </value>
+        /// <remarks>
+        /// This setting affects culture-sensitive operations that rely on default
+        /// formatting, parsing, casing, comparison, or other culture-specific behavior
+        /// when the caller does not explicitly provide a culture, format provider,
+        /// comparison option, or equivalent setting.
+        /// <para/>
+        /// Setting this property to <see langword="true"/> is recommended when porting
+        /// Java applications that expect locale-independent behavior. Java APIs commonly
+        /// use locale-independent defaults for operations such as numeric formatting,
+        /// whereas .NET APIs generally use the current culture by default.
+        /// <para/>
+        /// This setting has no effect on operations where the caller explicitly supplies
+        /// the culture-specific option to use, such as an
+        /// <see cref="IFormatProvider"/>, <see cref="CultureInfo"/>, or
+        /// <see cref="StringComparison"/> value.
+        /// </remarks>
         [CodeGenerationIgnore]
         public bool UseInvariantDefaults
         {
