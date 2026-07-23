@@ -708,18 +708,21 @@ namespace J2N.Text.Tests
 
         public static IEnumerable<object[]> Append_Decimal_TestData()
         {
-            yield return new object[] { "Hello", (double)0, "Hello0" };
-            yield return new object[] { "Hello", 1.23, "Hello1.23" };
-            yield return new object[] { "", -4.56, "-4.56" };
+            yield return new object[] { "Hello", 0m, "Hello0" };
+            yield return new object[] { "Hello", 1.23m, "Hello1.23" };
+            yield return new object[] { "", -4.56m, "-4.56" };
+            yield return new object[] { "", 0.000001m, "0.000001" };
+            yield return new object[] { "", 0.0000001m, "1E-7" };
+            yield return new object[] { "", 1.2300m, "1.2300" };
         }
 
         public static IEnumerable<object[]> Append_Decimal_Format_TestData()
         {
-            yield return new object[] { "Hello", 1d, "J", "Hello1" }; // J2N TODO: Fix "J" format tests
-            yield return new object[] { "Hello", 1d, "j", "Hello1" }; // J2N TODO: Fix "J" format tests
-            yield return new object[] { "Hello", 123d, "j1", "Hello123" };
-            yield return new object[] { "Hello", 1d, "g", "Hello1" };
-            yield return new object[] { "Hello", 123d, "g1", "Hello1e+02" };
+            yield return new object[] { "Hello", 1m, "J", "Hello1" };
+            yield return new object[] { "Hello", 1m, "j", "Hello1" };
+            yield return new object[] { "Hello", 123m, "j1", "Hello123" };
+            yield return new object[] { "Hello", 1m, "g", "Hello1" };
+            yield return new object[] { "Hello", 123m, "g1", "Hello1e+02" };
         }
 
         [Fact]
@@ -729,15 +732,15 @@ namespace J2N.Text.Tests
             {
                 foreach (var testdata in Append_Decimal_TestData())
                 {
-                    Test_Append_Decimal((string)testdata[0], (double)testdata[1], (string)testdata[2]);
+                    Test_Append_Decimal((string)testdata[0], (decimal)testdata[1], (string)testdata[2]);
                 }
             }
         }
 
-        private void Test_Append_Decimal(string original, double doubleValue, string expected)
+        private void Test_Append_Decimal(string original, decimal value, string expected)
         {
             var builder = MutableTextBufferFactory(original);
-            builder.Append(new decimal(doubleValue));
+            builder.Append(value);
             Assert.Equal(expected, builder.ToString());
         }
 
@@ -746,14 +749,14 @@ namespace J2N.Text.Tests
         {
             foreach (var testdata in Append_Decimal_Format_TestData())
             {
-                Test_Append_Decimal_Format((string)testdata[0], (double)testdata[1], (string)testdata[2], (string)testdata[3]);
+                Test_Append_Decimal_Format((string)testdata[0], (decimal)testdata[1], (string)testdata[2], (string)testdata[3]);
             }
         }
 
-        public void Test_Append_Decimal_Format(string original, double doubleValue, string format, string expected)
+        public void Test_Append_Decimal_Format(string original, decimal value, string format, string expected)
         {
             var builder = MutableTextBufferFactory(original);
-            builder.Append(new decimal(doubleValue), format, CultureInfo.InvariantCulture);
+            builder.Append(value, format, CultureInfo.InvariantCulture);
             Assert.Equal(expected, builder.ToString());
         }
 
@@ -3042,18 +3045,21 @@ namespace J2N.Text.Tests
 
         public static IEnumerable<object[]> Test_Insert_Decimal_TestData()
         {
-            yield return new object[] { "Hello", 0, (double)0, "0Hello" };
-            yield return new object[] { "Hello", 3, 1.23, "Hel1.23lo" };
-            yield return new object[] { "Hello", 5, -4.56, "Hello-4.56" };
+            yield return new object[] { "Hello", 0, 0m, "0Hello" };
+            yield return new object[] { "Hello", 3, 1.23m, "Hel1.23lo" };
+            yield return new object[] { "Hello", 5, -4.56m, "Hello-4.56" };
+            yield return new object[] { "", 0, 0.000001m, "0.000001" };
+            yield return new object[] { "", 0, 0.0000001m, "1E-7" };
+            yield return new object[] { "", 0, 1.2300m, "1.2300" };
         }
 
         public static IEnumerable<object[]> Test_Insert_Decimal_Format_TestData()
         {
-            yield return new object[] { "Hello", 0, 1d, "J", "1Hello" }; // J2N TODO: Fix "J" format tests
-            yield return new object[] { "Hello", 0, 1d, "j", "1Hello" }; // J2N TODO: Fix "J" format tests
-            yield return new object[] { "Hello", 0, 123d, "j1", "123Hello" };
-            yield return new object[] { "Hello", 0, 1d, "g", "1Hello" };
-            yield return new object[] { "Hello", 0, 123d, "g1", "1e+02Hello" };
+            yield return new object[] { "Hello", 0, 1m, "J", "1Hello" };
+            yield return new object[] { "Hello", 0, 1m, "j", "1Hello" };
+            yield return new object[] { "Hello", 0, 123m, "j1", "123Hello" };
+            yield return new object[] { "Hello", 0, 1m, "g", "1Hello" };
+            yield return new object[] { "Hello", 0, 123m, "g1", "1e+02Hello" };
         }
 
         [Fact]
@@ -3063,15 +3069,15 @@ namespace J2N.Text.Tests
             {
                 foreach (var testdata in Test_Insert_Decimal_TestData())
                 {
-                    Test_Insert_Decimal((string)testdata[0], (int)testdata[1], (double)testdata[2], (string)testdata[3]);
+                    Test_Insert_Decimal((string)testdata[0], (int)testdata[1], (decimal)testdata[2], (string)testdata[3]);
                 }
             }
         }
 
-        private void Test_Insert_Decimal(string original, int index, double doubleValue, string expected)
+        private void Test_Insert_Decimal(string original, int index, decimal value, string expected)
         {
             var builder = MutableTextBufferFactory(original);
-            builder.Insert(index, new decimal(doubleValue));
+            builder.Insert(index, value);
             Assert.Equal(expected, builder.ToString());
         }
 
@@ -3080,14 +3086,14 @@ namespace J2N.Text.Tests
         {
             foreach (var testdata in Test_Insert_Decimal_Format_TestData())
             {
-                Test_Insert_Decimal_Format((string)testdata[0], (int)testdata[1], (double)testdata[2], (string)testdata[3], (string)testdata[4]);
+                Test_Insert_Decimal_Format((string)testdata[0], (int)testdata[1], (decimal)testdata[2], (string)testdata[3], (string)testdata[4]);
             }
         }
 
-        public void Test_Insert_Decimal_Format(string original, int index, double doubleValue, string format, string expected)
+        public void Test_Insert_Decimal_Format(string original, int index, decimal value, string format, string expected)
         {
             var builder = MutableTextBufferFactory(original);
-            builder.Insert(index, new decimal(doubleValue), format, CultureInfo.InvariantCulture);
+            builder.Insert(index, value, format, CultureInfo.InvariantCulture);
             Assert.Equal(expected, builder.ToString());
         }
 

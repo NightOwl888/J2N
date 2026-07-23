@@ -117,7 +117,8 @@ namespace J2N.Text
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationExtensionImplementation]
         internal void AppendInternal(decimal value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
-            => AppendInternal(value.ToString(Number.ConvertFormatToString(format), provider ?? DefaultNumberFormatInfo));
+            => AppendNumberCore<decimal, DecimalFormatter>(14, value, format, provider);
+        //=> AppendInternal(value.ToString(Number.ConvertFormatToString(format), provider ?? DefaultNumberFormatInfo));
 
         /// <summary>
         /// Appends the string representation of a specified numeric type to this instance.
@@ -343,7 +344,8 @@ namespace J2N.Text
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationExtensionImplementation]
         internal void InsertInternal(int index, decimal value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
-            => InsertInternal(index, value.ToString(Number.ConvertFormatToString(format), provider ?? DefaultNumberFormatInfo), 1);
+            => InsertNumberCore<decimal, DecimalFormatter>(index, value, format, provider);
+        //=> InsertInternal(index, value.ToString(Number.ConvertFormatToString(format), provider ?? DefaultNumberFormatInfo), 1);
 
         /// <summary>
         /// Inserts the string representation of a specified numeric type to this instance

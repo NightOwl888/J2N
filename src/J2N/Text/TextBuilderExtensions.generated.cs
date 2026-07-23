@@ -2427,7 +2427,7 @@ namespace J2N.Text
         /// </remarks>
         /// <seealso cref="decimal" />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static TBuilder Append<TBuilder>(this TBuilder text, decimal value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
+        public static TBuilder Append<TBuilder>(this TBuilder text, decimal value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
             where TBuilder : TextBuilder
         {
             if (text is null)
@@ -2885,7 +2885,7 @@ namespace J2N.Text
         /// </remarks>
         /// <seealso cref="decimal" />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static TBuilder Insert<TBuilder>(this TBuilder text, int index, decimal value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
+        public static TBuilder Insert<TBuilder>(this TBuilder text, int index, decimal value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
             where TBuilder : TextBuilder
         {
             if (text is null)
