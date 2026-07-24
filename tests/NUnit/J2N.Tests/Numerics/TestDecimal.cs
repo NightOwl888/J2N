@@ -250,7 +250,16 @@ namespace J2N.Numerics
             yield return new object?[] { "-1.455E-20", -1.455E-20m, "-1455", 23, "j", null, "-1.455e-20" };
             yield return new object?[] { "-1.455E-20", -1.455E-20m, "-1455", 23, "j", new CultureInfo("de-DE"), "-1,455e-20" };
             yield return new object?[] { "-0.00001", -0.00001m, "-1", 5, "J", new CultureInfo("de-DE"), "-0,00001" };
-            yield return new object?[] { "-0.00001", -0.00001m, "-1", 5, "J", new CultureInfo("ar-IQ"), "\u061C\u002D0\u066B00001" };
+
+            var customNegativeSignDecimalGroupSeparator = new NumberFormatInfo()
+            {
+                NegativeSign = "#",
+                NumberDecimalSeparator = "~",
+                NumberGroupSeparator = "*"
+            };
+
+            yield return new object?[] { "-0.00001", -0.00001m, "-1", 5, "J", customNegativeSignDecimalGroupSeparator, "#0~00001" };
+            yield return new object?[] { "-123456789012345678901234567.89", -123456789012345678901234567.89m, "-12345678901234567890123456789", 2, "J", customNegativeSignDecimalGroupSeparator, "#123456789012345678901234567~89" };
 
             yield return new object?[] { "-1.455E-20", -1.455E-20m, "-1455", 23, "G", null, (-1.455E-20m).ToString(CultureInfo.InvariantCulture) };
             yield return new object?[] { "-1.455E-20", -1.455E-20m, "-1455", 23, "F", null, (-1.455E-20m).ToString("F", CultureInfo.InvariantCulture) };
