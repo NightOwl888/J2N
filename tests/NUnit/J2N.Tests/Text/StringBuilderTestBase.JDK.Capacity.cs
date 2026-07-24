@@ -68,10 +68,6 @@ namespace J2N.Text
         public virtual void Test_explicitCapacity(char ch, int initCapacity)
         {
             TextBuilder sb = StringBuilderFactory(initCapacity);
-            // J2N: Altered initial capacity logic to account for the fact that
-            // zero indicates DEFAULT_CAPACITY in our implementation. However, smaller
-            // than DEFAULT_CAPACITY can still be set explictily if greater than 0.
-            initCapacity = initCapacity == 0 ? DEFAULT_CAPACITY : initCapacity;
             assertEquals(sb.Capacity, initCapacity);
             for (int i = 0; i < initCapacity; i++)
             {
@@ -134,15 +130,10 @@ namespace J2N.Text
         [TestCaseSource(nameof(charCapacity))]
         public virtual void Test_ensureCapacity(char ch, int cap)
         {
-            // J2N: Keeping .NET's default capacity semantics because setting it to a
-            // zero-length buffer makes the first hit allocate every time. This does
-            // not bode well on the .NET platform.
-
             TextBuilder sb = StringBuilderFactory(0);
-            assertEquals(sb.Capacity, /*0*/ DEFAULT_CAPACITY); 
+            assertEquals(sb.Capacity, 0); 
             sb.EnsureCapacity(cap); // only has effect if cap > 0
-            //int newCap = (cap == 0) ? /*0*/ DEFAULT_CAPACITY : newCapacity(0, cap);
-            int newCap = cap <= 16 ? DEFAULT_CAPACITY : newCapacity(0, cap);
+            int newCap = (cap == 0) ? 0 : newCapacity(0, cap);
             assertEquals(sb.Capacity, newCap);
             sb.EnsureCapacity(newCap + 1);
             assertEquals(sb.Capacity, nextNewCapacity(newCap));

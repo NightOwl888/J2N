@@ -195,13 +195,11 @@ namespace J2N.Text
             if (capacity < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(capacity, ExceptionArgument.capacity);
 
-            if (capacity == 0)
-            {
-                capacity = Math.Min(DefaultCapacity, maxCapacity);
-            }
-
             m_MaxCapacity = maxCapacity;
-            m_Chars = allocator.Allocate(capacity);
+            if (capacity > 0)
+            {
+                m_Chars = allocator.Allocate(capacity);
+            }
             return this;
         }
 

@@ -85,10 +85,6 @@ namespace J2N.Text
         public override void Test_explicitCapacity(char ch, int initCapacity)
         {
             TextBuilder sb = StringBuilderFactory(initCapacity);
-            // J2N: Altered initial capacity logic to account for the fact that
-            // zero indicates DEFAULT_CAPACITY in our implementation. However, smaller
-            // than DEFAULT_CAPACITY can still be set explictily if greater than 0.
-            initCapacity = initCapacity == 0 ? DEFAULT_CAPACITY : initCapacity;
             Assert.GreaterOrEqual(sb.Capacity, initCapacity);
 
             // J2N: actual capacity may be larger than the JDK, so the test was
@@ -175,16 +171,12 @@ namespace J2N.Text
         [TestCaseSource(nameof(charCapacity))]
         public override void Test_ensureCapacity(char ch, int cap)
         {
-            // J2N: Keeping .NET's default capacity semantics because setting it to a
-            // zero-length buffer makes the first hit allocate every time. This does
-            // not bode well on the .NET platform.
-
             TextBuilder sb = StringBuilderFactory(0);
-            assertEquals(sb.Capacity, /*0*/ DEFAULT_CAPACITY);
+            assertEquals(sb.Capacity, 0);
             sb.EnsureCapacity(cap); // only has effect if cap > 0
-            //int newCap = (cap == 0) ? /*0*/ DEFAULT_CAPACITY : newCapacity(0, cap);
-            int newCap = cap <= 16 ? DEFAULT_CAPACITY : newCapacity(0, cap);
+            int newCap = (cap == 0) ? 0 : newCapacity(0, cap);
             Assert.GreaterOrEqual(sb.Capacity, newCap);
+            newCap = sb.Capacity; // J2N: We need to set newCap to the threshold to get it to grow
             sb.EnsureCapacity(newCap + 1);
             Assert.GreaterOrEqual(sb.Capacity, nextNewCapacity(newCap));
             sb.Append(ch);
