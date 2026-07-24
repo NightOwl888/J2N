@@ -505,14 +505,7 @@ namespace J2N.Numerics
                 }
             }
 
-            sb.Append(upperCase ? 'E' : 'e');
-
-            if (exponent >= 0)
-            {
-                sb.Append('+');
-            }
-
-            sb.Append(exponent.ToString(NumberFormatInfo.InvariantInfo)); // J2N TODO: Add an Append(int) overload
+            FormatExponent(ref sb, info, exponent, upperCase ? 'E' : 'e', minDigits: 0, positiveSign: true);
         }
 
         /// <summary>
