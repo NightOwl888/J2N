@@ -515,9 +515,6 @@ namespace J2N.Numerics
         [StructLayout(LayoutKind.Explicit)]
         internal struct DecimalData
         {
-            [FieldOffset(0)]
-            public decimal Value;
-
             // decimal layout:
             // flags, hi, lo, mid
 
@@ -538,7 +535,7 @@ namespace J2N.Numerics
             public readonly int Scale => (Flags >> 16) & 0xFF;
         }
 
-        // J2N TODO: Note that the BCL vectorizes this operation and does several other optimizations
+        // J2N: Note that the BCL vectorizes this operation and does several other optimizations
         // that expand it to 1500+ lines of code. This is the simplified version of what it is doing.
         internal static uint DecDivMod1E9(ref DecimalData value)
         {
@@ -565,7 +562,9 @@ namespace J2N.Numerics
 
         internal static unsafe void DecimalToNumber(ref decimal d, ref NumberBuffer number)
         {
-            DecimalData value = new DecimalData { Value = d };
+            DecimalData value = Unsafe.As<decimal, DecimalData>(ref d);
+
+            Debug.Assert(value.Scale >= 0 && value.Scale <= 28);
 
             byte* buffer = number.GetDigitsPointer();
 

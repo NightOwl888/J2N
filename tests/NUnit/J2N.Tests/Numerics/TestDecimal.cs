@@ -3,7 +3,9 @@ using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Runtime.CompilerServices;
 using System.Text;
+using static J2N.Numerics.DotNetNumber;
 #nullable enable
 
 namespace J2N.Numerics
@@ -1538,6 +1540,25 @@ namespace J2N.Numerics
             sb.Append("But was:  \"").Append(actual).AppendLine("\"");
 
             return sb.ToString();
+        }
+
+        // Our decimal formatter relies on the underlying layout of the decimal data type
+        // to read the raw binary data. GetBits() is another way to do this, but it allocates temporary
+        // heap. This test ensures the layout remains stable and will fail if the decimal format ever changes.
+        [Test]
+        public void TestDecimalLayout()
+        {
+            decimal value = 123.45m;
+
+            //DecimalData data = new DecimalData { Value = value };
+            DecimalData data = Unsafe.As<decimal, DecimalData>(ref value);
+
+            int[] bits = decimal.GetBits(value);
+
+            assertEquals(bits[0], unchecked((int)data.Low));
+            assertEquals(bits[1], unchecked((int)data.Mid));
+            assertEquals(bits[2], unchecked((int)data.High));
+            assertEquals(bits[3], data.Flags);
         }
     }
 }
