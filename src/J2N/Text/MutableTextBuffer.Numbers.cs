@@ -184,16 +184,7 @@ namespace J2N.Text
             int charsWritten;
             while (!default(TFormatter).TryFormat(value, format, provider, m_Chars.AsSpan(m_Position), out charsWritten))
             {
-                // Check if the valueCount will put us over m_MaxCapacity.
-                // Doing the check here prevents corruption of the MutableTextBuffer.
-                int newLength = m_Chars.Length * 2;
-                if (newLength > m_MaxCapacity)
-                {
-                    ThrowHelper.ThrowArgumentOutOfRangeException(value, ExceptionArgument.valueCount, ExceptionResource.ArgumentOutOfRange_LengthGreaterThanCapacity);
-                }
-
-                // J2N: This effectively doubles the buffer
-                Grow(m_Chars.Length + 1); // rare
+                GrowForRetry(throwOnOverflow: true);
             }
 
             m_Position += charsWritten;
@@ -212,18 +203,7 @@ namespace J2N.Text
             int charsWritten;
             while (!value.TryFormat(m_Chars.AsSpan(m_Position), out charsWritten, format, provider))
             {
-                int length = m_Chars.Length;
-                int additionalCapacity = length - m_Position == length ? m_Chars.Length + 1 : m_Chars.Length; // Ensure we request enough to cause a re-grow
-
-                // Check if the valueCount will put us over m_MaxCapacity.
-                // Doing the check here prevents corruption of the MutableTextBuffer.
-                int newLength = m_Position + additionalCapacity;
-                if (newLength > m_MaxCapacity)
-                {
-                    ThrowHelper.ThrowArgumentOutOfRangeException(value, ExceptionArgument.valueCount, ExceptionResource.ArgumentOutOfRange_LengthGreaterThanCapacity);
-                }
-
-                Grow(additionalCapacity);
+                GrowForRetry(throwOnOverflow: true);
             }
 
             m_Position += charsWritten;

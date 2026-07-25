@@ -60,13 +60,21 @@ namespace J2N.Text
             int pos = m_Position;
             if (pos > m_Chars.Length - valueLength)
             {
+                // Check if the valueCount will put us over m_MaxCapacity.
+                // Doing the check here prevents corruption of the MutableTextBuffer.
+                uint newLength = (uint)m_Position + (uint)valueLength;
+                if (newLength > m_MaxCapacity)
+                {
+                    ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.valueCount, ExceptionResource.ArgumentOutOfRange_LengthGreaterThanCapacity);
+                }
+
                 Grow(valueLength);
             }
 
             int length = value.ToUpper(m_Chars.AsSpan(m_Position), culture);
             while (length < 0) // rare
             {
-                Grow(valueLength);
+                GrowForRetry(throwOnOverflow: true);
                 length = value.ToUpper(m_Chars.AsSpan(m_Position), culture);
             }
             m_Position += length;
@@ -106,13 +114,21 @@ namespace J2N.Text
             int pos = m_Position;
             if (pos > m_Chars.Length - valueLength)
             {
+                // Check if the valueCount will put us over m_MaxCapacity.
+                // Doing the check here prevents corruption of the MutableTextBuffer.
+                uint newLength = (uint)m_Position + (uint)valueLength;
+                if (newLength > m_MaxCapacity)
+                {
+                    ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.valueCount, ExceptionResource.ArgumentOutOfRange_LengthGreaterThanCapacity);
+                }
+
                 Grow(valueLength);
             }
 
             int length = value.ToLower(m_Chars.AsSpan(m_Position), culture);
             while (length < 0) // rare
             {
-                Grow(valueLength);
+                GrowForRetry(throwOnOverflow: true);
                 length = value.ToLower(m_Chars.AsSpan(m_Position), culture);
             }
             m_Position += length;

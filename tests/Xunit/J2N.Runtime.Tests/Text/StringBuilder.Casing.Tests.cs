@@ -17,6 +17,7 @@
 #endregion
 
 using J2N.TestUtilities;
+using J2N.TestUtilities.Xunit;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -86,6 +87,15 @@ namespace J2N.Text.Tests
             Assert.Equal("ı", sb.ToString());
         }
 
+        [Fact]
+        public void AppendLower_CharSpan_NoSpareCapacity_ThrowsArgumentOutOfRangeException()
+        {
+            var builder = MutableTextBufferFactory(0, 5);
+            builder.Append("Hello");
+
+            AssertExtensions.Throws<ArgumentOutOfRangeException>(s_noCapacityParamName, () => builder.AppendLower("B".AsSpan(), new CultureInfo("en-US")));
+        }
+
         [Theory]
         [MemberData(nameof(Append_LowerCase_TestData))]
         public void AppendLower_String(string original, string input, string expected, CultureInfo culture)
@@ -121,6 +131,16 @@ namespace J2N.Text.Tests
             var sb = MutableTextBufferFactory("", 16, new MutableTextBufferTestOptions { UseInvariantDefaults = true });
             sb.AppendLower("I", new CultureInfo("tr-TR"));
             Assert.Equal("ı", sb.ToString());
+        }
+
+
+        [Fact]
+        public void AppendLower_String_NoSpareCapacity_ThrowsArgumentOutOfRangeException()
+        {
+            var builder = MutableTextBufferFactory(0, 5);
+            builder.Append("Hello");
+
+            AssertExtensions.Throws<ArgumentOutOfRangeException>(s_noCapacityParamName, () => builder.AppendLower("B", new CultureInfo("en-US")));
         }
 
         // ------------------------------
@@ -181,6 +201,15 @@ namespace J2N.Text.Tests
             Assert.Equal("İ", sb.ToString());
         }
 
+        [Fact]
+        public void AppendUpper_CharSpan_NoSpareCapacity_ThrowsArgumentOutOfRangeException()
+        {
+            var builder = MutableTextBufferFactory(0, 5);
+            builder.Append("Hello");
+
+            AssertExtensions.Throws<ArgumentOutOfRangeException>(s_noCapacityParamName, () => builder.AppendUpper("b".AsSpan(), new CultureInfo("en-US")));
+        }
+
         [Theory]
         [MemberData(nameof(Append_UpperCase_TestData))]
         public void AppendUpper_String(string original, string input, string expected, CultureInfo culture)
@@ -216,6 +245,15 @@ namespace J2N.Text.Tests
             var sb = MutableTextBufferFactory("", 16, new MutableTextBufferTestOptions { UseInvariantDefaults = true });
             sb.AppendUpper("i", new CultureInfo("tr-TR"));
             Assert.Equal("İ", sb.ToString());
+        }
+
+        [Fact]
+        public void AppendUpper_String_NoSpareCapacity_ThrowsArgumentOutOfRangeException()
+        {
+            var builder = MutableTextBufferFactory(0, 5);
+            builder.Append("Hello");
+
+            AssertExtensions.Throws<ArgumentOutOfRangeException>(s_noCapacityParamName, () => builder.AppendUpper("b", new CultureInfo("en-US")));
         }
 
         // ------------------------------

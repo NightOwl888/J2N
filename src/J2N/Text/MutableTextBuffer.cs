@@ -1309,6 +1309,24 @@ namespace J2N.Text
             ReplaceBuffer(CalculateNewArrayLength(additionalCapacityBeyondPos));
         }
 
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private void GrowForRetry(bool throwOnOverflow)
+        {
+            int additionalCapacity = (m_Chars.Length - m_Position) + 1;
+
+            if (throwOnOverflow)
+            {
+                int requiredLength = m_Position + additionalCapacity;
+
+                if (requiredLength > m_MaxCapacity)
+                {
+                    ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.valueCount, ExceptionResource.ArgumentOutOfRange_LengthGreaterThanCapacity);
+                }
+            }
+
+            Grow(additionalCapacity);
+        }
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private int CalculateNewArrayLength(int additionalCapacityBeyondPos)
         {
