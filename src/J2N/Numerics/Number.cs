@@ -503,30 +503,5 @@ namespace J2N.Numerics
 
             return format;
         }
-
-        /// <summary>
-        /// Converts "J" format to "G" and removes the precision specifier.
-        /// This is just so we can pass through the value to the built-in
-        /// .NET ToString() methods without them complaining. Someday this
-        /// format might morph into something else, in which case we will
-        /// remove this method. This is only intended for integral types
-        /// that do not actually support the "J" format.
-        /// </summary>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static string ConvertFormatToString(ReadOnlySpan<char> format)
-        {
-            if (format.IsEmpty)
-                return string.Empty;
-
-            char fmt = format[0];
-            // Remove any precision or other characters that are passed
-            // as we will ignore them
-            if (fmt == 'J')
-                return "G";
-            if (fmt == 'j')
-                return "g";
-
-            return format.ToString();
-        }
     }
 }
