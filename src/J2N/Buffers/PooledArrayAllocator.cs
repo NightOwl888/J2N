@@ -57,15 +57,25 @@ namespace J2N.Buffers
         }
 
         /// <summary>
-        /// Gets the default instance of <see cref="PooledArrayAllocator{T}"/>.
-        /// This instance does not clear the array after use.
+        /// Gets an instance of <see cref="PooledArrayAllocator{T}"/> that does not
+        /// clear arrays as it returns them to the pool.
         /// </summary>
+        /// <remarks>
+        /// The underlying pool is shared, but is not the same instance as <see cref="ArrayPool{T}.Shared"/>
+        /// and may have different peformance characteristics. However, since it is a separate pool,
+        /// sensitive data that is exposed when returned to this pool is not available to callers of
+        /// <see cref="ArrayPool{T}.Shared"/>.
+        /// </remarks>
         public static PooledArrayAllocator<T> Uncleared => UnclearedArrayPoolHolder.Instance;
 
         /// <summary>
         /// Gets an instance of <see cref="PooledArrayAllocator{T}"/> that clears
         /// arrays as it returns them to the pool.
         /// </summary>
+        /// <remarks>
+        /// The underlying pool is shared, but is not the same instance as <see cref="ArrayPool{T}.Shared"/>
+        /// and may have different peforamnce characteristics.
+        /// </remarks>
         public static PooledArrayAllocator<T> Cleared => ClearedArrayPoolHolder.Instance;
 
         /// <inheritdoc/>
