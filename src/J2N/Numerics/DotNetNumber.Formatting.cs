@@ -538,30 +538,29 @@ namespace J2N.Numerics
             public readonly int Scale => (Flags >> 16) & 0xFF;
         }
 
-        private const uint Billion = 1_000_000_000;
-
         // J2N TODO: Note that the BCL vectorizes this operation and does several other optimizations
         // that expand it to 1500+ lines of code. This is the simplified version of what it is doing.
         internal static uint DecDivMod1E9(ref DecimalData value)
         {
+            const uint OneBillion = 1_000_000_000;
             ulong n;
             uint remainder = 0;
 
             if (value.High != 0)
             {
                 n = value.High;
-                value.High = (uint)(n / Billion);
-                remainder = (uint)(n % Billion);
+                value.High = (uint)(n / OneBillion);
+                remainder = (uint)(n % OneBillion);
             }
 
             n = ((ulong)remainder << 32) | value.Mid;
-            value.Mid = (uint)(n / Billion);
-            remainder = (uint)(n % Billion);
+            value.Mid = (uint)(n / OneBillion);
+            remainder = (uint)(n % OneBillion);
 
             n = ((ulong)remainder << 32) | value.Low;
-            value.Low = (uint)(n / Billion);
+            value.Low = (uint)(n / OneBillion);
 
-            return (uint)(n % Billion);
+            return (uint)(n % OneBillion);
         }
 
         internal static unsafe void DecimalToNumber(ref decimal d, ref NumberBuffer number)
