@@ -110,7 +110,7 @@
 
   <ItemGroup>
     <CodeGenInputs Include="$(MSBuildProjectDirectory)\Text\MutableTextBuffer*.cs" />
-    <CodeGenInputs Include="$(MSBuildProjectDirectory)\Text\TextMemoryExtensions*.cs" />
+    <CodeGenInputs Include="$(MSBuildProjectDirectory)\MutableTextBufferExtensions*.cs" />
     <CodeGenInputs Include="$(MSBuildProjectDirectory)\CodeGeneration\**\*.cs" />
     <CodeGenInputs Include="$(MSBuildThisFileDirectory)..\..\eng\J2N.Text.CodeGen\**\*.cs" Exclude="**\bin\**;**\obj\**" />
   </ItemGroup>
