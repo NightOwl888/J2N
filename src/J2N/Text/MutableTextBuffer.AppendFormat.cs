@@ -29,9 +29,9 @@ namespace J2N.Text
         internal void AppendFormatInternal([StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, object? arg0)
         {
 #if FEATURE_INLINEARRAYATTRIBUTE
-            AppendFormatInternal(null, format, MemoryMarshal.CreateReadOnlySpan(ref arg0, 1));
+            AppendFormatCore(null, format, MemoryMarshal.CreateReadOnlySpan(ref arg0, 1));
 #else
-            AppendFormatInternal(null, format, new ParamsArray(arg0));
+            AppendFormatCore(null, format, new ParamsArray(arg0));
 #endif
         }
 
@@ -45,14 +45,14 @@ namespace J2N.Text
         /// Update that documentation if the behavior changes.
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        [CodeGenerationExtensionImplementation]
+        [CodeGenerationExtensionImplementation] // J2N TODO: API - change format to ReadOnlySpan<char> before making public
         internal void AppendFormatInternal([StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, object? arg0, object? arg1)
         {
 #if FEATURE_INLINEARRAYATTRIBUTE
             TwoObjects two = new TwoObjects(arg0, arg1);
-            AppendFormatInternal(null, format, (ReadOnlySpan<object?>)two);
+            AppendFormatCore(null, format, (ReadOnlySpan<object?>)two);
 #else
-            AppendFormatInternal(null, format, new ParamsArray(arg0, arg1));
+            AppendFormatCore(null, format, new ParamsArray(arg0, arg1));
 #endif
         }
 
@@ -66,14 +66,14 @@ namespace J2N.Text
         /// Update that documentation if the behavior changes.
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        [CodeGenerationExtensionImplementation]
+        [CodeGenerationExtensionImplementation] // J2N TODO: API - change format to ReadOnlySpan<char> before making public
         internal void AppendFormatInternal([StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, object? arg0, object? arg1, object? arg2)
         {
 #if FEATURE_INLINEARRAYATTRIBUTE
             ThreeObjects three = new ThreeObjects(arg0, arg1, arg2);
-            AppendFormatInternal(null, format, (ReadOnlySpan<object?>)three);
+            AppendFormatCore(null, format, (ReadOnlySpan<object?>)three);
 #else
-            AppendFormatInternal(null, format, new ParamsArray(arg0, arg1, arg2));
+            AppendFormatCore(null, format, new ParamsArray(arg0, arg1, arg2));
 #endif
         }
 
@@ -87,7 +87,7 @@ namespace J2N.Text
         /// Update that documentation if the behavior changes.
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        [CodeGenerationExtensionImplementation]
+        [CodeGenerationExtensionImplementation] // J2N TODO: API - change format to ReadOnlySpan<char> before making public
         internal void AppendFormatInternal([StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, params object?[] args)
         {
             if (args is null)
@@ -97,7 +97,7 @@ namespace J2N.Text
                 ThrowHelper.ThrowArgumentNullException(format is null ? ExceptionArgument.format : ExceptionArgument.args);
             }
 
-            AppendFormatInternal(null, format, args);
+            AppendFormatCore(null, format, args);
         }
 
         /// <summary>
@@ -110,10 +110,10 @@ namespace J2N.Text
         /// Update that documentation if the behavior changes.
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        [CodeGenerationExtensionImplementation]
+        [CodeGenerationExtensionImplementation] // J2N TODO: API - change format to ReadOnlySpan<char> before making public
         internal void AppendFormatInternal([StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, params ReadOnlySpan<object?> args)
         {
-            AppendFormatInternal(null, format, args);
+            AppendFormatCore(null, format, args);
         }
 
         /// <summary>
@@ -126,13 +126,13 @@ namespace J2N.Text
         /// Update that documentation if the behavior changes.
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        [CodeGenerationExtensionImplementation]
+        [CodeGenerationExtensionImplementation] // J2N TODO: API - change format to ReadOnlySpan<char> before making public
         internal void AppendFormatInternal(IFormatProvider? provider, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, object? arg0)
         {
 #if FEATURE_INLINEARRAYATTRIBUTE
-            AppendFormatInternal(provider, format, MemoryMarshal.CreateReadOnlySpan(ref arg0, 1));
+            AppendFormatCore(provider, format, MemoryMarshal.CreateReadOnlySpan(ref arg0, 1));
 #else
-            AppendFormatInternal(provider, format, new ParamsArray(arg0));
+            AppendFormatCore(provider, format, new ParamsArray(arg0));
 #endif
         }
 
@@ -146,14 +146,14 @@ namespace J2N.Text
         /// Update that documentation if the behavior changes.
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        [CodeGenerationExtensionImplementation]
+        [CodeGenerationExtensionImplementation] // J2N TODO: API - change format to ReadOnlySpan<char> before making public
         internal void AppendFormatInternal(IFormatProvider? provider, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, object? arg0, object? arg1)
         {
 #if FEATURE_INLINEARRAYATTRIBUTE
             TwoObjects two = new TwoObjects(arg0, arg1);
-            AppendFormatInternal(provider, format, (ReadOnlySpan<object?>)two);
+            AppendFormatCore(provider, format, (ReadOnlySpan<object?>)two);
 #else
-            AppendFormatInternal(provider, format, new ParamsArray(arg0, arg1));
+            AppendFormatCore(provider, format, new ParamsArray(arg0, arg1));
 #endif
         }
 
@@ -167,14 +167,14 @@ namespace J2N.Text
         /// Update that documentation if the behavior changes.
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        [CodeGenerationExtensionImplementation]
+        [CodeGenerationExtensionImplementation] // J2N TODO: API - change format to ReadOnlySpan<char> before making public
         internal void AppendFormatInternal(IFormatProvider? provider, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, object? arg0, object? arg1, object? arg2)
         {
 #if FEATURE_INLINEARRAYATTRIBUTE
             ThreeObjects three = new ThreeObjects(arg0, arg1, arg2);
-            AppendFormatInternal(provider, format, (ReadOnlySpan<object?>)three);
+            AppendFormatCore(provider, format, (ReadOnlySpan<object?>)three);
 #else
-            AppendFormatInternal(provider, format, new ParamsArray(arg0, arg1, arg2));
+            AppendFormatCore(provider, format, new ParamsArray(arg0, arg1, arg2));
 #endif
         }
 
@@ -188,7 +188,7 @@ namespace J2N.Text
         /// Update that documentation if the behavior changes.
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        [CodeGenerationExtensionImplementation]
+        [CodeGenerationExtensionImplementation] // J2N TODO: API - change format to ReadOnlySpan<char> before making public
         internal void AppendFormatInternal(IFormatProvider? provider, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, params object?[] args)
         {
             if (args is null)
@@ -198,7 +198,7 @@ namespace J2N.Text
                 ThrowHelper.ThrowArgumentNullException(format is null ? ExceptionArgument.format : ExceptionArgument.args);
             }
 
-            AppendFormatInternal(provider, format, (ReadOnlySpan<object?>)args);
+            AppendFormatCore(provider, format, (ReadOnlySpan<object?>)args);
         }
 
         /// <summary>
@@ -210,8 +210,18 @@ namespace J2N.Text
         /// <see cref="MutableTextBufferExtensions.AppendFormat{TBuilder}(TBuilder, IFormatProvider?, string, ReadOnlySpan{object?})"/>.
         /// Update that documentation if the behavior changes.
         /// </remarks>
-        [CodeGenerationExtensionImplementation]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [CodeGenerationExtensionImplementation] // J2N TODO: API - change format to ReadOnlySpan<char> before making public
         internal void AppendFormatInternal(IFormatProvider? provider, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, params ReadOnlySpan<object?> args) // KEEP OVERLOADS FOR ReadOnlySpan<object?> and ParamsArray IN SYNC
+        {
+            AppendFormatCore(provider, format, args);
+        }
+
+        // J2N TODO: API - change format to ReadOnlySpan<char> before making public
+        // J2N TODO: Correct business logic to prefer Java-style formatters for numbers, dates, arrays, and collections
+        // and sync those updates with the other overload. We also need to support J2N's reference type numbers that derive from Number.
+        // J2N TODO: Investigate whether we can support Java's and/or ICU's MessageFormat syntax for the format parameter.
+        private void AppendFormatCore(IFormatProvider? provider, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, params ReadOnlySpan<object?> args) // KEEP OVERLOADS FOR ReadOnlySpan<object?> and ParamsArray IN SYNC
         {
             if (format is null)
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.format);
@@ -493,7 +503,8 @@ namespace J2N.Text
         }
 
 #if !FEATURE_INLINEARRAYATTRIBUTE
-        private void AppendFormat(IFormatProvider? provider, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, ParamsArray args) // KEEP OVERLOADS FOR ReadOnlySpan<object?> and ParamsArray IN SYNC
+        // J2N TODO: API - change format to ReadOnlySpan<char> before making public
+        private void AppendFormatCore(IFormatProvider? provider, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, ParamsArray args) // KEEP OVERLOADS FOR ReadOnlySpan<object?> and ParamsArray IN SYNC
         {
             if (format is null)
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.format);
@@ -784,7 +795,7 @@ namespace J2N.Text
             if (format is null)
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.format);
             format.ValidateNumberOfArgs(1);
-            AppendFormat(provider, format, arg0, 0, 0, default);
+            AppendFormatCore(provider, format, arg0, 0, 0, default);
         }
 
         [CodeGenerationExtensionImplementation]
@@ -793,7 +804,7 @@ namespace J2N.Text
             if (format is null)
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.format);
             format.ValidateNumberOfArgs(2);
-            AppendFormat(provider, format, arg0, arg1, 0, default);
+            AppendFormatCore(provider, format, arg0, arg1, 0, default);
         }
 
         [CodeGenerationExtensionImplementation]
@@ -802,7 +813,7 @@ namespace J2N.Text
             if (format is null)
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.format);
             format.ValidateNumberOfArgs(3);
-            AppendFormat(provider, format, arg0, arg1, arg2, default);
+            AppendFormatCore(provider, format, arg0, arg1, arg2, default);
         }
 
         [CodeGenerationExtensionImplementation]
@@ -812,7 +823,7 @@ namespace J2N.Text
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.format);
             if (args is null)
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.args);
-            AppendFormat(provider, format, (ReadOnlySpan<object?>)args);
+            AppendFormatCore(provider, format, (ReadOnlySpan<object?>)args);
         }
 
         [CodeGenerationExtensionImplementation]
@@ -824,14 +835,14 @@ namespace J2N.Text
             format.ValidateNumberOfArgs(args.Length);
             args.Length switch
             {
-                0 => AppendFormat(provider, format, 0, 0, 0, args),
-                1 => AppendFormat(provider, format, args[0], 0, 0, args),
-                2 => AppendFormat(provider, format, args[0], args[1], 0, args),
-                _ => AppendFormat(provider, format, args[0], args[1], args[2], args),
+                0 => AppendFormatCore(provider, format, 0, 0, 0, args),
+                1 => AppendFormatCore(provider, format, args[0], 0, 0, args),
+                2 => AppendFormatCore(provider, format, args[0], args[1], 0, args),
+                _ => AppendFormatCore(provider, format, args[0], args[1], args[2], args),
             };
         }
 
-        private void AppendFormat<TArg0, TArg1, TArg2>(IFormatProvider? provider, CompositeFormat format, TArg0 arg0, TArg1 arg1, TArg2 arg2, ReadOnlySpan<object?> args)
+        private void AppendFormatCore<TArg0, TArg1, TArg2>(IFormatProvider? provider, CompositeFormat format, TArg0 arg0, TArg1 arg1, TArg2 arg2, ReadOnlySpan<object?> args)
         {
             // Create the interpolated string handler.
             var handler = new AppendInterpolatedStringHandler(format._literalLength, format._formattedCount, this, provider);
