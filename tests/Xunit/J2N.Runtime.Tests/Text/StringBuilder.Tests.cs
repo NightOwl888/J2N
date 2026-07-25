@@ -157,6 +157,14 @@ namespace J2N.Text.Tests
             return sb;
         }
 
+        private static CultureInfo CreateCustomNegativeSignCulture(string negativeSign)
+        {
+            var culture = (CultureInfo)CultureInfo.InvariantCulture.Clone();
+            culture.NumberFormat = (NumberFormatInfo)culture.NumberFormat.Clone();
+            culture.NumberFormat.NegativeSign = negativeSign;
+            return culture;
+        }
+
         #endregion MutableTextBuffer Helper Methods
 
         #region Constructor Tests
@@ -921,19 +929,19 @@ namespace J2N.Text.Tests
         [Fact]
         public void Append_Int_UsesAmbientCulture_WhenInvariantDefaultsDisabled()
         {
-            using var ambientCulture = new ThreadCultureChange("ar-IQ");
+            using var ambientCulture = new ThreadCultureChange(CreateCustomNegativeSignCulture("##"));
             var sb = MutableTextBufferFactory("foo", new MutableTextBufferTestOptions { UseInvariantDefaults = false });
             sb.Append(-1);
-            Assert.Equal("foo\u061C\u002D1", sb.ToString());
+            Assert.Equal("foo##1", sb.ToString());
         }
 
         [Fact]
         public void Append_Int_UsesInvariantCulture_WhenInvariantDefaultsEnabled()
         {
-            using var ambientCulture = new ThreadCultureChange("ar-IQ");
+            using var ambientCulture = new ThreadCultureChange(CreateCustomNegativeSignCulture("##"));
             var sb = MutableTextBufferFactory("foo", new MutableTextBufferTestOptions { UseInvariantDefaults = true });
             sb.Append(-1);
-            Assert.Equal("foo\u002D1", sb.ToString());
+            Assert.Equal("foo-1", sb.ToString());
         }
 
         [Fact]
@@ -941,8 +949,8 @@ namespace J2N.Text.Tests
         {
             using var ambientCulture = new ThreadCultureChange("en-US");
             var sb = MutableTextBufferFactory("foo", new MutableTextBufferTestOptions { UseInvariantDefaults = true });
-            sb.Append(-1, provider: new CultureInfo("ar-IQ"));
-            Assert.Equal("foo\u061C\u002D1", sb.ToString());
+            sb.Append(-1, provider: CreateCustomNegativeSignCulture("##"));
+            Assert.Equal("foo##1", sb.ToString());
         }
 
         [Fact]
@@ -950,8 +958,8 @@ namespace J2N.Text.Tests
         {
             using var ambientCulture = new ThreadCultureChange("en-US");
             var sb = MutableTextBufferFactory("foo", new MutableTextBufferTestOptions { UseInvariantDefaults = false });
-            sb.Append(-1, provider: new CultureInfo("ar-IQ"));
-            Assert.Equal("foo\u061C\u002D1", sb.ToString());
+            sb.Append(-1, provider: CreateCustomNegativeSignCulture("##"));
+            Assert.Equal("foo##1", sb.ToString());
         }
 
         [Theory]
@@ -2889,19 +2897,19 @@ namespace J2N.Text.Tests
         [Fact]
         public void Insert_Int_UsesAmbientCulture_WhenInvariantDefaultsDisabled()
         {
-            using var ambientCulture = new ThreadCultureChange("ar-IQ");
+            using var ambientCulture = new ThreadCultureChange(CreateCustomNegativeSignCulture("##"));
             var sb = MutableTextBufferFactory("foo", new MutableTextBufferTestOptions { UseInvariantDefaults = false });
             sb.Insert(0, -1);
-            Assert.Equal("\u061C\u002D1foo", sb.ToString());
+            Assert.Equal("##1foo", sb.ToString());
         }
 
         [Fact]
         public void Insert_Int_UsesInvariantCulture_WhenInvariantDefaultsEnabled()
         {
-            using var ambientCulture = new ThreadCultureChange("ar-IQ");
+            using var ambientCulture = new ThreadCultureChange(CreateCustomNegativeSignCulture("##"));
             var sb = MutableTextBufferFactory("foo", new MutableTextBufferTestOptions { UseInvariantDefaults = true });
             sb.Insert(0, -1);
-            Assert.Equal("\u002D1foo", sb.ToString());
+            Assert.Equal("-1foo", sb.ToString());
         }
 
         [Fact]
@@ -2909,8 +2917,8 @@ namespace J2N.Text.Tests
         {
             using var ambientCulture = new ThreadCultureChange("en-US");
             var sb = MutableTextBufferFactory("foo", new MutableTextBufferTestOptions { UseInvariantDefaults = true });
-            sb.Insert(0, -1, provider: new CultureInfo("ar-IQ"));
-            Assert.Equal("\u061C\u002D1foo", sb.ToString());
+            sb.Insert(0, -1, provider: CreateCustomNegativeSignCulture("##"));
+            Assert.Equal("##1foo", sb.ToString());
         }
 
         [Fact]
@@ -2918,8 +2926,8 @@ namespace J2N.Text.Tests
         {
             using var ambientCulture = new ThreadCultureChange("en-US");
             var sb = MutableTextBufferFactory("foo", new MutableTextBufferTestOptions { UseInvariantDefaults = false });
-            sb.Insert(0, -1, provider: new CultureInfo("ar-IQ"));
-            Assert.Equal("\u061C\u002D1foo", sb.ToString());
+            sb.Insert(0, -1, provider: CreateCustomNegativeSignCulture("##"));
+            Assert.Equal("##1foo", sb.ToString());
         }
 
         [Theory]
