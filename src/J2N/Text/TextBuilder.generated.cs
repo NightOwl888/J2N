@@ -11,22 +11,22 @@
 //------------------------------------------------------------------------------
 #nullable enable
 
+using J2N.Buffers;
 using J2N.CodeGeneration;
+using J2N.Collections;
+using J2N.Collections.Generic;
 using J2N.Numerics;
+using J2N.Numerics.Formatters;
 using System;
+using System.Buffers;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using System.Collections.Generic;
-using System.Globalization;
-using J2N.Buffers;
-using J2N.Collections;
-using System.Buffers;
 using System.Text;
-using System.ComponentModel;
-using J2N.Numerics.Formatters;
-using J2N.Collections.Generic;
 
 namespace J2N.Text
 {

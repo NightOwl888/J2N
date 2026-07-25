@@ -14,10 +14,10 @@
 #pragma warning disable CS3019 // CLS compliance checking will not be performed because it is not visible from outside this assembly
 using J2N.CodeGeneration;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Runtime.CompilerServices;
-using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Text;
 

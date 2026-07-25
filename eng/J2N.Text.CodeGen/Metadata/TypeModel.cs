@@ -2,7 +2,7 @@
 {
     public sealed class TypeModel
     {
-        public List<string> Usings { get; set; } = [];
+        public SortedSet<string> Usings { get; set; } = new(StringComparer.Ordinal);
 
         public string Namespace { get; set; } = "";
         public string Name { get; set; } = "";
