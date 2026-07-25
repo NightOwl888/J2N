@@ -4791,6 +4791,29 @@ namespace J2N.Text.Tests
         }
 
         [Fact]
+        public void GetSpan_ClearExposedBuffers_ReturnsClearedBuffer()
+        {
+            var builder = MutableTextBufferFactory("abcdefghijklmnopqrstuvwxyz", new MutableTextBufferTestOptions { ClearExposedBuffers = true });
+            builder.Length = 20;
+            Span<char> span = builder.GetSpan(5);
+            Assert.True(span.Length >= 5);
+            for (int i = 0; i < span.Length; i++)
+            {
+                Assert.Equal('\0', span[i]);
+            }
+        }
+
+        [Fact]
+        public void GetSpan_DontClearExposedBuffers_ReturnsUnclearedBuffer()
+        {
+            var builder = MutableTextBufferFactory("abcdefghijklmnopqrstuvwxyz", new MutableTextBufferTestOptions { ClearExposedBuffers = false });
+            builder.Length = 20;
+            Span<char> span = builder.GetSpan(5);
+            Assert.True(span.Length >= 5);
+            Assert.True(span.StartsWith("uvwxy"));
+        }
+
+        [Fact]
         public void GetMemory_SizeHintZero_ReturnsNonEmptySpan()
         {
             var builder = MutableTextBufferFactory();
@@ -4798,6 +4821,30 @@ namespace J2N.Text.Tests
             Memory<char> memory = builder.GetMemory();
 
             Assert.False(memory.IsEmpty);
+        }
+
+        [Fact]
+        public void GetMemory_ClearExposedBuffers_ReturnsClearedBuffer()
+        {
+            var builder = MutableTextBufferFactory("abcdefghijklmnopqrstuvwxyz", new MutableTextBufferTestOptions { ClearExposedBuffers = true });
+            builder.Length = 20;
+            Memory<char> memory = builder.GetMemory(5);
+            Assert.True(memory.Length >= 5);
+            Span<char> span = memory.Span;
+            for (int i = 0; i < memory.Length; i++)
+            {
+                Assert.Equal('\0', span[i]);
+            }
+        }
+
+        [Fact]
+        public void GetMemory_DontClearExposedBuffers_ReturnsUnclearedBuffer()
+        {
+            var builder = MutableTextBufferFactory("abcdefghijklmnopqrstuvwxyz", new MutableTextBufferTestOptions { ClearExposedBuffers = false });
+            builder.Length = 20;
+            Memory<char> memory = builder.GetMemory(5);
+            Assert.True(memory.Length >= 5);
+            Assert.True(memory.Span.StartsWith("uvwxy"));
         }
 
         [Fact]
