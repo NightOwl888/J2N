@@ -48,7 +48,8 @@ namespace J2N.Text
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(sizeHint, ExceptionArgument.sizeHint);
             }
 
-            if (sizeHint == 0)
+            // Return a minimum of DefaultCapacity.
+            if (sizeHint < DefaultCapacity)
             {
                 sizeHint = DefaultCapacity;
             }
@@ -59,9 +60,11 @@ namespace J2N.Text
 
             if (!clearExposedBuffers)
             {
+                // Return the whole remaining buffer, uncleared
                 return m_Chars.AsSpan(position);
             }
 
+            // Return the larger of DefaultCapacity or sizeHint, cleared
             return GetClearedWritableSpan(position, sizeHint);
         }
 
@@ -104,7 +107,8 @@ namespace J2N.Text
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(sizeHint, ExceptionArgument.sizeHint);
             }
 
-            if (sizeHint == 0)
+            // Return a minimum of DefaultCapacity.
+            if (sizeHint < DefaultCapacity)
             {
                 sizeHint = DefaultCapacity;
             }
@@ -115,9 +119,11 @@ namespace J2N.Text
 
             if (!clearExposedBuffers)
             {
+                // Return the whole remaining buffer, uncleared
                 return m_Chars.AsMemory(position);
             }
 
+            // Return the larger of DefaultCapacity or sizeHint, cleared
             m_Chars.AsSpan(position, sizeHint).Clear();
             return m_Chars.AsMemory(position, sizeHint);
         }
