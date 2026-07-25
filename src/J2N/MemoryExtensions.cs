@@ -322,7 +322,7 @@ namespace J2N
         /// <param name="text">This <see cref="Span{T}"/>.</param>
         /// <param name="oldChar">The Unicode character to be replaced.</param>
         /// <param name="newChar">The Unicode character to replace all occurrences of <paramref name="oldChar"/>.</param>
-        internal static void Replace(this Span<char> text, char oldChar, char newChar) // J2N TODO: Should we make a generic overload to patch System.MemoryExtensions publicly?
+        internal static void Replace(this Span<char> text, char oldChar, char newChar)
         {
 #if FEATURE_MEMORYEXTENSIONS_REPLACE_T_T
             System.MemoryExtensions.Replace(text, oldChar, newChar);
