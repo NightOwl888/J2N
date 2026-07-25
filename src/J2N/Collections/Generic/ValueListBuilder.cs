@@ -1,15 +1,13 @@
-﻿// Source: https://github.com/dotnet/runtime/blob/v9.0.1/src/libraries/System.Private.CoreLib/src/System/Collections/Generic/ValueListBuilder.cs
+﻿// Source: https://github.com/dotnet/runtime/blob/v11.0.0-preview.6.26359.118/src/libraries/Common/src/System/Collections/Generic/ValueListBuilder.cs
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+using J2N.Buffers;
+using J2N.Runtime.CompilerServices;
 using System;
 using System.Buffers;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace J2N.Collections.Generic
 {
@@ -19,12 +17,17 @@ namespace J2N.Collections.Generic
         private T[]? _arrayFromPool;
         private int _pos;
 
-        public ValueListBuilder(Span<T> initialSpan)
+        public ValueListBuilder(Span<T?> scratchBuffer)
         {
-            _span = initialSpan;
-            _arrayFromPool = null;
-            _pos = 0;
+            _span = scratchBuffer!;
         }
+
+        public ValueListBuilder(int capacity)
+        {
+            Grow(capacity);
+        }
+
+        public int Capacity => _span.Length; // J2N: Required for testing, but added for convenience
 
         public int Length
         {
@@ -85,7 +88,7 @@ namespace J2N.Collections.Generic
         {
             if ((uint)(_pos + source.Length) > (uint)_span.Length)
             {
-                Grow(_span.Length - _pos + source.Length);
+                Grow(source.Length);
             }
 
             source.CopyTo(_span.Slice(_pos));
@@ -113,7 +116,7 @@ namespace J2N.Collections.Generic
 
             int pos = _pos;
             Span<T> span = _span;
-            if ((ulong)(uint)pos + (ulong)(uint)length <= (ulong)(uint)span.Length) // same guard condition as in Span<T>.Slice on 64-bit
+            if ((uint)(pos + length) <= (uint)span.Length)
             {
                 _pos = pos + length;
                 return span.Slice(pos, length);
@@ -128,7 +131,7 @@ namespace J2N.Collections.Generic
         private Span<T> AppendSpanWithGrow(int length)
         {
             int pos = _pos;
-            Grow(_span.Length - pos + length);
+            Grow(length);
             _pos += length;
             return _span.Slice(pos, length);
         }
@@ -164,26 +167,47 @@ namespace J2N.Collections.Generic
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Dispose()
         {
+            int pos = _pos;
             T[]? toReturn = _arrayFromPool;
+
+            this = default;
+
             if (toReturn != null)
             {
-                _arrayFromPool = null;
-                ArrayPool<T>.Shared.Return(toReturn);
+                if (RuntimeHelper.IsReferenceOrContainsReferences<T>())
+                {
+                    ArrayPool<T>.Shared.Return(toReturn, pos);
+                }
+                else
+                {
+                    ArrayPool<T>.Shared.Return(toReturn);
+                }
             }
         }
 
-        // Note that consuming implementations depend on the list only growing if it's absolutely
-        // required.  If the list is already large enough to hold the additional items be added,
-        // it must not grow. The list is used in a number of places where the reference is checked
-        // and it's expected to match the initial reference provided to the constructor if that
-        // span was sufficiently large.
-        private void Grow(int additionalCapacityRequired = 1)
+        /// <summary>
+        /// Resize the internal buffer either by doubling current buffer size or
+        /// by adding <paramref name="additionalCapacityBeyondPos"/> to
+        /// <see cref="_pos"/> whichever is greater.
+        /// </summary>
+        /// <param name="additionalCapacityBeyondPos">
+        /// Number of chars requested beyond current position.
+        /// </param>
+        /// <remarks>
+        /// Note that consuming implementations depend on the list only growing if it's absolutely
+        /// required.  If the list is already large enough to hold the additional items be added,
+        /// it must not grow. The list is used in a number of places where the reference is checked
+        /// and it's expected to match the initial reference provided to the constructor if that
+        /// span was sufficiently large.
+        /// </remarks>
+        private void Grow(int additionalCapacityBeyondPos)
         {
-            const int ArrayMaxLength = 0x7FFFFFC7; // same as Array.MaxLength
+            Debug.Assert(additionalCapacityBeyondPos > 0);
+            Debug.Assert(_pos > _span.Length - additionalCapacityBeyondPos, "Grow called incorrectly, no resize is needed.");
 
             // Double the size of the span.  If it's currently empty, default to size 4,
             // although it'll be increased in Rent to the pool's minimum bucket size.
-            int nextCapacity = Math.Max(_span.Length != 0 ? _span.Length * 2 : 4, _span.Length + additionalCapacityRequired);
+            int nextCapacity = Math.Max(_span.Length != 0 ? _span.Length * 2 : 4, _pos + additionalCapacityBeyondPos);
 
             // If the computed doubled capacity exceeds the possible length of an array, then we
             // want to downgrade to either the maximum array length if that's large enough to hold
@@ -191,9 +215,9 @@ namespace J2N.Collections.Generic
             // which case it'll result in an OOM when calling Rent below.  In the exceedingly rare
             // case where _span.Length is already int.MaxValue (in which case it couldn't be a managed
             // array), just use that same value again and let it OOM in Rent as well.
-            if ((uint)nextCapacity > ArrayMaxLength)
+            if ((uint)nextCapacity > Arrays.MaxArrayLength)
             {
-                nextCapacity = Math.Max(Math.Max(_span.Length + 1, ArrayMaxLength), _span.Length);
+                nextCapacity = Math.Max(Math.Max(_span.Length + 1, Arrays.MaxArrayLength), _span.Length);
             }
 
             T[] array = ArrayPool<T>.Shared.Rent(nextCapacity);
@@ -203,7 +227,14 @@ namespace J2N.Collections.Generic
             _span = _arrayFromPool = array;
             if (toReturn != null)
             {
-                ArrayPool<T>.Shared.Return(toReturn);
+                if (RuntimeHelper.IsReferenceOrContainsReferences<T>())
+                {
+                    ArrayPool<T>.Shared.Return(toReturn, _pos);
+                }
+                else
+                {
+                    ArrayPool<T>.Shared.Return(toReturn);
+                }
             }
         }
     }
