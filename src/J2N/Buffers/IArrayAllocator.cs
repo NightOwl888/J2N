@@ -16,6 +16,8 @@
  */
 #endregion
 
+using System;
+
 namespace J2N.Buffers
 {
     /// <summary>
@@ -35,6 +37,24 @@ namespace J2N.Buffers
         /// </summary>
         /// <param name="minimumLength">The minimum length of the array.</param>
         /// <returns>An array of type <typeparamref name="T"/> that is at least <paramref name="minimumLength"/> in length.</returns>
+        /// <exception cref="OutOfMemoryException">The allocator cannot provide an array whose length is at least
+        /// <paramref name="minimumLength"/>.</exception>
+        /// /// <remarks>
+        /// Implementations must either:
+        /// <list type="bullet">
+        ///     <item>
+        ///         <description>
+        ///             Return an array whose length is at least <paramref name="minimumLength"/>.
+        ///         </description>
+        ///     </item>
+        ///     <item>
+        ///         <description>
+        ///             Throw an exception if such an array cannot be provided.
+        ///         </description>
+        ///     </item>
+        /// </list>
+        /// Returning an array whose length is less than <paramref name="minimumLength"/> violates the contract.
+        /// </remarks>
         T[] Allocate(int minimumLength);
 
         /// <summary>
