@@ -105,43 +105,48 @@ namespace J2N.Text
                 return;
             }
 
-            int pos = m_Position;
-            // Ensure we don't append more chars than we can hold, and we don't
-            // have any integer overflow in our new length.
-            long appendingChars = (long)count * repeatCount;
-            if (pos > m_Chars.Length - appendingChars)
+            AppendCodePointSlow(codePoint, repeatCount);
+
+            void AppendCodePointSlow(int codePoint, int repeatCount)
             {
-                // Check if the count will put us over m_MaxCapacity.
-                // Doing the check here prevents corruption of the StringBuilder.
-                long newLength = pos + appendingChars;
-                if (newLength > m_MaxCapacity || newLength < appendingChars)
+                int pos = m_Position;
+                // Ensure we don't append more chars than we can hold, and we don't
+                // have any integer overflow in our new length.
+                long appendingChars = (long)count * repeatCount;
+                if (pos > m_Chars.Length - appendingChars)
                 {
-                    ThrowHelper.ThrowArgumentOutOfRangeException(repeatCount, ExceptionArgument.repeatCount, ExceptionResource.ArgumentOutOfRange_LengthGreaterThanCapacity);
+                    // Check if the count will put us over m_MaxCapacity.
+                    // Doing the check here prevents corruption of the StringBuilder.
+                    long newLength = pos + appendingChars;
+                    if (newLength > m_MaxCapacity || newLength < appendingChars)
+                    {
+                        ThrowHelper.ThrowArgumentOutOfRangeException(repeatCount, ExceptionArgument.repeatCount, ExceptionResource.ArgumentOutOfRange_LengthGreaterThanCapacity);
+                    }
+
+                    Grow((int)appendingChars);
                 }
 
-                Grow((int)appendingChars);
+                int destinationLength = (int)appendingChars;
+                Span<char> destination =
+                    m_Chars.AsSpan(pos, destinationLength);
+                int copied = 0;
+
+                destination[copied++] = high;
+                destination[copied++] = low;
+
+                while (copied < destinationLength)
+                {
+                    int remaining = destinationLength - copied;
+                    int copyLength = copied < remaining ? copied : remaining;
+
+                    destination.Slice(0, copyLength)
+                        .CopyTo(destination.Slice(copied));
+
+                    copied += copyLength;
+                }
+
+                m_Position += destinationLength;
             }
-
-            int destinationLength = (int)appendingChars;
-            Span<char> destination =
-                m_Chars.AsSpan(pos, destinationLength);
-            int copied = 0;
-
-            destination[copied++] = high;
-            destination[copied++] = low;
-
-            while (copied < destinationLength)
-            {
-                int remaining = destinationLength - copied;
-                int copyLength = copied < remaining ? copied : remaining;
-
-                destination.Slice(0, copyLength)
-                    .CopyTo(destination.Slice(copied));
-
-                copied += copyLength;
-            }
-
-            m_Position += destinationLength;
         }
 
         #endregion
