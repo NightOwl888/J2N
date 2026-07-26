@@ -28,9 +28,15 @@ namespace J2N.Text
         #region AsCharSequence
 
         /// <summary>
-        /// Convenience method to wrap a string in a <see cref="MutableTextBufferCharSequence"/>
+        /// Convenience method to wrap a string in an adapter
         /// so a <see cref="TextBuilder"/> can be used as <see cref="ICharSequence"/>.
         /// </summary>
+        /// <remarks>
+        /// This API is being provided for compatibility. It is recommended to use
+        /// <see cref="AsSpan(TextBuilder?)"/> or <see cref="AsMemory(TextBuilder?)"/>
+        /// as alternatives for new development even though it may be quicker to port
+        /// from Java using <see cref="ICharSequence"/>.
+        /// </remarks>
         public static ICharSequence AsCharSequence(this TextBuilder? text)
         {
             return new MutableTextBufferCharSequence(text?.buffer);
