@@ -7,18 +7,23 @@ namespace J2N.Text
     // TextBuilderChunkEnumerator supports both the IEnumerable and IEnumerator pattern so foreach
     // works (see GetChunks).  It needs to be public (so the compiler can use it
     // when building a foreach statement) but users typically don't use it explicitly.
-    // (which is why it is a nested type).
+    // This class was nested inside StringBuilder in the BCL, but we have moved it to the top
+    // level so the same type can be shared across TextBuilder implementations.
 
     /// <summary>
-    /// Supports simple iteration over the chunks of an <see cref="MutableTextBuffer"/> instance.
+    /// Supports simple iteration over the chunks of an <see cref="TextBuilder"/> instance.
     /// </summary>
     /// <remarks>
-    /// A <see cref="TextBuilderChunkEnumerator"/> is returned by the <see cref="TextBuilderExtensions.GetChunks(TextBuilder?)"/> method. It supports both the
-    /// <see cref="System.Collections.IEnumerable"/> and <see cref="System.Collections.IEnumerator"/> patterns so
-    /// that the chunks can be enumerated with foreach in C# or For Each in Visual Basic.
+    /// A <see cref="TextBuilderChunkEnumerator"/> is returned by the <see cref="TextBuilderExtensions.GetChunks(TextBuilder?)"/>
+    /// method. It supports both the <see cref="System.Collections.IEnumerable"/> and <see cref="System.Collections.IEnumerator"/>
+    /// patterns so that the chunks can be enumerated with foreach in C# or For Each in Visual Basic.
     /// <para/>
     /// <see cref="TextBuilderChunkEnumerator"/> is a public structure so that language compilers can use it to build a
-    /// foreach statement. However, developers typically don't use it explicitly (which is why it is a nested type).
+    /// foreach statement. However, developers typically don't use it explicitly.
+    /// <para/>
+    /// This implementation only supports a single chunk. It is being provided for API compatibility with .NET only. It
+    /// is generally more practical to access the underlying memory through <see cref="TextBuilderExtensions.AsSpan(TextBuilder?)"/>
+    /// or one of its overloads.
     /// </remarks>
     public struct TextBuilderChunkEnumerator
     {
