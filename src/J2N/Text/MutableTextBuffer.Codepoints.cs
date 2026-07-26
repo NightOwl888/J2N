@@ -73,26 +73,29 @@ namespace J2N.Text
         /// Update that documentation if the behavior changes.
         /// </remarks>
         [CodeGenerationExtensionImplementation]
-        internal void InsertCodePointInternal(int index, int codePoint)
+        internal void InsertCodePointInternal(int index, int codePoint) // Coverage for the JDK
         {
+            uint value = (uint)codePoint;
+            if (!UnicodeUtility.IsValidCodePoint(value))
+                ThrowHelper.ThrowArgumentOutOfRange_InvalidCodePoint(codePoint);
             if ((uint)index > Length)
                 ThrowHelper.ThrowArgumentOutOfRange_ArgumentOutOfRange_IndexString(index, ExceptionArgument.index);
 
-            int count = Character.ToChars(codePoint, out char high, out char low);
-
-            // Check if the count will put us over m_MaxCapacity.
-            // Doing the check here prevents corruption of the StringBuilder.
-            int newLength = m_Position + count;
-            if (newLength > m_MaxCapacity || newLength < count)
-            {
-                ThrowHelper.ThrowArgumentOutOfRangeException(count, ExceptionArgument.codePoint, ExceptionResource.ArgumentOutOfRange_LengthGreaterThanCapacity);
-            }
+            int count = UnicodeUtility.IsBmpCodePoint(value) ? 1 : 2;
 
             MakeRoom(index, count);
 
-            m_Chars[index] = high;
-            if (count == 2)
-                m_Chars[index + 1] = low;
+            if (count == 1)
+            {
+                m_Chars[index] = (char)value;
+            }
+            else
+            {
+                UnicodeUtility.GetUtf16SurrogatesFromSupplementaryPlaneScalar(
+                    value,
+                    out m_Chars[index],
+                    out m_Chars[index + 1]);
+            }
         }
 
         /// <summary>
