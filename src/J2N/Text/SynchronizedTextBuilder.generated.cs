@@ -585,46 +585,40 @@ namespace J2N.Text
         }
 
         /// <summary>Returns a value indicating whether this instance is equal to a specified object.</summary>
-        /// <param name="sb">An object to compare with this instance, or <see langword="null"/>.</param>
+        /// <param name="other">An object to compare with this instance, or <see langword="null"/>.</param>
         /// <returns>
-        /// <see langword="true"/> if the characters in this instance and <paramref name="sb"/> are the same;
+        /// <see langword="true"/> if the characters in this instance and <paramref name="other"/> are the same;
         /// otherwise, <see langword="false"/>.
         /// </returns>
         /// <remarks>
-        /// The current instance and <paramref name="sb"/> are equal if the strings assigned to both
-        /// <see cref="SynchronizedTextBuilder"/> objects are the same. To determine equality, the
-        /// <see cref="Equals(SynchronizedTextBuilder)"/> method uses ordinal comparison.
+        /// The <see cref="Equals(SynchronizedTextBuilder?)"/> method performs an ordinal comparison to determine
+        /// whether the characters in the current instance and <paramref name="other"/> are equal.
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool Equals([NotNullWhen(true)] SynchronizedTextBuilder? sb)
+        public bool Equals([NotNullWhen(true)] SynchronizedTextBuilder? other)
         {
             lock (syncRoot)
             {
-                return buffer.Equals(sb?.buffer);
+                return buffer.Equals(other?.buffer);
             }
         }
 
         /// <summary>Returns a value indicating whether this instance is equal to a specified object.</summary>
-        /// <param name="sb">An object to compare with this instance, or <see langword="null"/>.</param>
+        /// <param name="other">An object to compare with this instance, or <see langword="null"/>.</param>
         /// <returns>
-        /// <see langword="true"/> if the characters in this instance and <paramref name="sb"/> are the same;
+        /// <see langword="true"/> if the characters in this instance and <paramref name="other"/> are the same;
         /// otherwise, <see langword="false"/>.
         /// </returns>
         /// <remarks>
-        /// The current instance and <paramref name="sb"/> are equal if the strings assigned to both
-        /// objects are the same. To determine equality, the <see cref="Equals(SynchronizedTextBuilder)"/>
-        /// method uses ordinal comparison.
-        /// </remarks>
-        /// <remarks>
-        /// The <see cref="Equals(StringBuilder)"/> method performs an ordinal comparison to determine
-        /// whether the characters in the current instance and span are equal.
+        /// The <see cref="Equals(StringBuilder?)"/> method performs an ordinal comparison to determine
+        /// whether the characters in the current instance and <paramref name="other"/> are equal.
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool Equals([NotNullWhen(true)] StringBuilder? sb)
+        public bool Equals([NotNullWhen(true)] StringBuilder? other)
         {
             lock (syncRoot)
             {
-                return buffer.Equals(sb);
+                return buffer.Equals(other);
             }
         }
 
@@ -632,21 +626,21 @@ namespace J2N.Text
         /// Returns a value indicating whether the characters in this instance are equal to the
         /// characters in a specified read-only character span.
         /// </summary>
-        /// <param name="span">The character span to compare with the current instance.</param>
+        /// <param name="other">The character span to compare with the current instance.</param>
         /// <returns>
-        /// <see langword="true"/> if the characters in this instance and <paramref name="span"/> are the same;
+        /// <see langword="true"/> if the characters in this instance and <paramref name="other"/> are the same;
         /// otherwise, <see langword="false"/>.
         /// </returns>
         /// <remarks>
-        /// The <see cref="Equals(SynchronizedTextBuilder)"/> method performs an ordinal comparison to determine
-        /// whether the characters in the current instance and span are equal.
+        /// The <see cref="Equals(ReadOnlySpan{char})"/> method performs an ordinal comparison to determine
+        /// whether the characters in the current instance and <paramref name="other"/> are equal.
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool Equals(ReadOnlySpan<char> span)
+        public bool Equals(ReadOnlySpan<char> other)
         {
             lock (syncRoot)
             {
-                return buffer.Equals(span);
+                return buffer.Equals(other);
             }
         }
 

@@ -827,66 +827,60 @@ namespace J2N.Text
         /// <summary>
         /// Returns a value indicating whether this instance is equal to a specified object.
         /// </summary>
-        /// <param name="sb">An object to compare with this instance, or <see langword="null"/>.</param>
-        /// <returns><see langword="true"/> if the characters in this instance and <paramref name="sb"/> are the same;
+        /// <param name="other">An object to compare with this instance, or <see langword="null"/>.</param>
+        /// <returns><see langword="true"/> if the characters in this instance and <paramref name="other"/> are the same;
         /// otherwise, <see langword="false"/>.</returns>
         /// <remarks>
-        /// The current instance and <paramref name="sb"/> are equal if the strings assigned to both
-        /// <see cref="MutableTextBuffer"/> objects are the same. To determine equality, the
-        /// <see cref="Equals(MutableTextBuffer)"/> method uses ordinal comparison.
+        /// The <see cref="Equals(MutableTextBuffer?)"/> method performs an ordinal comparison to determine
+        /// whether the characters in the current instance and <paramref name="other"/> are equal.
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool Equals([NotNullWhen(true)] MutableTextBuffer? sb)
+        public bool Equals([NotNullWhen(true)] MutableTextBuffer? other)
         {
-            if (sb == null)
+            if (other == null)
             {
                 return false;
             }
-            if (Length != sb.Length)
+            if (Length != other.Length)
             {
                 return false;
             }
-            if (sb == this)
+            if (other == this)
             {
                 return true;
             }
-            return new ReadOnlySpan<char>(m_Chars, 0, m_Position).SequenceEqual(new ReadOnlySpan<char>(sb.m_Chars, 0, sb.m_Position));
+            return new ReadOnlySpan<char>(m_Chars, 0, m_Position).SequenceEqual(new ReadOnlySpan<char>(other.m_Chars, 0, other.m_Position));
         }
 
         /// <summary>
         /// Returns a value indicating whether this instance is equal to a specified object.
         /// </summary>
-        /// <param name="sb">An object to compare with this instance, or <see langword="null"/>.</param>
-        /// <returns><see langword="true"/> if the characters in this instance and <paramref name="sb"/> are the same;
+        /// <param name="other">An object to compare with this instance, or <see langword="null"/>.</param>
+        /// <returns><see langword="true"/> if the characters in this instance and <paramref name="other"/> are the same;
         /// otherwise, <see langword="false"/>.</returns>
         /// <remarks>
-        /// The current instance and <paramref name="sb"/> are equal if the strings assigned to both
-        /// objects are the same. To determine equality, the <see cref="Equals(MutableTextBuffer)"/>
-        /// method uses ordinal comparison.
+        /// The <see cref="Equals(StringBuilder?)"/> method performs an ordinal comparison to determine
+        /// whether the characters in the current instance and <paramref name="other"/> are equal.
         /// </remarks>
-        /// <remarks>
-        /// The <see cref="Equals(StringBuilder)"/> method performs an ordinal comparison to determine
-        /// whether the characters in the current instance and span are equal.
-        /// </remarks>
-        public bool Equals([NotNullWhen(true)] StringBuilder? sb)
+        public bool Equals([NotNullWhen(true)] StringBuilder? other)
         {
-            if (sb == null)
+            if (other == null)
             {
                 return false;
             }
-            if (Length != sb.Length)
+            if (Length != other.Length)
             {
                 return false;
             }
 #if FEATURE_STRINGBUILDER_GETCHUNKS
             int offset = 0;
-            foreach (ReadOnlyMemory<char> chunk in sb.GetChunks())
+            foreach (ReadOnlyMemory<char> otherChunk in other.GetChunks())
             {
-                ReadOnlySpan<char> thisChunk = new ReadOnlySpan<char>(m_Chars, offset, chunk.Length);
-                if (!chunk.Span.SequenceEqual(thisChunk))
+                ReadOnlySpan<char> thisChunk = new ReadOnlySpan<char>(m_Chars, offset, otherChunk.Length);
+                if (!otherChunk.Span.SequenceEqual(thisChunk))
                     return false;
 
-                offset += chunk.Length;
+                offset += otherChunk.Length;
             }
             Debug.Assert(offset == Length);
             return true;
@@ -899,10 +893,10 @@ namespace J2N.Text
                 Span<char> textChars = length > CharStackBufferSize
                     ? (arrayToReturnToPool = ArrayPool<char>.Shared.Rent(length))
                     : stackalloc char[length];
-                sb.CopyTo(0, textChars, length);
+                other.CopyTo(0, textChars, length);
 #else
                 Span<char> textChars = arrayToReturnToPool = ArrayPool<char>.Shared.Rent(length);
-                sb.CopyTo(0, arrayToReturnToPool, 0, length);
+                other.CopyTo(0, arrayToReturnToPool, 0, length);
 #endif
                 return new ReadOnlySpan<char>(m_Chars, 0, m_Position).SequenceEqual(textChars.Slice(0, length));
             }
@@ -917,22 +911,22 @@ namespace J2N.Text
         /// Returns a value indicating whether the characters in this instance are equal to the
         /// characters in a specified read-only character span.
         /// </summary>
-        /// <param name="span">The character span to compare with the current instance.</param>
-        /// <returns><see langword="true"/> if the characters in this instance and <paramref name="span"/> are the same;
+        /// <param name="other">The character span to compare with the current instance.</param>
+        /// <returns><see langword="true"/> if the characters in this instance and <paramref name="other"/> are the same;
         /// otherwise, <see langword="false"/>.</returns>
         /// <remarks>
-        /// The <see cref="Equals(MutableTextBuffer)"/> method performs an ordinal comparison to determine
-        /// whether the characters in the current instance and span are equal.
+        /// The <see cref="Equals(ReadOnlySpan{char})"/> method performs an ordinal comparison to determine
+        /// whether the characters in the current instance and <paramref name="other"/> are equal.
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool Equals(ReadOnlySpan<char> span)
+        public bool Equals(ReadOnlySpan<char> other)
         {
-            if (span.Length != Length)
+            if (other.Length != Length)
             {
                 return false;
             }
 
-            return new ReadOnlySpan<char>(m_Chars, 0, m_Position).SequenceEqual(span);
+            return new ReadOnlySpan<char>(m_Chars, 0, m_Position).SequenceEqual(other);
         }
 
         #endregion
