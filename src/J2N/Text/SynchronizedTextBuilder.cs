@@ -24,8 +24,8 @@ namespace J2N.Text
     ///     <item><description>
     ///         Memory is directly accessible using <see cref="SynchronizedTextBuilderExtensions.AsSpan(SynchronizedTextBuilder?)"/> and
     ///         <see cref="SynchronizedTextBuilderExtensions.AsMemory(SynchronizedTextBuilder?)"/> overloads including the ability to slice.
-    ///         So, there is no need to allocate memory to call methods that require System.Memory types, such as
-    ///         <see cref="ReadOnlySpan{T}"/>. So, no allocation is necessary to read the results.
+    ///         There is no need to allocate memory and do a copy to call methods that require System.Memory types, such as
+    ///         <see cref="ReadOnlySpan{T}"/> or to access a portion of the underlying chars.
     ///     </description></item>
     ///     <description><item>
     ///         The <see cref="SynchronizedTextBuilder(int)"/> and <see cref="SynchronizedTextBuilder(int, int)"/> constructors allow
@@ -35,8 +35,14 @@ namespace J2N.Text
     ///         Indexing through <see cref="this[int]"/> is significantly faster than with <see cref="StringBuilder"/>.
     ///     </description></item>
     ///     <item><description>
+    ///         This class implements <see cref="IBufferWriter{Char}"/>, providing support for components that write
+    ///         directly to a character buffer. This interface provides similar capabilities as the <c>Appendable</c>
+    ///         interface in the JDK.
+    ///     </description></item>
+    ///     <item><description>
     ///         Rather than optimizing for operations that require moving or copying characters,
-    ///         this implementation optimizes for memory reuse, reducing array allocations.
+    ///         this implementation optimizes for memory reuse, reducing array allocations, and direct
+    ///         support for System.Memory capabilities.
     ///     </description></item>
     /// </list>
     /// <para/>
