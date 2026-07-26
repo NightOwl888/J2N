@@ -103,9 +103,9 @@ namespace J2N.Text
             sb.Insert(sb.Length, "null", 1);
             sb.Insert(sb.Length, "null", 5);
 
-            //sb.Insert(sb.Length, (ICharSequence?)null, 0); // J2N: These will be no-op in J2N to match the BCL.
-            //sb.Insert(sb.Length, (ICharSequence?)null, 1);
-            //sb.Insert(sb.Length, (ICharSequence?)null, 5);
+            sb.Insert(sb.Length, (ICharSequence?)null, 0); // J2N: These should be no-op in J2N to match the BCL (keeping this in place and repeating with strings below to confirm)
+            sb.Insert(sb.Length, (ICharSequence?)null, 1);
+            sb.Insert(sb.Length, (ICharSequence?)null, 5);
 
             sb.Insert(sb.Length, "null", 0); // J2N: Added these to make the test pass - need to pass a real string to print the word "null"
             sb.Insert(sb.Length, "null", 1);
@@ -182,17 +182,17 @@ namespace J2N.Text
 
             Assert.Throws<ArgumentException>(() =>
             {
-                sb.AppendCodePoint(Character.MaxCodePoint + 1, 1);
+                sb.AppendCodePoint(Character.MaxCodePoint + 1, 1); // J2N: Changed 2nd parameter to be valid so we get the right exception
             });
 
             Assert.Throws<ArgumentException>(() =>
             {
-                sb.AppendCodePoint(Character.MinCodePoint - 1, 1);
+                sb.AppendCodePoint(Character.MinCodePoint - 1, 1); // J2N: Changed 2nd parameter to be valid so we get the right exception
             });
 
             Assert.Throws<ArgumentOutOfRangeException>(() =>
             {
-                sb.AppendCodePoint(0, -1);
+                sb.AppendCodePoint(0, -1); // J2N: Changed 1st parameter to be valid so we get the right exception
             });
         }
     }
