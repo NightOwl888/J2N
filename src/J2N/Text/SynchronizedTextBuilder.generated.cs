@@ -541,7 +541,8 @@ namespace J2N.Text
         /// fixed size, preallocated, reusable, and possibly globally accessible.
         /// <para/>
         /// To access the characters for processing without allocating any heap memory, better alternatives are to use
-        /// <see cref="this[int]"/>, <see cref="SynchronizedTextBuilderExtensions.AsSpan(SynchronizedTextBuilder?, int, int)"/> or <see cref="CopyTo(int, Span{char}, int)"/>.
+        /// <see cref="this[int]"/>, <see cref="SynchronizedTextBuilderExtensions.AsSpan(SynchronizedTextBuilder?, int, int)"/> or
+        /// <see cref="CopyTo(int, Span{char}, int)"/>.
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void CopyTo(int sourceIndex, char[] destination, int destinationIndex, int count)
@@ -571,7 +572,7 @@ namespace J2N.Text
         /// The <see cref="CopyTo(int, Span{char}, int)"/> method is intended to be used in the rare situation
         /// when you need to efficiently copy successive sections of a <see cref="SynchronizedTextBuilder"/> object to a span.
         /// <para/>
-        /// To access the characters for processing without alocating any heap memory, better alternatives are to use
+        /// To access the characters for processing without allocating any heap memory, better alternatives are to use
         /// <see cref="this[int]"/> or <see cref="SynchronizedTextBuilderExtensions.AsSpan(SynchronizedTextBuilder?, int, int)"/>.
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
