@@ -25,9 +25,134 @@ namespace J2N.Buffers
     [TestFixture]
     public class TestPooledArrayAllocator
     {
-        /**
-         * @tests J2N.Buffers.PooledArrayAllocator<T>.Cleared
-         */
+        // --------------------------------------------------------------------
+        // Uncleared
+        // --------------------------------------------------------------------
+
+        [Test]
+        public void Test_Uncleared_ReturnsSingleton()
+        {
+            var allocator1 = PooledArrayAllocator<char>.Uncleared;
+            var allocator2 = PooledArrayAllocator<char>.Uncleared;
+
+            Assert.That(allocator1, Is.SameAs(allocator2));
+        }
+
+        [Test]
+        public void Test_Uncleared_GuaranteesClearedArrays_ReturnsFalse()
+        {
+            Assert.That(PooledArrayAllocator<char>.Uncleared.GuaranteesClearedArrays, Is.False);
+        }
+
+        [Test]
+        public void Test_Uncleared_Allocate_ReturnsAtLeastRequestedLength()
+        {
+            var allocator = PooledArrayAllocator<char>.Uncleared;
+
+            for (int i = 0; i < 4096; i++)
+            {
+                char[] array = allocator.Allocate(i);
+
+                Assert.That(array, Is.Not.Null);
+                Assert.That(array.Length, Is.GreaterThanOrEqualTo(i));
+
+                allocator.Return(array);
+            }
+        }
+
+        [Test]
+        public void Test_Uncleared_Allocate_ZeroLength()
+        {
+            var allocator = PooledArrayAllocator<char>.Uncleared;
+
+            char[] array = allocator.Allocate(0);
+
+            Assert.That(array, Is.Not.Null);
+            Assert.That(array.Length, Is.GreaterThanOrEqualTo(0));
+
+            allocator.Return(array);
+        }
+
+        [Test]
+        public void Test_Uncleared_Return_DoesNotThrow()
+        {
+            var allocator = PooledArrayAllocator<char>.Uncleared;
+
+            char[] array = allocator.Allocate(32);
+
+            Assert.DoesNotThrow(() => allocator.Return(array));
+        }
+
+        [Test]
+        public void Test_Uncleared_Allocate_NegativeLength_Throws()
+        {
+            var allocator = PooledArrayAllocator<char>.Uncleared;
+
+            Assert.Throws<ArgumentOutOfRangeException>(() =>
+            {
+                allocator.Allocate(-1);
+            });
+        }
+
+        [Test]
+        public void Test_Uncleared_Allocate_MultipleConcurrentRentReturnOperations()
+        {
+            var allocator = PooledArrayAllocator<char>.Uncleared;
+
+            Parallel.For(0, Environment.ProcessorCount * 8, _ =>
+            {
+                for (int i = 1; i <= 1024; i++)
+                {
+                    char[] array = allocator.Allocate(i);
+
+                    Assert.That(array.Length, Is.GreaterThanOrEqualTo(i));
+
+                    array[0] = 'A';
+
+                    allocator.Return(array);
+                }
+            });
+        }
+
+        [Test]
+        public void Test_Uncleared_Allocate_LargeBuffers()
+        {
+            var allocator = PooledArrayAllocator<char>.Uncleared;
+
+            int[] sizes =
+            {
+                1024,
+                4096,
+                16384,
+                65536,
+                131072
+            };
+
+            foreach (int size in sizes)
+            {
+                char[] array = allocator.Allocate(size);
+
+                Assert.That(array.Length, Is.GreaterThanOrEqualTo(size));
+
+                allocator.Return(array);
+            }
+        }
+
+        [Test]
+        public void Test_Uncleared_Return_Null_Throws()
+        {
+            var allocator = PooledArrayAllocator<char>.Uncleared;
+
+            Assert.Throws<ArgumentNullException>(() =>
+            {
+                allocator.Return(null!);
+            });
+        }
+
+        // --------------------------------------------------------------------
+        // Cleared
+        // --------------------------------------------------------------------
+
         [Test]
         public void Test_Cleared_ReturnsSingleton()
         {
@@ -37,20 +162,14 @@ namespace J2N.Buffers
             Assert.That(allocator1, Is.SameAs(allocator2));
         }
 
-        /**
-         * @tests J2N.Buffers.PooledArrayAllocator<T>.GuaranteesClearedArrays
-         */
         [Test]
-        public void Test_GuaranteesClearedArrays_ReturnsTrue()
+        public void Test_Cleared_GuaranteesClearedArrays_ReturnsTrue()
         {
             Assert.That(PooledArrayAllocator<char>.Cleared.GuaranteesClearedArrays, Is.True);
         }
 
-        /**
-         * @tests J2N.Buffers.PooledArrayAllocator<T>.Allocate(int)
-         */
         [Test]
-        public void Test_Allocate_ReturnsAtLeastRequestedLength()
+        public void Test_Cleared_Allocate_ReturnsAtLeastRequestedLength()
         {
             var allocator = PooledArrayAllocator<char>.Cleared;
 
@@ -65,11 +184,8 @@ namespace J2N.Buffers
             }
         }
 
-        /**
-         * @tests J2N.Buffers.PooledArrayAllocator<T>.Allocate(int)
-         */
         [Test]
-        public void Test_Allocate_ZeroLength()
+        public void Test_Cleared_Allocate_ZeroLength()
         {
             var allocator = PooledArrayAllocator<char>.Cleared;
 
@@ -81,11 +197,8 @@ namespace J2N.Buffers
             allocator.Return(array);
         }
 
-        /**
-         * @tests J2N.Buffers.PooledArrayAllocator<T>.Return(T[])
-         */
         [Test]
-        public void Test_Return_DoesNotThrow()
+        public void Test_Cleared_Return_DoesNotThrow()
         {
             var allocator = PooledArrayAllocator<char>.Cleared;
 
@@ -94,11 +207,8 @@ namespace J2N.Buffers
             Assert.DoesNotThrow(() => allocator.Return(array));
         }
 
-        /**
-         * @tests J2N.Buffers.PooledArrayAllocator<T>.Allocate(int)
-         */
         [Test]
-        public void Test_Allocate_NegativeLength_Throws()
+        public void Test_Cleared_Allocate_NegativeLength_Throws()
         {
             var allocator = PooledArrayAllocator<char>.Cleared;
 
@@ -108,11 +218,8 @@ namespace J2N.Buffers
             });
         }
 
-        /**
-         * @tests J2N.Buffers.PooledArrayAllocator<T>.Return(T[])
-         */
         [Test]
-        public void Test_ReturnedArrayIsClearedBeforeReuse()
+        public void Test_Cleared_ReturnedArrayIsClearedBeforeReuse()
         {
             var allocator = PooledArrayAllocator<char>.Cleared;
 
@@ -161,11 +268,8 @@ namespace J2N.Buffers
                 "Expected at least one reused array instance to be cleared.");
         }
 
-        /**
-         * @tests J2N.Buffers.PooledArrayAllocator<T>.Allocate(int)
-         */
         [Test]
-        public void Test_Allocate_MultipleConcurrentRentReturnOperations()
+        public void Test_Cleared_Allocate_MultipleConcurrentRentReturnOperations()
         {
             var allocator = PooledArrayAllocator<char>.Cleared;
 
@@ -184,11 +288,8 @@ namespace J2N.Buffers
             });
         }
 
-        /**
-         * @tests J2N.Buffers.PooledArrayAllocator<T>.Allocate(int)
-         */
         [Test]
-        public void Test_Allocate_LargeBuffers()
+        public void Test_Cleared_Allocate_LargeBuffers()
         {
             var allocator = PooledArrayAllocator<char>.Cleared;
 
@@ -211,11 +312,8 @@ namespace J2N.Buffers
             }
         }
 
-        /**
-         * @tests J2N.Buffers.PooledArrayAllocator<T>.Return(T[])
-         */
         [Test]
-        public void Test_Return_Null_Throws()
+        public void Test_Cleared_Return_Null_Throws()
         {
             var allocator = PooledArrayAllocator<char>.Cleared;
 
