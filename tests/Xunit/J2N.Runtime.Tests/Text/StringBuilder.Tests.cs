@@ -622,6 +622,43 @@ namespace J2N.Text.Tests
         }
 
         [Fact]
+        public void Length_Set_ClearExposedBuffers_ClearsBuffer()
+        {
+            var builder = MutableTextBufferFactory("Hello", new MutableTextBufferTestOptions { ClearExposedBuffers = true });
+
+            builder.Length = 2;
+            Assert.Equal(2, builder.Length);
+            Assert.Equal("He", builder.ToString());
+
+            builder.Length = 5;
+            Assert.Equal(5, builder.Length);
+            for (int i = 3; i < builder.Length; i++)
+            {
+                Assert.Equal('\0', builder[i]);
+            }
+        }
+
+        // J2N: The ClearExposedBuffers setting doesn't seem like it should apply to Length directly. Instead, we should
+        // expose a different opt-in API allow users to set length without clearing the buffer (for extension methods
+        // and subclasses).
+        [Fact]
+        public void Length_Set_DontClearExposedBuffers_ClearsBuffer()
+        {
+            var builder = MutableTextBufferFactory("Hello", new MutableTextBufferTestOptions { ClearExposedBuffers = false });
+
+            builder.Length = 2;
+            Assert.Equal(2, builder.Length);
+            Assert.Equal("He", builder.ToString());
+
+            builder.Length = 5;
+            Assert.Equal(5, builder.Length);
+            for (int i = 3; i < builder.Length; i++)
+            {
+                Assert.Equal('\0', builder[i]);
+            }
+        }
+
+        [Fact]
         public void Length_Set_InvalidValue_ThrowsArgumentOutOfRangeException()
         {
             var builder = MutableTextBufferFactory(10, 10);
