@@ -9,6 +9,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 
 namespace J2N.Text
 {
@@ -43,9 +44,16 @@ namespace J2N.Text
     ///     </description></item>
     ///     <item><description>
     ///         Rather than optimizing for operations that require moving or copying characters,
-    ///         this implementation optimizes for memory reuse, reducing array allocations.
+    ///         this implementation optimizes for memory reuse and reducing array allocations.
     ///     </description></item>
     /// </list>
+    /// <para/>
+    /// Unlike most <see cref="IDisposable"/> implementations, calling <see cref="Dispose()"/> does not permanently invalidate the
+    /// instance. The current character buffer is released to the configured <see cref="IArrayAllocator{Char}"/>, and a new buffer
+    /// will be allocated automatically if the instance is used again.
+    /// <para/>
+    /// Calling <see cref="Dispose()"/> is only required if the configured <see cref="IArrayAllocator{Char}"/> requires the
+    /// character array to be returned.
     /// </remarks>
     internal partial class MutableTextBuffer : IBufferWriter<char>,
         ISpannable<char>, ICopyable<char>, ISpanCopyable<char>, IDisposable
@@ -1027,9 +1035,6 @@ namespace J2N.Text
         /// <see cref="IArrayAllocator{T}"/> provided to this instance.
         /// </summary>
         /// <remarks>
-        /// Once this method has been called, the current instance no longer owns
-        /// the underlying buffer and further use of the instance is unsupported.
-        /// <para/>
         /// Depending on the allocator implementation, the underlying array may be:
         /// <list type="bullet">
         ///     <item>
@@ -1046,7 +1051,16 @@ namespace J2N.Text
         ///     </item>
         /// </list>
         /// <para/>
-        /// This method may be called multiple times safely.
+        /// This method releases ownership of the underlying buffer back to the
+        /// configured <see cref="IArrayAllocator{T}"/>. If the instance later allocates a
+        /// new buffer through subsequent use, that buffer becomes owned by the instance and will
+        /// likewise be released by a subsequent call to <see cref="Dispose()"/>.
+        /// <para/>
+        /// Calling <see cref="Dispose()"/> multiple times without allocating a new buffer between
+        /// calls has no effect.
+        /// <para/>
+        /// This method guarantees that a particular buffer is returned to the allocator at most once.
+        /// It does not make concurrent access to <see cref="MutableTextBuffer"/> thread-safe.
         /// </remarks>
         [CodeGenerationIgnore]
         public void Dispose()
@@ -1068,20 +1082,23 @@ namespace J2N.Text
         /// <para/>
         /// This implementation releases ownership of the underlying character buffer
         /// back to the configured <see cref="IArrayAllocator{T}"/>.
+        /// <para/>
+        /// Calling <see cref="Dispose()"/> multiple times without allocating a new buffer between
+        /// calls has no effect.
+        /// <para/>
+        /// This method guarantees that a particular buffer is returned to the allocator at most once.
+        /// It does not make concurrent access to <see cref="MutableTextBuffer"/> thread-safe.
         /// </remarks>
         [CodeGenerationIgnore]
         protected virtual void Dispose(bool disposing)
         {
-            if (disposing)
-            {
-                char[]? array = m_Chars;
+            if (!disposing)
+                return;
 
-                if (array.Length != 0)
-                {
-                    m_Chars = Arrays.Empty<char>();
-                    allocator.Return(array);
-                }
-            }
+            char[] toReturn = Interlocked.Exchange(ref m_Chars, Arrays.Empty<char>());
+
+            if (toReturn.Length != 0)
+                allocator.Return(toReturn);
         }
 
         #endregion Dispose

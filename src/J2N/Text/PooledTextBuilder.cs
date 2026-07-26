@@ -66,6 +66,11 @@ namespace J2N.Text
     /// <para/>
     /// By default, <see cref="PooledTextBuilder"/> follows typical .NET culture-sensitive behavior. When porting Java applications,
     /// consider setting <see cref="TextBuilder.UseInvariantDefaults"/> during construction to use invariant defaults for culture-sensitive operations.
+    /// <para/>
+    /// Unlike most <see cref="IDisposable"/> implementations, calling <see cref="Dispose()"/> does not permanently invalidate the
+    /// instance. The current character buffer is released to the configured <see cref="IArrayAllocator{Char}"/>, and a new buffer
+    /// will be allocated automatically if the instance is used again. However, a final call to <see cref="Dispose()"/> is required
+    /// to return the array to the pool before the instance goes out of scope to prevent leaking resources and/or undefined behavior.
     /// </remarks>
     public sealed partial class PooledTextBuilder : TextBuilder, IBufferWriter<char>,
         ISpannable<char>, ICopyable<char>, ISpanCopyable<char>, IDisposable
@@ -349,6 +354,18 @@ namespace J2N.Text
         /// <summary>
         /// Releases ownership of the underlying array and returns it to the underlying array pool.
         /// </summary>
+        /// <remarks>
+        /// This method releases ownership of the underlying buffer back to the
+        /// array pool. If the instance later allocates a
+        /// new buffer through subsequent use, that buffer becomes owned by the instance and will
+        /// likewise be released by a subsequent call to <see cref="Dispose()"/>.
+        /// <para/>
+        /// Calling <see cref="Dispose()"/> multiple times without allocating a new buffer between
+        /// calls has no effect.
+        /// <para/>
+        /// This method guarantees that a particular buffer is returned to the allocator at most once.
+        /// It does not make concurrent access to <see cref="MutableTextBuffer"/> thread-safe.
+        /// </remarks>
         public void Dispose() => buffer.Dispose();
     }
 }

@@ -16,6 +16,8 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using Xunit;
 //using System.Tests;
 //using Microsoft.DotNet.RemoteExecutor;
@@ -4894,8 +4896,53 @@ namespace J2N.Text.Tests
 
         #endregion InsertFromSelf Tests
 
+        [Fact]
+        public async Task Dispose_ConcurrentCalls_ShouldReturnBufferOnlyOnce()
+        {
+            for (int iteration = 0; iteration < 100; iteration++)
+            {
+                const int ThreadCount = 8;
 
+                var allocator = new CountingCharArrayAllocator();
+                var builder = MutableTextBufferFactory("abcdefghijklmnopqrstuvwxyz", 26, allocator);
 
+                using var barrier = new Barrier(ThreadCount);
+
+                Task[] tasks = new Task[ThreadCount];
+
+                for (int i = 0; i < ThreadCount; i++)
+                {
+                    tasks[i] = Task.Run(() =>
+                    {
+                        barrier.SignalAndWait();
+                        builder.Dispose();
+                    });
+                }
+
+                await Task.WhenAll(tasks);
+
+                Assert.Equal(1, allocator.ReturnCount);
+            }
+        }
+
+        private sealed class CountingCharArrayAllocator : IArrayAllocator<char>
+        {
+            private int returnCount;
+
+            public bool GuaranteesClearedArrays => true;
+
+            public int ReturnCount => Volatile.Read(ref returnCount);
+
+            public char[] Allocate(int minimumLength)
+            {
+                return new char[minimumLength];
+            }
+
+            public void Return(char[] array)
+            {
+                Interlocked.Increment(ref returnCount);
+            }
+        }
 
         /// <summary>
         /// A custom <see cref="ICharSequence"/> implementation used for testing unknown
