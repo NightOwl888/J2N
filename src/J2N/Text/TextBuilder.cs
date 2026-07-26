@@ -52,8 +52,7 @@ namespace J2N.Text
     /// By default, <see cref="TextBuilder"/> follows typical .NET culture-sensitive behavior. When porting Java applications,
     /// consider setting <see cref="UseInvariantDefaults"/> during construction to use invariant defaults for culture-sensitive operations.
     /// </remarks>
-    public partial class TextBuilder : IBufferWriter<char>,
-        ISpannable<char>, ICopyable<char>, ISpanCopyable<char>
+    public partial class TextBuilder : IBufferWriter<char>, ISpannable<char>, ISpanCopyable<char>, ICopyable<char>
     {
         internal readonly MutableTextBuffer buffer;
 

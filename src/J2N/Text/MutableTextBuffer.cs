@@ -62,8 +62,7 @@ namespace J2N.Text
     /// Calling <see cref="Dispose()"/> is only required if the configured <see cref="IArrayAllocator{Char}"/> requires the
     /// character array to be returned.
     /// </remarks>
-    internal partial class MutableTextBuffer : IBufferWriter<char>,
-        ISpannable<char>, ICopyable<char>, ISpanCopyable<char>, IDisposable
+    internal partial class MutableTextBuffer : IBufferWriter<char>, ISpannable<char>, ISpanCopyable<char>, ICopyable<char>, IDisposable
         //, IEnumerable<char> // ICU4N TODO: Implement?
     {
         private const int CharStackBufferSize = 32;

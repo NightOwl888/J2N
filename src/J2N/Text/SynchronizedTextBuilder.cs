@@ -49,8 +49,7 @@ namespace J2N.Text
     /// By default, <see cref="SynchronizedTextBuilder"/> follows typical .NET culture-sensitive behavior. When porting Java applications,
     /// consider setting <see cref="UseInvariantDefaults"/> during construction to use invariant defaults for culture-sensitive operations.
     /// </remarks>
-    internal partial class SynchronizedTextBuilder : IBufferWriter<char>,
-        ICopyable<char>, ISpanCopyable<char>
+    internal partial class SynchronizedTextBuilder : IBufferWriter<char>, ISpanCopyable<char>, ICopyable<char>
     {
         private readonly object syncRoot = new();
         internal readonly MutableTextBuffer buffer;

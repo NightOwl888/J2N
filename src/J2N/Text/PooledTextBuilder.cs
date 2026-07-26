@@ -79,8 +79,8 @@ namespace J2N.Text
     /// will be allocated automatically if the instance is used again. However, a final call to <see cref="Dispose()"/> is required
     /// to return the array to the pool before the instance goes out of scope to prevent leaking resources and/or undefined behavior.
     /// </remarks>
-    public sealed partial class PooledTextBuilder : TextBuilder, IBufferWriter<char>,
-        ISpannable<char>, ICopyable<char>, ISpanCopyable<char>, IDisposable
+    public sealed partial class PooledTextBuilder : TextBuilder, IBufferWriter<char>, ISpannable<char>, ISpanCopyable<char>,
+        ICopyable<char>, IDisposable
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static MutableTextBuffer CreateBuffer() => new(PooledArrayAllocator<char>.Uncleared)
