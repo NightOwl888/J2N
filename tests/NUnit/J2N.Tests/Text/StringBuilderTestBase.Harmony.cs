@@ -321,20 +321,21 @@ namespace J2N.Text
          * @tests java.lang.StringBuilder.Append(double)
          */
         [Test]
-        public void Test_appendD() // J2N TODO: Invariant
+        public void Test_appendD()
         {
+            // J2N: StringBuilerFactory() sets UseInvariantDefaults = true
             TextBuilder sb = StringBuilderFactory();
             assertSame(sb, sb.Append(1D));
-            assertEquals(Double.ToString(1D), sb.ToString());
+            assertEquals(Double.ToString(1D, CultureInfo.InvariantCulture), sb.ToString());
             sb.Length = (0);
             assertSame(sb, sb.Append(0D));
-            assertEquals(Double.ToString(0D), sb.ToString());
+            assertEquals(Double.ToString(0D, CultureInfo.InvariantCulture), sb.ToString());
             sb.Length = (0);
             assertSame(sb, sb.Append(-1D));
-            assertEquals(Double.ToString(-1D), sb.ToString());
+            assertEquals(Double.ToString(-1D, CultureInfo.InvariantCulture), sb.ToString());
             sb.Length = (0);
             assertSame(sb, sb.Append(double.NaN));
-            assertEquals(Double.ToString(double.NaN), sb.ToString());
+            assertEquals(Double.ToString(double.NaN, CultureInfo.InvariantCulture), sb.ToString());
             sb.Length = (0);
             assertSame(sb, sb.Append(double.NegativeInfinity));
             assertEquals(Double.ToString(double.NegativeInfinity, CultureInfo.InvariantCulture), sb.ToString());
@@ -353,20 +354,21 @@ namespace J2N.Text
          * @tests java.lang.StringBuilder.Append(float)
          */
         [Test]
-        public void Test_appendF() // J2N TODO: Invariant
+        public void Test_appendF()
         {
+            // J2N: StringBuilerFactory() sets UseInvariantDefaults = true
             TextBuilder sb = StringBuilderFactory();
             assertSame(sb, sb.Append(1F));
-            assertEquals(Float.ToString(1F), sb.ToString());
+            assertEquals(Float.ToString(1F, CultureInfo.InvariantCulture), sb.ToString());
             sb.Length = (0);
             assertSame(sb, sb.Append(0F));
-            assertEquals(Float.ToString(0F), sb.ToString());
+            assertEquals(Float.ToString(0F, CultureInfo.InvariantCulture), sb.ToString());
             sb.Length = (0);
             assertSame(sb, sb.Append(-1F));
-            assertEquals(Float.ToString(-1F), sb.ToString());
+            assertEquals(Float.ToString(-1F, CultureInfo.InvariantCulture), sb.ToString());
             sb.Length = (0);
             assertSame(sb, sb.Append(float.NaN));
-            assertEquals(Float.ToString(float.NaN), sb.ToString());
+            assertEquals(Float.ToString(float.NaN, CultureInfo.InvariantCulture), sb.ToString());
             sb.Length = (0);
             assertSame(sb, sb.Append(float.NegativeInfinity));
             assertEquals(Float.ToString(float.NegativeInfinity, CultureInfo.InvariantCulture), sb.ToString());
@@ -385,46 +387,48 @@ namespace J2N.Text
          * @tests java.lang.StringBuilder.Append(int)
          */
         [Test]
-        public void Test_appendI() // J2N TODO: Invariant
+        public void Test_appendI()
         {
+            // J2N: StringBuilerFactory() sets UseInvariantDefaults = true
             TextBuilder sb = StringBuilderFactory();
             assertSame(sb, sb.Append(1));
-            assertEquals(Integer.ToString(1), sb.ToString());
+            assertEquals(Integer.ToString(1, CultureInfo.InvariantCulture), sb.ToString());
             sb.Length = (0);
             assertSame(sb, sb.Append(0));
-            assertEquals(Integer.ToString(0), sb.ToString());
+            assertEquals(Integer.ToString(0, CultureInfo.InvariantCulture), sb.ToString());
             sb.Length = (0);
             assertSame(sb, sb.Append(-1));
-            assertEquals(Integer.ToString(-1), sb.ToString());
+            assertEquals(Integer.ToString(-1, CultureInfo.InvariantCulture), sb.ToString());
             sb.Length = (0);
             assertSame(sb, sb.Append(int.MinValue));
-            assertEquals(Integer.ToString(int.MinValue), sb.ToString());
+            assertEquals(Integer.ToString(int.MinValue, CultureInfo.InvariantCulture), sb.ToString());
             sb.Length = (0);
             assertSame(sb, sb.Append(int.MaxValue));
-            assertEquals(Integer.ToString(int.MaxValue), sb.ToString());
+            assertEquals(Integer.ToString(int.MaxValue, CultureInfo.InvariantCulture), sb.ToString());
         }
 
         /**
          * @tests java.lang.StringBuilder.Append(long)
          */
         [Test]
-        public void Test_appendL() // J2N TODO: Invariant
+        public void Test_appendL()
         {
+            // J2N: StringBuilerFactory() sets UseInvariantDefaults = true
             TextBuilder sb = StringBuilderFactory();
             assertSame(sb, sb.Append(1L));
-            assertEquals(Long.ToString(1L), sb.ToString());
+            assertEquals(Long.ToString(1L, CultureInfo.InvariantCulture), sb.ToString());
             sb.Length = (0);
             assertSame(sb, sb.Append(0L));
-            assertEquals(Long.ToString(0L), sb.ToString());
+            assertEquals(Long.ToString(0L, CultureInfo.InvariantCulture), sb.ToString());
             sb.Length = (0);
             assertSame(sb, sb.Append(-1L));
-            assertEquals(Long.ToString(-1L), sb.ToString());
+            assertEquals(Long.ToString(-1L, CultureInfo.InvariantCulture), sb.ToString());
             sb.Length = (0);
             assertSame(sb, sb.Append(long.MinValue));
-            assertEquals(Long.ToString(long.MinValue), sb.ToString());
+            assertEquals(Long.ToString(long.MinValue, CultureInfo.InvariantCulture), sb.ToString());
             sb.Length = (0);
             assertSame(sb, sb.Append(long.MaxValue));
-            assertEquals(Long.ToString(long.MaxValue), sb.ToString());
+            assertEquals(Long.ToString(long.MaxValue, CultureInfo.InvariantCulture), sb.ToString());
         }
 
         /**
@@ -959,24 +963,24 @@ namespace J2N.Text
         {
             const string fixture = "0123456789";
             TextBuilder sb = StringBuilderFactory(fixture);
-            assertEquals(0, sb.IndexOf("0", StringComparison.Ordinal));
-            assertEquals(0, sb.IndexOf("012", StringComparison.Ordinal));
-            assertEquals(-1, sb.IndexOf("02", StringComparison.Ordinal));
-            assertEquals(8, sb.IndexOf("89", StringComparison.Ordinal));
+            assertEquals(0, sb.IndexOf("0"));
+            assertEquals(0, sb.IndexOf("012"));
+            assertEquals(-1, sb.IndexOf("02"));
+            assertEquals(8, sb.IndexOf("89"));
 
-            assertEquals(0, sb.IndexOf("0", StringComparison.Ordinal), 0);
-            assertEquals(0, sb.IndexOf("012", StringComparison.Ordinal), 0);
-            assertEquals(-1, sb.IndexOf("02", StringComparison.Ordinal), 0);
-            assertEquals(8, sb.IndexOf("89", StringComparison.Ordinal), 0);
+            assertEquals(0, sb.IndexOf("0"), 0);
+            assertEquals(0, sb.IndexOf("012"), 0);
+            assertEquals(-1, sb.IndexOf("02"), 0);
+            assertEquals(8, sb.IndexOf("89"), 0);
 
-            assertEquals(-1, sb.IndexOf("0", StringComparison.Ordinal), 5);
-            assertEquals(-1, sb.IndexOf("012", StringComparison.Ordinal), 5);
-            assertEquals(-1, sb.IndexOf("02", StringComparison.Ordinal), 0);
-            assertEquals(8, sb.IndexOf("89", StringComparison.Ordinal), 5);
+            assertEquals(-1, sb.IndexOf("0"), 5);
+            assertEquals(-1, sb.IndexOf("012"), 5);
+            assertEquals(-1, sb.IndexOf("02"), 0);
+            assertEquals(8, sb.IndexOf("89"), 5);
 
             try
             {
-                sb.IndexOf((string)null, 0, StringComparison.Ordinal);
+                sb.IndexOf((string)null, 0);
                 fail("no NPE");
             }
             catch (ArgumentNullException) // NullPointerException
@@ -1459,6 +1463,7 @@ namespace J2N.Text
         [Test]
         public void Test_insertID()
         {
+            // J2N: StringBuilerFactory() sets UseInvariantDefaults = true
             const string fixture = "0000";
             TextBuilder sb = StringBuilderFactory(fixture);
             assertSame(sb, sb.Insert(0, -1D));
@@ -1509,6 +1514,7 @@ namespace J2N.Text
         [Test]
         public void Test_insertIF()
         {
+            // J2N: StringBuilerFactory() sets UseInvariantDefaults = true
             const string fixture = "0000";
             TextBuilder sb = StringBuilderFactory(fixture);
             assertSame(sb, sb.Insert(0, -1F));
@@ -1559,6 +1565,7 @@ namespace J2N.Text
         [Test]
         public void Test_insertII()
         {
+            // J2N: StringBuilerFactory() sets UseInvariantDefaults = true
             const string fixture = "0000";
             TextBuilder sb = StringBuilderFactory(fixture);
             assertSame(sb, sb.Insert(0, -1));
@@ -1609,6 +1616,7 @@ namespace J2N.Text
         [Test]
         public void Test_insertIJ()
         {
+            // J2N: StringBuilerFactory() sets UseInvariantDefaults = true
             const string fixture = "0000";
             TextBuilder sb = StringBuilderFactory(fixture);
             assertSame(sb, sb.Insert(0, -1L));
@@ -1765,14 +1773,14 @@ namespace J2N.Text
         {
             const string fixture = "0123456789";
             TextBuilder sb = StringBuilderFactory(fixture);
-            assertEquals(0, sb.LastIndexOf("0", StringComparison.Ordinal));
-            assertEquals(0, sb.LastIndexOf("012", StringComparison.Ordinal));
-            assertEquals(-1, sb.LastIndexOf("02", StringComparison.Ordinal));
-            assertEquals(8, sb.LastIndexOf("89", StringComparison.Ordinal));
+            assertEquals(0, sb.LastIndexOf("0"));
+            assertEquals(0, sb.LastIndexOf("012"));
+            assertEquals(-1, sb.LastIndexOf("02"));
+            assertEquals(8, sb.LastIndexOf("89"));
 
             try
             {
-                sb.LastIndexOf((string)null, StringComparison.Ordinal);
+                sb.LastIndexOf((string)null);
                 fail("no NPE");
             }
             catch (ArgumentNullException) // NullPointerException
@@ -1789,24 +1797,24 @@ namespace J2N.Text
         {
             const string fixture = "0123456789";
             TextBuilder sb = StringBuilderFactory(fixture);
-            assertEquals(0, sb.LastIndexOf("0", StringComparison.Ordinal));
-            assertEquals(0, sb.LastIndexOf("012", StringComparison.Ordinal));
-            assertEquals(-1, sb.LastIndexOf("02", StringComparison.Ordinal));
-            assertEquals(8, sb.LastIndexOf("89", StringComparison.Ordinal));
+            assertEquals(0, sb.LastIndexOf("0"));
+            assertEquals(0, sb.LastIndexOf("012"));
+            assertEquals(-1, sb.LastIndexOf("02"));
+            assertEquals(8, sb.LastIndexOf("89"));
 
-            assertEquals(0, sb.LastIndexOf("0", StringComparison.Ordinal), 0);
-            assertEquals(0, sb.LastIndexOf("012", StringComparison.Ordinal), 0);
-            assertEquals(-1, sb.LastIndexOf("02", StringComparison.Ordinal), 0);
-            assertEquals(8, sb.LastIndexOf("89", StringComparison.Ordinal), 0);
+            assertEquals(0, sb.LastIndexOf("0"), 0);
+            assertEquals(0, sb.LastIndexOf("012"), 0);
+            assertEquals(-1, sb.LastIndexOf("02"), 0);
+            assertEquals(8, sb.LastIndexOf("89"), 0);
 
-            assertEquals(-1, sb.LastIndexOf("0", StringComparison.Ordinal), 5);
-            assertEquals(-1, sb.LastIndexOf("012", StringComparison.Ordinal), 5);
-            assertEquals(-1, sb.LastIndexOf("02", StringComparison.Ordinal), 0);
-            assertEquals(8, sb.LastIndexOf("89", StringComparison.Ordinal), 5);
+            assertEquals(-1, sb.LastIndexOf("0"), 5);
+            assertEquals(-1, sb.LastIndexOf("012"), 5);
+            assertEquals(-1, sb.LastIndexOf("02"), 0);
+            assertEquals(8, sb.LastIndexOf("89"), 5);
 
             try
             {
-                sb.LastIndexOf((string)null, 0, StringComparison.Ordinal);
+                sb.LastIndexOf((string)null, 0);
                 fail("no NPE");
             }
             catch (ArgumentNullException) // NullPointerException
