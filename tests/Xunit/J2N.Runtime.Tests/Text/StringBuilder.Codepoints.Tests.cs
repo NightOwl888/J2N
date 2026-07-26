@@ -7,18 +7,52 @@ namespace J2N.Text.Tests
 {
     public abstract partial class StringBuilder_Tests
     {
+
+        public static IEnumerable<object[]> AppendCodePoint_TestData()
+        {
+            // BMP
+            yield return new object[] { "", 0x0041, "A".ToCharArray() };
+            yield return new object[] { "abc", 0x0041, "abcA".ToCharArray() };
+
+            // Supplementary
+            yield return new object[] { "", 0x1F600, "\uD83D\uDE00".ToCharArray() };
+            yield return new object[] { "abc", 0x1F600, "abc\uD83D\uDE00".ToCharArray() };
+
+            // Surrogates
+            yield return new object[] { "", 0xD800, "\uD800".ToCharArray() };
+            yield return new object[] { "abc", 0xD800, "abc\uD800".ToCharArray() };
+
+            yield return new object[] { "", 0xDC00, "\uDC00".ToCharArray() };
+            yield return new object[] { "abc", 0xDC00, "abc\uDC00".ToCharArray() };
+
+            // Harmony Character.ToChars() tests
+            yield return new object[] { "", 0x10000, "\uD800\uDC00".ToCharArray() };
+            yield return new object[] { "", 0x10001, "\uD800\uDC01".ToCharArray() };
+            yield return new object[] { "", 0x10401, "\uD801\uDC01".ToCharArray() };
+            yield return new object[] { "", 0x10FFFF, "\uDBFF\uDFFF".ToCharArray() };
+        }
+
         [Theory]
-        [InlineData("", 0x0041, "A")]
-        [InlineData("abc", 0x0041, "abcA")]
-        [InlineData("", 0x1F600, "\U0001F600")]
-        [InlineData("abc", 0x1F600, "abc\U0001F600")]
-        public void AppendCodePoint(string value, int codePoint, string expected)
+        [MemberData(nameof(AppendCodePoint_TestData))]
+        public void AppendCodePoint(string value, int codePoint, char[] expected)
         {
             MutableTextBuffer builder = MutableTextBufferFactory(value);
-
             builder.AppendCodePoint(codePoint);
+            AssertExtensions.Equal(expected, builder.AsSpan().ToArray());
+        }
 
-            Assert.Equal(expected, builder.ToString());
+        [Fact]
+        public void AppendCodePoint_Invalid()
+        {
+            AssertExtensions.Throws<ArgumentNullException>(
+                "text",
+                () => J2N.Text.MutableTextBufferExtensions.AppendCodePoint((MutableTextBuffer)null!, 'A'));
+
+            AssertExtensions.Throws<ArgumentOutOfRangeException>(
+                () => MutableTextBufferFactory().AppendCodePoint(Character.MinCodePoint - 1));
+
+            AssertExtensions.Throws<ArgumentOutOfRangeException>(
+                () => MutableTextBufferFactory().AppendCodePoint(Character.MaxCodePoint + 1));
         }
 
         [Theory]
