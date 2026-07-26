@@ -491,9 +491,9 @@ namespace J2N.Text
                 return default;
 
 #if FEATURE_MEMORYMARSHAL_CREATEREADONLYSPAN && FEATURE_MEMORYMARSHAL_GETARRAYDATAREFERENCE
-            // J2N: Careful - need to create a local copy because it could move.
+            // J2N: Cache the backing array in a local to avoid repeated field loads.
             char[] chars = text.m_Chars;
-            return MemoryMarshal.CreateReadOnlySpan<char>(ref MemoryMarshal.GetArrayDataReference(chars), text.Length);
+            return MemoryMarshal.CreateReadOnlySpan(ref MemoryMarshal.GetArrayDataReference(chars), text.Length);
 #else
             return new ReadOnlySpan<char>(text.m_Chars, 0, text.Length);
 #endif
@@ -536,9 +536,9 @@ namespace J2N.Text
                 ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.start);
 
 #if FEATURE_MEMORYMARSHAL_CREATEREADONLYSPAN && FEATURE_MEMORYMARSHAL_GETARRAYDATAREFERENCE
-            // J2N: Careful - need to create a local copy because it could move.
+            // J2N: Cache the backing array in a local to avoid repeated field loads.
             char[] chars = text.m_Chars;
-            return MemoryMarshal.CreateReadOnlySpan<char>(ref Unsafe.Add(ref MemoryMarshal.GetArrayDataReference(chars),
+            return MemoryMarshal.CreateReadOnlySpan(ref Unsafe.Add(ref MemoryMarshal.GetArrayDataReference(chars),
                 (nint)(uint)start /* force zero-extension */), text.Length - start);
 #else
             return new ReadOnlySpan<char>(text.m_Chars, start, text.Length - start);
@@ -593,9 +593,9 @@ namespace J2N.Text
             }
 
 #if FEATURE_MEMORYMARSHAL_CREATEREADONLYSPAN && FEATURE_MEMORYMARSHAL_GETARRAYDATAREFERENCE
-            // J2N: Careful - need to create a local copy because it could move.
+            // J2N: Cache the backing array in a local to avoid repeated field loads.
             char[] chars = text.m_Chars;
-            return MemoryMarshal.CreateReadOnlySpan<char>(ref Unsafe.Add(ref MemoryMarshal.GetArrayDataReference(chars),
+            return MemoryMarshal.CreateReadOnlySpan(ref Unsafe.Add(ref MemoryMarshal.GetArrayDataReference(chars),
                 (nint)(uint)start /* force zero-extension */), length);
 #else
             return new ReadOnlySpan<char>(text.m_Chars, start, length);
@@ -646,9 +646,9 @@ namespace J2N.Text
             }
 
 #if FEATURE_MEMORYMARSHAL_CREATEREADONLYSPAN && FEATURE_MEMORYMARSHAL_GETARRAYDATAREFERENCE
-            // J2N: Careful - need to create a local copy because it could move.
+            // J2N: Cache the backing array in a local to avoid repeated field loads.
             char[] chars = text.m_Chars;
-            return MemoryMarshal.CreateReadOnlySpan<char>(ref Unsafe.Add(ref MemoryMarshal.GetArrayDataReference(chars),
+            return MemoryMarshal.CreateReadOnlySpan(ref Unsafe.Add(ref MemoryMarshal.GetArrayDataReference(chars),
                 (nint)(uint)actualIndex /* force zero-extension */), text.Length - actualIndex);
 #else
             return new ReadOnlySpan<char>(text.m_Chars, actualIndex, text.Length - actualIndex);
@@ -699,9 +699,9 @@ namespace J2N.Text
             (int start, int length) = range.GetOffsetAndLength(text.Length);
 
 #if FEATURE_MEMORYMARSHAL_CREATEREADONLYSPAN && FEATURE_MEMORYMARSHAL_GETARRAYDATAREFERENCE
-            // J2N: Careful - need to create a local copy because it could move.
+            // J2N: Cache the backing array in a local to avoid repeated field loads.
             char[] chars = text.m_Chars;
-            return MemoryMarshal.CreateReadOnlySpan<char>(ref Unsafe.Add(ref MemoryMarshal.GetArrayDataReference(chars),
+            return MemoryMarshal.CreateReadOnlySpan(ref Unsafe.Add(ref MemoryMarshal.GetArrayDataReference(chars),
                 (nint)(uint)start /* force zero-extension */), length);
 #else
             return new ReadOnlySpan<char>(text.m_Chars, start, length);
