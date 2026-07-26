@@ -30,6 +30,15 @@ namespace J2N.Text
     ///         <see cref="ReadOnlySpan{T}"/>. So, no allocation is necessary to read the results.
     ///     </description></item>
     ///     <item><description>
+    ///         <see cref="MutableTextBuffer"/> is implicitly convertible to <see cref="ReadOnlySpan{Char}"/> to allow
+    ///         passing the builder to low-level APIs without needing custom overloads, similar to <see cref="T:char[]"/>
+    ///         and <see cref="string"/>.
+    ///     </description></item>
+    ///     <item><description>
+    ///         The <see cref="Initialize(int)"/> and <see cref="Initialize(int, int)"/> methods allow setting the initial capacity
+    ///         to zero, meaning no backing array is allocated unless it is needed.
+    ///     </description></item>
+    ///     <item><description>
     ///         Indexing through <see cref="this[int]"/> is significantly faster than with <see cref="StringBuilder"/>.
     ///     </description></item>
     ///     <item><description>

@@ -29,6 +29,10 @@ namespace J2N.Text
     ///         passing the builder to low-level APIs without needing custom overloads, similar to <see cref="T:char[]"/>
     ///         and <see cref="string"/>.
     ///     </description></item>
+    ///     <description><item>
+    ///         The <see cref="TextBuilder(int)"/> and <see cref="TextBuilder(int, int)"/> constructors allow
+    ///         setting the initial capacity to zero, meaning no backing array is allocated unless it is needed.
+    ///     </item></description>
     ///     <item><description>
     ///         Indexing through <see cref="this[int]"/> is significantly faster than with <see cref="StringBuilder"/>.
     ///     </description></item>
@@ -78,13 +82,15 @@ namespace J2N.Text
         /// <exception cref="ArgumentOutOfRangeException">
         /// <paramref name="capacity"/> is less than zero or greater than the platform-specific maximum array capacity.
         /// </exception>
-        /// <remarks>The <paramref name="capacity"/> parameter defines the maximum number of characters that can be stored
+        /// <remarks>
+        /// The <paramref name="capacity"/> parameter defines the maximum number of characters that can be stored
         /// in the memory allocated by the current instance. Its value is assigned to the <see cref="Capacity"/> property.
         /// If the number of characters to be stored in the current instance exceeds this <paramref name="capacity"/> value,
         /// the <see cref="TextBuilder"/> object allocates additional memory to store them.
         /// <para/>
-        /// The string value of this instance is set to <see cref="string.Empty"/>. If capacity is zero, the
-        /// implementation-specific default capacity is used.</remarks>
+        /// The string value of this instance is set to <see cref="string.Empty"/>. If <paramref name="capacity"/> is zero,
+        /// no backing array is allocated and the first mutation will grow the buffer, as needed.
+        /// </remarks>
         /// <seealso cref="Capacity"/>
         public TextBuilder(int capacity)
         {
@@ -175,7 +181,8 @@ namespace J2N.Text
         /// If the number of characters to be stored in the current instance exceeds this <paramref name="capacity"/> value,
         /// the <see cref="TextBuilder"/> object allocates additional memory to store them.
         /// <para/>
-        /// If <paramref name="capacity"/> is zero, the implementation-specific default capacity is used.
+        /// If <paramref name="capacity"/> is zero, no backing array is allocated and the first mutation will
+        /// grow the buffer, as needed.
         /// <para/>
         /// The <paramref name="maxCapacity"/> property defines the maximum number of characters that the current
         /// instance can hold. Its value is assigned to the <see cref="MaxCapacity"/> property. If the number of
@@ -313,8 +320,10 @@ namespace J2N.Text
         /// <param name="value">The <see cref="ICharSequence"/> used to initialize the value of the instance.
         /// If <paramref name="value"/> is <c>null</c>, the new <see cref="TextBuilder"/> will contain
         /// the empty string (that is, it contains <see cref="string.Empty"/>).</param>
-        /// <remarks>If <paramref name="value"/> is <c>null</c>, the new <see cref="TextBuilder"/> will
-        /// contain the empty string (that is, it contains <see cref="string.Empty"/>).</remarks>
+        /// <remarks>
+        /// If <paramref name="value"/> is <c>null</c>, the new <see cref="TextBuilder"/> will
+        /// contain the empty string (that is, it contains <see cref="string.Empty"/>).
+        /// </remarks>
         public TextBuilder(ICharSequence? value) // Coverage for the JDK // J2N TODO: Add overloads to slice the ICharsequence and set capacity?
         {
             buffer = CreateBuffer().Initialize(value);
