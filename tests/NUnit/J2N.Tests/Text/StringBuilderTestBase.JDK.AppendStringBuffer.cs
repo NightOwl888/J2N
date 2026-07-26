@@ -37,6 +37,17 @@ namespace J2N.Text
     {
         private static Randomizer generator = new Randomizer();
 
+        // J2N TODO: Evaluate the best way to convert this test to use SynchronizedTextBuffer instead of StringBuffer.
+        // We currently have no APIs on TextBuilder that append a SynchronizedTextBuffer without explicit external locking.
+        // It seems like having an Append(SynchronizedTextBuffer?) overload might be appropriate here, but if we go that route,
+        // we also need to cover other common APIs such as Equals(), CompareTo(), Insert(), Replace(), Repeat, etc. It may ultimately
+        // be more sensible to support that entire path through ICharSequence overloads (SynchronizedTextBuilder.AsCharSequence()),
+        // revert to having ICharSequence implemented dirctly on SynchronizedTextBuilder, or perhaps creating a new interface that
+        // represents a type that must be synchronized. Since implicit conversion to ReadOnlySpan<char> on SynchronizedTextBuilder
+        // is impractical because nothing we ever do with it will correctly synchronize the type, it seems like implementing
+        // ICharSequence directly would solve that problem in a way that doesn't add extra APIs onto MutableTextBuffer (except perhaps
+        // Equals, which doesn't curently support ICharSequence).
+
         [Test]
         public void Test_Append_StringBuffer()
         {
