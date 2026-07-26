@@ -233,10 +233,12 @@ namespace J2N.Text
         /// <remarks>
         /// This method is similar to <c>trimToSize()</c> in the JDK.
         /// <para/>
-        /// You can use the <see cref="TrimExcess()"/> method to minimize a <see cref="MutableTextBuffer"/> object's
-        /// memory overhead once it is known that no new characters will be added. To completely clear an
-        /// <see cref="MutableTextBuffer"/> object and release all memory referenced by it, call this method
-        /// after calling the <see cref="MutableTextBufferExtensions.Clear{TBuilder}(TBuilder)"/> method or setting <see cref="Length"/> property to 0.
+        /// The <see cref="TrimExcess()"/> method can be used to minimize a <see cref="MutableTextBuffer"/> object's
+        /// memory overhead once it is known that no new characters will be added.
+        /// <para/>
+        /// To completely clear a <see cref="MutableTextBuffer"/> object and release all memory referenced by it,
+        /// call <see cref="TrimExcess()"/> after calling the <see cref="MutableTextBufferExtensions.Clear{TBuilder}(TBuilder)"/>
+        /// method or after setting the <see cref="Length"/> property to 0.
         /// <para/>
         /// If the capacity is already equal to the current length, this method has no effect.
         /// </remarks>
