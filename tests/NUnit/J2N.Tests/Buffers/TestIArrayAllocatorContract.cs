@@ -20,7 +20,6 @@ using NUnit.Framework;
 
 namespace J2N.Buffers
 {
-
     [TestFixture]
     public class TestIArrayAllocatorContract
     {
@@ -34,9 +33,6 @@ namespace J2N.Buffers
 #endif
         };
 
-        /**
-         * @tests J2N.Buffers.IArrayAllocator<T>.Allocate(int)
-         */
         [Test]
         public void Test_AllAllocators_ReturnAtLeastRequestedLength()
         {
@@ -59,9 +55,6 @@ namespace J2N.Buffers
             }
         }
 
-        /**
-         * @tests J2N.Buffers.IArrayAllocator<T>.Allocate(int)
-         */
         [Test]
         public void Test_AllAllocators_AllowReadWriteOperations()
         {
@@ -88,9 +81,6 @@ namespace J2N.Buffers
             }
         }
 
-        /**
-         * @tests J2N.Buffers.IArrayAllocator<T>.Return(T[])
-         */
         [Test]
         public void Test_AllAllocators_SupportMultipleRentReturnCycles()
         {

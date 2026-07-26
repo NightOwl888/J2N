@@ -24,9 +24,6 @@ namespace J2N.Buffers
     [TestFixture]
     public class TestArrayAllocator
     {
-        /**
-         * @tests J2N.Buffers.ArrayAllocator<T>.Default
-         */
         [Test]
         public void Test_Default_ReturnsSingleton()
         {
@@ -36,18 +33,12 @@ namespace J2N.Buffers
             Assert.That(allocator1, Is.SameAs(allocator2));
         }
 
-        /**
-         * @tests J2N.Buffers.ArrayAllocator<T>.GuaranteesClearedArrays
-         */
         [Test]
         public void Test_GuaranteesClearedArrays_ReturnsTrue()
         {
             Assert.That(ArrayAllocator<char>.Default.GuaranteesClearedArrays, Is.True);
         }
 
-        /**
-         * @tests J2N.Buffers.ArrayAllocator<T>.Allocate(int)
-         */
         [Test]
         public void Test_Allocate_ReturnsExactLength()
         {
@@ -59,9 +50,6 @@ namespace J2N.Buffers
             Assert.That(array.Length, Is.EqualTo(128));
         }
 
-        /**
-         * @tests J2N.Buffers.ArrayAllocator<T>.Allocate(int)
-         */
         [Test]
         public void Test_Allocate_ZeroLength()
         {
@@ -73,9 +61,6 @@ namespace J2N.Buffers
             Assert.That(array.Length, Is.EqualTo(0));
         }
 
-        /**
-         * @tests J2N.Buffers.ArrayAllocator<T>.Allocate(int)
-         */
         [Test]
         public void Test_Allocate_ClearsArray()
         {
@@ -89,9 +74,6 @@ namespace J2N.Buffers
             }
         }
 
-        /**
-         * @tests J2N.Buffers.ArrayAllocator<T>.Return(T[])
-         */
         [Test]
         public void Test_Return_DoesNotThrow()
         {
@@ -102,9 +84,6 @@ namespace J2N.Buffers
             Assert.DoesNotThrow(() => allocator.Return(array));
         }
 
-        /**
-         * @tests J2N.Buffers.ArrayAllocator<T>.Allocate(int)
-         */
         [Test]
         public void Test_Allocate_NegativeLength_Throws()
         {
