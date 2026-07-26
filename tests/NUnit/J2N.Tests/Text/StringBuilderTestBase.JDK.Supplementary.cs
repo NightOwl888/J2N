@@ -224,8 +224,8 @@ namespace J2N.Text
             }
 
             // test exception
-            testAppendCodePoint(-1, typeof(ArgumentException));
-            testAppendCodePoint(0x10FFFF + 1, typeof(ArgumentException));
+            testAppendCodePoint(-1, typeof(ArgumentOutOfRangeException));
+            testAppendCodePoint(0x10FFFF + 1, typeof(ArgumentOutOfRangeException));
         }
 
         /**

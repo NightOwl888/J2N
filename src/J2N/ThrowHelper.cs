@@ -668,6 +668,18 @@ namespace J2N
         }
 
         [DoesNotReturn]
+        internal static void ThrowArgumentOutOfRange_InvalidCodePoint(int codePoint) // J2N: Moving forward, we should throw this. Character needs to be updated in 3.0.
+        {
+            throw new ArgumentOutOfRangeException(nameof(codePoint), SR.Format(SR.Argument_InvalidCodePoint, codePoint));
+        }
+
+        [DoesNotReturn]
+        internal static void ThrowArgumentOutOfRange_InvalidCodePoint(uint codePoint)
+        {
+            throw new ArgumentOutOfRangeException(nameof(codePoint), SR.Format(SR.Argument_InvalidCodePoint, codePoint));
+        }
+
+        [DoesNotReturn]
         internal static void ThrowArgumentException_Argument_MinMaxValue(ExceptionArgument min, ExceptionArgument max)
         {
             throw new ArgumentException(SR.Format(SR.Argument_MinMaxValue, GetArgumentName(min), GetArgumentName(max)));

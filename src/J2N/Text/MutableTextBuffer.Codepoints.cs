@@ -1,5 +1,7 @@
 ﻿using J2N.CodeGeneration;
 using System;
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
 
 namespace J2N.Text
 {
@@ -13,29 +15,53 @@ namespace J2N.Text
         /// <see cref="MutableTextBufferExtensions.AppendCodePoint{TBuilder}(TBuilder, int)"/>.
         /// Update that documentation if the behavior changes.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationExtensionImplementation]
         internal void AppendCodePointInternal(int codePoint) // Coverage for the JDK
         {
-            int count = Character.ToChars(codePoint, out char high, out char low);
+            uint value = (uint)codePoint;
+            if (!UnicodeUtility.IsValidCodePoint(value))
+                ThrowHelper.ThrowArgumentOutOfRange_InvalidCodePoint(codePoint);
 
+            bool isBmp = UnicodeUtility.IsBmpCodePoint(value);
             int pos = m_Position;
-            if (pos > m_Chars.Length - count)
+            if (isBmp && (uint)pos < (uint)m_Chars.Length)
             {
-                // Check if the count will put us over m_MaxCapacity.
-                // Doing the check here prevents corruption of the StringBuilder.
-                int newLength = pos + count;
-                if (newLength > m_MaxCapacity || newLength < count)
-                {
-                    ThrowHelper.ThrowArgumentOutOfRangeException(count, ExceptionArgument.codePoint, ExceptionResource.ArgumentOutOfRange_LengthGreaterThanCapacity);
-                }
+                m_Chars[pos] = (char)value;
+                m_Position = pos + 1;
+            }
+            else
+            {
+                AppendCodePointSlow(value, isBmp);
+            }
+        }
 
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private void AppendCodePointSlow(uint value, bool isBmp)
+        {
+            Debug.Assert(UnicodeUtility.IsValidCodePoint(value));
+
+            int count = isBmp ? 1 : 2;
+            if ((uint)m_Position + (uint)count > (uint)m_Chars.Length)
+            {
                 Grow(count);
             }
 
-            m_Chars[pos++] = high;
-            if (count == 2)
-                m_Chars[pos++] = low;
-            m_Position += count;
+            int pos = m_Position;
+
+            if (count == 1)
+            {
+                m_Chars[pos] = (char)value;
+            }
+            else
+            {
+                UnicodeUtility.GetUtf16SurrogatesFromSupplementaryPlaneScalar(
+                    value,
+                    out m_Chars[pos],
+                    out m_Chars[pos + 1]);
+            }
+
+            m_Position = pos + count;
         }
 
         /// <summary>
