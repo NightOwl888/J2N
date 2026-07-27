@@ -26,7 +26,7 @@ namespace J2N.Buffers
     /// An allocator that serves uninitialized arrays using <see cref="GC.AllocateUninitializedArray{T}(int, bool)"/>.
     /// </summary>
     /// <typeparam name="T">The type of array element.</typeparam>
-    public sealed class UninitializedArrayAllocator<T> : IArrayAllocator<T>
+    internal sealed class UninitializedArrayAllocator<T> : IArrayAllocator<T>
     {
         private UninitializedArrayAllocator() { }
 

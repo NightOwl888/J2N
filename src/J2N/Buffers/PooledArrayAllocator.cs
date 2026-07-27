@@ -26,7 +26,7 @@ namespace J2N.Buffers
     /// array instances using pooling.
     /// </summary>
     /// <typeparam name="T">The type of array element.</typeparam>
-    public sealed class PooledArrayAllocator<T> : IArrayAllocator<T>
+    internal sealed class PooledArrayAllocator<T> : IArrayAllocator<T>
     {
         private readonly ArrayPool<T> pool;
         private readonly bool clearArrays;

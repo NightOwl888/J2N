@@ -24,7 +24,7 @@ namespace J2N.Buffers
     /// Provides a contract for generating and releasing array storage.
     /// </summary>
     /// <typeparam name="T">The type of array element.</typeparam>
-    public interface IArrayAllocator<T>
+    internal interface IArrayAllocator<T>
     {
         /// <summary>
         /// Gets a value indicating whether the allocator gurantees array clearing or requires
