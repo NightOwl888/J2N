@@ -180,19 +180,14 @@ namespace J2N.Text
                 sb.Insert(sb.Length, MYCHARS, -1);
             });
 
-            Assert.Throws<ArgumentException>(() =>
+            Assert.Throws<ArgumentOutOfRangeException>(() =>
             {
-                sb.AppendCodePoint(Character.MaxCodePoint + 1, 1); // J2N: Changed 2nd parameter to be valid so we get the right exception
-            });
-
-            Assert.Throws<ArgumentException>(() =>
-            {
-                sb.AppendCodePoint(Character.MinCodePoint - 1, 1); // J2N: Changed 2nd parameter to be valid so we get the right exception
+                sb.AppendCodePoint(0x10FFFF + 1, -1);
             });
 
             Assert.Throws<ArgumentOutOfRangeException>(() =>
             {
-                sb.AppendCodePoint(0, -1); // J2N: Changed 1st parameter to be valid so we get the right exception
+                sb.AppendCodePoint(-1, -1);
             });
         }
     }
