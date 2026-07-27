@@ -25,7 +25,7 @@ namespace J2N.Text.Tests
 {
     public partial class MutableTextBuffer_Tests : StringBuilder_Tests
     {
-        public static readonly IArrayAllocator<char> DefaultAllocator =
+        internal static readonly IArrayAllocator<char> DefaultAllocator =
 #if FEATURE_GC_ALLOCATEUNINITIALIZEDARRAY
             UninitializedArrayAllocator<char>.Default;
 #else
