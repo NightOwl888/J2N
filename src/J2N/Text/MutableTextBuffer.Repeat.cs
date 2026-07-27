@@ -86,67 +86,74 @@ namespace J2N.Text
         /// <see cref="MutableTextBufferExtensions.AppendCodePoint{TBuilder}(TBuilder, int, int)"/>.
         /// Update that documentation if the behavior changes.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationExtensionImplementation]
         internal void AppendCodePointInternal(int codePoint, int repeatCount) // Coverage for the JDK
         {
+            uint value = (uint)codePoint;
+            if (!UnicodeUtility.IsValidCodePoint(value))
+                ThrowHelper.ThrowArgumentOutOfRange_InvalidCodePoint(codePoint);
             if (repeatCount < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(repeatCount, ExceptionArgument.repeatCount);
 
             if (repeatCount == 0)
+                return;
+
+            if (UnicodeUtility.IsBmpCodePoint(value))
             {
+                AppendCore((char)value, repeatCount);
                 return;
             }
 
-            int count = Character.ToChars(codePoint, out char high, out char low);
+            AppendSupplementaryRepeated(value, repeatCount);
+        }
 
-            if (count == 1)
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private void AppendSupplementaryRepeated(uint scalar, int repeatCount)
+        {
+            Debug.Assert(UnicodeUtility.GetUtf16SequenceLength(scalar) == 2);
+
+            int pos = m_Position;
+            // Ensure we don't append more chars than we can hold, and we don't
+            // have any integer overflow in our new length.
+            long appendingChars = (long)repeatCount * 2;
+            if (pos > m_Chars.Length - appendingChars)
             {
-                AppendCore((char)codePoint, repeatCount);
-                return;
-            }
-
-            AppendCodePointSlow(codePoint, repeatCount);
-
-            void AppendCodePointSlow(int codePoint, int repeatCount)
-            {
-                int pos = m_Position;
-                // Ensure we don't append more chars than we can hold, and we don't
-                // have any integer overflow in our new length.
-                long appendingChars = (long)count * repeatCount;
-                if (pos > m_Chars.Length - appendingChars)
+                // Check if the count will put us over m_MaxCapacity.
+                // Doing the check here prevents corruption of the StringBuilder.
+                long newLength = pos + appendingChars;
+                if (newLength > m_MaxCapacity || newLength < appendingChars)
                 {
-                    // Check if the count will put us over m_MaxCapacity.
-                    // Doing the check here prevents corruption of the StringBuilder.
-                    long newLength = pos + appendingChars;
-                    if (newLength > m_MaxCapacity || newLength < appendingChars)
-                    {
-                        ThrowHelper.ThrowArgumentOutOfRangeException(repeatCount, ExceptionArgument.repeatCount, ExceptionResource.ArgumentOutOfRange_LengthGreaterThanCapacity);
-                    }
-
-                    Grow((int)appendingChars);
+                    ThrowHelper.ThrowArgumentOutOfRangeException(
+                        repeatCount,
+                        ExceptionArgument.repeatCount,
+                        ExceptionResource.ArgumentOutOfRange_LengthGreaterThanCapacity);
                 }
 
-                int destinationLength = (int)appendingChars;
-                Span<char> destination =
-                    m_Chars.AsSpan(pos, destinationLength);
-                int copied = 0;
-
-                destination[copied++] = high;
-                destination[copied++] = low;
-
-                while (copied < destinationLength)
-                {
-                    int remaining = destinationLength - copied;
-                    int copyLength = copied < remaining ? copied : remaining;
-
-                    destination.Slice(0, copyLength)
-                        .CopyTo(destination.Slice(copied));
-
-                    copied += copyLength;
-                }
-
-                m_Position += destinationLength;
+                Grow((int)appendingChars);
             }
+
+            int destinationLength = (int)appendingChars;
+            Span<char> destination = m_Chars.AsSpan(pos, destinationLength);
+
+            UnicodeUtility.GetUtf16SurrogatesFromSupplementaryPlaneScalar(
+                scalar,
+                out destination[0],
+                out destination[1]);
+
+            int copied = 2;
+
+            while (copied < destinationLength)
+            {
+                int copyLength = Math.Min(copied, destinationLength - copied);
+
+                destination.Slice(0, copyLength)
+                    .CopyTo(destination.Slice(copied));
+
+                copied += copyLength;
+            }
+
+            m_Position = pos + destinationLength;
         }
 
         #endregion

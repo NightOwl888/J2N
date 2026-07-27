@@ -7,7 +7,6 @@ namespace J2N.Text.Tests
 {
     public abstract partial class StringBuilder_Tests
     {
-
         public static IEnumerable<object[]> AppendCodePoint_TestData()
         {
             // BMP
@@ -55,34 +54,114 @@ namespace J2N.Text.Tests
                 () => MutableTextBufferFactory().AppendCodePoint(Character.MaxCodePoint + 1));
         }
 
+        public static IEnumerable<object[]> AppendCodePoint_Repeat_TestData()
+        {
+            // BMP
+            yield return new object[] { "", 0x0041, 1, "A".ToCharArray() };
+            yield return new object[] { "", 0x0041, 2, "AA".ToCharArray() };
+            yield return new object[] { "", 0x0041, 5, "AAAAA".ToCharArray() };
+            yield return new object[] { "abc", 0x0041, 3, "abcAAA".ToCharArray() };
+
+            // Non-ASCII BMP
+            yield return new object[] { "", 0x03A9, 1, "Ω".ToCharArray() };
+            yield return new object[] { "abc", 0x03A9, 2, "abcΩΩ".ToCharArray() };
+
+            // High surrogate (BMP branch)
+            yield return new object[] { "", 0xD800, 3, new[] { '\uD800', '\uD800', '\uD800' } };
+
+            // Low surrogate (BMP branch)
+            yield return new object[] { "", 0xDC00, 2, new[] { '\uDC00', '\uDC00' } };
+
+            // Harmony values
+            yield return new object[] { "", 0x10000, 1, new[] { '\uD800', '\uDC00' } };
+            yield return new object[] { "", 0x10001, 2, new[] { '\uD800','\uDC01', '\uD800','\uDC01' } };
+            yield return new object[] { "", 0x10401, 2, new[] { '\uD801','\uDC01', '\uD801','\uDC01' } };
+            yield return new object[] { "", 0x10FFFF, 2, new[] { '\uDBFF','\uDFFF', '\uDBFF','\uDFFF'} };
+
+            // Emoji
+            yield return new object[] { "", 0x1F600, 3, new[] { '\uD83D', '\uDE00', '\uD83D', '\uDE00', '\uD83D','\uDE00' } };
+        }
+
         [Theory]
-        [InlineData("", 0x0041, 1, "A")]
-        [InlineData("", 0x0041, 2, "AA")]
-        [InlineData("", 0x0041, 5, "AAAAA")]
-        [InlineData("abc", 0x0041, 1, "abcA")]
-        [InlineData("abc", 0x0041, 3, "abcAAA")]
-
-        [InlineData("", 0x03A9, 1, "Ω")]
-        [InlineData("abc", 0x03A9, 2, "abcΩΩ")]
-
-        [InlineData("", 0x1F600, 1, "\U0001F600")]
-        [InlineData("", 0x1F600, 2, "\U0001F600\U0001F600")]
-        [InlineData("abc", 0x1F600, 1, "abc\U0001F600")]
-        [InlineData("abc", 0x1F600, 3, "abc\U0001F600\U0001F600\U0001F600")]
-
-        [InlineData("", 0x10FFFF, 1, "\U0010FFFF")]
-        [InlineData("", 0x10FFFF, 2, "\U0010FFFF\U0010FFFF")]
-        public void AppendCodePoint_RepeatCount(string value, int codePoint, int repeatCount, string expected)
+        [MemberData(nameof(AppendCodePoint_Repeat_TestData))]
+        public void AppendCodePoint_RepeatCount(string value, int codePoint, int repeatCount, char[] expected)
         {
             MutableTextBuffer builder = MutableTextBufferFactory(value);
+            builder.AppendCodePoint(codePoint, repeatCount);
+            AssertExtensions.Equal(expected, builder.AsSpan().ToArray());
+        }
+
+        [Theory]
+        [InlineData(0x0041, 'A', '\0', 1, 101)]
+        [InlineData(0x0041, 'A', '\0', 1, 127)]
+        [InlineData(0x0041, 'A', '\0', 1, 256)]
+        [InlineData(0x1F600, '\uD83D', '\uDE00', 2, 101)]
+        [InlineData(0x1F600, '\uD83D', '\uDE00', 2, 127)]
+        [InlineData(0x1F600, '\uD83D', '\uDE00', 2, 256)]
+        public void AppendCodePoint_RepeatCount_Large(int codePoint, char first, char second, int charCount, int repeatCount)
+        {
+            MutableTextBuffer builder = MutableTextBufferFactory();
 
             builder.AppendCodePoint(codePoint, repeatCount);
 
-            Assert.Equal(expected, builder.ToString());
+            char[] expected = new char[repeatCount * charCount];
+
+            int index = 0;
+            for (int i = 0; i < repeatCount; i++)
+            {
+                expected[index++] = first;
+                if (charCount == 2)
+                    expected[index++] = second;
+            }
+
+            AssertExtensions.Equal(expected, builder.AsSpan().ToArray());
+        }
+
+        [Theory]
+        [InlineData(0x0041, 'A', '\0', 1)]
+        [InlineData(0x1F600, '\uD83D', '\uDE00', 2)]
+        public void AppendCodePoint_RepeatCount_GrowsBuffer(int codePoint, char first, char second, int charCount)
+        {
+            MutableTextBuffer builder = MutableTextBufferFactory(0, 512);
+            const int RepeatCount = 100;
+            builder.AppendCodePoint(codePoint, RepeatCount);
+            Assert.Equal(RepeatCount * charCount, builder.Length);
+
+            int index = 0;
+            for (int i = 0; i < RepeatCount; i++)
+            {
+                Assert.Equal(first, builder[index++]);
+
+                if (charCount == 2)
+                    Assert.Equal(second, builder[index++]);
+            }
         }
 
         [Fact]
-        public void AppendCodePoint_Int32_Int32_Invalid()
+        public void AppendCodePoint_RepeatCount_AppendsAfterExistingContent()
+        {
+            MutableTextBuffer builder = MutableTextBufferFactory("Hello");
+            builder.AppendCodePoint(0x1F600, 100);
+            Assert.Equal("Hello", builder.ToString(0, 5));
+            for (int i = 0; i < 100; i++)
+            {
+                int index = 5 + i * 2;
+
+                Assert.Equal('\uD83D', builder[index]);
+                Assert.Equal('\uDE00', builder[index + 1]);
+            }
+        }
+
+        [Fact]
+        public void AppendCodePoint_RepeatCount_FillsCapacityExactly()
+        {
+            MutableTextBuffer builder = MutableTextBufferFactory(0, 200);
+            builder.AppendCodePoint(0x1F600, 100);
+            Assert.Equal(200, builder.Length);
+        }
+
+        [Fact]
+        public void AppendCodePoint_RepeatCount_Invalid()
         {
             AssertExtensions.Throws<ArgumentNullException>(
                 "text",
@@ -92,21 +171,15 @@ namespace J2N.Text.Tests
                 "repeatCount",
                 () => MutableTextBufferFactory().AppendCodePoint('A', -1));
 
-            AssertExtensions.Throws<ArgumentException>(
-                () => MutableTextBufferFactory().AppendCodePoint(-1, 1));
-
-            AssertExtensions.Throws<ArgumentException>(
-                () => MutableTextBufferFactory().AppendCodePoint(0x110000, 1));
-
-            AssertExtensions.Throws<ArgumentException>(
+            AssertExtensions.Throws<ArgumentOutOfRangeException>(
                 () => MutableTextBufferFactory().AppendCodePoint(Character.MinCodePoint - 1, 1));
 
-            AssertExtensions.Throws<ArgumentException>(
+            AssertExtensions.Throws<ArgumentOutOfRangeException>(
                 () => MutableTextBufferFactory().AppendCodePoint(Character.MaxCodePoint + 1, 1));
         }
 
         [Fact]
-        public void AppendCodePoint_Int32_Int32_CapacityExceeded()
+        public void AppendCodePoint_RepeatCount_CapacityExceeded()
         {
             MutableTextBuffer builder = MutableTextBufferFactory(0, 5);
 
