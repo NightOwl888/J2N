@@ -1,6 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <RootNamespace>J2N</RootNamespace>
     <Description>Abstractions for testing in Xunit (common base classes and mocks).</Description>
     <IsTestProject>false</IsTestProject>

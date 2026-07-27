@@ -6,6 +6,11 @@
 
   <Import Project="..\TestProject.Common.References.targets" />
   <Import Project="..\..\SystemMemoryReferenceOverride.targets" />
+  <ItemGroup>
+    <Compile Remove="Text\TextMemoryExtensions\**" />
+    <EmbeddedResource Remove="Text\TextMemoryExtensions\**" />
+    <None Remove="Text\TextMemoryExtensions\**" />
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\src\J2N\J2N.csproj">

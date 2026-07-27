@@ -2,7 +2,7 @@
 
 namespace J2N.Text.Tests
 {
-    internal static class MutableTextBufferExtensions
+    internal static class MutableTextBufferHelpers
     {
         public static char[] ToCharArray(this MutableTextBuffer buffer)
         {
