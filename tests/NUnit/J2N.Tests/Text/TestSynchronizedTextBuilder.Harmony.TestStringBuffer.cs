@@ -1350,24 +1350,24 @@ namespace J2N.Text
         {
             string fixture = "0123456789";
             SynchronizedTextBuilder sb = new SynchronizedTextBuilder(fixture);
-            assertEquals(0, sb.IndexOf("0", StringComparison.Ordinal));
-            assertEquals(0, sb.IndexOf("012", StringComparison.Ordinal));
-            assertEquals(-1, sb.IndexOf("02", StringComparison.Ordinal));
-            assertEquals(8, sb.IndexOf("89", StringComparison.Ordinal));
+            assertEquals(0, sb.IndexOf("0"));
+            assertEquals(0, sb.IndexOf("012"));
+            assertEquals(-1, sb.IndexOf("02"));
+            assertEquals(8, sb.IndexOf("89"));
 
-            assertEquals(0, sb.IndexOf("0", StringComparison.Ordinal), 0);
-            assertEquals(0, sb.IndexOf("012", StringComparison.Ordinal), 0);
-            assertEquals(-1, sb.IndexOf("02", StringComparison.Ordinal), 0);
-            assertEquals(8, sb.IndexOf("89", StringComparison.Ordinal), 0);
+            assertEquals(0, sb.IndexOf("0"), 0);
+            assertEquals(0, sb.IndexOf("012"), 0);
+            assertEquals(-1, sb.IndexOf("02"), 0);
+            assertEquals(8, sb.IndexOf("89"), 0);
 
-            assertEquals(-1, sb.IndexOf("0", StringComparison.Ordinal), 5);
-            assertEquals(-1, sb.IndexOf("012", StringComparison.Ordinal), 5);
-            assertEquals(-1, sb.IndexOf("02", StringComparison.Ordinal), 0);
-            assertEquals(8, sb.IndexOf("89", StringComparison.Ordinal), 5);
+            assertEquals(-1, sb.IndexOf("0"), 5);
+            assertEquals(-1, sb.IndexOf("012"), 5);
+            assertEquals(-1, sb.IndexOf("02"), 0);
+            assertEquals(8, sb.IndexOf("89"), 5);
 
             try
             {
-                sb.IndexOf(null, 0, StringComparison.Ordinal);
+                sb.IndexOf(null, 0);
                 fail("Should throw a NullPointerExceptionE");
             }
             catch (ArgumentNullException e)
@@ -1384,24 +1384,24 @@ namespace J2N.Text
         {
             string fixture = "0123456789";
             SynchronizedTextBuilder sb = new SynchronizedTextBuilder(fixture);
-            assertEquals(0, sb.LastIndexOf("0", StringComparison.Ordinal));
-            assertEquals(0, sb.LastIndexOf("012", StringComparison.Ordinal));
-            assertEquals(-1, sb.LastIndexOf("02", StringComparison.Ordinal));
-            assertEquals(8, sb.LastIndexOf("89", StringComparison.Ordinal));
+            assertEquals(0, sb.LastIndexOf("0"));
+            assertEquals(0, sb.LastIndexOf("012"));
+            assertEquals(-1, sb.LastIndexOf("02"));
+            assertEquals(8, sb.LastIndexOf("89"));
 
-            assertEquals(0, sb.LastIndexOf("0", StringComparison.Ordinal), 0);
-            assertEquals(0, sb.LastIndexOf("012", StringComparison.Ordinal), 0);
-            assertEquals(-1, sb.LastIndexOf("02", StringComparison.Ordinal), 0);
-            assertEquals(8, sb.LastIndexOf("89", StringComparison.Ordinal), 0);
+            assertEquals(0, sb.LastIndexOf("0"), 0);
+            assertEquals(0, sb.LastIndexOf("012"), 0);
+            assertEquals(-1, sb.LastIndexOf("02"), 0);
+            assertEquals(8, sb.LastIndexOf("89"), 0);
 
-            assertEquals(-1, sb.LastIndexOf("0", StringComparison.Ordinal), 5);
-            assertEquals(-1, sb.LastIndexOf("012", StringComparison.Ordinal), 5);
-            assertEquals(-1, sb.LastIndexOf("02", StringComparison.Ordinal), 0);
-            assertEquals(8, sb.LastIndexOf("89", StringComparison.Ordinal), 5);
+            assertEquals(-1, sb.LastIndexOf("0"), 5);
+            assertEquals(-1, sb.LastIndexOf("012"), 5);
+            assertEquals(-1, sb.LastIndexOf("02"), 0);
+            assertEquals(8, sb.LastIndexOf("89"), 5);
 
             try
             {
-                sb.LastIndexOf(null, 0, StringComparison.Ordinal);
+                sb.LastIndexOf(null, 0);
                 fail("Should throw a NullPointerException");
             }
             catch (ArgumentNullException e)
