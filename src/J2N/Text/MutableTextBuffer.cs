@@ -1,4 +1,7 @@
-﻿using J2N.Buffers;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+
+using J2N.Buffers;
 using J2N.CodeGeneration;
 using J2N.Collections;
 using J2N.Numerics;
