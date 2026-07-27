@@ -181,18 +181,18 @@ namespace J2N.Text
             assertEquals("Assert 1: must equal 'abc'.", "abc", new SynchronizedTextBuilder((string)"abc").ToString());
         }
 
-        //[Test]
-        //public void Test_trimToSize()
-        //{
-        //    SynchronizedTextBuilder buffer = new SynchronizedTextBuilder(25);
-        //    buffer.Append("abc");
-        //    int origCapacity = buffer.Capacity;
-        //    buffer.trimToSize();
-        //    int trimCapacity = buffer.Capacity;
-        //    assertTrue("Assert 0: capacity must be smaller.", trimCapacity < origCapacity);
-        //    assertEquals("Assert 1: length must still be 3", 3, buffer.Length);
-        //    assertEquals("Assert 2: value must still be 'abc'.", "abc", buffer.ToString());
-        //}
+        [Test]
+        public void Test_trimToSize()
+        {
+            SynchronizedTextBuilder buffer = new SynchronizedTextBuilder(25);
+            buffer.Append("abc");
+            int origCapacity = buffer.Capacity;
+            buffer.TrimExcess();
+            int trimCapacity = buffer.Capacity;
+            assertTrue("Assert 0: capacity must be smaller.", trimCapacity < origCapacity);
+            assertEquals("Assert 1: length must still be 3", 3, buffer.Length);
+            assertEquals("Assert 2: value must still be 'abc'.", "abc", buffer.ToString());
+        }
 
         /**
          * @tests java.lang.SynchronizedTextBuilder.Append(CharSequence)
