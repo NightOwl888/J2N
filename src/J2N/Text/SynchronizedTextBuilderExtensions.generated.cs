@@ -1404,7 +1404,7 @@ namespace J2N.Text
         /// <param name="text">The target builder.</param>
         /// <param name="codePoint">A Unicode code point.</param>
         /// <returns>A reference to this instance after the operation has completed.</returns>
-        /// <exception cref="ArgumentException"><paramref name="codePoint"/> is not a valid Unicode code point.</exception>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="codePoint"/> is not a valid Unicode code point.</exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TBuilder AppendCodePoint<TBuilder>(this TBuilder text, int codePoint)
             where TBuilder : SynchronizedTextBuilder
@@ -1439,10 +1439,12 @@ namespace J2N.Text
         /// <param name="codePoint">A Unicode code point.</param>
         /// <returns>A reference to this instance after the operation has completed.</returns>
         /// <exception cref="ArgumentOutOfRangeException">
-        /// <paramref name="index"/> is less than zero or greater
-        /// than the length of this instance.
+        /// <paramref name="index"/> is less than zero or greater than the length of this instance.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="codePoint"/> is not a valid Unicode code point.
         /// </exception>
-        /// <exception cref="ArgumentException"><paramref name="codePoint"/> is not a valid Unicode code point.</exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TBuilder InsertCodePoint<TBuilder>(this TBuilder text, int index, int codePoint)
             where TBuilder : SynchronizedTextBuilder
@@ -3477,8 +3479,11 @@ namespace J2N.Text
         /// <param name="codePoint">A Unicode code point.</param>
         /// <param name="repeatCount">The number of times to append the string representation of <paramref name="codePoint"/>.</param>
         /// <returns>A reference to this instance after the operation has completed.</returns>
-        /// <exception cref="ArgumentException"><paramref name="codePoint"/> is not a valid Unicode code point.</exception>
         /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="codePoint"/> is not a valid Unicode code point.
+        /// <para/>
+        /// -or-
+        /// <para/>
         /// <paramref name="repeatCount"/> is less than zero.
         /// <para/>
         /// -or-
