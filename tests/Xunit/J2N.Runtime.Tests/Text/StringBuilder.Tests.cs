@@ -2189,7 +2189,7 @@ namespace J2N.Text.Tests
             Assert.Equal(expected, destination);
         }
 
-        // J2N TODO: Multiple chunk tests?
+        // J2N: Multiple chunks are not supported.
         //[Fact]
         //public void CopyTo_StringBuilderWithMultipleChunks()
         //{
@@ -2267,7 +2267,7 @@ namespace J2N.Text.Tests
 
             yield return new object?[] { sb1, null, false };
 
-            // J2N TODO: StringBuilder with multiple chunks?
+            // J2N: Multiple chunks are not supported.
             //StringBuilder chunkSplitBuilder = StringBuilderWithMultipleChunks();
             //yield return new object?[] { chunkSplitBuilder, StringBuilderWithMultipleChunks(), true };
             //yield return new object?[] { sb1, chunkSplitBuilder, false };
@@ -3633,7 +3633,7 @@ namespace J2N.Text.Tests
             Assert.Equal(expected, builder.ToString());
         }
 
-        // J2N TODO: StringBuilder with multiple chunks?
+        // J2N: Multiple chunks are not supported.
         //[Theory]
         //[InlineData(1, 29, "a")]
         //[InlineData(0, 29, "a")]
@@ -3682,7 +3682,7 @@ namespace J2N.Text.Tests
             Assert.Equal(expected, builder.ToString());
         }
 
-        // J2N TODO: StringBuilder with multiple chunks?
+        // J2N: Multiple chunks are not supported.
         //[Fact]
         //public void Replace_Char_StringBuilderWithMultipleChunks()
         //{
@@ -3721,7 +3721,7 @@ namespace J2N.Text.Tests
             Assert.Equal(expected, builder.ToString(startIndex, length));
         }
 
-        // J2N TODO: StringBuilder with multiple chunks?
+        // J2N: Multiple chunks are not supported.
         //[Fact]
         //public void ToString_StringBuilderWithMultipleChunks()
         //{
@@ -4128,7 +4128,7 @@ namespace J2N.Text.Tests
             Assert.Equal(expected, destination);
         }
 
-        // J2N TODO: StringBuilder with multiple chunks?
+        // J2N: Multiple chunks are not supported.
         //[Fact]
         //public void CopyTo_CharSpan_StringBuilderWithMultipleChunks()
         //{
