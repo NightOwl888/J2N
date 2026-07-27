@@ -60,7 +60,7 @@ namespace J2N.Buffers
         /// Returns an array and clears up to the specified length.
         /// </summary>
         // From: https://github.com/dotnet/runtime/blob/v10.0.10/src/libraries/System.Private.CoreLib/src/System/Buffers/ArrayPool.cs#L101-L105
-        public static void Return<T>(this ArrayPool<T> pool, T[] array, int lengthToClear)
+        internal static void Return<T>(this ArrayPool<T> pool, T[] array, int lengthToClear)
         {
             array.AsSpan(0, lengthToClear).Clear();
             pool.Return(array);
