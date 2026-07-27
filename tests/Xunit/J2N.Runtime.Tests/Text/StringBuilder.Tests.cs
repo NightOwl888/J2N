@@ -178,7 +178,7 @@ namespace J2N.Text.Tests
             Assert.Same(string.Empty, builder.ToString());
             Assert.Equal(string.Empty, builder.ToString(0, 0));
             Assert.Equal(0, builder.Length);
-            Assert.Equal(MaxArrayLength, builder.MaxCapacity);
+            Assert.Equal(int.MaxValue, builder.MaxCapacity);
         }
 
         [Fact]
@@ -189,7 +189,7 @@ namespace J2N.Text.Tests
             Assert.Equal(0, builder.Length);
 
             Assert.True(builder.Capacity >= 42);
-            Assert.Equal(MaxArrayLength, builder.MaxCapacity);
+            Assert.Equal(int.MaxValue, builder.MaxCapacity);
         }
 
         [Fact]
@@ -257,7 +257,7 @@ namespace J2N.Text.Tests
             string expected = value ?? "";
             Assert.Equal(expected, builder.ToString());
             Assert.Equal(expected.Length, builder.Length);
-
+            
             Assert.True(builder.Capacity >= 42);
         }
 
@@ -275,11 +275,10 @@ namespace J2N.Text.Tests
         //    Assert.Equal(maxLength, builder.Length);
         //}
 
-        [Fact] // J2N specific - was Ctor_String_Int_NegativeCapacity_ThrowsArgumentOutOfRangeException()
-        public void Ctor_String_Int_Invalid()
+        [Fact]
+        public void Ctor_String_Int_NegativeCapacity_ThrowsArgumentOutOfRangeException()
         {
             AssertExtensions.Throws<ArgumentOutOfRangeException>("capacity", () => MutableTextBufferFactory("", -1)); // Capacity < 0
-            AssertExtensions.Throws<ArgumentOutOfRangeException>("capacity", () => MutableTextBufferFactory("foo", MaxArrayLength + 1)); // Capacity > Array.MaxLength
         }
 
         [Theory]
@@ -319,7 +318,7 @@ namespace J2N.Text.Tests
             AssertExtensions.Throws<ArgumentOutOfRangeException>("startIndex", () => MutableTextBufferFactory("foo", -1, 0, 0)); // Start index < 0
             AssertExtensions.Throws<ArgumentOutOfRangeException>("length", () => MutableTextBufferFactory("foo", 0, -1, 0)); // Length < 0
             AssertExtensions.Throws<ArgumentOutOfRangeException>("capacity", () => MutableTextBufferFactory("foo", 0, 0, -1)); // Capacity < 0
-            AssertExtensions.Throws<ArgumentOutOfRangeException>("capacity", () => MutableTextBufferFactory("foo", 0, 0, MaxArrayLength + 1)); // Capacity > Array.MaxLength
+            
             AssertExtensions.Throws<ArgumentOutOfRangeException>("length", () => MutableTextBufferFactory("foo", 4, 0, 0)); // Start index + length > builder.Length
             AssertExtensions.Throws<ArgumentOutOfRangeException>("length", () => MutableTextBufferFactory("foo", 3, 1, 0)); // Start index + length > builder.Length
         }
@@ -351,16 +350,6 @@ namespace J2N.Text.Tests
         //    Assert.Equal(MaxArrayLength, builder.Length);
         //}
 
-        [Fact] // J2N specific
-        public unsafe void Ctor_CharSpan_GreaterThanMaxArrayLength_ThrowsArgumentOutOfRangeException()
-        {
-            // We create an invalid pointer here instead of a string that is too long because the test would be very slow to run otherwise.
-            // The constructor should check the the length against MaxCapacity, so it should throw before it tries to
-            // read from the pointer.
-            char c = 'a';
-            AssertExtensions.Throws<ArgumentOutOfRangeException>("valueCount", () => MutableTextBufferFactory(new ReadOnlySpan<char>(Unsafe.AsPointer(ref c), MaxArrayLength + 1))); // value.Length > Array.MaxLength
-        }
-
         [Theory] // J2N specific
         [InlineData("Hello", 0, 5)]
         [InlineData("Hello", 2, 3)]
@@ -391,20 +380,9 @@ namespace J2N.Text.Tests
         //}
 
         [Fact] // J2N specific
-        public unsafe void Ctor_CharSpan_Int_GreaterThanMaxArrayLength_ThrowsArgumentOutOfRangeException()
-        {
-            // We create an invalid pointer here instead of a string that is too long because the test would be very slow to run otherwise.
-            // The constructor should check the the length against MaxCapacity, so it should throw before it tries to
-            // read from the pointer.
-            char c = 'a';
-            AssertExtensions.Throws<ArgumentOutOfRangeException>("valueCount", () => MutableTextBufferFactory(new ReadOnlySpan<char>(Unsafe.AsPointer(ref c), MaxArrayLength + 1), 0)); // value.Length > Array.MaxLength
-        }
-
-        [Fact] // J2N specific
-        public void Ctor_CharSpan_Int_Invalid()
+        public void Ctor_CharSpan_Int_NegativeCapacity_ThrowsArgumentOutOfRangeException()
         {
             AssertExtensions.Throws<ArgumentOutOfRangeException>("capacity", () => MutableTextBufferFactory("foo".AsSpan(0, 0), -1)); // Capacity < 0
-            AssertExtensions.Throws<ArgumentOutOfRangeException>("capacity", () => MutableTextBufferFactory("foo".AsSpan(0, 0), MaxArrayLength + 1)); // Capacity > Array.MaxLength
         }
 
         [Theory] // J2N specific
@@ -501,7 +479,6 @@ namespace J2N.Text.Tests
             AssertExtensions.Throws<ArgumentOutOfRangeException>("startIndex", () => MutableTextBufferFactory(new StringBuilder("foo"), -1, 0, 0)); // Start index < 0
             AssertExtensions.Throws<ArgumentOutOfRangeException>("length", () => MutableTextBufferFactory(new StringBuilder("foo"), 0, -1, 0)); // Length < 0
             AssertExtensions.Throws<ArgumentOutOfRangeException>("capacity", () => MutableTextBufferFactory(new StringBuilder("foo"), 0, 0, -1)); // Capacity < 0
-            AssertExtensions.Throws<ArgumentOutOfRangeException>("capacity", () => MutableTextBufferFactory(new StringBuilder("foo"), 0, 0, MaxArrayLength + 1)); // Capacity > Array.MaxLength
 
             AssertExtensions.Throws<ArgumentOutOfRangeException>("length", () => MutableTextBufferFactory(new StringBuilder("foo"), 4, 0, 0)); // Start index + length > builder.Length
             AssertExtensions.Throws<ArgumentOutOfRangeException>("length", () => MutableTextBufferFactory(new StringBuilder("foo"), 3, 1, 0)); // Start index + length > builder.Length
@@ -545,8 +522,8 @@ namespace J2N.Text.Tests
         {
             MutableTextBuffer builder = MutableTextBufferFactory(value);
 
-            Assert.Equal(expected, builder.ToString());
             Assert.Equal(expected.Length, builder.Length);
+            Assert.Equal(expected, builder.ToString());
         }
 
         #endregion Constructor Tests

@@ -111,7 +111,7 @@ namespace J2N.Text
             this.allocator = allocator;
             // J2N: We rely on Initialize() to properly set up the state, but it is considered
             // an optional operation.
-            m_MaxCapacity = Arrays.MaxArrayLength;
+            m_MaxCapacity = int.MaxValue;
             m_Chars = Arrays.Empty<char>();
         }
 
