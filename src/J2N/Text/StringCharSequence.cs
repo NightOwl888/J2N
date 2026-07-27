@@ -389,7 +389,9 @@ namespace J2N.Text
         /// </summary>
         /// <param name="other">A <see cref="T:char[]"/> to compare to the current <see cref="StringCharSequence"/>.</param>
         /// <returns><c>true</c> if <paramref name="other"/> is equal to the current <see cref="StringCharSequence"/>; otherwise, <c>false</c>.</returns>
-        public bool Equals(ReadOnlySpan<char> other)
+        // J2N TODO: API - Before we mark this public, we need to evaluate whether existing classes that are implicitly convertible to
+        // ReadOnlySpan<char> (whether or not they implement ICharSequence) will cause "ambiguous overload" issues with the compiler.
+        internal bool Equals(ReadOnlySpan<char> other)
         {
             return Value.AsSpan().SequenceEqual(other);
         }
@@ -530,7 +532,9 @@ namespace J2N.Text
         /// Zero indicates the strings are equal.
         /// Greater than zero indicates the comparison value is less than the current string.
         /// </returns>
-        public int CompareTo(ReadOnlySpan<char> other)
+        // J2N TODO: API - Before we mark this public, we need to evaluate whether existing classes that are implicitly convertible to
+        // ReadOnlySpan<char> (whether or not they implement ICharSequence) will cause "ambiguous overload" issues with the compiler.
+        internal int CompareTo(ReadOnlySpan<char> other)
         {
             return Value.CompareToOrdinal(other);
         }
