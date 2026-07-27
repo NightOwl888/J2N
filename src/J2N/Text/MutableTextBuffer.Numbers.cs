@@ -131,12 +131,10 @@ namespace J2N.Text
         /// <see cref="MutableTextBufferExtensions.Append{TBuilder}(TBuilder, decimal, ReadOnlySpan{char}, IFormatProvider?)"/>.
         /// Update that documentation if the behavior changes.
         /// </remarks>
-        // J2N TODO: Since BigDecimal in Java doesn't use the same default format as this, we will need to change the default before this can be made public
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationExtensionImplementation]
         internal void AppendInternal(decimal value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
             => AppendNumberCore<decimal, DecimalFormatter>(14, value, format, provider);
-        //=> AppendInternal(value.ToString(Number.ConvertFormatToString(format), provider ?? DefaultNumberFormatInfo));
 
         /// <summary>
         /// Appends the string representation of a specified numeric type to this instance.
@@ -338,12 +336,10 @@ namespace J2N.Text
         /// <see cref="MutableTextBufferExtensions.Insert{TBuilder}(TBuilder, int, decimal, ReadOnlySpan{char}, IFormatProvider?)"/>.
         /// Update that documentation if the behavior changes.
         /// </remarks>
-        // J2N TODO: Since BigDecimal in Java doesn't use the same default format as this, we will need to change the default before this can be made public
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationExtensionImplementation]
         internal void InsertInternal(int index, decimal value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
             => InsertNumberCore<decimal, DecimalFormatter>(index, value, format, provider);
-        //=> InsertInternal(index, value.ToString(Number.ConvertFormatToString(format), provider ?? DefaultNumberFormatInfo), 1);
 
         /// <summary>
         /// Inserts the string representation of a specified numeric type to this instance
