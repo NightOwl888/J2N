@@ -3719,6 +3719,11 @@ namespace J2N.Text.Tests
                 Assert.Equal(expected, builder.ToString());
             }
             Assert.Equal(expected, builder.ToString(startIndex, length));
+            // J2N: Exercise ToString(int) when the requested substring extends to the end.
+            if (length == value.Length - startIndex)
+            {
+                Assert.Equal(expected, builder.ToString(startIndex));
+            }
         }
 
         // J2N: Multiple chunks are not supported.
@@ -3737,9 +3742,11 @@ namespace J2N.Text.Tests
         {
             var builder = MutableTextBufferFactory("Hello");
             AssertExtensions.Throws<ArgumentOutOfRangeException>("startIndex", () => builder.ToString(-1, 0)); // Start index < 0
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("startIndex", () => builder.ToString(-1)); // Start index < 0
             AssertExtensions.Throws<ArgumentOutOfRangeException>("length", () => builder.ToString(0, -1)); // Length < 0
 
             AssertExtensions.Throws<ArgumentOutOfRangeException>("startIndex", () => builder.ToString(6, 0)); // Length + start index > builder.Length
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("startIndex", () => builder.ToString(6)); // Length + start index > builder.Length
             AssertExtensions.Throws<ArgumentOutOfRangeException>("length", () => builder.ToString(5, 1)); // Length + start index > builder.Length
             AssertExtensions.Throws<ArgumentOutOfRangeException>("length", () => builder.ToString(4, 2)); // Length + start index > builder.Length
         }
