@@ -43,6 +43,29 @@ namespace J2N.Text.Tests
             yield return new object[] { "aaaabbbbccccdddd", "aaaabbbbccccdddd", "", 16, 0, "aaaabbbbccccdddd" };
             yield return new object[] { "aaaabbbbccccdddd", "aaaabbbbccccdddde", "", 0, 16, "aaaabbbbccccdddd" };
             yield return new object[] { "aaaaaaaaaaaaaaaa", "a", "b", 0, 16, "bbbbbbbbbbbbbbbb" };
+
+            // Regression tests for issues found during initial AI review
+            yield return new object[] { "a-a", "a", "ZZ", 0, 3, "ZZ-ZZ" };
+            yield return new object[] { "axa", "a", "XX", 0, 3, "XXxXX" };
+            yield return new object[] { "abab", "b", "YYY", 0, 4, "aYYYaYYY" };
+            yield return new object[] { "a,a,a", "a", "QQ", 0, 5, "QQ,QQ,QQ" };
+            yield return new object[] { "foobar", "ba", "oo", 0, 6, "foooor" };
+
+            // Expansion path
+            yield return new object[] { "a-a", "a", "XXXXXXXXXXXXXXXXXXXX", 0, 3, "XXXXXXXXXXXXXXXXXXXX-XXXXXXXXXXXXXXXXXXXX" };
+            yield return new object[] { "abab", "b", "XXXXXXXXXXXXXXXXXXXX", 0, 4, "aXXXXXXXXXXXXXXXXXXXXaXXXXXXXXXXXXXXXXXXXX" };
+            yield return new object[] { "aaaaaaaaaaaaaaaa", "a", "XXXXXXXXXXXXXXXXXXXX", 0, 16, "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" };
+            yield return new object[] { "abababababababab", "b", "XXXXXXXXXXXXXXXXXXXX", 0, 16, "aXXXXXXXXXXXXXXXXXXXXaXXXXXXXXXXXXXXXXXXXXaXXXXXXXXXXXXXXXXXXXXaXXXXXXXXXXXXXXXXXXXXaXXXXXXXXXXXXXXXXXXXXaXXXXXXXXXXXXXXXXXXXXaXXXXXXXXXXXXXXXXXXXXaXXXXXXXXXXXXXXXXXXXX" };
+            yield return new object[] { "a,a,a,a,a,a,a,a", "a", "XXXXXXXXXXXXXXXXXXXX", 0, 15, "XXXXXXXXXXXXXXXXXXXX,XXXXXXXXXXXXXXXXXXXX,XXXXXXXXXXXXXXXXXXXX,XXXXXXXXXXXXXXXXXXXX,XXXXXXXXXXXXXXXXXXXX,XXXXXXXXXXXXXXXXXXXX,XXXXXXXXXXXXXXXXXXXX,XXXXXXXXXXXXXXXXXXXX" };
+            yield return new object[] { "aaaaaaaaaaaaaaaa", "aa", "XXXXXXXXXXXXXXXXXXXX", 0, 16, "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" };
+            yield return new object[] { "abababababababab", "ab", "XXXXXXXXXXXXXXXXXXXX", 0, 16, "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" };
+            yield return new object[] { "aaaaaaaaaaaaaaaa", "a", "", 0, 16, "" };
+            yield return new object[] { "aaaaaaaaaaaaaaaa", "a", "XXXXXXXXXXXXXXXXXXXX", 2, 12, "aaXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXaa" };
+            yield return new object[] { "aaaabbbbccccddddaaaabbbbccccdddd", "bbbb", "XXXXXXXXXXXXXXXXXXXX", 0, 32, "aaaaXXXXXXXXXXXXXXXXXXXXccccddddaaaaXXXXXXXXXXXXXXXXXXXXccccdddd" };
+            yield return new object[] { "012345678901234567890123456789", "0", "XXXXXXXXXXXXXXXXXXXX", 0, 30, "XXXXXXXXXXXXXXXXXXXX123456789XXXXXXXXXXXXXXXXXXXX123456789XXXXXXXXXXXXXXXXXXXX123456789" };
+            yield return new object[] { "xyxyxyxyxyxyxyxy", "xy", "XXXXXXXXXXXXXXXXXXXX", 0, 16, "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" };
+            yield return new object[] { "startstartstarttartcart55", "art", "_AAABBBCCCDDDEEEFFFGGG_", 0, 25, "st_AAABBBCCCDDDEEEFFFGGG_st_AAABBBCCCDDDEEEFFFGGG_st_AAABBBCCCDDDEEEFFFGGG_t_AAABBBCCCDDDEEEFFFGGG_c_AAABBBCCCDDDEEEFFFGGG_55" };
+
         }
 
         [Theory]
@@ -80,6 +103,338 @@ namespace J2N.Text.Tests
             // Use Replace(ReadOnlySpan<char>, ReadOnlySpan<char>, int, int)
             builder = MutableTextBufferFactory(value);
             builder.Replace(oldValue.AsSpan(), newValue.AsSpan(), startIndex, count);
+            Assert.Equal(expected, builder.ToString());
+        }
+
+        public static IEnumerable<object[]> Replace_Overlapping_TestData()
+        {
+            yield return new object[] { "foobar", TestValue.Literal("ba"), TestValue.Builder(1, 2), 0, 6, "foooor" };
+            yield return new object[] { "foobar", TestValue.Builder(3, 2), TestValue.Literal("oo"), 0, 6, "foooor" };
+            yield return new object[] { "foobar", TestValue.Builder(3, 2), TestValue.Builder(1, 2), 0, 6, "foooor" };
+
+            yield return new object[] { "foobar", TestValue.Builder(0, 3), TestValue.Literal("awnughcoo"), 0, 6, "awnughcoobar" };
+
+            yield return new object[] { "aaaabbbbccccdddd", TestValue.Builder(0, 10), TestValue.Literal("qkajelrfvrt"), 0, 16, "qkajelrfvrtccdddd" };
+
+            yield return new object[] { "aaaabbbbccccdddd", TestValue.Builder(0, 11), TestValue.Literal("ncpcaqghbvx"), 0, 16, "ncpcaqghbvxcdddd" };
+
+            yield return new object[] { "aaaabbbbccccdddd", TestValue.Builder(8, 6), TestValue.Literal("sytssuartco"), 0, 16, "aaaabbbbsytssuartcodd" };
+
+            yield return new object[] { "aaaabbbbccccdddd", TestValue.Builder(10, 5), TestValue.Literal("zuvqimjokw"), 0, 16, "aaaabbbbcczuvqimjokwd" };
+
+            yield return new object[] { "aaaabbbbccccdddd", TestValue.Builder(8, 7), TestValue.Literal("qxwu"), 0, 16, "aaaabbbbqxwud" };
+
+            yield return new object[] { "aaaabbbbccccdddd", TestValue.Builder(11, 3), TestValue.Literal("fvk"), 0, 16, "aaaabbbbcccfvkdd" };
+
+            yield return new object[] { "aaaabbbbccccdddd", TestValue.Builder(0, 11), TestValue.Literal("ospommcq"), 0, 16, "ospommcqcdddd" };
+
+            yield return new object[] { "aaaabbbbccccdddd", TestValue.Builder(4, 7), TestValue.Literal("sxkcch"), 0, 16, "aaaasxkcchcdddd" };
+
+            yield return new object[] { "a-a", TestValue.Builder(0, 2), TestValue.Literal("ru"), 0, 3, "rua" };
+
+            yield return new object[] { "axa", TestValue.Builder(0, 2), TestValue.Literal("saa"), 0, 3, "saaa" };
+
+            yield return new object[] { "abab", TestValue.Builder(0, 3), TestValue.Literal("fxfzsrafz"), 0, 4, "fxfzsrafzb" };
+
+            yield return new object[] { "a,a,a", TestValue.Builder(0, 3), TestValue.Literal("kgedapdod"), 0, 5, "kgedapdod,a" };
+
+            yield return new object[] { "aaaaaaaaaaaaaaaa", TestValue.Builder(10, 2), TestValue.Literal("rjhyd"), 0, 16, "rjhydrjhydrjhydrjhydrjhydrjhydrjhydrjhyd" };
+
+            yield return new object[] { "abababababababab", TestValue.Builder(8, 7), TestValue.Literal("rh"), 0, 16, "rhbrhb" };
+
+            yield return new object[] { "aaaaaaaaaaaaaaaa", TestValue.Builder(3, 6), TestValue.Literal("bpfipvgutquq"), 0, 16, "bpfipvgutquqbpfipvgutquqaaaa" };
+
+            yield return new object[] { "abababababababab", TestValue.Builder(0, 9), TestValue.Literal("yzqiancsjfvb"), 0, 16, "yzqiancsjfvbbababab" };
+
+            yield return new object[] { "a,a,a,a,a,a,a,a", TestValue.Builder(8, 4), TestValue.Literal("eibikrujygzo"), 0, 15, "eibikrujygzoeibikrujygzoeibikrujygzoa,a" };
+
+            yield return new object[] { "aaaabbbbccccddddaaaabbbbccccdddd", TestValue.Builder(11, 7), TestValue.Literal("c"), 0, 32, "aaaabbbbccccaabbbbccccdddd" };
+
+            yield return new object[] { "012345678901234567890123456789", TestValue.Builder(24, 2), TestValue.Literal("r"), 0, 30, "0123r67890123r67890123r6789" };
+
+            yield return new object[] { "xyxyxyxyxyxyxyxy", TestValue.Builder(7, 3), TestValue.Literal("ehlkxuts"), 0, 16, "xehlkxutsxehlkxutsxehlkxutsxehlkxuts" };
+
+            yield return new object[] { "startstartstarttartcart55", TestValue.Builder(19, 3), TestValue.Literal("mspea"), 0, 25, "startstartstarttartmspeat55" };
+
+            yield return new object[] { "aaaabbbbccccdddd", TestValue.Builder(7, 7), TestValue.Literal("mshn"), 2, 3, "aaaabbbbccccdddd" };
+
+            yield return new object[] { "aaaabbbbccccdddd", TestValue.Builder(1, 11), TestValue.Literal(""), 4, 4, "aaaabbbbccccdddd" };
+
+            yield return new object[] { "abababababab", TestValue.Builder(5, 6), TestValue.Literal("dpykxl"), 2, 8, "abadpykxlbab" };
+
+            yield return new object[] { "aaaaaaaaaaaaaaaa", TestValue.Builder(11, 4), TestValue.Literal("xeyyakqsoe"), 2, 12, "aaxeyyakqsoexeyyakqsoexeyyakqsoeaa" };
+
+            yield return new object[] { "abcdefghijklmnopqrstuvwxyz", TestValue.Builder(3, 17), TestValue.Literal("hbvdwil"), 0, 26, "abchbvdwiluvwxyz" };
+
+            yield return new object[] { "foobar", TestValue.Builder(1, 4), TestValue.Literal("ytpzxz"), 0, 6, "fytpzxzr" };
+            yield return new object[] { "foobar", TestValue.Literal("ba"), TestValue.Builder(0, 2), 0, 6, "foofor" };
+            yield return new object[] { "foobar", TestValue.Builder(1, 4), TestValue.Builder(0, 2), 0, 6, "ffor" };
+
+            yield return new object[] { "aaaabbbbccccdddd", TestValue.Builder(6, 2), TestValue.Literal("gao"), 0, 16, "aaaagaogaoccccdddd" };
+            yield return new object[] { "aaaabbbbccccdddd", TestValue.Literal("a"), TestValue.Builder(5, 6), 0, 16, "bbbcccbbbcccbbbcccbbbcccbbbbccccdddd" };
+            yield return new object[] { "aaaabbbbccccdddd", TestValue.Builder(6, 2), TestValue.Builder(5, 6), 0, 16, "aaaabbbcccbbbcccccccdddd" };
+
+            yield return new object[] { "aaaabbbbccccdddd", TestValue.Builder(4, 10), TestValue.Literal("ceoeedxlv"), 0, 16, "aaaaceoeedxlvdd" };
+            yield return new object[] { "aaaabbbbccccdddd", TestValue.Literal("aa"), TestValue.Builder(5, 6), 0, 16, "bbbcccbbbcccbbbbccccdddd" };
+            yield return new object[] { "aaaabbbbccccdddd", TestValue.Builder(4, 10), TestValue.Builder(5, 6), 0, 16, "aaaabbbcccdd" };
+
+            yield return new object[] { "aaaabbbbccccdddd", TestValue.Builder(5, 6), TestValue.Literal("xnm"), 0, 16, "aaaabxnmcdddd" };
+            yield return new object[] { "aaaabbbbccccdddd", TestValue.Literal("aa"), TestValue.Builder(5, 5), 0, 16, "bbbccbbbccbbbbccccdddd" };
+            yield return new object[] { "aaaabbbbccccdddd", TestValue.Builder(5, 6), TestValue.Builder(5, 5), 0, 16, "aaaabbbbcccdddd" };
+
+            yield return new object[] { "aaaabbbbccccdddd", TestValue.Builder(1, 5), TestValue.Literal("ammrnkotzg"), 0, 16, "aammrnkotzgbbccccdddd" };
+            yield return new object[] { "aaaabbbbccccdddd", TestValue.Literal("aaaa"), TestValue.Builder(0, 9), 0, 16, "aaaabbbbcbbbbccccdddd" };
+            yield return new object[] { "aaaabbbbccccdddd", TestValue.Builder(1, 5), TestValue.Builder(0, 9), 0, 16, "aaaaabbbbcbbccccdddd" };
+
+            yield return new object[] { "aaaabbbbccccdddd", TestValue.Builder(2, 6), TestValue.Literal("cxzxlpibra"), 0, 16, "aacxzxlpibraccccdddd" };
+            yield return new object[] { "aaaabbbbccccdddd", TestValue.Literal("aaaa"), TestValue.Builder(11, 3), 0, 16, "cddbbbbccccdddd" };
+            yield return new object[] { "aaaabbbbccccdddd", TestValue.Builder(2, 6), TestValue.Builder(11, 3), 0, 16, "aacddccccdddd" };
+
+            yield return new object[] { "aaaabbbbccccdddd", TestValue.Builder(11, 3), TestValue.Literal(""), 0, 16, "aaaabbbbcccdd" };
+            yield return new object[] { "aaaabbbbccccdddd", TestValue.Literal("a"), TestValue.Builder(1, 9), 0, 16, "aaabbbbccaaabbbbccaaabbbbccaaabbbbccbbbbccccdddd" };
+            yield return new object[] { "aaaabbbbccccdddd", TestValue.Builder(11, 3), TestValue.Builder(1, 9), 0, 16, "aaaabbbbcccaaabbbbccdd" };
+
+            yield return new object[] { "aaaabbbbccccdddd", TestValue.Builder(8, 4), TestValue.Literal("muthgz"), 0, 16, "aaaabbbbmuthgzdddd" };
+            yield return new object[] { "aaaabbbbccccdddd", TestValue.Literal("bbbb"), TestValue.Builder(5, 3), 0, 16, "aaaabbbccccdddd" };
+            yield return new object[] { "aaaabbbbccccdddd", TestValue.Builder(8, 4), TestValue.Builder(5, 3), 0, 16, "aaaabbbbbbbdddd" };
+
+            yield return new object[] { "aaaabbbbccccdddd", TestValue.Builder(11, 3), TestValue.Literal("svrr"), 0, 16, "aaaabbbbcccsvrrdd" };
+            yield return new object[] { "aaaabbbbccccdddd", TestValue.Literal("aaaabbbbccccdddd"), TestValue.Builder(1, 7), 0, 16, "aaabbbb" };
+            yield return new object[] { "aaaabbbbccccdddd", TestValue.Builder(11, 3), TestValue.Builder(1, 7), 0, 16, "aaaabbbbcccaaabbbbdd" };
+
+            yield return new object[] { "a-a", TestValue.Builder(0, 2), TestValue.Literal("ljnct"), 0, 3, "ljncta" };
+            yield return new object[] { "a-a", TestValue.Literal("a"), TestValue.Builder(0, 2), 0, 3, "a--a-" };
+            yield return new object[] { "a-a", TestValue.Builder(0, 2), TestValue.Builder(0, 2), 0, 3, "a-a" };
+
+            yield return new object[] { "axa", TestValue.Builder(0, 2), TestValue.Literal("orhet"), 0, 3, "orheta" };
+            yield return new object[] { "axa", TestValue.Literal("a"), TestValue.Builder(0, 2), 0, 3, "axxax" };
+            yield return new object[] { "axa", TestValue.Builder(0, 2), TestValue.Builder(0, 2), 0, 3, "axa" };
+
+            yield return new object[] { "abab", TestValue.Builder(0, 2), TestValue.Literal("sqygaef"), 0, 4, "sqygaefsqygaef" };
+            yield return new object[] { "abab", TestValue.Literal("b"), TestValue.Builder(0, 3), 0, 4, "aabaaaba" };
+            yield return new object[] { "abab", TestValue.Builder(0, 2), TestValue.Builder(0, 3), 0, 4, "abaaba" };
+
+            yield return new object[] { "a,a,a", TestValue.Builder(0, 2), TestValue.Literal("lxtdplriigua"), 0, 5, "lxtdplriigualxtdplriiguaa" };
+            yield return new object[] { "a,a,a", TestValue.Literal("a"), TestValue.Builder(0, 3), 0, 5, "a,a,a,a,a,a" };
+            yield return new object[] { "a,a,a", TestValue.Builder(0, 2), TestValue.Builder(0, 3), 0, 5, "a,aa,aa" };
+
+            yield return new object[] { "aaaaaaaaaaaaaaaa", TestValue.Builder(2, 11), TestValue.Literal("bloyxvsbi"), 0, 16, "bloyxvsbiaaaaa" };
+            yield return new object[] { "aaaaaaaaaaaaaaaa", TestValue.Literal("a"), TestValue.Builder(6, 3), 0, 16, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" };
+            yield return new object[] { "aaaaaaaaaaaaaaaa", TestValue.Builder(2, 11), TestValue.Builder(6, 3), 0, 16, "aaaaaaaa" };
+
+            yield return new object[] { "abababababababab", TestValue.Builder(2, 12), TestValue.Literal("mtdpgylickm"), 0, 16, "mtdpgylickmabab" };
+            yield return new object[] { "abababababababab", TestValue.Literal("b"), TestValue.Builder(1, 9), 0, 16, "abababababababababababababababababababababababababababababababababababababababab" };
+            yield return new object[] { "abababababababab", TestValue.Builder(2, 12), TestValue.Builder(1, 9), 0, 16, "babababababab" };
+
+            yield return new object[] { "aaaaaaaaaaaaaaaa", TestValue.Builder(2, 11), TestValue.Literal("y"), 0, 16, "yaaaaa" };
+            yield return new object[] { "aaaaaaaaaaaaaaaa", TestValue.Literal("aa"), TestValue.Builder(11, 3), 0, 16, "aaaaaaaaaaaaaaaaaaaaaaaa" };
+            yield return new object[] { "aaaaaaaaaaaaaaaa", TestValue.Builder(2, 11), TestValue.Builder(11, 3), 0, 16, "aaaaaaaa" };
+
+            yield return new object[] { "abababababababab", TestValue.Builder(2, 7), TestValue.Literal("tb"), 0, 16, "tbbtbb" };
+            yield return new object[] { "abababababababab", TestValue.Literal("ab"), TestValue.Builder(0, 5), 0, 16, "ababaababaababaababaababaababaababaababa" };
+            yield return new object[] { "abababababababab", TestValue.Builder(2, 7), TestValue.Builder(0, 5), 0, 16, "abababababab" };
+
+            yield return new object[] { "a,a,a,a,a,a,a,a", TestValue.Builder(0, 2), TestValue.Literal("dpgdjzdtqarh"), 0, 15, "dpgdjzdtqarhdpgdjzdtqarhdpgdjzdtqarhdpgdjzdtqarhdpgdjzdtqarhdpgdjzdtqarhdpgdjzdtqarha" };
+            yield return new object[] { "a,a,a,a,a,a,a,a", TestValue.Literal("a"), TestValue.Builder(10, 4), 0, 15, "a,a,,a,a,,a,a,,a,a,,a,a,,a,a,,a,a,,a,a," };
+            yield return new object[] { "a,a,a,a,a,a,a,a", TestValue.Builder(0, 2), TestValue.Builder(10, 4), 0, 15, "a,a,a,a,a,a,a,a,a,a,a,a,a,a,a" };
+
+            yield return new object[] { "aaaabbbbccccddddaaaabbbbccccdddd", TestValue.Builder(15, 2), TestValue.Literal("lguz"), 0, 32, "aaaabbbbccccdddlguzaaabbbbccccdddd" };
+            yield return new object[] { "aaaabbbbccccddddaaaabbbbccccdddd", TestValue.Literal("bbbb"), TestValue.Builder(10, 14), 0, 32, "aaaaccddddaaaabbbbccccddddaaaaccddddaaaabbbbccccdddd" };
+            yield return new object[] { "aaaabbbbccccddddaaaabbbbccccdddd", TestValue.Builder(15, 2), TestValue.Builder(10, 14), 0, 32, "aaaabbbbccccdddccddddaaaabbbbaaabbbbccccdddd" };
+
+            yield return new object[] { "012345678901234567890123456789", TestValue.Builder(17, 10), TestValue.Literal("mdusl"), 0, 30, "0123456mduslmdusl789" };
+            yield return new object[] { "012345678901234567890123456789", TestValue.Literal("0"), TestValue.Builder(18, 3), 0, 30, "890123456789890123456789890123456789" };
+            yield return new object[] { "012345678901234567890123456789", TestValue.Builder(17, 10), TestValue.Builder(18, 3), 0, 30, "0123456890890789" };
+
+            yield return new object[] { "xyxyxyxyxyxyxyxy", TestValue.Builder(2, 6), TestValue.Literal("uncdzob"), 0, 16, "uncdzobuncdzobxyxy" };
+            yield return new object[] { "xyxyxyxyxyxyxyxy", TestValue.Literal("xy"), TestValue.Builder(5, 7), 0, 16, "yxyxyxyyxyxyxyyxyxyxyyxyxyxyyxyxyxyyxyxyxyyxyxyxyyxyxyxy" };
+            yield return new object[] { "xyxyxyxyxyxyxyxy", TestValue.Builder(2, 6), TestValue.Builder(5, 7), 0, 16, "yxyxyxyyxyxyxyxyxy" };
+
+            yield return new object[] { "startstartstarttartcart55", TestValue.Builder(20, 4), TestValue.Literal("kycwzhwmijfg"), 0, 25, "startstartstarttartckycwzhwmijfg5" };
+            yield return new object[] { "startstartstarttartcart55", TestValue.Literal("art"), TestValue.Builder(20, 3), 0, 25, "startstartstarttartcart55" };
+            yield return new object[] { "startstartstarttartcart55", TestValue.Builder(20, 4), TestValue.Builder(20, 3), 0, 25, "startstartstarttartcart5" };
+
+            yield return new object[] { "aaaabbbbccccdddd", TestValue.Builder(7, 3), TestValue.Literal("ktxwmfyzrgfi"), 2, 3, "aaaabbbbccccdddd" };
+            yield return new object[] { "aaaabbbbccccdddd", TestValue.Literal("a"), TestValue.Builder(8, 5), 2, 3, "aaccccdccccdbbbbccccdddd" };
+            yield return new object[] { "aaaabbbbccccdddd", TestValue.Builder(7, 3), TestValue.Builder(8, 5), 2, 3, "aaaabbbbccccdddd" };
+
+            yield return new object[] { "aaaabbbbccccdddd", TestValue.Builder(6, 3), TestValue.Literal("pkjathsuu"), 4, 4, "aaaabbbbccccdddd" };
+            yield return new object[] { "aaaabbbbccccdddd", TestValue.Literal("bb"), TestValue.Builder(9, 4), 4, 4, "aaaacccdcccdccccdddd" };
+            yield return new object[] { "aaaabbbbccccdddd", TestValue.Builder(6, 3), TestValue.Builder(9, 4), 4, 4, "aaaabbbbccccdddd" };
+
+            yield return new object[] { "abababababab", TestValue.Builder(4, 6), TestValue.Literal("u"), 2, 8, "abuabab" };
+            yield return new object[] { "abababababab", TestValue.Literal("ab"), TestValue.Builder(3, 8), 2, 8, "abbabababababababababababababababaab" };
+            yield return new object[] { "abababababab", TestValue.Builder(4, 6), TestValue.Builder(3, 8), 2, 8, "abbabababaabab" };
+
+            yield return new object[] { "aaaaaaaaaaaaaaaa", TestValue.Builder(8, 7), TestValue.Literal("lhemo"), 2, 12, "aalhemoaaaaaaa" };
+            yield return new object[] { "aaaaaaaaaaaaaaaa", TestValue.Literal("a"), TestValue.Builder(6, 2), 2, 12, "aaaaaaaaaaaaaaaaaaaaaaaaaaaa" };
+            yield return new object[] { "aaaaaaaaaaaaaaaa", TestValue.Builder(8, 7), TestValue.Builder(6, 2), 2, 12, "aaaaaaaaaaa" };
+
+            yield return new object[] { "abcdefghijklmnopqrstuvwxyz", TestValue.Builder(16, 3), TestValue.Literal("yv"), 0, 26, "abcdefghijklmnopyvtuvwxyz" };
+            yield return new object[] { "abcdefghijklmnopqrstuvwxyz", TestValue.Literal("abcdefghijklmnopqrstuvwxyz"), TestValue.Builder(21, 3), 0, 26, "vwx" };
+            yield return new object[] { "abcdefghijklmnopqrstuvwxyz", TestValue.Builder(16, 3), TestValue.Builder(21, 3), 0, 26, "abcdefghijklmnopvwxtuvwxyz" };
+
+
+            yield return new object[] { "foobar", TestValue.Builder(0, 2), TestValue.Literal("dkyukhupa"), 0, 6, "dkyukhupaobar" };
+            yield return new object[] { "foobar", TestValue.Literal("ba"), TestValue.Builder(1, 2), 0, 6, "foooor" };
+            yield return new object[] { "foobar", TestValue.Builder(0, 2), TestValue.Builder(1, 2), 0, 6, "ooobar" };
+
+            yield return new object[] { "aaaabbbbccccdddd", TestValue.Builder(11, 4), TestValue.Literal("fspxuic"), 0, 16, "aaaabbbbcccfspxuicd" };
+            yield return new object[] { "aaaabbbbccccdddd", TestValue.Literal("a"), TestValue.Builder(4, 3), 0, 16, "bbbbbbbbbbbbbbbbccccdddd" };
+            yield return new object[] { "aaaabbbbccccdddd", TestValue.Builder(11, 4), TestValue.Builder(4, 3), 0, 16, "aaaabbbbcccbbbd" };
+
+            yield return new object[] { "aaaabbbbccccdddd", TestValue.Builder(7, 8), TestValue.Literal(""), 0, 16, "aaaabbbd" };
+            yield return new object[] { "aaaabbbbccccdddd", TestValue.Literal("aa"), TestValue.Builder(5, 6), 0, 16, "bbbcccbbbcccbbbbccccdddd" };
+            yield return new object[] { "aaaabbbbccccdddd", TestValue.Builder(7, 8), TestValue.Builder(5, 6), 0, 16, "aaaabbbbbbcccd" };
+
+            yield return new object[] { "aaaabbbbccccdddd", TestValue.Builder(10, 3), TestValue.Literal("hlq"), 0, 16, "aaaabbbbcchlqddd" };
+            yield return new object[] { "aaaabbbbccccdddd", TestValue.Literal("aa"), TestValue.Builder(10, 5), 0, 16, "ccdddccdddbbbbccccdddd" };
+            yield return new object[] { "aaaabbbbccccdddd", TestValue.Builder(10, 3), TestValue.Builder(10, 5), 0, 16, "aaaabbbbccccdddddd" };
+
+            yield return new object[] { "aaaabbbbccccdddd", TestValue.Builder(3, 8), TestValue.Literal("nvrzkvybkqr"), 0, 16, "aaanvrzkvybkqrcdddd" };
+            yield return new object[] { "aaaabbbbccccdddd", TestValue.Literal("aaaa"), TestValue.Builder(0, 8), 0, 16, "aaaabbbbbbbbccccdddd" };
+            yield return new object[] { "aaaabbbbccccdddd", TestValue.Builder(3, 8), TestValue.Builder(0, 8), 0, 16, "aaaaaaabbbbcdddd" };
+
+            yield return new object[] { "aaaabbbbccccdddd", TestValue.Builder(1, 7), TestValue.Literal("cf"), 0, 16, "acfccccdddd" };
+            yield return new object[] { "aaaabbbbccccdddd", TestValue.Literal("aaaa"), TestValue.Builder(10, 3), 0, 16, "ccdbbbbccccdddd" };
+            yield return new object[] { "aaaabbbbccccdddd", TestValue.Builder(1, 7), TestValue.Builder(10, 3), 0, 16, "accdccccdddd" };
+
+            yield return new object[] { "aaaabbbbccccdddd", TestValue.Builder(5, 7), TestValue.Literal("rhcgwvbjuhmp"), 0, 16, "aaaabrhcgwvbjuhmpdddd" };
+            yield return new object[] { "aaaabbbbccccdddd", TestValue.Literal("a"), TestValue.Builder(11, 2), 0, 16, "cdcdcdcdbbbbccccdddd" };
+            yield return new object[] { "aaaabbbbccccdddd", TestValue.Builder(5, 7), TestValue.Builder(11, 2), 0, 16, "aaaabcddddd" };
+
+            yield return new object[] { "aaaabbbbccccdddd", TestValue.Builder(6, 4), TestValue.Literal(""), 0, 16, "aaaabbccdddd" };
+            yield return new object[] { "aaaabbbbccccdddd", TestValue.Literal("bbbb"), TestValue.Builder(7, 6), 0, 16, "aaaabccccdccccdddd" };
+            yield return new object[] { "aaaabbbbccccdddd", TestValue.Builder(6, 4), TestValue.Builder(7, 6), 0, 16, "aaaabbbccccdccdddd" };
+
+            yield return new object[] { "aaaabbbbccccdddd", TestValue.Builder(9, 5), TestValue.Literal("rlfpirao"), 0, 16, "aaaabbbbcrlfpiraodd" };
+            yield return new object[] { "aaaabbbbccccdddd", TestValue.Literal("aaaabbbbccccdddd"), TestValue.Builder(10, 2), 0, 16, "cc" };
+            yield return new object[] { "aaaabbbbccccdddd", TestValue.Builder(9, 5), TestValue.Builder(10, 2), 0, 16, "aaaabbbbcccdd" };
+
+            yield return new object[] { "a-a", TestValue.Builder(0, 2), TestValue.Literal("mvgf"), 0, 3, "mvgfa" };
+            yield return new object[] { "a-a", TestValue.Literal("a"), TestValue.Builder(0, 2), 0, 3, "a--a-" };
+            yield return new object[] { "a-a", TestValue.Builder(0, 2), TestValue.Builder(0, 2), 0, 3, "a-a" };
+
+            yield return new object[] { "axa", TestValue.Builder(0, 2), TestValue.Literal("qwjloae"), 0, 3, "qwjloaea" };
+            yield return new object[] { "axa", TestValue.Literal("a"), TestValue.Builder(0, 2), 0, 3, "axxax" };
+            yield return new object[] { "axa", TestValue.Builder(0, 2), TestValue.Builder(0, 2), 0, 3, "axa" };
+
+            yield return new object[] { "abab", TestValue.Builder(0, 3), TestValue.Literal("lb"), 0, 4, "lbb" };
+            yield return new object[] { "abab", TestValue.Literal("b"), TestValue.Builder(0, 2), 0, 4, "aabaab" };
+            yield return new object[] { "abab", TestValue.Builder(0, 3), TestValue.Builder(0, 2), 0, 4, "abb" };
+
+            yield return new object[] { "a,a,a", TestValue.Builder(0, 2), TestValue.Literal("efhf"), 0, 5, "efhfefhfa" };
+            yield return new object[] { "a,a,a", TestValue.Literal("a"), TestValue.Builder(0, 3), 0, 5, "a,a,a,a,a,a" };
+            yield return new object[] { "a,a,a", TestValue.Builder(0, 2), TestValue.Builder(0, 3), 0, 5, "a,aa,aa" };
+
+            yield return new object[] { "aaaaaaaaaaaaaaaa", TestValue.Builder(6, 4), TestValue.Literal(""), 0, 16, "" };
+            yield return new object[] { "aaaaaaaaaaaaaaaa", TestValue.Literal("a"), TestValue.Builder(6, 7), 0, 16, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" };
+            yield return new object[] { "aaaaaaaaaaaaaaaa", TestValue.Builder(6, 4), TestValue.Builder(6, 7), 0, 16, "aaaaaaaaaaaaaaaaaaaaaaaaaaaa" };
+
+            yield return new object[] { "abababababababab", TestValue.Builder(1, 9), TestValue.Literal("adq"), 0, 16, "aadqababab" };
+            yield return new object[] { "abababababababab", TestValue.Literal("b"), TestValue.Builder(4, 11), 0, 16, "aabababababaaabababababaaabababababaaabababababaaabababababaaabababababaaabababababaaabababababa" };
+            yield return new object[] { "abababababababab", TestValue.Builder(1, 9), TestValue.Builder(4, 11), 0, 16, "aabababababaababab" };
+
+            yield return new object[] { "aaaaaaaaaaaaaaaa", TestValue.Builder(3, 6), TestValue.Literal("twfnonzpltx"), 0, 16, "twfnonzpltxtwfnonzpltxaaaa" };
+            yield return new object[] { "aaaaaaaaaaaaaaaa", TestValue.Literal("aa"), TestValue.Builder(7, 7), 0, 16, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" };
+            yield return new object[] { "aaaaaaaaaaaaaaaa", TestValue.Builder(3, 6), TestValue.Builder(7, 7), 0, 16, "aaaaaaaaaaaaaaaaaa" };
+
+            yield return new object[] { "abababababababab", TestValue.Builder(11, 2), TestValue.Literal("uopqiqa"), 0, 16, "auopqiqauopqiqauopqiqauopqiqauopqiqauopqiqauopqiqab" };
+            yield return new object[] { "abababababababab", TestValue.Literal("ab"), TestValue.Builder(3, 12), 0, 16, "babababababababababababababababababababababababababababababababababababababababababababababababa" };
+            yield return new object[] { "abababababababab", TestValue.Builder(11, 2), TestValue.Builder(3, 12), 0, 16, "ababababababababababababababababababababababababababababababababababababababababababab" };
+
+            yield return new object[] { "a,a,a,a,a,a,a,a", TestValue.Builder(0, 4), TestValue.Literal("qvkkfre"), 0, 15, "qvkkfreqvkkfreqvkkfrea,a" };
+            yield return new object[] { "a,a,a,a,a,a,a,a", TestValue.Literal("a"), TestValue.Builder(10, 3), 0, 15, "a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a" };
+            yield return new object[] { "a,a,a,a,a,a,a,a", TestValue.Builder(0, 4), TestValue.Builder(10, 3), 0, 15, "a,aa,aa,aa,a" };
+
+            yield return new object[] { "aaaabbbbccccddddaaaabbbbccccdddd", TestValue.Builder(16, 2), TestValue.Literal("sqq"), 0, 32, "sqqsqqbbbbccccddddsqqsqqbbbbccccdddd" };
+            yield return new object[] { "aaaabbbbccccddddaaaabbbbccccdddd", TestValue.Literal("bbbb"), TestValue.Builder(24, 7), 0, 32, "aaaaccccdddccccddddaaaaccccdddccccdddd" };
+            yield return new object[] { "aaaabbbbccccddddaaaabbbbccccdddd", TestValue.Builder(16, 2), TestValue.Builder(24, 7), 0, 32, "ccccdddccccdddbbbbccccddddccccdddccccdddbbbbccccdddd" };
+
+            yield return new object[] { "012345678901234567890123456789", TestValue.Builder(1, 8), TestValue.Literal("grcmqlunubrt"), 0, 30, "0grcmqlunubrt90grcmqlunubrt90grcmqlunubrt9" };
+            yield return new object[] { "012345678901234567890123456789", TestValue.Literal("0"), TestValue.Builder(17, 8), 0, 30, "789012341234567897890123412345678978901234123456789" };
+            yield return new object[] { "012345678901234567890123456789", TestValue.Builder(1, 8), TestValue.Builder(17, 8), 0, 30, "078901234907890123490789012349" };
+
+            yield return new object[] { "012345678901234567890123456789", TestValue.Builder(24, 2), TestValue.Literal("vprcnrmed"), 0, 30, "0123vprcnrmed67890123vprcnrmed67890123vprcnrmed6789" };
+            yield return new object[] { "012345678901234567890123456789", TestValue.Literal("0"), TestValue.Builder(23, 2), 0, 30, "341234567893412345678934123456789" };
+            yield return new object[] { "012345678901234567890123456789", TestValue.Builder(24, 2), TestValue.Builder(23, 2), 0, 30, "012334678901233467890123346789" };
+
+            yield return new object[] { "012345678901234567890123456789", TestValue.Builder(11, 4), TestValue.Literal("nnodfp"), 0, 30, "0nnodfp567890nnodfp567890nnodfp56789" };
+            yield return new object[] { "012345678901234567890123456789", TestValue.Literal("0"), TestValue.Builder(17, 8), 0, 30, "789012341234567897890123412345678978901234123456789" };
+            yield return new object[] { "012345678901234567890123456789", TestValue.Builder(11, 4), TestValue.Builder(17, 8), 0, 30, "078901234567890789012345678907890123456789" };
+
+            yield return new object[] { "012345678901234567890123456789", TestValue.Builder(3, 2), TestValue.Literal("hras"), 0, 30, "012hras56789012hras56789012hras56789" };
+            yield return new object[] { "012345678901234567890123456789", TestValue.Literal("0"), TestValue.Builder(1, 19), 0, 30, "123456789012345678912345678912345678901234567891234567891234567890123456789123456789" };
+            yield return new object[] { "012345678901234567890123456789", TestValue.Builder(3, 2), TestValue.Builder(1, 19), 0, 30, "012123456789012345678956789012123456789012345678956789012123456789012345678956789" };
+
+            yield return new object[] { "012345678901234567890123456789", TestValue.Builder(14, 8), TestValue.Literal("e"), 0, 30, "0123e23e23456789" };
+            yield return new object[] { "012345678901234567890123456789", TestValue.Literal("0"), TestValue.Builder(10, 10), 0, 30, "012345678912345678901234567891234567890123456789123456789" };
+            yield return new object[] { "012345678901234567890123456789", TestValue.Builder(14, 8), TestValue.Builder(10, 10), 0, 30, "0123012345678923012345678923456789" };
+
+            yield return new object[] { "xyxyxyxyxyxyxyxy", TestValue.Builder(0, 6), TestValue.Literal("ybkzztsmyzzx"), 0, 16, "ybkzztsmyzzxybkzztsmyzzxxyxy" };
+            yield return new object[] { "xyxyxyxyxyxyxyxy", TestValue.Literal("xy"), TestValue.Builder(7, 2), 0, 16, "yxyxyxyxyxyxyxyx" };
+            yield return new object[] { "xyxyxyxyxyxyxyxy", TestValue.Builder(0, 6), TestValue.Builder(7, 2), 0, 16, "yxyxxyxy" };
+
+            yield return new object[] { "startstartstarttartcart55", TestValue.Builder(5, 12), TestValue.Literal("qvagbksp"), 0, 25, "startqvagbksprtcart55" };
+            yield return new object[] { "startstartstarttartcart55", TestValue.Literal("art"), TestValue.Builder(16, 4), 0, 25, "startcstartcstartctartccartc55" };
+            yield return new object[] { "startstartstarttartcart55", TestValue.Builder(5, 12), TestValue.Builder(16, 4), 0, 25, "startartcrtcart55" };
+
+            yield return new object[] { "aaaabbbbccccdddd", TestValue.Builder(3, 9), TestValue.Literal("sbr"), 2, 3, "aaaabbbbccccdddd" };
+            yield return new object[] { "aaaabbbbccccdddd", TestValue.Literal("a"), TestValue.Builder(9, 6), 2, 3, "aacccdddcccdddbbbbccccdddd" };
+            yield return new object[] { "aaaabbbbccccdddd", TestValue.Builder(3, 9), TestValue.Builder(9, 6), 2, 3, "aaaabbbbccccdddd" };
+
+            yield return new object[] { "aaaabbbbccccdddd", TestValue.Builder(5, 10), TestValue.Literal("lvxevy"), 4, 4, "aaaabbbbccccdddd" };
+            yield return new object[] { "aaaabbbbccccdddd", TestValue.Literal("bb"), TestValue.Builder(6, 9), 4, 4, "aaaabbccccdddbbccccdddccccdddd" };
+            yield return new object[] { "aaaabbbbccccdddd", TestValue.Builder(5, 10), TestValue.Builder(6, 9), 4, 4, "aaaabbbbccccdddd" };
+
+            yield return new object[] { "abababababab", TestValue.Builder(3, 6), TestValue.Literal("nwm"), 2, 8, "abanwmbab" };
+            yield return new object[] { "abababababab", TestValue.Literal("ab"), TestValue.Builder(1, 4), 2, 8, "abbabababababababaab" };
+            yield return new object[] { "abababababab", TestValue.Builder(3, 6), TestValue.Builder(1, 4), 2, 8, "ababababab" };
+
+            yield return new object[] { "aaaaaaaaaaaaaaaa", TestValue.Builder(7, 4), TestValue.Literal("hygkmnrwzl"), 2, 12, "aahygkmnrwzlhygkmnrwzlhygkmnrwzlaa" };
+            yield return new object[] { "aaaaaaaaaaaaaaaa", TestValue.Literal("a"), TestValue.Builder(3, 11), 2, 12, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" };
+            yield return new object[] { "aaaaaaaaaaaaaaaa", TestValue.Builder(7, 4), TestValue.Builder(3, 11), 2, 12, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" };
+
+            yield return new object[] { "abcdefghijklmnopqrstuvwxyz", TestValue.Builder(13, 8), TestValue.Literal(""), 0, 26, "abcdefghijklmvwxyz" };
+            yield return new object[] { "abcdefghijklmnopqrstuvwxyz", TestValue.Literal("abcdefghijklmnopqrstuvwxyz"), TestValue.Builder(10, 7), 0, 26, "klmnopq" };
+            yield return new object[] { "abcdefghijklmnopqrstuvwxyz", TestValue.Builder(13, 8), TestValue.Builder(10, 7), 0, 26, "abcdefghijklmklmnopqvwxyz" };
+        }
+
+#nullable enable
+        internal readonly record struct TestValue
+        {
+            public string? Value { get; init; }
+            public int StartIndex { get; init; }
+            public int Length { get; init; }
+            public bool FromBuilder { get; init; }
+
+            public ReadOnlySpan<char> GetSpan(MutableTextBuffer builder)
+                => FromBuilder
+                    ? builder.AsSpan(StartIndex, Length)
+                    : Value.AsSpan();
+
+            internal static TestValue Literal(string value)
+                => new() { Value = value };
+
+            internal static TestValue Builder(int start, int length)
+                => new() { FromBuilder = true, StartIndex = start, Length = length };
+        }
+
+#nullable restore
+
+        [Theory]
+        [MemberData(nameof(Replace_Overlapping_TestData))]
+        internal void Replace_CharSpan_Overlapping(string value, TestValue oldValue, TestValue newValue, int startIndex, int count, string expected)
+        {
+            MutableTextBuffer builder;
+            if (startIndex == 0 && count == value.Length)
+            {
+                builder = MutableTextBufferFactory(value);
+                builder.Replace(oldValue.GetSpan(builder), newValue.GetSpan(builder));
+                Assert.Equal(expected, builder.ToString());
+            }
+            builder = MutableTextBufferFactory(value);
+            builder.Replace(oldValue.GetSpan(builder), newValue.GetSpan(builder), startIndex, count);
             Assert.Equal(expected, builder.ToString());
         }
 

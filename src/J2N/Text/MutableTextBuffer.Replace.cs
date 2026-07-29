@@ -4,6 +4,7 @@
 using J2N.CodeGeneration;
 using J2N.Collections.Generic;
 using System;
+using System.Buffers;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -53,7 +54,16 @@ namespace J2N.Text
         {
             if (oldValue is null)
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.oldValue);
-            ReplaceInternal(oldValue.AsSpan(), newValue.AsSpan(), startIndex, count);
+
+            int currentLength = Length;
+            if ((uint)startIndex > (uint)currentLength)
+                ThrowHelper.ThrowStartIndexArgumentOutOfRange_ArgumentOutOfRange_IndexMustBeLessOrEqual(startIndex);
+            if (count < 0 || startIndex > currentLength - count)
+                ThrowHelper.ThrowArgumentOutOfRangeException(count, ExceptionArgument.count, ExceptionResource.ArgumentOutOfRange_IndexMustBeLessOrEqual);
+            if (oldValue == string.Empty)
+                ThrowHelper.ThrowArgumentException(ExceptionResource.Arg_EmptySpan, ExceptionArgument.oldValue);
+
+            ReplaceCore(oldValue, newValue, startIndex, count);
         }
 
         /// <summary>
@@ -64,121 +74,380 @@ namespace J2N.Text
         /// <see cref="MutableTextBufferExtensions.Replace{TBuilder}(TBuilder, ReadOnlySpan{char}, ReadOnlySpan{char}, int, int)"/>.
         /// Update that documentation if the behavior changes.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationExtensionImplementation]
         internal void ReplaceInternal(ReadOnlySpan<char> oldValue, ReadOnlySpan<char> newValue, int startIndex, int count)
         {
             int currentLength = Length;
             if ((uint)startIndex > (uint)currentLength)
-            {
                 ThrowHelper.ThrowStartIndexArgumentOutOfRange_ArgumentOutOfRange_IndexMustBeLessOrEqual(startIndex);
-            }
             if (count < 0 || startIndex > currentLength - count)
-            {
                 ThrowHelper.ThrowArgumentOutOfRangeException(count, ExceptionArgument.count, ExceptionResource.ArgumentOutOfRange_IndexMustBeLessOrEqual);
-            }
-            if (oldValue.Length == 0)
-            {
+            if (oldValue.IsEmpty)
                 ThrowHelper.ThrowArgumentException(ExceptionResource.Arg_EmptySpan, ExceptionArgument.oldValue);
-            }
 
-            var replacements = new ValueListBuilder<int>(stackalloc int[128]); // A list of replacement positions in a chunk to apply
+            ReplaceCore(oldValue, newValue, startIndex, count);
+        }
+
+        private void ReplaceCore(ReadOnlySpan<char> oldValue, ReadOnlySpan<char> newValue, int startIndex, int count)
+        {
+            Debug.Assert((uint)startIndex <= (uint)Length);
+            Debug.Assert(count >= 0);
+            Debug.Assert(startIndex <= Length - count);
+            Debug.Assert(!oldValue.IsEmpty);
+
+            var replacements = new ValueListBuilder<int>(stackalloc int[128]);
+
             try
             {
-                // Starting point.
-                int indexInChunk = startIndex;
-                while (count > 0)
+                int searchStart = startIndex;
+                int searchEnd = startIndex + count; // Safe: validated above that startIndex + count <= currentLength.
+
+                while (searchStart <= searchEnd - oldValue.Length)
                 {
-                    //Debug.Assert(chunk != null, "chunk was null in replace");
+                    int found = m_Chars.AsSpan(searchStart, searchEnd - searchStart).IndexOf(oldValue);
 
-                    // While the remaining search space is at least as large as the old value being replaced,
-                    // find all occurrences of it contained entirely within the chunk. We stop searching
-                    // once we're within oldValue.Length from the end of the chunk (or count limit), at which point
-                    // we need to consider a value that bridges between two chunks.
-                    ReadOnlySpan<char> remainingChunk = m_Chars.AsSpan(indexInChunk, Math.Min(m_Position - indexInChunk, count));
-                    while (oldValue.Length <= remainingChunk.Length)
+                    if (found < 0)
+                        break;
+
+                    found += searchStart;
+                    replacements.Append(found);
+                    searchStart = found + oldValue.Length;
+                }
+
+                if (replacements.Length == 0)
+                    return;
+
+                int deltaPerMatch = newValue.Length - oldValue.Length;
+
+                long longDelta = (long)deltaPerMatch * replacements.Length;
+                int delta = (int)longDelta;
+
+                if (delta != longDelta)
+                    throw new OutOfMemoryException();
+
+                if ((uint)delta + (uint)m_Position <= (uint)m_Chars.Length)
+                {
+                    if (oldValue.Overlaps(m_Chars) || newValue.Overlaps(m_Chars))
                     {
-                        // Find the next match.
-                        int foundPos = remainingChunk.IndexOf(oldValue);
-                        if (foundPos >= 0)
-                        {
-                            // We found one.  Add it as a location for the replacement.
-                            indexInChunk += foundPos;
-                            replacements.Append(indexInChunk);
-
-                            // Move ahead to the next location.
-                            remainingChunk = remainingChunk.Slice(foundPos + oldValue.Length);
-                            indexInChunk += oldValue.Length;
-                            count -= foundPos + oldValue.Length;
-
-                            // If after accounting for moving past the match our count has
-                            // gone to 0, break out to stop searching.
-                            Debug.Assert(count >= 0, "count should never go negative");
-                            if (count == 0)
-                            {
-                                break;
-                            }
-                        }
-                        else
-                        {
-                            // No match found. Reposition to one character beyond the last starting
-                            // location searched, which will be oldValue.Length - 1 from the end.
-                            // Then break out so that we can start the cross-chunk matching from that location.
-                            int move = remainingChunk.Length - (oldValue.Length - 1);
-                            indexInChunk += move;
-                            count -= move;
-                            break;
-                        }
+                        ReplaceAllOverlapping(ref replacements, delta, oldValue, newValue, startIndex, count);
+                        return;
                     }
 
-                    Debug.Assert(oldValue.Length > Math.Min(count, m_Position - indexInChunk),
-                        $"oldValue.Length = {oldValue.Length}, m_Position - indexInChunk = {m_Position - indexInChunk}, count == {count}");
-
-                    // Now do the more complicated cross-chunk matching.
-                    while (indexInChunk < m_Position && count > 0)
-                    {
-                        if (StartsWith(indexInChunk, count, oldValue))
-                        {
-                            replacements.Append(indexInChunk);
-                            indexInChunk += oldValue.Length;
-                            count -= oldValue.Length;
-                        }
-                        else
-                        {
-                            indexInChunk++;
-                            --count;
-                        }
-                    }
-
-                    // We've either fully explored the chunk or we've reached our count limit.
-                    Debug.Assert(indexInChunk >= m_Position || count == 0,
-                        $"indexInChunk = {indexInChunk}, m_Position == {m_Position}, count == {count}");
-
-                    // Replacing mutates the blocks, so we need to convert to a logical index and back afterwards.
-                    int index = indexInChunk; // + chunk.m_ChunkOffset;
-
-                    // Apply any replacements we accumulated.
-                    if (replacements.Length != 0)
-                    {
-                        // Perform all replacements, and adjust the logical index if the new and old values
-                        // have different lengths, such that the replacements would have impacted it.
-                        ReplaceAll(replacements.AsSpan(), oldValue.Length, newValue);
-                        index += (newValue.Length - oldValue.Length) * replacements.Length;
-                        replacements.Length = 0;
-                    }
-
-                    //chunk = FindChunkForIndex(index);
-                    //indexInChunk = index - chunk.m_ChunkOffset;
-                    //Debug.Assert(chunk != null || count == 0, "Chunks ended prematurely!");
-
-                    indexInChunk = index - m_Position;
+                    ReplaceAllCore(ref replacements, delta, oldValue, newValue, startIndex, count);
+                }
+                else
+                {
+                    ReplaceAllWithExpansion(ref replacements, delta, oldValue, newValue, startIndex, count);
                 }
             }
             finally
             {
                 replacements.Dispose();
             }
+        }
 
-            //AssertInvariants();
+        private void ReplaceAllCore(scoped ref ValueListBuilder<int> replacements, int delta, scoped ReadOnlySpan<char> oldValue, scoped ReadOnlySpan<char> newValue, int startIndex, int count)
+        {
+            Debug.Assert((uint)(m_Position + delta) <= (uint)m_Chars.Length);
+
+            int originalLength = m_Position;
+            int finalLength = originalLength + delta;
+
+            if (delta < 0)
+            {
+                ReplaceAllLeftToRight(m_Chars, m_Chars, ref replacements, oldValue, newValue, originalLength, startIndex, count);
+                m_Position = finalLength;
+                return;
+            }
+
+            Span<char> chars = m_Chars;
+
+            // Safe: validated by argument checking.
+            int rangeEnd = startIndex + count;
+
+            int sourceEnd = originalLength;
+            int destinationEnd = finalLength;
+
+            //
+            // Copy suffix.
+            //
+            int suffixLength = originalLength - rangeEnd;
+
+            if (suffixLength > 0 && delta != 0)
+            {
+                sourceEnd -= suffixLength;
+                destinationEnd -= suffixLength;
+
+                if (sourceEnd != destinationEnd)
+                {
+                    chars.Slice(sourceEnd, suffixLength)
+                         .CopyTo(chars.Slice(destinationEnd));
+                }
+            }
+
+            //
+            // Replay replacements from right to left.
+            //
+            for (int i = replacements.Length - 1; i >= 0; i--)
+            {
+                int match = replacements[i];
+                // Safe: every match satisfies
+                // match + oldValue.Length <= rangeEnd.
+                int sourceAfterMatch = match + oldValue.Length;
+
+                //
+                // Copy text between this match and the next one (or the suffix).
+                //
+                int betweenLength = sourceEnd - sourceAfterMatch;
+
+                if (betweenLength > 0)
+                {
+                    int destinationAfterCopy = destinationEnd - betweenLength;
+
+                    if (delta != 0)
+                    {
+                        chars.Slice(sourceAfterMatch, betweenLength)
+                             .CopyTo(chars.Slice(destinationAfterCopy));
+                    }
+
+                    destinationEnd = destinationAfterCopy;
+                }
+
+                //
+                // Write replacement.
+                //
+                destinationEnd -= newValue.Length;
+
+                newValue.CopyTo(chars.Slice(destinationEnd));
+
+                //
+                // Continue processing the text preceding this match.
+                //
+                sourceEnd = match;
+            }
+
+            //
+            // Copy prefix.
+            //
+            int prefixLength = sourceEnd - startIndex;
+
+            if (prefixLength > 0)
+            {
+                int destinationPrefix = destinationEnd - prefixLength;
+
+                if (delta != 0)
+                {
+                    chars.Slice(startIndex, prefixLength)
+                         .CopyTo(chars.Slice(destinationPrefix));
+                }
+
+                destinationEnd = destinationPrefix;
+            }
+
+            Debug.Assert(destinationEnd == startIndex);
+
+            m_Position = finalLength;
+        }
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private void ReplaceAllOverlapping(ref ValueListBuilder<int> replacements, int delta, ReadOnlySpan<char> oldValue, ReadOnlySpan<char> newValue, int startIndex, int count)
+        {
+            bool oldOverlaps = oldValue.Overlaps(m_Chars);
+            bool newOverlaps = newValue.Overlaps(m_Chars);
+
+            Debug.Assert(oldOverlaps || newOverlaps);
+
+            if (oldOverlaps)
+            {
+                if (newOverlaps)
+                {
+                    ReplaceWithSnapshots(ref replacements, delta, oldValue, newValue, startIndex, count);
+                }
+                else
+                {
+                    ReplaceWithSnapshotOfOld(ref replacements, delta, oldValue, newValue, startIndex, count);
+                }
+            }
+            else
+            {
+                ReplaceWithSnapshotOfNew(ref replacements, delta, oldValue, newValue, startIndex, count);
+            }
+
+            void ReplaceWithSnapshotOfOld(ref ValueListBuilder<int> replacements, int delta, ReadOnlySpan<char> oldValue, ReadOnlySpan<char> newValue, int startIndex, int count)
+            {
+                char[]? buffer = null;
+
+                try
+                {
+                    Span<char> temp = oldValue.Length <= CharStackBufferSize
+                        ? stackalloc char[oldValue.Length]
+                        : (buffer = ArrayPool<char>.Shared.Rent(oldValue.Length)).AsSpan(0, oldValue.Length);
+
+                    oldValue.CopyTo(temp);
+
+                    ReplaceAllCore(ref replacements, delta, temp, newValue, startIndex, count);
+                }
+                finally
+                {
+                    if (buffer is not null)
+                        ArrayPool<char>.Shared.Return(buffer);
+                }
+            }
+
+            void ReplaceWithSnapshotOfNew(ref ValueListBuilder<int> replacements, int delta, ReadOnlySpan<char> oldValue, ReadOnlySpan<char> newValue, int startIndex, int count)
+            {
+                char[]? buffer = null;
+
+                try
+                {
+                    Span<char> temp = newValue.Length <= CharStackBufferSize
+                        ? stackalloc char[newValue.Length]
+                        : (buffer = ArrayPool<char>.Shared.Rent(newValue.Length)).AsSpan(0, newValue.Length);
+
+                    newValue.CopyTo(temp);
+
+                    ReplaceAllCore(ref replacements, delta, oldValue, temp, startIndex, count);
+                }
+                finally
+                {
+                    if (buffer is not null)
+                        ArrayPool<char>.Shared.Return(buffer);
+                }
+            }
+
+            void ReplaceWithSnapshots(ref ValueListBuilder<int> replacements, int delta, ReadOnlySpan<char> oldValue, ReadOnlySpan<char> newValue, int startIndex, int count)
+            {
+                char[]? oldBuffer = null;
+                char[]? newBuffer = null;
+
+                try
+                {
+                    Span<char> oldTemp = oldValue.Length <= CharStackBufferSize
+                        ? stackalloc char[oldValue.Length]
+                        : (oldBuffer = ArrayPool<char>.Shared.Rent(oldValue.Length)).AsSpan(0, oldValue.Length);
+
+                    Span<char> newTemp = newValue.Length <= CharStackBufferSize
+                        ? stackalloc char[newValue.Length]
+                        : (newBuffer = ArrayPool<char>.Shared.Rent(newValue.Length)).AsSpan(0, newValue.Length);
+
+                    oldValue.CopyTo(oldTemp);
+                    newValue.CopyTo(newTemp);
+
+                    ReplaceAllCore(ref replacements, delta, oldTemp, newTemp, startIndex, count);
+                }
+                finally
+                {
+                    if (oldBuffer is not null)
+                        ArrayPool<char>.Shared.Return(oldBuffer);
+
+                    if (newBuffer is not null)
+                        ArrayPool<char>.Shared.Return(newBuffer);
+                }
+            }
+        }
+
+        private void ReplaceAllWithExpansion(ref ValueListBuilder<int> replacements, int delta, ReadOnlySpan<char> oldValue, ReadOnlySpan<char> newValue, int startIndex, int count)
+        {
+            Debug.Assert((uint)delta + (uint)m_Position > (uint)m_Chars.Length);
+
+            int originalLength = m_Position;
+            int finalLength = originalLength + delta;
+
+            if ((uint)finalLength > (uint)m_MaxCapacity)
+            {
+                throw new ArgumentOutOfRangeException("requiredLength", SR.ArgumentOutOfRange_SmallCapacity);
+            }
+
+            char[] oldArray = m_Chars;
+            char[] newArray = allocator.Allocate(CalculateNewArrayLength(delta));
+
+            ReadOnlySpan<char> source = oldArray;
+            Span<char> destination = newArray;
+
+            //
+            // Copy prefix before replacement range.
+            //
+            if (startIndex > 0)
+            {
+                source.Slice(0, startIndex)
+                    .CopyTo(destination);
+            }
+
+            ReplaceAllLeftToRight(source, destination, ref replacements, oldValue, newValue, originalLength, startIndex, count);
+
+            m_Chars = newArray;
+            m_Position = finalLength;
+            allocator.Return(oldArray);
+        }
+
+        private static void ReplaceAllLeftToRight(scoped ReadOnlySpan<char> source, scoped Span<char> destination,
+            scoped ref ValueListBuilder<int> replacements, scoped ReadOnlySpan<char> oldValue, scoped ReadOnlySpan<char> newValue,
+            int originalLength, int startIndex, int count)
+        {
+            Debug.Assert(startIndex >= 0);
+            Debug.Assert(count >= 0);
+            Debug.Assert((uint)startIndex + (uint)count <= (uint)originalLength);
+
+            int sourceIndex = startIndex;
+            int destinationIndex = startIndex;
+
+            //
+            // Replay replacements from left to right.
+            //
+            for (int i = 0; i < replacements.Length; i++)
+            {
+                int match = replacements[i];
+
+                //
+                // Copy text before this match.
+                //
+                int copyLength = match - sourceIndex;
+
+                if (copyLength > 0)
+                {
+                    source.Slice(sourceIndex, copyLength)
+                          .CopyTo(destination.Slice(destinationIndex));
+
+                    sourceIndex += copyLength;
+                    destinationIndex += copyLength;
+                }
+
+                //
+                // Write replacement.
+                //
+                newValue.CopyTo(destination.Slice(destinationIndex));
+                destinationIndex += newValue.Length;
+
+                //
+                // Skip matched text.
+                //
+                sourceIndex += oldValue.Length;
+            }
+
+            //
+            // Copy the remaining text in the replacement range.
+            //
+            int rangeEnd = startIndex + count;
+
+            if (sourceIndex < rangeEnd)
+            {
+                int remaining = rangeEnd - sourceIndex;
+
+                source.Slice(sourceIndex, remaining)
+                      .CopyTo(destination.Slice(destinationIndex));
+
+                destinationIndex += remaining;
+            }
+
+            //
+            // Copy suffix.
+            //
+            if (rangeEnd < originalLength)
+            {
+                source.Slice(rangeEnd, originalLength - rangeEnd)
+                      .CopyTo(destination.Slice(destinationIndex));
+            }
         }
 
         /// <summary>
@@ -223,84 +492,6 @@ namespace J2N.Text
             span.Replace(oldChar, newChar);
 
             //AssertInvariants();
-        }
-
-        private void ReplaceAll(ReadOnlySpan<int> replacements, int removeCount, ReadOnlySpan<char> value) // Based on ReplaceAllInChunk()
-        {
-            Debug.Assert(!replacements.IsEmpty);
-
-            // calculate the total amount of extra space or space needed for all the replacements.
-            long longDelta = (value.Length - removeCount) * (long)replacements.Length;
-            int delta = (int)longDelta;
-            if (delta != longDelta)
-            {
-                throw new OutOfMemoryException();
-            }
-
-            int targetIndex = replacements[0];
-
-            // Make the room needed for all the new characters if needed.
-            if (delta > 0)
-            {
-                MakeRoom(targetIndex, delta);
-            }
-
-            char[] chars = m_Chars;
-            // We made certain that characters after the insertion point are not moved,
-            int i = 0;
-            while (true)
-            {
-                // Copy in the new string for the ith replacement
-                ReplaceInPlace(ref targetIndex, ref MemoryMarshal.GetReference(value), value.Length);
-                int gapStart = replacements[i] + removeCount;
-                i++;
-                if ((uint)i >= replacements.Length)
-                {
-                    break;
-                }
-
-                int gapEnd = replacements[i];
-                Debug.Assert(gapStart < chars.Length, "gap starts at end of buffer.  Should not happen");
-                Debug.Assert(gapStart <= gapEnd, "negative gap size");
-                Debug.Assert(gapEnd <= m_Position, "gap too big");
-                if (delta != 0)     // can skip the sliding of gaps if source an target string are the same size.
-                {
-                    // Copy the gap data between the current replacement and the next replacement
-                    ReplaceInPlace(ref targetIndex, ref chars[gapStart], gapEnd - gapStart);
-                }
-                else
-                {
-                    targetIndex += gapEnd - gapStart;
-                    Debug.Assert(targetIndex <= m_Position, "gap not in chunk");
-                }
-            }
-
-            // Remove extra space if necessary.
-            if (delta < 0)
-            {
-                RemoveCore(targetIndex, -delta);
-            }
-        }
-
-        private bool StartsWith(int index, int count, ReadOnlySpan<char> value)
-        {
-            for (int i = 0; i < value.Length; i++)
-            {
-                if (count == 0)
-                {
-                    return false;
-                }
-
-                if (value[i] != m_Chars[index])
-                {
-                    return false;
-                }
-
-                index++;
-                --count;
-            }
-
-            return true;
         }
 
         #endregion Replace (BCL overloads)
