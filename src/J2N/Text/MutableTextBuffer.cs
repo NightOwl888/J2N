@@ -1104,7 +1104,10 @@ namespace J2N.Text
             char[] toReturn = Interlocked.Exchange(ref m_Chars, Arrays.Empty<char>());
 
             if (toReturn.Length != 0)
+            {
                 allocator.Return(toReturn);
+                m_Position = 0;
+            }
         }
 
         #endregion Dispose

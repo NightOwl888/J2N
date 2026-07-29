@@ -4779,6 +4779,26 @@ namespace J2N.Text.Tests
             }
         }
 
+        [Fact]
+        public void Dispose_ClearsBuilder_ThenReusable()
+        {
+            const string Text1 = "test";
+            var vsb = MutableTextBufferFactory(Text1);
+
+            Assert.Equal(Text1.Length, vsb.Length);
+
+            vsb.Dispose();
+
+            Assert.Equal(0, vsb.Length);
+            Assert.Equal(string.Empty, vsb.ToString());
+            vsb.Dispose();
+
+            const string Text2 = "another test";
+            vsb.Append(Text2);
+            Assert.Equal(Text2.Length, vsb.Length);
+            Assert.Equal(Text2, vsb.ToString());
+        }
+
         private sealed class CountingCharArrayAllocator : IArrayAllocator<char>
         {
             private int returnCount;
