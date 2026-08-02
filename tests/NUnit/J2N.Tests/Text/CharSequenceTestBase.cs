@@ -1,5 +1,6 @@
 ﻿using NUnit.Framework;
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
 using System.Threading;
@@ -13,25 +14,17 @@ namespace J2N.Text
     {
         protected static readonly string String1 = "This is a portriat of a Turkish czar";
         protected static readonly string String2 = "This is not an equal string";
-        protected static readonly string String3 = String1 + String2;
-        protected static readonly string String4 = String1.Substring(0, String1.Length - 10);
 
         protected static readonly char[] CharArray1 = String1.ToCharArray();
         protected static readonly char[] CharArray2 = String2.ToCharArray();
-        protected static readonly char[] CharArray3 = String3.ToCharArray();
-        protected static readonly char[] CharArray4 = String4.ToCharArray();
 
         protected static readonly StringBuilder StringBuilder1 = new(String1);
         protected static readonly StringBuilder StringBuilder2 = new(String2);
-        protected static readonly StringBuilder StringBuilder3 = new(String3);
-        protected static readonly StringBuilder StringBuilder4 = new(String4);
 
         protected CultureInfo originalCulture = null!;
-        protected T target = default!;
-        protected T nullTarget = default!;
-        protected T equalTarget = default!;
-        protected T unequalTarget = default!;
-        protected T emptyTarget = default!;
+
+        public abstract T CreateClassUnderTest(string? value);
+
 
         [SetUp]
         public virtual void SetUp()
@@ -56,188 +49,401 @@ namespace J2N.Text
                 = originalCulture;
         }
 
-        protected abstract int CompareToString(T target, string? value);
-        protected abstract int CompareToCharArray(T target, char[]? value);
-        protected abstract int CompareToStringBuilder(T target, StringBuilder? value);
-        protected abstract int CompareToReadOnlySpan(T target, ReadOnlySpan<char> value);
-        protected abstract int CompareToObject(T target, object? value);
-
-        protected abstract bool EqualsString(T target, string? value);
-        protected abstract bool EqualsCharArray(T target, char[]? value);
-        protected abstract bool EqualsStringBuilder(T target, StringBuilder? value);
-        protected abstract bool EqualsReadOnlySpan(T target, ReadOnlySpan<char> value);
-
-        [Test]
-        public virtual void TestHasValue()
+        [TestCase("This is a portriat of a Turkish czar", true)]
+        [TestCase("", true)]
+        [TestCase(null, false)]
+        public virtual void Test_HasValue(string? value, bool expected)
         {
-            Assert.IsTrue(target.HasValue);
-            Assert.IsTrue(emptyTarget.HasValue);
-            Assert.IsFalse(nullTarget.HasValue);
+            Assert.AreEqual(expected, CreateClassUnderTest(value).HasValue);
         }
 
         [Test]
-        public virtual void TestIndexer()
+        public virtual void Test_Indexer()
         {
-            Assert.AreEqual('p', target[10]);
-
-            Assert.Throws<IndexOutOfRangeException>(() => { var x = target[String1.Length + 1]; });
-            Assert.Throws<IndexOutOfRangeException>(() => { var x = emptyTarget[0]; });
-            Assert.Throws<InvalidOperationException>(() => { var x = nullTarget[10]; });
+            Assert.AreEqual('p', CreateClassUnderTest(String1)[10]);
         }
 
         [Test]
-        public virtual void TestLength()
+        public virtual void Test_Indexer_Invalid()
         {
-            Assert.AreEqual(String1.Length, target.Length);
+            Assert.Throws<IndexOutOfRangeException>(() => { var x = CreateClassUnderTest(String1)[String1.Length + 1]; });
+            Assert.Throws<IndexOutOfRangeException>(() => { var x = CreateClassUnderTest("")[0]; });
+            Assert.Throws<InvalidOperationException>(() => { var x = CreateClassUnderTest(null)[10]; });
+        }
 
-            Assert.AreEqual(0, emptyTarget.Length);
-            Assert.AreEqual(0, nullTarget.Length);
+
+        [TestCase("This is a portriat of a Turkish czar", 36)]
+        [TestCase("", 0)]
+        [TestCase(null, 0)]
+        public virtual void Test_Length(string? value, int expected)
+        {
+            Assert.AreEqual(expected, CreateClassUnderTest(value).Length);
+        }
+
+        [TestCase("This is a portriat of a Turkish czar", 6, 10, "s a portri")]
+        [TestCase("This is a portriat of a Turkish czar", 0, 36, "This is a portriat of a Turkish czar")]
+        [TestCase("This is a portriat of a Turkish czar", 10, 0, "")]
+        public virtual void Test_Subsequence(string? value, int startIndex, int length, string expected)
+        {
+            Assert.AreEqual(expected, CreateClassUnderTest(value).Subsequence(startIndex, length).ToString());
+
+            //Assert.IsFalse(nullTarget.Subsequence(6, 10).HasValue); // Null target will always return null subsequence
         }
 
         [Test]
-        public virtual void TestSubsequence()
+        public virtual void Test_Subsequence_Invalid()
         {
-            Assert.AreEqual("s a portri", target.Subsequence(6, 10).ToString()); // Substring
-            Assert.AreEqual(String1, target.Subsequence(0, String1.Length).ToString()); // Full string
-            Assert.AreEqual(string.Empty, target.Subsequence(10, 0).ToString()); // Zero length
-            Assert.Throws<ArgumentOutOfRangeException>(() => target.Subsequence(-1, 10));
-            Assert.Throws<ArgumentOutOfRangeException>(() => target.Subsequence(3, -2));
-            Assert.Throws<ArgumentOutOfRangeException>(() => target.Subsequence(String1.Length, 1));
+            Assert.Throws<ArgumentOutOfRangeException>(() => CreateClassUnderTest(String1).Subsequence(-1, 10));
+            Assert.Throws<ArgumentOutOfRangeException>(() => CreateClassUnderTest(String1).Subsequence(3, -2));
+            Assert.Throws<ArgumentOutOfRangeException>(() => CreateClassUnderTest(String1).Subsequence(String1.Length, 1));
 
-            Assert.Throws<ArgumentOutOfRangeException>(() => emptyTarget.Subsequence(0, 1));
-
-            Assert.IsFalse(nullTarget.Subsequence(6, 10).HasValue); // Null target will always return null subsequence
+            Assert.Throws<ArgumentOutOfRangeException>(() => CreateClassUnderTest("").Subsequence(0, 1));
         }
 
-        [Test]
-        public virtual void TestToString()
+        [TestCase("Hello", "Hello")]
+        [TestCase("This is a portriat of a Turkish czar", "This is a portriat of a Turkish czar")]
+        [TestCase(null, "")]
+        [TestCase("", "")]
+        public virtual void Test_ToString(string? value, string expected)
         {
-            Assert.AreEqual(String1, target.ToString());
-            Assert.AreEqual(string.Empty, emptyTarget.ToString());
-            Assert.AreEqual(string.Empty, nullTarget.ToString());
+            Assert.AreEqual(expected, CreateClassUnderTest(value).ToString());
         }
 
-        [Test]
-        public virtual void TestEquals()
+        public static IEnumerable<TestCaseData> Equals_Object_TestData()
         {
-            Assert.IsTrue(EqualsString(target, String1));
-            Assert.IsTrue(EqualsCharArray(target, CharArray1));
-            Assert.IsTrue(EqualsReadOnlySpan(target, String1.AsSpan()));
-            Assert.IsTrue(EqualsStringBuilder(target, new StringBuilder(String1)));
-            Assert.IsTrue(target.Equals(new StringCharSequence(String1)));
-            Assert.IsTrue(target.Equals(new StringBuilderCharSequence(new StringBuilder(String1))));
-            Assert.IsTrue(target.Equals(new CharArrayCharSequence(String1.ToCharArray())));
-            Assert.IsTrue(target.Equals(new TextBuilder(String1)));
+            var factories = new Func<string?, object?>[]
+            {
+                CharSequenceUtil.CreateStringCharSequence,
+                CharSequenceUtil.CreateCharArrayCharSequence,
+                CharSequenceUtil.CreateStringBuilderCharSequence,
+                CharSequenceUtil.CreateMutableTextBufferCharSequence,
+                CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence,
+                CharSequenceUtil.CreateStringBuffer,
 
-            Assert.IsFalse(EqualsString(target, String2));
-            Assert.IsFalse(EqualsCharArray(target, CharArray2));
-            Assert.IsFalse(EqualsReadOnlySpan(target, String2.AsSpan()));
-            Assert.IsFalse(EqualsStringBuilder(target, new StringBuilder(String2)));
-            Assert.IsFalse(target.Equals(new StringCharSequence(String2)));
-            Assert.IsFalse(target.Equals(new StringBuilderCharSequence(new StringBuilder(String2))));
-            Assert.IsFalse(target.Equals(new CharArrayCharSequence(String2.ToCharArray())));
-            Assert.IsFalse(target.Equals(new TextBuilder(String2)));
+                CharSequenceUtil.CreateString,
+                CharSequenceUtil.CreateCharArray,
+                CharSequenceUtil.CreateStringBuilder,
 
-            Assert.IsTrue(EqualsString(nullTarget, null));
-            Assert.IsTrue(EqualsCharArray(nullTarget, null));
-            Assert.IsTrue(EqualsReadOnlySpan(nullTarget, null));
-            Assert.IsTrue(EqualsStringBuilder(nullTarget, null));
-            Assert.IsTrue(nullTarget!.Equals((ICharSequence?)null));
-            Assert.IsTrue(nullTarget!.Equals(new StringCharSequence(null)));
-            Assert.IsTrue(nullTarget!.Equals(new StringBuilderCharSequence(null)));
-            Assert.IsTrue(nullTarget!.Equals(new CharArrayCharSequence(null)));
+                CharSequenceUtil.CreateTextBuilder,
+                CharSequenceUtil.CreatePooledTextBuilder,
+                CharSequenceUtil.CreateSynchronizedTextBuilder,
+            };
 
+            foreach (var factory in factories)
+            {
+                foreach (var item in CharSequenceUtil.Equals_String_TestData())
+                {
+                    var leftArg = item[0];
+                    var rightArgRaw = factory((string?)item[1]);
+                    var expectedArg = item[2];
 
-            Assert.IsTrue(target.Equals((object)String1));
-            Assert.IsTrue(target.Equals((object)String1.ToCharArray()));
-            Assert.IsTrue(target.Equals((object)new StringBuilder(String1)));
-            Assert.IsTrue(target.Equals((object)new StringCharSequence(String1)));
-            Assert.IsTrue(target.Equals((object)new StringBuilderCharSequence(new StringBuilder(String1))));
-            Assert.IsTrue(target.Equals((object)new CharArrayCharSequence(String1.ToCharArray())));
-            Assert.IsTrue(target.Equals((object)new TextBuilder(String1)));
-
-            Assert.IsFalse(target.Equals((object)String2));
-            Assert.IsFalse(target.Equals((object)String2.ToCharArray()));
-            Assert.IsFalse(target.Equals((object)new StringBuilder(String2)));
-            Assert.IsFalse(target.Equals((object)new StringCharSequence(String2)));
-            Assert.IsFalse(target.Equals((object)new StringBuilderCharSequence(new StringBuilder(String2))));
-            Assert.IsFalse(target.Equals((object)new CharArrayCharSequence(String2.ToCharArray())));
-            Assert.IsFalse(target.Equals((object)new TextBuilder(String2)));
-
-            Assert.IsTrue(nullTarget!.Equals((object?)null));
-            Assert.IsTrue(nullTarget!.Equals((object?)(string?)null));
-            Assert.IsTrue(nullTarget!.Equals((object?)(char[]?)null));
-            Assert.IsTrue(nullTarget!.Equals((object?)new StringCharSequence(null)));
-            Assert.IsTrue(nullTarget!.Equals((object?)new StringBuilderCharSequence(null)));
-            Assert.IsTrue(nullTarget!.Equals((object?)new CharArrayCharSequence(null)));
-            Assert.IsTrue(nullTarget!.Equals((object?)(TextBuilder?)null));
+                    yield return new TestCaseData(leftArg, rightArgRaw, expectedArg)
+                        .FormatArguments(leftArg, rightArgRaw);
+                }
+            }
         }
 
-        [Test]
-        public virtual void TestGetHashCode()
+        public static IEnumerable<TestCaseData> Equals_ICharSequence_TestData()
         {
-            Assert.AreEqual(CharSequenceComparer.Ordinal.GetHashCode(String1), target.GetHashCode());
-            Assert.AreEqual(new StringBuilderCharSequence(new StringBuilder(String1)).GetHashCode(), target.GetHashCode());
-            Assert.AreEqual(new CharArrayCharSequence(String1.ToCharArray()).GetHashCode(), target.GetHashCode());
+            var factories = new Func<string?, object?>[]
+            {
+                CharSequenceUtil.CreateStringCharSequence,
+                CharSequenceUtil.CreateCharArrayCharSequence,
+                CharSequenceUtil.CreateStringBuilderCharSequence,
+                CharSequenceUtil.CreateMutableTextBufferCharSequence,
+                CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence,
+                CharSequenceUtil.CreateStringBuffer,
 
-            Assert.AreNotEqual(CharSequenceComparer.Ordinal.GetHashCode(String2), target.GetHashCode());
-            Assert.AreNotEqual(new StringBuilderCharSequence(new StringBuilder(String2)).GetHashCode(), target.GetHashCode());
-            Assert.AreNotEqual(new CharArrayCharSequence(String2.ToCharArray()).GetHashCode(), target.GetHashCode());
+                //CharSequenceUtil.CreateTextBuilderAsCharSequence,
+                //CharSequenceUtil.CreatePooledTextBuilderAsCharSequence,
+            };
 
-            Assert.AreEqual(0, emptyTarget.GetHashCode());
-            Assert.AreEqual(int.MaxValue, nullTarget.GetHashCode());
+            foreach (var factory in factories)
+            {
+                foreach (var item in CharSequenceUtil.Equals_String_TestData())
+                {
+                    var leftArg = item[0];
+                    var rightArgRaw = factory((string?)item[1]);
+                    var expectedArg = item[2];
+
+                    yield return new TestCaseData(leftArg, rightArgRaw, expectedArg)
+                        .FormatArguments(leftArg, rightArgRaw);
+                }
+            }
         }
 
-        [Test]
-        public virtual void TestCompareTo()
+        public static IEnumerable<TestCaseData> Equals_StringCharSequence_TestData()
         {
-            Assert.AreEqual(0, CompareToString(target, String1));
-            Assert.AreEqual(0, CompareToStringBuilder(target, new StringBuilder(String1)));
-            Assert.AreEqual(0, CompareToCharArray(target, String1.ToCharArray()));
-            Assert.AreEqual(0, CompareToReadOnlySpan(target, String1.AsSpan()));
-            Assert.AreEqual(0, target.CompareTo(String1.AsCharSequence()));
-            Assert.AreEqual(0, target.CompareTo(new StringBuilderCharSequence(new StringBuilder(String1))));
-            Assert.AreEqual(0, target.CompareTo(new CharArrayCharSequence(String1.ToCharArray())));
+            var factories = new Func<string?, object?>[]
+            {
+                CharSequenceUtil.CreateStringCharSequence,
+            };
 
-            Assert.Greater(0, CompareToString(target, String2));
-            Assert.Greater(0, CompareToStringBuilder(target, new StringBuilder(String2)));
-            Assert.Greater(0, CompareToCharArray(target, String2.ToCharArray()));
-            Assert.Greater(0, CompareToReadOnlySpan(target, String2.AsSpan()));
-            Assert.Greater(0, target.CompareTo(String2.AsCharSequence()));
-            Assert.Greater(0, target.CompareTo(new StringBuilderCharSequence(new StringBuilder(String2))));
-            Assert.Greater(0, target.CompareTo(new CharArrayCharSequence(String2.ToCharArray())));
+            foreach (var factory in factories)
+            {
+                foreach (var item in CharSequenceUtil.Equals_String_TestData())
+                {
+                    var leftArg = item[0];
+                    var rightArgRaw = factory((string?)item[1]);
+                    var expectedArg = item[2];
 
-            Assert.Greater(0, CompareToString(target, String3));
-            Assert.Greater(0, CompareToStringBuilder(target, new StringBuilder(String3)));
-            Assert.Greater(0, CompareToCharArray(target, String3.ToCharArray()));
-            Assert.Greater(0, CompareToReadOnlySpan(target, String3.AsSpan()));
-            Assert.Greater(0, target.CompareTo(String3.AsCharSequence()));
-            Assert.Greater(0, target.CompareTo(new StringBuilderCharSequence(new StringBuilder(String3))));
-            Assert.Greater(0, target.CompareTo(new CharArrayCharSequence(String3.ToCharArray())));
-
-            Assert.Less(0, CompareToString(target, String4));
-            Assert.Less(0, CompareToStringBuilder(target, new StringBuilder(String4)));
-            Assert.Less(0, CompareToCharArray(target, String4.ToCharArray()));
-            Assert.Less(0, CompareToReadOnlySpan(target, String4.AsSpan()));
-            Assert.Less(0, target.CompareTo(String4.AsCharSequence()));
-            Assert.Less(0, target.CompareTo(new StringBuilderCharSequence(new StringBuilder(String4))));
-            Assert.Less(0, target.CompareTo(new CharArrayCharSequence(String4.ToCharArray())));
-
-            Assert.Greater(0, CompareToString(nullTarget, String1));
-            Assert.Less(0, CompareToString(target, (string?)null));
-            Assert.Less(0, CompareToStringBuilder(target, (StringBuilder?)null));
-            Assert.Less(0, CompareToCharArray(target, (char[]?)null));
-
-            Assert.AreEqual(0, CompareToString(nullTarget, (string?)null));
-            Assert.AreEqual(0, CompareToStringBuilder(nullTarget, (StringBuilder?)null));
-            Assert.AreEqual(0, CompareToCharArray(nullTarget, (char[]?)null));
-            Assert.AreEqual(0, CompareToReadOnlySpan(nullTarget, (char[]?)null));
-            Assert.AreEqual(0, nullTarget.CompareTo((StringBuffer?)null));
-            Assert.AreEqual(0, nullTarget.CompareTo((ICharSequence?)null));
-            Assert.AreEqual(0, nullTarget.CompareTo(new StringBuilderCharSequence(null)));
-            Assert.AreEqual(0, nullTarget.CompareTo(new StringCharSequence(null)));
-            Assert.AreEqual(0, nullTarget.CompareTo(new CharArrayCharSequence(null)));
-            Assert.AreEqual(0, CompareToObject(nullTarget, (object?)null));
+                    yield return new TestCaseData(leftArg, rightArgRaw, expectedArg)
+                        .FormatArguments(leftArg, rightArgRaw);
+                }
+            }
         }
+
+        public static IEnumerable<TestCaseData> Equals_CharArrayCharSequence_TestData()
+        {
+            var factories = new Func<string?, object?>[]
+            {
+                CharSequenceUtil.CreateCharArrayCharSequence,
+            };
+
+            foreach (var factory in factories)
+            {
+                foreach (var item in CharSequenceUtil.Equals_String_TestData())
+                {
+                    var leftArg = item[0];
+                    var rightArgRaw = factory((string?)item[1]);
+                    var expectedArg = item[2];
+
+                    yield return new TestCaseData(leftArg, rightArgRaw, expectedArg)
+                        .FormatArguments(leftArg, rightArgRaw);
+                }
+            }
+        }
+
+        public static IEnumerable<TestCaseData> Equals_StringBuilderCharSequence_TestData()
+        {
+            var factories = new Func<string?, object?>[]
+            {
+                CharSequenceUtil.CreateStringBuilderCharSequence,
+            };
+
+            foreach (var factory in factories)
+            {
+                foreach (var item in CharSequenceUtil.Equals_String_TestData())
+                {
+                    var leftArg = item[0];
+                    var rightArgRaw = factory((string?)item[1]);
+                    var expectedArg = item[2];
+
+                    yield return new TestCaseData(leftArg, rightArgRaw, expectedArg)
+                        .FormatArguments(leftArg, rightArgRaw);
+                }
+            }
+        }
+
+        public static IEnumerable<TestCaseData> Equals_CharArray_TestData()
+        {
+            var factories = new Func<string?, object?>[]
+            {
+                CharSequenceUtil.CreateCharArray,
+            };
+
+            foreach (var factory in factories)
+            {
+                foreach (var item in CharSequenceUtil.Equals_String_TestData())
+                {
+                    var leftArg = item[0];
+                    var rightArgRaw = factory((string?)item[1]);
+                    var expectedArg = item[2];
+
+                    yield return new TestCaseData(leftArg, rightArgRaw, expectedArg)
+                        .FormatArguments(leftArg, rightArgRaw);
+                }
+            }
+        }
+
+        public static IEnumerable<TestCaseData> Equals_StringBuilder_TestData()
+        {
+            var factories = new Func<string?, object?>[]
+            {
+                CharSequenceUtil.CreateStringBuilder,
+            };
+
+            foreach (var factory in factories)
+            {
+                foreach (var item in CharSequenceUtil.Equals_String_TestData())
+                {
+                    var leftArg = item[0];
+                    var rightArgRaw = factory((string?)item[1]);
+                    var expectedArg = item[2];
+
+                    yield return new TestCaseData(leftArg, rightArgRaw, expectedArg)
+                        .FormatArguments(leftArg, rightArgRaw);
+                }
+            }
+        }
+
+        public static IEnumerable<TestCaseData> CompareTo_Object_TestData()
+        {
+            var factories = new Func<string?, object?>[]
+            {
+                CharSequenceUtil.CreateStringCharSequence,
+                CharSequenceUtil.CreateCharArrayCharSequence,
+                CharSequenceUtil.CreateStringBuilderCharSequence,
+                CharSequenceUtil.CreateMutableTextBufferCharSequence,
+                CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence,
+                CharSequenceUtil.CreateStringBuffer,
+
+                CharSequenceUtil.CreateString,
+                CharSequenceUtil.CreateCharArray,
+                CharSequenceUtil.CreateStringBuilder,
+
+                CharSequenceUtil.CreateTextBuilder,
+                CharSequenceUtil.CreatePooledTextBuilder,
+                CharSequenceUtil.CreateSynchronizedTextBuilder,
+            };
+
+            foreach (var factory in factories)
+            {
+                foreach (var item in CharSequenceUtil.CompareTo_String_TestData())
+                {
+                    var leftArg = item[0];
+                    var rightArgRaw = factory((string?)item[1]);
+                    var expectedArg = item[2];
+
+                    yield return new TestCaseData(leftArg, rightArgRaw, expectedArg)
+                        .FormatArguments(leftArg, rightArgRaw);
+                }
+            }
+        }
+
+        public static IEnumerable<TestCaseData> CompareTo_ICharSequence_TestData()
+        {
+            var factories = new Func<string?, object?>[]
+            {
+                CharSequenceUtil.CreateStringCharSequence,
+                CharSequenceUtil.CreateCharArrayCharSequence,
+                CharSequenceUtil.CreateStringBuilderCharSequence,
+                CharSequenceUtil.CreateMutableTextBufferCharSequence,
+                CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence,
+                CharSequenceUtil.CreateStringBuffer,
+
+                //CharSequenceUtil.CreateTextBuilderAsCharSequence,
+                //CharSequenceUtil.CreatePooledTextBuilderAsCharSequence,
+            };
+
+            foreach (var factory in factories)
+            {
+                foreach (var item in CharSequenceUtil.CompareTo_String_TestData())
+                {
+                    var leftArg = item[0];
+                    var rightArgRaw = factory((string?)item[1]);
+                    var expectedArg = item[2];
+
+                    yield return new TestCaseData(leftArg, rightArgRaw, expectedArg)
+                        .FormatArguments(leftArg, rightArgRaw);
+                }
+            }
+        }
+
+        public static IEnumerable<TestCaseData> CompareTo_StringCharSequence_TestData()
+        {
+            var factories = new Func<string?, object?>[]
+            {
+                CharSequenceUtil.CreateStringCharSequence,
+            };
+
+            foreach (var factory in factories)
+            {
+                foreach (var item in CharSequenceUtil.CompareTo_String_TestData())
+                {
+                    var leftArg = item[0];
+                    var rightArgRaw = factory((string?)item[1]);
+                    var expectedArg = item[2];
+
+                    yield return new TestCaseData(leftArg, rightArgRaw, expectedArg)
+                        .FormatArguments(leftArg, rightArgRaw);
+                }
+            }
+        }
+
+        public static IEnumerable<TestCaseData> CompareTo_CharArrayCharSequence_TestData()
+        {
+            var factories = new Func<string?, object?>[]
+            {
+                CharSequenceUtil.CreateCharArrayCharSequence,
+            };
+
+            foreach (var factory in factories)
+            {
+                foreach (var item in CharSequenceUtil.CompareTo_String_TestData())
+                {
+                    var leftArg = item[0];
+                    var rightArgRaw = factory((string?)item[1]);
+                    var expectedArg = item[2];
+
+                    yield return new TestCaseData(leftArg, rightArgRaw, expectedArg)
+                        .FormatArguments(leftArg, rightArgRaw);
+                }
+            }
+        }
+
+        public static IEnumerable<TestCaseData> CompareTo_StringBuilderCharSequence_TestData()
+        {
+            var factories = new Func<string?, object?>[]
+            {
+                CharSequenceUtil.CreateStringBuilderCharSequence,
+            };
+
+            foreach (var factory in factories)
+            {
+                foreach (var item in CharSequenceUtil.CompareTo_String_TestData())
+                {
+                    var leftArg = item[0];
+                    var rightArgRaw = factory((string?)item[1]);
+                    var expectedArg = item[2];
+
+                    yield return new TestCaseData(leftArg, rightArgRaw, expectedArg)
+                        .FormatArguments(leftArg, rightArgRaw);
+                }
+            }
+        }
+
+        public static IEnumerable<TestCaseData> CompareTo_CharArray_TestData()
+        {
+            var factories = new Func<string?, object?>[]
+            {
+                CharSequenceUtil.CreateCharArray,
+            };
+
+            foreach (var factory in factories)
+            {
+                foreach (var item in CharSequenceUtil.CompareTo_String_TestData())
+                {
+                    var leftArg = item[0];
+                    var rightArgRaw = factory((string?)item[1]);
+                    var expectedArg = item[2];
+
+                    yield return new TestCaseData(leftArg, rightArgRaw, expectedArg)
+                        .FormatArguments(leftArg, rightArgRaw);
+                }
+            }
+        }
+
+        public static IEnumerable<TestCaseData> CompareTo_StringBuilder_TestData()
+        {
+            var factories = new Func<string?, object?>[]
+            {
+                CharSequenceUtil.CreateStringBuilder,
+            };
+
+            foreach (var factory in factories)
+            {
+                foreach (var item in CharSequenceUtil.CompareTo_String_TestData())
+                {
+                    var leftArg = item[0];
+                    var rightArgRaw = factory((string?)item[1]);
+                    var expectedArg = item[2];
+
+                    yield return new TestCaseData(leftArg, rightArgRaw, expectedArg)
+                        .FormatArguments(leftArg, rightArgRaw);
+                }
+            }
+        }
+
     }
 }
