@@ -27,11 +27,11 @@ namespace J2N.Text
     /// A wrapper class that represents a <see cref="System.Text.StringBuilder"/> and implements <see cref="ICharSequence"/>.
     /// </summary>
     public class StringBuilderCharSequence : ICharSequence, IAppendable, 
-        IComparable<ICharSequence>, IComparable,
-        IComparable<string>, IComparable<StringBuilder>, IComparable<char[]>,
-        IEquatable<ICharSequence>,
-        IEquatable<CharArrayCharSequence>, IEquatable<StringBuilderCharSequence>, IEquatable<StringCharSequence>,
-        IEquatable<string>, IEquatable<StringBuilder>, IEquatable<char[]>, ISpanAppendable
+        IComparable<ICharSequence?>, IComparable,
+        IComparable<string?>, IComparable<StringBuilder?>, IComparable<char[]?>,
+        IEquatable<ICharSequence?>,
+        IEquatable<CharArrayCharSequence?>, IEquatable<StringBuilderCharSequence?>, IEquatable<StringCharSequence?>,
+        IEquatable<string?>, IEquatable<StringBuilder?>, IEquatable<char[]?>, ISpanAppendable
     {
         private const int CharStackBufferSize = 64;
 

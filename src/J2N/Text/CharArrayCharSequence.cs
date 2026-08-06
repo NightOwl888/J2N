@@ -28,11 +28,11 @@ namespace J2N.Text
     /// A wrapper class that represents a <see cref="T:char[]"/> and implements <see cref="ICharSequence"/>.
     /// </summary>
     public class CharArrayCharSequence : ICharSequence,
-        IComparable<ICharSequence>, IComparable,
-        IComparable<string>, IComparable<StringBuilder>, IComparable<char[]>,
-        IEquatable<ICharSequence>,
-        IEquatable<CharArrayCharSequence>, IEquatable<StringBuilderCharSequence>, IEquatable<StringCharSequence>,
-        IEquatable<string>, IEquatable<StringBuilder>, IEquatable<char[]>
+        IComparable<ICharSequence?>, IComparable,
+        IComparable<string?>, IComparable<StringBuilder?>, IComparable<char[]?>,
+        IEquatable<ICharSequence?>,
+        IEquatable<CharArrayCharSequence?>, IEquatable<StringBuilderCharSequence?>, IEquatable<StringCharSequence?>,
+        IEquatable<string?>, IEquatable<StringBuilder?>, IEquatable<char[]?>
     {
         private const int CharStackBufferSize = 64;
 
