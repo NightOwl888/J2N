@@ -26,13 +26,12 @@ namespace J2N.Text
     /// <summary>
     /// A wrapper class that represents a <see cref="string"/> and implements <see cref="ICharSequence"/>.
     /// </summary>
-    public class StringCharSequence : ICharSequence,
-        IComparable<ICharSequence?>, IComparable,
-        IComparable<string?>, IComparable<StringBuilder?>, IComparable<char[]?>,
-        IEquatable<ICharSequence?>,
-        IEquatable<CharArrayCharSequence?>, IEquatable<StringBuilderCharSequence?>, IEquatable<StringCharSequence?>,
-        IEquatable<string?>, IEquatable<StringBuilder?>, IEquatable<char[]?>,
-        ISpannable<char>, ICopyable<char>, ISpanCopyable<char>
+    public class StringCharSequence : ICharSequence, 
+        IComparable<ICharSequence>, IComparable,
+        IComparable<string>, IComparable<StringBuilder>, IComparable<char[]>,
+        IEquatable<ICharSequence>,
+        IEquatable<CharArrayCharSequence>, IEquatable<StringBuilderCharSequence>, IEquatable<StringCharSequence>, 
+        IEquatable<string>, IEquatable<StringBuilder>, IEquatable<char[]>
     {
         private const int CharStackBufferSize = 64;
 
@@ -122,7 +121,7 @@ namespace J2N.Text
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(startIndex, ExceptionArgument.startIndex);
             if (length < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(length, ExceptionArgument.length);
-            if ((uint)startIndex + (uint)length > Value.Length)
+            if (startIndex > Value.Length - length) // Checks for int overflow
                 ThrowHelper.ThrowArgumentOutOfRange_IndexLengthString(startIndex, length);
 
             return new StringCharSequence(Value.Substring(startIndex, length));
@@ -387,18 +386,6 @@ namespace J2N.Text
         /// <summary>
         /// Determines whether this <see cref="StringCharSequence"/> is equal to <paramref name="other"/>.
         /// </summary>
-        /// <param name="other">A <see cref="T:char[]"/> to compare to the current <see cref="StringCharSequence"/>.</param>
-        /// <returns><c>true</c> if <paramref name="other"/> is equal to the current <see cref="StringCharSequence"/>; otherwise, <c>false</c>.</returns>
-        // J2N TODO: API - Before we mark this public, we need to evaluate whether existing classes that are implicitly convertible to
-        // ReadOnlySpan<char> (whether or not they implement ICharSequence) will cause "ambiguous overload" issues with the compiler.
-        internal bool Equals(ReadOnlySpan<char> other)
-        {
-            return Value.AsSpan().SequenceEqual(other);
-        }
-
-        /// <summary>
-        /// Determines whether this <see cref="StringCharSequence"/> is equal to <paramref name="other"/>.
-        /// </summary>
         /// <param name="other">An object to compare to the current <see cref="StringCharSequence"/>.</param>
         /// <returns><c>true</c> if <paramref name="other"/> is equal to the current <see cref="StringCharSequence"/>; otherwise, <c>false</c>.</returns>
         public override bool Equals(object? other)
@@ -406,9 +393,7 @@ namespace J2N.Text
             if (other is null)
                 return !HasValue;
 
-            if (other is ISpannable<char> spannable)
-                return Equals(spannable.AsSpan());
-            else if (other is string otherString)
+            if (other is string otherString)
                 return Equals(otherString);
             else if (other is StringBuilder otherStringBuilder)
                 return Equals(otherStringBuilder);
@@ -522,24 +507,6 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// Compares this instance with a specified <see cref="ReadOnlySpan{Char}"/> and indicates whether
-        /// this instance precedes, follows, or appears in the same position in the sort order as the specified string.
-        /// </summary>
-        /// <param name="other">The <see cref="ReadOnlySpan{Char}"/> to compare with this instance.</param>
-        /// <returns>
-        /// An integer that indicates the lexical relationship between the two comparands.
-        /// Less than zero indicates the comparison value is greater than the current string.
-        /// Zero indicates the strings are equal.
-        /// Greater than zero indicates the comparison value is less than the current string.
-        /// </returns>
-        // J2N TODO: API - Before we mark this public, we need to evaluate whether existing classes that are implicitly convertible to
-        // ReadOnlySpan<char> (whether or not they implement ICharSequence) will cause "ambiguous overload" issues with the compiler.
-        internal int CompareTo(ReadOnlySpan<char> other)
-        {
-            return Value.CompareToOrdinal(other);
-        }
-
-        /// <summary>
         /// Compares this instance with a specified <see cref="object"/> and indicates whether
         /// this instance precedes, follows, or appears in the same position in the sort order as the specified string.
         /// </summary>
@@ -555,9 +522,7 @@ namespace J2N.Text
             if (this.Value is null) return (other is null) ? 0 : -1;
             if (other is null) return 1;
 
-            if (other is ISpannable<char> spannable)
-                return CompareTo(spannable.AsSpan());
-            else if (other is string otherString)
+            if (other is string otherString)
                 return CompareTo(otherString);
             else if (other is StringBuilder otherStringBuilder)
                 return CompareTo(otherStringBuilder);
@@ -578,33 +543,5 @@ namespace J2N.Text
         }
 
         #endregion
-
-        #region ICopyable<char> Members
-
-        void ICopyable<char>.CopyTo(int sourceIndex, char[] destination, int destinationIndex, int count)
-        {
-            Value?.CopyTo(sourceIndex, destination, destinationIndex, count);
-        }
-
-        #endregion ICopyable<char> Members
-
-        #region ISpanCopyable<char> Members
-
-        void ISpanCopyable<char>.CopyTo(int sourceIndex, Span<char> destination, int count)
-        {
-            Value?.AsSpan(sourceIndex, count).CopyTo(destination);
-        }
-
-        #endregion ISpanCopyable<char> Members
-
-        #region ISpannable<char> Members
-
-        ReadOnlySpan<char> ISpannable<char>.AsSpan() => Value.AsSpan();
-
-        ReadOnlySpan<char> ISpannable<char>.AsSpan(int start) => Value.AsSpan(start);
-
-        ReadOnlySpan<char> ISpannable<char>.AsSpan(int start, int length) => Value.AsSpan(start, length);
-
-        #endregion ISpannable<char> Members
     }
 }
