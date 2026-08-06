@@ -228,7 +228,7 @@ namespace J2N.Text
         public static void AssertCompareTo(int expected, int actual)
         {
             if (expected == 0)
-                Assert.AreEqual(actual, 0);
+                Assert.AreEqual(0, actual);
             else if (expected < 0)
                 Assert.Less(actual, 0);
             else
