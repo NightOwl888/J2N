@@ -5,6 +5,9 @@
 using NUnit.Framework;
 using System;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+#nullable enable
 
 namespace J2N
 {
@@ -46,6 +49,61 @@ namespace J2N
             where TThirdExceptionType : Exception
         {
             ThrowsAnyInternal(action, typeof(TFirstExceptionType), typeof(TSecondExceptionType), typeof(TThirdExceptionType));
+        }
+
+        public static void AssertNoABDeadlock<TLeft, TRight>(
+            Func<TLeft> createLeft,
+            Func<TRight> createRight,
+            Action<TLeft, TRight> operation,
+            int iterations = 1_000)
+        {
+            TLeft left1 = createLeft();
+            TLeft left2 = createLeft();
+
+            TRight right1 = createRight();
+            TRight right2 = createRight();
+
+            var barrier = new Barrier(2);
+
+            Exception? ex1 = null;
+            Exception? ex2 = null;
+
+            var t1 = Task.Factory.StartNew(() =>
+            {
+                barrier.SignalAndWait();
+
+                try
+                {
+                    for (int i = 0; i < iterations; i++)
+                        operation(left1, right2);
+                }
+                catch (Exception ex)
+                {
+                    ex1 = ex;
+                }
+            });
+
+            var t2 = Task.Factory.StartNew(() =>
+            {
+                barrier.SignalAndWait();
+
+                try
+                {
+                    for (int i = 0; i < iterations; i++)
+                        operation(left2, right1);
+                }
+                catch (Exception ex)
+                {
+                    ex2 = ex;
+                }
+            });
+
+            Assert.IsTrue(
+                Task.WaitAll(new Task[] { t1, t2 }, TimeSpan.FromSeconds(4)),
+                "Possible deadlock.");
+
+            Assert.IsNull(ex1);
+            Assert.IsNull(ex2);
         }
     }
 }

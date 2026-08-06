@@ -4,6 +4,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 #nullable enable
 
 namespace J2N.Text
@@ -135,6 +137,77 @@ namespace J2N.Text
 
         #region Utilities
 
+        public static void AssertSynchronizesWhileReading(SynchronizedTextBuilder builder, Action readOperation, int iterations = 500)
+        {
+            AssertSynchronizesWhileReading(builder.SyncRoot, readOperation, CreateMutation(builder, builder.ToString()), iterations);
+        }
+
+        public static void AssertSynchronizesWhileReading(StringBuffer buffer, Action readOperation, int iterations = 500)
+        {
+            AssertSynchronizesWhileReading(buffer.SyncRoot, readOperation, CreateMutation(buffer, buffer.ToString()), iterations);
+        }
+
+        private static void AssertSynchronizesWhileReading(object syncRoot, Action readOperation, Action mutate, int iterations)
+        {
+            using var cts = new CancellationTokenSource();
+
+            Task writer = Task.Run(() => MutationWorker(syncRoot, mutate, cts.Token));
+
+            try
+            {
+                for (int i = 0; i < iterations; i++)
+                {
+                    readOperation();
+                }
+            }
+            finally
+            {
+                cts.Cancel();
+                writer.Wait();
+            }
+        }
+
+
+        private static Action CreateMutation(SynchronizedTextBuilder builder, string original)
+        {
+            return () =>
+            {
+                builder.Clear();
+                builder.Append('X', original.Length);
+
+                builder.Clear();
+                builder.Append('Y', original.Length);
+
+                builder.Clear();
+                builder.Append(original);
+            };
+        }
+
+        private static Action CreateMutation(StringBuffer buffer, string original)
+        {
+            return () =>
+            {
+                buffer.Clear();
+                buffer.Append('X', original.Length);
+
+                buffer.Clear();
+                buffer.Append('Y', original.Length);
+
+                buffer.Clear();
+                buffer.Append(original);
+            };
+        }
+
+        private static void MutationWorker(object syncRoot, Action mutate, CancellationToken token)
+        {
+            while (!token.IsCancellationRequested)
+            {
+                lock (syncRoot)
+                {
+                    mutate();
+                }
+            }
+        }
 
         public static void Dispose(object? toDispose)
         {

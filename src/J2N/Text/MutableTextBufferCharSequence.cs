@@ -18,6 +18,7 @@
 
 using System;
 using System.Buffers;
+using System.Diagnostics;
 using System.Text;
 
 namespace J2N.Text
@@ -431,21 +432,19 @@ namespace J2N.Text
 
             if (other is ISpannable<char> spannable)
             {
-                return Equals(spannable.AsSpan());
+                return Value.AsSpan().SequenceEqual(spannable.AsSpan());
             }
-            else if (other is StringBuilderCharSequence || other is StringBuffer)
+            else if (other is StringBuilderCharSequence stringBuilderCharSequence)
             {
-                var copyable = (ICopyable<char>)other;
-                char[] buffer = ArrayPool<char>.Shared.Rent(other.Length);
-                try
-                {
-                    copyable.CopyTo(0, buffer, 0, other.Length);
-                    return Equals(buffer.AsSpan(0, other.Length));
-                }
-                finally
-                {
-                    ArrayPool<char>.Shared.Return(buffer);
-                }
+                return Equals(stringBuilderCharSequence.Value);
+            }
+            else if (other is SynchronizedTextBuilderCharSequence synchronizedTextBuilderCharSequence)
+            {
+                return Equals(synchronizedTextBuilderCharSequence);
+            }
+            else if (other is StringBuffer stringBuffer)
+            {
+                return Equals(stringBuffer);
             }
 
             ReadOnlySpan<char> thisSpan = Value.AsSpan();
@@ -461,10 +460,9 @@ namespace J2N.Text
         /// </summary>
         /// <param name="other">A <see cref="T:char[]"/> to compare to the current char sequence.</param>
         /// <returns><see langword="true"/> if <paramref name="other"/> is equal to the current char sequence; otherwise, <see langword="false"/>.</returns>
-        public bool Equals(char[]? other)
+        internal bool Equals(char[]? other)
         {
-            var value = Value;
-            if (value is null)
+            if (!HasValue)
                 return other is null;
             if (other is null)
                 return false;
@@ -477,8 +475,11 @@ namespace J2N.Text
         /// </summary>
         /// <param name="other">A <see cref="string"/> to compare to the current char sequence.</param>
         /// <returns><see langword="true"/> if <paramref name="other"/> is equal to the current char sequence; otherwise, <see langword="false"/>.</returns>
-        public bool Equals(ReadOnlySpan<char> other)
+        internal bool Equals(ReadOnlySpan<char> other)
         {
+            if (!HasValue)
+                return false;
+
             return Value.AsSpan().SequenceEqual(other);
         }
 
@@ -487,15 +488,14 @@ namespace J2N.Text
         /// </summary>
         /// <param name="other">A <see cref="string"/> to compare to the current char sequence.</param>
         /// <returns><see langword="true"/> if <paramref name="other"/> is equal to the current char sequence; otherwise, <see langword="false"/>.</returns>
-        public bool Equals(string? other)
+        internal bool Equals(string? other)
         {
-            var value = Value;
-            if (value is null)
+            if (!HasValue)
                 return other is null;
             if (other is null)
                 return false;
 
-            return Equals(other.AsSpan());
+            return Value!.AsSpan().SequenceEqual(other);
         }
 
         /// <summary>
@@ -503,10 +503,9 @@ namespace J2N.Text
         /// </summary>
         /// <param name="other">A <see cref="StringBuilder"/> to compare to the current char sequence.</param>
         /// <returns><see langword="true"/> if <paramref name="other"/> is equal to the current char sequence; otherwise, <see langword="false"/>.</returns>
-        public bool Equals(StringBuilder? other)
+        internal bool Equals(StringBuilder? other)
         {
-            var value = Value;
-            if (value is null)
+            if (!HasValue)
                 return other is null;
             if (other is null)
                 return false;
@@ -515,6 +514,21 @@ namespace J2N.Text
             int otherLength = other.Length;
             if (len != otherLength) return false;
 
+#if FEATURE_STRINGBUILDER_GETCHUNKS
+            ReadOnlySpan<char> thisSpan = Value.AsSpan();
+
+            int offset = 0;
+            foreach (ReadOnlyMemory<char> otherChunk in other.GetChunks())
+            {
+                ReadOnlySpan<char> thisChunk = thisSpan.Slice(offset, otherChunk.Length);
+                if (!otherChunk.Span.SequenceEqual(thisChunk))
+                    return false;
+
+                offset += otherChunk.Length;
+            }
+            Debug.Assert(offset == Length);
+            return true;
+#else
             char[]? buffer = ArrayPool<char>.Shared.Rent(otherLength);
             try
             {
@@ -525,6 +539,71 @@ namespace J2N.Text
             {
                 ArrayPool<char>.Shared.Return(buffer);
             }
+#endif
+        }
+
+        internal bool Equals(StringBuffer? other)
+        {
+            if (!HasValue)
+                return other is null;
+            if (other is null)
+                return false;
+
+            int len = Length;
+            int otherLength = other.Length;
+            if (len != otherLength) return false;
+
+#if FEATURE_STRINGBUILDER_GETCHUNKS
+            lock (other.SyncRoot)
+            {
+                ReadOnlySpan<char> thisSpan = Value.AsSpan();
+
+                int offset = 0;
+                foreach (ReadOnlyMemory<char> otherChunk in other.GetChunks())
+                {
+                    ReadOnlySpan<char> thisChunk = thisSpan.Slice(offset, otherChunk.Length);
+                    if (!otherChunk.Span.SequenceEqual(thisChunk))
+                        return false;
+
+                    offset += otherChunk.Length;
+                }
+                Debug.Assert(offset == Length);
+            }
+            return true;
+#else
+            char[]? buffer = ArrayPool<char>.Shared.Rent(otherLength);
+            try
+            {
+                other.CopyTo(0, buffer, 0, otherLength);
+                return Equals(buffer.AsSpan(0, otherLength));
+            }
+            finally
+            {
+                ArrayPool<char>.Shared.Return(buffer);
+            }
+#endif
+        }
+
+        internal bool Equals(SynchronizedTextBuilderCharSequence? other)
+        {
+            if (!HasValue)
+                return other is null || !other.HasValue;
+            if (other is null || !other.HasValue)
+                return false;
+
+            lock (other.SyncRoot)
+                return Value.AsSpan().SequenceEqual(other.Value.AsSpan());
+        }
+
+        internal bool Equals(SynchronizedTextBuilder? other)
+        {
+            if (!HasValue)
+                return other is null;
+            if (other is null)
+                return false;
+
+            lock (other.SyncRoot)
+                return Value.AsSpan().SequenceEqual(other.AsSpan());
         }
 
         /// <summary>
@@ -536,16 +615,27 @@ namespace J2N.Text
         {
             if (other is null)
                 return !HasValue;
-            else if (other is string otherString)
-                return Equals(otherString.AsSpan());
+
+            if (other is ISpannable<char> spannable)
+            {
+                if (!spannable.HasValue)
+                    return !HasValue;
+                else if (!HasValue)
+                    return false;
+
+                return Value.AsSpan().SequenceEqual(spannable.AsSpan());
+            }
+
+            if (other is string otherString)
+                return Equals(otherString);
             else if (other is char[] otherCharArray)
-                return Equals(otherCharArray.AsSpan());
+                return Equals(otherCharArray);
             else if (other is StringBuilder otherStringBuilder)
                 return Equals(otherStringBuilder);
             else if (other is ICharSequence otherCharSequence)
                 return Equals(otherCharSequence);
-            else if (other is ISpannable<char> otherSpannable)
-                return Equals(otherSpannable.AsSpan());
+            else if (other is SynchronizedTextBuilder otherSynchronizedTextBuilder)
+                return Equals(otherSynchronizedTextBuilder);
 
             return Equals(other.ToString());
         }
@@ -564,20 +654,24 @@ namespace J2N.Text
             if (!HasValue)
                 return int.MaxValue;
 
-            var value = Value!;
+            ReadOnlySpan<char> value = Value.AsSpan();
             // From Apache Harmony
             int length = value.Length;
             if (length == 0)
                 return 0;
-            int hash = 0;
-            for (int i = 0; i < length; i++)
+
+            unchecked
             {
-                hash = value[i] + ((hash << 5) - hash);
+                int hash = 0;
+                for (int i = 0; i < length; i++)
+                {
+                    hash = value[i] + ((hash << 5) - hash);
+                }
+                return hash;
             }
-            return hash;
         }
 
-        #endregion
+#endregion
 
         #region IComparable Members
 
@@ -594,29 +688,28 @@ namespace J2N.Text
         /// </returns>
         public int CompareTo(ICharSequence? other)
         {
-            if (Value is null) return (other is null || !other.HasValue) ? 0 : -1;
+            if (!HasValue) return (other is null || !other.HasValue) ? 0 : -1;
             if (other is null || !other.HasValue) return 1;
 
             if (other is ISpannable<char> spannable)
             {
                 return CompareTo(spannable.AsSpan());
             }
-            else if (other is StringBuilderCharSequence || other is StringBuffer)
+            else if (other is StringBuilderCharSequence stringBuilderCharSequence)
             {
-                var copyable = (ICopyable<char>)other;
-                char[] buffer = ArrayPool<char>.Shared.Rent(other.Length);
-                try
-                {
-                    copyable.CopyTo(0, buffer, 0, other.Length);
-                    return CompareTo(buffer.AsSpan(0, other.Length));
-                }
-                finally
-                {
-                    ArrayPool<char>.Shared.Return(buffer);
-                }
+                return CompareTo(stringBuilderCharSequence.Value);
+            }
+            else if (other is SynchronizedTextBuilderCharSequence synchronizedTextBuilderCharSequence)
+            {
+                return CompareTo(synchronizedTextBuilderCharSequence);
+            }
+            else if (other is StringBuffer stringBuffer)
+            {
+                return CompareTo(stringBuffer);
             }
 
-            int result, length = other.Length;
+            int length = Math.Min(Length, other.Length);
+            int result;
             ReadOnlySpan<char> thisSpan = Value.AsSpan();
             for (int i = 0; i < length; i++)
             {
@@ -640,9 +733,9 @@ namespace J2N.Text
         /// Zero indicates the strings are equal.
         /// Greater than zero indicates the comparison value is less than the current string.
         /// </returns>
-        public int CompareTo(string? other)
+        internal int CompareTo(string? other)
         {
-            if (Value is null) return (other is null) ? 0 : -1;
+            if (!HasValue) return (other is null) ? 0 : -1;
             if (other is null) return 1;
 
             return Value.AsSpan().CompareTo(other, StringComparison.Ordinal);
@@ -659,11 +752,38 @@ namespace J2N.Text
         /// Zero indicates the strings are equal.
         /// Greater than zero indicates the comparison value is less than the current string.
         /// </returns>
-        public int CompareTo(StringBuilder? other)
+        internal int CompareTo(StringBuilder? other)
         {
-            if (Value is null) return (other is null) ? 0 : -1;
+            if (!HasValue) return (other is null) ? 0 : -1;
             if (other is null) return 1;
 
+#if FEATURE_STRINGBUILDER_GETCHUNKS
+            ReadOnlySpan<char> thisSpan = Value.AsSpan();
+
+            int result;
+            int thisIndex = 0;
+            int remaining = Math.Min(thisSpan.Length, other.Length);
+
+            foreach (ReadOnlyMemory<char> chunk in other.GetChunks())
+            {
+                ReadOnlySpan<char> chunkSpan = chunk.Span;
+                int count = Math.Min(remaining, chunkSpan.Length);
+
+                for (int i = 0; i < count; i++, thisIndex++)
+                {
+                    if ((result = thisSpan[thisIndex] - chunkSpan[i]) != 0)
+                        return result;
+                }
+
+                remaining -= count;
+                if (remaining == 0)
+                    break;
+            }
+
+            // At this point, we have compared all the characters in at least one string.
+            // The longer string will be larger.
+            return thisSpan.Length - other.Length;
+#else
             char[] buffer = ArrayPool<char>.Shared.Rent(other.Length);
             try
             {
@@ -674,6 +794,7 @@ namespace J2N.Text
             {
                 ArrayPool<char>.Shared.Return(buffer);
             }
+#endif
         }
 
         /// <summary>
@@ -687,9 +808,9 @@ namespace J2N.Text
         /// Zero indicates the strings are equal.
         /// Greater than zero indicates the comparison value is less than the current string.
         /// </returns>
-        public int CompareTo(char[]? other)
+        internal int CompareTo(char[]? other)
         {
-            if (Value is null) return (other is null) ? 0 : -1;
+            if (!HasValue) return (other is null) ? 0 : -1;
             if (other is null) return 1;
 
             return Value.AsSpan().CompareTo(other, StringComparison.Ordinal);
@@ -706,9 +827,78 @@ namespace J2N.Text
         /// Zero indicates the strings are equal.
         /// Greater than zero indicates the comparison value is less than the current string.
         /// </returns>
-        public int CompareTo(ReadOnlySpan<char> other)
+        internal int CompareTo(ReadOnlySpan<char> other)
         {
+            if (!HasValue)
+                return -1;
+
             return Value.AsSpan().CompareTo(other, StringComparison.Ordinal);
+        }
+
+        internal int CompareTo(StringBuffer? other)
+        {
+            if (!HasValue) return (other is null) ? 0 : -1;
+            if (other is null) return 1;
+
+#if FEATURE_STRINGBUILDER_GETCHUNKS
+            ReadOnlySpan<char> thisSpan = Value.AsSpan();
+
+            lock (other.SyncRoot)
+            {
+                int result;
+                int thisIndex = 0;
+                int remaining = Math.Min(thisSpan.Length, other.Length);
+
+                foreach (ReadOnlyMemory<char> chunk in other.builder.GetChunks())
+                {
+                    ReadOnlySpan<char> chunkSpan = chunk.Span;
+                    int count = Math.Min(remaining, chunkSpan.Length);
+
+                    for (int i = 0; i < count; i++, thisIndex++)
+                    {
+                        if ((result = thisSpan[thisIndex] - chunkSpan[i]) != 0)
+                            return result;
+                    }
+
+                    remaining -= count;
+                    if (remaining == 0)
+                        break;
+                }
+
+                // At this point, we have compared all the characters in at least one string.
+                // The longer string will be larger.
+                return thisSpan.Length - other.Length;
+            }
+#else
+            char[] buffer = ArrayPool<char>.Shared.Rent(other.Length);
+            try
+            {
+                other.CopyTo(0, buffer, 0, other.Length);
+                return CompareTo(buffer.AsSpan(0, other.Length));
+            }
+            finally
+            {
+                ArrayPool<char>.Shared.Return(buffer);
+            }
+#endif
+        }
+
+        internal int CompareTo(SynchronizedTextBuilderCharSequence? other)
+        {
+            if (!HasValue) return (other is null || !other.HasValue) ? 0 : -1;
+            if (other is null || !other.HasValue) return 1;
+
+            lock (other.SyncRoot)
+                return Value.AsSpan().CompareTo(other.Value.AsSpan(), StringComparison.Ordinal);
+        }
+
+        internal int CompareTo(SynchronizedTextBuilder? other)
+        {
+            if (!HasValue) return (other is null) ? 0 : -1;
+            if (other is null) return 1;
+
+            lock (other.SyncRoot)
+                return Value.AsSpan().CompareTo(other.AsSpan(), StringComparison.Ordinal);
         }
 
         /// <summary>
@@ -724,8 +914,18 @@ namespace J2N.Text
         /// </returns>
         public int CompareTo(object? other)
         {
-            if (Value is null) return (other is null) ? 0 : -1;
-            if (other is null) return 1;
+            if (other is null)
+                return !HasValue ? 0 : 1;
+
+            if (other is ISpannable<char> spannable)
+            {
+                if (!spannable.HasValue)
+                    return !HasValue ? 0 : 1;
+                else if (!HasValue)
+                    return -1;
+
+                return CompareTo(spannable.AsSpan());
+            }
 
             if (other is string otherString)
                 return CompareTo(otherString);
@@ -735,6 +935,8 @@ namespace J2N.Text
                 return CompareTo(otherCharArray);
             else if (other is ICharSequence otherCharSequence)
                 return CompareTo(otherCharSequence);
+            else if (other is SynchronizedTextBuilder otherSynchronizedTextBuilder)
+                return CompareTo(otherSynchronizedTextBuilder);
 
             return Value.AsSpan().CompareTo(other.ToString(), StringComparison.Ordinal);
         }
