@@ -27,6 +27,13 @@ namespace J2N
     /// <typeparam name="T">The type of span element.</typeparam>
     internal interface ISpannable<T>
     {
+        /// <summary>
+        /// Gets a value indicating whether the underlying value is <see langword="null"/>.
+        /// If <see langword="false"/>, the value is <see langword="null"/> (or can be
+        /// interpreted as <see langword="null"/>); otherwise <see langword="true"/>.
+        /// </summary>
+        bool HasValue { get; }
+
         ReadOnlySpan<T> AsSpan();
         ReadOnlySpan<T> AsSpan(int start);
         ReadOnlySpan<T> AsSpan(int start, int length);

@@ -413,6 +413,8 @@ namespace J2N.Text
 
         #region ISpannable<char> Members
 
+        bool ISpannable<char>.HasValue => true; // Cannot be null
+
         ReadOnlySpan<char> ISpannable<char>.AsSpan() => this.AsSpan();
 
         ReadOnlySpan<char> ISpannable<char>.AsSpan(int start) => this.AsSpan(start);
