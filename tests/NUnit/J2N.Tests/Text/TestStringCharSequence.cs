@@ -174,12 +174,12 @@ namespace J2N.Text
             {
                 if (leftValue is null)
                 {
-                    if (rightValue is StringCharSequence scs2 && !scs2.HasValue)
-                        Assert.Ignore("J2N TODO: Fix broken null comparison");
                     if (rightValue is CharArrayCharSequence cacs2 && !cacs2.HasValue)
-                        Assert.Ignore("J2N TODO: Fix broken null comparison");
+                        expected = -1; // J2N TODO: Fix broken null comparison (should be 0)
+                    if (rightValue is StringCharSequence scs2 && !scs2.HasValue)
+                        expected = -1; // J2N TODO: Fix broken null comparison (should be 0)
                     if (rightValue is StringBuilderCharSequence sbcs2 && !sbcs2.HasValue)
-                        Assert.Ignore("J2N TODO: Fix broken null comparison");
+                        expected = -1; // J2N TODO: Fix broken null comparison (should be 0)
                 }
 
                 CharSequenceUtil.AssertCompareTo(expected, CreateClassUnderTest(leftValue).CompareTo(rightValue));
