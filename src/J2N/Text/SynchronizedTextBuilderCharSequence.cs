@@ -795,7 +795,7 @@ namespace J2N.Text
             }
         }
 
-#endregion
+        #endregion Equality Comparison
 
         #region IComparable Members
 
@@ -1028,8 +1028,13 @@ namespace J2N.Text
         /// </returns>
         public int CompareTo(object? other)
         {
+#if FEATURE_BROKEN_NULL_CHARSEQUENCE_COMPARISON
+            if (!HasValue) return (other is null) ? 0 : -1;
+            if (other is null) return 1;
+#else
             if (other is null)
                 return !HasValue ? 0 : 1;
+#endif
 
             if (other is ICharSequence otherCharSequence)
             {
@@ -1179,7 +1184,7 @@ namespace J2N.Text
         }
 
 
-#endregion
+        #endregion IComparable Members
 
         #region ISpanCopyable<char>
 
