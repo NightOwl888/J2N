@@ -75,7 +75,19 @@ namespace J2N.Text
             if (value is StringBuilderCharSequence sb)
                 return CompareToOrdinal(str, sb.Value);
             if (value is StringBuffer stringBuffer)
-                return CompareToOrdinal(str, stringBuffer.builder);
+            {
+                lock (stringBuffer.SyncRoot)
+                {
+                    return CompareToOrdinal(str, stringBuffer.builder);
+                }
+            }
+            if (value is SynchronizedTextBuilderCharSequence stb)
+            {
+                lock (stb.SyncRoot)
+                {
+                    return CompareToOrdinal(str, stb.Value.AsSpan());
+                }
+            }
 
             int length = Math.Min(str.Length, value.Length);
             int result;

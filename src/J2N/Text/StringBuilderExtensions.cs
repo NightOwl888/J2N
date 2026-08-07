@@ -517,7 +517,19 @@ namespace J2N.Text
             if (value is StringBuilderCharSequence sb)
                 return CompareToOrdinal(text, sb.Value);
             if (value is StringBuffer stringBuffer)
-                return CompareToOrdinal(text, stringBuffer.builder);
+            {
+                lock (stringBuffer.SyncRoot)
+                {
+                    return CompareToOrdinal(text, stringBuffer.builder);
+                }
+            }
+            if (value is SynchronizedTextBuilderCharSequence stb)
+            {
+                lock (stb.SyncRoot)
+                {
+                    return CompareToOrdinal(text, stb.Value.AsSpan());
+                }
+            }
 
 #if FEATURE_STRINGBUILDER_GETCHUNKS
             int result;

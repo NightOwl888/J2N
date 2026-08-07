@@ -45,6 +45,29 @@ namespace J2N.Text
         private static char[]? CreateClassUnderTest(string? value) => CharSequenceUtil.CreateCharArray(value);
 
 
+
+        [Test]
+        public void Test_CompareToOridnal_ICharSequence_SynchronizedTextBuilderCharSequence_SynchronizesWhileReading()
+        {
+            const string Value = "abcdefghijklmnopqrstuvwxyz";
+
+            var target = CreateClassUnderTest(Value);
+            var other = CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence(Value);
+
+            CharSequenceUtil.AssertSynchronizesWhileReading(other.Value!, () => Assert.AreEqual(0, target.CompareToOrdinal((ICharSequence?)other)));
+        }
+
+        [Test]
+        public void Test_CompareToOrdinal_ICharSequence_StringBuffer_SynchronizesWhileReading()
+        {
+            const string Value = "abcdefghijklmnopqrstuvwxyz";
+
+            var target = CreateClassUnderTest(Value);
+            var other = CharSequenceUtil.CreateStringBuffer(Value)!;
+
+            CharSequenceUtil.AssertSynchronizesWhileReading(other, () => Assert.AreEqual(0, target.CompareToOrdinal((ICharSequence?)other)));
+        }
+
         [TestCaseSource(typeof(CharSequenceUtil), nameof(CharSequenceUtil.CompareTo_ICharSequence_TestData))]
         public void Test_CompareToOrdinal_ICharSequence(string? leftValue, ICharSequence? rightValue, int expected)
         {
