@@ -251,7 +251,7 @@ namespace J2N.Text
 
         #endregion
 
-        #region Equality
+        #region Equality Comparison
 
         /// <summary>
         /// Determines whether this <see cref="StringBuilderCharSequence"/> is equal to <paramref name="other"/>.
@@ -494,9 +494,9 @@ namespace J2N.Text
             return CharSequenceComparer.Ordinal.GetHashCode(this.Value);
         }
 
-        #endregion
+        #endregion Equality Comparison
 
-        #region IComparable<T>
+        #region IComparable Members
 
         /// <summary>
         /// Compares this instance with a specified <see cref="ICharSequence"/> object and indicates whether
@@ -587,8 +587,23 @@ namespace J2N.Text
         /// </returns>
         public int CompareTo(object? other)
         {
+#if FEATURE_BROKEN_NULL_CHARSEQUENCE_COMPARISON
             if (!HasValue) return (other is null) ? 0 : -1;
             if (other is null) return 1;
+#else
+            if (other is null)
+                return !HasValue ? 0 : 1;
+#endif
+
+            if (other is ISpannable<char> spannable)
+            {
+                if (!spannable.HasValue)
+                    return !HasValue ? 0 : 1;
+                else if (!HasValue)
+                    return -1;
+
+                return Value.CompareToOrdinal(spannable.AsSpan());
+            }
 
             if (other is string otherString)
                 return CompareTo(otherString);
@@ -596,10 +611,6 @@ namespace J2N.Text
                 return CompareTo(otherStringBuilder);
             else if (other is char[] otherCharArray)
                 return CompareTo(otherCharArray);
-            else if (other is StringCharSequence otherStringCharSequence)
-                return CompareTo(otherStringCharSequence.Value);
-            else if (other is CharArrayCharSequence otherCharArrayCharSequence)
-                return CompareTo(otherCharArrayCharSequence.Value);
             else if (other is StringBuilderCharSequence otherStringBuilderCharSequence)
                 return CompareTo(otherStringBuilderCharSequence.Value);
             else if (other is StringBuffer stringBuffer)
@@ -610,7 +621,7 @@ namespace J2N.Text
             return Value.CompareToOrdinal(other.ToString());
         }
 
-        #endregion
+        #endregion IComparable Members
 
         #region IAppendable
 
