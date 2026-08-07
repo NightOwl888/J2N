@@ -514,8 +514,14 @@ namespace J2N.Text
             if (text is null) return (value is null || !value.HasValue) ? 0 : -1;
             if (value is null || !value.HasValue) return 1;
 
+            if (value is ISpannable<char> spannable)
+            {
+                return CompareToOrdinal(text, spannable.AsSpan());
+            }
             if (value is StringBuilderCharSequence sb)
+            {
                 return CompareToOrdinal(text, sb.Value);
+            }
             if (value is StringBuffer stringBuffer)
             {
                 lock (stringBuffer.SyncRoot)

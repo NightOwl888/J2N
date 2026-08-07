@@ -252,8 +252,14 @@ namespace J2N.Text
             if (value == null || !value.HasValue) return 1;
             if (value is CharArrayCharSequence ca && object.ReferenceEquals(str, ca.Value)) return 0;
 
+            if (value is ISpannable<char> spannable)
+            {
+                return CompareToOrdinal(str, spannable.AsSpan());
+            }
             if (value is StringBuilderCharSequence sb)
+            {
                 return CompareToOrdinal(str, sb.Value);
+            }
             if (value is StringBuffer stringBuffer)
             {
                 lock (stringBuffer.SyncRoot)
