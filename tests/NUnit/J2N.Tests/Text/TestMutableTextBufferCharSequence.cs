@@ -121,7 +121,7 @@ namespace J2N.Text
 
 
 
-        [TestCaseSource(nameof(Equals_Object_TestData))]
+        [TestCaseSource(typeof(CharSequenceUtil), nameof(CharSequenceUtil.Equals_Object_TestData))]
         public void Test_Equals_Object(string? leftValue, object? rightValue, bool expected)
         {
             try
@@ -134,7 +134,7 @@ namespace J2N.Text
             }
         }
 
-        [TestCaseSource(nameof(Equals_ICharSequence_TestData))]
+        [TestCaseSource(typeof(CharSequenceUtil), nameof(CharSequenceUtil.Equals_ICharSequence_TestData))]
         public void Test_Equals_ICharSequence(string? leftValue, ICharSequence? rightValue, bool expected)
         {
             try
@@ -147,7 +147,7 @@ namespace J2N.Text
             }
         }
 
-        [TestCaseSource(nameof(Equals_StringCharSequence_TestData))]
+        [TestCaseSource(typeof(CharSequenceUtil), nameof(CharSequenceUtil.Equals_StringCharSequence_TestData))]
         public void Test_Equals_StringCharSequence(string? leftValue, StringCharSequence? rightValue, bool expected)
         {
             try
@@ -160,7 +160,7 @@ namespace J2N.Text
             }
         }
 
-        [TestCaseSource(nameof(Equals_CharArrayCharSequence_TestData))]
+        [TestCaseSource(typeof(CharSequenceUtil), nameof(CharSequenceUtil.Equals_CharArrayCharSequence_TestData))]
         public void Test_Equals_CharArrayCharSequence(string? leftValue, CharArrayCharSequence? rightValue, bool expected)
         {
             try
@@ -173,7 +173,7 @@ namespace J2N.Text
             }
         }
 
-        [TestCaseSource(nameof(Equals_StringBuilderCharSequence_TestData))]
+        [TestCaseSource(typeof(CharSequenceUtil), nameof(CharSequenceUtil.Equals_StringBuilderCharSequence_TestData))]
         public void Test_Equals_StringBuilderCharSequence(string? leftValue, StringBuilderCharSequence? rightValue, bool expected)
         {
             try
@@ -200,7 +200,7 @@ namespace J2N.Text
             }
         }
 
-        [TestCaseSource(nameof(Equals_CharArray_TestData))]
+        [TestCaseSource(typeof(CharSequenceUtil), nameof(CharSequenceUtil.Equals_CharArray_TestData))]
         public void Test_Equals_CharArray(string? leftValue, char[]? rightValue, bool expected)
         {
             try
@@ -213,7 +213,7 @@ namespace J2N.Text
             }
         }
 
-        [TestCaseSource(nameof(Equals_StringBuilder_TestData))]
+        [TestCaseSource(typeof(CharSequenceUtil), nameof(CharSequenceUtil.Equals_StringBuilder_TestData))]
         public void Test_Equals_StringBuilder(string? leftValue, StringBuilder? rightValue, bool expected)
         {
             try
@@ -274,7 +274,7 @@ namespace J2N.Text
             CharSequenceUtil.AssertSynchronizesWhileReading(other, () => Assert.AreEqual(0, target.CompareTo((object?)other)));
         }
 
-        [TestCaseSource(nameof(CompareTo_Object_TestData))]
+        [TestCaseSource(typeof(CharSequenceUtil), nameof(CharSequenceUtil.CompareTo_Object_TestData))]
         public void Test_CompareTo_Object(string? leftValue, object? rightValue, int expected)
         {
             try
@@ -295,7 +295,7 @@ namespace J2N.Text
             }
         }
 
-        [TestCaseSource(nameof(CompareTo_ICharSequence_TestData))]
+        [TestCaseSource(typeof(CharSequenceUtil), nameof(CharSequenceUtil.CompareTo_ICharSequence_TestData))]
         public void Test_CompareTo_ICharSequence(string? leftValue, ICharSequence? rightValue, int expected)
         {
             try
@@ -308,7 +308,7 @@ namespace J2N.Text
             }
         }
 
-        [TestCaseSource(nameof(CompareTo_StringCharSequence_TestData))]
+        [TestCaseSource(typeof(CharSequenceUtil), nameof(CharSequenceUtil.CompareTo_StringCharSequence_TestData))]
         public void Test_CompareTo_StringCharSequence(string? leftValue, StringCharSequence? rightValue, int expected)
         {
             try
@@ -321,7 +321,7 @@ namespace J2N.Text
             }
         }
 
-        [TestCaseSource(nameof(CompareTo_CharArrayCharSequence_TestData))]
+        [TestCaseSource(typeof(CharSequenceUtil), nameof(CharSequenceUtil.CompareTo_CharArrayCharSequence_TestData))]
         public void Test_CompareTo_CharArrayCharSequence(string? leftValue, CharArrayCharSequence? rightValue, int expected)
         {
             try
@@ -334,7 +334,7 @@ namespace J2N.Text
             }
         }
 
-        [TestCaseSource(nameof(CompareTo_StringBuilderCharSequence_TestData))]
+        [TestCaseSource(typeof(CharSequenceUtil), nameof(CharSequenceUtil.CompareTo_StringBuilderCharSequence_TestData))]
         public void Test_CompareTo_StringBuilderCharSequence(string? leftValue, StringBuilderCharSequence? rightValue, int expected)
         {
             try
@@ -360,7 +360,7 @@ namespace J2N.Text
             }
         }
 
-        [TestCaseSource(nameof(CompareTo_CharArray_TestData))]
+        [TestCaseSource(typeof(CharSequenceUtil), nameof(CharSequenceUtil.CompareTo_CharArray_TestData))]
         public void Test_CompareTo_CharArray(string? leftValue, char[]? rightValue, int expected)
         {
             try
@@ -373,7 +373,7 @@ namespace J2N.Text
             }
         }
 
-        [TestCaseSource(nameof(CompareTo_StringBuilder_TestData))]
+        [TestCaseSource(typeof(CharSequenceUtil), nameof(CharSequenceUtil.CompareTo_StringBuilder_TestData))]
         public void Test_CompareTo_StringBuilder(string? leftValue, StringBuilder? rightValue, int expected)
         {
             try

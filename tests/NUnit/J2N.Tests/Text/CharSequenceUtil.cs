@@ -115,12 +115,348 @@ namespace J2N.Text
             }
         }
 
+        public static IEnumerable<TestCaseData> Equals_Object_TestData()
+        {
+            var factories = new Func<string?, object?>[]
+            {
+                CreateStringCharSequence,
+                CreateCharArrayCharSequence,
+                CreateStringBuilderCharSequence,
+                CreateMutableTextBufferCharSequence,
+                CreateSynchronizedTextBuilderCharSequence,
+                CreateStringBuffer,
+
+                CreateString,
+                CreateCharArray,
+                CreateStringBuilder,
+
+                CreateTextBuilder,
+                CreatePooledTextBuilder,
+                CreateSynchronizedTextBuilder,
+            };
+
+            foreach (var factory in factories)
+            {
+                foreach (var item in Equals_String_TestData())
+                {
+                    var leftArg = item[0];
+                    var rightArgRaw = factory((string?)item[1]);
+                    var expectedArg = item[2];
+
+                    yield return new TestCaseData(leftArg, rightArgRaw, expectedArg)
+                        .FormatArguments(leftArg, rightArgRaw);
+                }
+            }
+        }
+
+        public static IEnumerable<TestCaseData> Equals_ICharSequence_TestData()
+        {
+            var factories = new Func<string?, object?>[]
+            {
+                CreateStringCharSequence,
+                CreateCharArrayCharSequence,
+                CreateStringBuilderCharSequence,
+                CreateMutableTextBufferCharSequence,
+                CreateSynchronizedTextBuilderCharSequence,
+                CreateStringBuffer,
+
+                //CreateTextBuilderAsCharSequence,
+                //CreatePooledTextBuilderAsCharSequence,
+            };
+
+            foreach (var factory in factories)
+            {
+                foreach (var item in Equals_String_TestData())
+                {
+                    var leftArg = item[0];
+                    var rightArgRaw = factory((string?)item[1]);
+                    var expectedArg = item[2];
+
+                    yield return new TestCaseData(leftArg, rightArgRaw, expectedArg)
+                        .FormatArguments(leftArg, rightArgRaw);
+                }
+            }
+        }
+
+        public static IEnumerable<TestCaseData> Equals_StringCharSequence_TestData()
+        {
+            var factories = new Func<string?, object?>[]
+            {
+                CreateStringCharSequence,
+            };
+
+            foreach (var factory in factories)
+            {
+                foreach (var item in Equals_String_TestData())
+                {
+                    var leftArg = item[0];
+                    var rightArgRaw = factory((string?)item[1]);
+                    var expectedArg = item[2];
+
+                    yield return new TestCaseData(leftArg, rightArgRaw, expectedArg)
+                        .FormatArguments(leftArg, rightArgRaw);
+                }
+            }
+        }
+
+        public static IEnumerable<TestCaseData> Equals_CharArrayCharSequence_TestData()
+        {
+            var factories = new Func<string?, object?>[]
+            {
+                CreateCharArrayCharSequence,
+            };
+
+            foreach (var factory in factories)
+            {
+                foreach (var item in Equals_String_TestData())
+                {
+                    var leftArg = item[0];
+                    var rightArgRaw = factory((string?)item[1]);
+                    var expectedArg = item[2];
+
+                    yield return new TestCaseData(leftArg, rightArgRaw, expectedArg)
+                        .FormatArguments(leftArg, rightArgRaw);
+                }
+            }
+        }
+
+        public static IEnumerable<TestCaseData> Equals_StringBuilderCharSequence_TestData()
+        {
+            var factories = new Func<string?, object?>[]
+            {
+                CreateStringBuilderCharSequence,
+            };
+
+            foreach (var factory in factories)
+            {
+                foreach (var item in Equals_String_TestData())
+                {
+                    var leftArg = item[0];
+                    var rightArgRaw = factory((string?)item[1]);
+                    var expectedArg = item[2];
+
+                    yield return new TestCaseData(leftArg, rightArgRaw, expectedArg)
+                        .FormatArguments(leftArg, rightArgRaw);
+                }
+            }
+        }
+
+        public static IEnumerable<TestCaseData> Equals_CharArray_TestData()
+        {
+            var factories = new Func<string?, object?>[]
+            {
+                CreateCharArray,
+            };
+
+            foreach (var factory in factories)
+            {
+                foreach (var item in Equals_String_TestData())
+                {
+                    var leftArg = item[0];
+                    var rightArgRaw = factory((string?)item[1]);
+                    var expectedArg = item[2];
+
+                    yield return new TestCaseData(leftArg, rightArgRaw, expectedArg)
+                        .FormatArguments(leftArg, rightArgRaw);
+                }
+            }
+        }
+
+        public static IEnumerable<TestCaseData> Equals_StringBuilder_TestData()
+        {
+            var factories = new Func<string?, object?>[]
+            {
+                CreateStringBuilder,
+            };
+
+            foreach (var factory in factories)
+            {
+                foreach (var item in Equals_String_TestData())
+                {
+                    var leftArg = item[0];
+                    var rightArgRaw = factory((string?)item[1]);
+                    var expectedArg = item[2];
+
+                    yield return new TestCaseData(leftArg, rightArgRaw, expectedArg)
+                        .FormatArguments(leftArg, rightArgRaw);
+                }
+            }
+        }
+
         public static IEnumerable<object?[]> CompareTo_String_TestData()
         {
             foreach (var item in Comparison_String_TestData())
             {
                 // left, right, expected CompareTo
                 yield return new object?[] { item[0], item[1], item[3] };
+            }
+        }
+
+        public static IEnumerable<TestCaseData> CompareTo_Object_TestData()
+        {
+            var factories = new Func<string?, object?>[]
+            {
+                CreateStringCharSequence,
+                CreateCharArrayCharSequence,
+                CreateStringBuilderCharSequence,
+                CreateMutableTextBufferCharSequence,
+                CreateSynchronizedTextBuilderCharSequence,
+                CreateStringBuffer,
+
+                CreateString,
+                CreateCharArray,
+                CreateStringBuilder,
+
+                CreateTextBuilder,
+                CreatePooledTextBuilder,
+                CreateSynchronizedTextBuilder,
+            };
+
+            foreach (var factory in factories)
+            {
+                foreach (var item in CompareTo_String_TestData())
+                {
+                    var leftArg = item[0];
+                    var rightArgRaw = factory((string?)item[1]);
+                    var expectedArg = item[2];
+
+                    yield return new TestCaseData(leftArg, rightArgRaw, expectedArg)
+                        .FormatArguments(leftArg, rightArgRaw);
+                }
+            }
+        }
+
+        public static IEnumerable<TestCaseData> CompareTo_ICharSequence_TestData()
+        {
+            var factories = new Func<string?, object?>[]
+            {
+                CreateStringCharSequence,
+                CreateCharArrayCharSequence,
+                CreateStringBuilderCharSequence,
+                CreateMutableTextBufferCharSequence,
+                CreateSynchronizedTextBuilderCharSequence,
+                CreateStringBuffer,
+
+                //CreateTextBuilderAsCharSequence,
+                //CreatePooledTextBuilderAsCharSequence,
+            };
+
+            foreach (var factory in factories)
+            {
+                foreach (var item in CompareTo_String_TestData())
+                {
+                    var leftArg = item[0];
+                    var rightArgRaw = factory((string?)item[1]);
+                    var expectedArg = item[2];
+
+                    yield return new TestCaseData(leftArg, rightArgRaw, expectedArg)
+                        .FormatArguments(leftArg, rightArgRaw);
+                }
+            }
+        }
+
+        public static IEnumerable<TestCaseData> CompareTo_StringCharSequence_TestData()
+        {
+            var factories = new Func<string?, object?>[]
+            {
+                CreateStringCharSequence,
+            };
+
+            foreach (var factory in factories)
+            {
+                foreach (var item in CompareTo_String_TestData())
+                {
+                    var leftArg = item[0];
+                    var rightArgRaw = factory((string?)item[1]);
+                    var expectedArg = item[2];
+
+                    yield return new TestCaseData(leftArg, rightArgRaw, expectedArg)
+                        .FormatArguments(leftArg, rightArgRaw);
+                }
+            }
+        }
+
+        public static IEnumerable<TestCaseData> CompareTo_CharArrayCharSequence_TestData()
+        {
+            var factories = new Func<string?, object?>[]
+            {
+                CreateCharArrayCharSequence,
+            };
+
+            foreach (var factory in factories)
+            {
+                foreach (var item in CompareTo_String_TestData())
+                {
+                    var leftArg = item[0];
+                    var rightArgRaw = factory((string?)item[1]);
+                    var expectedArg = item[2];
+
+                    yield return new TestCaseData(leftArg, rightArgRaw, expectedArg)
+                        .FormatArguments(leftArg, rightArgRaw);
+                }
+            }
+        }
+
+        public static IEnumerable<TestCaseData> CompareTo_StringBuilderCharSequence_TestData()
+        {
+            var factories = new Func<string?, object?>[]
+            {
+                CreateStringBuilderCharSequence,
+            };
+
+            foreach (var factory in factories)
+            {
+                foreach (var item in CompareTo_String_TestData())
+                {
+                    var leftArg = item[0];
+                    var rightArgRaw = factory((string?)item[1]);
+                    var expectedArg = item[2];
+
+                    yield return new TestCaseData(leftArg, rightArgRaw, expectedArg)
+                        .FormatArguments(leftArg, rightArgRaw);
+                }
+            }
+        }
+
+        public static IEnumerable<TestCaseData> CompareTo_CharArray_TestData()
+        {
+            var factories = new Func<string?, object?>[]
+            {
+                CreateCharArray,
+            };
+
+            foreach (var factory in factories)
+            {
+                foreach (var item in CompareTo_String_TestData())
+                {
+                    var leftArg = item[0];
+                    var rightArgRaw = factory((string?)item[1]);
+                    var expectedArg = item[2];
+
+                    yield return new TestCaseData(leftArg, rightArgRaw, expectedArg)
+                        .FormatArguments(leftArg, rightArgRaw);
+                }
+            }
+        }
+
+        public static IEnumerable<TestCaseData> CompareTo_StringBuilder_TestData()
+        {
+            var factories = new Func<string?, object?>[]
+            {
+                CreateStringBuilder,
+            };
+
+            foreach (var factory in factories)
+            {
+                foreach (var item in CompareTo_String_TestData())
+                {
+                    var leftArg = item[0];
+                    var rightArgRaw = factory((string?)item[1]);
+                    var expectedArg = item[2];
+
+                    yield return new TestCaseData(leftArg, rightArgRaw, expectedArg)
+                        .FormatArguments(leftArg, rightArgRaw);
+                }
             }
         }
 
