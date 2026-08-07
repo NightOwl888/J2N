@@ -696,7 +696,11 @@ namespace J2N.Text
         public static int CompareToOrdinal(this StringBuilder? text, ReadOnlySpan<char> value) // KEEP OVERLOADS FOR ReadOnlySpan<char>, ICharSequence, char[], StringBuilder, and string IN SYNC
         {
             // J2N: Only consider whether the right side is empty if the left side is null. This is the equivalent of calling text.AsSpan() and then doing the comparison. See: https://github.com/NightOwl888/J2N/pull/122#discussion_r1850836158
+#if FEATURE_BROKEN_NULL_CHARSEQUENCE_COMPARISON
             if (text is null) return value.IsEmpty ? 0 : -1;
+#else
+            if (text is null) return -1;
+#endif
 
             unsafe
             {

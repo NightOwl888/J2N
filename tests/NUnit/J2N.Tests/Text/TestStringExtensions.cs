@@ -13,68 +13,89 @@ namespace J2N.Text
         const string hw1 = "HelloWorld";
         const string hw2 = "HelloWorld";
 
-        [Test]
-        public void TestCompareToOrdinal()
+#nullable enable
+
+        private static string? CreateClassUnderTest(string? value) => CharSequenceUtil.CreateString(value);
+
+
+        [TestCaseSource(typeof(CharSequenceUtil), nameof(CharSequenceUtil.CompareTo_ICharSequence_TestData))]
+        public void Test_CompareToOrdinal_ICharSequence(string? leftValue, ICharSequence? rightValue, int expected)
         {
-            string target = null;
-            string compareTo = "Alpine";
-
-            Assert.Greater(0, target.CompareToOrdinal(compareTo.AsSpan()));
-            Assert.Greater(0, target.CompareToOrdinal(compareTo.ToCharArray()));
-            Assert.Greater(0, target.CompareToOrdinal(new StringBuilder(compareTo)));
-            Assert.Greater(0, target.CompareToOrdinal(compareTo));
-            Assert.Greater(0, target.CompareToOrdinal(new CharArrayCharSequence(compareTo.ToCharArray())));
-            Assert.Greater(0, target.CompareToOrdinal(new StringBuilderCharSequence(new StringBuilder(compareTo))));
-            Assert.Greater(0, target.CompareToOrdinal(new StringCharSequence(compareTo)));
-
-            target = "Alpha";
-
-            Assert.Greater(0, target.CompareToOrdinal(compareTo.AsSpan()));
-            Assert.Greater(0, target.CompareToOrdinal(compareTo.ToCharArray()));
-            Assert.Greater(0, target.CompareToOrdinal(new StringBuilder(compareTo)));
-            Assert.Greater(0, target.CompareToOrdinal(compareTo));
-            Assert.Greater(0, target.CompareToOrdinal(new CharArrayCharSequence(compareTo.ToCharArray())));
-            Assert.Greater(0, target.CompareToOrdinal(new StringBuilderCharSequence(new StringBuilder(compareTo))));
-            Assert.Greater(0, target.CompareToOrdinal(new StringCharSequence(compareTo)));
-
-            compareTo = "Alpha";
-
-            Assert.AreEqual(0, target.CompareToOrdinal(compareTo.AsSpan()));
-            Assert.AreEqual(0, target.CompareToOrdinal(compareTo.ToCharArray()));
-            Assert.AreEqual(0, target.CompareToOrdinal(new StringBuilder(compareTo)));
-            Assert.AreEqual(0, target.CompareToOrdinal(compareTo));
-            Assert.AreEqual(0, target.CompareToOrdinal(new CharArrayCharSequence(compareTo.ToCharArray())));
-            Assert.AreEqual(0, target.CompareToOrdinal(new StringBuilderCharSequence(new StringBuilder(compareTo))));
-            Assert.AreEqual(0, target.CompareToOrdinal(new StringCharSequence(compareTo)));
-
-            compareTo = "Alp";
-
-            Assert.Less(0, target.CompareToOrdinal(compareTo.AsSpan()));
-            Assert.Less(0, target.CompareToOrdinal(compareTo.ToCharArray()));
-            Assert.Less(0, target.CompareToOrdinal(new StringBuilder(compareTo)));
-            Assert.Less(0, target.CompareToOrdinal(compareTo));
-            Assert.Less(0, target.CompareToOrdinal(new CharArrayCharSequence(compareTo.ToCharArray())));
-            Assert.Less(0, target.CompareToOrdinal(new StringBuilderCharSequence(new StringBuilder(compareTo))));
-            Assert.Less(0, target.CompareToOrdinal(new StringCharSequence(compareTo)));
-
-            Assert.Less(0, target.CompareToOrdinal((ReadOnlySpan<char>)null));
-            Assert.Less(0, target.CompareToOrdinal((char[])null));
-            Assert.Less(0, target.CompareToOrdinal((StringBuilder)null));
-            Assert.Less(0, target.CompareToOrdinal((string)null));
-            Assert.Less(0, target.CompareToOrdinal(new CharArrayCharSequence(null)));
-            Assert.Less(0, target.CompareToOrdinal(new StringBuilderCharSequence(null)));
-            Assert.Less(0, target.CompareToOrdinal(new StringCharSequence(null)));
-
-            target = null;
-
-            Assert.AreEqual(0, target.CompareToOrdinal((ReadOnlySpan<char>)null));
-            Assert.AreEqual(0, target.CompareToOrdinal((char[])null));
-            Assert.AreEqual(0, target.CompareToOrdinal((StringBuilder)null));
-            Assert.AreEqual(0, target.CompareToOrdinal((string)null));
-            Assert.AreEqual(0, target.CompareToOrdinal(new CharArrayCharSequence(null)));
-            Assert.AreEqual(0, target.CompareToOrdinal(new StringBuilderCharSequence(null)));
-            Assert.AreEqual(0, target.CompareToOrdinal(new StringCharSequence(null)));
+            try
+            {
+                CharSequenceUtil.AssertCompareTo(expected, CreateClassUnderTest(leftValue).CompareToOrdinal(rightValue));
+            }
+            finally
+            {
+                CharSequenceUtil.Dispose(rightValue);
+            }
         }
+
+        [TestCaseSource(typeof(CharSequenceUtil), nameof(CharSequenceUtil.CompareTo_String_TestData))]
+        public void Test_CompareToOrdinal_ReadOnlySpan(string? leftValue, string? rightValue, int expected)
+        {
+            try
+            {
+                if (rightValue is null)
+                {
+                    Assert.Inconclusive("Cannot test null ReadOnlySpan<char> since it is a value type and cannot be null.");
+                    return;
+                }
+#if FEATURE_BROKEN_NULL_CHARSEQUENCE_COMPARISON
+                if (leftValue is null)
+                {
+                    expected = 0; // J2N TODO: Fix broken null comparison (should be -1)
+                }
+#endif
+
+                CharSequenceUtil.AssertCompareTo(expected, CreateClassUnderTest(leftValue).CompareToOrdinal(rightValue.AsSpan()));
+            }
+            finally
+            {
+                CharSequenceUtil.Dispose(rightValue);
+            }
+        }
+
+        [TestCaseSource(typeof(CharSequenceUtil), nameof(CharSequenceUtil.CompareTo_String_TestData))]
+        public void Test_CompareToOrdinal_String(string? leftValue, string? rightValue, int expected)
+        {
+            try
+            {
+                CharSequenceUtil.AssertCompareTo(expected, CreateClassUnderTest(leftValue).CompareToOrdinal(rightValue));
+            }
+            finally
+            {
+                CharSequenceUtil.Dispose(rightValue);
+            }
+        }
+
+        [TestCaseSource(typeof(CharSequenceUtil), nameof(CharSequenceUtil.CompareTo_CharArray_TestData))]
+        public void Test_CompareToOrdinal_CharArray(string? leftValue, char[]? rightValue, int expected)
+        {
+            try
+            {
+                CharSequenceUtil.AssertCompareTo(expected, CreateClassUnderTest(leftValue).CompareToOrdinal(rightValue));
+            }
+            finally
+            {
+                CharSequenceUtil.Dispose(rightValue);
+            }
+        }
+
+        [TestCaseSource(typeof(CharSequenceUtil), nameof(CharSequenceUtil.CompareTo_StringBuilder_TestData))]
+        public void Test_CompareToOrdinal_StringBuilder(string? leftValue, StringBuilder? rightValue, int expected)
+        {
+            try
+            {
+                CharSequenceUtil.AssertCompareTo(expected, CreateClassUnderTest(leftValue).CompareToOrdinal(rightValue));
+            }
+            finally
+            {
+                CharSequenceUtil.Dispose(rightValue);
+            }
+        }
+
+#nullable restore
 
         // This is a compatibility API for < .NET Standard 2.1
 #if !FEATURE_STRING_CONTAINS_CHAR
