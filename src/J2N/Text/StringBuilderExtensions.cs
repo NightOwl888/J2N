@@ -519,6 +519,31 @@ namespace J2N.Text
             if (value is StringBuffer stringBuffer)
                 return CompareToOrdinal(text, stringBuffer.builder);
 
+#if FEATURE_STRINGBUILDER_GETCHUNKS
+            int result;
+            int valueIndex = 0;
+            int remaining = Math.Min(text.Length, value.Length);
+
+            foreach (ReadOnlyMemory<char> chunk in text.GetChunks())
+            {
+                ReadOnlySpan<char> chunkSpan = chunk.Span;
+                int count = Math.Min(remaining, chunkSpan.Length);
+
+                for (int i = 0; i < count; i++, valueIndex++)
+                {
+                    if ((result = chunkSpan[i] - value[valueIndex]) != 0)
+                        return result;
+                }
+
+                remaining -= count;
+                if (remaining == 0)
+                    break;
+            }
+
+            // At this point, we have compared all the characters in at least one string.
+            // The longer string will be larger.
+            return text.Length - value.Length;
+#else
             int length = Math.Min(text.Length, value.Length);
             char[]? arrayToReturnToPool = null;
             try
@@ -547,6 +572,7 @@ namespace J2N.Text
             {
                 ArrayPool<char>.Shared.ReturnIfNotNull(arrayToReturnToPool);
             }
+#endif
         }
 
         /// <summary>
@@ -605,6 +631,61 @@ namespace J2N.Text
             if (text is null) return (value is null) ? 0 : -1;
             if (value is null) return 1;
 
+#if FEATURE_STRINGBUILDER_GETCHUNKS
+            StringBuilder.ChunkEnumerator textChunks = text.GetChunks();
+            StringBuilder.ChunkEnumerator valueChunks = value.GetChunks();
+            ReadOnlySpan<char> textSpan = default;
+            ReadOnlySpan<char> valueSpan = default;
+            int textIndex = 0;
+            int valueIndex = 0;
+            bool hasText = textChunks.MoveNext();
+            bool hasValue = valueChunks.MoveNext();
+
+            if (hasText)
+                textSpan = textChunks.Current.Span;
+
+            if (hasValue)
+                valueSpan = valueChunks.Current.Span;
+
+            while (hasText && hasValue)
+            {
+                int count = Math.Min(textSpan.Length - textIndex, valueSpan.Length - valueIndex);
+
+                for (int i = 0; i < count; i++)
+                {
+                    int result = textSpan[textIndex + i] - valueSpan[valueIndex + i];
+                    if (result != 0)
+                        return result;
+                }
+
+                textIndex += count;
+                valueIndex += count;
+
+                if (textIndex == textSpan.Length)
+                {
+                    hasText = textChunks.MoveNext();
+                    if (hasText)
+                    {
+                        textSpan = textChunks.Current.Span;
+                        textIndex = 0;
+                    }
+                }
+
+                if (valueIndex == valueSpan.Length)
+                {
+                    hasValue = valueChunks.MoveNext();
+                    if (hasValue)
+                    {
+                        valueSpan = valueChunks.Current.Span;
+                        valueIndex = 0;
+                    }
+                }
+            }
+
+            // At this point, we have compared all the characters in at least one string.
+            // The longer string will be larger.
+            return text.Length - value.Length;
+#else
             int length = Math.Min(text.Length, value.Length);
             char[]? textArrayToReturnToPool = null;
             char[]? valueArrayToReturnToPool = null;
@@ -641,6 +722,7 @@ namespace J2N.Text
                 ArrayPool<char>.Shared.ReturnIfNotNull(textArrayToReturnToPool);
                 ArrayPool<char>.Shared.ReturnIfNotNull(valueArrayToReturnToPool);
             }
+#endif
         }
 
         /// <summary>
@@ -714,6 +796,31 @@ namespace J2N.Text
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private unsafe static int CompareToOrdinalCore(StringBuilder text, char* value, int valueLength)
         {
+#if FEATURE_STRINGBUILDER_GETCHUNKS
+            int result;
+            int valueIndex = 0;
+            int remaining = Math.Min(text.Length, valueLength);
+
+            foreach (ReadOnlyMemory<char> chunk in text.GetChunks())
+            {
+                ReadOnlySpan<char> chunkSpan = chunk.Span;
+                int count = Math.Min(remaining, chunkSpan.Length);
+
+                for (int i = 0; i < count; i++, valueIndex++)
+                {
+                    if ((result = chunkSpan[i] - value[valueIndex]) != 0)
+                        return result;
+                }
+
+                remaining -= count;
+                if (remaining == 0)
+                    break;
+            }
+
+            // At this point, we have compared all the characters in at least one string.
+            // The longer string will be larger.
+            return text.Length - valueLength;
+#else
             int length = Math.Min(text.Length, valueLength);
             char[]? arrayToReturnToPool = null;
             try
@@ -742,6 +849,7 @@ namespace J2N.Text
             {
                 ArrayPool<char>.Shared.ReturnIfNotNull(arrayToReturnToPool);
             }
+#endif
         }
 
         #endregion CompareToOrdinal

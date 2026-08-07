@@ -140,6 +140,31 @@ namespace J2N.Text
             if (str is null) return (value is null) ? 0 : -1;
             if (value is null) return 1;
 
+#if FEATURE_STRINGBUILDER_GETCHUNKS
+            int result;
+            int strIndex = 0;
+            int remaining = Math.Min(str.Length, value.Length);
+
+            foreach (ReadOnlyMemory<char> chunk in value.GetChunks())
+            {
+                ReadOnlySpan<char> chunkSpan = chunk.Span;
+                int count = Math.Min(remaining, chunkSpan.Length);
+
+                for (int i = 0; i < count; i++, strIndex++)
+                {
+                    if ((result = str[strIndex] - chunkSpan[i]) != 0)
+                        return result;
+                }
+
+                remaining -= count;
+                if (remaining == 0)
+                    break;
+            }
+
+            // At this point, we have compared all the characters in at least one string.
+            // The longer string will be larger.
+            return str.Length - value.Length;
+#else
             int length = Math.Min(str.Length, value.Length);
             char[]? arrayToReturnToPool = null;
             try
@@ -168,6 +193,7 @@ namespace J2N.Text
             {
                 ArrayPool<char>.Shared.ReturnIfNotNull(arrayToReturnToPool);
             }
+#endif
         }
 
         /// <summary>
