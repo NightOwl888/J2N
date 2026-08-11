@@ -32,7 +32,8 @@ namespace J2N.Text
         IComparable<string?>, IComparable<StringBuilder?>, IComparable<char[]?>,
         IEquatable<ICharSequence?>,
         IEquatable<CharArrayCharSequence?>, IEquatable<StringBuilderCharSequence?>, IEquatable<StringCharSequence?>,
-        IEquatable<string?>, IEquatable<StringBuilder?>, IEquatable<char[]?>
+        IEquatable<string?>, IEquatable<StringBuilder?>, IEquatable<char[]?>,
+        ISpannable<char>, ICopyable<char>, ISpanCopyable<char>
     {
         private const int CharStackBufferSize = 64;
 
@@ -560,5 +561,39 @@ namespace J2N.Text
         }
 
         #endregion IComparable Members
+
+        #region ICopyable<char> Members
+
+        void ICopyable<char>.CopyTo(int sourceIndex, char[] destination, int destinationIndex, int count)
+        {
+            if (Value is not null)
+            {
+                Array.Copy(Value, sourceIndex, destination, destinationIndex, count);
+            }
+        }
+
+        #endregion ICopyable<char> Members
+
+        #region ISpanCopyable<char> Members
+
+        void ISpanCopyable<char>.CopyTo(int sourceIndex, Span<char> destination, int count)
+        {
+            if (Value is not null)
+            {
+                new Span<char>(Value, sourceIndex, count).CopyTo(destination);
+            }
+        }
+
+        #endregion ISpanCopyable<char> Members
+
+        #region ISpannable<char> Members
+
+        ReadOnlySpan<char> ISpannable<char>.AsSpan() => Value.AsSpan();
+
+        ReadOnlySpan<char> ISpannable<char>.AsSpan(int start) => Value.AsSpan(start);
+
+        ReadOnlySpan<char> ISpannable<char>.AsSpan(int start, int length) => Value.AsSpan(start, length);
+
+        #endregion ISpannable<char> Members
     }
 }
