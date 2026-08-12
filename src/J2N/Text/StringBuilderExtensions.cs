@@ -17,6 +17,7 @@
 #endregion
 
 using J2N.Buffers;
+using J2N.Globalization;
 using System;
 using System.Buffers;
 using System.Diagnostics;
@@ -509,88 +510,10 @@ namespace J2N.Text
         /// Zero indicates the strings are equal.
         /// Greater than zero indicates the comparison value is less than the current string.
         /// </returns>
-        public static int CompareToOrdinal(this StringBuilder? text, ICharSequence? value) // KEEP OVERLOADS FOR ReadOnlySpan<char>, ICharSequence, char[], StringBuilder, and string IN SYNC
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static int CompareToOrdinal(this StringBuilder? text, ICharSequence? value)
         {
-            if (text is null) return (value is null || !value.HasValue) ? 0 : -1;
-            if (value is null || !value.HasValue) return 1;
-
-            if (value is ISpannable<char> spannable)
-            {
-                return CompareToOrdinal(text, spannable.AsSpan());
-            }
-            if (value is StringBuilderCharSequence sb)
-            {
-                return CompareToOrdinal(text, sb.Value);
-            }
-            if (value is StringBuffer stringBuffer)
-            {
-                lock (stringBuffer.SyncRoot)
-                {
-                    return CompareToOrdinal(text, stringBuffer.builder);
-                }
-            }
-            if (value is SynchronizedTextBuilderCharSequence stb)
-            {
-                lock (stb.SyncRoot)
-                {
-                    return CompareToOrdinal(text, stb.Value.AsSpan());
-                }
-            }
-
-#if FEATURE_STRINGBUILDER_GETCHUNKS
-            int result;
-            int valueIndex = 0;
-            int remaining = Math.Min(text.Length, value.Length);
-
-            foreach (ReadOnlyMemory<char> chunk in text.GetChunks())
-            {
-                ReadOnlySpan<char> chunkSpan = chunk.Span;
-                int count = Math.Min(remaining, chunkSpan.Length);
-
-                for (int i = 0; i < count; i++, valueIndex++)
-                {
-                    if ((result = chunkSpan[i] - value[valueIndex]) != 0)
-                        return result;
-                }
-
-                remaining -= count;
-                if (remaining == 0)
-                    break;
-            }
-
-            // At this point, we have compared all the characters in at least one string.
-            // The longer string will be larger.
-            return text.Length - value.Length;
-#else
-            int length = Math.Min(text.Length, value.Length);
-            char[]? arrayToReturnToPool = null;
-            try
-            {
-#if FEATURE_STRINGBUILDER_COPYTO_SPAN // If this method isn't supported, we are buffering to an array pool to get to the stack, anyway.
-                Span<char> textChars = length > CharStackBufferSize
-                    ? (arrayToReturnToPool = ArrayPool<char>.Shared.Rent(length))
-                    : stackalloc char[length];
-                text.CopyTo(0, textChars, length);
-#else
-                Span<char> textChars = arrayToReturnToPool = ArrayPool<char>.Shared.Rent(length);
-                text.CopyTo(0, arrayToReturnToPool, 0, length);
-#endif
-                int result;
-                for (int i = 0; i < length; i++)
-                {
-                    if ((result = textChars[i] - value[i]) != 0)
-                        return result;
-                }
-
-                // At this point, we have compared all the characters in at least one string.
-                // The longer string will be larger.
-                return text.Length - value.Length;
-            }
-            finally
-            {
-                ArrayPool<char>.Shared.ReturnIfNotNull(arrayToReturnToPool);
-            }
-#endif
+            return Ordinal.CompareString(text, value);
         }
 
         /// <summary>
@@ -611,18 +534,13 @@ namespace J2N.Text
         /// Zero indicates the strings are equal.
         /// Greater than zero indicates the comparison value is less than the current string.
         /// </returns>
-        public static int CompareToOrdinal(this StringBuilder? text, char[]? value) // KEEP OVERLOADS FOR ReadOnlySpan<char>, ICharSequence, char[], StringBuilder, and string IN SYNC
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static int CompareToOrdinal(this StringBuilder? text, char[]? value)
         {
             if (text is null) return (value is null) ? 0 : -1;
             if (value is null) return 1;
 
-            unsafe
-            {
-                fixed (char* valuePtr = value)
-                {
-                    return CompareToOrdinalCore(text, valuePtr, value.Length);
-                }
-            }
+            return Ordinal.CompareString(text, value);
         }
 
         /// <summary>
@@ -643,104 +561,10 @@ namespace J2N.Text
         /// Zero indicates the strings are equal.
         /// Greater than zero indicates the comparison value is less than the current string.
         /// </returns>
-        public static int CompareToOrdinal(this StringBuilder? text, StringBuilder? value) // KEEP OVERLOADS FOR ReadOnlySpan<char>, ICharSequence, char[], StringBuilder, and string IN SYNC
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static int CompareToOrdinal(this StringBuilder? text, StringBuilder? value)
         {
-            if (object.ReferenceEquals(text, value)) return 0;
-            if (text is null) return (value is null) ? 0 : -1;
-            if (value is null) return 1;
-
-#if FEATURE_STRINGBUILDER_GETCHUNKS
-            StringBuilder.ChunkEnumerator textChunks = text.GetChunks();
-            StringBuilder.ChunkEnumerator valueChunks = value.GetChunks();
-            ReadOnlySpan<char> textSpan = default;
-            ReadOnlySpan<char> valueSpan = default;
-            int textIndex = 0;
-            int valueIndex = 0;
-            bool hasText = textChunks.MoveNext();
-            bool hasValue = valueChunks.MoveNext();
-
-            if (hasText)
-                textSpan = textChunks.Current.Span;
-
-            if (hasValue)
-                valueSpan = valueChunks.Current.Span;
-
-            while (hasText && hasValue)
-            {
-                int count = Math.Min(textSpan.Length - textIndex, valueSpan.Length - valueIndex);
-
-                for (int i = 0; i < count; i++)
-                {
-                    int result = textSpan[textIndex + i] - valueSpan[valueIndex + i];
-                    if (result != 0)
-                        return result;
-                }
-
-                textIndex += count;
-                valueIndex += count;
-
-                if (textIndex == textSpan.Length)
-                {
-                    hasText = textChunks.MoveNext();
-                    if (hasText)
-                    {
-                        textSpan = textChunks.Current.Span;
-                        textIndex = 0;
-                    }
-                }
-
-                if (valueIndex == valueSpan.Length)
-                {
-                    hasValue = valueChunks.MoveNext();
-                    if (hasValue)
-                    {
-                        valueSpan = valueChunks.Current.Span;
-                        valueIndex = 0;
-                    }
-                }
-            }
-
-            // At this point, we have compared all the characters in at least one string.
-            // The longer string will be larger.
-            return text.Length - value.Length;
-#else
-            int length = Math.Min(text.Length, value.Length);
-            char[]? textArrayToReturnToPool = null;
-            char[]? valueArrayToReturnToPool = null;
-            try
-            {
-#if FEATURE_STRINGBUILDER_COPYTO_SPAN // If this method isn't supported, we are buffering to an array pool to get to the stack, anyway.
-                Span<char> textChars = length > CharStackBufferSize
-                    ? (textArrayToReturnToPool = ArrayPool<char>.Shared.Rent(length))
-                    : stackalloc char[length];
-                Span<char> valueChars = length > CharStackBufferSize
-                    ? (valueArrayToReturnToPool = ArrayPool<char>.Shared.Rent(length))
-                    : stackalloc char[length];
-                text.CopyTo(0, textChars, length);
-                value.CopyTo(0, valueChars, length);
-#else
-                Span<char> textChars = textArrayToReturnToPool = ArrayPool<char>.Shared.Rent(length);
-                Span<char> valueChars = valueArrayToReturnToPool = ArrayPool<char>.Shared.Rent(length);
-                text.CopyTo(0, textArrayToReturnToPool, 0, length);
-                value.CopyTo(0, valueArrayToReturnToPool, 0, length);
-#endif
-                int result;
-                for (int i = 0; i < length; i++)
-                {
-                    if ((result = textChars[i] - valueChars[i]) != 0)
-                        return result;
-                }
-
-                // At this point, we have compared all the characters in at least one string.
-                // The longer string will be larger.
-                return text.Length - value.Length;
-            }
-            finally
-            {
-                ArrayPool<char>.Shared.ReturnIfNotNull(textArrayToReturnToPool);
-                ArrayPool<char>.Shared.ReturnIfNotNull(valueArrayToReturnToPool);
-            }
-#endif
+            return Ordinal.CompareString(text, value);
         }
 
         /// <summary>
@@ -761,18 +585,13 @@ namespace J2N.Text
         /// Zero indicates the strings are equal.
         /// Greater than zero indicates the comparison value is less than the current string.
         /// </returns>
-        public static int CompareToOrdinal(this StringBuilder? text, string? value) // KEEP OVERLOADS FOR ReadOnlySpan<char>, ICharSequence, char[], StringBuilder, and string IN SYNC
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static int CompareToOrdinal(this StringBuilder? text, string? value)
         {
             if (text is null) return (value is null) ? 0 : -1;
             if (value is null) return 1;
 
-            unsafe
-            {
-                fixed (char* valuePtr = value)
-                {
-                    return CompareToOrdinalCore(text, valuePtr, value.Length);
-                }
-            }
+            return Ordinal.CompareString(text, value);
         }
 
         /// <summary>
@@ -793,7 +612,8 @@ namespace J2N.Text
         /// Zero indicates the strings are equal.
         /// Greater than zero indicates the comparison value is less than the current string.
         /// </returns>
-        public static int CompareToOrdinal(this StringBuilder? text, ReadOnlySpan<char> value) // KEEP OVERLOADS FOR ReadOnlySpan<char>, ICharSequence, char[], StringBuilder, and string IN SYNC
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static int CompareToOrdinal(this StringBuilder? text, ReadOnlySpan<char> value)
         {
             // J2N: Only consider whether the right side is empty if the left side is null. This is the equivalent of calling text.AsSpan() and then doing the comparison. See: https://github.com/NightOwl888/J2N/pull/122#discussion_r1850836158
 #if FEATURE_BROKEN_NULL_CHARSEQUENCE_COMPARISON
@@ -801,73 +621,7 @@ namespace J2N.Text
 #else
             if (text is null) return -1;
 #endif
-
-            unsafe
-            {
-                fixed (char* valuePtr = &MemoryMarshal.GetReference(value))
-                {
-                    return CompareToOrdinalCore(text, valuePtr, value.Length);
-                }
-            }
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private unsafe static int CompareToOrdinalCore(StringBuilder text, char* value, int valueLength)
-        {
-#if FEATURE_STRINGBUILDER_GETCHUNKS
-            int result;
-            int valueIndex = 0;
-            int remaining = Math.Min(text.Length, valueLength);
-
-            foreach (ReadOnlyMemory<char> chunk in text.GetChunks())
-            {
-                ReadOnlySpan<char> chunkSpan = chunk.Span;
-                int count = Math.Min(remaining, chunkSpan.Length);
-
-                for (int i = 0; i < count; i++, valueIndex++)
-                {
-                    if ((result = chunkSpan[i] - value[valueIndex]) != 0)
-                        return result;
-                }
-
-                remaining -= count;
-                if (remaining == 0)
-                    break;
-            }
-
-            // At this point, we have compared all the characters in at least one string.
-            // The longer string will be larger.
-            return text.Length - valueLength;
-#else
-            int length = Math.Min(text.Length, valueLength);
-            char[]? arrayToReturnToPool = null;
-            try
-            {
-#if FEATURE_STRINGBUILDER_COPYTO_SPAN // If this method isn't supported, we are buffering to an array pool to get to the stack, anyway.
-                Span<char> textChars = length > CharStackBufferSize
-                    ? (arrayToReturnToPool = ArrayPool<char>.Shared.Rent(length))
-                    : stackalloc char[length];
-                text.CopyTo(0, textChars, length);
-#else
-                Span<char> textChars = arrayToReturnToPool = ArrayPool<char>.Shared.Rent(length);
-                text.CopyTo(0, arrayToReturnToPool, 0, length);
-#endif
-                int result;
-                for (int i = 0; i < length; i++)
-                {
-                    if ((result = textChars[i] - value[i]) != 0)
-                        return result;
-                }
-
-                // At this point, we have compared all the characters in at least one string.
-                // The longer string will be larger.
-                return text.Length - valueLength;
-            }
-            finally
-            {
-                ArrayPool<char>.Shared.ReturnIfNotNull(arrayToReturnToPool);
-            }
-#endif
+            return Ordinal.CompareString(text, value);
         }
 
         #endregion CompareToOrdinal
