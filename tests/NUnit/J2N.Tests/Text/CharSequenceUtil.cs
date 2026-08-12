@@ -1,4 +1,22 @@
-﻿using J2N.Buffers;
+﻿#region Copyright 2019-2026 by Shad Storhaug, Licensed under the Apache License, Version 2.0
+/*  Licensed to the Apache Software Foundation (ASF) under one or more
+ *  contributor license agreements.  See the NOTICE file distributed with
+ *  this work for additional information regarding copyright ownership.
+ *  The ASF licenses this file to You under the Apache License, Version 2.0
+ *  (the "License"); you may not use this file except in compliance with
+ *  the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+#endregion
+
+using J2N.Buffers;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
@@ -99,11 +117,14 @@ namespace J2N.Text
             // Canonically equivalent Unicode sequences are NOT equal ordinally
             yield return new object?[] { "\u00E9", "e\u0301", false, 132, 233 };
 
-            yield return new object?[] { "abc", "abcd", false, -100, 96354 };
-            yield return new object?[] { "abcd", "abc", false, 100, 2987074 };
+            yield return new object?[] { "abc", "abcd", false, -1, 96354 };
+            yield return new object?[] { "abcd", "abc", false, 1, 2987074 };
 
             yield return new object?[] { "😀", "😀", true, 0, 1772899 };
             yield return new object?[] { "😁", "😀", false, 1, 1772900 };
+
+            yield return new object?[] { "abcdefghijklmnopqrstuvwxyz", "abcdefghijklmnopqrstuvwxyz", true, 0, 958031277 };
+            yield return new object?[] { "abcdefghijklmnopqrstuvwxyza", "abcdefghijklmnopqrstuvwxyz", false, 1, -365801388 };
         }
 
         public static IEnumerable<object?[]> Equals_String_TestData()
@@ -542,6 +563,8 @@ namespace J2N.Text
                 {
                     mutate();
                 }
+
+                Thread.Yield();
             }
         }
 
