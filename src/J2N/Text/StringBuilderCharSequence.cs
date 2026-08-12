@@ -31,7 +31,11 @@ namespace J2N.Text
         IComparable<string?>, IComparable<StringBuilder?>, IComparable<char[]?>,
         IEquatable<ICharSequence?>,
         IEquatable<CharArrayCharSequence?>, IEquatable<StringBuilderCharSequence?>, IEquatable<StringCharSequence?>,
-        IEquatable<string?>, IEquatable<StringBuilder?>, IEquatable<char[]?>, ISpanAppendable
+        IEquatable<string?>, IEquatable<StringBuilder?>, IEquatable<char[]?>, ISpanAppendable,
+        ICopyable<char>
+#if FEATURE_STRINGBUILDER_COPYTO_SPAN
+        , ISpanCopyable<char>
+#endif
     {
         /// <summary>
         /// Initializes a new instance of <see cref="StringBuilderCharSequence"/> with a new backing <see cref="StringBuilder"/>.
@@ -862,6 +866,26 @@ namespace J2N.Text
         ISpanAppendable ISpanAppendable.Append(ReadOnlySpan<char> value) => this.Append(value);
 
         #endregion
-    }
 
+        #region ICopyable<char> Members
+
+        void ICopyable<char>.CopyTo(int sourceIndex, char[] destination, int destinationIndex, int count)
+        {
+            Value?.CopyTo(sourceIndex, destination, destinationIndex, count);
+        }
+
+        #endregion ICopyable<char> Members
+
+        #region ISpanCopyable<char> Members
+
+#if FEATURE_STRINGBUILDER_COPYTO_SPAN
+        void ISpanCopyable<char>.CopyTo(int sourceIndex, Span<char> destination, int count)
+        {
+            Value?.CopyTo(sourceIndex, destination, count);
+        }
+
+#endif
+
+        #endregion ISpanCopyable<char> Members
+    }
 }
