@@ -69,8 +69,10 @@ namespace J2N.Text
         public virtual int Compare(object? x, object? y)
         {
             if (x == y) return 0;
+#if FEATURE_BROKEN_NULL_CHARSEQUENCE_COMPARISON
             if (x == null) return -1;
             if (y == null) return 1;
+#endif
 
             if (x is ICharSequence sa)
             {
@@ -299,7 +301,9 @@ namespace J2N.Text
         public virtual new bool Equals(object? x, object? y)
         {
             if (x == y) return true;
+#if FEATURE_BROKEN_NULL_CHARSEQUENCE_COMPARISON
             if (x is null || y is null) return false;
+#endif
 
             if (x is ICharSequence sa)
             {

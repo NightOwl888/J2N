@@ -88,30 +88,18 @@ namespace J2N.Text
         {
             try
             {
+#if FEATURE_BROKEN_NULL_CHARSEQUENCE_COMPARISON
                 if (leftValue is null)
                 {
-                    if (rightValue is StringCharSequence scs2 && !scs2.HasValue)
-                        expected = false; // J2N TODO: Fix broken null comparison
-                    if (rightValue is CharArrayCharSequence cacs2 && !cacs2.HasValue)
-                        expected = false; // J2N TODO: Fix broken null comparison
-                    if (rightValue is StringBuilderCharSequence sbcs2 && !sbcs2.HasValue)
+                    if (rightValue is ICharSequence cs2 && !cs2.HasValue)
                         expected = false; // J2N TODO: Fix broken null comparison
                 }
-                if (leftValue is StringCharSequence scs1 && !scs1.HasValue)
+                if (leftValue is ICharSequence cs1 && !cs1.HasValue)
                 {
                     if (rightValue is null)
                         expected = false; // J2N TODO: Fix broken null comparison
                 }
-                if (leftValue is CharArrayCharSequence cacs1 && !cacs1.HasValue)
-                {
-                    if (rightValue is null)
-                        expected = false; // J2N TODO: Fix broken null comparison
-                }
-                if (leftValue is StringBuilderCharSequence sbcs1 && !sbcs1.HasValue)
-                {
-                    if (rightValue is null)
-                        expected = false; // J2N TODO: Fix broken null comparison
-                }
+#endif
 
                 Assert.AreEqual(expected, CharSequenceComparer.Ordinal.Equals(leftValue, rightValue));
             }
@@ -367,114 +355,25 @@ namespace J2N.Text
         {
             try
             {
+#if FEATURE_BROKEN_NULL_CHARSEQUENCE_COMPARISON
                 if (leftValue is null)
                 {
-                    if (rightValue is StringCharSequence scs2 && !scs2.HasValue)
-                        expected = -1; // J2N TODO: Fix broken null comparison
-                    if (rightValue is CharArrayCharSequence cacs2 && !cacs2.HasValue)
-                        expected = -1; // J2N TODO: Fix broken null comparison
-                    if (rightValue is StringBuilderCharSequence sbcs2 && !sbcs2.HasValue)
+                    if (rightValue is ICharSequence cs2 && !cs2.HasValue)
                         expected = -1; // J2N TODO: Fix broken null comparison
                 }
-                if (leftValue is StringCharSequence scs1 && !scs1.HasValue)
+                if (leftValue is ICharSequence cs1 && !cs1.HasValue)
                 {
                     if (rightValue is null)
                         expected = 1; // J2N TODO: Fix broken null comparison
-                    if (rightValue is CharArrayCharSequence cacs2)
+                    if (rightValue is ICharSequence cs2)
                     {
-                        if (!cacs2.HasValue)
+                        if (!cs2.HasValue)
                             expected = -1; // J2N TODO: Fix broken null comparison
-                        else if (cacs2.HasValue && cacs2.Length == 0)
-                            expected = 0; // J2N TODO: Fix broken null comparison
-                    }
-                    if (rightValue is StringBuilderCharSequence sbcs2)
-                    {
-                        if (!sbcs2.HasValue)
-                            expected = -1; // J2N TODO: Fix broken null comparison
-                        else if (sbcs2.HasValue && sbcs2.Length == 0)
-                            expected = 0; // J2N TODO: Fix broken null comparison
-                    }
-                    if (rightValue is StringCharSequence scs2)
-                    {
-                        if (!scs2.HasValue)
-                            expected = -1; // J2N TODO: Fix broken null comparison
-                        else if (scs2.HasValue && scs2.Length == 0)
-                            expected = 0; // J2N TODO: Fix broken null comparison
-                    }
-                    if (rightValue is StringBuffer sbuf2)
-                    {
-                        if (!((ICharSequence)sbuf2).HasValue)
-                            expected = -1; // J2N TODO: Fix broken null comparison
-                        else if (((ICharSequence)sbuf2).HasValue && sbuf2.Length == 0)
+                        else if (cs2.HasValue && cs2.Length == 0)
                             expected = 0; // J2N TODO: Fix broken null comparison
                     }
                 }
-                if (leftValue is CharArrayCharSequence cacs1 && !cacs1.HasValue)
-                {
-                    if (rightValue is null)
-                        expected = 1; // J2N TODO: Fix broken null comparison
-                    if (rightValue is CharArrayCharSequence cacs2)
-                    {
-                        if (!cacs2.HasValue)
-                            expected = -1; // J2N TODO: Fix broken null comparison
-                        else if (cacs2.HasValue && cacs2.Length == 0)
-                            expected = 0; // J2N TODO: Fix broken null comparison
-                    }
-                    if (rightValue is StringBuilderCharSequence sbcs2)
-                    {
-                        if (!sbcs2.HasValue)
-                            expected = -1; // J2N TODO: Fix broken null comparison
-                        else if (sbcs2.HasValue && sbcs2.Length == 0)
-                            expected = 0; // J2N TODO: Fix broken null comparison
-                    }
-                    if (rightValue is StringCharSequence scs2)
-                    {
-                        if (!scs2.HasValue)
-                            expected = -1; // J2N TODO: Fix broken null comparison
-                        else if (scs2.HasValue && scs2.Length == 0)
-                            expected = 0; // J2N TODO: Fix broken null comparison
-                    }
-                    if (rightValue is StringBuffer sbuf2)
-                    {
-                        if (!((ICharSequence)sbuf2).HasValue)
-                            expected = -1; // J2N TODO: Fix broken null comparison
-                        else if (((ICharSequence)sbuf2).HasValue && sbuf2.Length == 0)
-                            expected = 0; // J2N TODO: Fix broken null comparison
-                    }
-                }
-                if (leftValue is StringBuilderCharSequence sbcs1 && !sbcs1.HasValue)
-                {
-                    if (rightValue is null)
-                        expected = 1; // J2N TODO: Fix broken null comparison
-                    if (rightValue is CharArrayCharSequence cacs2)
-                    {
-                        if (!cacs2.HasValue)
-                            expected = -1; // J2N TODO: Fix broken null comparison
-                        else if (cacs2.HasValue && cacs2.Length == 0)
-                            expected = 0; // J2N TODO: Fix broken null comparison
-                    }
-                    if (rightValue is StringBuilderCharSequence sbcs2)
-                    {
-                        if (!sbcs2.HasValue)
-                            expected = -1; // J2N TODO: Fix broken null comparison
-                        else if (sbcs2.HasValue && sbcs2.Length == 0)
-                            expected = 0; // J2N TODO: Fix broken null comparison
-                    }
-                    if (rightValue is StringCharSequence scs2)
-                    {
-                        if (!scs2.HasValue)
-                            expected = -1; // J2N TODO: Fix broken null comparison
-                        else if (scs2.HasValue && scs2.Length == 0)
-                            expected = 0; // J2N TODO: Fix broken null comparison
-                    }
-                    if (rightValue is StringBuffer sbuf2)
-                    {
-                        if (!((ICharSequence)sbuf2).HasValue)
-                            expected = -1; // J2N TODO: Fix broken null comparison
-                        else if (((ICharSequence)sbuf2).HasValue && sbuf2.Length == 0)
-                            expected = 0; // J2N TODO: Fix broken null comparison
-                    }
-                }
+#endif
 
                 CharSequenceUtil.AssertCompareTo(expected, CharSequenceComparer.Ordinal.Compare(leftValue, rightValue));
             }
@@ -531,140 +430,28 @@ namespace J2N.Text
         {
             try
             {
+#if FEATURE_BROKEN_NULL_CHARSEQUENCE_COMPARISON
                 if (leftValue is null)
                 {
-                    if (rightValue is CharArrayCharSequence cacs2)
+                    if (rightValue is ICharSequence cs2)
                     {
-                        if (!cacs2.HasValue)
+                        if (!cs2.HasValue)
                             expected = -1; // J2N TODO: Fix broken null comparison
-                        else if (cacs2.HasValue && cacs2.Length == 0)
-                            expected = 0; // J2N TODO: Fix broken null comparison
-                    }
-                    if (rightValue is StringBuilderCharSequence sbcs2)
-                    {
-                        if (!sbcs2.HasValue)
-                            expected = -1; // J2N TODO: Fix broken null comparison
-                        else if (sbcs2.HasValue && sbcs2.Length == 0)
-                            expected = 0; // J2N TODO: Fix broken null comparison
-                    }
-                    if (rightValue is StringCharSequence scs2)
-                    {
-                        if (!scs2.HasValue)
-                            expected = -1; // J2N TODO: Fix broken null comparison
-                        else if (scs2.HasValue && scs2.Length == 0)
-                            expected = 0; // J2N TODO: Fix broken null comparison
-                    }
-                    if (rightValue is StringBuffer sbuf2)
-                    {
-                        if (!((ICharSequence)sbuf2).HasValue)
-                            expected = -1; // J2N TODO: Fix broken null comparison
-                        else if (((ICharSequence)sbuf2).HasValue && sbuf2.Length == 0)
+                        else if (cs2.HasValue && cs2.Length == 0)
                             expected = 0; // J2N TODO: Fix broken null comparison
                     }
                 }
-                //if (leftValue is MutableTextBufferCharSequence mtbcs1 && !mtbcs1.HasValue)
-                //{
-                //    if (rightValue is ICharSequence cs2 && (!cs2.HasValue || cs2.HasValue && cs2.Length == 0))
-                //        Assert.Ignore("J2N TODO: Fix broken null comparison");
-                //}
-                //if (leftValue is SynchronizedTextBuilderCharSequence stbcs1 && !stbcs1.HasValue)
-                //{
-                //    if (rightValue is ICharSequence cs2 && (!cs2.HasValue || cs2.HasValue && cs2.Length == 0))
-                //        Assert.Ignore("J2N TODO: Fix broken null comparison");
-                //}
-                if (leftValue is CharArrayCharSequence cacs1 && !cacs1.HasValue)
+                if (leftValue is ICharSequence cs1 && !cs1.HasValue)
                 {
-                    if (rightValue is CharArrayCharSequence cacs2)
+                    if (rightValue is ICharSequence cs2)
                     {
-                        if (!cacs2.HasValue)
+                        if (!cs2.HasValue)
                             expected = -1; // J2N TODO: Fix broken null comparison
-                        else if (cacs2.HasValue && cacs2.Length == 0)
-                            expected = 0; // J2N TODO: Fix broken null comparison
-                    }
-                    if (rightValue is StringBuilderCharSequence sbcs2)
-                    {
-                        if (!sbcs2.HasValue)
-                            expected = -1; // J2N TODO: Fix broken null comparison
-                        else if (sbcs2.HasValue && sbcs2.Length == 0)
-                            expected = 0; // J2N TODO: Fix broken null comparison
-                    }
-                    if (rightValue is StringCharSequence scs2)
-                    {
-                        if (!scs2.HasValue)
-                            expected = -1; // J2N TODO: Fix broken null comparison
-                        else if (scs2.HasValue && scs2.Length == 0)
-                            expected = 0; // J2N TODO: Fix broken null comparison
-                    }
-                    if (rightValue is StringBuffer sbuf2)
-                    {
-                        if (!((ICharSequence)sbuf2).HasValue)
-                            expected = -1; // J2N TODO: Fix broken null comparison
-                        else if (((ICharSequence)sbuf2).HasValue && sbuf2.Length == 0)
+                        else if (cs2.HasValue && cs2.Length == 0)
                             expected = 0; // J2N TODO: Fix broken null comparison
                     }
                 }
-                if (leftValue is StringBuilderCharSequence sbcs1 && !sbcs1.HasValue)
-                {
-                    if (rightValue is CharArrayCharSequence cacs2)
-                    {
-                        if (!cacs2.HasValue)
-                            expected = -1; // J2N TODO: Fix broken null comparison
-                        else if (cacs2.HasValue && cacs2.Length == 0)
-                            expected = 0; // J2N TODO: Fix broken null comparison
-                    }
-                    if (rightValue is StringBuilderCharSequence sbcs2)
-                    {
-                        if (!sbcs2.HasValue)
-                            expected = -1; // J2N TODO: Fix broken null comparison
-                        else if (sbcs2.HasValue && sbcs2.Length == 0)
-                            expected = 0; // J2N TODO: Fix broken null comparison
-                    }
-                    if (rightValue is StringCharSequence scs2)
-                    {
-                        if (!scs2.HasValue)
-                            expected = -1; // J2N TODO: Fix broken null comparison
-                        else if (scs2.HasValue && scs2.Length == 0)
-                            expected = 0; // J2N TODO: Fix broken null comparison
-                    }
-                    if (rightValue is StringBuffer sbuf2)
-                    {
-                        if (!((ICharSequence)sbuf2).HasValue)
-                            expected = -1; // J2N TODO: Fix broken null comparison
-                        else if (((ICharSequence)sbuf2).HasValue && sbuf2.Length == 0)
-                            expected = 0; // J2N TODO: Fix broken null comparison
-                    }
-                }
-                if (leftValue is StringCharSequence scs1 && !scs1.HasValue)
-                {
-                    if (rightValue is CharArrayCharSequence cacs2)
-                    {
-                        if (!cacs2.HasValue)
-                            expected = -1; // J2N TODO: Fix broken null comparison
-                        else if (cacs2.HasValue && cacs2.Length == 0)
-                            expected = 0; // J2N TODO: Fix broken null comparison
-                    }
-                    if (rightValue is StringBuilderCharSequence sbcs2)
-                    {
-                        if (!sbcs2.HasValue)
-                            expected = -1; // J2N TODO: Fix broken null comparison
-                        else if (sbcs2.HasValue && sbcs2.Length == 0)
-                            expected = 0; // J2N TODO: Fix broken null comparison
-                    }
-                    if (rightValue is StringCharSequence scs2)
-                    {
-                        if (!scs2.HasValue)
-                            expected = -1; // J2N TODO: Fix broken null comparison
-                        else if (scs2.HasValue && scs2.Length == 0)
-                            expected = 0; // J2N TODO: Fix broken null comparison
-                    }
-                    if (rightValue is StringBuffer sbuf2)
-                    {
-                        if (!((ICharSequence)sbuf2).HasValue)
-                            expected = -1; // J2N TODO: Fix broken null comparison
-                        else if (((ICharSequence)sbuf2).HasValue && sbuf2.Length == 0)
-                            expected = 0; // J2N TODO: Fix broken null comparison
-                    }
-                }
+#endif
 
                 CharSequenceUtil.AssertCompareTo(expected, CharSequenceComparer.Ordinal.Compare(leftValue, rightValue));
             }
@@ -809,27 +596,19 @@ namespace J2N.Text
         {
             try
             {
+#if FEATURE_BROKEN_NULL_CHARSEQUENCE_COMPARISON
                 if (leftValue is null)
                 {
                     if (rightValue is null)
                         expected = -1; // J2N TODO: Fix broken null comparison
                 }
-                if (leftValue is StringCharSequence scs1 && !scs1.HasValue)
-                {
-                    if (rightValue is null)
-                        expected = -1; // J2N TODO: Fix broken null comparison
-                }
-                if (leftValue is CharArrayCharSequence cacs1 && !cacs1.HasValue)
-                {
-                    if (rightValue is null)
-                        expected = -1; // J2N TODO: Fix broken null comparison
-                }
-                if (leftValue is StringBuilderCharSequence sbcs1 && !sbcs1.HasValue)
+                if (leftValue is ICharSequence cs1 && !cs1.HasValue)
                 {
                     if (rightValue is null)
                         expected = -1; // J2N TODO: Fix broken null comparison
                 }
 
+#endif
                 CharSequenceUtil.AssertCompareTo(expected, CharSequenceComparer.Ordinal.Compare(leftValue, rightValue));
             }
             finally
