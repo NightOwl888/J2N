@@ -43,22 +43,12 @@ namespace J2N.Globalization
 
         public static IEnumerable<TestCaseData> Equals_ICharSequence_StringBuilder_TestData()
         {
-            var leftFactories = new Func<string?, object?>[]
-            {
-                CharSequenceUtil.CreateStringCharSequence,
-                CharSequenceUtil.CreateCharArrayCharSequence,
-                CharSequenceUtil.CreateStringBuilderCharSequence,
-                CharSequenceUtil.CreateMutableTextBufferCharSequence,
-                CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence,
-                CharSequenceUtil.CreateStringBuffer,
-            };
-
             var rightFactories = new Func<string?, object?>[]
             {
                 CharSequenceUtil.CreateStringBuilder,
             };
 
-            foreach (var leftFactory in leftFactories)
+            foreach (var leftFactory in CharSequenceUtil.ICharSequenceFactories)
             {
                 foreach (var rightFactory in rightFactories)
                 {
@@ -164,22 +154,12 @@ namespace J2N.Globalization
 
         public static IEnumerable<TestCaseData> CompareTo_ICharSequence_StringBuilder_TestData()
         {
-            var leftFactories = new Func<string?, object?>[]
-            {
-                CharSequenceUtil.CreateStringCharSequence,
-                CharSequenceUtil.CreateCharArrayCharSequence,
-                CharSequenceUtil.CreateStringBuilderCharSequence,
-                CharSequenceUtil.CreateMutableTextBufferCharSequence,
-                CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence,
-                CharSequenceUtil.CreateStringBuffer,
-            };
-
             var rightFactories = new Func<string?, object?>[]
             {
                 CharSequenceUtil.CreateStringBuilder,
             };
 
-            foreach (var leftFactory in leftFactories)
+            foreach (var leftFactory in CharSequenceUtil.ICharSequenceFactories)
             {
                 foreach (var rightFactory in rightFactories)
                 {

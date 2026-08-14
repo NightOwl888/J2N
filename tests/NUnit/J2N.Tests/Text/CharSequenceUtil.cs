@@ -95,6 +95,34 @@ namespace J2N.Text
 
         #endregion
 
+        #region CharSequence Factory Common Lists
+
+        public static IReadOnlyList<Func<string?, object?>> ICharSequenceFactories { get; } =
+            new Func<string?, object?>[]
+            {
+                CreateStringCharSequence,
+                CreateCharArrayCharSequence,
+                CreateStringBuilderCharSequence,
+                CreateMutableTextBufferCharSequence,
+                CreateSynchronizedTextBuilderCharSequence,
+                CreateStringBuffer,
+            };
+
+        public static IReadOnlyList<Func<string?, object?>> ComparableObjectFactories { get; } =
+            ICharSequenceFactories
+                .Concat(new Func<string?, object?>[]
+                {
+                    CreateString,
+                    CreateCharArray,
+                    CreateStringBuilder,
+                    CreateTextBuilder,
+                    CreatePooledTextBuilder,
+                    CreateSynchronizedTextBuilder,
+                })
+                .ToArray();
+
+        #endregion CharSequence Factory Common Lists
+
         #region Test Data
 
         public static IEnumerable<object?[]> Comparison_String_TestData()
@@ -141,25 +169,7 @@ namespace J2N.Text
 
         public static IEnumerable<TestCaseData> Equals_Object_TestData()
         {
-            var factories = new Func<string?, object?>[]
-            {
-                CreateStringCharSequence,
-                CreateCharArrayCharSequence,
-                CreateStringBuilderCharSequence,
-                CreateMutableTextBufferCharSequence,
-                CreateSynchronizedTextBuilderCharSequence,
-                CreateStringBuffer,
-
-                CreateString,
-                CreateCharArray,
-                CreateStringBuilder,
-
-                CreateTextBuilder,
-                CreatePooledTextBuilder,
-                CreateSynchronizedTextBuilder,
-            };
-
-            foreach (var factory in factories)
+            foreach (var factory in ComparableObjectFactories)
             {
                 foreach (var item in Equals_String_TestData())
                 {
@@ -175,20 +185,7 @@ namespace J2N.Text
 
         public static IEnumerable<TestCaseData> Equals_ICharSequence_TestData()
         {
-            var factories = new Func<string?, object?>[]
-            {
-                CreateStringCharSequence,
-                CreateCharArrayCharSequence,
-                CreateStringBuilderCharSequence,
-                CreateMutableTextBufferCharSequence,
-                CreateSynchronizedTextBuilderCharSequence,
-                CreateStringBuffer,
-
-                //CreateTextBuilderAsCharSequence,
-                //CreatePooledTextBuilderAsCharSequence,
-            };
-
-            foreach (var factory in factories)
+            foreach (var factory in ICharSequenceFactories)
             {
                 foreach (var item in Equals_String_TestData())
                 {
@@ -318,25 +315,7 @@ namespace J2N.Text
 
         public static IEnumerable<TestCaseData> CompareTo_Object_TestData()
         {
-            var factories = new Func<string?, object?>[]
-            {
-                CreateStringCharSequence,
-                CreateCharArrayCharSequence,
-                CreateStringBuilderCharSequence,
-                CreateMutableTextBufferCharSequence,
-                CreateSynchronizedTextBuilderCharSequence,
-                CreateStringBuffer,
-
-                CreateString,
-                CreateCharArray,
-                CreateStringBuilder,
-
-                CreateTextBuilder,
-                CreatePooledTextBuilder,
-                CreateSynchronizedTextBuilder,
-            };
-
-            foreach (var factory in factories)
+            foreach (var factory in ComparableObjectFactories)
             {
                 foreach (var item in CompareTo_String_TestData())
                 {
@@ -352,20 +331,7 @@ namespace J2N.Text
 
         public static IEnumerable<TestCaseData> CompareTo_ICharSequence_TestData()
         {
-            var factories = new Func<string?, object?>[]
-            {
-                CreateStringCharSequence,
-                CreateCharArrayCharSequence,
-                CreateStringBuilderCharSequence,
-                CreateMutableTextBufferCharSequence,
-                CreateSynchronizedTextBuilderCharSequence,
-                CreateStringBuffer,
-
-                //CreateTextBuilderAsCharSequence,
-                //CreatePooledTextBuilderAsCharSequence,
-            };
-
-            foreach (var factory in factories)
+            foreach (var factory in ICharSequenceFactories)
             {
                 foreach (var item in CompareTo_String_TestData())
                 {

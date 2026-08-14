@@ -32,8 +32,8 @@ namespace J2N.Globalization
         public void Test_Equal_SynchronizedTextBuilderCharSequence_SynchronizedTextBuilder_ShouldNotDeadlock_WhenComparingOppositeDirections()
         {
             AssertExtensions.AssertNoABDeadlock(
-                () => new SynchronizedTextBuilderCharSequence(new SynchronizedTextBuilder(Value)),
-                () => new SynchronizedTextBuilder(Value),
+                () => CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence(Value),
+                () => CharSequenceUtil.CreateSynchronizedTextBuilder(Value),
                 (seq1, seq2) =>
                 {
                     Assert.IsTrue(Ordinal.Equal(seq1, seq2));
@@ -44,8 +44,8 @@ namespace J2N.Globalization
         public void Test_Equal_SynchronizedTextBuilder_SynchronizedTextBuilderCharSequence_ShouldNotDeadlock_WhenComparingOppositeDirections()
         {
             AssertExtensions.AssertNoABDeadlock(
-                () => new SynchronizedTextBuilder(Value),
-                () => new SynchronizedTextBuilderCharSequence(new SynchronizedTextBuilder(Value)),
+                () => CharSequenceUtil.CreateSynchronizedTextBuilder(Value),
+                () => CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence(Value),
                 (seq1, seq2) =>
                 {
                     Assert.IsTrue(Ordinal.Equal(seq1, seq2));
@@ -56,8 +56,8 @@ namespace J2N.Globalization
         public void Test_Equal_SynchronizedTextBuilder_StringBuffer_ShouldNotDeadlock_WhenComparingOppositeDirections()
         {
             AssertExtensions.AssertNoABDeadlock(
-                () => new SynchronizedTextBuilder(Value),
-                () => new StringBuffer(Value),
+                () => CharSequenceUtil.CreateSynchronizedTextBuilder(Value),
+                () => CharSequenceUtil.CreateStringBuffer(Value),
                 (seq1, seq2) =>
                 {
                     Assert.IsTrue(Ordinal.Equal(seq1, seq2));
@@ -68,8 +68,8 @@ namespace J2N.Globalization
         public void Test_Equal_StringBuffer_SynchronizedTextBuilder_ShouldNotDeadlock_WhenComparingOppositeDirections()
         {
             AssertExtensions.AssertNoABDeadlock(
-                () => new StringBuffer(Value),
-                () => new SynchronizedTextBuilder(Value),
+                () => CharSequenceUtil.CreateStringBuffer(Value),
+                () => CharSequenceUtil.CreateSynchronizedTextBuilder(Value),
                 (seq1, seq2) =>
                 {
                     Assert.IsTrue(Ordinal.Equal(seq1, seq2));
@@ -80,8 +80,8 @@ namespace J2N.Globalization
         public void Test_Equal_SynchronizedTextBuilderCharSequence_StringBuffer_ShouldNotDeadlock_WhenComparingOppositeDirections()
         {
             AssertExtensions.AssertNoABDeadlock(
-                () => new SynchronizedTextBuilderCharSequence(new SynchronizedTextBuilder(Value)),
-                () => new StringBuffer(Value),
+                () => CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence(Value),
+                () => CharSequenceUtil.CreateStringBuffer(Value),
                 (seq1, seq2) =>
                 {
                     Assert.IsTrue(Ordinal.Equal(seq1, seq2));
@@ -93,7 +93,7 @@ namespace J2N.Globalization
         {
             AssertExtensions.AssertNoABDeadlock(
                 () => new StringBuffer(Value),
-                () => new SynchronizedTextBuilderCharSequence(new SynchronizedTextBuilder(Value)),
+                () => CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence(Value),
                 (seq1, seq2) =>
                 {
                     Assert.IsTrue(Ordinal.Equal(seq1, seq2));
@@ -103,22 +103,12 @@ namespace J2N.Globalization
 
         public static IEnumerable<TestCaseData> Equal_ICharSequence_SynchronizedTextBuilder_TestData()
         {
-            var leftFactories = new Func<string?, object?>[]
-            {
-                CharSequenceUtil.CreateStringCharSequence,
-                CharSequenceUtil.CreateCharArrayCharSequence,
-                CharSequenceUtil.CreateStringBuilderCharSequence,
-                CharSequenceUtil.CreateMutableTextBufferCharSequence,
-                CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence,
-                CharSequenceUtil.CreateStringBuffer,
-            };
-
             var rightFactories = new Func<string?, object?>[]
             {
                 CharSequenceUtil.CreateSynchronizedTextBuilder,
             };
 
-            foreach (var leftFactory in leftFactories)
+            foreach (var leftFactory in CharSequenceUtil.ICharSequenceFactories)
             {
                 foreach (var rightFactory in rightFactories)
                 {
@@ -166,22 +156,12 @@ namespace J2N.Globalization
 
         public static IEnumerable<TestCaseData> Equal_ICharSequence_StringBuffer_TestData()
         {
-            var leftFactories = new Func<string?, object?>[]
-            {
-                CharSequenceUtil.CreateStringCharSequence,
-                CharSequenceUtil.CreateCharArrayCharSequence,
-                CharSequenceUtil.CreateStringBuilderCharSequence,
-                CharSequenceUtil.CreateMutableTextBufferCharSequence,
-                CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence,
-                CharSequenceUtil.CreateStringBuffer,
-            };
-
             var rightFactories = new Func<string?, object?>[]
             {
                 CharSequenceUtil.CreateStringBuffer,
             };
 
-            foreach (var leftFactory in leftFactories)
+            foreach (var leftFactory in CharSequenceUtil.ICharSequenceFactories)
             {
                 foreach (var rightFactory in rightFactories)
                 {
@@ -233,8 +213,8 @@ namespace J2N.Globalization
         public void Test_CompareString_SynchronizedTextBuilderCharSequence_SynchronizedTextBuilder_ShouldNotDeadlock_WhenComparingOppositeDirections()
         {
             AssertExtensions.AssertNoABDeadlock(
-                () => new SynchronizedTextBuilderCharSequence(new SynchronizedTextBuilder(Value)),
-                () => new SynchronizedTextBuilder(Value),
+                () => CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence(Value),
+                () => CharSequenceUtil.CreateSynchronizedTextBuilder(Value),
                 (seq1, seq2) =>
                 {
                     Assert.AreEqual(0, Ordinal.CompareString(seq1, seq2));
@@ -245,8 +225,8 @@ namespace J2N.Globalization
         public void Test_CompareString_SynchronizedTextBuilder_SynchronizedTextBuilderCharSequence_ShouldNotDeadlock_WhenComparingOppositeDirections()
         {
             AssertExtensions.AssertNoABDeadlock(
-                () => new SynchronizedTextBuilder(Value),
-                () => new SynchronizedTextBuilderCharSequence(new SynchronizedTextBuilder(Value)),
+                () => CharSequenceUtil.CreateSynchronizedTextBuilder(Value),
+                () => CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence(Value),
                 (seq1, seq2) =>
                 {
                     Assert.AreEqual(0, Ordinal.CompareString(seq1, seq2));
@@ -257,8 +237,8 @@ namespace J2N.Globalization
         public void Test_CompareString_SynchronizedTextBuilder_StringBuffer_ShouldNotDeadlock_WhenComparingOppositeDirections()
         {
             AssertExtensions.AssertNoABDeadlock(
-                () => new SynchronizedTextBuilder(Value),
-                () => new StringBuffer(Value),
+                () => CharSequenceUtil.CreateSynchronizedTextBuilder(Value),
+                () => CharSequenceUtil.CreateStringBuffer(Value),
                 (seq1, seq2) =>
                 {
                     Assert.AreEqual(0, Ordinal.CompareString(seq1, seq2));
@@ -269,8 +249,8 @@ namespace J2N.Globalization
         public void Test_CompareString_StringBuffer_SynchronizedTextBuilder_ShouldNotDeadlock_WhenComparingOppositeDirections()
         {
             AssertExtensions.AssertNoABDeadlock(
-                () => new StringBuffer(Value),
-                () => new SynchronizedTextBuilder(Value),
+                () => CharSequenceUtil.CreateStringBuffer(Value),
+                () => CharSequenceUtil.CreateSynchronizedTextBuilder(Value),
                 (seq1, seq2) =>
                 {
                     Assert.AreEqual(0, Ordinal.CompareString(seq1, seq2));
@@ -281,8 +261,8 @@ namespace J2N.Globalization
         public void Test_CompareString_SynchronizedTextBuilderCharSequence_StringBuffer_ShouldNotDeadlock_WhenComparingOppositeDirections()
         {
             AssertExtensions.AssertNoABDeadlock(
-                () => new SynchronizedTextBuilderCharSequence(new SynchronizedTextBuilder(Value)),
-                () => new StringBuffer(Value),
+                () => CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence(Value),
+                () => CharSequenceUtil.CreateStringBuffer(Value),
                 (seq1, seq2) =>
                 {
                     Assert.AreEqual(0, Ordinal.CompareString(seq1, seq2));
@@ -293,8 +273,8 @@ namespace J2N.Globalization
         public void Test_CompareString_StringBuffer_SynchronizedTextBuilderCharSequence_ShouldNotDeadlock_WhenComparingOppositeDirections()
         {
             AssertExtensions.AssertNoABDeadlock(
-                () => new StringBuffer(Value),
-                () => new SynchronizedTextBuilderCharSequence(new SynchronizedTextBuilder(Value)),
+                () => CharSequenceUtil.CreateStringBuffer(Value),
+                () => CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence(Value),
                 (seq1, seq2) =>
                 {
                     Assert.AreEqual(0, Ordinal.CompareString(seq1, seq2));
@@ -304,22 +284,12 @@ namespace J2N.Globalization
 
         public static IEnumerable<TestCaseData> CompareString_ICharSequence_SynchronizedTextBuilder_TestData()
         {
-            var leftFactories = new Func<string?, object?>[]
-            {
-                CharSequenceUtil.CreateStringCharSequence,
-                CharSequenceUtil.CreateCharArrayCharSequence,
-                CharSequenceUtil.CreateStringBuilderCharSequence,
-                CharSequenceUtil.CreateMutableTextBufferCharSequence,
-                CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence,
-                CharSequenceUtil.CreateStringBuffer,
-            };
-
             var rightFactories = new Func<string?, object?>[]
             {
                 CharSequenceUtil.CreateSynchronizedTextBuilder,
             };
 
-            foreach (var leftFactory in leftFactories)
+            foreach (var leftFactory in CharSequenceUtil.ICharSequenceFactories)
             {
                 foreach (var rightFactory in rightFactories)
                 {
@@ -367,22 +337,12 @@ namespace J2N.Globalization
 
         public static IEnumerable<TestCaseData> CompareString_ICharSequence_StringBuffer_TestData()
         {
-            var leftFactories = new Func<string?, object?>[]
-            {
-                CharSequenceUtil.CreateStringCharSequence,
-                CharSequenceUtil.CreateCharArrayCharSequence,
-                CharSequenceUtil.CreateStringBuilderCharSequence,
-                CharSequenceUtil.CreateMutableTextBufferCharSequence,
-                CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence,
-                CharSequenceUtil.CreateStringBuffer,
-            };
-
             var rightFactories = new Func<string?, object?>[]
             {
                 CharSequenceUtil.CreateStringBuffer,
             };
 
-            foreach (var leftFactory in leftFactories)
+            foreach (var leftFactory in CharSequenceUtil.ICharSequenceFactories)
             {
                 foreach (var rightFactory in rightFactories)
                 {

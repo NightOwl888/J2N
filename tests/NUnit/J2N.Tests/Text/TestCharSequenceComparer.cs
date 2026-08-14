@@ -172,17 +172,7 @@ namespace J2N.Text
         {
             const string Value = "abcdefghijklmnopqrstuvwxyz";
 
-            var leftFactories = new Func<string?, object?>[]
-            {
-                CharSequenceUtil.CreateStringCharSequence,
-                CharSequenceUtil.CreateCharArrayCharSequence,
-                CharSequenceUtil.CreateStringBuilderCharSequence,
-                CharSequenceUtil.CreateMutableTextBufferCharSequence,
-                CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence,
-                CharSequenceUtil.CreateStringBuffer,
-            };
-
-            foreach (var leftFactory in leftFactories)
+            foreach (var leftFactory in CharSequenceUtil.ICharSequenceFactories)
             {
                 var sequence = CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence(Value);
                 CharSequenceUtil.AssertSynchronizesWhileReading(sequence.Value!, () => Assert.IsTrue(CharSequenceComparer.Ordinal.Equals(leftFactory(Value), sequence)));
@@ -194,17 +184,7 @@ namespace J2N.Text
         {
             const string Value = "abcdefghijklmnopqrstuvwxyz";
 
-            var leftFactories = new Func<string?, object?>[]
-            {
-                CharSequenceUtil.CreateStringCharSequence,
-                CharSequenceUtil.CreateCharArrayCharSequence,
-                CharSequenceUtil.CreateStringBuilderCharSequence,
-                CharSequenceUtil.CreateMutableTextBufferCharSequence,
-                CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence,
-                CharSequenceUtil.CreateStringBuffer,
-            };
-
-            foreach (var leftFactory in leftFactories)
+            foreach (var leftFactory in CharSequenceUtil.ICharSequenceFactories)
             {
                 var sequence = CharSequenceUtil.CreateStringBuffer(Value);
                 CharSequenceUtil.AssertSynchronizesWhileReading(sequence!, () => Assert.IsTrue(CharSequenceComparer.Ordinal.Equals(leftFactory(Value), sequence)));
@@ -216,25 +196,7 @@ namespace J2N.Text
         {
             const string Value = "abcdefghijklmnopqrstuvwxyz";
 
-            var leftFactories = new Func<string?, object?>[]
-            {
-                CharSequenceUtil.CreateStringCharSequence,
-                CharSequenceUtil.CreateCharArrayCharSequence,
-                CharSequenceUtil.CreateStringBuilderCharSequence,
-                CharSequenceUtil.CreateMutableTextBufferCharSequence,
-                CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence,
-                CharSequenceUtil.CreateStringBuffer,
-
-                CharSequenceUtil.CreateString,
-                CharSequenceUtil.CreateCharArray,
-                CharSequenceUtil.CreateStringBuilder,
-
-                CharSequenceUtil.CreateTextBuilder,
-                CharSequenceUtil.CreatePooledTextBuilder,
-                CharSequenceUtil.CreateSynchronizedTextBuilder,
-            };
-
-            foreach (var leftFactory in leftFactories)
+            foreach (var leftFactory in CharSequenceUtil.ComparableObjectFactories)
             {
                 var sequence = CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence(Value);
                 CharSequenceUtil.AssertSynchronizesWhileReading(sequence.Value!, () => Assert.IsTrue(CharSequenceComparer.Ordinal.Equals((object?)leftFactory(Value), (object?)sequence)));
@@ -246,25 +208,7 @@ namespace J2N.Text
         {
             const string Value = "abcdefghijklmnopqrstuvwxyz";
 
-            var leftFactories = new Func<string?, object?>[]
-            {
-                CharSequenceUtil.CreateStringCharSequence,
-                CharSequenceUtil.CreateCharArrayCharSequence,
-                CharSequenceUtil.CreateStringBuilderCharSequence,
-                CharSequenceUtil.CreateMutableTextBufferCharSequence,
-                CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence,
-                CharSequenceUtil.CreateStringBuffer,
-
-                CharSequenceUtil.CreateString,
-                CharSequenceUtil.CreateCharArray,
-                CharSequenceUtil.CreateStringBuilder,
-
-                CharSequenceUtil.CreateTextBuilder,
-                CharSequenceUtil.CreatePooledTextBuilder,
-                CharSequenceUtil.CreateSynchronizedTextBuilder,
-            };
-
-            foreach (var leftFactory in leftFactories)
+            foreach (var leftFactory in CharSequenceUtil.ComparableObjectFactories)
             {
                 var sequence = CharSequenceUtil.CreateSynchronizedTextBuilder(Value);
                 CharSequenceUtil.AssertSynchronizesWhileReading(sequence!, () => Assert.IsTrue(CharSequenceComparer.Ordinal.Equals((object?)leftFactory(Value), (object?)sequence)));
@@ -276,25 +220,7 @@ namespace J2N.Text
         {
             const string Value = "abcdefghijklmnopqrstuvwxyz";
 
-            var leftFactories = new Func<string?, object?>[]
-            {
-                CharSequenceUtil.CreateStringCharSequence,
-                CharSequenceUtil.CreateCharArrayCharSequence,
-                CharSequenceUtil.CreateStringBuilderCharSequence,
-                CharSequenceUtil.CreateMutableTextBufferCharSequence,
-                CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence,
-                CharSequenceUtil.CreateStringBuffer,
-
-                CharSequenceUtil.CreateString,
-                CharSequenceUtil.CreateCharArray,
-                CharSequenceUtil.CreateStringBuilder,
-
-                CharSequenceUtil.CreateTextBuilder,
-                CharSequenceUtil.CreatePooledTextBuilder,
-                CharSequenceUtil.CreateSynchronizedTextBuilder,
-            };
-
-            foreach (var leftFactory in leftFactories)
+            foreach (var leftFactory in CharSequenceUtil.ComparableObjectFactories)
             {
                 var sequence = CharSequenceUtil.CreateStringBuffer(Value);
                 CharSequenceUtil.AssertSynchronizesWhileReading(sequence!, () => Assert.IsTrue(CharSequenceComparer.Ordinal.Equals((object?)leftFactory(Value), (object?)sequence)));
@@ -303,45 +229,9 @@ namespace J2N.Text
 
         public static IEnumerable<TestCaseData> Equals_Object_Object_TestData()
         {
-            var leftFactories = new Func<string?, object?>[]
+            foreach (var leftFactory in CharSequenceUtil.ComparableObjectFactories)
             {
-                CharSequenceUtil.CreateStringCharSequence,
-                CharSequenceUtil.CreateCharArrayCharSequence,
-                CharSequenceUtil.CreateStringBuilderCharSequence,
-                CharSequenceUtil.CreateMutableTextBufferCharSequence,
-                CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence,
-                CharSequenceUtil.CreateStringBuffer,
-
-                CharSequenceUtil.CreateString,
-                CharSequenceUtil.CreateCharArray,
-                CharSequenceUtil.CreateStringBuilder,
-
-                CharSequenceUtil.CreateTextBuilder,
-                CharSequenceUtil.CreatePooledTextBuilder,
-                CharSequenceUtil.CreateSynchronizedTextBuilder,
-            };
-
-            var rightFactories = new Func<string?, object?>[]
-            {
-                CharSequenceUtil.CreateStringCharSequence,
-                CharSequenceUtil.CreateCharArrayCharSequence,
-                CharSequenceUtil.CreateStringBuilderCharSequence,
-                CharSequenceUtil.CreateMutableTextBufferCharSequence,
-                CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence,
-                CharSequenceUtil.CreateStringBuffer,
-
-                CharSequenceUtil.CreateString,
-                CharSequenceUtil.CreateCharArray,
-                CharSequenceUtil.CreateStringBuilder,
-
-                CharSequenceUtil.CreateTextBuilder,
-                CharSequenceUtil.CreatePooledTextBuilder,
-                CharSequenceUtil.CreateSynchronizedTextBuilder,
-            };
-
-            foreach (var leftFactory in leftFactories)
-            {
-                foreach (var rightFactory in rightFactories)
+                foreach (var rightFactory in CharSequenceUtil.ComparableObjectFactories)
                 {
                     foreach (var item in CharSequenceUtil.Equals_String_TestData())
                     {
@@ -393,22 +283,9 @@ namespace J2N.Text
 
         public static IEnumerable<TestCaseData> Equals_ICharSequence_ICharSequence_TestData()
         {
-            var factories = new Func<string?, object?>[]
+            foreach (var leftFactory in CharSequenceUtil.ICharSequenceFactories)
             {
-                CharSequenceUtil.CreateStringCharSequence,
-                CharSequenceUtil.CreateCharArrayCharSequence,
-                CharSequenceUtil.CreateStringBuilderCharSequence,
-                CharSequenceUtil.CreateMutableTextBufferCharSequence,
-                CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence,
-                CharSequenceUtil.CreateStringBuffer,
-
-                //CreateTextBuilderAsCharSequence,
-                //CreatePooledTextBuilderAsCharSequence,
-            };
-
-            foreach (var leftFactory in factories)
-            {
-                foreach (var rightFactory in factories)
+                foreach (var rightFactory in CharSequenceUtil.ICharSequenceFactories)
                 {
                     foreach (var item in CharSequenceUtil.Equals_String_TestData())
                     {
@@ -439,22 +316,12 @@ namespace J2N.Text
 
         public static IEnumerable<TestCaseData> Equals_ICharSequence_String_TestData()
         {
-            var leftFactories = new Func<string?, object?>[]
-            {
-                CharSequenceUtil.CreateStringCharSequence,
-                CharSequenceUtil.CreateCharArrayCharSequence,
-                CharSequenceUtil.CreateStringBuilderCharSequence,
-                CharSequenceUtil.CreateMutableTextBufferCharSequence,
-                CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence,
-                CharSequenceUtil.CreateStringBuffer,
-            };
-
             var rightFactories = new Func<string?, object?>[]
             {
                 CharSequenceUtil.CreateString,
             };
 
-            foreach (var leftFactory in leftFactories)
+            foreach (var leftFactory in CharSequenceUtil.ICharSequenceFactories)
             {
                 foreach (var rightFactory in rightFactories)
                 {
@@ -486,22 +353,12 @@ namespace J2N.Text
 
         public static IEnumerable<TestCaseData> Equals_ICharSequence_CharArray_TestData()
         {
-            var leftFactories = new Func<string?, object?>[]
-            {
-                CharSequenceUtil.CreateStringCharSequence,
-                CharSequenceUtil.CreateCharArrayCharSequence,
-                CharSequenceUtil.CreateStringBuilderCharSequence,
-                CharSequenceUtil.CreateMutableTextBufferCharSequence,
-                CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence,
-                CharSequenceUtil.CreateStringBuffer,
-            };
-
             var rightFactories = new Func<string?, object?>[]
             {
                 CharSequenceUtil.CreateCharArray,
             };
 
-            foreach (var leftFactory in leftFactories)
+            foreach (var leftFactory in CharSequenceUtil.ICharSequenceFactories)
             {
                 foreach (var rightFactory in rightFactories)
                 {
@@ -533,22 +390,12 @@ namespace J2N.Text
 
         public static IEnumerable<TestCaseData> Equals_ICharSequence_StringBuilder_TestData()
         {
-            var leftFactories = new Func<string?, object?>[]
-            {
-                CharSequenceUtil.CreateStringCharSequence,
-                CharSequenceUtil.CreateCharArrayCharSequence,
-                CharSequenceUtil.CreateStringBuilderCharSequence,
-                CharSequenceUtil.CreateMutableTextBufferCharSequence,
-                CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence,
-                CharSequenceUtil.CreateStringBuffer,
-            };
-
             var rightFactories = new Func<string?, object?>[]
             {
                 CharSequenceUtil.CreateStringBuilder,
             };
 
-            foreach (var leftFactory in leftFactories)
+            foreach (var leftFactory in CharSequenceUtil.ICharSequenceFactories)
             {
                 foreach (var rightFactory in rightFactories)
                 {
@@ -715,17 +562,7 @@ namespace J2N.Text
         {
             const string Value = "abcdefghijklmnopqrstuvwxyz";
 
-            var leftFactories = new Func<string?, object?>[]
-            {
-                CharSequenceUtil.CreateStringCharSequence,
-                CharSequenceUtil.CreateCharArrayCharSequence,
-                CharSequenceUtil.CreateStringBuilderCharSequence,
-                CharSequenceUtil.CreateMutableTextBufferCharSequence,
-                CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence,
-                CharSequenceUtil.CreateStringBuffer,
-            };
-
-            foreach (var leftFactory in leftFactories)
+            foreach (var leftFactory in CharSequenceUtil.ICharSequenceFactories)
             {
                 var sequence = CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence(Value);
                 CharSequenceUtil.AssertSynchronizesWhileReading(sequence.Value!, () => Assert.AreEqual(0, CharSequenceComparer.Ordinal.Compare(leftFactory(Value), sequence)));
@@ -737,17 +574,7 @@ namespace J2N.Text
         {
             const string Value = "abcdefghijklmnopqrstuvwxyz";
 
-            var leftFactories = new Func<string?, object?>[]
-            {
-                CharSequenceUtil.CreateStringCharSequence,
-                CharSequenceUtil.CreateCharArrayCharSequence,
-                CharSequenceUtil.CreateStringBuilderCharSequence,
-                CharSequenceUtil.CreateMutableTextBufferCharSequence,
-                CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence,
-                CharSequenceUtil.CreateStringBuffer,
-            };
-
-            foreach (var leftFactory in leftFactories)
+            foreach (var leftFactory in CharSequenceUtil.ICharSequenceFactories)
             {
                 var sequence = CharSequenceUtil.CreateStringBuffer(Value);
                 CharSequenceUtil.AssertSynchronizesWhileReading(sequence!, () => Assert.AreEqual(0, CharSequenceComparer.Ordinal.Compare(leftFactory(Value), sequence)));
@@ -759,25 +586,7 @@ namespace J2N.Text
         {
             const string Value = "abcdefghijklmnopqrstuvwxyz";
 
-            var leftFactories = new Func<string?, object?>[]
-            {
-                CharSequenceUtil.CreateStringCharSequence,
-                CharSequenceUtil.CreateCharArrayCharSequence,
-                CharSequenceUtil.CreateStringBuilderCharSequence,
-                CharSequenceUtil.CreateMutableTextBufferCharSequence,
-                CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence,
-                CharSequenceUtil.CreateStringBuffer,
-
-                CharSequenceUtil.CreateString,
-                CharSequenceUtil.CreateCharArray,
-                CharSequenceUtil.CreateStringBuilder,
-
-                CharSequenceUtil.CreateTextBuilder,
-                CharSequenceUtil.CreatePooledTextBuilder,
-                CharSequenceUtil.CreateSynchronizedTextBuilder,
-            };
-
-            foreach (var leftFactory in leftFactories)
+            foreach (var leftFactory in CharSequenceUtil.ComparableObjectFactories)
             {
                 var sequence = CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence(Value);
                 CharSequenceUtil.AssertSynchronizesWhileReading(sequence.Value!, () => Assert.AreEqual(0, CharSequenceComparer.Ordinal.Compare((object?)leftFactory(Value), (object?)sequence)));
@@ -789,25 +598,7 @@ namespace J2N.Text
         {
             const string Value = "abcdefghijklmnopqrstuvwxyz";
 
-            var leftFactories = new Func<string?, object?>[]
-            {
-                CharSequenceUtil.CreateStringCharSequence,
-                CharSequenceUtil.CreateCharArrayCharSequence,
-                CharSequenceUtil.CreateStringBuilderCharSequence,
-                CharSequenceUtil.CreateMutableTextBufferCharSequence,
-                CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence,
-                CharSequenceUtil.CreateStringBuffer,
-
-                CharSequenceUtil.CreateString,
-                CharSequenceUtil.CreateCharArray,
-                CharSequenceUtil.CreateStringBuilder,
-
-                CharSequenceUtil.CreateTextBuilder,
-                CharSequenceUtil.CreatePooledTextBuilder,
-                CharSequenceUtil.CreateSynchronizedTextBuilder,
-            };
-
-            foreach (var leftFactory in leftFactories)
+            foreach (var leftFactory in CharSequenceUtil.ComparableObjectFactories)
             {
                 var sequence = CharSequenceUtil.CreateSynchronizedTextBuilder(Value);
                 CharSequenceUtil.AssertSynchronizesWhileReading(sequence!, () => Assert.AreEqual(0, CharSequenceComparer.Ordinal.Compare((object?)leftFactory(Value), (object?)sequence)));
@@ -819,25 +610,7 @@ namespace J2N.Text
         {
             const string Value = "abcdefghijklmnopqrstuvwxyz";
 
-            var leftFactories = new Func<string?, object?>[]
-            {
-                CharSequenceUtil.CreateStringCharSequence,
-                CharSequenceUtil.CreateCharArrayCharSequence,
-                CharSequenceUtil.CreateStringBuilderCharSequence,
-                CharSequenceUtil.CreateMutableTextBufferCharSequence,
-                CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence,
-                CharSequenceUtil.CreateStringBuffer,
-
-                CharSequenceUtil.CreateString,
-                CharSequenceUtil.CreateCharArray,
-                CharSequenceUtil.CreateStringBuilder,
-
-                CharSequenceUtil.CreateTextBuilder,
-                CharSequenceUtil.CreatePooledTextBuilder,
-                CharSequenceUtil.CreateSynchronizedTextBuilder,
-            };
-
-            foreach (var leftFactory in leftFactories)
+            foreach (var leftFactory in CharSequenceUtil.ComparableObjectFactories)
             {
                 var sequence = CharSequenceUtil.CreateStringBuffer(Value);
                 CharSequenceUtil.AssertSynchronizesWhileReading(sequence!, () => Assert.AreEqual(0, CharSequenceComparer.Ordinal.Compare((object?)leftFactory(Value), (object?)sequence)));
@@ -848,45 +621,9 @@ namespace J2N.Text
 
         public static IEnumerable<TestCaseData> Compare_Object_Object_TestData()
         {
-            var leftFactories = new Func<string?, object?>[]
+            foreach (var leftFactory in CharSequenceUtil.ComparableObjectFactories)
             {
-                CharSequenceUtil.CreateStringCharSequence,
-                CharSequenceUtil.CreateCharArrayCharSequence,
-                CharSequenceUtil.CreateStringBuilderCharSequence,
-                CharSequenceUtil.CreateMutableTextBufferCharSequence,
-                CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence,
-                CharSequenceUtil.CreateStringBuffer,
-
-                CharSequenceUtil.CreateString,
-                CharSequenceUtil.CreateCharArray,
-                CharSequenceUtil.CreateStringBuilder,
-
-                CharSequenceUtil.CreateTextBuilder,
-                CharSequenceUtil.CreatePooledTextBuilder,
-                CharSequenceUtil.CreateSynchronizedTextBuilder,
-            };
-
-            var rightFactories = new Func<string?, object?>[]
-            {
-                CharSequenceUtil.CreateStringCharSequence,
-                CharSequenceUtil.CreateCharArrayCharSequence,
-                CharSequenceUtil.CreateStringBuilderCharSequence,
-                CharSequenceUtil.CreateMutableTextBufferCharSequence,
-                CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence,
-                CharSequenceUtil.CreateStringBuffer,
-
-                CharSequenceUtil.CreateString,
-                CharSequenceUtil.CreateCharArray,
-                CharSequenceUtil.CreateStringBuilder,
-
-                CharSequenceUtil.CreateTextBuilder,
-                CharSequenceUtil.CreatePooledTextBuilder,
-                CharSequenceUtil.CreateSynchronizedTextBuilder,
-            };
-
-            foreach (var leftFactory in leftFactories)
-            {
-                foreach (var rightFactory in rightFactories)
+                foreach (var rightFactory in CharSequenceUtil.ComparableObjectFactories)
                 {
                     foreach (var item in CharSequenceUtil.CompareTo_String_TestData())
                     {
@@ -958,25 +695,7 @@ namespace J2N.Text
         {
             const string Value = "abcdefghijklmnopqrstuvwxyz";
 
-            var factories = new Func<string?, object?>[]
-            {
-                CharSequenceUtil.CreateStringCharSequence,
-                CharSequenceUtil.CreateCharArrayCharSequence,
-                CharSequenceUtil.CreateStringBuilderCharSequence,
-                CharSequenceUtil.CreateMutableTextBufferCharSequence,
-                CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence,
-                CharSequenceUtil.CreateStringBuffer,
-
-                CharSequenceUtil.CreateString,
-                CharSequenceUtil.CreateCharArray,
-                CharSequenceUtil.CreateStringBuilder,
-
-                CharSequenceUtil.CreateTextBuilder,
-                CharSequenceUtil.CreatePooledTextBuilder,
-                CharSequenceUtil.CreateSynchronizedTextBuilder,
-            };
-
-            foreach (var factory in factories)
+            foreach (var factory in CharSequenceUtil.ComparableObjectFactories)
             {
                 var leftArg = factory(Value);
                 var rightArg = CharSequenceUtil.CreateInvalidCharSequenceObject(Value);
@@ -985,7 +704,7 @@ namespace J2N.Text
                     .FormatArguments(leftArg, rightArg);
             }
 
-            foreach (var factory in factories)
+            foreach (var factory in CharSequenceUtil.ComparableObjectFactories)
             {
                 var leftArg = CharSequenceUtil.CreateInvalidCharSequenceObject(Value);
                 var rightArg = factory(Value);
@@ -1013,22 +732,9 @@ namespace J2N.Text
 
         public static IEnumerable<TestCaseData> Compare_ICharSequence_ICharSequence_TestData()
         {
-            var factories = new Func<string?, object?>[]
+            foreach (var leftFactory in CharSequenceUtil.ICharSequenceFactories)
             {
-                CharSequenceUtil.CreateStringCharSequence,
-                CharSequenceUtil.CreateCharArrayCharSequence,
-                CharSequenceUtil.CreateStringBuilderCharSequence,
-                CharSequenceUtil.CreateMutableTextBufferCharSequence,
-                CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence,
-                CharSequenceUtil.CreateStringBuffer,
-
-                //CreateTextBuilderAsCharSequence,
-                //CreatePooledTextBuilderAsCharSequence,
-            };
-
-            foreach (var leftFactory in factories)
-            {
-                foreach (var rightFactory in factories)
+                foreach (var rightFactory in CharSequenceUtil.ICharSequenceFactories)
                 {
                     foreach (var item in CharSequenceUtil.CompareTo_String_TestData())
                     {
@@ -1092,22 +798,12 @@ namespace J2N.Text
 
         public static IEnumerable<TestCaseData> Compare_ICharSequence_String_TestData()
         {
-            var leftFactories = new Func<string?, object?>[]
-            {
-                CharSequenceUtil.CreateStringCharSequence,
-                CharSequenceUtil.CreateCharArrayCharSequence,
-                CharSequenceUtil.CreateStringBuilderCharSequence,
-                CharSequenceUtil.CreateMutableTextBufferCharSequence,
-                CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence,
-                CharSequenceUtil.CreateStringBuffer,
-            };
-
             var rightFactories = new Func<string?, object?>[]
             {
                 CharSequenceUtil.CreateString,
             };
 
-            foreach (var leftFactory in leftFactories)
+            foreach (var leftFactory in CharSequenceUtil.ICharSequenceFactories)
             {
                 foreach (var rightFactory in rightFactories)
                 {
@@ -1139,22 +835,12 @@ namespace J2N.Text
 
         public static IEnumerable<TestCaseData> Compare_ICharSequence_CharArray_TestData()
         {
-            var leftFactories = new Func<string?, object?>[]
-            {
-                CharSequenceUtil.CreateStringCharSequence,
-                CharSequenceUtil.CreateCharArrayCharSequence,
-                CharSequenceUtil.CreateStringBuilderCharSequence,
-                CharSequenceUtil.CreateMutableTextBufferCharSequence,
-                CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence,
-                CharSequenceUtil.CreateStringBuffer,
-            };
-
             var rightFactories = new Func<string?, object?>[]
             {
                 CharSequenceUtil.CreateCharArray,
             };
 
-            foreach (var leftFactory in leftFactories)
+            foreach (var leftFactory in CharSequenceUtil.ICharSequenceFactories)
             {
                 foreach (var rightFactory in rightFactories)
                 {
@@ -1186,22 +872,12 @@ namespace J2N.Text
 
         public static IEnumerable<TestCaseData> Compare_ICharSequence_StringBuilder_TestData()
         {
-            var leftFactories = new Func<string?, object?>[]
-            {
-                CharSequenceUtil.CreateStringCharSequence,
-                CharSequenceUtil.CreateCharArrayCharSequence,
-                CharSequenceUtil.CreateStringBuilderCharSequence,
-                CharSequenceUtil.CreateMutableTextBufferCharSequence,
-                CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence,
-                CharSequenceUtil.CreateStringBuffer,
-            };
-
             var rightFactories = new Func<string?, object?>[]
             {
                 CharSequenceUtil.CreateStringBuilder,
             };
 
-            foreach (var leftFactory in leftFactories)
+            foreach (var leftFactory in CharSequenceUtil.ICharSequenceFactories)
             {
                 foreach (var rightFactory in rightFactories)
                 {
@@ -1292,25 +968,7 @@ namespace J2N.Text
 
         public static IEnumerable<TestCaseData> GetHashCode_Object_TestData()
         {
-            var factories = new Func<string?, object?>[]
-            {
-                CharSequenceUtil.CreateStringCharSequence,
-                CharSequenceUtil.CreateCharArrayCharSequence,
-                CharSequenceUtil.CreateStringBuilderCharSequence,
-                CharSequenceUtil.CreateMutableTextBufferCharSequence,
-                CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence,
-                CharSequenceUtil.CreateStringBuffer,
-
-                CharSequenceUtil.CreateString,
-                CharSequenceUtil.CreateCharArray,
-                CharSequenceUtil.CreateStringBuilder,
-
-                CharSequenceUtil.CreateTextBuilder,
-                CharSequenceUtil.CreatePooledTextBuilder,
-                CharSequenceUtil.CreateSynchronizedTextBuilder,
-            };
-
-            foreach (var leftFactory in factories)
+            foreach (var leftFactory in CharSequenceUtil.ComparableObjectFactories)
             {
                 foreach (var item in CharSequenceUtil.GetHashCode_String_TestData())
                 {
@@ -1338,17 +996,7 @@ namespace J2N.Text
 
         public static IEnumerable<TestCaseData> GetHashCode_ICharSequence_TestData()
         {
-            var factories = new Func<string?, object?>[]
-            {
-                CharSequenceUtil.CreateStringCharSequence,
-                CharSequenceUtil.CreateCharArrayCharSequence,
-                CharSequenceUtil.CreateStringBuilderCharSequence,
-                CharSequenceUtil.CreateMutableTextBufferCharSequence,
-                CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence,
-                CharSequenceUtil.CreateStringBuffer,
-            };
-
-            foreach (var leftFactory in factories)
+            foreach (var leftFactory in CharSequenceUtil.ICharSequenceFactories)
             {
                 foreach (var item in CharSequenceUtil.GetHashCode_String_TestData())
                 {
