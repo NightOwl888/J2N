@@ -88,10 +88,15 @@ namespace J2N.Text
                     return Compare(sa, otherStringBuffer.builder);
             }
 
+#if FEATURE_BROKEN_CHARSEQENCE_EXCEPTION_HANDLING
             if (x is IComparable comparable)
                 return comparable.CompareTo(y);
 
             throw new ArgumentException($"Argument '{nameof(x)}' must implement IComparable");
+#else
+            ThrowHelper.ThrowArgumentException(ExceptionResource.NotSupported_StringComparison);
+            return 0; // unreachable
+#endif
         }
 
         /// <summary>
@@ -318,7 +323,14 @@ namespace J2N.Text
                 else if (y is StringBuffer otherStringBuffer)
                     return Equals(sa, otherStringBuffer.builder);
             }
+
+#if FEATURE_BROKEN_CHARSEQENCE_EXCEPTION_HANDLING
             return x.Equals(y);
+#else
+            ThrowHelper.ThrowArgumentException(ExceptionResource.NotSupported_StringComparison);
+            return false; // unreachable
+#endif
+
         }
 
         /// <summary>
@@ -387,7 +399,12 @@ namespace J2N.Text
             else if (obj is StringBuffer otherStringBuffer)
                 return GetHashCode(otherStringBuffer.builder);
 
+#if FEATURE_BROKEN_CHARSEQENCE_EXCEPTION_HANDLING
             return obj.GetHashCode();
+#else
+            ThrowHelper.ThrowArgumentException(ExceptionResource.NotSupported_StringComparison);
+            return 0; // unreachable
+#endif
         }
 
         /// <summary>
@@ -427,24 +444,461 @@ namespace J2N.Text
         {
             private const int CharStackBufferSize = 64;
 
+
+            public override int Compare(object? x, object? y)
+            {
+                if (x == y) return 0;
+#if FEATURE_BROKEN_NULL_CHARSEQUENCE_COMPARISON
+                if (x == null) return -1;
+                if (y == null) return 1;
+#endif
+
+                if (x is SynchronizedTextBuilder stb1)
+                    return Compare(stb1, y, ExceptionArgument.y);
+                if (y is SynchronizedTextBuilder stb2)
+                    return Compare(x, stb2, ExceptionArgument.x);
+
+#if FEATURE_BROKEN_NULL_CHARSEQUENCE_COMPARISON
+                if (x is SynchronizedTextBuilderCharSequence stbcs1)
+                    return Compare(stbcs1, y, ExceptionArgument.y);
+                if (y is SynchronizedTextBuilderCharSequence stbcs2)
+                    return Compare(x, stbcs2, ExceptionArgument.x);
+#else
+                if (x is SynchronizedTextBuilderCharSequence stbcs1)
+                    return Compare(stbcs1.Value, y, ExceptionArgument.y);
+                if (y is SynchronizedTextBuilderCharSequence stbcs2)
+                    return Compare(x, stbcs2.Value, ExceptionArgument.x);
+#endif
+
+                if (x is StringBuffer sbuf1)
+                    return Compare(sbuf1, y, ExceptionArgument.y);
+                if (y is StringBuffer sbuf2)
+                    return Compare(x, sbuf2, ExceptionArgument.x);
+
+                if (x is ICharSequence cs1)
+                {
+#if !FEATURE_BROKEN_NULL_CHARSEQUENCE_COMPARISON
+                    if (y is null)
+                    {
+                        return !cs1.HasValue ? 0 : 1;
+                    }
+#endif
+
+                    if (y is ISpannable<char> otherSpannable)
+                    {
+#if FEATURE_BROKEN_NULL_CHARSEQUENCE_COMPARISON
+                        if (!cs1.HasValue) return otherSpannable.HasValue ? 0 : -1;
+                        if (!otherSpannable.HasValue) return 1;
+#else
+                        if (!cs1.HasValue) return !otherSpannable.HasValue ? 0 : -1;
+                        if (!otherSpannable.HasValue) return 1;
+#endif
+
+                        return Compare(cs1, otherSpannable.AsSpan());
+                    }
+
+                    if (y is ICharSequence otherCharSequence)
+                        return Compare(cs1, otherCharSequence);
+                    else if (y is string otherString)
+                        return Compare(cs1, otherString);
+                    else if (y is StringBuilder otherStringBuilder)
+                        return Compare(cs1, otherStringBuilder);
+                    else if (y is char[] otherCharArray)
+                        return Compare(cs1, otherCharArray);
+                }
+
+                if (y is ICharSequence cs2)
+                {
+#if !FEATURE_BROKEN_NULL_CHARSEQUENCE_COMPARISON
+                    if (x is null)
+                    {
+                        return !cs2.HasValue ? 0 : -1;
+                    }
+#endif
+
+                    if (x is ISpannable<char> otherSpannable)
+                    {
+#if FEATURE_BROKEN_NULL_CHARSEQUENCE_COMPARISON
+                        if (!otherSpannable.HasValue) return cs2.HasValue ? 0 : -1;
+                        if (!cs2.HasValue) return 1;
+#else
+                        if (!otherSpannable.HasValue) return !cs2.HasValue ? 0 : -1;
+                        if (!cs2.HasValue) return 1;
+#endif
+
+                        return Compare(otherSpannable.AsSpan(), cs2);
+                    }
+                    // x is ICharSequence tried above
+
+                    if (x is string otherString)
+                        return Compare(otherString, cs2);
+                    else if (x is StringBuilder otherStringBuilder)
+                        return J2N.Globalization.Ordinal.CompareString(otherStringBuilder, cs2);
+                    else if (x is char[] otherCharArray)
+                        return Compare(otherCharArray, cs2);
+                }
+
+                if (x is ISpannable<char> spannable1)
+                {
+                    if (y is null)
+                    {
+                        return !spannable1.HasValue ? 0 : 1;
+                    }
+
+                    if (y is ISpannable<char> yspannable2)
+                    {
+                        if (!spannable1.HasValue) return !yspannable2.HasValue ? 0 : -1;
+                        if (!yspannable2.HasValue) return 1;
+
+                        return spannable1.AsSpan().SequenceCompareTo(yspannable2.AsSpan());
+                    }
+
+                    if (!spannable1.HasValue) return -1; // y cannot be null here
+                    if (y is string ys2)
+                        return spannable1.AsSpan().SequenceCompareTo(ys2);
+                    if (y is char[] yca2)
+                        return spannable1.AsSpan().SequenceCompareTo(yca2);
+                    if (y is StringBuilder ysb2)
+                        return J2N.Globalization.Ordinal.CompareString(spannable1.AsSpan(), ysb2);
+                }
+                if (y is ISpannable<char> spannable2)
+                {
+                    if (x is null) return !spannable2.HasValue ? 0 : -1;
+                    if (!spannable2.HasValue) return 1;
+                    // x is ISpannable<char> tried above
+                    if (x is string xs1)
+                        return xs1.AsSpan().SequenceCompareTo(spannable2.AsSpan());
+                    if (x is char[] xca1)
+                        return xca1.AsSpan().SequenceCompareTo(spannable2.AsSpan());
+                    if (x is StringBuilder xsb1)
+                        return J2N.Globalization.Ordinal.CompareString(xsb1, spannable2.AsSpan());
+                }
+
+                if (x is string s1)
+                {
+                    if (y is null) return 1;
+                    if (y is string ys2)
+                        return s1.AsSpan().SequenceCompareTo(ys2);
+                    if (y is char[] yca2)
+                        return s1.AsSpan().SequenceCompareTo(yca2);
+                    if (y is StringBuilder ysb2)
+                        return J2N.Globalization.Ordinal.CompareString(s1, ysb2);
+                }
+                if (y is string s2)
+                {
+                    if (x is null) return -1;
+                    // x is string tried above
+                    if (x is char[] xca2)
+                        return xca2.AsSpan().SequenceCompareTo(s2);
+                    if (x is StringBuilder xsb2)
+                        return J2N.Globalization.Ordinal.CompareString(xsb2, s2);
+                }
+
+                if (x is char[] ca1)
+                {
+                    if (y is null) return 1;
+                    // y is string tried above
+                    if (y is char[] yca2)
+                        return ca1.AsSpan().SequenceCompareTo(yca2);
+                    if (y is StringBuilder ysb2)
+                        return J2N.Globalization.Ordinal.CompareString(ca1, ysb2);
+                }
+                if (y is char[] ca2)
+                {
+                    if (x is null) return -1;
+                    // x is string tried above
+                    // x is char[] tried above
+                    if (x is StringBuilder xsb2)
+                        return J2N.Globalization.Ordinal.CompareString(xsb2, ca2);
+                }
+
+                if (x is StringBuilder sb1)
+                {
+                    if (y is null) return 1;
+                    // y is string tried above
+                    // y is char[] tried above
+                    if (y is StringBuilder ysb2)
+                        return J2N.Globalization.Ordinal.CompareString(sb1, ysb2);
+                }
+                if (y is StringBuilder sb2)
+                {
+                    if (x is null) return -1;
+                    // x is string tried above
+                    // x is char[] tried above
+                    // x is StringBuilder tried above
+                }
+
+#if FEATURE_BROKEN_CHARSEQENCE_EXCEPTION_HANDLING
+                if (x is IComparable comparable)
+                    return comparable.CompareTo(y);
+
+                throw new ArgumentException($"Argument '{nameof(x)}' must implement IComparable");
+#else
+                ThrowHelper.ThrowArgumentException(ExceptionResource.NotSupported_StringComparison);
+                return 0; // unreachable
+#endif
+            }
+
+#if FEATURE_BROKEN_NULL_CHARSEQUENCE_COMPARISON
+            private int Compare(SynchronizedTextBuilderCharSequence? x, object? y, ExceptionArgument exceptionArgument)
+            {
+                if (x == y) return 0;
+
+                if (x is null || !x.HasValue)
+                {
+                    if (y is null)
+                        return 0;
+
+                    if (y is ICharSequence cs)
+                        return cs.HasValue ? 0 : -1;
+
+                    if (y is ISpannable<char> spannable)
+                        return spannable.HasValue ? 0 : -1;
+
+                    // For non-ICharSequence/non-ISpannable types, preserve
+                    // the historical object-comparison behavior.
+                }
+
+
+                return Compare(x?.Value, y, exceptionArgument);
+            }
+
+            private int Compare(object? x, SynchronizedTextBuilderCharSequence? y, ExceptionArgument exceptionArgument)
+            {
+                if (x == y) return 0;
+
+                if (x is null)
+                    return y is null || y.HasValue ? 0 : -1;
+
+                if (x is ICharSequence xCharSequence)
+                {
+                    if (!xCharSequence.HasValue) return y is null || y.HasValue ? 0 : -1;
+                    if (y is null || !y.HasValue) return 1;
+                }
+
+                if (x is ISpannable<char> xSpannable)
+                {
+                    if (!xSpannable.HasValue) return y is null || y.HasValue ? 0 : -1;
+                    if (y is null || !y.HasValue) return 1;
+                }
+
+                return Compare(x, y?.Value, exceptionArgument);
+            }
+#endif
+
+
+            private int Compare(SynchronizedTextBuilder? x, object? y, ExceptionArgument exceptionArgument)
+            {
+                if (x == y) return 0;
+                if (x is not null && y is null) return 1;
+
+                if (y is SynchronizedTextBuilder stb)
+                {
+#if FEATURE_BROKEN_NULL_CHARSEQUENCE_COMPARISON
+                    if (x is null) return -1;
+#endif
+                    return J2N.Globalization.Ordinal.CompareString(x, stb);
+                }
+                if (y is ICharSequence cs)
+                {
+#if FEATURE_BROKEN_NULL_CHARSEQUENCE_COMPARISON
+                    if (x is null) return cs.HasValue ? 0 : -1;
+                    if (!cs.HasValue) return 1;
+#endif
+                    return J2N.Globalization.Ordinal.CompareString(x, cs);
+                }
+                if (y is ISpannable<char> spannable)
+                {
+                    if (x is null) return !spannable.HasValue ? 0 : -1;
+                    if (!spannable.HasValue) return 1;
+
+                    lock (x.SyncRoot)
+                        return x.AsSpan().SequenceCompareTo(spannable.AsSpan());
+                }
+                if (y is string s)
+                {
+                    if (x is null) return -1;
+
+                    lock (x.SyncRoot)
+                        return x.AsSpan().SequenceCompareTo(s);
+                }
+                if (y is char[] charArray)
+                {
+                    if (x is null) return -1;
+
+                    lock (x.SyncRoot)
+                        return x.AsSpan().SequenceCompareTo(charArray);
+                }
+                if (y is StringBuilder sb)
+                {
+                    if (x is null) return -1;
+
+                    lock (x.SyncRoot)
+                        return J2N.Globalization.Ordinal.CompareString(x.AsSpan(), sb);
+                }
+
+                ThrowHelper.ThrowArgumentException(ExceptionResource.NotSupported_StringComparison, exceptionArgument);
+                return 0; // Unreachable
+            }
+
+            private int Compare(object? x, SynchronizedTextBuilder? y, ExceptionArgument exceptionArgument)
+#if FEATURE_BROKEN_NULL_CHARSEQUENCE_COMPARISON
+            {
+                if (x is ICharSequence xCharSequence && !xCharSequence.HasValue)
+                    return y is null || y.Length == 0 ? 0 : -1;
+
+                if (x is ISpannable<char> xSpannable && !xSpannable.HasValue)
+                    return y is null || y.Length == 0 ? 0 : -1;
+
+                return Compare(y, x, exceptionArgument) * -1;
+            }
+#else
+                => Compare(y, x, exceptionArgument) * -1;
+#endif
+
+            private int Compare(StringBuffer? x, object? y, ExceptionArgument exceptionArgument)
+            {
+                if (x == y) return 0;
+                if (x is not null && y is null) return 1;
+
+                if (y is SynchronizedTextBuilder stb)
+                    return J2N.Globalization.Ordinal.CompareString(x, stb);
+                if (y is ICharSequence cs)
+                {
+#if FEATURE_BROKEN_NULL_CHARSEQUENCE_COMPARISON
+                    if (x is null) return cs.HasValue ? 0 : -1;
+                    if (!cs.HasValue) return 1;
+#endif
+                    return J2N.Globalization.Ordinal.CompareString(x, cs);
+                }
+                if (y is ISpannable<char> spannable)
+                {
+                    if (x is null) return !spannable.HasValue ? 0 : -1;
+                    if (!spannable.HasValue) return -1;
+
+                    lock (x.SyncRoot)
+                        return J2N.Globalization.Ordinal.CompareString(x.builder, spannable.AsSpan());
+                }
+                if (y is string s)
+                {
+                    if (x is null) return -1;
+
+                    lock (x.SyncRoot)
+                        return J2N.Globalization.Ordinal.CompareString(x.builder, s);
+                }
+                if (y is char[] charArray)
+                {
+                    if (x is null) return -1;
+
+                    lock (x.SyncRoot)
+                        return J2N.Globalization.Ordinal.CompareString(x.builder, charArray);
+                }
+                if (y is StringBuilder sb)
+                {
+                    if (x is null) return -1;
+
+                    lock (x.SyncRoot)
+                        return J2N.Globalization.Ordinal.CompareString(x.builder, sb);
+                }
+
+                ThrowHelper.ThrowArgumentException(ExceptionResource.NotSupported_StringComparison, exceptionArgument);
+                return 0; // Unreachable
+            }
+
+            private int Compare(object? x, StringBuffer? y, ExceptionArgument exceptionArgument)
+#if FEATURE_BROKEN_NULL_CHARSEQUENCE_COMPARISON
+            {
+                if (x is ICharSequence xCharSequence && !xCharSequence.HasValue)
+                    return y is null || ((ICharSequence)y).HasValue ? 0 : -1;
+
+                if (x is ISpannable<char> xSpannable && !xSpannable.HasValue)
+                    return y is null || ((ICharSequence)y).HasValue ? 0 : -1;
+
+                return Compare(y, x, exceptionArgument) * -1;
+            }
+#else
+                => Compare(y, x, exceptionArgument) * -1;
+#endif
+
+            private int Compare(ICharSequence? x, ReadOnlySpan<char> y)
+            {
+                if (x is null || !x.HasValue) return -1;
+
+                if (x is ISpannable<char> spannable)
+                {
+                    return spannable.AsSpan().SequenceCompareTo(y);
+                }
+                if (x is StringBuilderCharSequence sb)
+                {
+                    return J2N.Globalization.Ordinal.CompareString(sb.Value, y);
+                }
+                if (x is SynchronizedTextBuilderCharSequence stb)
+                {
+                    lock (stb.SyncRoot)
+                    {
+                        return stb.Value.AsSpan().SequenceCompareTo(y);
+                    }
+                }
+                if (x is StringBuffer stringBuffer)
+                {
+                    lock (stringBuffer.SyncRoot)
+                    {
+                        return J2N.Globalization.Ordinal.CompareString(stringBuffer.builder, y);
+                    }
+                }
+
+                int result;
+                int count = Math.Min(x.Length, y.Length);
+                for (int i = 0; i < count; i++)
+                {
+                    if ((result = x[i] - y[i]) != 0)
+                        return result;
+                }
+
+                // At this point, we have compared all the characters in at least one string.
+                // The longer string will be larger.
+                return x.Length - y.Length;
+            }
+
+            private int Compare(ReadOnlySpan<char> x, ICharSequence? y)
+                => Compare(y, x) * -1;
+
+
+
+
             public override int Compare(ICharSequence? x, ICharSequence? y)
             {
+                if (x == y) return 0;
+#if FEATURE_BROKEN_NULL_CHARSEQUENCE_COMPARISON
                 if (x is null || !x.HasValue) return (y is null || y.HasValue) ? 0 : -1;
                 if (y is null || !y.HasValue) return 1;
+#else
+                if (x is null || !x.HasValue) return (y is null || !y.HasValue) ? 0 : -1;
+                if (y is null || !y.HasValue) return 1;
+#endif
+                if (x is SynchronizedTextBuilderCharSequence stbcs1)
+                    return J2N.Globalization.Ordinal.CompareString(stbcs1.Value, y);
+                if (x is StringBuffer sbuf1)
+                    return J2N.Globalization.Ordinal.CompareString(sbuf1, y);
+                if (y is SynchronizedTextBuilderCharSequence stbcs2)
+                    return J2N.Globalization.Ordinal.CompareString(x, stbcs2.Value);
+                if (y is StringBuffer sbuf2)
+                    return J2N.Globalization.Ordinal.CompareString(x, sbuf2);
 
-                if (x is StringBuilderCharSequence stringBuilder)
-                    return Compare(stringBuilder.Value, y);
-                if (x is StringBuffer stringBuffer)
-                    return Compare(stringBuffer.builder, y);
-
-                if (y is StringCharSequence yString)
-                    return Compare(x, yString.Value);
-                if (y is CharArrayCharSequence yCharArray)
-                    return Compare(x, yCharArray.Value);
-                if (y is StringBuilderCharSequence yStringBuilder)
-                    return Compare(x, yStringBuilder.Value);
-                if (y is StringBuffer yStringBuffer)
-                    return Compare(x, yStringBuffer.builder);
+                if (x is StringBuilderCharSequence sbcs1)
+                {
+#if FEATURE_BROKEN_NULL_CHARSEQUENCE_COMPARISON
+                    if (x is null) return (y is null || y.HasValue) ? 0 : -1;
+                    if (y is null || !y.HasValue) return 1;
+#endif
+                    return J2N.Globalization.Ordinal.CompareString(sbcs1.Value, y);
+                }
+                if (y is StringBuilderCharSequence sbcs2)
+                    return Compare(x, sbcs2.Value);
+                if (x is ISpannable<char> spannable1)
+                    return Compare(spannable1.AsSpan(), y);
+                if (y is ISpannable<char> spannable2)
+                    return Compare(x, spannable2.AsSpan());
 
                 int length = Math.Min(x.Length, y.Length);
                 int result;
@@ -457,50 +911,6 @@ namespace J2N.Text
                 // At this point, we have compared all the characters in at least one string.
                 // The longer string will be larger.
                 return x.Length - y.Length;
-            }
-
-            private int Compare(StringBuilder? x, ICharSequence? y)
-            {
-                if (x is null) return (y is null || y.HasValue) ? 0 : -1;
-                if (y is null || !y.HasValue) return 1;
-
-                if (y is StringCharSequence yString)
-                    return Compare(x, yString.Value);
-                if (y is CharArrayCharSequence yCharArray)
-                    return Compare(x, yCharArray.Value);
-                if (y is StringBuilderCharSequence yStringBuilder)
-                    return Compare(x, yStringBuilder.Value);
-                if (y is StringBuffer yStringBuffer)
-                    return Compare(x, yStringBuffer.builder);
-
-                int length = Math.Min(x.Length, y.Length);
-                char[]? xArrayToReturnToPool = null;
-                try
-                {
-#if FEATURE_STRINGBUILDER_COPYTO_SPAN // If this method isn't supported, we are buffering to an array pool to get to the stack, anyway.
-                    Span<char> xChars = length > CharStackBufferSize
-                        ? (xArrayToReturnToPool = ArrayPool<char>.Shared.Rent(length))
-                        : stackalloc char[length];
-                    x.CopyTo(0, xChars, length);
-#else
-                    Span<char> xChars = xArrayToReturnToPool = ArrayPool<char>.Shared.Rent(length);
-                    x.CopyTo(0, xArrayToReturnToPool, 0, length);
-#endif
-                    int result;
-                    for (int i = 0; i < length; i++)
-                    {
-                        if ((result = xChars[i] - y[i]) != 0)
-                            return result;
-                    }
-
-                    // At this point, we have compared all the characters in at least one string.
-                    // The longer string will be larger.
-                    return x.Length - y.Length;
-                }
-                finally
-                {
-                    ArrayPool<char>.Shared.ReturnIfNotNull(xArrayToReturnToPool);
-                }
             }
 
             public override int Compare(ICharSequence? x, char[]? y)
@@ -508,57 +918,7 @@ namespace J2N.Text
                 if (x is null || !x.HasValue) return (y is null) ? 0 : -1;
                 if (y is null) return 1;
 
-                if (x is StringBuilderCharSequence stringBuilder)
-                    return Compare(stringBuilder.Value, y);
-                if (x is StringBuffer stringBuffer)
-                    return Compare(stringBuffer.builder, y);
-
-                int length = Math.Min(x.Length, y.Length);
-                int result;
-                for (int i = 0; i < length; i++)
-                {
-                    if ((result = x[i] - y[i]) != 0)
-                        return result;
-                }
-
-                // At this point, we have compared all the characters in at least one string.
-                // The longer string will be larger.
-                return x.Length - y.Length;
-            }
-
-            private int Compare(StringBuilder? x, char[]? y)
-            {
-                if (x is null) return (y is null) ? 0 : -1;
-                if (y is null) return 1;
-
-                int length = Math.Min(x.Length, y.Length);
-                char[]? xArrayToReturnToPool = null;
-                try
-                {
-#if FEATURE_STRINGBUILDER_COPYTO_SPAN // If this method isn't supported, we are buffering to an array pool to get to the stack, anyway.
-                    Span<char> xChars = length > CharStackBufferSize
-                        ? (xArrayToReturnToPool = ArrayPool<char>.Shared.Rent(length))
-                        : stackalloc char[length];
-                    x.CopyTo(0, xChars, length);
-#else
-                    Span<char> xChars = xArrayToReturnToPool = ArrayPool<char>.Shared.Rent(length);
-                    x.CopyTo(0, xArrayToReturnToPool, 0, length);
-#endif
-                    int result;
-                    for (int i = 0; i < length; i++)
-                    {
-                        if ((result = xChars[i] - y[i]) != 0)
-                            return result;
-                    }
-
-                    // At this point, we have compared all the characters in at least one string.
-                    // The longer string will be larger.
-                    return x.Length - y.Length;
-                }
-                finally
-                {
-                    ArrayPool<char>.Shared.ReturnIfNotNull(xArrayToReturnToPool);
-                }
+                return Compare(x, y.AsSpan());
             }
 
             public override int Compare(ICharSequence? x, string? y)
@@ -566,214 +926,369 @@ namespace J2N.Text
                 if (x is null || !x.HasValue) return (y is null) ? 0 : -1;
                 if (y is null) return 1;
 
-                if (x is StringBuilderCharSequence stringBuilder)
-                    return Compare(stringBuilder.Value, y);
-                if (x is StringBuffer stringBuffer)
-                    return Compare(stringBuffer.builder, y);
-
-                int length = Math.Min(x.Length, y.Length);
-                int result;
-                for (int i = 0; i < length; i++)
-                {
-                    if ((result = x[i] - y[i]) != 0)
-                        return result;
-                }
-
-                // At this point, we have compared all the characters in at least one string.
-                // The longer string will be larger.
-                return x.Length - y.Length;
-            }
-
-            private int Compare(StringBuilder? x, string? y)
-            {
-                if (x is null) return (y is null) ? 0 : -1;
-                if (y is null) return 1;
-
-                int length = Math.Min(x.Length, y.Length);
-                char[]? xArrayToReturnToPool = null;
-                try
-                {
-#if FEATURE_STRINGBUILDER_COPYTO_SPAN // If this method isn't supported, we are buffering to an array pool to get to the stack, anyway.
-                    Span<char> xChars = length > CharStackBufferSize
-                        ? (xArrayToReturnToPool = ArrayPool<char>.Shared.Rent(length))
-                        : stackalloc char[length];
-                    x.CopyTo(0, xChars, length);
-#else
-                    Span<char> xChars = xArrayToReturnToPool = ArrayPool<char>.Shared.Rent(length);
-                    x.CopyTo(0, xArrayToReturnToPool, 0, length);
-#endif
-                    int result;
-                    for (int i = 0; i < length; i++)
-                    {
-                        if ((result = xChars[i] - y[i]) != 0)
-                            return result;
-                    }
-
-                    // At this point, we have compared all the characters in at least one string.
-                    // The longer string will be larger.
-                    return x.Length - y.Length;
-                }
-                finally
-                {
-                    ArrayPool<char>.Shared.ReturnIfNotNull(xArrayToReturnToPool);
-                }
+                return Compare(x, y.AsSpan());
             }
 
             public override int Compare(ICharSequence? x, StringBuilder? y)
             {
+#if FEATURE_BROKEN_NULL_CHARSEQUENCE_COMPARISON
                 if (x == null || !x.HasValue) return -1;
                 if (y == null) return 1;
-
-                if (x is StringBuilderCharSequence stringBuilder)
-                    return Compare(stringBuilder.Value, y);
-                if (x is StringBuffer stringBuffer)
-                    return Compare(stringBuffer.builder, y);
-
-                int length = Math.Min(x.Length, y.Length);
-                char[]? yArrayToReturnToPool = null;
-                try
-                {
-#if FEATURE_STRINGBUILDER_COPYTO_SPAN // If this method isn't supported, we are buffering to an array pool to get to the stack, anyway.
-                    Span<char> yChars = length > CharStackBufferSize
-                        ? (yArrayToReturnToPool = ArrayPool<char>.Shared.Rent(length))
-                        : stackalloc char[length];
-                    y.CopyTo(0, yChars, length);
-#else
-                    Span<char> yChars = yArrayToReturnToPool = ArrayPool<char>.Shared.Rent(length);
-                    y.CopyTo(0, yArrayToReturnToPool, 0, length);
 #endif
-                    int result;
-                    for (int i = 0; i < length; i++)
-                    {
-                        if ((result = x[i] - yChars[i]) != 0)
-                            return result;
-                    }
 
-                    // At this point, we have compared all the characters in at least one string.
-                    // The longer string will be larger.
-                    return x.Length - y.Length;
-                }
-                finally
-                {
-                    ArrayPool<char>.Shared.ReturnIfNotNull(yArrayToReturnToPool);
-                }
+                return J2N.Globalization.Ordinal.CompareString(x, y);
             }
 
-            private int Compare(StringBuilder? x, StringBuilder? y)
-            {
-                if (x == null) return -1;
-                if (y == null) return 1;
 
-                int length = Math.Min(x.Length, y.Length);
-                char[]? xArrayToReturnToPool = null;
-                char[]? yArrayToReturnToPool = null;
-                try
-                {
-#if FEATURE_STRINGBUILDER_COPYTO_SPAN // If this method isn't supported, we are buffering to an array pool to get to the stack, anyway.
-                    Span<char> xChars = length > CharStackBufferSize
-                        ? (xArrayToReturnToPool = ArrayPool<char>.Shared.Rent(length))
-                        : stackalloc char[length];
-                    Span<char> yChars = length > CharStackBufferSize
-                        ? (yArrayToReturnToPool = ArrayPool<char>.Shared.Rent(length))
-                        : stackalloc char[length];
-                    x.CopyTo(0, xChars, length);
-                    y.CopyTo(0, yChars, length);
-#else
-                    Span<char> xChars = xArrayToReturnToPool = ArrayPool<char>.Shared.Rent(length);
-                    Span<char> yChars = yArrayToReturnToPool = ArrayPool<char>.Shared.Rent(length);
-                    x.CopyTo(0, xArrayToReturnToPool, 0, length);
-                    y.CopyTo(0, yArrayToReturnToPool, 0, length);
+
+
+            public override bool Equals(object? x, object? y)
+            {
+                if (x == y) return true;
+#if FEATURE_BROKEN_NULL_CHARSEQUENCE_COMPARISON
+                if (x is null || y is null) return false;
 #endif
-                    int result;
-                    for (int i = 0; i < length; i++)
+
+                if (x is SynchronizedTextBuilder stb1)
+                    return Equals(stb1, y, ExceptionArgument.y);
+                if (y is SynchronizedTextBuilder stb2)
+                    return Equals(x, stb2, ExceptionArgument.x);
+
+                if (x is SynchronizedTextBuilderCharSequence stbcs1)
+                    return Equals(stbcs1.Value, y, ExceptionArgument.y);
+                if (y is SynchronizedTextBuilderCharSequence stbcs2)
+                    return Equals(x, stbcs2.Value, ExceptionArgument.x);
+
+                if (x is StringBuffer sbuf1)
+                    return Equals(sbuf1, y, ExceptionArgument.y);
+                if (y is StringBuffer sbuf2)
+                    return Equals(x, sbuf2, ExceptionArgument.x);
+
+                if (x is ICharSequence cs1)
+                {
+                    if (y is null)
                     {
-                        if ((result = xChars[i] - yChars[i]) != 0)
-                            return result;
+                        return !cs1.HasValue;
                     }
 
-                    // At this point, we have compared all the characters in at least one string.
-                    // The longer string will be larger.
-                    return x.Length - y.Length;
+                    if (y is ISpannable<char> otherSpannable)
+                    {
+                        if (!cs1.HasValue) return !otherSpannable.HasValue;
+                        if (!otherSpannable.HasValue) return false;
+
+                        return Equals(cs1, otherSpannable.AsSpan());
+                    }
+
+                    if (y is ICharSequence otherCharSequence)
+                        return Equals(cs1, otherCharSequence);
+                    else if (y is string otherString)
+                        return Equals(cs1, otherString);
+                    else if (y is StringBuilder otherStringBuilder)
+                        return Equals(cs1, otherStringBuilder);
+                    else if (y is char[] otherCharArray)
+                        return Equals(cs1, otherCharArray);
                 }
-                finally
+
+                if (y is ICharSequence cs2)
                 {
-                    ArrayPool<char>.Shared.ReturnIfNotNull(xArrayToReturnToPool);
-                    ArrayPool<char>.Shared.ReturnIfNotNull(yArrayToReturnToPool);
+#if !FEATURE_BROKEN_NULL_CHARSEQUENCE_COMPARISON
+                    if (x is null)
+                    {
+                        return !cs2.HasValue;
+                    }
+#endif
+
+                    if (x is ISpannable<char> otherSpannable)
+                    {
+                        if (!otherSpannable.HasValue) return !cs2.HasValue;
+                        if (!cs2.HasValue) return false;
+
+                        return Equals(otherSpannable.AsSpan(), cs2);
+                    }
+                    // x is ICharSequence tried above
+
+                    if (x is string otherString)
+                        return Equals(otherString, cs2);
+                    else if (x is StringBuilder otherStringBuilder)
+                        return J2N.Globalization.Ordinal.Equal(otherStringBuilder, cs2);
+                    else if (x is char[] otherCharArray)
+                        return Equals(otherCharArray, cs2);
                 }
+
+                if (x is ISpannable<char> spannable1)
+                {
+                    if (y is null)
+                    {
+                        return !spannable1.HasValue;
+                    }
+
+                    if (y is ISpannable<char> yspannable2)
+                    {
+                        if (!spannable1.HasValue) return !yspannable2.HasValue;
+                        if (!yspannable2.HasValue) return false;
+
+                        return spannable1.AsSpan().SequenceEqual(yspannable2.AsSpan());
+                    }
+
+                    if (!spannable1.HasValue) return false; // y cannot be null here
+
+                    if (y is string ys2)
+                        return spannable1.AsSpan().SequenceEqual(ys2);
+                    if (y is char[] yca2)
+                        return spannable1.AsSpan().SequenceEqual(yca2);
+                    if (y is StringBuilder ysb2)
+                        return J2N.Globalization.Ordinal.Equal(spannable1.AsSpan(), ysb2);
+                }
+                if (y is ISpannable<char> spannable2)
+                {
+                    if (x is null) return !spannable2.HasValue;
+                    if (!spannable2.HasValue) return false;
+                    // x is ISpannable<char> tried above
+                    if (x is string xs1)
+                        return xs1.AsSpan().SequenceEqual(spannable2.AsSpan());
+                    if (x is char[] xca1)
+                        return xca1.AsSpan().SequenceEqual(spannable2.AsSpan());
+                    if (x is StringBuilder xsb1)
+                        return J2N.Globalization.Ordinal.Equal(xsb1, spannable2.AsSpan());
+                }
+
+                if (x is string s1)
+                {
+                    if (y is null) return false;
+                    if (y is string ys2)
+                        return s1.AsSpan().SequenceEqual(ys2);
+                    if (y is char[] yca2)
+                        return s1.AsSpan().SequenceEqual(yca2);
+                    if (y is StringBuilder ysb2)
+                        return J2N.Globalization.Ordinal.Equal(s1, ysb2);
+                }
+                if (y is string s2)
+                {
+                    if (x is null) return false;
+                    // x is string tried above
+                    if (x is char[] xca2)
+                        return xca2.AsSpan().SequenceEqual(s2);
+                    if (x is StringBuilder xsb2)
+                        return J2N.Globalization.Ordinal.Equal(xsb2, s2);
+                }
+
+                if (x is char[] ca1)
+                {
+                    if (y is null) return false;
+                    // y is string tried above
+                    if (y is char[] yca2)
+                        return ca1.AsSpan().SequenceEqual(yca2);
+                    if (y is StringBuilder ysb2)
+                        return J2N.Globalization.Ordinal.Equal(ca1, ysb2);
+                }
+                if (y is char[] ca2)
+                {
+                    if (x is null) return false;
+                    // x is string tried above
+                    // x is char[] tried above
+                    if (x is StringBuilder xsb2)
+                        return J2N.Globalization.Ordinal.Equal(xsb2, ca2);
+                }
+
+                if (x is StringBuilder sb1)
+                {
+                    if (y is null) return false;
+                    // y is string tried above
+                    // y is char[] tried above
+                    if (y is StringBuilder ysb2)
+                        return J2N.Globalization.Ordinal.Equal(sb1, ysb2);
+                }
+                if (y is StringBuilder sb2)
+                {
+                    if (x is null) return false;
+                    // x is string tried above
+                    // x is char[] tried above
+                    // x is StringBuilder tried above
+                }
+
+#if FEATURE_BROKEN_CHARSEQENCE_EXCEPTION_HANDLING
+                return x.Equals(y);
+#else
+                ThrowHelper.ThrowArgumentException(ExceptionResource.NotSupported_StringComparison);
+                return false; // unreachable
+#endif
             }
 
-            public override bool Equals(ICharSequence? x, ICharSequence? y)
+            private bool Equals(SynchronizedTextBuilder? x, object? y, ExceptionArgument exceptionArgument)
             {
-                if (x is null || !x.HasValue)
-                    return y is null || !y.HasValue;
-                if (y is null || !y.HasValue)
-                    return false;
+                if (x == y) return true;
+                if (x is not null && y is null) return false;
 
-                if (x is StringBuilderCharSequence stringBuilder)
-                    return Equals(stringBuilder.Value, y);
+                if (y is SynchronizedTextBuilder stb)
+                {
+                    return J2N.Globalization.Ordinal.Equal(x, stb);
+                }
+                if (y is ICharSequence cs)
+                {
+                    return J2N.Globalization.Ordinal.Equal(x, cs);
+                }
+                if (y is ISpannable<char> spannable)
+                {
+                    if (x is null) return !spannable.HasValue;
+                    if (!spannable.HasValue) return false;
+
+                    lock (x.SyncRoot)
+                        return x.AsSpan().SequenceEqual(spannable.AsSpan());
+                }
+                if (y is string s)
+                {
+                    if (x is null) return false;
+
+                    lock (x.SyncRoot)
+                        return x.AsSpan().SequenceEqual(s);
+                }
+                if (y is char[] charArray)
+                {
+                    if (x is null) return false;
+
+                    lock (x.SyncRoot)
+                        return x.AsSpan().SequenceEqual(charArray);
+                }
+                if (y is StringBuilder sb)
+                {
+                    if (x is null) return false;
+
+                    lock (x.SyncRoot)
+                        return J2N.Globalization.Ordinal.Equal(x.AsSpan(), sb);
+                }
+
+                ThrowHelper.ThrowArgumentException(ExceptionResource.NotSupported_StringComparison, exceptionArgument);
+                return false; // Unreachable
+            }
+
+            private bool Equals(object? x, SynchronizedTextBuilder? y, ExceptionArgument exceptionArgument)
+                => Equals(y, x, exceptionArgument);
+
+            private bool Equals(StringBuffer? x, object? y, ExceptionArgument exceptionArgument)
+            {
+                if (x == y) return true;
+                if (x is not null && y is null) return false;
+
+                if (y is SynchronizedTextBuilder stb)
+                {
+                    return J2N.Globalization.Ordinal.Equal(x, stb);
+                }
+                if (y is ICharSequence cs)
+                {
+                    return J2N.Globalization.Ordinal.Equal(x, cs);
+                }
+                if (y is ISpannable<char> spannable)
+                {
+                    if (x is null) return !spannable.HasValue;
+                    if (!spannable.HasValue) return false;
+
+                    lock (x.SyncRoot)
+                        return J2N.Globalization.Ordinal.Equal(x.builder, spannable.AsSpan());
+                }
+                if (y is string s)
+                {
+                    if (x is null) return false;
+
+                    lock (x.SyncRoot)
+                        return J2N.Globalization.Ordinal.Equal(x.builder, s);
+                }
+                if (y is char[] charArray)
+                {
+                    if (x is null) return false;
+
+                    lock (x.SyncRoot)
+                        return J2N.Globalization.Ordinal.Equal(x.builder, charArray);
+                }
+                if (y is StringBuilder sb)
+                {
+                    if (x is null) return false;
+
+                    lock (x.SyncRoot)
+                        return J2N.Globalization.Ordinal.Equal(x.builder, sb);
+                }
+
+                ThrowHelper.ThrowArgumentException(ExceptionResource.NotSupported_StringComparison, exceptionArgument);
+                return false; // Unreachable
+            }
+
+            private bool Equals(object? x, StringBuffer? y, ExceptionArgument exceptionArgument)
+                => Equals(y, x, exceptionArgument);
+
+            private bool Equals(ICharSequence? x, ReadOnlySpan<char> y)
+            {
+                if (x is null || !x.HasValue) return false;
+
+                if (x is ISpannable<char> spannable)
+                {
+                    return spannable.AsSpan().SequenceEqual(y);
+                }
+                if (x is StringBuilderCharSequence sb)
+                {
+                    return J2N.Globalization.Ordinal.Equal(sb.Value, y);
+                }
+                if (x is SynchronizedTextBuilderCharSequence stb)
+                {
+                    lock (stb.SyncRoot)
+                    {
+                        return stb.Value.AsSpan().SequenceEqual(y);
+                    }
+                }
                 if (x is StringBuffer stringBuffer)
-                    return Equals(stringBuffer.builder, y);
-
-                if (y is StringCharSequence yString)
-                    return Equals(x, yString.Value);
-                if (y is CharArrayCharSequence yCharArray)
-                    return Equals(x, yCharArray.Value);
-                if (y is StringBuilderCharSequence yStringBuilder)
-                    return Equals(x, yStringBuilder.Value);
-                if (y is StringBuffer yStringBuffer)
-                    return Equals(x, yStringBuffer.builder);
-
+                {
+                    lock (stringBuffer.SyncRoot)
+                    {
+                        return J2N.Globalization.Ordinal.Equal(stringBuffer.builder, y);
+                    }
+                }
 
                 int len = x.Length;
                 if (len != y.Length) return false;
                 for (int i = 0; i < len; i++)
                 {
-                    if (!x[i].Equals(y[i])) return false;
+                    if (x[i] != y[i]) return false;
                 }
                 return true;
             }
 
-            private bool Equals(StringBuilder? x, ICharSequence? y)
+            private bool Equals(ReadOnlySpan<char> x, ICharSequence? y)
+                => Equals(y, x);
+
+
+            public override bool Equals(ICharSequence? x, ICharSequence? y)
             {
-                if (x is null)
+                if (x == y) return true;
+                if (x is null || !x.HasValue)
                     return y is null || !y.HasValue;
                 if (y is null || !y.HasValue)
                     return false;
 
-                if (y is StringCharSequence yString)
-                    return Equals(x, yString.Value);
-                if (y is CharArrayCharSequence yCharArray)
-                    return Equals(x, yCharArray.Value);
-                if (y is StringBuilderCharSequence yStringBuilder)
-                    return Equals(x, yStringBuilder.Value);
-                if (y is StringBuffer yStringBuffer)
-                    return Equals(x, yStringBuffer.builder);
+                if (x is SynchronizedTextBuilderCharSequence stbcs1)
+                    return J2N.Globalization.Ordinal.Equal(stbcs1.Value, y);
+                if (x is StringBuffer sbuf1)
+                    return J2N.Globalization.Ordinal.Equal(sbuf1, y);
+                if (y is SynchronizedTextBuilderCharSequence stbcs2)
+                    return J2N.Globalization.Ordinal.Equal(x, stbcs2.Value);
+                if (y is StringBuffer sbuf2)
+                    return J2N.Globalization.Ordinal.Equal(x, sbuf2);
+
+                if (x is StringBuilderCharSequence sbcs1)
+                {
+                    return J2N.Globalization.Ordinal.Equal(sbcs1.Value, y);
+                }
+                if (y is StringBuilderCharSequence sbcs2)
+                    return Equals(x, sbcs2.Value);
+                if (x is ISpannable<char> spannable1)
+                    return Equals(spannable1.AsSpan(), y);
+                if (y is ISpannable<char> spannable2)
+                    return Equals(x, spannable2.AsSpan());
 
                 int len = x.Length;
                 if (len != y.Length) return false;
-
-                char[]? xArrayToReturnToPool = null;
-                try
+                for (int i = 0; i < len; i++)
                 {
-#if FEATURE_STRINGBUILDER_COPYTO_SPAN // If this method isn't supported, we are buffering to an array pool to get to the stack, anyway.
-                    Span<char> xChars = len > CharStackBufferSize
-                        ? (xArrayToReturnToPool = ArrayPool<char>.Shared.Rent(len))
-                        : stackalloc char[len];
-                    x.CopyTo(0, xChars, len);
-#else
-                    char[] xChars = xArrayToReturnToPool = ArrayPool<char>.Shared.Rent(len);
-                    x.CopyTo(0, xChars, 0, len);
-#endif
-                    for (int i = 0; i < len; i++)
-                    {
-                        if (!xChars[i].Equals(y[i])) return false;
-                    }
-                    return true;
+                    if (x[i] != y[i]) return false;
                 }
-                finally
-                {
-                    ArrayPool<char>.Shared.ReturnIfNotNull(xArrayToReturnToPool);
-                }
+                return true;
             }
 
             public override bool Equals(ICharSequence? x, char[]? y)
@@ -783,133 +1298,12 @@ namespace J2N.Text
                 if (y is null)
                     return false;
 
-                if (x is StringBuilderCharSequence stringBuilder)
-                    return Equals(stringBuilder.Value, y);
-                if (x is StringBuffer stringBuffer)
-                    return Equals(stringBuffer.builder, y);
-
-                int len = x.Length;
-                if (len != y.Length) return false;
-                for (int i = 0; i < len; i++)
-                {
-                    if (!x[i].Equals(y[i])) return false;
-                }
-                return true;
-            }
-
-            private bool Equals(StringBuilder? x, char[]? y)
-            {
-                if (x is null)
-                    return y is null;
-                if (y is null)
-                    return false;
-
-                int len = x.Length;
-                if (len != y.Length) return false;
-
-                char[]? xArrayToReturnToPool = null;
-                try
-                {
-#if FEATURE_STRINGBUILDER_COPYTO_SPAN // If this method isn't supported, we are buffering to an array pool to get to the stack, anyway.
-                    Span<char> xChars = len > CharStackBufferSize
-                        ? (xArrayToReturnToPool = ArrayPool<char>.Shared.Rent(len))
-                        : stackalloc char[len];
-                    x.CopyTo(0, xChars, len);
-#else
-                    Span<char> xChars = xArrayToReturnToPool = ArrayPool<char>.Shared.Rent(len);
-                    x.CopyTo(0, xArrayToReturnToPool, 0, len);
-#endif
-                    for (int i = 0; i < len; i++)
-                    {
-                        if (!xChars[i].Equals(y[i])) return false;
-                    }
-                    return true;
-                }
-                finally
-                {
-                    ArrayPool<char>.Shared.ReturnIfNotNull(xArrayToReturnToPool);
-                }
+                return Equals(x, y.AsSpan());
             }
 
             public override bool Equals(ICharSequence? x, StringBuilder? y)
             {
-                if (x is null || !x.HasValue)
-                    return y is null;
-                if (y is null)
-                    return false;
-
-                if (x is StringBuilderCharSequence stringBuilder)
-                    return Equals(stringBuilder.Value, y);
-                if (x is StringBuffer stringBuffer)
-                    return Equals(stringBuffer.builder, y);
-
-                int len = x.Length;
-                if (len != y.Length) return false;
-
-                char[]? yArrayToReturnToPool = null;
-                try
-                {
-#if FEATURE_STRINGBUILDER_COPYTO_SPAN // If this method isn't supported, we are buffering to an array pool to get to the stack, anyway.
-                    Span<char> yChars = len > CharStackBufferSize
-                        ? (yArrayToReturnToPool = ArrayPool<char>.Shared.Rent(len))
-                        : stackalloc char[len];
-                    y.CopyTo(0, yChars, len);
-#else
-                    Span<char> yChars = yArrayToReturnToPool = ArrayPool<char>.Shared.Rent(len);
-                    y.CopyTo(0, yArrayToReturnToPool, 0, len);
-#endif
-                    for (int i = 0; i < len; i++)
-                    {
-                        if (!x[i].Equals(yChars[i])) return false;
-                    }
-                    return true;
-                }
-                finally
-                {
-                    ArrayPool<char>.Shared.ReturnIfNotNull(yArrayToReturnToPool);
-                }
-            }
-
-            private bool Equals(StringBuilder? x, StringBuilder? y)
-            {
-                if (x is null)
-                    return y is null;
-                if (y is null)
-                    return false;
-
-                int len = x.Length;
-                if (len != y.Length) return false;
-
-                char[]? xArrayToReturnToPool = null;
-                char[]? yArrayToReturnToPool = null;
-                try
-                {
-#if FEATURE_STRINGBUILDER_COPYTO_SPAN // If this method isn't supported, we are buffering to an array pool to get to the stack, anyway.
-                    Span<char> xChars = len > CharStackBufferSize
-                        ? (xArrayToReturnToPool = ArrayPool<char>.Shared.Rent(len))
-                        : stackalloc char[len];
-                    Span<char> yChars = len > CharStackBufferSize
-                        ? (yArrayToReturnToPool = ArrayPool<char>.Shared.Rent(len))
-                        : stackalloc char[len];
-                    x.CopyTo(0, xChars, len);
-                    y.CopyTo(0, yChars, len);
-#else
-                    Span<char> xChars = xArrayToReturnToPool = ArrayPool<char>.Shared.Rent(len);
-                    Span<char> yChars = yArrayToReturnToPool = ArrayPool<char>.Shared.Rent(len);
-                    x.CopyTo(0, xArrayToReturnToPool, 0, len);
-                    y.CopyTo(0, yArrayToReturnToPool, 0, len);
-#endif
-                    for (int i = 0; i < len; i++)
-                    {
-                        if (!xChars[i].Equals(yChars[i])) return false;
-                    }
-                    return true;
-                }
-                finally
-                {
-                    ArrayPool<char>.Shared.ReturnIfNotNull(xArrayToReturnToPool);
-                    ArrayPool<char>.Shared.ReturnIfNotNull(yArrayToReturnToPool);
-                }
+                return J2N.Globalization.Ordinal.Equal(x, y);
             }
 
             public override bool Equals(ICharSequence? x, string? y)
@@ -919,67 +1313,78 @@ namespace J2N.Text
                 if (y is null)
                     return false;
 
-                if (x is StringBuilderCharSequence stringBuilder)
-                    return Equals(stringBuilder.Value, y);
-                if (x is StringBuffer stringBuffer)
-                    return Equals(stringBuffer.builder, y);
-
-                int len = x.Length;
-                if (len != y.Length) return false;
-                for (int i = 0; i < len; i++)
-                {
-                    if (!x[i].Equals(y[i])) return false;
-                }
-                return true;
+                return Equals(x, y.AsSpan());
             }
 
-            private bool Equals(StringBuilder? x, string? y)
+
+            private int GetHashCode(ReadOnlySpan<char> value)
             {
-                if (x is null)
-                    return y is null;
-                if (y is null)
-                    return false;
-
-                int len = x.Length;
-                if (len != y.Length) return false;
-
-                char[]? xArrayToReturnToPool = null;
-                try
+                // From Apache Harmony
+                int length = value.Length;
+                if (length == 0)
+                    return 0;
+                int hash = 0;
+                for (int i = 0; i < length; i++)
                 {
-#if FEATURE_STRINGBUILDER_COPYTO_SPAN // If this method isn't supported, we are buffering to an array pool to get to the stack, anyway.
-                    Span<char> xChars = len > CharStackBufferSize
-                        ? (xArrayToReturnToPool = ArrayPool<char>.Shared.Rent(len))
-                        : stackalloc char[len];
-                    x.CopyTo(0, xChars, len);
-#else
-                    Span<char> xChars = xArrayToReturnToPool = ArrayPool<char>.Shared.Rent(len);
-                    x.CopyTo(0, xArrayToReturnToPool, 0, len);
-#endif
-                    for (int i = 0; i < len; i++)
-                    {
-                        if (!xChars[i].Equals(y[i])) return false;
-                    }
-                    return true;
+                    hash = value[i] + ((hash << 5) - hash);
                 }
-                finally
-                {
-                    ArrayPool<char>.Shared.ReturnIfNotNull(xArrayToReturnToPool);
-                }
+                return hash;
             }
+
+            public override int GetHashCode(object? obj)
+            {
+                if (obj is null)
+                    return int.MaxValue;
+
+                if (obj is string otherString)
+                    return GetHashCode(otherString);
+                else if (obj is StringBuilder otherStringBuilder)
+                    return GetHashCode(otherStringBuilder);
+                else if (obj is char[] otherCharArray)
+                    return GetHashCode(otherCharArray);
+                else if (obj is ISpannable<char> otherSpannable)
+                {
+                    if (!otherSpannable.HasValue)
+                        return int.MaxValue;
+
+                    return GetHashCode(otherSpannable.AsSpan());
+                }
+                else if (obj is ICharSequence otherCharSequence)
+                    return GetHashCode(otherCharSequence);
+                else if (obj is SynchronizedTextBuilder otherSynchronizedTextBuilder)
+                {
+                    lock (otherSynchronizedTextBuilder.SyncRoot)
+                        return GetHashCode(otherSynchronizedTextBuilder.AsSpan());
+                }
+
+#if FEATURE_BROKEN_CHARSEQENCE_EXCEPTION_HANDLING
+                return obj.GetHashCode();
+#else
+                ThrowHelper.ThrowArgumentException(ExceptionResource.NotSupported_StringComparison);
+                return 0; // unreachable
+#endif
+            }
+
 
             public override int GetHashCode(ICharSequence? obj)
             {
                 if (obj is null ||!obj.HasValue)
                     return int.MaxValue;
 
-                if (obj is StringCharSequence yString)
-                    return GetHashCode(yString.Value);
-                if (obj is CharArrayCharSequence yCharArray)
-                    return GetHashCode(yCharArray.Value);
+                if (obj is ISpannable<char> spannable)
+                    return GetHashCode(spannable.AsSpan());
                 if (obj is StringBuilderCharSequence yStringBuilder)
                     return GetHashCode(yStringBuilder.Value);
+                if (obj is SynchronizedTextBuilderCharSequence synchronizedTextBuilderCharSequence)
+                {
+                    lock (synchronizedTextBuilderCharSequence.SyncRoot)
+                        return GetHashCode(synchronizedTextBuilderCharSequence.Value.AsSpan());
+                }
                 if (obj is StringBuffer yStringBuffer)
-                    return GetHashCode(yStringBuffer.builder);
+                {
+                    lock (yStringBuffer.SyncRoot)
+                        return GetHashCode(yStringBuffer.builder);
+                }
 
                 // From Apache Harmony
                 int length = obj.Length;
@@ -1019,6 +1424,19 @@ namespace J2N.Text
                 if (length == 0)
                     return 0;
 
+#if FEATURE_STRINGBUILDER_GETCHUNKS
+                // From Apache Harmony
+                int hash = 0;
+                foreach (ReadOnlyMemory<char> chunk in obj.GetChunks())
+                {
+                    ReadOnlySpan<char> chars = chunk.Span;
+                    for (int i = 0; i < chars.Length; i++)
+                    {
+                        hash = chars[i] + ((hash << 5) - hash);
+                    }
+                }
+                return hash;
+#else
                 char[]? arrayToReturnToPool = null;
                 try
                 {
@@ -1043,6 +1461,7 @@ namespace J2N.Text
                 {
                     ArrayPool<char>.Shared.ReturnIfNotNull(arrayToReturnToPool);
                 }
+#endif
             }
 
             public override int GetHashCode(string? obj)

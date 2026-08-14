@@ -1270,9 +1270,12 @@ namespace J2N
                     return "values";
                 case ExceptionArgument.writer:
                     return "writer";
+                case ExceptionArgument.y:
+                    return "y";
                 case ExceptionArgument.year:
                     return "year";
-
+                case ExceptionArgument.x:
+                    return "x";
 
                 //case ExceptionArgument.obj:
                 //    return "obj";
@@ -1777,7 +1780,9 @@ namespace J2N
         valueCount,
         values,
         writer,
+        y,
         year,
+        x,
 
         //obj,
         

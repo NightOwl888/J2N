@@ -40,6 +40,267 @@ namespace J2N.Text
 
         #region Equals
 
+        [Test]
+        public void Test_Equals_Object_SynchronizedTextBuilderCharSequence_SynchronizedTextBuilderCharSequence_ShouldNotDeadlock_WhenComparingOppositeDirections()
+        {
+            const string Value = "abcdefghijklmnopqrstuvwxyz";
+
+            AssertExtensions.AssertNoABDeadlock(
+                () => CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence(Value),
+                () => CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence(Value),
+                (seq1, seq2) =>
+                {
+                    Assert.IsTrue(CharSequenceComparer.Ordinal.Equals((object?)seq1, (object?)seq2));
+                });
+        }
+
+        [Test]
+        public void Test_Equals_Object_SynchronizedTextBuilderCharSequence_SynchronizedTextBuilder_ShouldNotDeadlock_WhenComparingOppositeDirections()
+        {
+            const string Value = "abcdefghijklmnopqrstuvwxyz";
+
+            AssertExtensions.AssertNoABDeadlock(
+                () => CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence(Value),
+                () => CharSequenceUtil.CreateSynchronizedTextBuilder(Value),
+                (seq1, seq2) =>
+                {
+                    Assert.IsTrue(CharSequenceComparer.Ordinal.Equals((object?)seq1, (object?)seq2));
+                });
+        }
+
+        [Test]
+        public void Test_Equals_Object_SynchronizedTextBuilderCharSequence_StringBuffer_ShouldNotDeadlock_WhenComparingOppositeDirections()
+        {
+            const string Value = "abcdefghijklmnopqrstuvwxyz";
+
+            AssertExtensions.AssertNoABDeadlock(
+                () => CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence(Value),
+                () => CharSequenceUtil.CreateStringBuffer(Value),
+                (seq1, seq2) =>
+                {
+                    Assert.IsTrue(CharSequenceComparer.Ordinal.Equals((object?)seq1, (object?)seq2));
+                });
+        }
+
+        [Test]
+        public void Test_Equals_Object_StringBuffer_SynchronizedTextBuilderCharSequence_ShouldNotDeadlock_WhenComparingOppositeDirections()
+        {
+            const string Value = "abcdefghijklmnopqrstuvwxyz";
+
+            AssertExtensions.AssertNoABDeadlock(
+                () => CharSequenceUtil.CreateStringBuffer(Value),
+                () => CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence(Value),
+                (seq1, seq2) =>
+                {
+                    Assert.IsTrue(CharSequenceComparer.Ordinal.Equals((object?)seq1, (object?)seq2));
+                });
+        }
+
+        [Test]
+        public void Test_Equals_Object_StringBuffer_SynchronizedTextBuilder_ShouldNotDeadlock_WhenComparingOppositeDirections()
+        {
+            const string Value = "abcdefghijklmnopqrstuvwxyz";
+
+            AssertExtensions.AssertNoABDeadlock(
+                () => CharSequenceUtil.CreateStringBuffer(Value),
+                () => CharSequenceUtil.CreateSynchronizedTextBuilder(Value),
+                (seq1, seq2) =>
+                {
+                    Assert.IsTrue(CharSequenceComparer.Ordinal.Equals((object?)seq1, (object?)seq2));
+                });
+        }
+
+        [Test]
+        public void Test_Equals_Object_StringBuffer_StringBuffer_ShouldNotDeadlock_WhenComparingOppositeDirections()
+        {
+            const string Value = "abcdefghijklmnopqrstuvwxyz";
+
+            AssertExtensions.AssertNoABDeadlock(
+                () => CharSequenceUtil.CreateStringBuffer(Value),
+                () => CharSequenceUtil.CreateStringBuffer(Value),
+                (seq1, seq2) =>
+                {
+                    Assert.IsTrue(CharSequenceComparer.Ordinal.Equals((object?)seq1, (object?)seq2));
+                });
+        }
+
+        [Test]
+        public void Test_Equals_ICharSequence_SynchronizedTextBuilderCharSequence_SynchronizedTextBuilderCharSequence_ShouldNotDeadlock_WhenComparingOppositeDirections()
+        {
+            const string Value = "abcdefghijklmnopqrstuvwxyz";
+
+            AssertExtensions.AssertNoABDeadlock(
+                () => CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence(Value),
+                () => CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence(Value),
+                (seq1, seq2) =>
+                {
+                    Assert.IsTrue(CharSequenceComparer.Ordinal.Equals(seq1, seq2));
+                });
+        }
+
+        [Test]
+        public void Test_Equals_ICharSequence_SynchronizedTextBuilderCharSequence_StringBuffer_ShouldNotDeadlock_WhenComparingOppositeDirections()
+        {
+            const string Value = "abcdefghijklmnopqrstuvwxyz";
+
+            AssertExtensions.AssertNoABDeadlock(
+                () => CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence(Value),
+                () => CharSequenceUtil.CreateStringBuffer(Value),
+                (seq1, seq2) =>
+                {
+                    Assert.IsTrue(CharSequenceComparer.Ordinal.Equals(seq1, seq2));
+                });
+        }
+
+        [Test]
+        public void Test_Equals_ICharSequence_StringBuffer_SynchronizedTextBuilderCharSequence_ShouldNotDeadlock_WhenComparingOppositeDirections()
+        {
+            const string Value = "abcdefghijklmnopqrstuvwxyz";
+
+            AssertExtensions.AssertNoABDeadlock(
+                () => CharSequenceUtil.CreateStringBuffer(Value),
+                () => CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence(Value),
+                (seq1, seq2) =>
+                {
+                    Assert.IsTrue(CharSequenceComparer.Ordinal.Equals(seq1, seq2));
+                });
+        }
+
+
+        [Test]
+        public void Test_Equals_ICharSequence_SynchronizedTextBuilderCharSequence_SynchronizesWhileReading()
+        {
+            const string Value = "abcdefghijklmnopqrstuvwxyz";
+
+            var leftFactories = new Func<string?, object?>[]
+            {
+                CharSequenceUtil.CreateStringCharSequence,
+                CharSequenceUtil.CreateCharArrayCharSequence,
+                CharSequenceUtil.CreateStringBuilderCharSequence,
+                CharSequenceUtil.CreateMutableTextBufferCharSequence,
+                CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence,
+                CharSequenceUtil.CreateStringBuffer,
+            };
+
+            foreach (var leftFactory in leftFactories)
+            {
+                var sequence = CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence(Value);
+                CharSequenceUtil.AssertSynchronizesWhileReading(sequence.Value!, () => Assert.IsTrue(CharSequenceComparer.Ordinal.Equals(leftFactory(Value), sequence)));
+            }
+        }
+
+        [Test]
+        public void Test_Equals_ICharSequence_StringBuffer_SynchronizesWhileReading()
+        {
+            const string Value = "abcdefghijklmnopqrstuvwxyz";
+
+            var leftFactories = new Func<string?, object?>[]
+            {
+                CharSequenceUtil.CreateStringCharSequence,
+                CharSequenceUtil.CreateCharArrayCharSequence,
+                CharSequenceUtil.CreateStringBuilderCharSequence,
+                CharSequenceUtil.CreateMutableTextBufferCharSequence,
+                CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence,
+                CharSequenceUtil.CreateStringBuffer,
+            };
+
+            foreach (var leftFactory in leftFactories)
+            {
+                var sequence = CharSequenceUtil.CreateStringBuffer(Value);
+                CharSequenceUtil.AssertSynchronizesWhileReading(sequence!, () => Assert.IsTrue(CharSequenceComparer.Ordinal.Equals(leftFactory(Value), sequence)));
+            }
+        }
+
+        [Test]
+        public void Test_Equals_Object_SynchronizedTextBuilderCharSequence_SynchronizesWhileReading()
+        {
+            const string Value = "abcdefghijklmnopqrstuvwxyz";
+
+            var leftFactories = new Func<string?, object?>[]
+            {
+                CharSequenceUtil.CreateStringCharSequence,
+                CharSequenceUtil.CreateCharArrayCharSequence,
+                CharSequenceUtil.CreateStringBuilderCharSequence,
+                CharSequenceUtil.CreateMutableTextBufferCharSequence,
+                CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence,
+                CharSequenceUtil.CreateStringBuffer,
+
+                CharSequenceUtil.CreateString,
+                CharSequenceUtil.CreateCharArray,
+                CharSequenceUtil.CreateStringBuilder,
+
+                CharSequenceUtil.CreateTextBuilder,
+                CharSequenceUtil.CreatePooledTextBuilder,
+                CharSequenceUtil.CreateSynchronizedTextBuilder,
+            };
+
+            foreach (var leftFactory in leftFactories)
+            {
+                var sequence = CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence(Value);
+                CharSequenceUtil.AssertSynchronizesWhileReading(sequence.Value!, () => Assert.IsTrue(CharSequenceComparer.Ordinal.Equals((object?)leftFactory(Value), (object?)sequence)));
+            }
+        }
+
+        [Test]
+        public void Test_Equals_Object_SynchronizedTextBuilder_SynchronizesWhileReading()
+        {
+            const string Value = "abcdefghijklmnopqrstuvwxyz";
+
+            var leftFactories = new Func<string?, object?>[]
+            {
+                CharSequenceUtil.CreateStringCharSequence,
+                CharSequenceUtil.CreateCharArrayCharSequence,
+                CharSequenceUtil.CreateStringBuilderCharSequence,
+                CharSequenceUtil.CreateMutableTextBufferCharSequence,
+                CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence,
+                CharSequenceUtil.CreateStringBuffer,
+
+                CharSequenceUtil.CreateString,
+                CharSequenceUtil.CreateCharArray,
+                CharSequenceUtil.CreateStringBuilder,
+
+                CharSequenceUtil.CreateTextBuilder,
+                CharSequenceUtil.CreatePooledTextBuilder,
+                CharSequenceUtil.CreateSynchronizedTextBuilder,
+            };
+
+            foreach (var leftFactory in leftFactories)
+            {
+                var sequence = CharSequenceUtil.CreateSynchronizedTextBuilder(Value);
+                CharSequenceUtil.AssertSynchronizesWhileReading(sequence!, () => Assert.IsTrue(CharSequenceComparer.Ordinal.Equals((object?)leftFactory(Value), (object?)sequence)));
+            }
+        }
+
+        [Test]
+        public void Test_Equals_Object_StringBuffer_SynchronizesWhileReading()
+        {
+            const string Value = "abcdefghijklmnopqrstuvwxyz";
+
+            var leftFactories = new Func<string?, object?>[]
+            {
+                CharSequenceUtil.CreateStringCharSequence,
+                CharSequenceUtil.CreateCharArrayCharSequence,
+                CharSequenceUtil.CreateStringBuilderCharSequence,
+                CharSequenceUtil.CreateMutableTextBufferCharSequence,
+                CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence,
+                CharSequenceUtil.CreateStringBuffer,
+
+                CharSequenceUtil.CreateString,
+                CharSequenceUtil.CreateCharArray,
+                CharSequenceUtil.CreateStringBuilder,
+
+                CharSequenceUtil.CreateTextBuilder,
+                CharSequenceUtil.CreatePooledTextBuilder,
+                CharSequenceUtil.CreateSynchronizedTextBuilder,
+            };
+
+            foreach (var leftFactory in leftFactories)
+            {
+                var sequence = CharSequenceUtil.CreateStringBuffer(Value);
+                CharSequenceUtil.AssertSynchronizesWhileReading(sequence!, () => Assert.IsTrue(CharSequenceComparer.Ordinal.Equals((object?)leftFactory(Value), (object?)sequence)));
+            }
+        }
+
         public static IEnumerable<TestCaseData> Equals_Object_Object_TestData()
         {
             var leftFactories = new Func<string?, object?>[]
@@ -50,6 +311,14 @@ namespace J2N.Text
                 CharSequenceUtil.CreateMutableTextBufferCharSequence,
                 CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence,
                 CharSequenceUtil.CreateStringBuffer,
+
+                CharSequenceUtil.CreateString,
+                CharSequenceUtil.CreateCharArray,
+                CharSequenceUtil.CreateStringBuilder,
+
+                CharSequenceUtil.CreateTextBuilder,
+                CharSequenceUtil.CreatePooledTextBuilder,
+                CharSequenceUtil.CreateSynchronizedTextBuilder,
             };
 
             var rightFactories = new Func<string?, object?>[]
@@ -64,6 +333,10 @@ namespace J2N.Text
                 CharSequenceUtil.CreateString,
                 CharSequenceUtil.CreateCharArray,
                 CharSequenceUtil.CreateStringBuilder,
+
+                CharSequenceUtil.CreateTextBuilder,
+                CharSequenceUtil.CreatePooledTextBuilder,
+                CharSequenceUtil.CreateSynchronizedTextBuilder,
             };
 
             foreach (var leftFactory in leftFactories)
@@ -109,6 +382,14 @@ namespace J2N.Text
                 CharSequenceUtil.Dispose(rightValue);
             }
         }
+
+#if !FEATURE_BROKEN_CHARSEQENCE_EXCEPTION_HANDLING
+        [TestCaseSource(nameof(Object_Object_Invalid_TestData))]
+        public void Test_Equals_Object_Object_Invalid(object? leftValue, object? rightValue)
+        {
+            Assert.Throws<ArgumentException>(() => CharSequenceComparer.Ordinal.Compare(leftValue, rightValue));
+        }
+#endif
 
         public static IEnumerable<TestCaseData> Equals_ICharSequence_ICharSequence_TestData()
         {
@@ -302,6 +583,269 @@ namespace J2N.Text
 
         #region Compare
 
+        [Test]
+        public void Test_Compare_Object_SynchronizedTextBuilderCharSequence_SynchronizedTextBuilderCharSequence_ShouldNotDeadlock_WhenComparingOppositeDirections()
+        {
+            const string Value = "abcdefghijklmnopqrstuvwxyz";
+
+            AssertExtensions.AssertNoABDeadlock(
+                () => CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence(Value),
+                () => CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence(Value),
+                (seq1, seq2) =>
+                {
+                    Assert.AreEqual(0, CharSequenceComparer.Ordinal.Compare((object?)seq1, (object?)seq2));
+                });
+        }
+
+        [Test]
+        public void Test_Compare_Object_SynchronizedTextBuilderCharSequence_SynchronizedTextBuilder_ShouldNotDeadlock_WhenComparingOppositeDirections()
+        {
+            const string Value = "abcdefghijklmnopqrstuvwxyz";
+
+            AssertExtensions.AssertNoABDeadlock(
+                () => CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence(Value),
+                () => CharSequenceUtil.CreateSynchronizedTextBuilder(Value),
+                (seq1, seq2) =>
+                {
+                    Assert.AreEqual(0, CharSequenceComparer.Ordinal.Compare((object?)seq1, (object?)seq2));
+                });
+        }
+
+        [Test]
+        public void Test_Compare_Object_SynchronizedTextBuilderCharSequence_StringBuffer_ShouldNotDeadlock_WhenComparingOppositeDirections()
+        {
+            const string Value = "abcdefghijklmnopqrstuvwxyz";
+
+            AssertExtensions.AssertNoABDeadlock(
+                () => CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence(Value),
+                () => CharSequenceUtil.CreateStringBuffer(Value),
+                (seq1, seq2) =>
+                {
+                    Assert.AreEqual(0, CharSequenceComparer.Ordinal.Compare((object?)seq1, (object?)seq2));
+                });
+        }
+
+        [Test]
+        public void Test_Compare_Object_StringBuffer_SynchronizedTextBuilderCharSequence_ShouldNotDeadlock_WhenComparingOppositeDirections()
+        {
+            const string Value = "abcdefghijklmnopqrstuvwxyz";
+
+            AssertExtensions.AssertNoABDeadlock(
+                () => CharSequenceUtil.CreateStringBuffer(Value),
+                () => CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence(Value),
+                (seq1, seq2) =>
+                {
+                    Assert.AreEqual(0, CharSequenceComparer.Ordinal.Compare((object?)seq1, (object?)seq2));
+                });
+        }
+
+        [Test]
+        public void Test_Compare_Object_StringBuffer_SynchronizedTextBuilder_ShouldNotDeadlock_WhenComparingOppositeDirections()
+        {
+            const string Value = "abcdefghijklmnopqrstuvwxyz";
+
+            AssertExtensions.AssertNoABDeadlock(
+                () => CharSequenceUtil.CreateStringBuffer(Value),
+                () => CharSequenceUtil.CreateSynchronizedTextBuilder(Value),
+                (seq1, seq2) =>
+                {
+                    Assert.AreEqual(0, CharSequenceComparer.Ordinal.Compare((object?)seq1, (object?)seq2));
+                });
+        }
+
+        [Test]
+        public void Test_Compare_Object_StringBuffer_StringBuffer_ShouldNotDeadlock_WhenComparingOppositeDirections()
+        {
+            const string Value = "abcdefghijklmnopqrstuvwxyz";
+
+            AssertExtensions.AssertNoABDeadlock(
+                () => CharSequenceUtil.CreateStringBuffer(Value),
+                () => CharSequenceUtil.CreateStringBuffer(Value),
+                (seq1, seq2) =>
+                {
+                    Assert.AreEqual(0, CharSequenceComparer.Ordinal.Compare((object?)seq1, (object?)seq2));
+                });
+        }
+
+        [Test]
+        public void Test_Compare_ICharSequence_SynchronizedTextBuilderCharSequence_SynchronizedTextBuilderCharSequence_ShouldNotDeadlock_WhenComparingOppositeDirections()
+        {
+            const string Value = "abcdefghijklmnopqrstuvwxyz";
+
+            AssertExtensions.AssertNoABDeadlock(
+                () => CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence(Value),
+                () => CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence(Value),
+                (seq1, seq2) =>
+                {
+                    Assert.AreEqual(0, CharSequenceComparer.Ordinal.Compare(seq1, seq2));
+                });
+        }
+
+        [Test]
+        public void Test_Compare_ICharSequence_SynchronizedTextBuilderCharSequence_StringBuffer_ShouldNotDeadlock_WhenComparingOppositeDirections()
+        {
+            const string Value = "abcdefghijklmnopqrstuvwxyz";
+
+            AssertExtensions.AssertNoABDeadlock(
+                () => CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence(Value),
+                () => CharSequenceUtil.CreateStringBuffer(Value),
+                (seq1, seq2) =>
+                {
+                    Assert.AreEqual(0, CharSequenceComparer.Ordinal.Compare(seq1, seq2));
+                });
+        }
+
+        [Test]
+        public void Test_Compare_ICharSequence_StringBuffer_SynchronizedTextBuilderCharSequence_ShouldNotDeadlock_WhenComparingOppositeDirections()
+        {
+            const string Value = "abcdefghijklmnopqrstuvwxyz";
+
+            AssertExtensions.AssertNoABDeadlock(
+                () => CharSequenceUtil.CreateStringBuffer(Value),
+                () => CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence(Value),
+                (seq1, seq2) =>
+                {
+                    Assert.AreEqual(0, CharSequenceComparer.Ordinal.Compare(seq1, seq2));
+                });
+        }
+
+
+        [Test]
+        public void Test_Compare_ICharSequence_SynchronizedTextBuilderCharSequence_SynchronizesWhileReading()
+        {
+            const string Value = "abcdefghijklmnopqrstuvwxyz";
+
+            var leftFactories = new Func<string?, object?>[]
+            {
+                CharSequenceUtil.CreateStringCharSequence,
+                CharSequenceUtil.CreateCharArrayCharSequence,
+                CharSequenceUtil.CreateStringBuilderCharSequence,
+                CharSequenceUtil.CreateMutableTextBufferCharSequence,
+                CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence,
+                CharSequenceUtil.CreateStringBuffer,
+            };
+
+            foreach (var leftFactory in leftFactories)
+            {
+                var sequence = CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence(Value);
+                CharSequenceUtil.AssertSynchronizesWhileReading(sequence.Value!, () => Assert.AreEqual(0, CharSequenceComparer.Ordinal.Compare(leftFactory(Value), sequence)));
+            }
+        }
+
+        [Test]
+        public void Test_Compare_ICharSequence_StringBuffer_SynchronizesWhileReading()
+        {
+            const string Value = "abcdefghijklmnopqrstuvwxyz";
+
+            var leftFactories = new Func<string?, object?>[]
+            {
+                CharSequenceUtil.CreateStringCharSequence,
+                CharSequenceUtil.CreateCharArrayCharSequence,
+                CharSequenceUtil.CreateStringBuilderCharSequence,
+                CharSequenceUtil.CreateMutableTextBufferCharSequence,
+                CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence,
+                CharSequenceUtil.CreateStringBuffer,
+            };
+
+            foreach (var leftFactory in leftFactories)
+            {
+                var sequence = CharSequenceUtil.CreateStringBuffer(Value);
+                CharSequenceUtil.AssertSynchronizesWhileReading(sequence!, () => Assert.AreEqual(0, CharSequenceComparer.Ordinal.Compare(leftFactory(Value), sequence)));
+            }
+        }
+
+        [Test]
+        public void Test_Compare_Object_SynchronizedTextBuilderCharSequence_SynchronizesWhileReading()
+        {
+            const string Value = "abcdefghijklmnopqrstuvwxyz";
+
+            var leftFactories = new Func<string?, object?>[]
+            {
+                CharSequenceUtil.CreateStringCharSequence,
+                CharSequenceUtil.CreateCharArrayCharSequence,
+                CharSequenceUtil.CreateStringBuilderCharSequence,
+                CharSequenceUtil.CreateMutableTextBufferCharSequence,
+                CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence,
+                CharSequenceUtil.CreateStringBuffer,
+
+                CharSequenceUtil.CreateString,
+                CharSequenceUtil.CreateCharArray,
+                CharSequenceUtil.CreateStringBuilder,
+
+                CharSequenceUtil.CreateTextBuilder,
+                CharSequenceUtil.CreatePooledTextBuilder,
+                CharSequenceUtil.CreateSynchronizedTextBuilder,
+            };
+
+            foreach (var leftFactory in leftFactories)
+            {
+                var sequence = CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence(Value);
+                CharSequenceUtil.AssertSynchronizesWhileReading(sequence.Value!, () => Assert.AreEqual(0, CharSequenceComparer.Ordinal.Compare((object?)leftFactory(Value), (object?)sequence)));
+            }
+        }
+
+        [Test]
+        public void Test_Compare_Object_SynchronizedTextBuilder_SynchronizesWhileReading()
+        {
+            const string Value = "abcdefghijklmnopqrstuvwxyz";
+
+            var leftFactories = new Func<string?, object?>[]
+            {
+                CharSequenceUtil.CreateStringCharSequence,
+                CharSequenceUtil.CreateCharArrayCharSequence,
+                CharSequenceUtil.CreateStringBuilderCharSequence,
+                CharSequenceUtil.CreateMutableTextBufferCharSequence,
+                CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence,
+                CharSequenceUtil.CreateStringBuffer,
+
+                CharSequenceUtil.CreateString,
+                CharSequenceUtil.CreateCharArray,
+                CharSequenceUtil.CreateStringBuilder,
+
+                CharSequenceUtil.CreateTextBuilder,
+                CharSequenceUtil.CreatePooledTextBuilder,
+                CharSequenceUtil.CreateSynchronizedTextBuilder,
+            };
+
+            foreach (var leftFactory in leftFactories)
+            {
+                var sequence = CharSequenceUtil.CreateSynchronizedTextBuilder(Value);
+                CharSequenceUtil.AssertSynchronizesWhileReading(sequence!, () => Assert.AreEqual(0, CharSequenceComparer.Ordinal.Compare((object?)leftFactory(Value), (object?)sequence)));
+            }
+        }
+
+        [Test]
+        public void Test_Compare_Object_StringBuffer_SynchronizesWhileReading()
+        {
+            const string Value = "abcdefghijklmnopqrstuvwxyz";
+
+            var leftFactories = new Func<string?, object?>[]
+            {
+                CharSequenceUtil.CreateStringCharSequence,
+                CharSequenceUtil.CreateCharArrayCharSequence,
+                CharSequenceUtil.CreateStringBuilderCharSequence,
+                CharSequenceUtil.CreateMutableTextBufferCharSequence,
+                CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence,
+                CharSequenceUtil.CreateStringBuffer,
+
+                CharSequenceUtil.CreateString,
+                CharSequenceUtil.CreateCharArray,
+                CharSequenceUtil.CreateStringBuilder,
+
+                CharSequenceUtil.CreateTextBuilder,
+                CharSequenceUtil.CreatePooledTextBuilder,
+                CharSequenceUtil.CreateSynchronizedTextBuilder,
+            };
+
+            foreach (var leftFactory in leftFactories)
+            {
+                var sequence = CharSequenceUtil.CreateStringBuffer(Value);
+                CharSequenceUtil.AssertSynchronizesWhileReading(sequence!, () => Assert.AreEqual(0, CharSequenceComparer.Ordinal.Compare((object?)leftFactory(Value), (object?)sequence)));
+            }
+        }
+
+
+
         public static IEnumerable<TestCaseData> Compare_Object_Object_TestData()
         {
             var leftFactories = new Func<string?, object?>[]
@@ -312,6 +856,14 @@ namespace J2N.Text
                 CharSequenceUtil.CreateMutableTextBufferCharSequence,
                 CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence,
                 CharSequenceUtil.CreateStringBuffer,
+
+                CharSequenceUtil.CreateString,
+                CharSequenceUtil.CreateCharArray,
+                CharSequenceUtil.CreateStringBuilder,
+
+                CharSequenceUtil.CreateTextBuilder,
+                CharSequenceUtil.CreatePooledTextBuilder,
+                CharSequenceUtil.CreateSynchronizedTextBuilder,
             };
 
             var rightFactories = new Func<string?, object?>[]
@@ -326,6 +878,10 @@ namespace J2N.Text
                 CharSequenceUtil.CreateString,
                 CharSequenceUtil.CreateCharArray,
                 CharSequenceUtil.CreateStringBuilder,
+
+                CharSequenceUtil.CreateTextBuilder,
+                CharSequenceUtil.CreatePooledTextBuilder,
+                CharSequenceUtil.CreateSynchronizedTextBuilder,
             };
 
             foreach (var leftFactory in leftFactories)
@@ -372,6 +928,18 @@ namespace J2N.Text
                         else if (cs2.HasValue && cs2.Length == 0)
                             expected = 0; // J2N TODO: Fix broken null comparison
                     }
+                    if (rightValue is ISpannable<char> spannable2)
+                    {
+                        if (!spannable2.HasValue)
+                            expected = -1; // J2N TODO: Fix broken null comparison
+                        else if (spannable2.HasValue && spannable2.AsSpan().IsEmpty)
+                            expected = 0; // J2N TODO: Fix broken null comparison
+                    }
+                    if (rightValue is SynchronizedTextBuilder stb)
+                    {
+                        if (stb.Length == 0)
+                            expected = 0; // J2N TODO: Fix broken null comparison
+                    }
                 }
 #endif
 
@@ -383,6 +951,65 @@ namespace J2N.Text
                 CharSequenceUtil.Dispose(rightValue);
             }
         }
+
+#if !FEATURE_BROKEN_CHARSEQENCE_EXCEPTION_HANDLING
+
+        public static IEnumerable<TestCaseData> Object_Object_Invalid_TestData()
+        {
+            const string Value = "abcdefghijklmnopqrstuvwxyz";
+
+            var factories = new Func<string?, object?>[]
+            {
+                CharSequenceUtil.CreateStringCharSequence,
+                CharSequenceUtil.CreateCharArrayCharSequence,
+                CharSequenceUtil.CreateStringBuilderCharSequence,
+                CharSequenceUtil.CreateMutableTextBufferCharSequence,
+                CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence,
+                CharSequenceUtil.CreateStringBuffer,
+
+                CharSequenceUtil.CreateString,
+                CharSequenceUtil.CreateCharArray,
+                CharSequenceUtil.CreateStringBuilder,
+
+                CharSequenceUtil.CreateTextBuilder,
+                CharSequenceUtil.CreatePooledTextBuilder,
+                CharSequenceUtil.CreateSynchronizedTextBuilder,
+            };
+
+            foreach (var factory in factories)
+            {
+                var leftArg = factory(Value);
+                var rightArg = CharSequenceUtil.CreateInvalidCharSequenceObject(Value);
+
+                yield return new TestCaseData(leftArg, rightArg)
+                    .FormatArguments(leftArg, rightArg);
+            }
+
+            foreach (var factory in factories)
+            {
+                var leftArg = CharSequenceUtil.CreateInvalidCharSequenceObject(Value);
+                var rightArg = factory(Value);
+
+                yield return new TestCaseData(leftArg, rightArg)
+                    .FormatArguments(leftArg, rightArg);
+            }
+
+            {
+                var leftArg = CharSequenceUtil.CreateInvalidCharSequenceObject(Value);
+                var rightArg = CharSequenceUtil.CreateInvalidCharSequenceObject(Value);
+
+                yield return new TestCaseData(leftArg, rightArg)
+                    .FormatArguments(leftArg, rightArg);
+            }
+        }
+
+        [TestCaseSource(nameof(Object_Object_Invalid_TestData))]
+        public void Test_Compare_Object_Object_Invalid(object? leftValue, object? rightValue)
+        {
+            Assert.Throws<ArgumentException>(() => CharSequenceComparer.Ordinal.Compare(leftValue, rightValue));
+        }
+#endif
+
 
         public static IEnumerable<TestCaseData> Compare_ICharSequence_ICharSequence_TestData()
         {
@@ -620,6 +1247,95 @@ namespace J2N.Text
 
         #endregion Compare
 
+
+        #region GetHashCode
+
+        [Test]
+        public void Test_GetHashCode_ICharSequence_SynchronizedTextBuilderCharSequence_SynchronizesWhileReading()
+        {
+            const string Value = "abcdefghijklmnopqrstuvwxyz";
+            var sequence = CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence(Value);
+            CharSequenceUtil.AssertSynchronizesWhileReading(sequence.Value!, () => Assert.AreEqual(958031277, CharSequenceComparer.Ordinal.GetHashCode(sequence)));
+        }
+
+        [Test]
+        public void Test_GetHashCode_ICharSequence_StringBuffer_SynchronizesWhileReading()
+        {
+            const string Value = "abcdefghijklmnopqrstuvwxyz";
+            var sequence = CharSequenceUtil.CreateStringBuffer(Value);
+            CharSequenceUtil.AssertSynchronizesWhileReading(sequence!, () => Assert.AreEqual(958031277, CharSequenceComparer.Ordinal.GetHashCode(sequence)));
+        }
+
+        [Test]
+        public void Test_GetHashCode_Object_SynchronizedTextBuilderCharSequence_SynchronizesWhileReading()
+        {
+            const string Value = "abcdefghijklmnopqrstuvwxyz";
+            var sequence = CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence(Value);
+            CharSequenceUtil.AssertSynchronizesWhileReading(sequence.Value!, () => Assert.AreEqual(958031277, CharSequenceComparer.Ordinal.GetHashCode((object?)sequence)));
+        }
+
+        [Test]
+        public void Test_GetHashCode_Object_SynchronizedTextBuilder_SynchronizesWhileReading()
+        {
+            const string Value = "abcdefghijklmnopqrstuvwxyz";
+            var sequence = CharSequenceUtil.CreateSynchronizedTextBuilder(Value);
+            CharSequenceUtil.AssertSynchronizesWhileReading(sequence!, () => Assert.AreEqual(958031277, CharSequenceComparer.Ordinal.GetHashCode((object?)sequence)));
+        }
+
+        [Test]
+        public void Test_GetHashCode_Object_StringBuffer_SynchronizesWhileReading()
+        {
+            const string Value = "abcdefghijklmnopqrstuvwxyz";
+            var sequence = CharSequenceUtil.CreateStringBuffer(Value);
+            CharSequenceUtil.AssertSynchronizesWhileReading(sequence!, () => Assert.AreEqual(958031277, CharSequenceComparer.Ordinal.GetHashCode((object?)sequence)));
+        }
+
+        public static IEnumerable<TestCaseData> GetHashCode_Object_TestData()
+        {
+            var factories = new Func<string?, object?>[]
+            {
+                CharSequenceUtil.CreateStringCharSequence,
+                CharSequenceUtil.CreateCharArrayCharSequence,
+                CharSequenceUtil.CreateStringBuilderCharSequence,
+                CharSequenceUtil.CreateMutableTextBufferCharSequence,
+                CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence,
+                CharSequenceUtil.CreateStringBuffer,
+
+                CharSequenceUtil.CreateString,
+                CharSequenceUtil.CreateCharArray,
+                CharSequenceUtil.CreateStringBuilder,
+
+                CharSequenceUtil.CreateTextBuilder,
+                CharSequenceUtil.CreatePooledTextBuilder,
+                CharSequenceUtil.CreateSynchronizedTextBuilder,
+            };
+
+            foreach (var leftFactory in factories)
+            {
+                foreach (var item in CharSequenceUtil.GetHashCode_String_TestData())
+                {
+                    var leftArg = leftFactory((string?)item[0]);
+                    var expectedArg = item[1];
+                    yield return new TestCaseData(leftArg, expectedArg)
+                        .FormatArguments(leftArg);
+                }
+            }
+        }
+
+        [TestCaseSource(nameof(GetHashCode_Object_TestData))]
+        public void Test_GetHashCode_Object(object? value, int expected)
+        {
+            Assert.AreEqual(expected, CharSequenceComparer.Ordinal.GetHashCode(value));
+        }
+
+#if !FEATURE_BROKEN_CHARSEQENCE_EXCEPTION_HANDLING
+        [Test]
+        public void Test_GetHashCode_Object_Invalid()
+        {
+            Assert.Throws<ArgumentException>(() => CharSequenceComparer.Ordinal.GetHashCode(CharSequenceUtil.CreateInvalidCharSequenceObject(null)));
+        }
+#endif
+
         public static IEnumerable<TestCaseData> GetHashCode_ICharSequence_TestData()
         {
             var factories = new Func<string?, object?>[]
@@ -706,5 +1422,7 @@ namespace J2N.Text
         {
             Assert.AreEqual(expected, CharSequenceComparer.Ordinal.GetHashCode(value));
         }
+
+        #endregion GetHashCode
     }
 }

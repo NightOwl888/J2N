@@ -90,6 +90,9 @@ namespace J2N.Text
         public static SynchronizedTextBuilder? CreateSynchronizedTextBuilder(string? value)
             => value is null ? null : new SynchronizedTextBuilder(value);
 
+        public static object CreateInvalidCharSequenceObject(string? value)
+            => new object();
+
         #endregion
 
         #region Test Data
