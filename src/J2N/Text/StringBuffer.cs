@@ -1,8 +1,10 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+using J2N.Globalization;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.Text;
 
@@ -1724,7 +1726,26 @@ namespace J2N.Text
 
         #region Equals
 
-#if FEATURE_STRINGBUILDER_EQUALS_READONLYSPAN
+        internal bool Equals(ICharSequence? other)
+        {
+            if (other is null)
+                return false;
+            if (this == other) return true;
+
+            if (other is SynchronizedTextBuilderCharSequence otherSynchronizedTextBuilderCharSequence)
+            {
+                return Ordinal.Equal(this, otherSynchronizedTextBuilderCharSequence.Value);
+            }
+            else if (other is StringBuffer otherStringBuffer)
+            {
+                return Ordinal.Equal(this, otherStringBuffer);
+            }
+
+            lock (syncRoot)
+            {
+                return EqualsCore(other);
+            }
+        }
 
         /// <summary>
         /// Returns a value indicating whether this instance is equal to a specified object.
@@ -1734,9 +1755,8 @@ namespace J2N.Text
         public bool Equals(ReadOnlySpan<char> span)
         {
             lock (syncRoot)
-                return builder.Equals(span);
+                return EqualsCore(span);
         }
-#endif
 
         /// <summary>
         /// Returns a value indicating whether this instance is equal to a specified object.
@@ -1760,8 +1780,10 @@ namespace J2N.Text
         /// and <see cref="MaxCapacity"/> values; otherwise, <c>false</c>.</returns>
         public bool Equals(StringBuilder? other)
         {
+            if (other is null) return false;
+
             lock (syncRoot)
-                return builder.Equals(other);
+                return Ordinal.Equal(builder, other);
         }
 
         /// <summary>
@@ -1772,7 +1794,9 @@ namespace J2N.Text
         /// and <see cref="MaxCapacity"/> values; otherwise, <c>false</c>.</returns>
         public bool Equals(StringBuffer? other)
         {
-            return Equals(other?.builder);
+            if (other is null) return false;
+
+            return Ordinal.Equal(this, other);
         }
 
         /// <summary>
@@ -1784,16 +1808,63 @@ namespace J2N.Text
         public override bool Equals(object? obj)
         {
             if (obj is null) return false;
+            if (this == obj) return true;
 
-            if (obj is StringBuffer stringBuffer)
-                return Equals(stringBuffer);
-            if (obj is StringBuilder stringBuilder)
-                return Equals(stringBuilder);
-            if (obj is StringBuilderCharSequence stringBuilder1)
-                return Equals(stringBuilder1);
+            if (obj is ICharSequence otherCharSequence)
+            {
+                return Equals(otherCharSequence);
+            }
+            else if (obj is SynchronizedTextBuilder otherSynchronizedTextBuilder)
+            {
+                return Ordinal.Equal(this, otherSynchronizedTextBuilder);
+            }
 
             lock (syncRoot)
-                return builder.Equals(obj);
+            {
+                return EqualsCore(obj);
+            }
+        }
+
+        private bool EqualsCore(ICharSequence? other)
+        {
+            if (other is null) return false;
+            if (this == other) return true;
+
+            int len = Length;
+            if (len != other.Length) return false;
+
+            return Ordinal.Equal(builder, other);
+        }
+
+        private bool EqualsCore(ReadOnlySpan<char> other)
+        {
+#if FEATURE_STRINGBUILDER_EQUALS_READONLYSPAN
+            return builder.Equals(other);
+#else
+            return Ordinal.Equal(builder, other);
+#endif
+        }
+
+        private bool EqualsCore(object other)
+        {
+            Debug.Assert(other != null);
+
+            if (other is ISpannable<char> spannable)
+            {
+                if (!spannable.HasValue)
+                    return false;
+
+                return Ordinal.Equal(builder, spannable.AsSpan());
+            }
+
+            if (other is string otherString)
+                return EqualsCore(otherString);
+            else if (other is char[] otherCharArray)
+                return EqualsCore(otherCharArray);
+            else if (other is StringBuilder otherStringBuilder)
+                return Ordinal.Equal(builder, otherStringBuilder);
+
+            return false; // Cannot be converted to a char sequence, reject
         }
 
         #endregion Equals

@@ -1,5 +1,6 @@
 ﻿using NUnit.Framework;
 using System;
+using System.Collections.Generic;
 using System.Text;
 
 namespace J2N.Text
@@ -1414,15 +1415,15 @@ namespace J2N.Text
         //            Serializable deserialized)
         //    {
 
-//        StringBuffer init = (StringBuffer)initial;
-//        StringBuffer desr = (StringBuffer)deserialized;
+        //        StringBuffer init = (StringBuffer)initial;
+        //        StringBuffer desr = (StringBuffer)deserialized;
 
-//        // serializable fields are: 'count', 'shared', 'value'
-//        // serialization of 'shared' is not verified
-//        // 'count' + 'value' should result in required string
-//        assertEquals("toString", init.ToString(), desr.ToString());
-//    }
-//};
+        //        // serializable fields are: 'count', 'shared', 'value'
+        //        // serialization of 'shared' is not verified
+        //        // 'count' + 'value' should result in required string
+        //        assertEquals("toString", init.ToString(), desr.ToString());
+        //    }
+        //};
 
 #if FEATURE_SERIALIZABLE_STRINGS
         /**
@@ -1459,5 +1460,230 @@ namespace J2N.Text
         ////    SerializationTest.verifyGolden(this, new StringBuffer("0123456789"),
         ////                STRING_BUFFER_COMPARATOR);
         ////}
+
+#nullable enable
+        internal class Comparison
+        {
+            const string Value = "abcdefghijklmnopqrstuvwxyz";
+
+            public StringBuffer? CreateClassUnderTest(string? value)
+                => CharSequenceUtil.CreateStringBuffer(value);
+
+            [Test]
+            public void Test_Equals_ICharSequence_SynchronizedTextBuilderCharSequence_ShouldNotDeadlock_WhenComparingOppositeDirections()
+            {
+                AssertExtensions.AssertNoABDeadlock(
+                    () => CreateClassUnderTest(Value)!,
+                    () => CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence(Value),
+                    (seq1, seq2) =>
+                    {
+                        Assert.IsTrue(seq1.Equals(seq2));
+                    });
+            }
+
+            [Test]
+            public void Test_Equals_ICharSequence_StringBuffer_ShouldNotDeadlock_WhenComparingOppositeDirections()
+            {
+                AssertExtensions.AssertNoABDeadlock(
+                    () => CreateClassUnderTest(Value)!,
+                    () => CharSequenceUtil.CreateStringBuffer(Value),
+                    (seq1, seq2) =>
+                    {
+                        Assert.IsTrue(seq1.Equals(seq2));
+                    });
+            }
+
+            [Test]
+            public void Test_Equals_Object_SynchronizedTextBuilderCharSequence_ShouldNotDeadlock_WhenComparingOppositeDirections()
+            {
+                AssertExtensions.AssertNoABDeadlock(
+                    () => CreateClassUnderTest(Value)!,
+                    () => CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence(Value),
+                    (seq1, seq2) =>
+                    {
+                        Assert.IsTrue(seq1.Equals((object?)seq2));
+                    });
+            }
+
+            [Test]
+            public void Test_Equals_Object_SynchronizedTextBuilder_ShouldNotDeadlock_WhenComparingOppositeDirections()
+            {
+                AssertExtensions.AssertNoABDeadlock(
+                    () => CreateClassUnderTest(Value)!,
+                    () => CharSequenceUtil.CreateSynchronizedTextBuilder(Value),
+                    (seq1, sb2) =>
+                    {
+                        Assert.IsTrue(seq1.Equals((object?)sb2));
+                    });
+            }
+
+
+            [Test]
+            public void Test_Equals_Object_StringBuffer_ShouldNotDeadlock_WhenComparingOppositeDirections()
+            {
+                AssertExtensions.AssertNoABDeadlock(
+                    () => CreateClassUnderTest(Value)!,
+                    () => CharSequenceUtil.CreateStringBuffer(Value),
+                    (seq1, sb2) =>
+                    {
+                        Assert.IsTrue(seq1.Equals((object?)sb2));
+                    });
+            }
+
+            [Test]
+            public void Test_Equals_ICharSequence_SynchronizedTextBuilderCharSequence_SynchronizesWhileReading()
+            {
+                var target = CreateClassUnderTest(Value)!;
+                var other = CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence(Value);
+
+                CharSequenceUtil.AssertSynchronizesWhileReading(other.Value!, () => Assert.IsTrue(target.Equals((ICharSequence?)other)));
+            }
+
+            [Test]
+            public void Test_Equals_ICharSequence_StringBuffer_SynchronizesWhileReading()
+            {
+                var target = CreateClassUnderTest(Value)!;
+                var other = CharSequenceUtil.CreateStringBuffer(Value)!;
+
+                CharSequenceUtil.AssertSynchronizesWhileReading(other, () => Assert.IsTrue(target.Equals((ICharSequence?)other)));
+            }
+
+            [Test]
+            public void Test_Equals_Object_SynchronizedTextBuilderCharSequence_SynchronizesWhileReading()
+            {
+                var target = CreateClassUnderTest(Value)!;
+                var other = CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence(Value);
+
+                CharSequenceUtil.AssertSynchronizesWhileReading(other.Value!, () => Assert.IsTrue(target.Equals((object?)other)));
+            }
+
+            [Test]
+            public void Test_Equals_Object_SynchronizedTextBuilder_SynchronizesWhileReading()
+            {
+                var target = CreateClassUnderTest(Value)!;
+                var other = CharSequenceUtil.CreateSynchronizedTextBuilder(Value)!;
+
+                CharSequenceUtil.AssertSynchronizesWhileReading(other, () => Assert.IsTrue(target.Equals((object?)other)));
+            }
+
+            [Test]
+            public void Test_Equals_Object_StringBuffer_SynchronizesWhileReading()
+            {
+                var target = CreateClassUnderTest(Value)!;
+                var other = CharSequenceUtil.CreateStringBuffer(Value)!;
+
+                CharSequenceUtil.AssertSynchronizesWhileReading(other, () => Assert.IsTrue(target.Equals((object?)other)));
+            }
+
+            public static IEnumerable<TestCaseData> Equals_Object_TestData()
+            {
+                foreach (TestCaseData item in CharSequenceUtil.Equals_Object_TestData())
+                {
+                    if (item.Arguments[0] is not null)
+                        yield return item;
+                }
+            }
+
+            [TestCaseSource(nameof(Equals_Object_TestData))]
+            public void Test_Equals_Object(string leftValue, object? rightValue, bool expected)
+            {
+                try
+                {
+                    Assert.AreEqual(expected, CreateClassUnderTest(leftValue)!.Equals(rightValue));
+                }
+                finally
+                {
+                    CharSequenceUtil.Dispose(rightValue);
+                }
+            }
+
+            public static IEnumerable<TestCaseData> Equals_ICharSequence_TestData()
+            {
+                foreach (TestCaseData item in CharSequenceUtil.Equals_ICharSequence_TestData())
+                {
+                    if (item.Arguments[0] is not null)
+                        yield return item;
+                }
+            }
+
+            [TestCaseSource(nameof(Equals_ICharSequence_TestData))]
+            public void Test_Equals_ICharSequence(string leftValue, ICharSequence? rightValue, bool expected)
+            {
+                try
+                {
+                    Assert.AreEqual(expected, CreateClassUnderTest(leftValue)!.Equals(rightValue));
+                }
+                finally
+                {
+                    CharSequenceUtil.Dispose(rightValue);
+                }
+            }
+
+            public static IEnumerable<TestCaseData> Equals_StringBuilderCharSequence_TestData()
+            {
+                foreach (TestCaseData item in CharSequenceUtil.Equals_StringBuilderCharSequence_TestData())
+                {
+                    if (item.Arguments[0] is not null)
+                        yield return item;
+                }
+            }
+
+            [TestCaseSource(nameof(Equals_StringBuilderCharSequence_TestData))]
+            public void Test_Equals_StringBuilderCharSequence(string leftValue, StringBuilderCharSequence? rightValue, bool expected)
+            {
+                try
+                {
+                    Assert.AreEqual(expected, CreateClassUnderTest(leftValue)!.Equals(rightValue));
+                }
+                finally
+                {
+                    CharSequenceUtil.Dispose(rightValue);
+                }
+            }
+
+            public static IEnumerable<TestCaseData> Equals_StringBuilder_TestData()
+            {
+                foreach (TestCaseData item in CharSequenceUtil.Equals_StringBuilder_TestData())
+                {
+                    if (item.Arguments[0] is not null)
+                        yield return item;
+                }
+            }
+
+            [TestCaseSource(nameof(Equals_StringBuilder_TestData))]
+            public void Test_Equals_StringBuilder(string leftValue, StringBuilder? rightValue, bool expected)
+            {
+                try
+                {
+                    Assert.AreEqual(expected, CreateClassUnderTest(leftValue)!.Equals(rightValue));
+                }
+                finally
+                {
+                    CharSequenceUtil.Dispose(rightValue);
+                }
+            }
+
+            public static IEnumerable<object?[]> Equals_String_TestData()
+            {
+                foreach (var item in CharSequenceUtil.Equals_String_TestData())
+                {
+                    if (item[0] is not null && item[1] is not null)
+                        yield return item;
+                }
+            }
+
+            [TestCaseSource(nameof(Equals_String_TestData))]
+            public void Test_Equals_CharSpan(string leftValue, string rightValue, bool expected)
+            {
+                try
+                {
+                    Assert.AreEqual(expected, CreateClassUnderTest(leftValue)!.Equals(rightValue.AsSpan()));
+                }
+                finally
+                {
+                    CharSequenceUtil.Dispose(rightValue);
+                }
+            }
+        }
     }
 }
