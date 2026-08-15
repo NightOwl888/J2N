@@ -4,6 +4,7 @@
 using J2N.Buffers;
 using J2N.CodeGeneration;
 using J2N.Collections;
+using J2N.Globalization;
 using J2N.Numerics;
 using System;
 using System.Buffers;
@@ -875,39 +876,8 @@ namespace J2N.Text
             {
                 return false;
             }
-#if FEATURE_STRINGBUILDER_GETCHUNKS
-            int offset = 0;
-            foreach (ReadOnlyMemory<char> otherChunk in other.GetChunks())
-            {
-                ReadOnlySpan<char> thisChunk = new ReadOnlySpan<char>(m_Chars, offset, otherChunk.Length);
-                if (!otherChunk.Span.SequenceEqual(thisChunk))
-                    return false;
 
-                offset += otherChunk.Length;
-            }
-            Debug.Assert(offset == Length);
-            return true;
-#else
-            int length = m_Position;
-            char[]? arrayToReturnToPool = null;
-            try
-            {
-#if FEATURE_STRINGBUILDER_COPYTO_SPAN // If this method isn't supported, we are buffering to an array pool to get to the stack, anyway.
-                Span<char> textChars = length > CharStackBufferSize
-                    ? (arrayToReturnToPool = ArrayPool<char>.Shared.Rent(length))
-                    : stackalloc char[length];
-                other.CopyTo(0, textChars, length);
-#else
-                Span<char> textChars = arrayToReturnToPool = ArrayPool<char>.Shared.Rent(length);
-                other.CopyTo(0, arrayToReturnToPool, 0, length);
-#endif
-                return new ReadOnlySpan<char>(m_Chars, 0, m_Position).SequenceEqual(textChars.Slice(0, length));
-            }
-            finally
-            {
-                ArrayPool<char>.Shared.ReturnIfNotNull(arrayToReturnToPool);
-            }
-#endif
+            return Ordinal.Equal(new ReadOnlySpan<char>(m_Chars, 0, m_Position), other);
         }
 
         /// <summary>
