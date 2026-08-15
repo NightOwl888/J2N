@@ -88,6 +88,20 @@ namespace J2N.Text
         }
 
         [Test]
+        public void Test_Equals_ICharSequence_StringBuffer_ShouldNotDeadlock_WhenComparingOppositeDirections()
+        {
+            const string Value = "abcdefghijklmnopqrstuvwxyz";
+
+            AssertExtensions.AssertNoABDeadlock(
+                () => CreateClassUnderTest(Value),
+                () => CharSequenceUtil.CreateStringBuffer(Value),
+                (seq1, seq2) =>
+                {
+                    Assert.IsTrue(seq1.Equals(seq2));
+                });
+        }
+
+        [Test]
         public void Test_Equals_Object_SynchronizedTextBuilderCharSequence_ShouldNotDeadlock_WhenComparingOppositeDirections()
         {
             const string Value = "abcdefghijklmnopqrstuvwxyz";
@@ -109,6 +123,20 @@ namespace J2N.Text
             AssertExtensions.AssertNoABDeadlock(
                 () => CreateClassUnderTest(Value),
                 () => CharSequenceUtil.CreateSynchronizedTextBuilder(Value),
+                (seq1, sb2) =>
+                {
+                    Assert.IsTrue(seq1.Equals((object?)sb2));
+                });
+        }
+
+        [Test]
+        public void Test_Equals_Object_StringBuffer_ShouldNotDeadlock_WhenComparingOppositeDirections()
+        {
+            const string Value = "abcdefghijklmnopqrstuvwxyz";
+
+            AssertExtensions.AssertNoABDeadlock(
+                () => CreateClassUnderTest(Value),
+                () => CharSequenceUtil.CreateStringBuffer(Value),
                 (seq1, sb2) =>
                 {
                     Assert.IsTrue(seq1.Equals((object?)sb2));
@@ -272,6 +300,20 @@ namespace J2N.Text
         }
 
         [Test]
+        public void Test_CompareTo_ICharSequence_StringBuffer_ShouldNotDeadlock_WhenComparingOppositeDirections()
+        {
+            const string Value = "abcdefghijklmnopqrstuvwxyz";
+
+            AssertExtensions.AssertNoABDeadlock(
+                () => CreateClassUnderTest(Value),
+                () => CharSequenceUtil.CreateStringBuffer(Value),
+                (seq1, seq2) =>
+                {
+                    Assert.AreEqual(0, seq1.CompareTo(seq2));
+                });
+        }
+
+        [Test]
         public void Test_CompareTo_Object_SynchronizedTextBuilderCharSequence_ShouldNotDeadlock_WhenComparingOppositeDirections()
         {
             const string Value = "abcdefghijklmnopqrstuvwxyz";
@@ -293,6 +335,20 @@ namespace J2N.Text
             AssertExtensions.AssertNoABDeadlock(
                 () => CreateClassUnderTest(Value),
                 () => CharSequenceUtil.CreateSynchronizedTextBuilder(Value),
+                (seq1, sb2) =>
+                {
+                    Assert.AreEqual(0, seq1.CompareTo((object?)sb2));
+                });
+        }
+
+        [Test]
+        public void Test_CompareTo_Object_StringBuffer_ShouldNotDeadlock_WhenComparingOppositeDirections()
+        {
+            const string Value = "abcdefghijklmnopqrstuvwxyz";
+
+            AssertExtensions.AssertNoABDeadlock(
+                () => CreateClassUnderTest(Value),
+                () => CharSequenceUtil.CreateStringBuffer(Value),
                 (seq1, sb2) =>
                 {
                     Assert.AreEqual(0, seq1.CompareTo((object?)sb2));
