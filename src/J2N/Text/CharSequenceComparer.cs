@@ -1319,12 +1319,16 @@ namespace J2N.Text
                 int length = value.Length;
                 if (length == 0)
                     return 0;
-                int hash = 0;
-                for (int i = 0; i < length; i++)
+
+                unchecked
                 {
-                    hash = value[i] + ((hash << 5) - hash);
+                    int hash = 0;
+                    for (int i = 0; i < length; i++)
+                    {
+                        hash = value[i] + ((hash << 5) - hash);
+                    }
+                    return hash;
                 }
-                return hash;
             }
 
             public override int GetHashCode(object? obj)
@@ -1386,12 +1390,16 @@ namespace J2N.Text
                 int length = obj.Length;
                 if (length == 0)
                     return 0;
-                int hash = 0;
-                for (int i = 0; i < length; i++)
+
+                unchecked
                 {
-                    hash = obj[i] + ((hash << 5) - hash);
+                    int hash = 0;
+                    for (int i = 0; i < length; i++)
+                    {
+                        hash = obj[i] + ((hash << 5) - hash);
+                    }
+                    return hash;
                 }
-                return hash;
             }
 
             public override int GetHashCode(char[]? obj)
@@ -1403,12 +1411,16 @@ namespace J2N.Text
                 int length = obj.Length;
                 if (length == 0)
                     return 0;
-                int hash = 0;
-                for (int i = 0; i < length; i++)
+
+                unchecked
                 {
-                    hash = obj[i] + ((hash << 5) - hash);
+                    int hash = 0;
+                    for (int i = 0; i < length; i++)
+                    {
+                        hash = obj[i] + ((hash << 5) - hash);
+                    }
+                    return hash;
                 }
-                return hash;
             }
 
             public override int GetHashCode(StringBuilder? obj)
@@ -1421,17 +1433,20 @@ namespace J2N.Text
                     return 0;
 
 #if FEATURE_STRINGBUILDER_GETCHUNKS
-                // From Apache Harmony
-                int hash = 0;
-                foreach (ReadOnlyMemory<char> chunk in obj.GetChunks())
+                unchecked
                 {
-                    ReadOnlySpan<char> chars = chunk.Span;
-                    for (int i = 0; i < chars.Length; i++)
+                    // From Apache Harmony
+                    int hash = 0;
+                    foreach (ReadOnlyMemory<char> chunk in obj.GetChunks())
                     {
-                        hash = chars[i] + ((hash << 5) - hash);
+                        ReadOnlySpan<char> chars = chunk.Span;
+                        for (int i = 0; i < chars.Length; i++)
+                        {
+                            hash = chars[i] + ((hash << 5) - hash);
+                        }
                     }
+                    return hash;
                 }
-                return hash;
 #else
                 char[]? arrayToReturnToPool = null;
                 try
@@ -1445,13 +1460,16 @@ namespace J2N.Text
                     Span<char> objChars = arrayToReturnToPool = ArrayPool<char>.Shared.Rent(length);
                     obj.CopyTo(0, arrayToReturnToPool, 0, length);
 #endif
-                    // From Apache Harmony
-                    int hash = 0;
-                    for (int i = 0; i < length; i++)
+                    unchecked
                     {
-                        hash = objChars[i] + ((hash << 5) - hash);
+                        // From Apache Harmony
+                        int hash = 0;
+                        for (int i = 0; i < length; i++)
+                        {
+                            hash = objChars[i] + ((hash << 5) - hash);
+                        }
+                        return hash;
                     }
-                    return hash;
                 }
                 finally
                 {
@@ -1469,12 +1487,16 @@ namespace J2N.Text
                 int length = obj.Length;
                 if (length == 0)
                     return 0;
-                int hash = 0;
-                for (int i = 0; i < length; i++)
+
+                unchecked
                 {
-                    hash = obj[i] + ((hash << 5) - hash);
+                    int hash = 0;
+                    for (int i = 0; i < length; i++)
+                    {
+                        hash = obj[i] + ((hash << 5) - hash);
+                    }
+                    return hash;
                 }
-                return hash;
             }
         }
     }
