@@ -514,7 +514,7 @@ namespace J2N.Text
 
             lock (SyncRoot)
             {
-                return EqualsCore(other);
+                return Ordinal.Equal(Value.AsSpan(), other);
             }
         }
 
@@ -559,6 +559,10 @@ namespace J2N.Text
             {
                 return EqualsCore(spannable.AsSpan());
             }
+            else if (other is StringBuilderCharSequence stringBuilderCharSequence)
+            {
+                return Ordinal.Equal(Value.AsSpan(), stringBuilderCharSequence.Value);
+            }
             else if (other is ICopyable<char> copyable)
             {
                 char[] buffer = ArrayPool<char>.Shared.Rent(other.Length);
@@ -576,7 +580,7 @@ namespace J2N.Text
             ReadOnlySpan<char> thisSpan = Value.AsSpan();
             for (int i = 0; i < len; i++)
             {
-                if (!thisSpan[i].Equals(other[i])) return false;
+                if (thisSpan[i] != other[i]) return false;
             }
             return true;
         }
@@ -606,35 +610,7 @@ namespace J2N.Text
             if (!HasValue)
                 return false;
 
-            int len = Length;
-            int otherLength = other!.Length;
-            if (len != otherLength) return false;
-
-#if FEATURE_STRINGBUILDER_GETCHUNKS
-            ReadOnlySpan<char> thisSpan = Value.AsSpan();
-            int offset = 0;
-            foreach (ReadOnlyMemory<char> otherChunk in other.GetChunks())
-            {
-                ReadOnlySpan<char> thisChunk = thisSpan.Slice(offset, otherChunk.Length);
-                if (!otherChunk.Span.SequenceEqual(thisChunk))
-                    return false;
-
-                offset += otherChunk.Length;
-            }
-            Debug.Assert(offset == Length);
-            return true;
-#else
-            char[]? buffer = ArrayPool<char>.Shared.Rent(otherLength);
-            try
-            {
-                other.CopyTo(0, buffer, 0, otherLength);
-                return EqualsCore(buffer.AsSpan(0, otherLength));
-            }
-            finally
-            {
-                ArrayPool<char>.Shared.Return(buffer);
-            }
-#endif
+            return Ordinal.Equal(Value.AsSpan(), other);
         }
 
         private bool EqualsCore(object other)
@@ -772,7 +748,7 @@ namespace J2N.Text
 
             lock (SyncRoot)
             {
-                return CompareToCore(other);
+                return Ordinal.CompareString(Value.AsSpan(), other);
             }
         }
 
@@ -870,7 +846,7 @@ namespace J2N.Text
             }
             else if (other is StringBuilderCharSequence stringBuilderCharSequence)
             {
-                return CompareToCore(stringBuilderCharSequence.Value!);
+                return Ordinal.CompareString(Value.AsSpan(), stringBuilderCharSequence.Value);
             }
 
             int result;
@@ -904,44 +880,7 @@ namespace J2N.Text
             if (!HasValue)
                 return -1;
 
-#if FEATURE_STRINGBUILDER_GETCHUNKS
-            ReadOnlySpan<char> thisSpan = Value.AsSpan();
-
-            int result;
-            int thisIndex = 0;
-            int remaining = Math.Min(thisSpan.Length, other.Length);
-
-            foreach (ReadOnlyMemory<char> chunk in other.GetChunks())
-            {
-                ReadOnlySpan<char> chunkSpan = chunk.Span;
-                int length = Math.Min(remaining, chunkSpan.Length);
-
-                for (int i = 0; i < length; i++, thisIndex++)
-                {
-                    if ((result = thisSpan[thisIndex] - chunkSpan[i]) != 0)
-                        return result;
-                }
-
-                remaining -= length;
-                if (remaining == 0)
-                    break;
-            }
-
-            // At this point, we have compared all the characters in at least one string.
-            // The longer string will be larger.
-            return thisSpan.Length - other.Length;
-#else
-            char[] buffer = ArrayPool<char>.Shared.Rent(other!.Length);
-            try
-            {
-                other.CopyTo(0, buffer, 0, other.Length);
-                return CompareTo(buffer.AsSpan(0, other.Length));
-            }
-            finally
-            {
-                ArrayPool<char>.Shared.Return(buffer);
-            }
-#endif
+            return Ordinal.CompareString(Value.AsSpan(), other);
         }
 
         private int CompareToCore(char[]? other)
