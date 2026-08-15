@@ -994,13 +994,12 @@ namespace J2N.Text
             Assert.AreEqual(expected, CharSequenceComparer.Ordinal.GetHashCode(value));
         }
 
-#if !FEATURE_BROKEN_CHARSEQENCE_EXCEPTION_HANDLING
         [Test]
         public void Test_GetHashCode_Object_Invalid()
         {
-            Assert.Throws<ArgumentException>(() => CharSequenceComparer.Ordinal.GetHashCode(CharSequenceUtil.CreateInvalidCharSequenceObject(null)));
+            // Just like the BCL, we allow arbitrary types to return their own hash code even if they are not in our comparison domain.
+            Assert.DoesNotThrow(() => CharSequenceComparer.Ordinal.GetHashCode(CharSequenceUtil.CreateInvalidCharSequenceObject(null)));
         }
-#endif
 
         public static IEnumerable<TestCaseData> GetHashCode_ICharSequence_TestData()
         {

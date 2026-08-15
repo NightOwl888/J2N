@@ -1357,12 +1357,9 @@ namespace J2N.Text
                         return GetHashCode(otherSynchronizedTextBuilder.AsSpan());
                 }
 
-#if FEATURE_BROKEN_CHARSEQENCE_EXCEPTION_HANDLING
+                // J2N: Just like the BCL, we are calling GetHashCode() on the passed in object
+                // as a fallback when the type is not in our comparison domain.
                 return obj.GetHashCode();
-#else
-                ThrowHelper.ThrowArgumentException(ExceptionResource.NotSupported_StringComparison);
-                return 0; // unreachable
-#endif
             }
 
 
