@@ -168,7 +168,7 @@ namespace J2N.Text
         {
             try
             {
-                CharSequenceUtil.AssertCompareTo(expected, CreateClassUnderTest(leftValue).CompareToOrdinal(rightValue));
+                Assert.AreEqual(expected, CreateClassUnderTest(leftValue).CompareToOrdinal(rightValue));
             }
             finally
             {
@@ -193,7 +193,7 @@ namespace J2N.Text
                 }
 #endif
 
-                CharSequenceUtil.AssertCompareTo(expected, CreateClassUnderTest(leftValue).CompareToOrdinal(rightValue.AsSpan()));
+                Assert.AreEqual(expected, CreateClassUnderTest(leftValue).CompareToOrdinal(rightValue.AsSpan()));
             }
             finally
             {
@@ -206,7 +206,7 @@ namespace J2N.Text
         {
             try
             {
-                CharSequenceUtil.AssertCompareTo(expected, CreateClassUnderTest(leftValue).CompareToOrdinal(rightValue));
+                Assert.AreEqual(expected, CreateClassUnderTest(leftValue).CompareToOrdinal(rightValue));
             }
             finally
             {
@@ -219,7 +219,7 @@ namespace J2N.Text
         {
             try
             {
-                CharSequenceUtil.AssertCompareTo(expected, CreateClassUnderTest(leftValue).CompareToOrdinal(rightValue));
+                Assert.AreEqual(expected, CreateClassUnderTest(leftValue).CompareToOrdinal(rightValue));
             }
             finally
             {
@@ -232,7 +232,7 @@ namespace J2N.Text
         {
             try
             {
-                CharSequenceUtil.AssertCompareTo(expected, CreateClassUnderTest(leftValue).CompareToOrdinal(rightValue));
+                Assert.AreEqual(expected, CreateClassUnderTest(leftValue).CompareToOrdinal(rightValue));
             }
             finally
             {

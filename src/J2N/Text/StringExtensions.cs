@@ -184,7 +184,10 @@ namespace J2N.Text
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int CompareToOrdinal(this string? str, string? value)
         {
-            return string.CompareOrdinal(str, value);
+            if (str is null) return (value is null) ? 0 : -1;
+            if (value is null) return 1;
+
+            return str.AsSpan().SequenceCompareTo(value);
         }
 
         /// <summary>
