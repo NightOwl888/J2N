@@ -275,9 +275,17 @@ namespace J2N.Text
 
 #if !FEATURE_BROKEN_CHARSEQENCE_EXCEPTION_HANDLING
         [TestCaseSource(nameof(Object_Object_Invalid_TestData))]
-        public void Test_Equals_Object_Object_Invalid(object? leftValue, object? rightValue)
+        public void Test_Equals_Object_Object_InvalidObjectType_ReturnsFalse(object? leftValue, object? rightValue)
         {
-            Assert.Throws<ArgumentException>(() => CharSequenceComparer.Ordinal.Compare(leftValue, rightValue));
+            Assert.IsFalse(CharSequenceComparer.Ordinal.Equals(leftValue, rightValue));
+        }
+
+        [Test]
+        public void Test_Equals_Object_WithMatchingFormattedInteger_ReturnsFalse()
+        {
+            int value = 123;
+            Assert.IsFalse(CharSequenceComparer.Ordinal.Equals(value.ToString(), value));
+            Assert.IsFalse(CharSequenceComparer.Ordinal.Equals(value, value.ToString()));
         }
 #endif
 

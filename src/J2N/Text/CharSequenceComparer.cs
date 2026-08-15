@@ -327,8 +327,7 @@ namespace J2N.Text
 #if FEATURE_BROKEN_CHARSEQENCE_EXCEPTION_HANDLING
             return x.Equals(y);
 #else
-            ThrowHelper.ThrowArgumentException(ExceptionResource.NotSupported_StringComparison);
-            return false; // unreachable
+            return false;
 #endif
 
         }
@@ -1109,8 +1108,7 @@ namespace J2N.Text
 #if FEATURE_BROKEN_CHARSEQENCE_EXCEPTION_HANDLING
                 return x.Equals(y);
 #else
-                ThrowHelper.ThrowArgumentException(ExceptionResource.NotSupported_StringComparison);
-                return false; // unreachable
+                return false;
 #endif
             }
 
@@ -1157,8 +1155,7 @@ namespace J2N.Text
                         return J2N.Globalization.Ordinal.Equal(x.AsSpan(), sb);
                 }
 
-                ThrowHelper.ThrowArgumentException(ExceptionResource.NotSupported_StringComparison, exceptionArgument);
-                return false; // Unreachable
+                return false;
             }
 
             private bool Equals(object? x, SynchronizedTextBuilder? y, ExceptionArgument exceptionArgument)
@@ -1207,8 +1204,7 @@ namespace J2N.Text
                         return J2N.Globalization.Ordinal.Equal(x.builder, sb);
                 }
 
-                ThrowHelper.ThrowArgumentException(ExceptionResource.NotSupported_StringComparison, exceptionArgument);
-                return false; // Unreachable
+                return false;
             }
 
             private bool Equals(object? x, StringBuffer? y, ExceptionArgument exceptionArgument)
