@@ -16,6 +16,7 @@
  */
 #endregion
 
+using J2N.Globalization;
 using System;
 using System.Buffers;
 using System.Diagnostics;
@@ -434,11 +435,11 @@ namespace J2N.Text
 
             if (other is SynchronizedTextBuilderCharSequence otherSynchronizedTextBuilderCharSequence)
             {
-                return Equals(otherSynchronizedTextBuilderCharSequence.Value);
+                return Ordinal.Equal(Value, otherSynchronizedTextBuilderCharSequence.Value);
             }
             else if (other is StringBuffer otherStringBuffer)
             {
-                return Equals(otherStringBuffer);
+                return Ordinal.Equal(Value, otherStringBuffer);
             }
 
             lock (SyncRoot)
@@ -534,7 +535,7 @@ namespace J2N.Text
             }
             else if (other is SynchronizedTextBuilder otherSynchronizedTextBuilder)
             {
-                return Equals(otherSynchronizedTextBuilder);
+                return Ordinal.Equal(Value, otherSynchronizedTextBuilder);
             }
 
             lock (SyncRoot)
@@ -542,107 +543,6 @@ namespace J2N.Text
                 return EqualsCore(other);
             }
         }
-
-        private bool Equals(SynchronizedTextBuilder? other)
-        {
-            if (!HasValue)
-                return other is null;
-            if (other is null)
-                return false;
-            if (Value == other)
-                return true;
-
-            bool lockTaken = false;
-            try
-            {
-                Monitor.Enter(other.SyncRoot, ref lockTaken);
-                int otherLength = other.buffer.Length;
-                char[] buffer = ArrayPool<char>.Shared.Rent(otherLength);
-                try
-                {
-                    try
-                    {
-                        other.buffer.CopyTo(0, buffer, 0, otherLength);
-                    }
-                    finally
-                    {
-                        // This line unlocks the other implementation
-                        if (lockTaken)
-                        {
-                            Monitor.Exit(other.SyncRoot);
-                            lockTaken = false;
-                        }
-                    }
-
-                    // Other lock is released, now lock us and do the comparison
-                    lock (SyncRoot)
-                    {
-                        return EqualsCore(buffer.AsSpan(0, otherLength));
-                    }
-                }
-                finally
-                {
-                    ArrayPool<char>.Shared.Return(buffer);
-                }
-            }
-            finally
-            {
-                if (lockTaken)
-                {
-                    Monitor.Exit(other.SyncRoot);
-                }
-            }
-        }
-
-        private bool Equals(StringBuffer? other)
-        {
-            if (!HasValue)
-                return other is null || !((ICharSequence)other).HasValue;
-            if (other is null || !((ICharSequence)other).HasValue)
-                return false;
-
-            bool lockTaken = false;
-            try
-            {
-                Monitor.Enter(other.SyncRoot, ref lockTaken);
-                int otherLength = other.builder.Length;
-                char[] buffer = ArrayPool<char>.Shared.Rent(otherLength);
-                try
-                {
-                    try
-                    {
-                        other.builder.CopyTo(0, buffer, 0, otherLength);
-                    }
-                    finally
-                    {
-                        // This line unlocks the other implementation
-                        if (lockTaken)
-                        {
-                            Monitor.Exit(other.SyncRoot);
-                            lockTaken = false;
-                        }
-                    }
-
-                    // Other lock is released, now lock us and do the comparison
-                    lock (SyncRoot)
-                    {
-                        return EqualsCore(buffer.AsSpan(0, otherLength));
-                    }
-                }
-                finally
-                {
-                    ArrayPool<char>.Shared.Return(buffer);
-                }
-            }
-            finally
-            {
-                if (lockTaken)
-                {
-                    Monitor.Exit(other.SyncRoot);
-                }
-            }
-        }
-
         private bool EqualsCore(ICharSequence? other)
         {
             if (!HasValue)
@@ -819,11 +719,11 @@ namespace J2N.Text
 
             if (other is SynchronizedTextBuilderCharSequence otherSynchronizedTextBuilderCharSequence)
             {
-                return CompareTo(otherSynchronizedTextBuilderCharSequence.Value);
+                return Ordinal.CompareString(Value, otherSynchronizedTextBuilderCharSequence.Value);
             }
             else if (other is StringBuffer otherStringBuffer)
             {
-                return CompareTo(otherStringBuffer);
+                return Ordinal.CompareString(Value, otherStringBuffer);
             }
 
             lock (SyncRoot)
@@ -919,102 +819,6 @@ namespace J2N.Text
                 return CompareToCore(other);
             }
         }
-
-        internal int CompareTo(StringBuffer? other)
-        {
-            if (!HasValue) return (other is null || !((ICharSequence)other).HasValue) ? 0 : -1;
-            if (other is null || !((ICharSequence)other).HasValue) return 1;
-
-            bool lockTaken = false;
-            try
-            {
-                Monitor.Enter(other.SyncRoot, ref lockTaken);
-                int otherLength = other.builder.Length;
-                char[] buffer = ArrayPool<char>.Shared.Rent(otherLength);
-                try
-                {
-                    try
-                    {
-                        // This line does not lock the other implementation
-                        other.builder.CopyTo(0, buffer, 0, otherLength);
-                    }
-                    finally
-                    {
-                        if (lockTaken)
-                        {
-                            Monitor.Exit(other.SyncRoot);
-                            lockTaken = false;
-                        }
-                    }
-
-                    // Other lock is released, now lock us and do the comparison
-                    lock (SyncRoot)
-                    {
-                        return CompareToCore(buffer.AsSpan(0, otherLength));
-                    }
-                }
-                finally
-                {
-                    ArrayPool<char>.Shared.Return(buffer);
-                }
-            }
-            finally
-            {
-                if (lockTaken)
-                {
-                    Monitor.Exit(other.SyncRoot);
-                }
-            }
-        }
-
-        internal int CompareTo(SynchronizedTextBuilder? other)
-        {
-            if (!HasValue) return (other is null) ? 0 : -1;
-            if (other is null) return 1;
-            if (Value == other) return 0;
-
-            bool lockTaken = false;
-            try
-            {
-                Monitor.Enter(other.SyncRoot, ref lockTaken);
-                int otherLength = other.buffer.Length;
-                char[] buffer = ArrayPool<char>.Shared.Rent(otherLength);
-                try
-                {
-                    try
-                    {
-                        // This line does not lock the other implementation
-                        other.buffer.CopyTo(0, buffer, 0, otherLength);
-                    }
-                    finally
-                    {
-                        if (lockTaken)
-                        {
-                            Monitor.Exit(other.SyncRoot);
-                            lockTaken = false;
-                        }
-                    }
-
-                    // Other lock is released, now lock us and do the comparison
-                    lock (SyncRoot)
-                    {
-                        return CompareToCore(buffer.AsSpan(0, otherLength));
-                    }
-                }
-                finally
-                {
-                    ArrayPool<char>.Shared.Return(buffer);
-                }
-            }
-            finally
-            {
-                if (lockTaken)
-                {
-                    Monitor.Exit(other.SyncRoot);
-                }
-            }
-        }
-
         /// <summary>
         /// Compares this instance with a specified <see cref="object"/> and indicates whether
         /// this instance precedes, follows, or appears in the same position in the sort order as the specified string.
@@ -1042,7 +846,7 @@ namespace J2N.Text
             }
             else if (other is SynchronizedTextBuilder otherSynchronizedTextBuilder)
             {
-                return CompareTo(otherSynchronizedTextBuilder);
+                return Ordinal.CompareString(Value, otherSynchronizedTextBuilder);
             }
 
             lock (SyncRoot)
