@@ -79,8 +79,8 @@ namespace J2N.Text
             const string Value = "abcdefghijklmnopqrstuvwxyz";
 
             AssertExtensions.AssertNoABDeadlock(
-                () => new SynchronizedTextBuilderCharSequence(new SynchronizedTextBuilder(Value)),
-                () => new SynchronizedTextBuilderCharSequence(new SynchronizedTextBuilder(Value)),
+                () => CreateClassUnderTest(Value),
+                () => CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence(Value),
                 (seq1, seq2) =>
                 {
                     Assert.IsTrue(seq1.Equals(seq2));
@@ -93,8 +93,8 @@ namespace J2N.Text
             const string Value = "abcdefghijklmnopqrstuvwxyz";
 
             AssertExtensions.AssertNoABDeadlock(
-                () => new SynchronizedTextBuilderCharSequence(new SynchronizedTextBuilder(Value)),
-                () => new SynchronizedTextBuilderCharSequence(new SynchronizedTextBuilder(Value)),
+                () => CreateClassUnderTest(Value),
+                () => CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence(Value),
                 (seq1, seq2) =>
                 {
                     Assert.IsTrue(seq1.Equals((object?)seq2));
@@ -107,8 +107,8 @@ namespace J2N.Text
             const string Value = "abcdefghijklmnopqrstuvwxyz";
 
             AssertExtensions.AssertNoABDeadlock(
-                () => new SynchronizedTextBuilderCharSequence(new SynchronizedTextBuilder(Value)),
-                () => new SynchronizedTextBuilder(Value),
+                () => CreateClassUnderTest(Value),
+                () => CharSequenceUtil.CreateSynchronizedTextBuilder(Value),
                 (seq1, sb2) =>
                 {
                     Assert.IsTrue(seq1.Equals((object?)sb2));
@@ -263,8 +263,8 @@ namespace J2N.Text
             const string Value = "abcdefghijklmnopqrstuvwxyz";
 
             AssertExtensions.AssertNoABDeadlock(
-                () => new SynchronizedTextBuilderCharSequence(new SynchronizedTextBuilder(Value)),
-                () => new SynchronizedTextBuilderCharSequence(new SynchronizedTextBuilder(Value)),
+                () => CreateClassUnderTest(Value),
+                () => CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence(Value),
                 (seq1, seq2) =>
                 {
                     Assert.AreEqual(0, seq1.CompareTo(seq2));
@@ -277,8 +277,8 @@ namespace J2N.Text
             const string Value = "abcdefghijklmnopqrstuvwxyz";
 
             AssertExtensions.AssertNoABDeadlock(
-                () => new SynchronizedTextBuilderCharSequence(new SynchronizedTextBuilder(Value)),
-                () => new SynchronizedTextBuilderCharSequence(new SynchronizedTextBuilder(Value)),
+                () => CreateClassUnderTest(Value),
+                () => CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence(Value),
                 (seq1, seq2) =>
                 {
                     Assert.AreEqual(0, seq1.CompareTo((object?)seq2));
@@ -291,8 +291,8 @@ namespace J2N.Text
             const string Value = "abcdefghijklmnopqrstuvwxyz";
 
             AssertExtensions.AssertNoABDeadlock(
-                () => new SynchronizedTextBuilderCharSequence(new SynchronizedTextBuilder(Value)),
-                () => new SynchronizedTextBuilder(Value),
+                () => CreateClassUnderTest(Value),
+                () => CharSequenceUtil.CreateSynchronizedTextBuilder(Value),
                 (seq1, sb2) =>
                 {
                     Assert.AreEqual(0, seq1.CompareTo((object?)sb2));
