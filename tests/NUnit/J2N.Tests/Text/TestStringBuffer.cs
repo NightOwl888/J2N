@@ -1575,6 +1575,14 @@ namespace J2N.Text
                 CharSequenceUtil.AssertSynchronizesWhileReading(other, () => Assert.IsTrue(target.Equals((object?)other)));
             }
 
+            [Test]
+            public void Test_Equals_Object_WithMatchingFormattedInteger_ReturnsFalse()
+            {
+                int value = 123;
+                var target = CreateClassUnderTest(value.ToString())!;
+                Assert.IsFalse(target.Equals(value));
+            }
+
             public static IEnumerable<TestCaseData> Equals_Object_TestData()
             {
                 foreach (TestCaseData item in CharSequenceUtil.Equals_Object_TestData())

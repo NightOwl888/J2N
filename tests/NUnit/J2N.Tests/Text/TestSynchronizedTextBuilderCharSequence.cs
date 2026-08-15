@@ -17,6 +17,7 @@
 #endregion
 
 using NUnit.Framework;
+using System;
 using System.Text;
 #nullable enable
 
@@ -177,6 +178,14 @@ namespace J2N.Text
             var other = CharSequenceUtil.CreateSynchronizedTextBuilder(String1)!;
 
             CharSequenceUtil.AssertSynchronizesWhileReading(other, () => Assert.IsTrue(target.Equals((object?)other)));
+        }
+
+        [Test]
+        public void Test_Equals_Object_WithMatchingFormattedInteger_ReturnsFalse()
+        {
+            int value = 123;
+            var target = CreateClassUnderTest(value.ToString());
+            Assert.IsFalse(target.Equals(value));
         }
 
         [TestCaseSource(typeof(CharSequenceUtil), nameof(CharSequenceUtil.Equals_Object_TestData))]
@@ -398,6 +407,14 @@ namespace J2N.Text
             var other = CharSequenceUtil.CreateStringBuffer(String1)!;
 
             CharSequenceUtil.AssertSynchronizesWhileReading(other, () => Assert.AreEqual(0, target.CompareTo((object?)other)));
+        }
+
+        [Test]
+        public void Test_CompareTo_Object_WithMatchingFormattedInteger_ThrowsArgumentException()
+        {
+            int value = 123;
+            var target = CreateClassUnderTest(value.ToString());
+            Assert.Throws<ArgumentException>(() => target.CompareTo(value));
         }
 
         [TestCaseSource(typeof(CharSequenceUtil), nameof(CharSequenceUtil.CompareTo_Object_TestData))]

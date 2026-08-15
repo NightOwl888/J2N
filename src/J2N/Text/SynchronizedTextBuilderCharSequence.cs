@@ -634,7 +634,7 @@ namespace J2N.Text
             else if (other is StringBuilder otherStringBuilder)
                 return EqualsCore(otherStringBuilder);
 
-            return EqualsCore(other?.ToString() ?? string.Empty);
+            return false;
         }
 
         /// <summary>
@@ -923,7 +923,8 @@ namespace J2N.Text
             else if (other is char[] otherCharArray)
                 return CompareToCore(otherCharArray);
 
-            return Value.AsSpan().CompareTo(other!.ToString(), StringComparison.Ordinal);
+            ThrowHelper.ThrowArgumentException(ExceptionResource.NotSupported_StringComparison);
+            return 0; // unreachable
         }
 
 

@@ -565,7 +565,12 @@ namespace J2N.Text
             else if (other is SynchronizedTextBuilder otherSynchronizedTextBuilder)
                 return CompareTo(otherSynchronizedTextBuilder);
 
+#if FEATURE_BROKEN_CHARSEQENCE_EXCEPTION_HANDLING
             return Value.CompareToOrdinal(other.ToString());
+#else
+            ThrowHelper.ThrowArgumentException(ExceptionResource.NotSupported_StringComparison);
+            return 0; // unreachable
+#endif
         }
 
         #endregion IComparable Members

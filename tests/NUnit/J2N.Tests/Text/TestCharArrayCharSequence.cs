@@ -1,4 +1,5 @@
 ﻿using NUnit.Framework;
+using System;
 using System.Text;
 #nullable enable
 
@@ -106,6 +107,17 @@ namespace J2N.Text
             CharSequenceUtil.AssertSynchronizesWhileReading(other, () => Assert.IsTrue(target.Equals((object?)other)));
         }
 
+        [Test]
+        public void Test_Equals_Object_WithMatchingFormattedInteger_ReturnsFalse()
+        {
+            int value = 123;
+            var target = CreateClassUnderTest(value.ToString());
+#if FEATURE_BROKEN_CHARSEQENCE_EXCEPTION_HANDLING
+            Assert.IsTrue(target.Equals(value));
+#else
+            Assert.IsFalse(target.Equals(value));
+#endif
+        }
 
         [TestCaseSource(typeof(CharSequenceUtil), nameof(CharSequenceUtil.Equals_Object_TestData))]
         public void Test_Equals_Object(string? leftValue, object? rightValue, bool expected)
@@ -256,6 +268,18 @@ namespace J2N.Text
             var other = CharSequenceUtil.CreateStringBuffer(String1)!;
 
             CharSequenceUtil.AssertSynchronizesWhileReading(other, () => Assert.AreEqual(0, target.CompareTo((object?)other)));
+        }
+
+        [Test]
+        public void Test_CompareTo_Object_WithMatchingFormattedInteger_ThrowsArgumentException()
+        {
+            int value = 123;
+            var target = CreateClassUnderTest(value.ToString());
+#if FEATURE_BROKEN_CHARSEQENCE_EXCEPTION_HANDLING
+            Assert.AreEqual(0, target.CompareTo(value));
+#else
+            Assert.Throws<ArgumentException>(() => target.CompareTo(value));
+#endif
         }
 
         [TestCaseSource(typeof(CharSequenceUtil), nameof(CharSequenceUtil.CompareTo_Object_TestData))]
