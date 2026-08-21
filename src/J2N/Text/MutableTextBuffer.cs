@@ -69,7 +69,7 @@ namespace J2N.Text
     internal partial class MutableTextBuffer : IBufferWriter<char>, ISpannable<char>, ISpanCopyable<char>, ICopyable<char>, IDisposable
         //, IEnumerable<char> // ICU4N TODO: Implement?
     {
-        private const int CharStackBufferSize = 32;
+        internal const int CharStackBufferSize = 32; // internal for testing
 
         private readonly IArrayAllocator<char> allocator;
 

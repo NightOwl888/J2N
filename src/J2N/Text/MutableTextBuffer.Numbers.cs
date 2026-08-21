@@ -385,9 +385,9 @@ namespace J2N.Text
 
         // J2N: Helper method for supported types so we don't need to duplicate all of this business logic
         // on every number type.
-        private void InsertNumberCore<T, TFormatter>(
-            int index, T value, ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
-            where TFormatter : struct, INumberFormatter<T>
+        internal void InsertNumberCore<T, TFormatter>(
+            int index, T value, ReadOnlySpan<char> format = default, IFormatProvider? provider = null, ArrayPool<char>? arrayPool = null)
+            where TFormatter : struct, INumberFormatter<T> // internal for testing
         {
             if ((uint)index > (uint)Length)
             {
@@ -395,6 +395,8 @@ namespace J2N.Text
             }
 
             provider ??= DefaultNumberFormatInfo; // Set by UseInvariantDefaults
+            arrayPool ??= ArrayPool<char>.Shared; // Allow tests to inject this
+
             char[]? arrayToReturnToPool = null;
             Span<char> buffer = stackalloc char[CharStackBufferSize];
             int charsWritten = 0;
@@ -409,7 +411,17 @@ namespace J2N.Text
                     {
                         ThrowHelper.ThrowArgumentOutOfRangeException(value, ExceptionArgument.valueCount, ExceptionResource.ArgumentOutOfRange_LengthGreaterThanCapacity);
                     }
-                    buffer = arrayToReturnToPool = ArrayPool<char>.Shared.Rent(newLength);
+
+                    char[]? temp = arrayToReturnToPool;
+                    try
+                    {
+                        buffer = arrayToReturnToPool = arrayPool.Rent(newLength);
+                    }
+                    finally
+                    {
+                        if (temp is not null && !ReferenceEquals(temp, arrayToReturnToPool))
+                            arrayPool.Return(temp);
+                    }
                 }
 
                 // We don't use Insert(int, ReadOnlySpan<char>) for exception compatibility;
@@ -418,12 +430,12 @@ namespace J2N.Text
             }
             finally
             {
-                if (arrayToReturnToPool != null)
-                    ArrayPool<char>.Shared.Return(arrayToReturnToPool);
+                if (arrayToReturnToPool is not null)
+                    arrayPool.Return(arrayToReturnToPool);
             }
         }
 
-        private void InsertSpanFormattable<T>(int index, T value, ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
+        internal void InsertSpanFormattable<T>(int index, T value, ReadOnlySpan<char> format = default, IFormatProvider? provider = null, ArrayPool<char>? arrayPool = null) // internal for testing
 #if FEATURE_SPANFORMATTABLE
             where T : ISpanFormattable
 #else
@@ -432,12 +444,13 @@ namespace J2N.Text
         {
             Debug.Assert(typeof(T).Assembly.Equals(typeof(object).Assembly) || typeof(T).Assembly.Equals(typeof(Number).Assembly), "Implementation trusts the results of TryFormat because T is expected to be something known");
 
-            provider ??= DefaultNumberFormatInfo; // Set by UseInvariantDefaults
-
             if ((uint)index > (uint)Length)
             {
                 ThrowHelper.ThrowArgumentOutOfRange_IndexMustBeLessOrEqualException(index);
             }
+
+            provider ??= DefaultNumberFormatInfo; // Set by UseInvariantDefaults
+            arrayPool ??= ArrayPool<char>.Shared; // Allow tests to inject this
 
             char[]? arrayToReturnToPool = null;
             Span<char> buffer = stackalloc char[CharStackBufferSize];
@@ -454,7 +467,16 @@ namespace J2N.Text
                         ThrowHelper.ThrowArgumentOutOfRangeException(value, ExceptionArgument.valueCount, ExceptionResource.ArgumentOutOfRange_LengthGreaterThanCapacity);
                     }
 
-                    buffer = arrayToReturnToPool = ArrayPool<char>.Shared.Rent(newLength);
+                    char[]? temp = arrayToReturnToPool;
+                    try
+                    {
+                        buffer = arrayToReturnToPool = arrayPool.Rent(newLength);
+                    }
+                    finally
+                    {
+                        if (temp is not null && !ReferenceEquals(temp, arrayToReturnToPool))
+                            arrayPool.Return(temp);
+                    }
                 }
 
                 // We don't use Insert(int, ReadOnlySpan<char>) for exception compatibility;
@@ -463,8 +485,8 @@ namespace J2N.Text
             }
             finally
             {
-                if (arrayToReturnToPool != null)
-                    ArrayPool<char>.Shared.Return(arrayToReturnToPool);
+                if (arrayToReturnToPool is not null)
+                    arrayPool.Return(arrayToReturnToPool);
             }
         }
 

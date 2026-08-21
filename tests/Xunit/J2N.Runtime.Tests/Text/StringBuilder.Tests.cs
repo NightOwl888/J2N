@@ -6,9 +6,11 @@ using J2N.Buffers;
 using J2N.Collections;
 using J2N.IO;
 using J2N.Numerics;
+using J2N.Numerics.Formatters;
 using J2N.TestUtilities;
 using J2N.TestUtilities.Xunit;
 using System;
+using System.Buffers;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -3036,6 +3038,81 @@ namespace J2N.Text.Tests
             AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => builder.Insert(builder.Length + 1, (sbyte)1)); // Index > builder.Length
             Assert.Throws<OutOfMemoryException>(() => builder.Insert(builder.Length, (sbyte)1)); // New length > builder.MaxCapacity
         }
+
+        [Fact]
+        public void InsertNumberCore_ReturnsAllRentedBuffers_WhenMultipleRetriesAreRequired()
+        {
+            var builder = MutableTextBufferFactory(0, 256);
+            var pool = new TrackingCharArrayPool();
+
+            int requiredLength = MutableTextBuffer.CharStackBufferSize * 2 + 1;
+            string format = "D" + requiredLength;
+
+            builder.InsertNumberCore<int, Int32Formatter>(
+                0,
+                1,
+                format,
+                CultureInfo.InvariantCulture,
+                pool);
+
+            Assert.Equal(requiredLength, builder.Length);
+            Assert.Equal(pool.RentedArrays.Count, pool.ReturnedArrays.Count);
+            Assert.All(pool.RentedArrays, array => Assert.Contains(array, pool.ReturnedArrays));
+        }
+
+        [Fact]
+        public void InsertSpanFormattable_ReturnsAllRentedBuffers_WhenMultipleRetriesAreRequired()
+        {
+            var builder = MutableTextBufferFactory(0, 256);
+            var pool = new TrackingCharArrayPool();
+
+            int requiredLength = MutableTextBuffer.CharStackBufferSize * 2 + 1;
+            string format = "D" + requiredLength;
+
+            builder.InsertSpanFormattable(
+                0,
+#if FEATURE_SPANFORMATTABLE
+                1,
+#else
+                J2N.Numerics.Int32.GetInstance(1),
+#endif
+                format,
+                CultureInfo.InvariantCulture,
+                pool);
+
+            Assert.Equal(requiredLength, builder.Length);
+            Assert.Equal(pool.RentedArrays.Count, pool.ReturnedArrays.Count);
+            Assert.All(pool.RentedArrays, array => Assert.Contains(array, pool.ReturnedArrays));
+        }
+
+        private sealed class TrackingCharArrayPool : ArrayPool<char>
+        {
+            private readonly List<char[]> rentedArrays = new();
+            private readonly HashSet<char[]> returnedArrays = new();
+
+            public int RentCount => rentedArrays.Count;
+            public int ReturnCount => returnedArrays.Count;
+
+            public IReadOnlyList<char[]> RentedArrays => rentedArrays;
+            public IReadOnlyCollection<char[]> ReturnedArrays => returnedArrays;
+
+            public override char[] Rent(int minimumLength)
+            {
+                var array = new char[minimumLength];
+                rentedArrays.Add(array);
+                return array;
+            }
+
+            public override void Return(char[] array, bool clearArray = false)
+            {
+                Assert.Contains(array, rentedArrays);
+                Assert.DoesNotContain(array, returnedArrays);
+
+                returnedArrays.Add(array);
+            }
+        }
+
+
 
         [Theory]
         [InlineData("Hello", 0, "\0", 0, "Hello")]
