@@ -1530,49 +1530,79 @@ namespace J2N.Text
                     });
             }
 
-            [Test]
-            public void Test_Equals_ICharSequence_SynchronizedTextBuilderCharSequence_SynchronizesWhileReading()
+            public static IEnumerable<TestCaseData> Equals_Object_Synchronization_TestData()
             {
-                var target = CreateClassUnderTest(Value)!;
-                var other = CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence(Value);
+                foreach (var factory in CharSequenceUtil.ComparableObjectFactories)
+                {
+                        var leftArg = Value;
+                        var rightArgRaw = factory(Value);
+                        var expectedArg = true;
 
-                CharSequenceUtil.AssertSynchronizesWhileReading(other.Value!, () => Assert.IsTrue(target.Equals((ICharSequence?)other)));
+                        yield return new TestCaseData(leftArg, rightArgRaw, expectedArg)
+                            .FormatArguments(leftArg, rightArgRaw);
+                }
+            }
+
+            [TestCaseSource(nameof(Equals_Object_Synchronization_TestData))]
+            public void Test_Equals_Object_SynchronizesWhileReading(string leftValue, object? rightValue, bool expected)
+            {
+                var target = CreateClassUnderTest(leftValue)!;
+
+                // J2N NOTE: We intentionally attempt to mutate target here instead of rightValue to ensure the target is the one that is locked.
+                // Per the JDK, there are no guarantees that rightValue is locked even if it is a synchronized type.
+                CharSequenceUtil.AssertSynchronizesWhileReading(target, () => Assert.AreEqual(expected, target.Equals(rightValue)));
+            }
+
+            public static IEnumerable<TestCaseData> Equals_ICharSequence_Synchronization_TestData()
+            {
+                foreach (var factory in CharSequenceUtil.ICharSequenceFactories)
+                {
+                    var leftArg = Value;
+                    var rightArgRaw = factory(Value);
+                    var expectedArg = true;
+
+                    yield return new TestCaseData(leftArg, rightArgRaw, expectedArg)
+                        .FormatArguments(leftArg, rightArgRaw);
+                }
+            }
+
+            [TestCaseSource(nameof(Equals_ICharSequence_Synchronization_TestData))]
+            public void Test_Equals_ICharSequence_SynchronizesWhileReading(string leftValue, object? rightValue, bool expected)
+            {
+                var target = CreateClassUnderTest(leftValue)!;
+
+                // J2N NOTE: We intentionally attempt to mutate target here instead of rightValue to ensure the target is the one that is locked.
+                // Per the JDK, there are no guarantees that rightValue is locked even if it is a synchronized type.
+                CharSequenceUtil.AssertSynchronizesWhileReading(target, () => Assert.AreEqual(expected, target.Equals(rightValue)));
             }
 
             [Test]
-            public void Test_Equals_ICharSequence_StringBuffer_SynchronizesWhileReading()
+            public void Test_Equals_StringBuilder_SynchronizesWhileReading()
             {
+                bool expected = true;
                 var target = CreateClassUnderTest(Value)!;
-                var other = CharSequenceUtil.CreateStringBuffer(Value)!;
+                var rightValue = CharSequenceUtil.CreateStringBuilder(Value)!;
 
-                CharSequenceUtil.AssertSynchronizesWhileReading(other, () => Assert.IsTrue(target.Equals((ICharSequence?)other)));
+                CharSequenceUtil.AssertSynchronizesWhileReading(target, () => Assert.AreEqual(expected, target.Equals(rightValue)));
             }
 
             [Test]
-            public void Test_Equals_Object_SynchronizedTextBuilderCharSequence_SynchronizesWhileReading()
+            public void Test_Equals_StringBuilderCharSequence_SynchronizesWhileReading()
             {
+                bool expected = true;
                 var target = CreateClassUnderTest(Value)!;
-                var other = CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence(Value);
+                var rightValue = CharSequenceUtil.CreateStringBuilderCharSequence(Value);
 
-                CharSequenceUtil.AssertSynchronizesWhileReading(other.Value!, () => Assert.IsTrue(target.Equals((object?)other)));
+                CharSequenceUtil.AssertSynchronizesWhileReading(target, () => Assert.AreEqual(expected, target.Equals(rightValue)));
             }
 
             [Test]
-            public void Test_Equals_Object_SynchronizedTextBuilder_SynchronizesWhileReading()
+            public void Test_Equals_CharSpan_SynchronizesWhileReading()
             {
+                bool expected = true;
                 var target = CreateClassUnderTest(Value)!;
-                var other = CharSequenceUtil.CreateSynchronizedTextBuilder(Value)!;
 
-                CharSequenceUtil.AssertSynchronizesWhileReading(other, () => Assert.IsTrue(target.Equals((object?)other)));
-            }
-
-            [Test]
-            public void Test_Equals_Object_StringBuffer_SynchronizesWhileReading()
-            {
-                var target = CreateClassUnderTest(Value)!;
-                var other = CharSequenceUtil.CreateStringBuffer(Value)!;
-
-                CharSequenceUtil.AssertSynchronizesWhileReading(other, () => Assert.IsTrue(target.Equals((object?)other)));
+                CharSequenceUtil.AssertSynchronizesWhileReading(target, () => Assert.AreEqual(expected, target.Equals(Value.AsSpan())));
             }
 
             [Test]
