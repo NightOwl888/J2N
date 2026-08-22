@@ -54,7 +54,7 @@ namespace J2N.Text.Tests
         [MemberData(nameof(Append_LowerCase_TestData))]
         public void AppendLower_CharSpan(string original, string input, string expected, CultureInfo culture)
         {
-            var ambientCulture = new ThreadCultureChange("tr-TR");
+            using var ambientCulture = new ThreadCultureChange("tr-TR");
             var sb = MutableTextBufferFactory(original, 15);
             sb.AppendLower(input.AsSpan(), culture);
             Assert.Equal(expected, sb.ToString());
@@ -100,7 +100,7 @@ namespace J2N.Text.Tests
         [MemberData(nameof(Append_LowerCase_TestData))]
         public void AppendLower_String(string original, string input, string expected, CultureInfo culture)
         {
-            var ambientCulture = new ThreadCultureChange("tr-TR");
+            using var ambientCulture = new ThreadCultureChange("tr-TR");
             var sb = MutableTextBufferFactory(original, 15);
             sb.AppendLower(input, culture);
             Assert.Equal(expected, sb.ToString());
@@ -109,7 +109,7 @@ namespace J2N.Text.Tests
         [Fact]
         public void AppendLower_String_UsesAmbientCulture_WhenInvariantDefaultsDisabled()
         {
-            using var ambientCulture = new ThreadCultureChange("tr-TR");
+            using using var ambientCulture = new ThreadCultureChange("tr-TR");
             var sb = MutableTextBufferFactory("", 16, new MutableTextBufferTestOptions { UseInvariantDefaults = false });
             sb.AppendLower("I", culture: null);
             Assert.Equal("ı", sb.ToString());
@@ -168,7 +168,7 @@ namespace J2N.Text.Tests
         [MemberData(nameof(Append_UpperCase_TestData))]
         public void AppendUpper_CharSpan(string original, string input, string expected, CultureInfo culture)
         {
-            var ambientCulture = new ThreadCultureChange("tr-TR");
+            using var ambientCulture = new ThreadCultureChange("tr-TR");
             var sb = MutableTextBufferFactory(original, 15);
             sb.AppendUpper(input.AsSpan(), culture);
             Assert.Equal(expected, sb.ToString());
@@ -214,7 +214,7 @@ namespace J2N.Text.Tests
         [MemberData(nameof(Append_UpperCase_TestData))]
         public void AppendUpper_String(string original, string input, string expected, CultureInfo culture)
         {
-            var ambientCulture = new ThreadCultureChange("tr-TR");
+            using var ambientCulture = new ThreadCultureChange("tr-TR");
             var sb = MutableTextBufferFactory(original, 15);
             sb.AppendUpper(input, culture);
             Assert.Equal(expected, sb.ToString());
