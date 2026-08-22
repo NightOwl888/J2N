@@ -1010,11 +1010,18 @@ namespace J2N.Text
         {
             Debug.Assert(valueCount >= 0, "Invalid length; should have been validated by caller.");
 
+            if (value == null)
+            {
+                sourceOffset = -1;
+                return false;
+            }
+
             fixed (char* buffer = m_Chars)
             {
                 nuint offset = (nuint)(value - buffer);
 
-                if (offset <= (nuint)(m_Chars.Length - valueCount))
+                if (offset <= (nuint)m_Chars.Length &&
+                    (nuint)valueCount <= (nuint)m_Chars.Length - offset)
                 {
                     sourceOffset = (int)offset;
                     return true;

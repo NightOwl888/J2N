@@ -1143,6 +1143,14 @@ namespace J2N.Text.Tests
             }
         }
 
+        [Fact] // J2N specific
+        public unsafe void Append_CharPointer_Null_DoesNotUseOverlappingPath()
+        {
+            var builder = MutableTextBufferFactory(0, 16);
+
+            Assert.Throws<NullReferenceException>(() => builder.Append((char*)null, 1));
+        }
+
         [Fact]
         public unsafe void Append_CharPointer_Null_ThrowsNullReferenceException()
         {
@@ -2395,6 +2403,14 @@ namespace J2N.Text.Tests
 
                 Assert.Equal(expected.ToString(), actual.ToString());
             }
+        }
+
+        [Fact] // J2N specific
+        public unsafe void Insert_CharPointer_Null_DoesNotUseOverlappingPath()
+        {
+            var builder = MutableTextBufferFactory(0, 16);
+
+            Assert.Throws<NullReferenceException>(() => builder.Insert(0, (char*)null, 1));
         }
 
         [Fact] // J2N specific
