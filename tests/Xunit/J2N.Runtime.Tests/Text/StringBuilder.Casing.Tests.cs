@@ -109,7 +109,7 @@ namespace J2N.Text.Tests
         [Fact]
         public void AppendLower_String_UsesAmbientCulture_WhenInvariantDefaultsDisabled()
         {
-            using using var ambientCulture = new ThreadCultureChange("tr-TR");
+            using var ambientCulture = new ThreadCultureChange("tr-TR");
             var sb = MutableTextBufferFactory("", 16, new MutableTextBufferTestOptions { UseInvariantDefaults = false });
             sb.AppendLower("I", culture: null);
             Assert.Equal("ı", sb.ToString());
