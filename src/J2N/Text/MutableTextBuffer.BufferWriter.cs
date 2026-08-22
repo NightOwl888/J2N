@@ -66,15 +66,28 @@ namespace J2N.Text
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(sizeHint, ExceptionArgument.sizeHint);
             }
 
-            // Return a minimum of DefaultCapacity.
-            if (sizeHint < DefaultCapacity)
+            int position = m_Position;
+            int availableCapacity = m_Chars.Length - position;
+
+            if (sizeHint == 0)
             {
-                sizeHint = DefaultCapacity;
+                // Try to guarantee at least DefaultCapacity, but only grow if absolutely necessary
+                if (availableCapacity >= DefaultCapacity || availableCapacity == 0)
+                    sizeHint = DefaultCapacity;
+                else
+                    sizeHint = availableCapacity;
             }
 
-            EnsureCapacityForWriting(sizeHint);
+            if (sizeHint > availableCapacity)
+            {
+                Grow(sizeHint);
 
-            int position = m_Position;
+                if (allocator.GuaranteesClearedArrays)
+                {
+                    // Return the whole remaining buffer, uncleared
+                    return m_Chars.AsSpan(position);
+                }
+            }
 
             if (!clearExposedBuffers)
             {
@@ -82,8 +95,10 @@ namespace J2N.Text
                 return m_Chars.AsSpan(position);
             }
 
-            // Return the larger of DefaultCapacity or sizeHint, cleared
-            return GetClearedWritableSpan(position, sizeHint);
+            // Return the requested amount, cleared
+            Span<char> result = m_Chars.AsSpan(position, sizeHint);
+            result.Clear();
+            return result;
         }
 
         /// <summary>
@@ -125,15 +140,28 @@ namespace J2N.Text
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(sizeHint, ExceptionArgument.sizeHint);
             }
 
-            // Return a minimum of DefaultCapacity.
-            if (sizeHint < DefaultCapacity)
+            int position = m_Position;
+            int availableCapacity = m_Chars.Length - position;
+
+            if (sizeHint == 0)
             {
-                sizeHint = DefaultCapacity;
+                // Try to guarantee at least DefaultCapacity, but only grow if absolutely necessary
+                if (availableCapacity >= DefaultCapacity || availableCapacity == 0)
+                    sizeHint = DefaultCapacity;
+                else
+                    sizeHint = availableCapacity;
             }
 
-            EnsureCapacityForWriting(sizeHint);
+            if (sizeHint > availableCapacity)
+            {
+                Grow(sizeHint);
 
-            int position = m_Position;
+                if (allocator.GuaranteesClearedArrays)
+                {
+                    // Return the whole remaining buffer, uncleared
+                    return m_Chars.AsMemory(position);
+                }
+            }
 
             if (!clearExposedBuffers)
             {
@@ -141,7 +169,7 @@ namespace J2N.Text
                 return m_Chars.AsMemory(position);
             }
 
-            // Return the larger of DefaultCapacity or sizeHint, cleared
+            // Return the requested amount, cleared
             m_Chars.AsSpan(position, sizeHint).Clear();
             return m_Chars.AsMemory(position, sizeHint);
         }
@@ -180,23 +208,6 @@ namespace J2N.Text
             }
 
             m_Position += count;
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void EnsureCapacityForWriting(int sizeHint)
-        {
-            if (sizeHint > (m_Chars.Length - m_Position))
-            {
-                Grow(sizeHint);
-            }
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private Span<char> GetClearedWritableSpan(int start, int length)
-        {
-            Span<char> span = m_Chars.AsSpan(start, length);
-            span.Fill('\0');
-            return span;
         }
 
         [MethodImpl(MethodImplOptions.NoInlining)]

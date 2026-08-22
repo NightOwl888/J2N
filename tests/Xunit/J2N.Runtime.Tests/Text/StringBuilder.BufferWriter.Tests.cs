@@ -16,6 +16,7 @@
  */
 #endregion
 
+using J2N.Buffers;
 using J2N.TestUtilities.Xunit;
 using System;
 using System.Text;
@@ -25,6 +26,9 @@ namespace J2N.Text.Tests
 {
     public abstract partial class StringBuilder_Tests
     {
+        private static readonly IArrayAllocator<char> ClearedAllocator = new MockArrayAllocator(value: '\0');
+        private static readonly IArrayAllocator<char> NonClearingAllocator = new MockArrayAllocator(value: '\uFFFF');
+
         [Fact]
         public void GetSpan_DataAppendedCorrectly()
         {
@@ -142,6 +146,162 @@ namespace J2N.Text.Tests
         }
 
         [Fact]
+        public void GetSpan_BoundedByMaxCapacity_DoesNotExpandBeyondMaxCapacity()
+        {
+            var builder = MutableTextBufferFactory(4, 4);
+            AssertExtensions.GreaterThanOrEqualTo(builder.GetSpan(4).Length, 4);
+            AssertExtensions.GreaterThanOrEqualTo(builder.GetSpan(0).Length, 4);
+        }
+
+        [Fact]
+        public void GetSpan_SizeHintLessThanDefaultCapacity_ReturnsRequestedSize()
+        {
+            var builder = MutableTextBufferFactory(
+                32,
+                new MutableTextBufferTestOptions { ClearExposedBuffers = true });
+
+            Span<char> span = builder.GetSpan(4);
+
+            Assert.Equal(4, span.Length);
+        }
+
+        [Fact]
+        public void GetSpan_SizeHintZero_WithSufficientCapacity_ReturnsDefaultCapacity()
+        {
+            var builder = MutableTextBufferFactory(
+                32,
+                new MutableTextBufferTestOptions { ClearExposedBuffers = true });
+
+            Span<char> span = builder.GetSpan(0);
+
+            Assert.Equal(16, span.Length);
+        }
+
+        [Fact]
+        public void GetSpan_SizeHintZero_WithLessThanDefaultCapacityRemaining_ReturnsRemainingCapacity()
+        {
+            var builder = MutableTextBufferFactory(
+                26,
+                new MutableTextBufferTestOptions { ClearExposedBuffers = true, Allocator = ClearedAllocator });
+
+            builder.Append("abcdefghijklmnopqrstuvwxyz");
+            builder.Length = 16;
+
+            Span<char> span = builder.GetSpan(0);
+
+            Assert.Equal(10, span.Length);
+
+            for (int i = 0; i < span.Length; i++)
+            {
+                Assert.Equal('\0', span[i]);
+            }
+        }
+
+        [Fact]
+        public void GetSpan_SizeHintZero_WithNoCapacity_GrowsToDefaultCapacity()
+        {
+            var builder = MutableTextBufferFactory(
+                0,
+                new MutableTextBufferTestOptions { ClearExposedBuffers = true });
+
+            Span<char> span = builder.GetSpan(0);
+
+            Assert.Equal(16, span.Length);
+        }
+
+        [Fact]
+        public void GetSpan_ClearExposedBuffers_ClearsOnlyRequestedSize()
+        {
+            var builder = MutableTextBufferFactory(
+                32,
+                new MutableTextBufferTestOptions { ClearExposedBuffers = true, Allocator = ClearedAllocator });
+
+            Span<char> initial = builder.GetSpan(10);
+            "abcdefghij".AsSpan().CopyTo(initial);
+
+            Span<char> result = builder.GetSpan(4);
+
+            Assert.Equal(4, result.Length);
+            Assert.Equal('\0', result[0]);
+            Assert.Equal('\0', result[1]);
+            Assert.Equal('\0', result[2]);
+            Assert.Equal('\0', result[3]);
+
+            // The portion beyond sizeHint was not unnecessarily cleared.
+            Assert.Equal('e', initial[4]);
+            Assert.Equal('f', initial[5]);
+            Assert.Equal('g', initial[6]);
+            Assert.Equal('h', initial[7]);
+            Assert.Equal('i', initial[8]);
+            Assert.Equal('j', initial[9]);
+        }
+
+        [Fact]
+        public void GetSpan_GrowsWithClearedAllocator_ReturnsEntireClearedBuffer()
+        {
+            var builder = MutableTextBufferFactory(
+                4,
+                new MutableTextBufferTestOptions
+                {
+                    ClearExposedBuffers = true,
+                    Allocator = ClearedAllocator
+                });
+
+            Span<char> span = builder.GetSpan(20);
+
+            Assert.True(span.Length >= 20);
+            Assert.Equal(builder.Capacity - builder.Length, span.Length);
+
+            for (int i = 0; i < span.Length; i++)
+            {
+                Assert.Equal('\0', span[i]);
+            }
+        }
+
+        [Fact]
+        public void GetSpan_GrowsWithNonClearingAllocator_ReturnsOnlyRequestedSize()
+        {
+            var builder = MutableTextBufferFactory(
+                4,
+                new MutableTextBufferTestOptions
+                {
+                    ClearExposedBuffers = true,
+                    Allocator = NonClearingAllocator,
+                });
+
+            Span<char> span = builder.GetSpan(20);
+
+            Assert.Equal(20, span.Length);
+
+            for (int i = 0; i < span.Length; i++)
+            {
+                Assert.Equal('\0', span[i]);
+            }
+        }
+
+        [Fact]
+        public void GetSpan_GrowsWithoutClearing_ReturnsEntireRemainingBuffer()
+        {
+            var builder = MutableTextBufferFactory(
+                4,
+                new MutableTextBufferTestOptions
+                {
+                    ClearExposedBuffers = false,
+                    Allocator = NonClearingAllocator,
+                });
+
+            Span<char> span = builder.GetSpan(20);
+
+            Assert.True(span.Length >= 20);
+            Assert.Equal(builder.Capacity - builder.Length, span.Length);
+
+            for (int i = 0; i < span.Length; i++)
+            {
+                Assert.Equal('\uFFFF', span[i]);
+            }
+        }
+
+        [Fact]
         public void GetMemory_SizeHintZero_ReturnsNonEmptySpan()
         {
             var builder = MutableTextBufferFactory();
@@ -174,6 +334,167 @@ namespace J2N.Text.Tests
             Assert.True(memory.Length >= 5);
             Assert.True(memory.Span.StartsWith("uvwxy"));
         }
+
+        [Fact]
+        public void GetMemory_BoundedByMaxCapacity_DoesNotExpandBeyondMaxCapacity()
+        {
+            var builder = MutableTextBufferFactory(4, 4);
+
+            AssertExtensions.GreaterThanOrEqualTo(builder.GetMemory(4).Length, 4);
+            AssertExtensions.GreaterThanOrEqualTo(builder.GetMemory(0).Length, 4);
+        }
+
+
+        [Fact]
+        public void GetMemory_SizeHintLessThanDefaultCapacity_ReturnsRequestedSize()
+        {
+            var builder = MutableTextBufferFactory(
+                32,
+                new MutableTextBufferTestOptions { ClearExposedBuffers = true });
+
+            Memory<char> memory = builder.GetMemory(4);
+
+            Assert.Equal(4, memory.Length);
+        }
+
+        [Fact]
+        public void GetMemory_SizeHintZero_WithSufficientCapacity_ReturnsDefaultCapacity()
+        {
+            var builder = MutableTextBufferFactory(
+                32,
+                new MutableTextBufferTestOptions { ClearExposedBuffers = true });
+
+            Memory<char> memory = builder.GetMemory(0);
+
+            Assert.Equal(16, memory.Length);
+        }
+
+        [Fact]
+        public void GetMemory_SizeHintZero_WithLessThanDefaultCapacityRemaining_ReturnsRemainingCapacity()
+        {
+            var builder = MutableTextBufferFactory(
+                26,
+                new MutableTextBufferTestOptions { ClearExposedBuffers = true, Allocator = ClearedAllocator });
+
+            builder.Append("abcdefghijklmnopqrstuvwxyz");
+            builder.Length = 16;
+
+            Memory<char> memory = builder.GetMemory(0);
+
+            Assert.Equal(10, memory.Length);
+
+            for (int i = 0; i < memory.Length; i++)
+            {
+                Assert.Equal('\0', memory.Span[i]);
+            }
+        }
+
+        [Fact]
+        public void GetMemory_SizeHintZero_WithNoCapacity_GrowsToDefaultCapacity()
+        {
+            var builder = MutableTextBufferFactory(
+                0,
+                new MutableTextBufferTestOptions { ClearExposedBuffers = true });
+
+            Memory<char> memory = builder.GetMemory(0);
+
+            Assert.Equal(16, memory.Length);
+        }
+
+        [Fact]
+        public void GetMemory_ClearExposedBuffers_ClearsOnlyRequestedSize()
+        {
+            var builder = MutableTextBufferFactory(
+                32,
+                new MutableTextBufferTestOptions { ClearExposedBuffers = true, Allocator = ClearedAllocator });
+
+            Memory<char> initial = builder.GetMemory(10);
+            "abcdefghij".AsSpan().CopyTo(initial.Span);
+
+            Memory<char> result = builder.GetMemory(4);
+
+            Assert.Equal(4, result.Length);
+            Assert.Equal('\0', result.Span[0]);
+            Assert.Equal('\0', result.Span[1]);
+            Assert.Equal('\0', result.Span[2]);
+            Assert.Equal('\0', result.Span[3]);
+
+            // The portion beyond sizeHint was not unnecessarily cleared.
+            Assert.Equal('e', initial.Span[4]);
+            Assert.Equal('f', initial.Span[5]);
+            Assert.Equal('g', initial.Span[6]);
+            Assert.Equal('h', initial.Span[7]);
+            Assert.Equal('i', initial.Span[8]);
+            Assert.Equal('j', initial.Span[9]);
+        }
+
+        [Fact]
+        public void GetMemory_GrowsWithClearedAllocator_ReturnsEntireClearedBuffer()
+        {
+            var builder = MutableTextBufferFactory(
+                4,
+                new MutableTextBufferTestOptions
+                {
+                    ClearExposedBuffers = true,
+                    Allocator = ClearedAllocator
+                });
+
+            Memory<char> memory = builder.GetMemory(20);
+
+            Assert.True(memory.Length >= 20);
+            Assert.Equal(builder.Capacity - builder.Length, memory.Length);
+
+            for (int i = 0; i < memory.Length; i++)
+            {
+                Assert.Equal('\0', memory.Span[i]);
+            }
+        }
+
+        [Fact]
+        public void GetMemory_GrowsWithNonClearingAllocator_ReturnsOnlyRequestedSize()
+        {
+            var builder = MutableTextBufferFactory(
+                4,
+                new MutableTextBufferTestOptions
+                {
+                    ClearExposedBuffers = true,
+                    Allocator = NonClearingAllocator,
+                });
+
+            Memory<char> memory = builder.GetMemory(20);
+
+            Assert.Equal(20, memory.Length);
+
+            for (int i = 0; i < memory.Length; i++)
+            {
+                Assert.Equal('\0', memory.Span[i]);
+            }
+        }
+
+        [Fact]
+        public void GetMemory_GrowsWithoutClearing_ReturnsEntireRemainingBuffer()
+        {
+            var builder = MutableTextBufferFactory(
+                4,
+                new MutableTextBufferTestOptions
+                {
+                    ClearExposedBuffers = false,
+                    Allocator = NonClearingAllocator,
+                });
+
+            Memory<char> memory = builder.GetMemory(20);
+
+            Assert.True(memory.Length >= 20);
+            Assert.Equal(builder.Capacity - builder.Length, memory.Length);
+
+            for (int i = 0; i < memory.Length; i++)
+            {
+                Assert.Equal('\uFFFF', memory.Span[i]);
+            }
+        }
+
+
+
 
         [Fact]
         public void GetSpan_Invalid()
@@ -269,5 +590,56 @@ namespace J2N.Text.Tests
 
             Assert.Equal("HelloWorld", builder.ToString());
         }
+
+        private sealed class MockArrayAllocator : IArrayAllocator<char>
+        {
+            private readonly bool guaranteesClearedArrays;
+            private readonly char value;
+
+            public MockArrayAllocator(char value)
+            {
+                guaranteesClearedArrays = value == '\0';
+                this.value = value;
+            }
+
+            public bool GuaranteesClearedArrays => guaranteesClearedArrays;
+
+            public char[] Allocate(int minimumLength)
+            {
+                char[] array = new char[minimumLength];
+                ArrayExtensions.Fill(array, value);
+                return array;
+            }
+
+            public void Return(char[] array)
+            {
+                // Intentionally empty
+            }
+        }
+
+
+        //private sealed class MockArrayAllocator<T> : IArrayAllocator<T>
+        //{
+        //    private readonly IArrayAllocator<T> innerAllocator;
+        //    private readonly bool guaranteesClearedArrays;
+
+        //    public MockArrayAllocator(IArrayAllocator<T> innerAllocator, bool guaranteesClearedArrays)
+        //    {
+        //        this.innerAllocator = innerAllocator;
+        //        this.guaranteesClearedArrays = guaranteesClearedArrays;
+        //    }
+
+        //    public bool GuaranteesClearedArrays => guaranteesClearedArrays;
+
+        //    public T[] Allocate(int minimumLength)
+        //    {
+        //        return innerAllocator.Allocate(minimumLength);
+        //    }
+
+        //    public void Return(T[] array)
+        //    {
+        //        innerAllocator.Return(array);
+        //    }
+        //}
     }
 }
