@@ -49,6 +49,7 @@ namespace J2N.Text.Tests
         {
             public bool UseInvariantDefaults { get; init; } = false;
             public bool ClearExposedBuffers { get; init; } = true;
+            public IArrayAllocator<char>? Allocator { get; init; } = null;
         }
 
         #region MutableTextBuffer Helper Methods
@@ -124,12 +125,6 @@ namespace J2N.Text.Tests
         /// </summary>
         /// <returns>An instance of <see cref="MutableTextBuffer"/> that can be used for testing.</returns>
         private protected abstract MutableTextBuffer MutableTextBufferFactory(ICharSequence? value, MutableTextBufferTestOptions? options = null);
-
-        /// <summary>
-        /// Creates an instance of an <see cref="MutableTextBuffer"/> that can be used for testing.
-        /// </summary>
-        /// <returns>An instance of <see cref="MutableTextBuffer"/> that can be used for testing.</returns>
-        private protected abstract MutableTextBuffer MutableTextBufferFactory(string? value, int capacity, IArrayAllocator<char> allocator, MutableTextBufferTestOptions? options = null);
 
         private static CultureInfo CreateCustomNegativeSignCulture(string negativeSign)
         {
@@ -1252,7 +1247,7 @@ namespace J2N.Text.Tests
             var expected = MutableTextBufferFactory(original);
             expected.Append(original.AsSpan(sourceIndex, length));
 
-            var actual = MutableTextBufferFactory(original, capacity, allocator);
+            var actual = MutableTextBufferFactory(original, capacity, new MutableTextBufferTestOptions { Allocator = allocator });
 
             fixed (char* p = actual.RawChars)
             {
@@ -1273,7 +1268,7 @@ namespace J2N.Text.Tests
             var expected = MutableTextBufferFactory(original);
             expected.Append(original);
 
-            var actual = MutableTextBufferFactory(original, capacity, allocator);
+            var actual = MutableTextBufferFactory(original, capacity, new MutableTextBufferTestOptions { Allocator = allocator });
             fixed (char* p = actual.RawChars)
             {
                 actual.Append(p, actual.Length);
@@ -1291,7 +1286,7 @@ namespace J2N.Text.Tests
         {
             var allocator = new EvilCharArrayAllocator();
 
-            var builder = MutableTextBufferFactory(original, capacity, allocator);
+            var builder = MutableTextBufferFactory(original, capacity, new MutableTextBufferTestOptions { Allocator = allocator });
 
             sourceValue.AsSpan().CopyTo(
                 builder.RawChars.Slice(sourceOffset, sourceLength));
@@ -3915,7 +3910,7 @@ namespace J2N.Text.Tests
             var expected = MutableTextBufferFactory(original);
             expected.Append(original.AsSpan(sourceIndex, length));
 
-            var actual = MutableTextBufferFactory(original, capacity, allocator);
+            var actual = MutableTextBufferFactory(original, capacity, new MutableTextBufferTestOptions { Allocator = allocator });
             actual.Append(actual.AsSpan(sourceIndex, length));
 
             Assert.Equal(expected.ToString(), actual.ToString());
@@ -3932,7 +3927,7 @@ namespace J2N.Text.Tests
             var expected = MutableTextBufferFactory(original);
             expected.Append(original);
 
-            var actual = MutableTextBufferFactory(original, capacity, allocator);
+            var actual = MutableTextBufferFactory(original, capacity, new MutableTextBufferTestOptions { Allocator = allocator });
             actual.Append(actual.AsSpan());
 
             Assert.Equal(expected.ToString(), actual.ToString());
@@ -3947,7 +3942,7 @@ namespace J2N.Text.Tests
         {
             var allocator = new EvilCharArrayAllocator();
 
-            var builder = MutableTextBufferFactory(original, capacity, allocator);
+            var builder = MutableTextBufferFactory(original, capacity, new MutableTextBufferTestOptions { Allocator = allocator });
 
             sourceValue.AsSpan().CopyTo(
                 builder.RawChars.Slice(sourceOffset, sourceLength));
@@ -4851,7 +4846,7 @@ namespace J2N.Text.Tests
                 const int ThreadCount = 8;
 
                 var allocator = new CountingCharArrayAllocator();
-                var builder = MutableTextBufferFactory("abcdefghijklmnopqrstuvwxyz", 26, allocator);
+                var builder = MutableTextBufferFactory("abcdefghijklmnopqrstuvwxyz", 26, new MutableTextBufferTestOptions { Allocator = allocator });
 
                 using var barrier = new Barrier(ThreadCount);
 
