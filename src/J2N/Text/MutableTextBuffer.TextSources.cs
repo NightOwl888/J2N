@@ -124,7 +124,8 @@ namespace J2N.Text
         [CodeGenerationExtensionImplementation]
         internal unsafe void AppendInternal(char* value, int valueCount)
         {
-            // We don't check null value as this case will throw null reference exception anyway
+            // A null value is not an overlapping source. Dereferencing it below
+            // will produce the expected NullReferenceException.
             if (valueCount < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(valueCount, ExceptionArgument.valueCount);
 
@@ -616,7 +617,8 @@ namespace J2N.Text
         [CodeGenerationExtensionImplementation]
         internal unsafe void InsertInternal(int index, char* value, int valueCount)
         {
-            // We don't check null value as this case will throw null reference exception anyway
+            // A null value is not an overlapping source. Dereferencing it below
+            // will produce the expected NullReferenceException.
             if ((uint)index > (uint)Length)
             {
                 ThrowHelper.ThrowArgumentOutOfRange_IndexMustBeLessOrEqualException(index);
@@ -990,21 +992,24 @@ namespace J2N.Text
 
         #endregion Insert ICharSequence
 
-
         /// <summary>
-        /// Determines whether <paramref name="value"/> points into the current backing
-        /// array and, if so, returns its character offset.
+        /// Determines whether the specified character range is contained within the
+        /// current backing array and, if so, returns its character offset.
         /// </summary>
         /// <param name="value">The source pointer.</param>
-        /// <param name="valueCount">The number of characters that will be read.</param>
+        /// <param name="valueCount">The number of characters in the source range.</param>
         /// <param name="sourceOffset">
-        /// Receives the offset into <see cref="m_Chars"/> if this method returns
-        /// <see langword="true"/>; otherwise -1.
+        /// Receives the offset into <see cref="m_Chars"/> if the source range is
+        /// contained within the backing array; otherwise -1.
         /// </param>
         /// <returns>
-        /// <see langword="true"/> if the entire source range lies within
+        /// <see langword="true"/> if the entire source range is contained within
         /// <see cref="m_Chars"/>; otherwise <see langword="false"/>.
         /// </returns>
+        /// <remarks>
+        /// This is technically a contains operation, but we are naming it overlaps
+        /// for parity with other similar operations.
+        /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private unsafe bool Overlaps(char* value, int valueCount, out int sourceOffset)
         {

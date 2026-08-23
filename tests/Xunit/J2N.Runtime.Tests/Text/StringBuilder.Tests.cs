@@ -1178,6 +1178,28 @@ namespace J2N.Text.Tests
         }
 
         [Theory]
+        [InlineData(16, 17)]
+        [InlineData(16, 20)]
+        [InlineData(16, 64)]
+        [InlineData(16, 500)]
+        [InlineData(0, 3)]
+        [InlineData(1, 2)]
+        [InlineData(2, 3)]
+        public unsafe void Append_CharPointer_ExceedsCurrentCapacity_Grows(int capacity, int valueCount)
+        {
+            var builder = MutableTextBufferFactory(capacity, int.MaxValue);
+            var value = new string('x', valueCount);
+
+            fixed (char* p = value)
+            {
+                builder.Append(p, valueCount);
+            }
+
+            Assert.Equal(valueCount, builder.Length);
+            Assert.Equal(value, builder.ToString());
+        }
+
+        [Theory]
         [InlineData(0, 8)]
         [InlineData(0, 4)]
         [InlineData(2, 4)]
@@ -2437,6 +2459,30 @@ namespace J2N.Text.Tests
             {
                 fixed (char* value = new char[] { 'a' }) { builder.Insert(1, value, 1); }
             });
+        }
+
+        [Theory]
+        [InlineData(16, 17)]
+        [InlineData(16, 20)]
+        [InlineData(16, 64)]
+        [InlineData(16, 500)]
+        [InlineData(0, 3)]
+        [InlineData(1, 2)]
+        [InlineData(2, 3)]
+        public unsafe void Insert_CharPointer_ExceedsCurrentCapacity_Grows(int capacity, int valueCount)
+        {
+            var builder = MutableTextBufferFactory(capacity, int.MaxValue);
+            builder.Append("ab");
+
+            var value = new string('x', valueCount);
+
+            fixed (char* p = value)
+            {
+                builder.Insert(1, p, valueCount);
+            }
+
+            Assert.Equal(2 + valueCount, builder.Length);
+            Assert.Equal("a" + value + "b", builder.ToString());
         }
 
         [Fact] // J2N specific
