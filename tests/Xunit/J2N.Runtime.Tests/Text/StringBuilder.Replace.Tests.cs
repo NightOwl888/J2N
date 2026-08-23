@@ -484,7 +484,7 @@ namespace J2N.Text.Tests
         public void Replace_CharSpan_WholeString()
         {
             MutableTextBuffer builder = MutableTextBufferFactory(s_chunkSplitSource);
-            builder.Replace(builder.AsSpan(), "".AsSpan());
+            builder.Replace(builder.ToString().AsSpan(), "".AsSpan());
             Assert.Same(string.Empty, builder.ToString());
         }
 
