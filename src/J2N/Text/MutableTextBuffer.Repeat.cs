@@ -1,6 +1,7 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+using J2N.Buffers;
 using J2N.CodeGeneration;
 using System;
 using System.Buffers;
@@ -216,7 +217,7 @@ namespace J2N.Text
 
             if (m_Chars.AsSpan().Overlaps(value))
             {
-                InsertOverlappingRepeated(index, value, destinationLength, repeatCount);
+                InsertOverlappingRepeated(index, value, destinationLength);
                 return;
             }
 
@@ -224,7 +225,7 @@ namespace J2N.Text
         }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
-        private void InsertOverlappingRepeated(int index, ReadOnlySpan<char> value, int destinationLength, int repeatCount)
+        private void InsertOverlappingRepeated(int index, ReadOnlySpan<char> value, int destinationLength)
         {
             char[]? buffer = null;
             try
@@ -232,7 +233,7 @@ namespace J2N.Text
                 int valueLength = value.Length;
                 Span<char> temp = valueLength <= CharStackBufferSize
                     ? stackalloc char[valueLength]
-                    : (buffer = ArrayPool<char>.Shared.Rent(valueLength)).AsSpan(0, valueLength);
+                    : (buffer = LocalArrayPool.Instance.Rent(valueLength)).AsSpan(0, valueLength);
 
                 value.CopyTo(temp);
                 InsertRepeated(index, temp, destinationLength);
@@ -240,7 +241,7 @@ namespace J2N.Text
             finally
             {
                 if (buffer is not null)
-                    ArrayPool<char>.Shared.Return(buffer);
+                    LocalArrayPool.Instance.Return(buffer);
             }
         }
 

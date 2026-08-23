@@ -395,7 +395,7 @@ namespace J2N.Text
             }
 
             provider ??= DefaultNumberFormatInfo; // Set by UseInvariantDefaults
-            arrayPool ??= ArrayPool<char>.Shared; // Allow tests to inject this
+            arrayPool ??= LocalArrayPool.Instance; // Allow tests to inject this
 
             char[]? arrayToReturnToPool = null;
             Span<char> buffer = stackalloc char[CharStackBufferSize];
@@ -450,7 +450,7 @@ namespace J2N.Text
             }
 
             provider ??= DefaultNumberFormatInfo; // Set by UseInvariantDefaults
-            arrayPool ??= ArrayPool<char>.Shared; // Allow tests to inject this
+            arrayPool ??= LocalArrayPool.Instance; // Allow tests to inject this
 
             char[]? arrayToReturnToPool = null;
             Span<char> buffer = stackalloc char[CharStackBufferSize];

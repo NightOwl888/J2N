@@ -282,7 +282,7 @@ namespace J2N.Text
                 {
                     Span<char> temp = oldValue.Length <= CharStackBufferSize
                         ? stackalloc char[oldValue.Length]
-                        : (buffer = ArrayPool<char>.Shared.Rent(oldValue.Length)).AsSpan(0, oldValue.Length);
+                        : (buffer = LocalArrayPool.Instance.Rent(oldValue.Length)).AsSpan(0, oldValue.Length);
 
                     oldValue.CopyTo(temp);
 
@@ -291,7 +291,7 @@ namespace J2N.Text
                 finally
                 {
                     if (buffer is not null)
-                        ArrayPool<char>.Shared.Return(buffer);
+                        LocalArrayPool.Instance.Return(buffer);
                 }
             }
 
@@ -303,7 +303,7 @@ namespace J2N.Text
                 {
                     Span<char> temp = newValue.Length <= CharStackBufferSize
                         ? stackalloc char[newValue.Length]
-                        : (buffer = ArrayPool<char>.Shared.Rent(newValue.Length)).AsSpan(0, newValue.Length);
+                        : (buffer = LocalArrayPool.Instance.Rent(newValue.Length)).AsSpan(0, newValue.Length);
 
                     newValue.CopyTo(temp);
 
@@ -312,7 +312,7 @@ namespace J2N.Text
                 finally
                 {
                     if (buffer is not null)
-                        ArrayPool<char>.Shared.Return(buffer);
+                        LocalArrayPool.Instance.Return(buffer);
                 }
             }
 
@@ -325,11 +325,11 @@ namespace J2N.Text
                 {
                     Span<char> oldTemp = oldValue.Length <= CharStackBufferSize
                         ? stackalloc char[oldValue.Length]
-                        : (oldBuffer = ArrayPool<char>.Shared.Rent(oldValue.Length)).AsSpan(0, oldValue.Length);
+                        : (oldBuffer = LocalArrayPool.Instance.Rent(oldValue.Length)).AsSpan(0, oldValue.Length);
 
                     Span<char> newTemp = newValue.Length <= CharStackBufferSize
                         ? stackalloc char[newValue.Length]
-                        : (newBuffer = ArrayPool<char>.Shared.Rent(newValue.Length)).AsSpan(0, newValue.Length);
+                        : (newBuffer = LocalArrayPool.Instance.Rent(newValue.Length)).AsSpan(0, newValue.Length);
 
                     oldValue.CopyTo(oldTemp);
                     newValue.CopyTo(newTemp);
@@ -339,10 +339,10 @@ namespace J2N.Text
                 finally
                 {
                     if (oldBuffer is not null)
-                        ArrayPool<char>.Shared.Return(oldBuffer);
+                        LocalArrayPool.Instance.Return(oldBuffer);
 
                     if (newBuffer is not null)
-                        ArrayPool<char>.Shared.Return(newBuffer);
+                        LocalArrayPool.Instance.Return(newBuffer);
                 }
             }
         }

@@ -1058,7 +1058,7 @@ namespace J2N.Text
                 {
                     Span<char> temp = valueCount <= CharStackBufferSize
                         ? stackalloc char[valueCount]
-                        : (buffer = ArrayPool<char>.Shared.Rent(valueCount)).AsSpan(0, valueCount);
+                        : (buffer = LocalArrayPool.Instance.Rent(valueCount)).AsSpan(0, valueCount);
 
                     m_Chars.AsSpan(sourceOffset, valueCount).CopyTo(temp);
                     Append(ref MemoryMarshal.GetReference(temp), temp.Length);
@@ -1066,7 +1066,7 @@ namespace J2N.Text
                 finally
                 {
                     if (buffer is not null)
-                        ArrayPool<char>.Shared.Return(buffer);
+                        LocalArrayPool.Instance.Return(buffer);
                 }
             }
         }
@@ -1100,7 +1100,7 @@ namespace J2N.Text
                 {
                     Span<char> temp = count <= CharStackBufferSize
                         ? stackalloc char[count]
-                        : (buffer = ArrayPool<char>.Shared.Rent(count)).AsSpan(0, count);
+                        : (buffer = LocalArrayPool.Instance.Rent(count)).AsSpan(0, count);
 
                     m_Chars.AsSpan(sourceOffset, count).CopyTo(temp);
                     Insert(index, ref MemoryMarshal.GetReference(temp), count);
@@ -1108,7 +1108,7 @@ namespace J2N.Text
                 finally
                 {
                     if (buffer is not null)
-                        ArrayPool<char>.Shared.Return(buffer);
+                        LocalArrayPool.Instance.Return(buffer);
                 }
             }
         }

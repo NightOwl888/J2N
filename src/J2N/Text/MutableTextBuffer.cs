@@ -71,6 +71,15 @@ namespace J2N.Text
     {
         internal const int CharStackBufferSize = 32; // internal for testing
 
+        /// <summary>
+        /// A private array pool used to ensure that temporary buffer data doesn't leak
+        /// into the shared array pool.
+        /// </summary>
+        private static class LocalArrayPool
+        {
+            public static readonly ArrayPool<char> Instance = ArrayPool<char>.Create();
+        }
+
         private readonly IArrayAllocator<char> allocator;
 
         /// <summary>
