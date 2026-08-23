@@ -45,10 +45,10 @@ namespace J2N.Text
     ///         There is no need to allocate memory and do a copy to call methods that require System.Memory types, such as
     ///         <see cref="ReadOnlySpan{T}"/> or to access a portion of the underlying chars.
     ///     </description></item>
-    ///     <description><item>
+    ///     <item><description>
     ///         The <see cref="SynchronizedTextBuilder(int)"/> and <see cref="SynchronizedTextBuilder(int, int)"/> constructors allow
     ///         setting the initial capacity to zero, meaning no backing array is allocated unless it is needed.
-    ///     </item></description>
+    ///     </description></item>
     ///     <item><description>
     ///         Indexing through <see cref="this[int]"/> is significantly faster than with <see cref="StringBuilder"/>.
     ///     </description></item>

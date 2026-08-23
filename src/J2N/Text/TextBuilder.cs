@@ -48,10 +48,10 @@ namespace J2N.Text
     ///         This is similar to how <see cref="T:char[]"/> and <see cref="string"/> are implicitly converted to
     ///         <see cref="ReadOnlySpan{Char}"/>.
     ///     </description></item>
-    ///     <description><item>
+    ///     <item><description>
     ///         The <see cref="TextBuilder(int)"/> and <see cref="TextBuilder(int, int)"/> constructors allow
     ///         setting the initial capacity to zero, meaning no backing array is allocated unless it is needed.
-    ///     </item></description>
+    ///     </description></item>
     ///     <item><description>
     ///         Indexing through <see cref="this[int]"/> is significantly faster than with <see cref="StringBuilder"/>.
     ///     </description></item>
