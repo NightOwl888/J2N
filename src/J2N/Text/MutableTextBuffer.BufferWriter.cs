@@ -130,7 +130,7 @@ namespace J2N.Text
         /// <synchronizationNote>
         /// The returned memory provides direct access to the underlying memory of the <see cref="SynchronizedTextBuilder"/>.
         /// Callers must synchronize externally using <see cref="SynchronizedTextBuilder.SyncRoot"/> for the duration of the
-        /// span usage if concurrent mutation is possible.
+        /// memory usage if concurrent mutation is possible.
         /// </synchronizationNote>
         [CodeGenerationSkipSynchronization]
         public Memory<char> GetMemory(int sizeHint = 0)
