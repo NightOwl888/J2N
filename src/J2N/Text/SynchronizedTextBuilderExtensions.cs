@@ -28,8 +28,8 @@ namespace J2N.Text
         #region AsCharSequence
 
         /// <summary>
-        /// Convenience method to wrap a string in a <see cref="SynchronizedTextBuilderCharSequence"/>
-        /// so a <see cref="SynchronizedTextBuilder"/> can be used as <see cref="ICharSequence"/>.
+        /// Convenience method to wrap a <see cref="SynchronizedTextBuilder"/> in a <see cref="SynchronizedTextBuilderCharSequence"/>
+        /// so it can be used as <see cref="ICharSequence"/>.
         /// </summary>
         public static SynchronizedTextBuilderCharSequence AsCharSequence(this SynchronizedTextBuilder? text)
         {

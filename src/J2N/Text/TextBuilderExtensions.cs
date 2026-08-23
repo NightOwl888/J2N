@@ -28,8 +28,8 @@ namespace J2N.Text
         #region AsCharSequence
 
         /// <summary>
-        /// Convenience method to wrap a string in an adapter
-        /// so a <see cref="TextBuilder"/> can be used as <see cref="ICharSequence"/>.
+        /// Convenience method to wrap a <see cref="TextBuilder"/> in an adapter
+        /// so it can be used as <see cref="ICharSequence"/>.
         /// </summary>
         /// <remarks>
         /// This API is being provided for compatibility. It is recommended to use

@@ -257,8 +257,8 @@ namespace J2N.Text
         #region AsCharSequence
 
         /// <summary>
-        /// Convenience method to wrap a string in a <see cref="MutableTextBufferCharSequence"/>
-        /// so a <see cref="MutableTextBuffer"/> can be used as <see cref="ICharSequence"/>.
+        /// Convenience method to wrap a <see cref="MutableTextBuffer"/> in a <see cref="MutableTextBufferCharSequence"/>
+        /// so it can be used as <see cref="ICharSequence"/>.
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CodeGenerationIgnore]
