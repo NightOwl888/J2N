@@ -3545,8 +3545,8 @@ namespace J2N.Text
         /// <summary>
         /// Replaces the specified substring in this builder with the specified
         /// string, <paramref name="newValue"/>. The substring begins at the specified
-        /// <paramref name="startIndex"/> and ends to the character at
-        /// <c><paramref name="count"/> - <paramref name="startIndex"/></c> or
+        /// <paramref name="startIndex"/> and ends at
+        /// <c><paramref name="startIndex"/> + <paramref name="count"/></c> or
         /// to the end of the sequence if no such character exists. First the
         /// characters in the substring are removed and then the specified
         /// <paramref name="newValue"/> is inserted at <paramref name="startIndex"/>.
@@ -3584,8 +3584,8 @@ namespace J2N.Text
         /// <summary>
         /// Replaces the specified substring in this builder with the specified
         /// character span, <paramref name="newValue"/>. The substring begins at the specified
-        /// <paramref name="startIndex"/> and ends to the character at
-        /// <c><paramref name="count"/> - <paramref name="startIndex"/></c> or
+        /// <paramref name="startIndex"/> and ends at
+        /// <c><paramref name="startIndex"/> + <paramref name="count"/></c> or
         /// to the end of the sequence if no such character exists. First the
         /// characters in the substring are removed and then the specified
         /// <paramref name="newValue"/> is inserted at <paramref name="startIndex"/>.
@@ -3623,8 +3623,8 @@ namespace J2N.Text
         /// <summary>
         /// Replaces the specified substring in this builder with the specified
         /// string builder, <paramref name="newValue"/>. The substring begins at the specified
-        /// <paramref name="startIndex"/> and ends to the character at
-        /// <c><paramref name="count"/> - <paramref name="startIndex"/></c> or
+        /// <paramref name="startIndex"/> and ends at
+        /// <c><paramref name="startIndex"/> + <paramref name="count"/></c> or
         /// to the end of the sequence if no such character exists. First the
         /// characters in the substring are removed and then the specified
         /// <paramref name="newValue"/> is inserted at <paramref name="startIndex"/>.
