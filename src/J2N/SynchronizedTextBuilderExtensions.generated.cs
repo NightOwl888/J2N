@@ -93,7 +93,7 @@ namespace J2N
         /// <summary>Appends the string representation of a specified subarray of Unicode characters to this instance.</summary>
         /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
         /// <param name="text">The target builder.</param>
-        /// <param name="value">The UTF-16-encoded code unit to append.</param>
+        /// <param name="value">The sequence of characters to append.</param>
         /// <param name="startIndex">The starting position in <paramref name="value"/>.</param>
         /// <param name="count">The number of characters to append.</param>
         /// <returns>A reference to this instance after the operation has completed.</returns>
