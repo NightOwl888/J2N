@@ -80,7 +80,7 @@ namespace J2N.Text
             assertEquals(sb.IndexOf("y", 0), 1);
             assertEquals(sb.IndexOf("y", 1), 1);
             assertEquals(sb.IndexOf("y", 2), 2);
-            assertEquals(sb.IndexOf("not found"), -1);
+            assertEquals(sb.IndexOf("not found", 0), -1); // J2N: Fixed bug from JDK code where it was testing the wrong overload
         }
 
         [Test]
