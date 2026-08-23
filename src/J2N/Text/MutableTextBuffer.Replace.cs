@@ -620,7 +620,7 @@ namespace J2N.Text
             {
                 Span<char> temp = sourceLength <= CharStackBufferSize
                     ? stackalloc char[sourceLength]
-                    : (arrayToReturn = allocator.Allocate(sourceLength)).AsSpan(0, sourceLength);
+                    : (arrayToReturn = LocalArrayPool.Instance.Rent(sourceLength)).AsSpan(0, sourceLength);
 
                 m_Chars.AsSpan(sourceOffset, sourceLength)
                     .CopyTo(temp);
@@ -641,7 +641,7 @@ namespace J2N.Text
             finally
             {
                 if (arrayToReturn is not null)
-                    allocator.Return(arrayToReturn);
+                    LocalArrayPool.Instance.Return(arrayToReturn);
             }
         }
 
@@ -737,7 +737,7 @@ namespace J2N.Text
 
                 Span<char> temp = newValueLength <= CharStackBufferSize
                     ? stackalloc char[newValueLength]
-                    : (arrayToReturn = allocator.Allocate(newValueLength)).AsSpan(0, newValueLength);
+                    : (arrayToReturn = LocalArrayPool.Instance.Rent(newValueLength)).AsSpan(0, newValueLength);
 
                 if (newValue is ISpanCopyable<char> spanCopyable)
                 {
@@ -774,7 +774,7 @@ namespace J2N.Text
             finally
             {
                 if (arrayToReturn is not null)
-                    allocator.Return(arrayToReturn);
+                    LocalArrayPool.Instance.Return(arrayToReturn);
             }
         }
 
