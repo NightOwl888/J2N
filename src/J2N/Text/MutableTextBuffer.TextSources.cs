@@ -702,7 +702,7 @@ namespace J2N.Text
 
             if (count < 0)
             {
-                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(count, ExceptionArgument.charCount);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(count, ExceptionArgument.count);
             }
 
             if (startIndex > value.Length - count)
@@ -766,13 +766,13 @@ namespace J2N.Text
         [CodeGenerationExtensionImplementation]
         internal void InsertInternal(int index, StringBuilder? value)
         {
-            if (value is null)
-                return;
-
             if ((uint)index > (uint)Length)
             {
                 ThrowHelper.ThrowArgumentOutOfRange_IndexMustBeLessOrEqualException(index);
             }
+
+            if (value is null)
+                return;
 
             int count = value.Length;
             if (count > 0)

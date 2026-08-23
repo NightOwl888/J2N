@@ -2501,7 +2501,7 @@ namespace J2N.Text.Tests
             Assert.Throws<OutOfMemoryException>(() => builder.Insert(builder.Length, (float)1)); // New length > builder.MaxCapacity
         }
 
-        public static IEnumerable<object?[]> Test_Insert_ICharSequence_TestData()
+        public static IEnumerable<object?[]> Test_Insert_String_TestData()
         {
             yield return new object?[] { "Hello", 0, "\0", 0, 1, "\0Hello" };
             yield return new object?[] { "Hello", 3, "abc", 0, 1, "Helalo" };
@@ -2516,9 +2516,9 @@ namespace J2N.Text.Tests
             yield return new object?[] { "Hello", 3, "abc", 0, 2, "Helablo" };
         }
 
-        public static IEnumerable<object?[]> Test_Insert_ICharSequence_Typed_TestData()
+        public static IEnumerable<object?[]> Test_Insert_ICharSequence_TestData()
         {
-            foreach (var testCase in Test_Insert_ICharSequence_TestData())
+            foreach (var testCase in Test_Insert_String_TestData())
             {
                 yield return new object?[] { testCase[0], testCase[1], new StringCharSequence((string?)testCase[2]), testCase[3], testCase[4], testCase[5] };
                 yield return new object?[] { testCase[0], testCase[1], new StringBuilderCharSequence(new StringBuilder((string?)testCase[2])), testCase[3], testCase[4], testCase[5] };
@@ -2540,7 +2540,7 @@ namespace J2N.Text.Tests
         }
 
         [Theory]
-        [MemberData(nameof(Test_Insert_ICharSequence_Typed_TestData))]
+        [MemberData(nameof(Test_Insert_ICharSequence_TestData))]
         public void Insert_ICharSequence(string? original, int index, ICharSequence? value, int startIndex, int count, string expected)
         {
             MutableTextBuffer builder;
@@ -2564,12 +2564,13 @@ namespace J2N.Text.Tests
             builder.Append("Hello");
 
             AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => builder.Insert(-1, new char[1].AsCharSequence())); // Index < 0
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => builder.Insert(-1, (ICharSequence?)null)); // Index < 0
             AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => builder.Insert(-1, new char[0].AsCharSequence(), 0, 0)); // Index < 0
 
             AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => builder.Insert(builder.Length + 1, new char[1].AsCharSequence())); // Index > builder.Length
             AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => builder.Insert(builder.Length + 1, new char[0].AsCharSequence(), 0, 0)); // Index > builder.Length
 
-            Assert.Throws<ArgumentNullException>(() => builder.Insert(0, (char[]?)null, 1, 1)); // Value is null (startIndex and count are not zero)
+            Assert.Throws<ArgumentNullException>(() => builder.Insert(0, (ICharSequence?)null, 1, 1)); // Value is null (startIndex and count are not zero)
             AssertExtensions.Throws<ArgumentOutOfRangeException>("startIndex", () => builder.Insert(0, new char[0].AsCharSequence(), -1, 0)); // Start index < 0
 
             AssertExtensions.Throws<ArgumentOutOfRangeException>("startIndex", () => builder.Insert(0, new char[3].AsCharSequence(), 4, 0)); // Start index + char count > value.Length
@@ -2578,13 +2579,7 @@ namespace J2N.Text.Tests
 
             AssertExtensions.Throws<ArgumentOutOfRangeException>("requiredLength", () => builder.Insert(builder.Length, new char[1].AsCharSequence())); // New length > builder.MaxCapacity
             AssertExtensions.Throws<ArgumentOutOfRangeException>("requiredLength", () => builder.Insert(builder.Length, new char[] { 'a' }.AsCharSequence(), 0, 1)); // New length > builder.MaxCapacity
-        }
 
-        [Fact]
-        public void Insert_ICharSequence_InvalidCount()
-        {
-            var builder = MutableTextBufferFactory(0, 5);
-            builder.Append("Hello");
             AssertExtensions.Throws<ArgumentOutOfRangeException>("count", () => builder.Insert(0, new char[0].AsCharSequence(), 0, -1)); // Char count < 0
         }
 
@@ -3123,7 +3118,49 @@ namespace J2N.Text.Tests
             }
         }
 
+        [Theory]
+        [MemberData(nameof(Test_Insert_String_TestData))]
+        public void Insert_String(string? original, int index, string? value, int startIndex, int count, string expected)
+        {
+            MutableTextBuffer builder;
+            if (startIndex == 0 && count == (value?.Length ?? 0))
+            {
+                // Use Insert(int, string)
+                builder = MutableTextBufferFactory(original);
+                builder.Insert(index, value);
+                Assert.Equal(expected, builder.ToString());
+            }
+            // Use Insert(int, string, int, int)
+            builder = MutableTextBufferFactory(original);
+            builder.Insert(index, value, startIndex, count);
+            Assert.Equal(expected, builder.ToString());
+        }
 
+        [Fact]
+        public void Insert_String_Invalid()
+        {
+            var builder = MutableTextBufferFactory(0, 5);
+            builder.Append("Hello");
+
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => builder.Insert(-1, "")); // Index < 0
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => builder.Insert(-1, (string?)null)); // Index < 0
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => builder.Insert(-1, "", 0, 0)); // Index < 0
+
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => builder.Insert(builder.Length + 1, "")); // Index > builder.Length
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => builder.Insert(builder.Length + 1, "", 0, 0)); // Index > builder.Length
+
+            Assert.Throws<ArgumentNullException>(() => builder.Insert(0, (string?)null, 1, 1)); // Value is null (startIndex and count are not zero)
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("startIndex", () => builder.Insert(0, "", -1, 0)); // Start index < 0
+
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("startIndex", () => builder.Insert(0, "abc", 4, 0)); // Start index + char count > value.Length
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("startIndex", () => builder.Insert(0, "abc", 3, 1)); // Start index + char count > value.Length
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("startIndex", () => builder.Insert(0, "abc", 2, 2)); // Start index + char count > value.Length
+
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("requiredLength", () => builder.Insert(builder.Length, "a")); // New length > builder.MaxCapacity
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("requiredLength", () => builder.Insert(builder.Length, "a", 0, 1)); // New length > builder.MaxCapacity
+
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("count", () => builder.Insert(0, "", 0, -1)); // Char count < 0
+        }
 
         [Theory]
         [InlineData("Hello", 0, "\0", 0, "Hello")]
@@ -3147,16 +3184,8 @@ namespace J2N.Text.Tests
         [InlineData("", 0, "abcde", 7, "abcdeabcdeabcdeabcdeabcdeabcdeabcde")]
         public void Insert_String_RepeatCount(string? original, int index, string? value, int count, string expected)
         {
-            MutableTextBuffer builder;
-            if (count == 1)
-            {
-                // Use Insert(int, string)
-                builder = MutableTextBufferFactory(original);
-                builder.Insert(index, value);
-                Assert.Equal(expected, builder.ToString());
-            }
             // Use Insert(int, string, int)
-            builder = MutableTextBufferFactory(original);
+            MutableTextBuffer builder = MutableTextBufferFactory(original);
             builder.Insert(index, value, count);
             Assert.Equal(expected, builder.ToString());
         }
@@ -3167,19 +3196,44 @@ namespace J2N.Text.Tests
             var builder = MutableTextBufferFactory(0, 6);
             builder.Append("Hello");
 
-            AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => builder.Insert(-1, "")); // Index < 0
             AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => builder.Insert(-1, "", 0)); // Index < 0
 
-            AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => builder.Insert(builder.Length + 1, "")); // Index > builder.Length
             AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => builder.Insert(builder.Length + 1, "", 0)); // Index > builder.Length
 
-            AssertExtensions.Throws<ArgumentOutOfRangeException>("repeatCount", () => builder.Insert(0, "", -1)); // Count < 0
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("repeatCount", () => builder.Insert(0, "", -1)); // Repeat count < 0
 
-            AssertExtensions.Throws<ArgumentOutOfRangeException>("requiredLength", () => builder.Insert(builder.Length, "aa")); // New length > builder.MaxCapacity
             Assert.Throws<OutOfMemoryException>(() => builder.Insert(builder.Length, "aa", 1)); // New length > builder.MaxCapacity
             Assert.Throws<OutOfMemoryException>(() => builder.Insert(builder.Length, "a", 2)); // New length > builder.MaxCapacity
         }
 
+        [Theory]
+        [MemberData(nameof(Test_Insert_String_TestData))]
+        public void Insert_CharSpan(string? original, int index, string? value, int startIndex, int count, string expected)
+        {
+            MutableTextBuffer builder;
+            if (startIndex == 0 && count == (value?.Length ?? 0))
+            {
+                // Use Insert(int, ReadOnlySpan<char>)
+                builder = MutableTextBufferFactory(original);
+                builder.Insert(index, value.AsSpan());
+                Assert.Equal(expected, builder.ToString());
+            }
+            // Use Insert(int, ReadOnlySpan<char>)
+            builder = MutableTextBufferFactory(original);
+            builder.Insert(index, value.AsSpan(startIndex, count));
+            Assert.Equal(expected, builder.ToString());
+        }
+
+        [Fact]
+        public void Insert_CharSpan_Invalid()
+        {
+            var builder = MutableTextBufferFactory(0, 5);
+            builder.Append("Hello");
+
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => builder.Insert(-1, new ReadOnlySpan<char>(new char[0]))); // Index < 0
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => builder.Insert(builder.Length + 1, new ReadOnlySpan<char>(new char[0]))); // Index > builder.Length
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("requiredLength", () => builder.Insert(builder.Length, new ReadOnlySpan<char>(new char[1]))); // New length > builder.MaxCapacity
+        }
 
         [Theory] // J2N specific
         [InlineData("Hello", 0, "\0", 0, "Hello")]
@@ -3256,20 +3310,137 @@ namespace J2N.Text.Tests
             var builder = MutableTextBufferFactory(0, 6);
             builder.Append("Hello");
 
-            AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => builder.Insert(-1, "".AsSpan())); // Index < 0
             AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => builder.Insert(-1, "".AsSpan(), 0)); // Index < 0
 
-            AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => builder.Insert(builder.Length + 1, "".AsSpan())); // Index > builder.Length
             AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => builder.Insert(builder.Length + 1, "".AsSpan(), 0)); // Index > builder.Length
 
             AssertExtensions.Throws<ArgumentOutOfRangeException>("repeatCount", () => builder.Insert(0, "".AsSpan(), -1)); // Count < 0
 
-            AssertExtensions.Throws<ArgumentOutOfRangeException>("requiredLength", () => builder.Insert(builder.Length, "aa".AsSpan())); // New length > builder.MaxCapacity
             Assert.Throws<OutOfMemoryException>(() => builder.Insert(builder.Length, "aa".AsSpan(), 1)); // New length > builder.MaxCapacity
             Assert.Throws<OutOfMemoryException>(() => builder.Insert(builder.Length, "a".AsSpan(), 2)); // New length > builder.MaxCapacity
         }
 
-        public static IEnumerable<object?[]> Test_Insert_ICharSequence_RepeatCount_TestData()
+        [Theory]
+        [MemberData(nameof(Insert_Overlapping_TestData))]
+        public void Insert_CharSpan_Overlapping(string value, int index, int sourceIndex, int sourceLength, string expected)
+        {
+            MutableTextBuffer builder = MutableTextBufferFactory(value);
+            ReadOnlySpan<char> source = builder.AsSpan(sourceIndex, sourceLength);
+            builder.Insert(index, source);
+            Assert.Equal(expected, builder.ToString());
+        }
+
+        [Theory]
+        [InlineData("ABCDEFGH", 0, 4)]
+        [InlineData("ABCDEFGH", 1, 3)]
+        [InlineData("ABCDEFGH", 2, 2)]
+        [InlineData("ABCDEFGH", 3, 1)]
+        [InlineData("ABCDEFGH", 0, 2)]
+        public void Insert_CharSpan_IsSelf_ShouldMatchInsertSelf(string original, int sourceIndex, int length)
+        {
+            for (int insertIndex = 0; insertIndex <= original.Length; insertIndex++)
+            {
+                var expected = MutableTextBufferFactory(original);
+                expected.InsertFromSelf(insertIndex, sourceIndex, length);
+
+                var actual = MutableTextBufferFactory(original);
+                actual.Insert(insertIndex,
+                    actual.AsSpan(sourceIndex, length));
+
+                Assert.Equal(expected.ToString(), actual.ToString());
+            }
+        }
+
+        /// <summary>
+        /// Stresses the MakeRoom() implementation
+        /// </summary>
+        [Theory]
+        [InlineData("0123456789", 0, "ABC")]
+        [InlineData("0123456789", 1, "ABC")]
+        [InlineData("0123456789", 5, "ABC")]
+        [InlineData("0123456789", 9, "ABC")]
+        [InlineData("0123456789", 10, "ABC")]
+        public void Insert_CharSpan_InPlaceMove_MatchesStringInsert(string original, int index, string value)
+        {
+            // Enough spare capacity to guarantee the in-place MakeRoom() path.
+            var builder = MutableTextBufferFactory(
+                original,
+                original.Length + value.Length + 10);
+
+            builder.Insert(index, value.AsSpan());
+
+            Assert.Equal(
+                original.Insert(index, value),
+                builder.ToString());
+        }
+
+        /// <summary>
+        /// Stresses the MakeRoom() implementation
+        /// </summary>
+        [Theory]
+        [InlineData("0123456789", 0, "ABC")]
+        [InlineData("0123456789", 1, "ABC")]
+        [InlineData("0123456789", 5, "ABC")]
+        [InlineData("0123456789", 9, "ABC")]
+        [InlineData("0123456789", 10, "ABC")]
+        public void Insert_CharSpan_ReallocationMove_MatchesStringInsert(string original, int index, string value)
+        {
+            // No spare capacity. Forces allocation.
+            var builder = MutableTextBufferFactory(
+                original,
+                original.Length);
+
+            builder.Insert(index, value.AsSpan());
+
+            Assert.Equal(
+                original.Insert(index, value),
+                builder.ToString());
+        }
+
+        /// <summary>
+        /// Stresses the MakeRoom() implementation
+        /// </summary>
+        [Fact]
+        public void Insert_CharSpan_InPlaceMove_LargeOverlap_MatchesStringInsert()
+        {
+            string original = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            string value = "1234567890";
+
+            var builder = MutableTextBufferFactory(
+                original,
+                original.Length + value.Length + 10);
+
+            builder.Insert(1, value.AsSpan());
+
+            Assert.Equal(
+                original.Insert(1, value),
+                builder.ToString());
+        }
+
+        [Fact]
+        public void Insert_CharSpan_RepeatedFrontInsertions_MatchesStringInsert()
+        {
+            string expected = "XYZ";
+
+            var builder = MutableTextBufferFactory("XYZ", 64);
+
+            builder.Insert(0, "1".AsSpan());
+            expected = expected.Insert(0, "1");
+
+            builder.Insert(0, "2".AsSpan());
+            expected = expected.Insert(0, "2");
+
+            builder.Insert(0, "3".AsSpan());
+            expected = expected.Insert(0, "3");
+
+            builder.Insert(0, "4".AsSpan());
+            expected = expected.Insert(0, "4");
+
+            Assert.Equal(expected, builder.ToString());
+        }
+
+
+        public static IEnumerable<object?[]> Test_Insert_String_RepeatCount_TestData()
         {
             yield return new object?[] { "Hello", 0, "\0", 0, "Hello" };
             yield return new object?[] { "Hello", 0, "\0", 1, "\0Hello" };
@@ -3294,9 +3465,9 @@ namespace J2N.Text.Tests
             yield return new object?[] { "", 0, "abcde", 7, "abcdeabcdeabcdeabcdeabcdeabcdeabcde" };
         }
 
-        public static IEnumerable<object?[]> Test_Insert_ICharSequence_Typed_RepeatCount_TestData()
+        public static IEnumerable<object?[]> Test_Insert_ICharSequence_RepeatCount_TestData()
         {
-            foreach (var testCase in Test_Insert_ICharSequence_RepeatCount_TestData())
+            foreach (var testCase in Test_Insert_String_RepeatCount_TestData())
             {
                 yield return new object?[] { testCase[0], testCase[1], new StringCharSequence((string?)testCase[2]), testCase[3], testCase[4] };
                 yield return new object?[] { testCase[0], testCase[1], new StringBuilderCharSequence(new StringBuilder((string?)testCase[2])), testCase[3], testCase[4] };
@@ -3319,7 +3490,7 @@ namespace J2N.Text.Tests
 
 
         [Theory] // J2N specific
-        [MemberData(nameof(Test_Insert_ICharSequence_Typed_RepeatCount_TestData))]
+        [MemberData(nameof(Test_Insert_ICharSequence_RepeatCount_TestData))]
         public void Insert_ICharSequence_RepeatCount(string? original, int index, ICharSequence? value, int count, string expected)
         {
             MutableTextBuffer builder;
@@ -3336,21 +3507,19 @@ namespace J2N.Text.Tests
             Assert.Equal(expected, builder.ToString());
         }
 
-        [Fact] // J2N specific
+        [Fact] // J2N: Based on char[] logic
         public void Insert_ICharSequence_RepeatCount_Invalid()
         {
-            var builder = MutableTextBufferFactory(0, 6);
+            var builder = MutableTextBufferFactory(0, 5);
             builder.Append("Hello");
 
-            AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => builder.Insert(-1, "".AsCharSequence())); // Index < 0
             AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => builder.Insert(-1, "".AsCharSequence(), 0)); // Index < 0
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => builder.Insert(-1, (ICharSequence?)null, 0)); // Index < 0
 
-            AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => builder.Insert(builder.Length + 1, "".AsCharSequence())); // Index > builder.Length
             AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => builder.Insert(builder.Length + 1, "".AsCharSequence(), 0)); // Index > builder.Length
 
-            AssertExtensions.Throws<ArgumentOutOfRangeException>("repeatCount", () => builder.Insert(0, "".AsCharSequence(), -1)); // Count < 0
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("repeatCount", () => builder.Insert(0, "".AsCharSequence(), -1)); // Repeat count < 0
 
-            AssertExtensions.Throws<ArgumentOutOfRangeException>("requiredLength", () => builder.Insert(builder.Length, "aa".AsCharSequence())); // New length > builder.MaxCapacity
             Assert.Throws<OutOfMemoryException>(() => builder.Insert(builder.Length, "aa".AsCharSequence(), 1)); // New length > builder.MaxCapacity
             Assert.Throws<OutOfMemoryException>(() => builder.Insert(builder.Length, "a".AsCharSequence(), 2)); // New length > builder.MaxCapacity
         }
@@ -3434,7 +3603,7 @@ namespace J2N.Text.Tests
 
         public static IEnumerable<object?[]> Test_Insert_StringBuilder_RepeatCount_TestData()
         {
-            foreach (var testCase in Test_Insert_ICharSequence_RepeatCount_TestData())
+            foreach (var testCase in Test_Insert_String_RepeatCount_TestData())
             {
                 if (testCase[2] is not null)
                 {
@@ -3466,21 +3635,44 @@ namespace J2N.Text.Tests
             Assert.Equal(expected, builder.ToString());
         }
 
+        [Fact] // J2N: Copy of char[] logic
+        public void Insert_StringBuilder_Invalid()
+        {
+            var builder = MutableTextBufferFactory(0, 5);
+            builder.Append("Hello");
+
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => builder.Insert(-1, new StringBuilder(""))); // Index < 0
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => builder.Insert(-1, (StringBuilder?)null)); // Index < 0
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => builder.Insert(-1, new StringBuilder(""), 0, 0)); // Index < 0
+
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => builder.Insert(builder.Length + 1, new StringBuilder(""))); // Index > builder.Length
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => builder.Insert(builder.Length + 1, new StringBuilder(""), 0, 0)); // Index > builder.Length
+
+            Assert.Throws<ArgumentNullException>(() => builder.Insert(0, (StringBuilder?)null, 1, 1)); // Value is null (startIndex and count are not zero)
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("startIndex", () => builder.Insert(0, new StringBuilder(""), -1, 0)); // Start index < 0
+
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("startIndex", () => builder.Insert(0, new StringBuilder("abc"), 4, 0)); // Start index + char count > value.Length
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("startIndex", () => builder.Insert(0, new StringBuilder("abc"), 3, 1)); // Start index + char count > value.Length
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("startIndex", () => builder.Insert(0, new StringBuilder("abc"), 2, 2)); // Start index + char count > value.Length
+
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("requiredLength", () => builder.Insert(builder.Length, new StringBuilder("a"))); // New length > builder.MaxCapacity
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("requiredLength", () => builder.Insert(builder.Length, new StringBuilder("a"), 0, 1)); // New length > builder.MaxCapacity
+
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("count", () => builder.Insert(0, new StringBuilder(""), 0, -1)); // Count < 0
+        }
+
         [Fact] // J2N specific
         public void Insert_StringBuilder_RepeatCount_Invalid()
         {
             var builder = MutableTextBufferFactory(0, 6);
             builder.Append("Hello");
 
-            AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => builder.Insert(-1, new StringBuilder(""))); // Index < 0
             AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => builder.Insert(-1, new StringBuilder(""), 0)); // Index < 0
 
-            AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => builder.Insert(builder.Length + 1, new StringBuilder(""))); // Index > builder.Length
             AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => builder.Insert(builder.Length + 1, new StringBuilder(""), 0)); // Index > builder.Length
 
-            AssertExtensions.Throws<ArgumentOutOfRangeException>("repeatCount", () => builder.Insert(0, new StringBuilder(""), -1)); // Count < 0
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("repeatCount", () => builder.Insert(0, new StringBuilder(""), -1)); // Repeat count < 0
 
-            AssertExtensions.Throws<ArgumentOutOfRangeException>("requiredLength", () => builder.Insert(builder.Length, new StringBuilder("aa"))); // New length > builder.MaxCapacity
             Assert.Throws<OutOfMemoryException>(() => builder.Insert(builder.Length, new StringBuilder("aa"), 1)); // New length > builder.MaxCapacity
             Assert.Throws<OutOfMemoryException>(() => builder.Insert(builder.Length, new StringBuilder("a"), 2)); // New length > builder.MaxCapacity
         }
@@ -3520,6 +3712,7 @@ namespace J2N.Text.Tests
             builder.Append("Hello");
 
             AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => builder.Insert(-1, new char[1])); // Index < 0
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => builder.Insert(-1, (char[]?)null)); // Index < 0
             AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => builder.Insert(-1, new char[0], 0, 0)); // Index < 0
 
             AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => builder.Insert(builder.Length + 1, new char[1])); // Index > builder.Length
@@ -3534,21 +3727,7 @@ namespace J2N.Text.Tests
 
             AssertExtensions.Throws<ArgumentOutOfRangeException>("requiredLength", () => builder.Insert(builder.Length, new char[1])); // New length > builder.MaxCapacity
             AssertExtensions.Throws<ArgumentOutOfRangeException>("requiredLength", () => builder.Insert(builder.Length, new char[] { 'a' }, 0, 1)); // New length > builder.MaxCapacity
-        }
 
-        [Fact]
-        public void Insert_CharArray_InvalidCount()
-        {
-            var builder = MutableTextBufferFactory(0, 5);
-            builder.Append("Hello");
-            AssertExtensions.Throws<ArgumentOutOfRangeException>("charCount", () => builder.Insert(0, new char[0], 0, -1)); // Char count < 0
-        }
-
-        [Fact]
-        public void Insert_CharArray_InvalidCharCount()
-        {
-            var builder = MutableTextBufferFactory(0, 5);
-            builder.Append("Hello");
             AssertExtensions.Throws<ArgumentOutOfRangeException>("charCount", () => builder.Insert(0, new char[0], 0, -1)); // Char count < 0
         }
 
@@ -4094,148 +4273,6 @@ namespace J2N.Text.Tests
             AssertExtensions.Throws<ArgumentException>(null, () => builder.CopyTo(4, new Span<char>(new char[10]), 2)); // Source index + count > builder.Length
 
             AssertExtensions.Throws<ArgumentException>(null, () => builder.CopyTo(0, new Span<char>(new char[10]), 11)); // count > destinationArray.Length
-        }
-
-        [Theory]
-        [InlineData("Hello", 0, new char[] { '\0' }, "\0Hello")]
-        [InlineData("Hello", 3, new char[] { 'a', 'b', 'c' }, "Helabclo")]
-        [InlineData("Hello", 5, new char[] { 'd', 'e', 'f' }, "Hellodef")]
-        [InlineData("Hello", 0, new char[0], "Hello")]
-        public void Insert_CharSpan(string original, int index, char[] value, string expected)
-        {
-            var builder = MutableTextBufferFactory(original);
-            builder.Insert(index, new ReadOnlySpan<char>(value));
-            Assert.Equal(expected, builder.ToString());
-        }
-
-        [Theory]
-        [MemberData(nameof(Insert_Overlapping_TestData))]
-        public void Insert_CharSpan_Overlapping(string value, int index, int sourceIndex, int sourceLength, string expected)
-        {
-            MutableTextBuffer builder = MutableTextBufferFactory(value);
-            ReadOnlySpan<char> source = builder.AsSpan(sourceIndex, sourceLength);
-            builder.Insert(index, source);
-            Assert.Equal(expected, builder.ToString());
-        }
-
-        [Theory]
-        [InlineData("ABCDEFGH", 0, 4)]
-        [InlineData("ABCDEFGH", 1, 3)]
-        [InlineData("ABCDEFGH", 2, 2)]
-        [InlineData("ABCDEFGH", 3, 1)]
-        [InlineData("ABCDEFGH", 0, 2)]
-        public void Insert_CharSpan_IsSelf_ShouldMatchInsertSelf(string original, int sourceIndex, int length)
-        {
-            for (int insertIndex = 0; insertIndex <= original.Length; insertIndex++)
-            {
-                var expected = MutableTextBufferFactory(original);
-                expected.InsertFromSelf(insertIndex, sourceIndex, length);
-
-                var actual = MutableTextBufferFactory(original);
-                actual.Insert(insertIndex,
-                    actual.AsSpan(sourceIndex, length));
-
-                Assert.Equal(expected.ToString(), actual.ToString());
-            }
-        }
-
-        [Fact]
-        public void Insert_CharSpan_Invalid()
-        {
-            var builder = MutableTextBufferFactory(0, 5);
-            builder.Append("Hello");
-
-            AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => builder.Insert(-1, new ReadOnlySpan<char>(new char[0]))); // Index < 0
-            AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => builder.Insert(builder.Length + 1, new ReadOnlySpan<char>(new char[0]))); // Index > builder.Length
-            AssertExtensions.Throws<ArgumentOutOfRangeException>("requiredLength", () => builder.Insert(builder.Length, new ReadOnlySpan<char>(new char[1]))); // New length > builder.MaxCapacity
-        }
-
-        /// <summary>
-        /// Stresses the MakeRoom() implementation
-        /// </summary>
-        [Theory]
-        [InlineData("0123456789", 0, "ABC")]
-        [InlineData("0123456789", 1, "ABC")]
-        [InlineData("0123456789", 5, "ABC")]
-        [InlineData("0123456789", 9, "ABC")]
-        [InlineData("0123456789", 10, "ABC")]
-        public void Insert_CharSpan_InPlaceMove_MatchesStringInsert(string original, int index, string value)
-        {
-            // Enough spare capacity to guarantee the in-place MakeRoom() path.
-            var builder = MutableTextBufferFactory(
-                original,
-                original.Length + value.Length + 10);
-
-            builder.Insert(index, value.AsSpan());
-
-            Assert.Equal(
-                original.Insert(index, value),
-                builder.ToString());
-        }
-
-        /// <summary>
-        /// Stresses the MakeRoom() implementation
-        /// </summary>
-        [Theory]
-        [InlineData("0123456789", 0, "ABC")]
-        [InlineData("0123456789", 1, "ABC")]
-        [InlineData("0123456789", 5, "ABC")]
-        [InlineData("0123456789", 9, "ABC")]
-        [InlineData("0123456789", 10, "ABC")]
-        public void Insert_CharSpan_ReallocationMove_MatchesStringInsert(string original, int index, string value)
-        {
-            // No spare capacity. Forces allocation.
-            var builder = MutableTextBufferFactory(
-                original,
-                original.Length);
-
-            builder.Insert(index, value.AsSpan());
-
-            Assert.Equal(
-                original.Insert(index, value),
-                builder.ToString());
-        }
-
-        /// <summary>
-        /// Stresses the MakeRoom() implementation
-        /// </summary>
-        [Fact]
-        public void Insert_CharSpan_InPlaceMove_LargeOverlap_MatchesStringInsert()
-        {
-            string original = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-            string value = "1234567890";
-
-            var builder = MutableTextBufferFactory(
-                original,
-                original.Length + value.Length + 10);
-
-            builder.Insert(1, value.AsSpan());
-
-            Assert.Equal(
-                original.Insert(1, value),
-                builder.ToString());
-        }
-
-        [Fact]
-        public void Insert_CharSpan_RepeatedFrontInsertions_MatchesStringInsert()
-        {
-            string expected = "XYZ";
-
-            var builder = MutableTextBufferFactory("XYZ", 64);
-
-            builder.Insert(0, "1".AsSpan());
-            expected = expected.Insert(0, "1");
-
-            builder.Insert(0, "2".AsSpan());
-            expected = expected.Insert(0, "2");
-
-            builder.Insert(0, "3".AsSpan());
-            expected = expected.Insert(0, "3");
-
-            builder.Insert(0, "4".AsSpan());
-            expected = expected.Insert(0, "4");
-
-            Assert.Equal(expected, builder.ToString());
         }
 
         public IEnumerable<object?[]> Append_MutableTextBuffer_TestData()
