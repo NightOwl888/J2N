@@ -72,7 +72,7 @@ namespace J2N.Text
 
         /// <summary>
         /// Inserts the string representation of a specified Boolean value to this instance
-        /// in lowercase at the specifed character position.
+        /// in lowercase at the specified character position.
         /// </summary>
         /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
         /// <param name="text">The target builder.</param>

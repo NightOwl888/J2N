@@ -215,7 +215,7 @@ namespace J2N.Text
         /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
-        /// When you instantiate an <see cref="TextBuilder"/> object by calling the <see cref="TextBuilder(int, int)"/>
+        /// When you instantiate a <see cref="TextBuilder"/> object by calling the <see cref="TextBuilder(int, int)"/>
         /// constructor, both the length and the capacity of the <see cref="TextBuilder"/> instance can grow beyond
         /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="TextBuilderExtensions.Append{TBuilder}(TBuilder, string?)"/>
         /// and <see cref="TextBuilderExtensions.AppendFormat{TBuilder}(TBuilder, string, object?)"/> methods to append small strings.

@@ -251,7 +251,7 @@ namespace J2N
 
         #endregion Insert ICharSequence
 
-        #region Insert ICharSequnce repeated
+        #region Insert ICharSequence repeated
 
         /// <summary>Inserts one or more copies of a specified sequence of characters into this instance at the specified character position.</summary>
         /// <typeparam name="TBuilder">The type of the target builder.</typeparam>

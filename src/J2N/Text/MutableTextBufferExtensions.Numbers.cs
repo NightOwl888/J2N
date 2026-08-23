@@ -48,7 +48,7 @@ namespace J2N.Text
         /// <para/>
         /// If no <paramref name="provider"/> is explicitly specified, this method uses the default formatting behavior
         /// determined by the <see cref="MutableTextBuffer.UseInvariantDefaults"/> setting. To obtain locale-independent
-        /// formatting that is consistent with typical JDK behavior, either specify an invariant format provider explictly
+        /// formatting that is consistent with typical JDK behavior, either specify an invariant format provider explicitly
         /// or set <see cref="MutableTextBuffer.UseInvariantDefaults"/> to <see langword="true"/> when constructing the
         /// <see cref="MutableTextBuffer"/>.
         /// <para/>
@@ -95,7 +95,7 @@ namespace J2N.Text
         /// <para/>
         /// If no <paramref name="provider"/> is explicitly specified, this method uses the default formatting behavior
         /// determined by the <see cref="MutableTextBuffer.UseInvariantDefaults"/> setting. To obtain locale-independent
-        /// formatting that is consistent with typical JDK behavior, either specify an invariant format provider explictly
+        /// formatting that is consistent with typical JDK behavior, either specify an invariant format provider explicitly
         /// or set <see cref="MutableTextBuffer.UseInvariantDefaults"/> to <see langword="true"/> when constructing the
         /// <see cref="MutableTextBuffer"/>.
         /// <para/>
@@ -141,7 +141,7 @@ namespace J2N.Text
         /// <para/>
         /// If no <paramref name="provider"/> is explicitly specified, this method uses the default formatting behavior
         /// determined by the <see cref="MutableTextBuffer.UseInvariantDefaults"/> setting. To obtain locale-independent
-        /// formatting that is consistent with typical JDK behavior, either specify an invariant format provider explictly
+        /// formatting that is consistent with typical JDK behavior, either specify an invariant format provider explicitly
         /// or set <see cref="MutableTextBuffer.UseInvariantDefaults"/> to <see langword="true"/> when constructing the
         /// <see cref="MutableTextBuffer"/>.
         /// <para/>
@@ -187,7 +187,7 @@ namespace J2N.Text
         /// <para/>
         /// If no <paramref name="provider"/> is explicitly specified, this method uses the default formatting behavior
         /// determined by the <see cref="MutableTextBuffer.UseInvariantDefaults"/> setting. To obtain locale-independent
-        /// formatting that is consistent with typical JDK behavior, either specify an invariant format provider explictly
+        /// formatting that is consistent with typical JDK behavior, either specify an invariant format provider explicitly
         /// or set <see cref="MutableTextBuffer.UseInvariantDefaults"/> to <see langword="true"/> when constructing the
         /// <see cref="MutableTextBuffer"/>.
         /// <para/>
@@ -233,7 +233,7 @@ namespace J2N.Text
         /// <para/>
         /// If no <paramref name="provider"/> is explicitly specified, this method uses the default formatting behavior
         /// determined by the <see cref="MutableTextBuffer.UseInvariantDefaults"/> setting. To obtain locale-independent
-        /// formatting that is consistent with typical JDK behavior, either specify an invariant format provider explictly
+        /// formatting that is consistent with typical JDK behavior, either specify an invariant format provider explicitly
         /// or set <see cref="MutableTextBuffer.UseInvariantDefaults"/> to <see langword="true"/> when constructing the
         /// <see cref="MutableTextBuffer"/>.
         /// <para/>
@@ -279,7 +279,7 @@ namespace J2N.Text
         /// <para/>
         /// If no <paramref name="provider"/> is explicitly specified, this method uses the default formatting behavior
         /// determined by the <see cref="MutableTextBuffer.UseInvariantDefaults"/> setting. To obtain locale-independent
-        /// formatting that is consistent with typical JDK behavior, either specify an invariant format provider explictly
+        /// formatting that is consistent with typical JDK behavior, either specify an invariant format provider explicitly
         /// or set <see cref="MutableTextBuffer.UseInvariantDefaults"/> to <see langword="true"/> when constructing the
         /// <see cref="MutableTextBuffer"/>.
         /// <para/>
@@ -325,7 +325,7 @@ namespace J2N.Text
         /// <para/>
         /// If no <paramref name="provider"/> is explicitly specified, this method uses the default formatting behavior
         /// determined by the <see cref="MutableTextBuffer.UseInvariantDefaults"/> setting. To obtain locale-independent
-        /// formatting that is consistent with typical JDK behavior, either specify an invariant format provider explictly
+        /// formatting that is consistent with typical JDK behavior, either specify an invariant format provider explicitly
         /// or set <see cref="MutableTextBuffer.UseInvariantDefaults"/> to <see langword="true"/> when constructing the
         /// <see cref="MutableTextBuffer"/>.
         /// <para/>
@@ -371,7 +371,7 @@ namespace J2N.Text
         /// <para/>
         /// If no <paramref name="provider"/> is explicitly specified, this method uses the default formatting behavior
         /// determined by the <see cref="MutableTextBuffer.UseInvariantDefaults"/> setting. To obtain locale-independent
-        /// formatting that is consistent with typical JDK behavior, either specify an invariant format provider explictly
+        /// formatting that is consistent with typical JDK behavior, either specify an invariant format provider explicitly
         /// or set <see cref="MutableTextBuffer.UseInvariantDefaults"/> to <see langword="true"/> when constructing the
         /// <see cref="MutableTextBuffer"/>.
         /// <para/>
@@ -417,7 +417,7 @@ namespace J2N.Text
         /// <para/>
         /// If no <paramref name="provider"/> is explicitly specified, this method uses the default formatting behavior
         /// determined by the <see cref="MutableTextBuffer.UseInvariantDefaults"/> setting. To obtain locale-independent
-        /// formatting that is consistent with typical JDK behavior, either specify an invariant format provider explictly
+        /// formatting that is consistent with typical JDK behavior, either specify an invariant format provider explicitly
         /// or set <see cref="MutableTextBuffer.UseInvariantDefaults"/> to <see langword="true"/> when constructing the
         /// <see cref="MutableTextBuffer"/>.
         /// <para/>
@@ -464,7 +464,7 @@ namespace J2N.Text
         /// <para/>
         /// If no <paramref name="provider"/> is explicitly specified, this method uses the default formatting behavior
         /// determined by the <see cref="MutableTextBuffer.UseInvariantDefaults"/> setting. To obtain locale-independent
-        /// formatting that is consistent with typical JDK behavior, either specify an invariant format provider explictly
+        /// formatting that is consistent with typical JDK behavior, either specify an invariant format provider explicitly
         /// or set <see cref="MutableTextBuffer.UseInvariantDefaults"/> to <see langword="true"/> when constructing the
         /// <see cref="MutableTextBuffer"/>.
         /// <para/>
@@ -511,7 +511,7 @@ namespace J2N.Text
         /// <para/>
         /// If no <paramref name="provider"/> is explicitly specified, this method uses the default formatting behavior
         /// determined by the <see cref="MutableTextBuffer.UseInvariantDefaults"/> setting. To obtain locale-independent
-        /// formatting that is consistent with typical JDK behavior, either specify an invariant format provider explictly
+        /// formatting that is consistent with typical JDK behavior, either specify an invariant format provider explicitly
         /// or set <see cref="MutableTextBuffer.UseInvariantDefaults"/> to <see langword="true"/> when constructing the
         /// <see cref="MutableTextBuffer"/>.
         /// <para/>
@@ -564,7 +564,7 @@ namespace J2N.Text
         /// <para/>
         /// If no <paramref name="provider"/> is explicitly specified, this method uses the default formatting behavior
         /// determined by the <see cref="MutableTextBuffer.UseInvariantDefaults"/> setting. To obtain locale-independent
-        /// formatting that is consistent with typical JDK behavior, either specify an invariant format provider explictly
+        /// formatting that is consistent with typical JDK behavior, either specify an invariant format provider explicitly
         /// or set <see cref="MutableTextBuffer.UseInvariantDefaults"/> to <see langword="true"/> when constructing the
         /// <see cref="MutableTextBuffer"/>.
         /// </remarks>
@@ -610,7 +610,7 @@ namespace J2N.Text
         /// <para/>
         /// If no <paramref name="provider"/> is explicitly specified, this method uses the default formatting behavior
         /// determined by the <see cref="MutableTextBuffer.UseInvariantDefaults"/> setting. To obtain locale-independent
-        /// formatting that is consistent with typical JDK behavior, either specify an invariant format provider explictly
+        /// formatting that is consistent with typical JDK behavior, either specify an invariant format provider explicitly
         /// or set <see cref="MutableTextBuffer.UseInvariantDefaults"/> to <see langword="true"/> when constructing the
         /// <see cref="MutableTextBuffer"/>.
         /// </remarks>
@@ -655,7 +655,7 @@ namespace J2N.Text
         /// <para/>
         /// If no <paramref name="provider"/> is explicitly specified, this method uses the default formatting behavior
         /// determined by the <see cref="MutableTextBuffer.UseInvariantDefaults"/> setting. To obtain locale-independent
-        /// formatting that is consistent with typical JDK behavior, either specify an invariant format provider explictly
+        /// formatting that is consistent with typical JDK behavior, either specify an invariant format provider explicitly
         /// or set <see cref="MutableTextBuffer.UseInvariantDefaults"/> to <see langword="true"/> when constructing the
         /// <see cref="MutableTextBuffer"/>.
         /// </remarks>
@@ -700,7 +700,7 @@ namespace J2N.Text
         /// <para/>
         /// If no <paramref name="provider"/> is explicitly specified, this method uses the default formatting behavior
         /// determined by the <see cref="MutableTextBuffer.UseInvariantDefaults"/> setting. To obtain locale-independent
-        /// formatting that is consistent with typical JDK behavior, either specify an invariant format provider explictly
+        /// formatting that is consistent with typical JDK behavior, either specify an invariant format provider explicitly
         /// or set <see cref="MutableTextBuffer.UseInvariantDefaults"/> to <see langword="true"/> when constructing the
         /// <see cref="MutableTextBuffer"/>.
         /// </remarks>
@@ -745,7 +745,7 @@ namespace J2N.Text
         /// <para/>
         /// If no <paramref name="provider"/> is explicitly specified, this method uses the default formatting behavior
         /// determined by the <see cref="MutableTextBuffer.UseInvariantDefaults"/> setting. To obtain locale-independent
-        /// formatting that is consistent with typical JDK behavior, either specify an invariant format provider explictly
+        /// formatting that is consistent with typical JDK behavior, either specify an invariant format provider explicitly
         /// or set <see cref="MutableTextBuffer.UseInvariantDefaults"/> to <see langword="true"/> when constructing the
         /// <see cref="MutableTextBuffer"/>.
         /// </remarks>
@@ -790,7 +790,7 @@ namespace J2N.Text
         /// <para/>
         /// If no <paramref name="provider"/> is explicitly specified, this method uses the default formatting behavior
         /// determined by the <see cref="MutableTextBuffer.UseInvariantDefaults"/> setting. To obtain locale-independent
-        /// formatting that is consistent with typical JDK behavior, either specify an invariant format provider explictly
+        /// formatting that is consistent with typical JDK behavior, either specify an invariant format provider explicitly
         /// or set <see cref="MutableTextBuffer.UseInvariantDefaults"/> to <see langword="true"/> when constructing the
         /// <see cref="MutableTextBuffer"/>.
         /// </remarks>
@@ -835,7 +835,7 @@ namespace J2N.Text
         /// <para/>
         /// If no <paramref name="provider"/> is explicitly specified, this method uses the default formatting behavior
         /// determined by the <see cref="MutableTextBuffer.UseInvariantDefaults"/> setting. To obtain locale-independent
-        /// formatting that is consistent with typical JDK behavior, either specify an invariant format provider explictly
+        /// formatting that is consistent with typical JDK behavior, either specify an invariant format provider explicitly
         /// or set <see cref="MutableTextBuffer.UseInvariantDefaults"/> to <see langword="true"/> when constructing the
         /// <see cref="MutableTextBuffer"/>.
         /// </remarks>
@@ -880,7 +880,7 @@ namespace J2N.Text
         /// <para/>
         /// If no <paramref name="provider"/> is explicitly specified, this method uses the default formatting behavior
         /// determined by the <see cref="MutableTextBuffer.UseInvariantDefaults"/> setting. To obtain locale-independent
-        /// formatting that is consistent with typical JDK behavior, either specify an invariant format provider explictly
+        /// formatting that is consistent with typical JDK behavior, either specify an invariant format provider explicitly
         /// or set <see cref="MutableTextBuffer.UseInvariantDefaults"/> to <see langword="true"/> when constructing the
         /// <see cref="MutableTextBuffer"/>.
         /// </remarks>
@@ -925,7 +925,7 @@ namespace J2N.Text
         /// <para/>
         /// If no <paramref name="provider"/> is explicitly specified, this method uses the default formatting behavior
         /// determined by the <see cref="MutableTextBuffer.UseInvariantDefaults"/> setting. To obtain locale-independent
-        /// formatting that is consistent with typical JDK behavior, either specify an invariant format provider explictly
+        /// formatting that is consistent with typical JDK behavior, either specify an invariant format provider explicitly
         /// or set <see cref="MutableTextBuffer.UseInvariantDefaults"/> to <see langword="true"/> when constructing the
         /// <see cref="MutableTextBuffer"/>.
         /// </remarks>
@@ -971,7 +971,7 @@ namespace J2N.Text
         /// <para/>
         /// If no <paramref name="provider"/> is explicitly specified, this method uses the default formatting behavior
         /// determined by the <see cref="MutableTextBuffer.UseInvariantDefaults"/> setting. To obtain locale-independent
-        /// formatting that is consistent with typical JDK behavior, either specify an invariant format provider explictly
+        /// formatting that is consistent with typical JDK behavior, either specify an invariant format provider explicitly
         /// or set <see cref="MutableTextBuffer.UseInvariantDefaults"/> to <see langword="true"/> when constructing the
         /// <see cref="MutableTextBuffer"/>.
         /// </remarks>
@@ -1017,7 +1017,7 @@ namespace J2N.Text
         /// <para/>
         /// If no <paramref name="provider"/> is explicitly specified, this method uses the default formatting behavior
         /// determined by the <see cref="MutableTextBuffer.UseInvariantDefaults"/> setting. To obtain locale-independent
-        /// formatting that is consistent with typical JDK behavior, either specify an invariant format provider explictly
+        /// formatting that is consistent with typical JDK behavior, either specify an invariant format provider explicitly
         /// or set <see cref="MutableTextBuffer.UseInvariantDefaults"/> to <see langword="true"/> when constructing the
         /// <see cref="MutableTextBuffer"/>.
         /// </remarks>

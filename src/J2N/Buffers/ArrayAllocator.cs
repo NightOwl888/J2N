@@ -19,7 +19,7 @@
 namespace J2N.Buffers
 {
     /// <summary>
-    /// A simple alloctor that provides newly cleared arrays.
+    /// A simple allocator that provides newly cleared arrays.
     /// </summary>
     /// <typeparam name="T">The type of array element.</typeparam>
     internal sealed class ArrayAllocator<T> : IArrayAllocator<T>

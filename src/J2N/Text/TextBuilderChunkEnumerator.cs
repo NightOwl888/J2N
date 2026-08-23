@@ -14,7 +14,7 @@ namespace J2N.Text
     // level so the same type can be shared across TextBuilder implementations.
 
     /// <summary>
-    /// Supports simple iteration over the chunks of an <see cref="TextBuilder"/> instance.
+    /// Supports simple iteration over the chunks of a <see cref="TextBuilder"/> instance.
     /// </summary>
     /// <remarks>
     /// A <see cref="TextBuilderChunkEnumerator"/> is returned by the <see cref="TextBuilderExtensions.GetChunks(TextBuilder?)"/>

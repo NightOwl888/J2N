@@ -62,7 +62,7 @@ namespace J2N.Text
         /// <list type="table">
         ///   <listheader>
         ///     <description>Element</description>
-        ///     <description>Descripton</description>
+        ///     <description>Description</description>
         ///   </listheader>
         ///   <item>
         ///     <description><i>index</i></description>
@@ -153,7 +153,7 @@ namespace J2N.Text
         /// <list type="table">
         ///   <listheader>
         ///     <description>Element</description>
-        ///     <description>Descripton</description>
+        ///     <description>Description</description>
         ///   </listheader>
         ///   <item>
         ///     <description><i>index</i></description>
@@ -245,7 +245,7 @@ namespace J2N.Text
         /// <list type="table">
         ///   <listheader>
         ///     <description>Element</description>
-        ///     <description>Descripton</description>
+        ///     <description>Description</description>
         ///   </listheader>
         ///   <item>
         ///     <description><i>index</i></description>
@@ -335,7 +335,7 @@ namespace J2N.Text
         /// <list type="table">
         ///   <listheader>
         ///     <description>Element</description>
-        ///     <description>Descripton</description>
+        ///     <description>Description</description>
         ///   </listheader>
         ///   <item>
         ///     <description><i>index</i></description>
@@ -425,7 +425,7 @@ namespace J2N.Text
         /// <list type="table">
         ///   <listheader>
         ///     <description>Element</description>
-        ///     <description>Descripton</description>
+        ///     <description>Description</description>
         ///   </listheader>
         ///   <item>
         ///     <description><i>index</i></description>
@@ -518,7 +518,7 @@ namespace J2N.Text
         /// <list type="table">
         ///   <listheader>
         ///     <description>Element</description>
-        ///     <description>Descripton</description>
+        ///     <description>Description</description>
         ///   </listheader>
         ///   <item>
         ///     <description><i>index</i></description>
@@ -623,7 +623,7 @@ namespace J2N.Text
         /// <list type="table">
         ///   <listheader>
         ///     <description>Element</description>
-        ///     <description>Descripton</description>
+        ///     <description>Description</description>
         ///   </listheader>
         ///   <item>
         ///     <description><i>index</i></description>
@@ -729,7 +729,7 @@ namespace J2N.Text
         /// <list type="table">
         ///   <listheader>
         ///     <description>Element</description>
-        ///     <description>Descripton</description>
+        ///     <description>Description</description>
         ///   </listheader>
         ///   <item>
         ///     <description><i>index</i></description>
@@ -834,7 +834,7 @@ namespace J2N.Text
         /// <list type="table">
         ///   <listheader>
         ///     <description>Element</description>
-        ///     <description>Descripton</description>
+        ///     <description>Description</description>
         ///   </listheader>
         ///   <item>
         ///     <description><i>index</i></description>
@@ -939,7 +939,7 @@ namespace J2N.Text
         /// <list type="table">
         ///   <listheader>
         ///     <description>Element</description>
-        ///     <description>Descripton</description>
+        ///     <description>Description</description>
         ///   </listheader>
         ///   <item>
         ///     <description><i>index</i></description>

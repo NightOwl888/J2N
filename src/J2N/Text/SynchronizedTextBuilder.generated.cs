@@ -322,7 +322,7 @@ namespace J2N.Text
         /// You must request a new buffer after calling <see cref="Advance(int)"/> to continue writing more data
         /// and cannot write to a previously acquired buffer.
         /// <para/>
-        /// Calling <see cref="Advance(int)"/> is effictively the same operation as adding <paramref name="count"/>
+        /// Calling <see cref="Advance(int)"/> is effectively the same operation as adding <paramref name="count"/>
         /// to the existing <see cref="Length"/>.
         /// <para/>
         /// This method is intended to be used in conjunction with either <see cref="GetSpan(int)"/> or <see cref="GetMemory(int)"/>.

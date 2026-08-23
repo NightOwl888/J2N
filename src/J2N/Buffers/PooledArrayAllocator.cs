@@ -62,7 +62,7 @@ namespace J2N.Buffers
         /// </summary>
         /// <remarks>
         /// The underlying pool is shared, but is not the same instance as <see cref="ArrayPool{T}.Shared"/>
-        /// and may have different peformance characteristics. However, since it is a separate pool,
+        /// and may have different performance characteristics. However, since it is a separate pool,
         /// sensitive data that is exposed when returned to this pool is not available to callers of
         /// <see cref="ArrayPool{T}.Shared"/>.
         /// </remarks>
@@ -74,7 +74,7 @@ namespace J2N.Buffers
         /// </summary>
         /// <remarks>
         /// The underlying pool is shared, but is not the same instance as <see cref="ArrayPool{T}.Shared"/>
-        /// and may have different peforamnce characteristics.
+        /// and may have different performance characteristics.
         /// </remarks>
         public static PooledArrayAllocator<T> Cleared => ClearedArrayPoolHolder.Instance;
 

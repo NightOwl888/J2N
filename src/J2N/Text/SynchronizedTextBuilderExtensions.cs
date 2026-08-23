@@ -46,13 +46,13 @@ namespace J2N.Text
         /// </summary>
         /// <returns>An enumerator for the chunks in the <see cref="ReadOnlyMemory{Char}" />.</returns>
         /// <remarks>
-        /// This API is for compatibility with the <c>System.Text.StringBuilder.GetChuncks()</c> method.
+        /// This API is for compatibility with the <c>System.Text.StringBuilder.GetChunks()</c> method.
         /// <see cref="SynchronizedTextBuilder" /> will never have more than a single chunk of memory so it is generally
         /// more efficient to use <see cref="AsSpan(SynchronizedTextBuilder?)" /> or <see cref="AsMemory(SynchronizedTextBuilder?)" />
         /// when you need to access the underlying memory than calling this method.
         /// <para/>
         /// The returned enumerator provides direct access to the underlying memory of the <see cref="SynchronizedTextBuilder"/>.
-        /// Callers must synchronize externally using <see cref = "SynchronizedTextBuilder.SyncRoot" /> property for the
+        /// Callers must synchronize externally using <see cref="SynchronizedTextBuilder.SyncRoot" /> property for the
         /// entire duration of span usage if concurrent mutation is possible.
         /// </remarks>
         public static TextBuilderChunkEnumerator GetChunks(this SynchronizedTextBuilder text)

@@ -36,7 +36,7 @@ namespace J2N
         /// <param name="sourceIndex">The starting position in this instance where elements will be copied from.
         /// The index is zero-based.</param>
         /// <param name="destination">The array where elements will be copied.</param>
-        /// <param name="destinationIndex">The starting position in <paramref name="destination"/> where eleements
+        /// <param name="destinationIndex">The starting position in <paramref name="destination"/> where elements
         /// will be copied. The index is zero-based.</param>
         /// <param name="count">The number of elements to be copied.</param>
         void CopyTo(int sourceIndex, T[] destination, int destinationIndex, int count);

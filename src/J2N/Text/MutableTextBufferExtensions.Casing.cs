@@ -38,7 +38,7 @@ namespace J2N.Text
         /// <remarks>
         /// The capacity of this instance is adjusted as needed.
         /// <para/>
-        /// If no <paramref name="culture"/> is expecitly specified, this method uses the default casing behavior
+        /// If no <paramref name="culture"/> is explicitly specified, this method uses the default casing behavior
         /// determined by the <see cref="MutableTextBuffer.UseInvariantDefaults"/> setting.
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -66,7 +66,7 @@ namespace J2N.Text
         /// <remarks>
         /// The capacity of this instance is adjusted as needed.
         /// <para/>
-        /// If no <paramref name="culture"/> is expecitly specified, this method uses the default casing behavior
+        /// If no <paramref name="culture"/> is explicitly specified, this method uses the default casing behavior
         /// determined by the <see cref="MutableTextBuffer.UseInvariantDefaults"/> setting.
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -136,7 +136,7 @@ namespace J2N.Text
         /// <remarks>
         /// The capacity of this instance is adjusted as needed.
         /// <para/>
-        /// If no <paramref name="culture"/> is expecitly specified, this method uses the default casing behavior
+        /// If no <paramref name="culture"/> is explicitly specified, this method uses the default casing behavior
         /// determined by the <see cref="MutableTextBuffer.UseInvariantDefaults"/> setting.
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -164,7 +164,7 @@ namespace J2N.Text
         /// <remarks>
         /// The capacity of this instance is adjusted as needed.
         /// <para/>
-        /// If no <paramref name="culture"/> is expecitly specified, this method uses the default casing behavior
+        /// If no <paramref name="culture"/> is explicitly specified, this method uses the default casing behavior
         /// determined by the <see cref="MutableTextBuffer.UseInvariantDefaults"/> setting.
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

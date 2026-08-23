@@ -27,7 +27,7 @@ namespace J2N.Buffers
     internal interface IArrayAllocator<T>
     {
         /// <summary>
-        /// Gets a value indicating whether the allocator gurantees array clearing or requires
+        /// Gets a value indicating whether the allocator guarantees array clearing or requires
         /// clearing unused elements for safe public exposure.
         /// </summary>
         bool GuaranteesClearedArrays { get; }
@@ -39,7 +39,7 @@ namespace J2N.Buffers
         /// <returns>An array of type <typeparamref name="T"/> that is at least <paramref name="minimumLength"/> in length.</returns>
         /// <exception cref="OutOfMemoryException">The allocator cannot provide an array whose length is at least
         /// <paramref name="minimumLength"/>.</exception>
-        /// /// <remarks>
+        /// <remarks>
         /// Implementations must either:
         /// <list type="bullet">
         ///     <item>
@@ -62,7 +62,7 @@ namespace J2N.Buffers
         /// method on the same instance. This transfers ownership of the array from the caller
         /// back to the underlying implementation.
         /// </summary>
-        /// <param name="array">A buffer that was previously obtained using the <see cref="Allocate(int)"/>.</param>
+        /// <param name="array">A buffer that was previously obtained using <see cref="Allocate(int)"/>.</param>
         /// <remarks>
         /// Once a buffer has been returned, the caller gives up all ownership of the buffer and must not use it.
         /// The reference returned from <see cref="Allocate(int)"/> must only be returned using the

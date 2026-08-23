@@ -141,7 +141,7 @@ namespace J2N.Text
         /// Gets the underlying storage of the builder.
         /// </summary>
         /// <remarks>
-        /// This property does not clear the underlying storage, but returns the raw unfiltered bytes
+        /// This property does not clear the underlying storage, but returns the raw unfiltered characters
         /// in writable form.
         /// </remarks>
         [CodeGenerationIgnore]

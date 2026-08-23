@@ -61,7 +61,7 @@ namespace J2N.Text
         /// <list type="table">
         ///   <listheader>
         ///     <description>Element</description>
-        ///     <description>Descripton</description>
+        ///     <description>Description</description>
         ///   </listheader>
         ///   <item>
         ///     <description><i>index</i></description>
@@ -154,7 +154,7 @@ namespace J2N.Text
         /// <list type="table">
         ///   <listheader>
         ///     <description>Element</description>
-        ///     <description>Descripton</description>
+        ///     <description>Description</description>
         ///   </listheader>
         ///   <item>
         ///     <description><i>index</i></description>
@@ -248,7 +248,7 @@ namespace J2N.Text
         /// <list type="table">
         ///   <listheader>
         ///     <description>Element</description>
-        ///     <description>Descripton</description>
+        ///     <description>Description</description>
         ///   </listheader>
         ///   <item>
         ///     <description><i>index</i></description>
@@ -340,7 +340,7 @@ namespace J2N.Text
         /// <list type="table">
         ///   <listheader>
         ///     <description>Element</description>
-        ///     <description>Descripton</description>
+        ///     <description>Description</description>
         ///   </listheader>
         ///   <item>
         ///     <description><i>index</i></description>
@@ -432,7 +432,7 @@ namespace J2N.Text
         /// <list type="table">
         ///   <listheader>
         ///     <description>Element</description>
-        ///     <description>Descripton</description>
+        ///     <description>Description</description>
         ///   </listheader>
         ///   <item>
         ///     <description><i>index</i></description>
@@ -527,7 +527,7 @@ namespace J2N.Text
         /// <list type="table">
         ///   <listheader>
         ///     <description>Element</description>
-        ///     <description>Descripton</description>
+        ///     <description>Description</description>
         ///   </listheader>
         ///   <item>
         ///     <description><i>index</i></description>
@@ -634,7 +634,7 @@ namespace J2N.Text
         /// <list type="table">
         ///   <listheader>
         ///     <description>Element</description>
-        ///     <description>Descripton</description>
+        ///     <description>Description</description>
         ///   </listheader>
         ///   <item>
         ///     <description><i>index</i></description>
@@ -742,7 +742,7 @@ namespace J2N.Text
         /// <list type="table">
         ///   <listheader>
         ///     <description>Element</description>
-        ///     <description>Descripton</description>
+        ///     <description>Description</description>
         ///   </listheader>
         ///   <item>
         ///     <description><i>index</i></description>
@@ -849,7 +849,7 @@ namespace J2N.Text
         /// <list type="table">
         ///   <listheader>
         ///     <description>Element</description>
-        ///     <description>Descripton</description>
+        ///     <description>Description</description>
         ///   </listheader>
         ///   <item>
         ///     <description><i>index</i></description>
@@ -956,7 +956,7 @@ namespace J2N.Text
         /// <list type="table">
         ///   <listheader>
         ///     <description>Element</description>
-        ///     <description>Descripton</description>
+        ///     <description>Description</description>
         ///   </listheader>
         ///   <item>
         ///     <description><i>index</i></description>
@@ -1181,7 +1181,7 @@ namespace J2N.Text
         /// <remarks>
         /// The capacity of this instance is adjusted as needed.
         /// <para/>
-        /// If no <paramref name="culture"/> is expecitly specified, this method uses the default casing behavior
+        /// If no <paramref name="culture"/> is explicitly specified, this method uses the default casing behavior
         /// determined by the <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> setting.
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1213,7 +1213,7 @@ namespace J2N.Text
         /// <remarks>
         /// The capacity of this instance is adjusted as needed.
         /// <para/>
-        /// If no <paramref name="culture"/> is expecitly specified, this method uses the default casing behavior
+        /// If no <paramref name="culture"/> is explicitly specified, this method uses the default casing behavior
         /// determined by the <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> setting.
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1291,7 +1291,7 @@ namespace J2N.Text
         /// <remarks>
         /// The capacity of this instance is adjusted as needed.
         /// <para/>
-        /// If no <paramref name="culture"/> is expecitly specified, this method uses the default casing behavior
+        /// If no <paramref name="culture"/> is explicitly specified, this method uses the default casing behavior
         /// determined by the <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> setting.
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1323,7 +1323,7 @@ namespace J2N.Text
         /// <remarks>
         /// The capacity of this instance is adjusted as needed.
         /// <para/>
-        /// If no <paramref name="culture"/> is expecitly specified, this method uses the default casing behavior
+        /// If no <paramref name="culture"/> is explicitly specified, this method uses the default casing behavior
         /// determined by the <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> setting.
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1519,7 +1519,7 @@ namespace J2N.Text
 
         /// <summary>
         /// Inserts the string representation of a specified Boolean value to this instance
-        /// in lowercase at the specifed character position.
+        /// in lowercase at the specified character position.
         /// </summary>
         /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
         /// <param name="text">The target builder.</param>
@@ -2294,7 +2294,7 @@ namespace J2N.Text
         /// <para/>
         /// If no <paramref name="provider"/> is explicitly specified, this method uses the default formatting behavior
         /// determined by the <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> setting. To obtain locale-independent
-        /// formatting that is consistent with typical JDK behavior, either specify an invariant format provider explictly
+        /// formatting that is consistent with typical JDK behavior, either specify an invariant format provider explicitly
         /// or set <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> to <see langword="true"/> when constructing the
         /// <see cref="SynchronizedTextBuilder"/>.
         /// <para/>
@@ -2343,7 +2343,7 @@ namespace J2N.Text
         /// <para/>
         /// If no <paramref name="provider"/> is explicitly specified, this method uses the default formatting behavior
         /// determined by the <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> setting. To obtain locale-independent
-        /// formatting that is consistent with typical JDK behavior, either specify an invariant format provider explictly
+        /// formatting that is consistent with typical JDK behavior, either specify an invariant format provider explicitly
         /// or set <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> to <see langword="true"/> when constructing the
         /// <see cref="SynchronizedTextBuilder"/>.
         /// <para/>
@@ -2391,7 +2391,7 @@ namespace J2N.Text
         /// <para/>
         /// If no <paramref name="provider"/> is explicitly specified, this method uses the default formatting behavior
         /// determined by the <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> setting. To obtain locale-independent
-        /// formatting that is consistent with typical JDK behavior, either specify an invariant format provider explictly
+        /// formatting that is consistent with typical JDK behavior, either specify an invariant format provider explicitly
         /// or set <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> to <see langword="true"/> when constructing the
         /// <see cref="SynchronizedTextBuilder"/>.
         /// <para/>
@@ -2439,7 +2439,7 @@ namespace J2N.Text
         /// <para/>
         /// If no <paramref name="provider"/> is explicitly specified, this method uses the default formatting behavior
         /// determined by the <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> setting. To obtain locale-independent
-        /// formatting that is consistent with typical JDK behavior, either specify an invariant format provider explictly
+        /// formatting that is consistent with typical JDK behavior, either specify an invariant format provider explicitly
         /// or set <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> to <see langword="true"/> when constructing the
         /// <see cref="SynchronizedTextBuilder"/>.
         /// <para/>
@@ -2487,7 +2487,7 @@ namespace J2N.Text
         /// <para/>
         /// If no <paramref name="provider"/> is explicitly specified, this method uses the default formatting behavior
         /// determined by the <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> setting. To obtain locale-independent
-        /// formatting that is consistent with typical JDK behavior, either specify an invariant format provider explictly
+        /// formatting that is consistent with typical JDK behavior, either specify an invariant format provider explicitly
         /// or set <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> to <see langword="true"/> when constructing the
         /// <see cref="SynchronizedTextBuilder"/>.
         /// <para/>
@@ -2535,7 +2535,7 @@ namespace J2N.Text
         /// <para/>
         /// If no <paramref name="provider"/> is explicitly specified, this method uses the default formatting behavior
         /// determined by the <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> setting. To obtain locale-independent
-        /// formatting that is consistent with typical JDK behavior, either specify an invariant format provider explictly
+        /// formatting that is consistent with typical JDK behavior, either specify an invariant format provider explicitly
         /// or set <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> to <see langword="true"/> when constructing the
         /// <see cref="SynchronizedTextBuilder"/>.
         /// <para/>
@@ -2583,7 +2583,7 @@ namespace J2N.Text
         /// <para/>
         /// If no <paramref name="provider"/> is explicitly specified, this method uses the default formatting behavior
         /// determined by the <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> setting. To obtain locale-independent
-        /// formatting that is consistent with typical JDK behavior, either specify an invariant format provider explictly
+        /// formatting that is consistent with typical JDK behavior, either specify an invariant format provider explicitly
         /// or set <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> to <see langword="true"/> when constructing the
         /// <see cref="SynchronizedTextBuilder"/>.
         /// <para/>
@@ -2631,7 +2631,7 @@ namespace J2N.Text
         /// <para/>
         /// If no <paramref name="provider"/> is explicitly specified, this method uses the default formatting behavior
         /// determined by the <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> setting. To obtain locale-independent
-        /// formatting that is consistent with typical JDK behavior, either specify an invariant format provider explictly
+        /// formatting that is consistent with typical JDK behavior, either specify an invariant format provider explicitly
         /// or set <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> to <see langword="true"/> when constructing the
         /// <see cref="SynchronizedTextBuilder"/>.
         /// <para/>
@@ -2679,7 +2679,7 @@ namespace J2N.Text
         /// <para/>
         /// If no <paramref name="provider"/> is explicitly specified, this method uses the default formatting behavior
         /// determined by the <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> setting. To obtain locale-independent
-        /// formatting that is consistent with typical JDK behavior, either specify an invariant format provider explictly
+        /// formatting that is consistent with typical JDK behavior, either specify an invariant format provider explicitly
         /// or set <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> to <see langword="true"/> when constructing the
         /// <see cref="SynchronizedTextBuilder"/>.
         /// <para/>
@@ -2728,7 +2728,7 @@ namespace J2N.Text
         /// <para/>
         /// If no <paramref name="provider"/> is explicitly specified, this method uses the default formatting behavior
         /// determined by the <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> setting. To obtain locale-independent
-        /// formatting that is consistent with typical JDK behavior, either specify an invariant format provider explictly
+        /// formatting that is consistent with typical JDK behavior, either specify an invariant format provider explicitly
         /// or set <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> to <see langword="true"/> when constructing the
         /// <see cref="SynchronizedTextBuilder"/>.
         /// <para/>
@@ -2777,7 +2777,7 @@ namespace J2N.Text
         /// <para/>
         /// If no <paramref name="provider"/> is explicitly specified, this method uses the default formatting behavior
         /// determined by the <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> setting. To obtain locale-independent
-        /// formatting that is consistent with typical JDK behavior, either specify an invariant format provider explictly
+        /// formatting that is consistent with typical JDK behavior, either specify an invariant format provider explicitly
         /// or set <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> to <see langword="true"/> when constructing the
         /// <see cref="SynchronizedTextBuilder"/>.
         /// <para/>
@@ -2832,7 +2832,7 @@ namespace J2N.Text
         /// <para/>
         /// If no <paramref name="provider"/> is explicitly specified, this method uses the default formatting behavior
         /// determined by the <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> setting. To obtain locale-independent
-        /// formatting that is consistent with typical JDK behavior, either specify an invariant format provider explictly
+        /// formatting that is consistent with typical JDK behavior, either specify an invariant format provider explicitly
         /// or set <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> to <see langword="true"/> when constructing the
         /// <see cref="SynchronizedTextBuilder"/>.
         /// </remarks>
@@ -2880,7 +2880,7 @@ namespace J2N.Text
         /// <para/>
         /// If no <paramref name="provider"/> is explicitly specified, this method uses the default formatting behavior
         /// determined by the <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> setting. To obtain locale-independent
-        /// formatting that is consistent with typical JDK behavior, either specify an invariant format provider explictly
+        /// formatting that is consistent with typical JDK behavior, either specify an invariant format provider explicitly
         /// or set <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> to <see langword="true"/> when constructing the
         /// <see cref="SynchronizedTextBuilder"/>.
         /// </remarks>
@@ -2927,7 +2927,7 @@ namespace J2N.Text
         /// <para/>
         /// If no <paramref name="provider"/> is explicitly specified, this method uses the default formatting behavior
         /// determined by the <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> setting. To obtain locale-independent
-        /// formatting that is consistent with typical JDK behavior, either specify an invariant format provider explictly
+        /// formatting that is consistent with typical JDK behavior, either specify an invariant format provider explicitly
         /// or set <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> to <see langword="true"/> when constructing the
         /// <see cref="SynchronizedTextBuilder"/>.
         /// </remarks>
@@ -2974,7 +2974,7 @@ namespace J2N.Text
         /// <para/>
         /// If no <paramref name="provider"/> is explicitly specified, this method uses the default formatting behavior
         /// determined by the <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> setting. To obtain locale-independent
-        /// formatting that is consistent with typical JDK behavior, either specify an invariant format provider explictly
+        /// formatting that is consistent with typical JDK behavior, either specify an invariant format provider explicitly
         /// or set <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> to <see langword="true"/> when constructing the
         /// <see cref="SynchronizedTextBuilder"/>.
         /// </remarks>
@@ -3021,7 +3021,7 @@ namespace J2N.Text
         /// <para/>
         /// If no <paramref name="provider"/> is explicitly specified, this method uses the default formatting behavior
         /// determined by the <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> setting. To obtain locale-independent
-        /// formatting that is consistent with typical JDK behavior, either specify an invariant format provider explictly
+        /// formatting that is consistent with typical JDK behavior, either specify an invariant format provider explicitly
         /// or set <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> to <see langword="true"/> when constructing the
         /// <see cref="SynchronizedTextBuilder"/>.
         /// </remarks>
@@ -3068,7 +3068,7 @@ namespace J2N.Text
         /// <para/>
         /// If no <paramref name="provider"/> is explicitly specified, this method uses the default formatting behavior
         /// determined by the <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> setting. To obtain locale-independent
-        /// formatting that is consistent with typical JDK behavior, either specify an invariant format provider explictly
+        /// formatting that is consistent with typical JDK behavior, either specify an invariant format provider explicitly
         /// or set <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> to <see langword="true"/> when constructing the
         /// <see cref="SynchronizedTextBuilder"/>.
         /// </remarks>
@@ -3115,7 +3115,7 @@ namespace J2N.Text
         /// <para/>
         /// If no <paramref name="provider"/> is explicitly specified, this method uses the default formatting behavior
         /// determined by the <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> setting. To obtain locale-independent
-        /// formatting that is consistent with typical JDK behavior, either specify an invariant format provider explictly
+        /// formatting that is consistent with typical JDK behavior, either specify an invariant format provider explicitly
         /// or set <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> to <see langword="true"/> when constructing the
         /// <see cref="SynchronizedTextBuilder"/>.
         /// </remarks>
@@ -3162,7 +3162,7 @@ namespace J2N.Text
         /// <para/>
         /// If no <paramref name="provider"/> is explicitly specified, this method uses the default formatting behavior
         /// determined by the <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> setting. To obtain locale-independent
-        /// formatting that is consistent with typical JDK behavior, either specify an invariant format provider explictly
+        /// formatting that is consistent with typical JDK behavior, either specify an invariant format provider explicitly
         /// or set <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> to <see langword="true"/> when constructing the
         /// <see cref="SynchronizedTextBuilder"/>.
         /// </remarks>
@@ -3209,7 +3209,7 @@ namespace J2N.Text
         /// <para/>
         /// If no <paramref name="provider"/> is explicitly specified, this method uses the default formatting behavior
         /// determined by the <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> setting. To obtain locale-independent
-        /// formatting that is consistent with typical JDK behavior, either specify an invariant format provider explictly
+        /// formatting that is consistent with typical JDK behavior, either specify an invariant format provider explicitly
         /// or set <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> to <see langword="true"/> when constructing the
         /// <see cref="SynchronizedTextBuilder"/>.
         /// </remarks>
@@ -3257,7 +3257,7 @@ namespace J2N.Text
         /// <para/>
         /// If no <paramref name="provider"/> is explicitly specified, this method uses the default formatting behavior
         /// determined by the <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> setting. To obtain locale-independent
-        /// formatting that is consistent with typical JDK behavior, either specify an invariant format provider explictly
+        /// formatting that is consistent with typical JDK behavior, either specify an invariant format provider explicitly
         /// or set <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> to <see langword="true"/> when constructing the
         /// <see cref="SynchronizedTextBuilder"/>.
         /// </remarks>
@@ -3305,7 +3305,7 @@ namespace J2N.Text
         /// <para/>
         /// If no <paramref name="provider"/> is explicitly specified, this method uses the default formatting behavior
         /// determined by the <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> setting. To obtain locale-independent
-        /// formatting that is consistent with typical JDK behavior, either specify an invariant format provider explictly
+        /// formatting that is consistent with typical JDK behavior, either specify an invariant format provider explicitly
         /// or set <see cref="SynchronizedTextBuilder.UseInvariantDefaults"/> to <see langword="true"/> when constructing the
         /// <see cref="SynchronizedTextBuilder"/>.
         /// </remarks>
@@ -3334,7 +3334,7 @@ namespace J2N.Text
         /// <para/>
         /// This method differs from <see cref="Remove{TBuilder}(TBuilder, int, int)"/> in that it will automatically
         /// adjust the <paramref name="count"/> if <c><paramref name="startIndex"/> + <paramref name="count"/> > <see cref="SynchronizedTextBuilder.Length"/></c>
-        /// to <c><see cref="SynchronizedTextBuilder.Length"/> - <paramref name="startIndex"/>.</c>, provided it is not bounded by <see cref="SynchronizedTextBuilder.MaxCapacity"/>.
+        /// to <c><see cref="SynchronizedTextBuilder.Length"/> - <paramref name="startIndex"/></c>, provided it is not bounded by <see cref="SynchronizedTextBuilder.MaxCapacity"/>.
         /// </summary>
         /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
         /// <param name="text">The target builder.</param>
@@ -3438,7 +3438,7 @@ namespace J2N.Text
         /// <remarks>
         /// The <see cref="Append{TBuilder}(TBuilder, char, int)"/> method modifies the existing instance of this class;
         /// it does not return a new class instance. Because of this, you can call a method or property
-        /// on the existing reference and you do not have to assign the return value to an
+        /// on the existing reference and you do not have to assign the return value to a
         /// <see cref="SynchronizedTextBuilder"/> object, as the following example illustrates.
         /// <code>
         /// decimal value = 1346.19m;

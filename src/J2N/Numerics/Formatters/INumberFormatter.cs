@@ -21,7 +21,7 @@ using System;
 namespace J2N.Numerics.Formatters
 {
     /// <summary>
-    /// Defines a number formtter. This is similar to ISpanFormattable, except that it
+    /// Defines a number formatter. This is similar to ISpanFormattable, except that it
     /// only has a single member. The purpose is to simplify the usage of number formatting
     /// by providing a common interface for formatting.
     /// </summary>

@@ -34,7 +34,7 @@ namespace J2N.Text.CodeGen.Projection
 
         /// <summary>
         /// Inserts the synthetic extension-method "this" parameter before all
-        /// existing <param/> elements.
+        /// existing &lt;param/&gt; elements.
         /// </summary>
         public XmlDocumentationElementModel? AdditionalThisParameter { get; init; }
 

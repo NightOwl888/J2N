@@ -33,7 +33,7 @@ namespace J2N.Text
         /// <para/>
         /// This method differs from <see cref="Remove{TBuilder}(TBuilder, int, int)"/> in that it will automatically
         /// adjust the <paramref name="count"/> if <c><paramref name="startIndex"/> + <paramref name="count"/> > <see cref="MutableTextBuffer.Length"/></c>
-        /// to <c><see cref="MutableTextBuffer.Length"/> - <paramref name="startIndex"/>.</c>, provided it is not bounded by <see cref="MutableTextBuffer.MaxCapacity"/>.
+        /// to <c><see cref="MutableTextBuffer.Length"/> - <paramref name="startIndex"/></c>, provided it is not bounded by <see cref="MutableTextBuffer.MaxCapacity"/>.
         /// </summary>
         /// <typeparam name="TBuilder">The type of the target builder.</typeparam>
         /// <param name="text">The target builder.</param>

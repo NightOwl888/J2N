@@ -69,7 +69,7 @@ namespace J2N.Text
         /// Gets the default <see cref="CultureInfo"/> instance for the current <see cref="MutableTextBuffer"/>.
         /// <para/>
         /// This value will be respected as the default setting when the caller does not provide a choice or
-        /// is calling a culture-sensitve API without an option to override culture.
+        /// is calling a culture-sensitive API without an option to override culture.
         /// </summary>
         /// <remarks>
         /// Subclasses may honor this setting or ignore it.
@@ -81,7 +81,7 @@ namespace J2N.Text
         /// Gets the default <see cref="NumberFormatInfo"/> instance for the current <see cref="MutableTextBuffer"/>.
         /// <para/>
         /// This value will be respected as the default setting when the caller does not provide a choice or
-        /// is calling a culture-sensitve API without an option to override culture.
+        /// is calling a culture-sensitive API without an option to override culture.
         /// </summary>
         /// <remarks>
         /// Subclasses may honor this setting or ignore it.
@@ -93,7 +93,7 @@ namespace J2N.Text
         /// Gets the default <see cref="DateTimeFormatInfo"/> instance for the current <see cref="MutableTextBuffer"/>.
         /// <para/>
         /// This value will be respected as the default setting when the caller does not provide a choice or
-        /// is calling a culture-sensitve API without an option to override culture.
+        /// is calling a culture-sensitive API without an option to override culture.
         /// </summary>
         /// <remarks>
         /// Subclasses may honor this setting or ignore it.
@@ -105,7 +105,7 @@ namespace J2N.Text
         /// Gets the default <see cref="StringFormatter"/> instance for the current <see cref="MutableTextBuffer"/>.
         /// <para/>
         /// This value will be respected as the default setting when the caller does not provide a choice or
-        /// is calling a culture-sensitve API without an option to override culture.
+        /// is calling a culture-sensitive API without an option to override culture.
         /// </summary>
         /// <remarks>
         /// Subclasses may honor this setting or ignore it.
@@ -117,7 +117,7 @@ namespace J2N.Text
         /// Gets the default <see cref="StringComparison"/> setting for the current <see cref="MutableTextBuffer"/>.
         /// <para/>
         /// This value will be respected as the default setting when the caller does not provide a choice or
-        /// is calling a culture-sensitve API without an option to override culture.
+        /// is calling a culture-sensitive API without an option to override culture.
         /// </summary>
         /// <remarks>
         /// Subclasses may honor this setting or ignore it.
