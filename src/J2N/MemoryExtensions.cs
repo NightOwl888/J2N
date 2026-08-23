@@ -316,8 +316,8 @@ namespace J2N
         #region Replace
 
         /// <summary>
-        /// Returns a new string in which all occurrences of a specified Unicode character in this instance
-        /// are replaced with another specified Unicode character. The operation is done in place.
+        /// Replaces all occurrences of <paramref name="oldChar"/> with <paramref name="newChar"/> in
+        /// <paramref name="text"/>. The operation is done in place.
         /// </summary>
         /// <param name="text">This <see cref="Span{T}"/>.</param>
         /// <param name="oldChar">The Unicode character to be replaced.</param>
