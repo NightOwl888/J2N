@@ -25,7 +25,7 @@ namespace J2N.Numerics.Formatters
     /// only has a single member. The purpose is to simplify the usage of number formatting
     /// by providing a common interface for formatting.
     /// </summary>
-    /// <typeparam name="T"></typeparam>
+    /// <typeparam name="T">The type to format to a sequence of characters.</typeparam>
     internal interface INumberFormatter<T>
     {
         bool TryFormat(
