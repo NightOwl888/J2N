@@ -79,10 +79,11 @@ namespace J2N.Text
         /// <summary>Gets the maximum capacity of this instance.</summary>
         /// <value>The maximum number of characters this instance can hold.</value>
         /// <remarks>
-        /// The maximum capacity for this implementation is <c>Array.MaxLength</c> on .NET 6.0
-        /// or higher. On earlier versions of .NET, the maximum capacity is <c>2_146_435_071</c>.
-        /// You can explicitly set the maximum capacity of a <see cref="SynchronizedTextBuilder"/>
-        /// object by calling <see cref="SynchronizedTextBuilder(int, int)"/>.
+        /// The maximum capacity for this implementation is <see cref="int.MaxValue"/>.
+        /// However, this value is implementation-specific and might be different in other
+        /// or later implementations. You can explicitly set the maximum capacity of a
+        /// <see cref="SynchronizedTextBuilder"/> object by calling
+        /// <see cref="SynchronizedTextBuilder(int, int)"/>.
         /// <para/>
         /// <b>Notes to Callers</b>
         /// <para/>
