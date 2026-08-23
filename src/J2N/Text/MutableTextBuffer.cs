@@ -69,7 +69,7 @@ namespace J2N.Text
     internal partial class MutableTextBuffer : IBufferWriter<char>, ISpannable<char>, ISpanCopyable<char>, ICopyable<char>, IDisposable
         //, IEnumerable<char> // ICU4N TODO: Implement?
     {
-        internal const int CharStackBufferSize = 32; // internal for testing
+        internal const int CharStackBufferSize = 64; // internal for testing
 
         /// <summary>
         /// A private array pool used to ensure that temporary buffer data doesn't leak

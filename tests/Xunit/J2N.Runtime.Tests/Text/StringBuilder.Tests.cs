@@ -3052,7 +3052,7 @@ namespace J2N.Text.Tests
             var pool = new TrackingCharArrayPool();
 
             int requiredLength = MutableTextBuffer.CharStackBufferSize * 2 + 1;
-            string format = "D" + requiredLength;
+            string format = new string('0', requiredLength);
 
             builder.InsertNumberCore<int, Int32Formatter>(
                 0,
@@ -3073,7 +3073,7 @@ namespace J2N.Text.Tests
             var pool = new TrackingCharArrayPool();
 
             int requiredLength = MutableTextBuffer.CharStackBufferSize * 2 + 1;
-            string format = "D" + requiredLength;
+            string format = new string('0', requiredLength);
 
             builder.InsertSpanFormattable(
                 0,
