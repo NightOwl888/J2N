@@ -1,7 +1,6 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-using J2N.Runtime.InteropServices;
 using System;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
@@ -108,9 +107,9 @@ namespace J2N
             [MethodImpl(MethodImplOptions.NoInlining)]
             static void MemoryCopySlow(ref byte src, ref byte dest, ulong sourceBytesToCopy)
             {
-                if (!Unsafe.IsAddressLessThan(ref dest, ref src)) // Backward copy (dest < src)
+                if (!Unsafe.IsAddressLessThan(ref dest, ref src)) // Backward copy (source is before destination)
                 {
-                    // Backward copy (overlapping and src < dest)
+                    // Backward copy (source is before destination)
                     src = ref Unsafe.Add(ref src, (nint)sourceBytesToCopy - 1);
                     dest = ref Unsafe.Add(ref dest, (nint)sourceBytesToCopy - 1);
 
@@ -122,7 +121,7 @@ namespace J2N
                         sourceBytesToCopy--;
                     }
                 }
-                else // Forward copy (src < dest)
+                else // Forward copy (destination is before source)
                 {
                     while (sourceBytesToCopy > 0)
                     {

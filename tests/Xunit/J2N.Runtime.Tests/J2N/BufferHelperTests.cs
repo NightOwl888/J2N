@@ -171,7 +171,12 @@ namespace J2N.Tests
         }
 
         [Theory]
+        [InlineData(200, 1, 100)]
+        [InlineData(200, 5, 100)]
+        [InlineData(200, 15, 100)]
         [InlineData(200, 50, 100)]
+        [InlineData(200, 99, 100)]
+        [InlineData(200, 50, 5)]
         [InlineData(200, 5, 15)]
         public static unsafe void MemoryCopy_OverlappingBuffers(int sourceLength, int destinationIndexOffset, int sourceBytesToCopy)
         {
@@ -181,9 +186,14 @@ namespace J2N.Tests
                 array[i] = i;
             }
 
+            // Source is before destination, so MemoryCopy must copy backward.
             fixed (int* arrayBase = array)
             {
-                BufferHelper.MemoryCopy(arrayBase, arrayBase + destinationIndexOffset, sourceLength * 4, sourceBytesToCopy * 4);
+                BufferHelper.MemoryCopy(
+                    arrayBase,
+                    arrayBase + destinationIndexOffset,
+                    sourceLength * sizeof(int),
+                    sourceBytesToCopy * sizeof(int));
             }
 
             for (int i = 0; i < sourceBytesToCopy; i++)
@@ -191,7 +201,7 @@ namespace J2N.Tests
                 Assert.Equal(i, array[i + destinationIndexOffset]);
             }
 
-            // Reset the array
+            // Reset the array.
             for (int i = 0; i < array.Length; i++)
             {
                 array[i] = i;
@@ -199,14 +209,78 @@ namespace J2N.Tests
 
             int sourceIndexOffset = destinationIndexOffset;
 
+            // Source is after destination, so MemoryCopy must copy forward.
             fixed (int* arrayBase = array)
             {
-                BufferHelper.MemoryCopy(arrayBase + sourceIndexOffset, arrayBase, sourceLength * 4, sourceBytesToCopy * 4);
+                BufferHelper.MemoryCopy(
+                    arrayBase + sourceIndexOffset,
+                    arrayBase,
+                    sourceLength * sizeof(int),
+                    sourceBytesToCopy * sizeof(int));
             }
 
-            for (int i = sourceIndexOffset; i < sourceBytesToCopy; i++)
+            for (int i = 0; i < sourceBytesToCopy; i++)
             {
                 Assert.Equal(i + sourceIndexOffset, array[i]);
+            }
+        }
+
+        [Theory]
+        [InlineData(256, 1, 64)]
+        [InlineData(256, 4, 64)]
+        [InlineData(256, 5, 64)]
+        [InlineData(256, 7, 64)]
+        [InlineData(256, 8, 64)]
+        [InlineData(256, 9, 64)]
+        [InlineData(256, 15, 64)]
+        [InlineData(256, 16, 64)]
+        [InlineData(256, 17, 64)]
+        [InlineData(256, 31, 64)]
+        [InlineData(256, 50, 64)]
+        public static unsafe void MemoryCopy_OverlappingByteBuffers(int sourceLength, int destinationIndexOffset, int sourceBytesToCopy)
+        {
+            var array = new byte[sourceLength];
+            for (int i = 0; i < array.Length; i++)
+            {
+                array[i] = (byte)i;
+            }
+
+            // Source is before destination, so MemoryCopy must copy backward.
+            fixed (byte* arrayBase = array)
+            {
+                BufferHelper.MemoryCopy(
+                    arrayBase,
+                    arrayBase + destinationIndexOffset,
+                    sourceLength,
+                    sourceBytesToCopy);
+            }
+
+            for (int i = 0; i < sourceBytesToCopy; i++)
+            {
+                Assert.Equal((byte)i, array[i + destinationIndexOffset]);
+            }
+
+            // Reset the array.
+            for (int i = 0; i < array.Length; i++)
+            {
+                array[i] = (byte)i;
+            }
+
+            int sourceIndexOffset = destinationIndexOffset;
+
+            // Source is after destination, so MemoryCopy must copy forward.
+            fixed (byte* arrayBase = array)
+            {
+                BufferHelper.MemoryCopy(
+                    arrayBase + sourceIndexOffset,
+                    arrayBase,
+                    sourceLength,
+                    sourceBytesToCopy);
+            }
+
+            for (int i = 0; i < sourceBytesToCopy; i++)
+            {
+                Assert.Equal((byte)(i + sourceIndexOffset), array[i]);
             }
         }
 
