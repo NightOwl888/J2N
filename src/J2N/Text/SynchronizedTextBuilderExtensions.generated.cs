@@ -1469,7 +1469,7 @@ namespace J2N.Text
         /// <returns>A reference to this instance after the operation has completed.</returns>
         /// <remarks>
         /// This matches the behavior of Java's StringBuilder. To match the behavior
-        /// of .NET, call <see cref="Insert{TBuilder}(TBuilder, int, bool, BooleanFormat)"/> and specify <see cref="BooleanFormat.TitleCase"/>.
+        /// of .NET, call <see cref="Append{TBuilder}(TBuilder, bool, BooleanFormat)"/> and specify <see cref="BooleanFormat.TitleCase"/>.
         /// <para/>
         /// The capacity of this instance is adjusted as needed.
         /// </remarks>
