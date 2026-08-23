@@ -1593,10 +1593,10 @@ namespace J2N.Text
             return text;
         }
 
-        /// <summary>Creates a new <see cref="ReadOnlyMemory{T}"/> over the portion of the target string.</summary>
-        /// <param name="text">The target string.</param>
+        /// <summary>Creates a new <see cref="ReadOnlyMemory{T}"/> over the portion of the target <paramref name="text"/>.</summary>
+        /// <param name="text">The target <paramref name="text"/>.</param>
         /// <returns>
-        /// The read-only character memory representation of the string, or <c>default</c> if
+        /// The read-only character memory representation of the <paramref name="text"/>, or <c>default</c> if
         /// <paramref name="text"/> is <see langword="null"/>.
         /// </returns>
         /// <remarks>
@@ -1614,10 +1614,13 @@ namespace J2N.Text
             return new ReadOnlyMemory<char>(text.buffer.m_Chars, 0, text.Length);
         }
 
-        /// <summary>Creates a new <see cref="ReadOnlyMemory{T}"/> over the portion of the target string.</summary>
-        /// <param name="text">The target string.</param>
+        /// <summary>Creates a new <see cref="ReadOnlyMemory{T}"/> over the portion of the target <paramref name="text"/>.</summary>
+        /// <param name="text">The target <paramref name="text"/>.</param>
         /// <param name="start">The index at which to begin this slice.</param>
-        /// <returns>Returns default when <paramref name="text"/> is null.</returns>
+        /// <returns>
+        /// The read-only character memory representation of the <paramref name="text"/>, or <c>default</c> if
+        /// <paramref name="text"/> is <see langword="null"/>.
+        /// </returns>
         /// <exception cref="ArgumentOutOfRangeException">
         /// <paramref name="start"/> is not in range of <paramref name="text"/>
         /// (<paramref name="start"/> is &lt;0 or &gt;<c>text.Length</c>).
@@ -1643,12 +1646,12 @@ namespace J2N.Text
             return new ReadOnlyMemory<char>(text.buffer.m_Chars, start, text.Length - start);
         }
 
-        /// <summary>Creates a new <see cref="ReadOnlyMemory{T}"/> over the portion of the target string.</summary>
-        /// <param name="text">The target string.</param>
+        /// <summary>Creates a new <see cref="ReadOnlyMemory{T}"/> over the portion of the target <paramref name="text"/>.</summary>
+        /// <param name="text">The target <paramref name="text"/>.</param>
         /// <param name="start">The index at which to begin this slice.</param>
-        /// <param name="length">The desired length for the slice (exclusive).</param>
+        /// <param name="length">The desired length for the slice.</param>
         /// <returns>
-        /// The read-only character memory representation of the string, or <c>default</c>
+        /// The read-only character memory representation of the <paramref name="text"/>, or <c>default</c>
         /// if <paramref name="text"/> is <see langword="null"/>.
         /// </returns>
         /// <exception cref="ArgumentOutOfRangeException">
@@ -1686,10 +1689,10 @@ namespace J2N.Text
         }
 
 #if FEATURE_INDEX_RANGE
-        /// <summary>Creates a new <see cref="ReadOnlyMemory{T}"/> over the portion of the target string.</summary>
-        /// <param name="text">The target string.</param>
+        /// <summary>Creates a new <see cref="ReadOnlyMemory{T}"/> over the portion of the target <paramref name="text"/>.</summary>
+        /// <param name="text">The target <paramref name="text"/>.</param>
         /// <param name="startIndex">The index at which to begin this slice.</param>
-        /// <returns>The read-only character memory representation of the string.</returns>
+        /// <returns>The read-only character memory representation of the <paramref name="text"/>.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="text"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentOutOfRangeException">
         /// <paramref name="startIndex"/> is less
@@ -1718,13 +1721,13 @@ namespace J2N.Text
             return new ReadOnlyMemory<char>(text.buffer.m_Chars, actualIndex, text.Length - actualIndex);
         }
 
-        /// <summary>Creates a new <see cref="ReadOnlyMemory{T}"/> over the portion of the target string.</summary>
-        /// <param name="text">The target string.</param>
-        /// <param name="range">The range used to indicate the start and length of the sliced string.</param>
-        /// <returns>The read-only character memory representation of the string.</returns>
+        /// <summary>Creates a new <see cref="ReadOnlyMemory{T}"/> over the portion of the target <paramref name="text"/>.</summary>
+        /// <param name="text">The target <paramref name="text"/>.</param>
+        /// <param name="range">The range used to indicate the start and length of the sliced <paramref name="text"/>.</param>
+        /// <returns>The read-only character memory representation of the <paramref name="text"/>.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="text"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentOutOfRangeException">
-        /// <paramref name="range"/>'s start or end index is not within the bounds of the string.
+        /// <paramref name="range"/>'s start or end index is not within the bounds of the <paramref name="text"/>.
         /// <para/>
         /// -or-
         /// <para/>
@@ -1755,9 +1758,9 @@ namespace J2N.Text
 
 #endif
 
-        /// <summary>Creates a new readonly span over the portion of the target string.</summary>
-        /// <param name="text">The target string.</param>
-        /// <returns>The read-only span representation of the string.</returns>
+        /// <summary>Creates a new readonly span over the portion of the target <paramref name="text"/>.</summary>
+        /// <param name="text">The target <paramref name="text"/>.</param>
+        /// <returns>The read-only span representation of the <paramref name="text"/>.</returns>
         /// <remarks>
         /// Returns <see langword="default"/> when <paramref name="text"/> is <see langword="null"/>.
         /// <para/>
@@ -1780,12 +1783,12 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// Creates a new read-only span over a portion of the target string from
-        /// a specified position to the end of the string.
+        /// Creates a new read-only span over a portion of the target <paramref name="text"/> from
+        /// a specified position to the end of the <paramref name="text"/>.
         /// </summary>
-        /// <param name="text">The target string.</param>
+        /// <param name="text">The target <paramref name="text"/>.</param>
         /// <param name="start">The index at which to begin this slice.</param>
-        /// <returns>The read-only span representation of the string.</returns>
+        /// <returns>The read-only span representation of the <paramref name="text"/>.</returns>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="start"/> is less than 0 or greater than <c>text.Length</c>.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="text"/> is <see langword="null"/>.</exception>
         /// <remarks>
@@ -1818,13 +1821,13 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// Creates a new read-only span over a portion of the target string from a
+        /// Creates a new read-only span over a portion of the target <paramref name="text"/> from a
         /// specified position for a specified number of characters.
         /// </summary>
-        /// <param name="text">The target string.</param>
+        /// <param name="text">The target <paramref name="text"/>.</param>
         /// <param name="start">The index at which to begin this slice.</param>
         /// <param name="length">The desired length for the slice.</param>
-        /// <returns>The read-only span representation of the string.</returns>
+        /// <returns>The read-only span representation of the <paramref name="text"/>.</returns>
         /// <exception cref="ArgumentOutOfRangeException">
         /// <paramref name="start"/>, <paramref name="length"/>, or
         /// <paramref name="start"/> + <paramref name="length"/> is not
@@ -1871,11 +1874,11 @@ namespace J2N.Text
 #if FEATURE_INDEX_RANGE
         /// <summary>
         /// Creates a new read-only span over a portion of the
-        /// target string from a specified position to the end of the string.
+        /// target <paramref name="text"/> from a specified position to the end of the <paramref name="text"/>.
         /// </summary>
-        /// <param name="text">The target string.</param>
+        /// <param name="text">The target <paramref name="text"/>.</param>
         /// <param name="startIndex">The index at which to begin this slice.</param>
-        /// <returns>The read-only span representation of the string.</returns>
+        /// <returns>The read-only span representation of the <paramref name="text"/>.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="text"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentOutOfRangeException">
         /// <paramref name="startIndex"/> is less
@@ -1917,15 +1920,15 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// Creates a new read-only span over a portion of a target string
+        /// Creates a new read-only span over a portion of a target <paramref name="text"/>
         /// using the range start and end indexes.
         /// </summary>
-        /// <param name="text">The target string.</param>
-        /// <param name="range">The range that has start and end indexes to use for slicing the string.</param>
-        /// <returns>The read-only span representation of the string.</returns>
+        /// <param name="text">The target <paramref name="text"/>.</param>
+        /// <param name="range">The range that has start and end indexes to use for slicing the <paramref name="text"/>.</param>
+        /// <returns>The read-only span representation of the <paramref name="text"/>.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="text"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentOutOfRangeException">
-        /// <paramref name="range"/>'s start or end index is not within the bounds of the string.
+        /// <paramref name="range"/>'s start or end index is not within the bounds of the <paramref name="text"/>.
         /// -or-
         /// <paramref name="range"/>'s start index is greater than its end index.
         /// </exception>
