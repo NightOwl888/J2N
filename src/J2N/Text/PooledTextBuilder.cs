@@ -371,7 +371,7 @@ namespace J2N.Text
         /// calls has no effect.
         /// <para/>
         /// This method guarantees that a particular buffer is returned to the allocator at most once.
-        /// It does not make concurrent access to <see cref="MutableTextBuffer"/> thread-safe.
+        /// It does not make concurrent access to <see cref="PooledTextBuilder"/> thread-safe.
         /// </remarks>
         public void Dispose() => buffer.Dispose();
     }
