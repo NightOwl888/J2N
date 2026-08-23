@@ -56,7 +56,7 @@ namespace J2N.Text
 
             try
             {
-                new StringBuilder(-1);
+                StringBuilderFactory(-1);
                 fail("no exception");
             }
             catch (ArgumentOutOfRangeException) // NegativeArraySizeException
