@@ -103,8 +103,7 @@
   <PropertyGroup>
     <CodeGenProject>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)../../eng/J2N.Text.CodeGen/J2N.Text.CodeGen.csproj'))</CodeGenProject>
     <CodeGenAssembly>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)../../eng/J2N.Text.CodeGen/bin/$(Configuration)/net10.0/J2N.Text.CodeGen.dll'))</CodeGenAssembly>
-    <BaseIntermediateOutputPath>obj/</BaseIntermediateOutputPath>
-    <CodeGenOutputStamp>$(BaseIntermediateOutputPath)J2N.Text.CodeGen.stamp</CodeGenOutputStamp>
+    <CodeGenOutputStamp>$(MSBuildProjectExtensionsPath)J2N.Text.CodeGen.stamp</CodeGenOutputStamp>
     <CodeGenMissing>false</CodeGenMissing>
   </PropertyGroup>
 
