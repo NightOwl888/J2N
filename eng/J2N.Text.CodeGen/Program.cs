@@ -22,11 +22,15 @@ using J2N.Text.CodeGen.Metadata;
 using J2N.Text.CodeGen.Projection;
 using J2N.Text.CodeGen.Roslyn;
 using Microsoft.CodeAnalysis;
+using System.Text;
 
 namespace J2N.Text.CodeGen
 {
     internal class Program
     {
+        // Use deterministic encoding to ensure portability
+        private static readonly UTF8Encoding UTF8EncodingNoBOM = new(encoderShouldEmitUTF8Identifier: false);
+
         static int Main(string[] args)
         {
             string? j2nSourceDirectory = null;
@@ -296,7 +300,8 @@ namespace J2N.Text.CodeGen
 
             File.WriteAllText(
                 facadePath,
-                facadeCode);
+                facadeCode,
+                UTF8EncodingNoBOM);
         }
 
         static void GenerateExtensions(
@@ -342,7 +347,8 @@ namespace J2N.Text.CodeGen
 
             File.WriteAllText(
                 extensionPath,
-                extensionCode);
+                extensionCode,
+                UTF8EncodingNoBOM);
         }
     }
 }
