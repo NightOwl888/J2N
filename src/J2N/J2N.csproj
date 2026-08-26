@@ -101,22 +101,22 @@
   <!-- Builder code generation -->
 
   <PropertyGroup>
-    <CodeGenProject>$(MSBuildThisFileDirectory)..\..\eng\J2N.Text.CodeGen\J2N.Text.CodeGen.csproj</CodeGenProject>
-    <CodeGenAssembly>$(MSBuildThisFileDirectory)..\..\eng\J2N.Text.CodeGen\bin\$(Configuration)\net10.0\J2N.Text.CodeGen.dll</CodeGenAssembly>
-    <BaseIntermediateOutputPath>obj\</BaseIntermediateOutputPath>
+    <CodeGenProject>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)../../eng/J2N.Text.CodeGen/J2N.Text.CodeGen.csproj'))</CodeGenProject>
+    <CodeGenAssembly>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)../../eng/J2N.Text.CodeGen/bin/$(Configuration)/net10.0/J2N.Text.CodeGen.dll'))</CodeGenAssembly>
+    <BaseIntermediateOutputPath>obj/</BaseIntermediateOutputPath>
     <CodeGenOutputStamp>$(BaseIntermediateOutputPath)J2N.Text.CodeGen.stamp</CodeGenOutputStamp>
     <CodeGenMissing>false</CodeGenMissing>
   </PropertyGroup>
 
   <ItemGroup>
-    <CodeGenInputs Include="$(MSBuildProjectDirectory)\Text\MutableTextBuffer*.cs" />
-    <CodeGenInputs Include="$(MSBuildProjectDirectory)\MutableTextBufferExtensions*.cs" />
-    <CodeGenInputs Include="$(MSBuildProjectDirectory)\CodeGeneration\**\*.cs" />
-    <CodeGenInputs Include="$(MSBuildThisFileDirectory)..\..\eng\J2N.Text.CodeGen\**\*.cs" Exclude="**\bin\**;**\obj\**" />
+    <CodeGenInputs Include="$(MSBuildProjectDirectory)/Text/MutableTextBuffer*.cs" />
+    <CodeGenInputs Include="$(MSBuildProjectDirectory)/MutableTextBufferExtensions*.cs" />
+    <CodeGenInputs Include="$(MSBuildProjectDirectory)/CodeGeneration/**/*.cs" />
+    <CodeGenInputs Include="$(MSBuildThisFileDirectory)../../eng/J2N.Text.CodeGen/**/*.cs" Exclude="**/bin/**;**/obj/**" />
   </ItemGroup>
 
   <ItemGroup>
-    <GeneratedCode Include="$(MSBuildProjectDirectory)\Text\*.generated.cs" />
+    <GeneratedCode Include="$(MSBuildProjectDirectory)/Text/*.generated.cs" />
   </ItemGroup>
 
   <Target Name="ForceCodeGenIfOutputsMissing"
@@ -148,13 +148,13 @@
          RemoveProperties="TargetFramework;TargetFrameworks"
          Properties="Configuration=$(Configuration)" />
 
-    <Exec Command='dotnet &quot;$(CodeGenAssembly)&quot; --j2n-source-directory &quot;$(MSBuildProjectDirectory)&quot; --source-directory &quot;$(MSBuildProjectDirectory)\Text&quot; --infrastructure-directory &quot;$(MSBuildProjectDirectory)\CodeGeneration&quot;' />
-    
+    <Exec Command='dotnet &quot;$(CodeGenAssembly)&quot; --j2n-source-directory &quot;$(MSBuildProjectDirectory)&quot; --source-directory &quot;$(MSBuildProjectDirectory)/Text&quot; --infrastructure-directory &quot;$(MSBuildProjectDirectory)/CodeGeneration&quot;' />
+
     <Touch Files="$(CodeGenOutputStamp)"
            AlwaysCreate="true" />
-  
+
     <ItemGroup>
-      <Compile Include="Text\*.generated.cs" />
+      <Compile Include="Text/*.generated.cs" />
     </ItemGroup>
   </Target>
 
