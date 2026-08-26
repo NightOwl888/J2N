@@ -227,238 +227,6 @@ namespace J2N.Text
             }
         }
 
-        /// <summary>
-        /// Returns a <see cref="Span{Char}"/> to write to that is at least the requested size
-        /// (specified by <paramref name="sizeHint"/>).
-        /// </summary>
-        /// <param name="sizeHint">
-        /// The minimum length of the returned <see cref="Span{Char}"/>.
-        /// If 0, a non-empty buffer is returned.
-        /// </param>
-        /// <returns>
-        /// A <see cref="Span{Char}"/> of at least the size <paramref name="sizeHint"/>.
-        /// If <paramref name="sizeHint"/> is 0, returns a non-empty buffer.
-        /// </returns>
-        /// <exception cref="ArgumentOutOfRangeException"><paramref name="sizeHint"/> is less than zero.</exception>
-        /// <remarks>
-        /// The capacity is adjusted as needed.
-        /// <para/>
-        /// This method never returns <see cref="Span{Char}.Empty"/>.
-        /// <para/>
-        /// The returned <see cref="Span{Char}"/> allows writing characters directly to the buffer of
-        /// <see cref="SynchronizedTextBuilder"/>. This can be used for more complex and low-level business
-        /// logic to be applied when either the number of characters is unknown or the number of separate
-        /// operations would be prohibitively costly.
-        /// <para/>
-        /// <b>Notes to Callers</b>
-        /// <para/>
-        /// When you instantiate a <see cref="SynchronizedTextBuilder"/> object by calling <see cref="SynchronizedTextBuilder(int, int)"/>,
-        /// both the length and the capacity of the <see cref="SynchronizedTextBuilder"/> instance can grow beyond
-        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="SynchronizedTextBuilderExtensions.Append{TBuilder}(TBuilder, string?)"/>
-        /// and <see cref="SynchronizedTextBuilderExtensions.AppendFormat{TBuilder}(TBuilder, string, object?)"/> methods to append small strings.
-        /// <para/>
-        /// The returned span provides direct access to the underlying memory of the <see cref="SynchronizedTextBuilder"/>.
-        /// Callers must synchronize externally using <see cref="SynchronizedTextBuilder.SyncRoot"/> for the duration of the
-        /// span usage if concurrent mutation is possible.
-        /// </remarks>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Span<char> GetSpan(int sizeHint = 0)
-        {
-            return buffer.GetSpan(sizeHint);
-        }
-
-        /// <summary>
-        /// Returns a <see cref="Memory{Char}"/> to write to that is at least the length
-        /// specified by <paramref name="sizeHint"/>.
-        /// </summary>
-        /// <param name="sizeHint">
-        /// The minimum requested length of the <see cref="Memory{Char}"/>.
-        /// If 0, a non-empty buffer is returned.
-        /// </param>
-        /// <returns>
-        /// A <see cref="Memory{Char}"/> whose length is at least <paramref name="sizeHint"/>.
-        /// If <paramref name="sizeHint"/> is not provided or is equal to 0, some non-empty buffer is returned.
-        /// </returns>
-        /// <exception cref="ArgumentOutOfRangeException"><paramref name="sizeHint"/> is less than zero.</exception>
-        /// <remarks>
-        /// The capacity is adjusted as needed.
-        /// <para/>
-        /// This method never returns <see cref="Memory{Char}.Empty"/>.
-        /// <para/>
-        /// The returned <see cref="Memory{Char}"/> allows writing characters directly to the buffer of
-        /// <see cref="SynchronizedTextBuilder"/>. This can be used for more complex and low-level business
-        /// logic to be applied when either the number of characters is unknown or the number of separate
-        /// operations would be prohibitively costly.
-        /// <para/>
-        /// <b>Notes to Callers</b>
-        /// <para/>
-        /// When you instantiate a <see cref="SynchronizedTextBuilder"/> object by calling <see cref="SynchronizedTextBuilder(int, int)"/>,
-        /// both the length and the capacity of the <see cref="SynchronizedTextBuilder"/> instance can grow beyond
-        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="SynchronizedTextBuilderExtensions.Append{TBuilder}(TBuilder, string?)"/>
-        /// and <see cref="SynchronizedTextBuilderExtensions.AppendFormat{TBuilder}(TBuilder, string, object?)"/> methods to append small strings.
-        /// <para/>
-        /// The returned memory provides direct access to the underlying memory of the <see cref="SynchronizedTextBuilder"/>.
-        /// Callers must synchronize externally using <see cref="SynchronizedTextBuilder.SyncRoot"/> for the duration of the
-        /// memory usage if concurrent mutation is possible.
-        /// </remarks>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Memory<char> GetMemory(int sizeHint = 0)
-        {
-            return buffer.GetMemory(sizeHint);
-        }
-
-        /// <summary>
-        /// Notifies the <see cref="SynchronizedTextBuilder"/> that <paramref name="count"/> items were
-        /// written to the output <see cref="Span{Char}"/> of a prior call to <see cref="GetSpan(int)"/>
-        /// or <see cref="Memory{Char}"/> of a prior call to <see cref="GetMemory(int)"/>.
-        /// </summary>
-        /// <param name="count">The number of items written.</param>
-        /// <exception cref="ArgumentOutOfRangeException"><paramref name="count"/> is less than zero.</exception>
-        /// <exception cref="InvalidOperationException">
-        /// The method call attempts to advance past the remaining <see cref="Capacity"/>
-        /// beyond <see cref="Length"/>.
-        /// </exception>
-        /// <remarks>
-        /// You must request a new buffer after calling <see cref="Advance(int)"/> to continue writing more data
-        /// and cannot write to a previously acquired buffer.
-        /// <para/>
-        /// Calling <see cref="Advance(int)"/> is effectively the same operation as adding <paramref name="count"/>
-        /// to the existing <see cref="Length"/>.
-        /// <para/>
-        /// This method is intended to be used in conjunction with either <see cref="GetSpan(int)"/> or <see cref="GetMemory(int)"/>.
-        /// If concurrent mutation is possible, this method should be synchronized externally by the caller with either of those two
-        /// methods using <see cref="SynchronizedTextBuilder.SyncRoot"/> for the duration of the memory usage.
-        /// </remarks>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Advance(int count)
-        {
-            buffer.Advance(count);
-        }
-
-        /// <summary>
-        /// Returns the code point at <paramref name="index"/> in the specified sequence of
-        /// character units. If the unit at <paramref name="index"/> is a high-surrogate unit,
-        /// <c><paramref name="index"/> + 1</c> is less than the length of the sequence and the unit at
-        /// <c><paramref name="index"/> + 1</c> is a low-surrogate unit, then the supplementary code
-        /// point represented by the pair is returned; otherwise the <see cref="char"/>
-        /// value at <paramref name="index"/> is returned.
-        /// </summary>
-        /// <param name="index">
-        /// The position in this <see cref="SynchronizedTextBuilder"/> from which to retrieve the code
-        /// point.
-        /// </param>
-        /// <returns>
-        /// The Unicode code point or <see cref="char"/> value at <paramref name="index"/> in
-        /// this <see cref="SynchronizedTextBuilder"/>.
-        /// </returns>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// <paramref name="index"/> is greater than or equal to <see cref="Length"/>.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// <paramref name="index"/> is less than zero.
-        /// </exception>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public int CodePointAt(int index)
-        {
-            lock (syncRoot)
-            {
-                return buffer.CodePointAt(index);
-            }
-        }
-
-        /// <summary>
-        /// Returns the code point that precedes <paramref name="index"/> in the specified
-        /// sequence of character units. If the unit at <c><paramref name="index"/> - 1</c> is a
-        /// low-surrogate unit, <c><paramref name="index"/> - 2</c> is not negative and the unit at
-        /// <c><paramref name="index"/> - 2</c> is a high-surrogate unit, then the supplementary code
-        /// point represented by the pair is returned; otherwise the <see cref="char"/>
-        /// value at <c><paramref name="index"/> - 1</c> is returned.
-        /// </summary>
-        /// <param name="index">
-        /// The position in this <see cref="SynchronizedTextBuilder"/> following the code
-        /// point that should be returned.
-        /// </param>
-        /// <returns>
-        /// The Unicode code point or <see cref="char"/> value before <paramref name="index"/>
-        /// in this <see cref="SynchronizedTextBuilder"/>.
-        /// </returns>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// If the <paramref name="index"/> is less than
-        /// 1 or greater than <see cref="Length"/>.
-        /// </exception>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public int CodePointBefore(int index)
-        {
-            lock (syncRoot)
-            {
-                return buffer.CodePointBefore(index);
-            }
-        }
-
-        /// <summary>
-        /// Returns the number of Unicode code points in the text range of the specified char sequence.
-        /// The text range begins at the specified <paramref name="startIndex"/> and extends for the number
-        /// of characters specified in <paramref name="length"/>.
-        /// Unpaired surrogates within the text range count as one code point each.
-        /// <para/>
-        /// IMPORTANT: This method has .NET semantics. That is, the <paramref name="length"/> parameter
-        /// is a length rather than an exclusive end index. To convert from
-        /// Java, use <c>endIndex - startIndex</c> to obtain the length.
-        /// </summary>
-        /// <param name="startIndex">The index to the first char of the text range.</param>
-        /// <param name="length">The number of characters to consider in this <see cref="SynchronizedTextBuilder"/>.</param>
-        /// <returns>The number of Unicode code points in the specified text range.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// <paramref name="startIndex"/> plus <paramref name="length"/> indicates a position not within
-        /// this <see cref="SynchronizedTextBuilder"/>.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// <paramref name="startIndex"/> or <paramref name="length"/> is less than zero.
-        /// </exception>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public int CodePointCount(int startIndex, int length)
-        {
-            lock (syncRoot)
-            {
-                return buffer.CodePointCount(startIndex, length);
-            }
-        }
-
-        /// <summary>
-        /// Returns the index within the given char sequence that is offset from the given <paramref name="index"/> by
-        /// <paramref name="codePointOffset"/> code points. Unpaired surrogates within the text range given by
-        /// <paramref name="index"/> and <paramref name="codePointOffset"/> count as one code point each.
-        /// </summary>
-        /// <param name="index">The index to be offset.</param>
-        /// <param name="codePointOffset">
-        /// The number of code points to look backwards or forwards; may
-        /// be a negative or positive value.
-        /// </param>
-        /// <returns>The index within the char sequence, offset by <paramref name="codePointOffset"/> code points.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// <paramref name="index"/> is less than zero or greater than <see cref="Length"/>.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// <paramref name="codePointOffset"/> is positive and the subsequence starting with
-        /// <paramref name="index"/> has fewer than <paramref name="codePointOffset"/> code points.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// <paramref name="codePointOffset"/> is negative and the subsequence before <paramref name="index"/>
-        /// has fewer than the absolute value of <paramref name="codePointOffset"/> code points.
-        /// </exception>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public int OffsetByCodePoints(int index, int codePointOffset)
-        {
-            lock (syncRoot)
-            {
-                return buffer.OffsetByCodePoints(index, codePointOffset);
-            }
-        }
-
         /// <summary>Ensures that the capacity of this builder is at least the specified value.</summary>
         /// <param name="capacity">The minimum capacity to ensure.</param>
         /// <returns>The new capacity of this instance.</returns>
@@ -727,6 +495,238 @@ namespace J2N.Text
             lock (syncRoot)
             {
                 return buffer.ToString(startIndex, length);
+            }
+        }
+
+        /// <summary>
+        /// Returns a <see cref="Span{Char}"/> to write to that is at least the requested size
+        /// (specified by <paramref name="sizeHint"/>).
+        /// </summary>
+        /// <param name="sizeHint">
+        /// The minimum length of the returned <see cref="Span{Char}"/>.
+        /// If 0, a non-empty buffer is returned.
+        /// </param>
+        /// <returns>
+        /// A <see cref="Span{Char}"/> of at least the size <paramref name="sizeHint"/>.
+        /// If <paramref name="sizeHint"/> is 0, returns a non-empty buffer.
+        /// </returns>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="sizeHint"/> is less than zero.</exception>
+        /// <remarks>
+        /// The capacity is adjusted as needed.
+        /// <para/>
+        /// This method never returns <see cref="Span{Char}.Empty"/>.
+        /// <para/>
+        /// The returned <see cref="Span{Char}"/> allows writing characters directly to the buffer of
+        /// <see cref="SynchronizedTextBuilder"/>. This can be used for more complex and low-level business
+        /// logic to be applied when either the number of characters is unknown or the number of separate
+        /// operations would be prohibitively costly.
+        /// <para/>
+        /// <b>Notes to Callers</b>
+        /// <para/>
+        /// When you instantiate a <see cref="SynchronizedTextBuilder"/> object by calling <see cref="SynchronizedTextBuilder(int, int)"/>,
+        /// both the length and the capacity of the <see cref="SynchronizedTextBuilder"/> instance can grow beyond
+        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="SynchronizedTextBuilderExtensions.Append{TBuilder}(TBuilder, string?)"/>
+        /// and <see cref="SynchronizedTextBuilderExtensions.AppendFormat{TBuilder}(TBuilder, string, object?)"/> methods to append small strings.
+        /// <para/>
+        /// The returned span provides direct access to the underlying memory of the <see cref="SynchronizedTextBuilder"/>.
+        /// Callers must synchronize externally using <see cref="SynchronizedTextBuilder.SyncRoot"/> for the duration of the
+        /// span usage if concurrent mutation is possible.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public Span<char> GetSpan(int sizeHint = 0)
+        {
+            return buffer.GetSpan(sizeHint);
+        }
+
+        /// <summary>
+        /// Returns a <see cref="Memory{Char}"/> to write to that is at least the length
+        /// specified by <paramref name="sizeHint"/>.
+        /// </summary>
+        /// <param name="sizeHint">
+        /// The minimum requested length of the <see cref="Memory{Char}"/>.
+        /// If 0, a non-empty buffer is returned.
+        /// </param>
+        /// <returns>
+        /// A <see cref="Memory{Char}"/> whose length is at least <paramref name="sizeHint"/>.
+        /// If <paramref name="sizeHint"/> is not provided or is equal to 0, some non-empty buffer is returned.
+        /// </returns>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="sizeHint"/> is less than zero.</exception>
+        /// <remarks>
+        /// The capacity is adjusted as needed.
+        /// <para/>
+        /// This method never returns <see cref="Memory{Char}.Empty"/>.
+        /// <para/>
+        /// The returned <see cref="Memory{Char}"/> allows writing characters directly to the buffer of
+        /// <see cref="SynchronizedTextBuilder"/>. This can be used for more complex and low-level business
+        /// logic to be applied when either the number of characters is unknown or the number of separate
+        /// operations would be prohibitively costly.
+        /// <para/>
+        /// <b>Notes to Callers</b>
+        /// <para/>
+        /// When you instantiate a <see cref="SynchronizedTextBuilder"/> object by calling <see cref="SynchronizedTextBuilder(int, int)"/>,
+        /// both the length and the capacity of the <see cref="SynchronizedTextBuilder"/> instance can grow beyond
+        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="SynchronizedTextBuilderExtensions.Append{TBuilder}(TBuilder, string?)"/>
+        /// and <see cref="SynchronizedTextBuilderExtensions.AppendFormat{TBuilder}(TBuilder, string, object?)"/> methods to append small strings.
+        /// <para/>
+        /// The returned memory provides direct access to the underlying memory of the <see cref="SynchronizedTextBuilder"/>.
+        /// Callers must synchronize externally using <see cref="SynchronizedTextBuilder.SyncRoot"/> for the duration of the
+        /// memory usage if concurrent mutation is possible.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public Memory<char> GetMemory(int sizeHint = 0)
+        {
+            return buffer.GetMemory(sizeHint);
+        }
+
+        /// <summary>
+        /// Notifies the <see cref="SynchronizedTextBuilder"/> that <paramref name="count"/> items were
+        /// written to the output <see cref="Span{Char}"/> of a prior call to <see cref="GetSpan(int)"/>
+        /// or <see cref="Memory{Char}"/> of a prior call to <see cref="GetMemory(int)"/>.
+        /// </summary>
+        /// <param name="count">The number of items written.</param>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="count"/> is less than zero.</exception>
+        /// <exception cref="InvalidOperationException">
+        /// The method call attempts to advance past the remaining <see cref="Capacity"/>
+        /// beyond <see cref="Length"/>.
+        /// </exception>
+        /// <remarks>
+        /// You must request a new buffer after calling <see cref="Advance(int)"/> to continue writing more data
+        /// and cannot write to a previously acquired buffer.
+        /// <para/>
+        /// Calling <see cref="Advance(int)"/> is effectively the same operation as adding <paramref name="count"/>
+        /// to the existing <see cref="Length"/>.
+        /// <para/>
+        /// This method is intended to be used in conjunction with either <see cref="GetSpan(int)"/> or <see cref="GetMemory(int)"/>.
+        /// If concurrent mutation is possible, this method should be synchronized externally by the caller with either of those two
+        /// methods using <see cref="SynchronizedTextBuilder.SyncRoot"/> for the duration of the memory usage.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void Advance(int count)
+        {
+            buffer.Advance(count);
+        }
+
+        /// <summary>
+        /// Returns the code point at <paramref name="index"/> in the specified sequence of
+        /// character units. If the unit at <paramref name="index"/> is a high-surrogate unit,
+        /// <c><paramref name="index"/> + 1</c> is less than the length of the sequence and the unit at
+        /// <c><paramref name="index"/> + 1</c> is a low-surrogate unit, then the supplementary code
+        /// point represented by the pair is returned; otherwise the <see cref="char"/>
+        /// value at <paramref name="index"/> is returned.
+        /// </summary>
+        /// <param name="index">
+        /// The position in this <see cref="SynchronizedTextBuilder"/> from which to retrieve the code
+        /// point.
+        /// </param>
+        /// <returns>
+        /// The Unicode code point or <see cref="char"/> value at <paramref name="index"/> in
+        /// this <see cref="SynchronizedTextBuilder"/>.
+        /// </returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="index"/> is greater than or equal to <see cref="Length"/>.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="index"/> is less than zero.
+        /// </exception>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public int CodePointAt(int index)
+        {
+            lock (syncRoot)
+            {
+                return buffer.CodePointAt(index);
+            }
+        }
+
+        /// <summary>
+        /// Returns the code point that precedes <paramref name="index"/> in the specified
+        /// sequence of character units. If the unit at <c><paramref name="index"/> - 1</c> is a
+        /// low-surrogate unit, <c><paramref name="index"/> - 2</c> is not negative and the unit at
+        /// <c><paramref name="index"/> - 2</c> is a high-surrogate unit, then the supplementary code
+        /// point represented by the pair is returned; otherwise the <see cref="char"/>
+        /// value at <c><paramref name="index"/> - 1</c> is returned.
+        /// </summary>
+        /// <param name="index">
+        /// The position in this <see cref="SynchronizedTextBuilder"/> following the code
+        /// point that should be returned.
+        /// </param>
+        /// <returns>
+        /// The Unicode code point or <see cref="char"/> value before <paramref name="index"/>
+        /// in this <see cref="SynchronizedTextBuilder"/>.
+        /// </returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// If the <paramref name="index"/> is less than
+        /// 1 or greater than <see cref="Length"/>.
+        /// </exception>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public int CodePointBefore(int index)
+        {
+            lock (syncRoot)
+            {
+                return buffer.CodePointBefore(index);
+            }
+        }
+
+        /// <summary>
+        /// Returns the number of Unicode code points in the text range of the specified char sequence.
+        /// The text range begins at the specified <paramref name="startIndex"/> and extends for the number
+        /// of characters specified in <paramref name="length"/>.
+        /// Unpaired surrogates within the text range count as one code point each.
+        /// <para/>
+        /// IMPORTANT: This method has .NET semantics. That is, the <paramref name="length"/> parameter
+        /// is a length rather than an exclusive end index. To convert from
+        /// Java, use <c>endIndex - startIndex</c> to obtain the length.
+        /// </summary>
+        /// <param name="startIndex">The index to the first char of the text range.</param>
+        /// <param name="length">The number of characters to consider in this <see cref="SynchronizedTextBuilder"/>.</param>
+        /// <returns>The number of Unicode code points in the specified text range.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="startIndex"/> plus <paramref name="length"/> indicates a position not within
+        /// this <see cref="SynchronizedTextBuilder"/>.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="startIndex"/> or <paramref name="length"/> is less than zero.
+        /// </exception>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public int CodePointCount(int startIndex, int length)
+        {
+            lock (syncRoot)
+            {
+                return buffer.CodePointCount(startIndex, length);
+            }
+        }
+
+        /// <summary>
+        /// Returns the index within the given char sequence that is offset from the given <paramref name="index"/> by
+        /// <paramref name="codePointOffset"/> code points. Unpaired surrogates within the text range given by
+        /// <paramref name="index"/> and <paramref name="codePointOffset"/> count as one code point each.
+        /// </summary>
+        /// <param name="index">The index to be offset.</param>
+        /// <param name="codePointOffset">
+        /// The number of code points to look backwards or forwards; may
+        /// be a negative or positive value.
+        /// </param>
+        /// <returns>The index within the char sequence, offset by <paramref name="codePointOffset"/> code points.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="index"/> is less than zero or greater than <see cref="Length"/>.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="codePointOffset"/> is positive and the subsequence starting with
+        /// <paramref name="index"/> has fewer than <paramref name="codePointOffset"/> code points.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="codePointOffset"/> is negative and the subsequence before <paramref name="index"/>
+        /// has fewer than the absolute value of <paramref name="codePointOffset"/> code points.
+        /// </exception>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public int OffsetByCodePoints(int index, int codePointOffset)
+        {
+            lock (syncRoot)
+            {
+                return buffer.OffsetByCodePoints(index, codePointOffset);
             }
         }
 
