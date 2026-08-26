@@ -92,11 +92,21 @@ namespace J2N.Text.CodeGen
             List<string> sourceTexts =
                 Directory.GetFiles(sourceDirectory, "MutableTextBuffer*.cs")
                     .Where(f => !f.EndsWith(".generated.cs", StringComparison.OrdinalIgnoreCase))
+                    .Where(f => !f.EndsWith("CharSequence.cs", StringComparison.OrdinalIgnoreCase))
+                    .OrderBy(
+                        f => !string.Equals(
+                            Path.GetFileName(f),
+                            "MutableTextBuffer.cs",
+                            StringComparison.OrdinalIgnoreCase))
+                    .ThenBy(f => f, StringComparer.OrdinalIgnoreCase)
+                    .ThenBy(f => f, StringComparer.Ordinal)
                     .Select(File.ReadAllText)
                     .ToList();
 
             List<string> infrastructureTexts =
                 Directory.GetFiles(infrastructureDirectory, "*.cs")
+                    .OrderBy(f => f, StringComparer.OrdinalIgnoreCase)
+                    .ThenBy(f => f, StringComparer.Ordinal)
                     .Select(File.ReadAllText)
                     .ToList();
 
@@ -115,12 +125,26 @@ namespace J2N.Text.CodeGen
             List<string> j2nExtensionSourceTexts =
                 Directory.GetFiles(j2nSourceDirectory, "MutableTextBufferExtensions*.cs")
                     .Where(f => !f.EndsWith(".generated.cs", StringComparison.OrdinalIgnoreCase))
+                    .OrderBy(
+                        f => !string.Equals(
+                            Path.GetFileName(f),
+                            "MutableTextBufferExtensions.cs",
+                            StringComparison.OrdinalIgnoreCase))
+                    .ThenBy(f => f, StringComparer.OrdinalIgnoreCase)
+                    .ThenBy(f => f, StringComparer.Ordinal)
                     .Select(File.ReadAllText)
                     .ToList();
 
             List<string> extensionSourceTexts =
                 Directory.GetFiles(sourceDirectory, "MutableTextBufferExtensions*.cs")
                     .Where(f => !f.EndsWith(".generated.cs", StringComparison.OrdinalIgnoreCase))
+                    .OrderBy(
+                        f => !string.Equals(
+                            Path.GetFileName(f),
+                            "MutableTextBufferExtensions.cs",
+                            StringComparison.OrdinalIgnoreCase))
+                    .ThenBy(f => f, StringComparer.OrdinalIgnoreCase)
+                    .ThenBy(f => f, StringComparer.Ordinal)
                     .Select(File.ReadAllText)
                     .ToList();
 
@@ -139,7 +163,15 @@ namespace J2N.Text.CodeGen
             List<string> implementationSourceTexts =
                 Directory.GetFiles(sourceDirectory, "MutableTextBuffer*.cs")
                     .Where(f => !f.EndsWith(".generated.cs", StringComparison.OrdinalIgnoreCase))
+                    .Where(f => !f.EndsWith("CharSequence.cs", StringComparison.OrdinalIgnoreCase))
                     .Where(f => !f.StartsWith("MutableTextBufferExtensions", StringComparison.OrdinalIgnoreCase))
+                    .OrderBy(
+                        f => !string.Equals(
+                            Path.GetFileName(f),
+                            "MutableTextBuffer.cs",
+                            StringComparison.OrdinalIgnoreCase))
+                    .ThenBy(f => f, StringComparer.OrdinalIgnoreCase)
+                    .ThenBy(f => f, StringComparer.Ordinal)
                     .Select(File.ReadAllText)
                     .ToList();
 
