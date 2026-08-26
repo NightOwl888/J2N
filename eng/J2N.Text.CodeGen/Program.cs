@@ -97,6 +97,7 @@ namespace J2N.Text.CodeGen
                 Directory.GetFiles(sourceDirectory, "MutableTextBuffer*.cs")
                     .Where(f => !f.EndsWith(".generated.cs", StringComparison.OrdinalIgnoreCase))
                     .Where(f => !f.EndsWith("CharSequence.cs", StringComparison.OrdinalIgnoreCase))
+                    .Where(f => !Path.GetFileName(f).StartsWith("MutableTextBufferExtensions", StringComparison.OrdinalIgnoreCase))
                     .OrderBy(
                         f => !string.Equals(
                             Path.GetFileName(f),
@@ -168,7 +169,7 @@ namespace J2N.Text.CodeGen
                 Directory.GetFiles(sourceDirectory, "MutableTextBuffer*.cs")
                     .Where(f => !f.EndsWith(".generated.cs", StringComparison.OrdinalIgnoreCase))
                     .Where(f => !f.EndsWith("CharSequence.cs", StringComparison.OrdinalIgnoreCase))
-                    .Where(f => !f.StartsWith("MutableTextBufferExtensions", StringComparison.OrdinalIgnoreCase))
+                    .Where(f => !Path.GetFileName(f).StartsWith("MutableTextBufferExtensions", StringComparison.OrdinalIgnoreCase))
                     .OrderBy(
                         f => !string.Equals(
                             Path.GetFileName(f),
