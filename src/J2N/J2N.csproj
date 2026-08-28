@@ -98,63 +98,6 @@
     <InternalsVisibleTo Include="J2N.Runtime.Tests" />
   </ItemGroup>
 
-  <!-- Builder code generation -->
-
-  <PropertyGroup>
-    <CodeGenProject>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)../../eng/J2N.Text.CodeGen/J2N.Text.CodeGen.csproj'))</CodeGenProject>
-    <CodeGenAssembly>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)../../eng/J2N.Text.CodeGen/bin/$(Configuration)/net10.0/J2N.Text.CodeGen.dll'))</CodeGenAssembly>
-    <CodeGenOutputStamp>$(MSBuildProjectExtensionsPath)J2N.Text.CodeGen.stamp</CodeGenOutputStamp>
-    <CodeGenMissing>false</CodeGenMissing>
-  </PropertyGroup>
-
-  <ItemGroup>
-    <CodeGenInputs Include="$(MSBuildProjectDirectory)/Text/MutableTextBuffer*.cs" />
-    <CodeGenInputs Include="$(MSBuildProjectDirectory)/MutableTextBufferExtensions*.cs" />
-    <CodeGenInputs Include="$(MSBuildProjectDirectory)/CodeGeneration/**/*.cs" />
-    <CodeGenInputs Include="$(MSBuildThisFileDirectory)../../eng/J2N.Text.CodeGen/**/*.cs" Exclude="**/bin/**;**/obj/**" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <GeneratedCode Include="$(MSBuildProjectDirectory)/Text/*.generated.cs" />
-  </ItemGroup>
-
-  <Target Name="ForceCodeGenIfOutputsMissing"
-        BeforeTargets="RunTextCodeGen"
-        Condition="'$(IsCrossTargetingBuild)' == 'true'">
-
-    <ItemGroup>
-      <MissingCodeGenOutputs
-        Include="@(GeneratedCode)"
-        Condition="!Exists('%(Identity)')" />
-    </ItemGroup>
-
-    <Delete Files="$(CodeGenOutputStamp)"
-            Condition="'@(MissingCodeGenOutputs)' != ''" />
-
-  </Target>
-
-  <Target Name="RunTextCodeGen"
-          BeforeTargets="DispatchToInnerBuilds"
-          Inputs="@(CodeGenInputs)"
-          Outputs="$(CodeGenOutputStamp)"
-          Condition="'$(IsCrossTargetingBuild)' == 'true'">
-
-    <Message Importance="high"
-             Text="Running J2N.Text.CodeGen..." />
-
-    <MSBuild Projects="$(CodeGenProject)"
-         Targets="Build"
-         RemoveProperties="TargetFramework;TargetFrameworks"
-         Properties="Configuration=$(Configuration)" />
-
-    <Exec Command='dotnet &quot;$(CodeGenAssembly)&quot; --j2n-source-directory &quot;$(MSBuildProjectDirectory)&quot; --source-directory &quot;$(MSBuildProjectDirectory)/Text&quot; --infrastructure-directory &quot;$(MSBuildProjectDirectory)/CodeGeneration&quot;' />
-
-    <Touch Files="$(CodeGenOutputStamp)"
-           AlwaysCreate="true" />
-
-    <ItemGroup>
-      <Compile Include="Text/*.generated.cs" />
-    </ItemGroup>
-  </Target>
+  <Import Project="J2N.Text.CodeGen.targets" />
 
 </Project>
