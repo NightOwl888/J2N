@@ -787,6 +787,9 @@ namespace J2N.Text.Tests
             yield return new object[] { "abcdef", 0, 6, 2, 0, "" };
             yield return new object[] { "abcdef", 4, 2, 0, 0, "abcd" };
             yield return new object[] { "abcdef", 3, 0, 1, 0, "abcdef" };
+
+            // Exercise array pool fallback path.
+            yield return new object[] { "x012345678901234567890123456789012345678901234567890123456789012345", 66, 0, 1, 66, "x01234567890123456789012345678901234567890123456789012345678901234" + "012345678901234567890123456789012345678901234567890123456789012345" + "5" };
         }
 
         [Theory]
