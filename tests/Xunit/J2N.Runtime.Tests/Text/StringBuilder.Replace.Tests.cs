@@ -2,6 +2,7 @@
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+using J2N.Buffers;
 using J2N.TestUtilities.Xunit;
 using System;
 using System.Collections.Generic;
@@ -871,6 +872,49 @@ namespace J2N.Text.Tests
                 new SpannableCharSequence(builder.AsMemory(5, 10)));
 
             Assert.Equal("abcdefghijklmnopqrstuvwxyz", builder.ToString());
+        }
+
+        private sealed class ClearedTestAllocator : IArrayAllocator<char>
+        {
+            public bool GuaranteesClearedArrays => true;
+
+            public char[] Allocate(int minimumLength)
+            {
+                return new char[minimumLength];
+            }
+
+            public void Return(char[] array)
+            {
+                Array.Clear(array, 0, array.Length);
+            }
+        }
+
+        [Fact]
+        public void Replace_Int32_Int32_CharSpan_Overlapping_StaleSpanCorruption_Regression()
+        {
+            // Arrange: Create a buffer with zero capacity slack to force MakeRoom reallocation
+            var options = new MutableTextBufferTestOptions
+            {
+                Allocator = new ClearedTestAllocator()
+            };
+
+            // "SS-------------\0\0" scenario mapped to exact initial size. Note that we must call the
+            // capacity overload and append the initial value later to get a specific buffer size.
+            string initialValue = "SS-------------";
+            MutableTextBuffer builder = MutableTextBufferFactory(capacity: initialValue.Length, options: options);
+            builder.Append(initialValue);
+
+            // Source region lies before startIndex, delta > 0 forces reallocation via MakeRoom
+            // sourceOffset = 0, sourceLength = 2 ("SS"), startIndex = 15, count = 0
+            ReadOnlySpan<char> source = builder.AsSpan(0, 2);
+
+            // Act
+            builder.Replace(15, 0, source);
+
+            // Assert: Without the fix, the cleared allocator zeroes out the stale array,
+            // resulting in corruption like "SS-------------\0\0".
+            // With the fix (re-deriving the span after MakeRoom), it should be "SS-------------SS"
+            Assert.Equal("SS-------------SS", builder.ToString());
         }
     }
 }

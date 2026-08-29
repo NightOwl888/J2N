@@ -552,6 +552,7 @@ namespace J2N.Text
 
             int replacedLength = end - startIndex;
 
+            // NOTE: If newValue is Empty, the Overlaps() check always fails.
             if (m_Chars.AsSpan().Overlaps(newValue, out int sourceOffset))
             {
                 ReplaceCoreOverlapping(startIndex, count, sourceOffset, newValue.Length, replacedLength, end);
@@ -584,6 +585,7 @@ namespace J2N.Text
 
         private void ReplaceCoreOverlapping(int startIndex, int count, int sourceOffset, int sourceLength, int replacedLength, int end)
         {
+            Debug.Assert(sourceLength > 0);
             Debug.Assert(startIndex <= int.MaxValue - sourceLength);
 
             // Fast path: Exact self-replacement (no-op)
@@ -592,13 +594,11 @@ namespace J2N.Text
                 return;
             }
 
+            int delta = sourceLength - replacedLength;
+
             // Common case: Source entirely before the replacement region
             if ((uint)sourceOffset + (uint)sourceLength <= startIndex)
             {
-                ReadOnlySpan<char> source = m_Chars.AsSpan(sourceOffset, sourceLength);
-
-                int delta = sourceLength - replacedLength;
-
                 if (delta > 0)
                 {
                     MakeRoom(end, delta);
@@ -608,10 +608,10 @@ namespace J2N.Text
                     RemoveCore(startIndex + sourceLength, -delta);
                 }
 
-                if (sourceLength > 0)
-                {
-                    source.CopyTo(m_Chars.AsSpan(startIndex));
-                }
+                // NOTE: We derive a new span here because MakeRoom() could replace our backing buffer.
+                // We rely on the fact that MakeRoom() will copy the head chars to the same location as the
+                // original buffer.
+                m_Chars.AsSpan(sourceOffset, sourceLength).CopyTo(m_Chars.AsSpan(startIndex));
                 return;
             }
 
@@ -624,8 +624,6 @@ namespace J2N.Text
 
                 m_Chars.AsSpan(sourceOffset, sourceLength)
                     .CopyTo(temp);
-
-                int delta = sourceLength - replacedLength;
 
                 if (delta > 0)
                 {
