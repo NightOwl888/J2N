@@ -939,14 +939,14 @@ namespace J2N.Text
         {
             const string fixture = "0123456789";
             TextBuilder sb = StringBuilderFactory(fixture);
-            assertEquals(0, sb.IndexOf("0", StringComparison.Ordinal));
-            assertEquals(0, sb.IndexOf("012", StringComparison.Ordinal));
-            assertEquals(-1, sb.IndexOf("02", StringComparison.Ordinal));
-            assertEquals(8, sb.IndexOf("89", StringComparison.Ordinal));
+            assertEquals(0, sb.IndexOf("0"));
+            assertEquals(0, sb.IndexOf("012"));
+            assertEquals(-1, sb.IndexOf("02"));
+            assertEquals(8, sb.IndexOf("89"));
 
             try
             {
-                sb.IndexOf((string)null, StringComparison.Ordinal);
+                sb.IndexOf((string)null);
                 fail("no NPE");
             }
             catch (ArgumentNullException) // NullPointerException
@@ -968,15 +968,15 @@ namespace J2N.Text
             assertEquals(-1, sb.IndexOf("02"));
             assertEquals(8, sb.IndexOf("89"));
 
-            assertEquals(0, sb.IndexOf("0"), 0);
-            assertEquals(0, sb.IndexOf("012"), 0);
-            assertEquals(-1, sb.IndexOf("02"), 0);
-            assertEquals(8, sb.IndexOf("89"), 0);
+            assertEquals(0, sb.IndexOf("0", 0));
+            assertEquals(0, sb.IndexOf("012", 0));
+            assertEquals(-1, sb.IndexOf("02", 0));
+            assertEquals(8, sb.IndexOf("89", 0));
 
-            assertEquals(-1, sb.IndexOf("0"), 5);
-            assertEquals(-1, sb.IndexOf("012"), 5);
-            assertEquals(-1, sb.IndexOf("02"), 0);
-            assertEquals(8, sb.IndexOf("89"), 5);
+            assertEquals(-1, sb.IndexOf("0", 5));
+            assertEquals(-1, sb.IndexOf("012", 5));
+            assertEquals(-1, sb.IndexOf("02", 0));
+            assertEquals(8, sb.IndexOf("89", 5));
 
             try
             {
@@ -1802,15 +1802,18 @@ namespace J2N.Text
             assertEquals(-1, sb.LastIndexOf("02"));
             assertEquals(8, sb.LastIndexOf("89"));
 
-            assertEquals(0, sb.LastIndexOf("0"), 0);
-            assertEquals(0, sb.LastIndexOf("012"), 0);
-            assertEquals(-1, sb.LastIndexOf("02"), 0);
-            assertEquals(8, sb.LastIndexOf("89"), 0);
+            // J2N: We are diverging from Harmony because its tests were
+            // calling the wrong overload and also had incorrect expected values.
+            // This is confirmed against JDK 8.
+            assertEquals(0, sb.LastIndexOf("0", fixture.Length));
+            assertEquals(0, sb.LastIndexOf("012", fixture.Length));
+            assertEquals(-1, sb.LastIndexOf("02", fixture.Length));
+            assertEquals(8, sb.LastIndexOf("89", fixture.Length));
 
-            assertEquals(-1, sb.LastIndexOf("0"), 5);
-            assertEquals(-1, sb.LastIndexOf("012"), 5);
-            assertEquals(-1, sb.LastIndexOf("02"), 0);
-            assertEquals(8, sb.LastIndexOf("89"), 5);
+            assertEquals(0, sb.LastIndexOf("0", 5));
+            assertEquals(0, sb.LastIndexOf("012", 5));
+            assertEquals(-1, sb.LastIndexOf("02", 0));
+            assertEquals(-1, sb.LastIndexOf("89", 5));
 
             try
             {
