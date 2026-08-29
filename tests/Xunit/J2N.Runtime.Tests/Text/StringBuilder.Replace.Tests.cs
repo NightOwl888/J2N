@@ -398,6 +398,15 @@ namespace J2N.Text.Tests
             yield return new object[] { "abcdefghijklmnopqrstuvwxyz", TestValue.Builder(13, 8), TestValue.Literal(""), 0, 26, "abcdefghijklmvwxyz" };
             yield return new object[] { "abcdefghijklmnopqrstuvwxyz", TestValue.Literal("abcdefghijklmnopqrstuvwxyz"), TestValue.Builder(10, 7), 0, 26, "klmnopq" };
             yield return new object[] { "abcdefghijklmnopqrstuvwxyz", TestValue.Builder(13, 8), TestValue.Builder(10, 7), 0, 26, "abcdefghijklmklmnopqvwxyz" };
+
+            // Exercise pooled snapshot path (> CharStackBufferSize) for aliased oldValue.
+            yield return new object[] { "a012345678901234567890123456789012345678901234567890123456789012345", TestValue.Builder(0, 65), TestValue.Literal("X"), 0, 66, "X45" };
+
+            // Exercise pooled snapshot path (> CharStackBufferSize) for aliased newValue.
+            yield return new object[] { "x012345678901234567890123456789012345678901234567890123456789012345", TestValue.Literal("x"), TestValue.Builder(1, 65), 0, 66, "01234567890123456789012345678901234567890123456789012345678901234" + "012345678901234567890123456789012345678901234567890123456789012345" };
+
+            // Exercise pooled snapshot path (> CharStackBufferSize) when both values alias.
+            yield return new object[] { "a012345678901234567890123456789012345678901234567890123456789012345", TestValue.Builder(0, 65), TestValue.Builder(1, 65), 0, 66, "0123456789012345678901234567890123456789012345678901234567890123445" };
         }
 
 #nullable enable
@@ -412,6 +421,12 @@ namespace J2N.Text.Tests
                 => FromBuilder
                     ? builder.AsSpan(StartIndex, Length)
                     : Value.AsSpan();
+
+            // Handy for comparing against StringBuilder without changing the test data
+            //public ReadOnlySpan<char> GetSpan(StringBuilder builder)
+            //    => FromBuilder
+            //        ? builder.ToString(StartIndex, Length).AsSpan()
+            //        : Value.AsSpan();
 
             internal static TestValue Literal(string value)
                 => new() { Value = value };
