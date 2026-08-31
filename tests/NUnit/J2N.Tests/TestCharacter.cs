@@ -1,8 +1,6 @@
-﻿using ICU4N;
-using ICU4N.Globalization;
-using ICU4N.Text;
-using J2N.Collections;
+﻿using J2N.Collections;
 using J2N.Text;
+using J2N.Unicode;
 using NUnit.Framework;
 using System;
 using System.Globalization;
@@ -1731,7 +1729,7 @@ namespace J2N
         }
 
         [Test]
-        public void Test_DigitCI_Against_ICU4N()
+        public void Test_DigitCI_Against_UnicodeData()
         {
             for (int c = Character.MinCodePoint; c <= Character.MaxCodePoint; c++)
             {
@@ -1740,7 +1738,7 @@ namespace J2N
 
                 for (int radix = Character.MinRadix; radix <= Character.MaxRadix; radix++)
                 {
-                    int expected = UChar.Digit(c, radix);
+                    int expected = UnicodeCharacterData.Digit(c, radix);
                     int actual = Character.Digit((char)c, radix);
 
                     assertEquals($"{c} (Hex 0x{c.ToHexString()}) failed to match for radix {radix}.", expected, actual);
@@ -1767,14 +1765,13 @@ namespace J2N
         }
 
         [Test]
-        //[Ignore("Run Manually - ICU4N's Digit method is slow with surrogates")]
-        public void Test_Digit_II_Against_ICU4N()
+        public void Test_Digit_II_Against_UnicodeData()
         {
             for (int c = Character.MinCodePoint; c <= Character.MaxCodePoint; c++)
             {
                 for (int radix = Character.MinRadix; radix <= Character.MaxRadix; radix++)
                 {
-                    int expected = UChar.Digit(c, radix);
+                    int expected = UnicodeCharacterData.Digit(c, radix);
                     int actual = Character.Digit(c, radix);
 
                     assertEquals($"{c} (Hex 0x{c.ToHexString()}) failed to match for radix {radix}.", expected, actual);
@@ -1784,12 +1781,12 @@ namespace J2N
 
         [Test]
         [Ignore("For debugging")]
-        public void Test_Digit_II_Against_ICU4N_Debug()
+        public void Test_Digit_II_Against_UnicodeData_Debug()
         {
             int c = 0x1d7e2; // 0x1d7d8; // 0x1d7ce; //0x1d7f6; // 0x1d7ec; // 0x1d7e2; // 0x1d7d8;
             int radix = 2;
 
-            int expected = UChar.Digit(c, radix);
+            int expected = UnicodeCharacterData.Digit(c, radix);
             int actual = Character.Digit(c, radix);
 
             assertEquals($"{c} (Hex 0x{c.ToHexString()}) failed to match for radix {radix}.", expected, actual);
@@ -1854,14 +1851,14 @@ namespace J2N
         }
 
         [Test]
-        public void Test_GetNumericValueC_Against_ICU4N()
+        public void Test_GetNumericValueC_Against_UnicodeData()
         {
             for (int c = Character.MinCodePoint; c <= Character.MaxCodePoint; c++)
             {
                 if (c >= Character.MinSupplementaryCodePoint)
                     continue;
 
-                int expected = UChar.GetNumericValue(c);
+                int expected = UnicodeCharacterData.GetNumericValue(c);
                 int actual = Character.GetNumericValue((char)c);
 
                 assertEquals($"{c} (Hex 0x{c.ToHexString()}) failed to match.", expected, actual);
@@ -1870,11 +1867,11 @@ namespace J2N
 
         [Test]
         [Ignore("For debugging")]
-        public void Test_GetNumericValueC_Against_ICU4N_Debug()
+        public void Test_GetNumericValueC_Against_UnicodeData_Debug()
         {
             int c = 0x2187; // 0xd58; //0xc7c; //0x9f9; //0x9f4; //0xb2;
 
-            int expected = UChar.GetNumericValue(c);
+            int expected = UnicodeCharacterData.GetNumericValue(c);
             int actual = Character.GetNumericValue((char)c);
 
             assertEquals($"{c} (Hex 0x{c.ToHexString()}) failed to match.", expected, actual);
@@ -1917,11 +1914,11 @@ namespace J2N
         }
 
         [Test]
-        public void Test_GetNumericValue_I_Against_ICU4N()
+        public void Test_GetNumericValue_I_Against_UnicodeData()
         {
             for (int c = Character.MinCodePoint; c <= Character.MaxCodePoint; c++)
             {
-                int expected = UChar.GetNumericValue(c);
+                int expected = UnicodeCharacterData.GetNumericValue(c);
                 int actual = Character.GetNumericValue(c);
 
                 assertEquals($"{c} (Hex 0x{c.ToHexString()}) failed to match.", expected, actual);
@@ -1930,11 +1927,11 @@ namespace J2N
 
         [Test]
         [Ignore("For debugging")]
-        public void Test_GetNumericValue_I_Against_ICU4N_Debug()
+        public void Test_GetNumericValue_I_Against_UnicodeData_Debug()
         {
             int c = 0x0; //0x10131; // 0xd58; //0xc7c; //0x9f9; //0x9f4; //0xb2;
 
-            int expected = UChar.GetNumericValue(c);
+            int expected = UnicodeCharacterData.GetNumericValue(c);
             int actual = Character.GetNumericValue(c);
 
             assertEquals($"{c} (Hex 0x{c.ToHexString()}) failed to match.", expected, actual);
@@ -2820,7 +2817,7 @@ namespace J2N
 
             for (int c = Character.MinCodePoint; c <= Character.MaxCodePoint; c++)
             {
-                assertEquals($"0x{c:X4}", UChar.IsWhiteSpace((char)c), Character.IsWhiteSpace((char)c));
+                assertEquals($"0x{c:X4}", UnicodeCharacterData.IsWhiteSpace((char)c), Character.IsWhiteSpace((char)c));
             }
 
             //assertTrue("space returned false", Character.IsWhiteSpace('\n'));
@@ -2833,7 +2830,7 @@ namespace J2N
         [Test]
         public void Test_isWhitespace_I()
         {
-            // J2N: Added more thorough tests because Harmony had differences from ICU4N
+            // J2N: Added more thorough tests because Harmony had differences from the Unicode Character Database
 
             int[] javaGoodWhiteSpaceChars = new int[] {
                 0x0009,
@@ -2891,7 +2888,7 @@ namespace J2N
 
             for (int c = Character.MinCodePoint; c <= Character.MaxCodePoint; c++)
             {
-                assertEquals($"0x{c:X4}", UChar.IsWhiteSpace(c), Character.IsWhiteSpace(c));
+                assertEquals($"0x{c:X4}", UnicodeCharacterData.IsWhiteSpace(c), Character.IsWhiteSpace(c));
             }
 
             //assertTrue(Character.IsWhiteSpace((int)'\n'));
