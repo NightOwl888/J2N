@@ -34,8 +34,6 @@ using System.IO.Compression;
 // Example:
 //     dotnet run --project tools/GenerateUnicodeData -- 10.0.0
 
-
-
 string unicodeVersion = args.Length > 0 ? args[0] : "10.0.0";
 string outputFile = args.Length > 1
     ? args[1]
@@ -70,12 +68,14 @@ WriteRunLengthEncodedData(outputFile, unicodeVersion, generalCategory, decimalDi
 
 Console.WriteLine($"Wrote {outputFile}");
 
+return;
+
 static string ReadUnihanNumericValues(byte[] zipBytes)
 {
     using var stream = new MemoryStream(zipBytes);
     using var archive = new ZipArchive(stream, ZipArchiveMode.Read);
-    ZipArchiveEntry entry = archive.GetEntry("Unihan_NumericValues.txt")
-        ?? throw new InvalidOperationException("Unihan_NumericValues.txt was not found in Unihan.zip.");
+    var entry = archive.GetEntry("Unihan_NumericValues.txt")
+                ?? throw new InvalidOperationException("Unihan_NumericValues.txt was not found in Unihan.zip.");
     using var entryStream = entry.Open();
     using var reader = new StreamReader(entryStream);
     return reader.ReadToEnd();
@@ -147,6 +147,8 @@ static void ParseUnicodeData(string text, string?[] generalCategory, int[] decim
         Assign(codePoint, digitField, numericField, decimalDigitValue, numericValue);
     }
 
+    return;
+
     static void Assign(int codePoint, string digitField, string numericField, int[] decimalDigitValue, long[] numericValue)
     {
         if (digitField.Length != 0)
@@ -200,7 +202,7 @@ static void WriteRunLengthEncodedData(string outputFile, string unicodeVersion, 
 
         // Only code points that carry no digit or numeric value can be coalesced into a
         // run; where a value exists it increments per code point, so each one is its own row.
-        if (current == previous.Value && current.Digit == -1 && current.Numeric == -1)
+        if (current == previous.Value && current is { Digit: -1, Numeric: -1 })
         {
             continue;
         }
@@ -216,6 +218,8 @@ static void WriteRunLengthEncodedData(string outputFile, string unicodeVersion, 
 
     Console.WriteLine($"{rowCount} rows");
 
+    return;
+
     static void WriteRow(StreamWriter writer, int start, int end, (int Digit, int Numeric, bool WhiteSpace) value)
     {
         writer.WriteLine(string.Create(CultureInfo.InvariantCulture,
@@ -228,19 +232,19 @@ static void WriteRunLengthEncodedData(string outputFile, string unicodeVersion, 
 static int GetDigitValue(int codePoint, string?[] generalCategory, int[] decimalDigitValue)
 {
     int value;
-    if (codePoint >= 'a' && codePoint <= 'z')
+    if (codePoint is >= 'a' and <= 'z')
     {
         value = codePoint - 'a' + 10;
     }
-    else if (codePoint >= 'A' && codePoint <= 'Z')
+    else if (codePoint is >= 'A' and <= 'Z')
     {
         value = codePoint - 'A' + 10;
     }
-    else if (codePoint >= 0xFF41 && codePoint <= 0xFF5A)
+    else if (codePoint is >= 0xFF41 and <= 0xFF5A)
     {
         value = codePoint - 0xFF41 + 10;
     }
-    else if (codePoint >= 0xFF21 && codePoint <= 0xFF3A)
+    else if (codePoint is >= 0xFF21 and <= 0xFF3A)
     {
         value = codePoint - 0xFF21 + 10;
     }
@@ -257,31 +261,20 @@ static int GetDigitValue(int codePoint, string?[] generalCategory, int[] decimal
 }
 
 static int GetNumericValue(int codePoint, long[] numericValue)
-{
-    if (codePoint >= 'a' && codePoint <= 'z')
+    => codePoint switch
     {
-        return codePoint - 'a' + 10;
-    }
-    if (codePoint >= 'A' && codePoint <= 'Z')
-    {
-        return codePoint - 'A' + 10;
-    }
-    if (codePoint >= 0xFF41 && codePoint <= 0xFF5A)
-    {
-        return codePoint - 0xFF41 + 10;
-    }
-    if (codePoint >= 0xFF21 && codePoint <= 0xFF3A)
-    {
-        return codePoint - 0xFF21 + 10;
-    }
-    return (int)numericValue[codePoint];
-}
+        >= 'a' and <= 'z' => codePoint - 'a' + 10,
+        >= 'A' and <= 'Z' => codePoint - 'A' + 10,
+        >= 0xFF41 and <= 0xFF5A => codePoint - 0xFF41 + 10,
+        >= 0xFF21 and <= 0xFF3A => codePoint - 0xFF21 + 10,
+        _ => (int)numericValue[codePoint]
+    };
 
 // Java whitespace: the Unicode space separators except the non-breaking ones,
 // plus the ASCII control characters Java treats as whitespace.
 static bool IsWhiteSpace(int codePoint, string?[] generalCategory)
 {
-    if (codePoint == 0x00A0 || codePoint == 0x2007 || codePoint == 0x202F)
+    if (codePoint is 0x00A0 or 0x2007 or 0x202F)
     {
         return false;
     }
@@ -292,15 +285,14 @@ static bool IsWhiteSpace(int codePoint, string?[] generalCategory)
         return true;
     }
 
-    return (codePoint >= 0x09 && codePoint <= 0x0D)
-        || (codePoint >= 0x1C && codePoint <= 0x1F);
+    return codePoint is >= 0x09 and <= 0x0D or >= 0x1C and <= 0x1F;
 }
 
 static long ParseNumericValue(string field)
 {
     // Fractions (for example "1/2") and values outside the range of Int32
     // cannot be represented, which both Java and ICU report as -2.
-    if (field.IndexOf('/') >= 0)
+    if (field.Contains('/'))
     {
         return Ucd.NumericNotRepresentable;
     }
@@ -310,13 +302,13 @@ static long ParseNumericValue(string field)
         return Ucd.NumericNotRepresentable;
     }
 
-    return value >= 0 && value <= int.MaxValue ? value : Ucd.NumericNotRepresentable;
+    return value is >= 0 and <= int.MaxValue ? value : Ucd.NumericNotRepresentable;
 }
 
 static IEnumerable<string> EnumerateLines(string text)
 {
     using var reader = new StringReader(text);
-    while (reader.ReadLine() is string line)
+    while (reader.ReadLine() is { } line)
     {
         yield return line;
     }
