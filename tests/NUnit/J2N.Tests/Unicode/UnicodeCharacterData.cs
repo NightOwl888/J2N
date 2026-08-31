@@ -63,14 +63,14 @@ namespace J2N.Unicode
 
         static UnicodeCharacterData()
         {
-            using Stream stream = typeof(UnicodeCharacterData).FindAndGetManifestResourceStream(ResourceName)
-                ?? throw new InvalidOperationException(
-                    $"The embedded resource '{ResourceName}' was not found. Run 'dotnet run --project tools/GenerateUnicodeData' to generate it.");
+            using var stream = typeof(UnicodeCharacterData).FindAndGetManifestResourceStream(ResourceName)
+                               ?? throw new InvalidOperationException(
+                                   $"The embedded resource '{ResourceName}' was not found. " +
+                                   $"Run 'dotnet run --project tools/GenerateUnicodeData' to generate it.");
             using var reader = new StreamReader(stream);
 
             int expectedCodePoint = 0;
-            string line;
-            while ((line = reader.ReadLine()) != null)
+            while (reader.ReadLine() is { } line)
             {
                 if (line.Length == 0)
                 {
@@ -99,7 +99,8 @@ namespace J2N.Unicode
                 if (start != expectedCodePoint)
                 {
                     throw new InvalidOperationException(
-                        $"The data in '{ResourceName}' is not contiguous: expected the row starting at U+{expectedCodePoint:X4} but found U+{start:X4}.");
+                        $"The data in '{ResourceName}' is not contiguous: " +
+                        $"expected the row starting at U+{expectedCodePoint:X4} but found U+{start:X4}.");
                 }
 
                 for (int codePoint = start; codePoint <= end; codePoint++)
@@ -115,7 +116,8 @@ namespace J2N.Unicode
             if (expectedCodePoint != Character.MaxCodePoint + 1)
             {
                 throw new InvalidOperationException(
-                    $"The data in '{ResourceName}' ends at U+{expectedCodePoint - 1:X4} but should cover through U+{Character.MaxCodePoint:X4}.");
+                    $"The data in '{ResourceName}' ends at U+{expectedCodePoint - 1:X4} " +
+                    $"but should cover through U+{Character.MaxCodePoint:X4}.");
             }
         }
 
@@ -125,7 +127,7 @@ namespace J2N.Unicode
         /// </summary>
         public static int Digit(int codePoint, int radix)
         {
-            if (radix < Character.MinRadix || radix > Character.MaxRadix)
+            if (radix is < Character.MinRadix or > Character.MaxRadix)
             {
                 return None;
             }
