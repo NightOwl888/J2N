@@ -6,6 +6,10 @@ namespace System
     /// Provides functionality to format the string representation of an object into
     /// a span.
     /// </summary>
+    [Obsolete("This interface is a compatibility shim for platforms that do not define System.ISpanFormattable, " +
+        "and it collides with the built-in interface of the same name when a .NET Standard build of J2N is " +
+        "consumed from .NET 6.0 or higher. Cast to J2N.Numerics.Number to call TryFormat() instead. " +
+        "This interface will be removed in J2N 3.0.")]
     public interface ISpanFormattable : IFormattable
     {
         /// <summary>

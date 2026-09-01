@@ -32,7 +32,9 @@ namespace J2N.Numerics
 #if FEATURE_SERIALIZABLE
     [Serializable]
 #endif
+#pragma warning disable CS0618 // Type or member is obsolete - ISpanFormattable is our own compatibility shim on platforms where System.ISpanFormattable doesn't exist. See https://github.com/NightOwl888/J2N/issues/130.
     public abstract class Number : IFormattable, ISpanFormattable
+#pragma warning restore CS0618 // Type or member is obsolete
     {
         // From System.Convert
 
