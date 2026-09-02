@@ -24,7 +24,7 @@ namespace J2N.Text
         /// Update that documentation if the behavior changes.
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        [CodeGenerationExtensionImplementation]
+        [CodeGenerationExtensionImplementation] // J2N TODO: Make separator into ReadOnlySpan<char> before making this public
         internal void AppendJoinInternal(string? separator, params object?[] values)
         {
             if (values is null)
@@ -46,7 +46,7 @@ namespace J2N.Text
         /// Update that documentation if the behavior changes.
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        [CodeGenerationExtensionImplementation]
+        [CodeGenerationExtensionImplementation] // J2N TODO: Make separator into ReadOnlySpan<char> before making this public
         internal void AppendJoinInternal(string? separator, params ReadOnlySpan<object?> values)
         {
             separator ??= string.Empty;
@@ -63,7 +63,7 @@ namespace J2N.Text
         /// Update that documentation if the behavior changes.
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        [CodeGenerationExtensionImplementation]
+        [CodeGenerationExtensionImplementation] // J2N TODO: Make separator into ReadOnlySpan<char> before making this public
         internal void AppendJoinInternal<T>(string? separator, IEnumerable<T> values)
         {
             if (values is null)
@@ -85,7 +85,7 @@ namespace J2N.Text
         /// Update that documentation if the behavior changes.
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        [CodeGenerationExtensionImplementation]
+        [CodeGenerationExtensionImplementation] // J2N TODO: Make separator into ReadOnlySpan<char> before making this public
         internal void AppendJoinInternal(string? separator, params string?[] values)
         {
             if (values is null)
@@ -107,7 +107,7 @@ namespace J2N.Text
         /// Update that documentation if the behavior changes.
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        [CodeGenerationExtensionImplementation]
+        [CodeGenerationExtensionImplementation] // J2N TODO: Make separator into ReadOnlySpan<char> before making this public
         internal void AppendJoinInternal(string? separator, params ReadOnlySpan<string?> values)
         {
             separator ??= string.Empty;
