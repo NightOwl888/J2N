@@ -343,9 +343,11 @@ namespace J2N.Globalization
             int offset = 0;
             foreach (ReadOnlyMemory<char> xChunk in x.GetChunks())
             {
+                ReadOnlySpan<char> xSpan = xChunk.Span;
+
                 for (int i = 0; i < xChunk.Length; i++)
                 {
-                    if (xChunk.Span[i] != y[offset + i])
+                    if (xSpan[i] != y[offset + i])
                         return false;
                 }
 
