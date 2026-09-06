@@ -1803,21 +1803,6 @@ namespace J2N.Text
         {
             if (obj is null) return false;
             if (this == obj) return true;
-
-            if (obj is ICharSequence otherCharSequence)
-            {
-                return Equals(otherCharSequence);
-            }
-            else if (obj is SynchronizedTextBuilder otherSynchronizedTextBuilder)
-            {
-                // J2N NOTE: The JDK does not lock obj, so we do not either. It is up to the
-                // caller to decide whether or not to lock the passed in object.
-                lock (syncRoot)
-                {
-                    return Ordinal.Equal(builder, otherSynchronizedTextBuilder.AsSpan());
-                }
-            }
-
             lock (syncRoot)
             {
                 return EqualsCore(obj);
@@ -1832,19 +1817,6 @@ namespace J2N.Text
             // J2N NOTE: The JDK does not lock obj, so we do not either. It is up to the
             // caller to decide whether or not to lock the passed in object. So, we have to override
             // Ordinal.Equal() behavior here until that change can be addressed in Ordinal.Equal().
-            if (other is SynchronizedTextBuilderCharSequence otherSynchronizedTextBuilderCharSequence)
-            {
-                return Ordinal.Equal(builder, otherSynchronizedTextBuilderCharSequence.Value.AsSpan());
-            }
-            else if (other is StringBuffer otherStringBuffer)
-            {
-                return Ordinal.Equal(builder, otherStringBuffer.builder);
-            }
-
-            int len = Length;
-            if (len != other!.Length) return false;
-            if (len == 0) return true;
-
             return Ordinal.Equal(builder, other);
         }
 
@@ -1865,7 +1837,17 @@ namespace J2N.Text
                 return Ordinal.Equal(builder, spannable.AsSpan());
             }
 
-            if (other is string otherString)
+            if (other is ICharSequence otherCharSequence)
+            {
+                return EqualsCore(otherCharSequence);
+            }
+            else if (other is SynchronizedTextBuilder otherSynchronizedTextBuilder)
+            {
+                // J2N NOTE: The JDK does not lock obj, so we do not either. It is up to the
+                // caller to decide whether or not to lock the passed in object.
+                return Ordinal.Equal(builder, otherSynchronizedTextBuilder.AsSpan());
+            }
+            else if (other is string otherString)
                 return EqualsCore(otherString);
             else if (other is char[] otherCharArray)
                 return EqualsCore(otherCharArray);

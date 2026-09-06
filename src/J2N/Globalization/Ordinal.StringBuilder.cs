@@ -48,19 +48,17 @@ namespace J2N.Globalization
             {
                 return CompareString(x, sb.Value);
             }
+            // J2N: The JDK never locks the "other" type if it is synchronized.
+            // We assume the caller of this method is using StringBuilder as the
+            // known type and the other type is unknown, so we will never lock it
+            // even if it supports synchronization.
             if (y is SynchronizedTextBuilderCharSequence stb)
             {
-                lock (stb.SyncRoot)
-                {
-                    return CompareString(x, stb.Value.AsSpan());
-                }
+                return CompareString(x, stb.Value.AsSpan());
             }
             if (y is StringBuffer stringBuffer)
             {
-                lock (stringBuffer.SyncRoot)
-                {
-                    return CompareString(x, stringBuffer.builder);
-                }
+                return CompareString(x, stringBuffer.builder);
             }
 
             int xLength = x.Length;
@@ -319,19 +317,17 @@ namespace J2N.Globalization
             {
                 return Equal(x, sb.Value);
             }
+            // J2N: The JDK never locks the "other" type if it is synchronized.
+            // We assume the caller of this method is using StringBuilder as the
+            // known type and the other type is unknown, so we will never lock it
+            // even if it supports synchronization.
             if (y is SynchronizedTextBuilderCharSequence stb)
             {
-                lock (stb.SyncRoot)
-                {
-                    return Equal(x, stb.Value.AsSpan());
-                }
+                return Equal(x, stb.Value.AsSpan());
             }
             if (y is StringBuffer stringBuffer)
             {
-                lock (stringBuffer.SyncRoot)
-                {
-                    return Equal(x, stringBuffer.builder);
-                }
+                return Equal(x, stringBuffer.builder);
             }
 
             int xLength = x.Length;

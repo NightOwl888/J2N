@@ -150,7 +150,7 @@ namespace J2N.Text
             var target = CreateClassUnderTest(String1);
             var other = CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence(String1);
 
-            CharSequenceUtil.AssertSynchronizesWhileReading(other.Value!, () => Assert.IsTrue(target.Equals((ICharSequence?)other)));
+            CharSequenceUtil.AssertSynchronizesWhileReading(target.Value!, () => Assert.IsTrue(target.Equals((ICharSequence?)other)));
         }
 
         [Test]
@@ -159,7 +159,7 @@ namespace J2N.Text
             var target = CreateClassUnderTest(String1);
             var other = CharSequenceUtil.CreateStringBuffer(String1)!;
 
-            CharSequenceUtil.AssertSynchronizesWhileReading(other, () => Assert.IsTrue(target.Equals((ICharSequence?)other)));
+            CharSequenceUtil.AssertSynchronizesWhileReading(target.Value!, () => Assert.IsTrue(target.Equals((ICharSequence?)other)));
         }
 
         [Test]
@@ -168,7 +168,7 @@ namespace J2N.Text
             var target = CreateClassUnderTest(String1);
             var other = CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence(String1);
 
-            CharSequenceUtil.AssertSynchronizesWhileReading(other.Value!, () => Assert.IsTrue(target.Equals((object?)other)));
+            CharSequenceUtil.AssertSynchronizesWhileReading(target.Value!, () => Assert.IsTrue(target.Equals((object?)other)));
         }
 
         [Test]
@@ -177,7 +177,7 @@ namespace J2N.Text
             var target = CreateClassUnderTest(String1);
             var other = CharSequenceUtil.CreateSynchronizedTextBuilder(String1)!;
 
-            CharSequenceUtil.AssertSynchronizesWhileReading(other, () => Assert.IsTrue(target.Equals((object?)other)));
+            CharSequenceUtil.AssertSynchronizesWhileReading(target.Value!, () => Assert.IsTrue(target.Equals((object?)other)));
         }
 
         [Test]
@@ -370,7 +370,7 @@ namespace J2N.Text
             var target = CreateClassUnderTest(String1);
             var other = CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence(String1);
 
-            CharSequenceUtil.AssertSynchronizesWhileReading(other.Value!, () => Assert.AreEqual(0, target.CompareTo((ICharSequence?)other)));
+            CharSequenceUtil.AssertSynchronizesWhileReading(target.Value!, () => Assert.AreEqual(0, target.CompareTo((ICharSequence?)other)));
         }
 
         [Test]
@@ -379,7 +379,7 @@ namespace J2N.Text
             var target = CreateClassUnderTest(String1);
             var other = CharSequenceUtil.CreateStringBuffer(String1)!;
 
-            CharSequenceUtil.AssertSynchronizesWhileReading(other, () => Assert.AreEqual(0, target.CompareTo((ICharSequence?)other)));
+            CharSequenceUtil.AssertSynchronizesWhileReading(target.Value!, () => Assert.AreEqual(0, target.CompareTo((ICharSequence?)other)));
         }
 
         [Test]
@@ -388,7 +388,7 @@ namespace J2N.Text
             var target = CreateClassUnderTest(String1);
             var other = CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence(String1);
 
-            CharSequenceUtil.AssertSynchronizesWhileReading(other.Value!, () => Assert.AreEqual(0, target.CompareTo((object?)other)));
+            CharSequenceUtil.AssertSynchronizesWhileReading(target.Value!, () => Assert.AreEqual(0, target.CompareTo((object?)other)));
         }
 
         [Test]
@@ -397,7 +397,7 @@ namespace J2N.Text
             var target = CreateClassUnderTest(String1);
             var other = CharSequenceUtil.CreateSynchronizedTextBuilder(String1)!;
 
-            CharSequenceUtil.AssertSynchronizesWhileReading(other, () => Assert.AreEqual(0, target.CompareTo((object?)other)));
+            CharSequenceUtil.AssertSynchronizesWhileReading(target.Value!, () => Assert.AreEqual(0, target.CompareTo((object?)other)));
         }
 
         [Test]
@@ -406,7 +406,7 @@ namespace J2N.Text
             var target = CreateClassUnderTest(String1);
             var other = CharSequenceUtil.CreateStringBuffer(String1)!;
 
-            CharSequenceUtil.AssertSynchronizesWhileReading(other, () => Assert.AreEqual(0, target.CompareTo((object?)other)));
+            CharSequenceUtil.AssertSynchronizesWhileReading(target.Value!, () => Assert.AreEqual(0, target.CompareTo((object?)other)));
         }
 
         [Test]

@@ -276,10 +276,7 @@ namespace J2N.Text
             }
             else if (other is StringBuffer stringBuffer)
             {
-                lock (stringBuffer.SyncRoot)
-                {
-                    return Ordinal.Equal(Value.AsSpan(), stringBuffer.builder);
-                }
+                return Ordinal.Equal(Value.AsSpan(), stringBuffer.builder);
             }
 
             ReadOnlySpan<char> thisSpan = Value.AsSpan();
@@ -396,8 +393,7 @@ namespace J2N.Text
             if (other is null)
                 return false;
 
-            lock (other.SyncRoot)
-                return Value.AsSpan().SequenceEqual(other.AsSpan());
+            return Value.AsSpan().SequenceEqual(other.AsSpan());
         }
 
         /// <summary>
@@ -536,8 +532,7 @@ namespace J2N.Text
             if (!HasValue) return (other is null) ? 0 : -1;
             if (other is null) return 1;
 
-            lock (other.SyncRoot)
-                return Value.AsSpan().SequenceCompareTo(other.AsSpan());
+            return Value.AsSpan().SequenceCompareTo(other.AsSpan());
         }
 
         /// <summary>

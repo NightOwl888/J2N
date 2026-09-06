@@ -71,7 +71,7 @@ namespace J2N.Text
         {
             if (str is null) return (value is null || !value.HasValue) ? 0 : -1;
             if (value is null || !value.HasValue) return 1;
-            if (value is StringCharSequence s && object.ReferenceEquals(str, s.Value)) return 0;
+            if (value is StringCharSequence s && ReferenceEquals(str, s.Value)) return 0;
 
             if (value is ISpannable<char> spannable)
             {
@@ -83,17 +83,11 @@ namespace J2N.Text
             }
             if (value is StringBuffer stringBuffer)
             {
-                lock (stringBuffer.SyncRoot)
-                {
-                    return Ordinal.CompareString(str, stringBuffer.builder);
-                }
+                return Ordinal.CompareString(str, stringBuffer.builder);
             }
             if (value is SynchronizedTextBuilderCharSequence stb)
             {
-                lock (stb.SyncRoot)
-                {
-                    return str.AsSpan().SequenceCompareTo(stb.Value.AsSpan());
-                }
+                return str.AsSpan().SequenceCompareTo(stb.Value.AsSpan());
             }
 
             int length = Math.Min(str.Length, value.Length);

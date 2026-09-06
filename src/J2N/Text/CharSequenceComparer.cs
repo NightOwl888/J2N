@@ -693,47 +693,46 @@ namespace J2N.Text
 
                 if (y is SynchronizedTextBuilder stb)
                 {
-#if FEATURE_BROKEN_NULL_CHARSEQUENCE_COMPARISON
                     if (x is null) return -1;
-#endif
-                    return J2N.Globalization.Ordinal.CompareString(x, stb);
+
+                    return x.AsSpan().SequenceCompareTo(stb.AsSpan());
                 }
                 if (y is ICharSequence cs)
                 {
 #if FEATURE_BROKEN_NULL_CHARSEQUENCE_COMPARISON
                     if (x is null) return cs.HasValue ? 0 : -1;
                     if (!cs.HasValue) return 1;
+#else
+                    if (x is null) return !cs.HasValue ? 0 : -1;
+                    if (!cs.HasValue) return 1;
 #endif
-                    return J2N.Globalization.Ordinal.CompareString(x, cs);
+
+                    return Compare(x.AsSpan(), cs);
                 }
                 if (y is ISpannable<char> spannable)
                 {
                     if (x is null) return !spannable.HasValue ? 0 : -1;
                     if (!spannable.HasValue) return 1;
 
-                    lock (x.SyncRoot)
-                        return x.AsSpan().SequenceCompareTo(spannable.AsSpan());
+                    return x.AsSpan().SequenceCompareTo(spannable.AsSpan());
                 }
                 if (y is string s)
                 {
                     if (x is null) return -1;
 
-                    lock (x.SyncRoot)
-                        return x.AsSpan().SequenceCompareTo(s);
+                    return x.AsSpan().SequenceCompareTo(s);
                 }
                 if (y is char[] charArray)
                 {
                     if (x is null) return -1;
 
-                    lock (x.SyncRoot)
-                        return x.AsSpan().SequenceCompareTo(charArray);
+                    return x.AsSpan().SequenceCompareTo(charArray);
                 }
                 if (y is StringBuilder sb)
                 {
                     if (x is null) return -1;
 
-                    lock (x.SyncRoot)
-                        return J2N.Globalization.Ordinal.CompareString(x.AsSpan(), sb);
+                    return J2N.Globalization.Ordinal.CompareString(x.AsSpan(), sb);
                 }
 
                 ThrowHelper.ThrowArgumentException(ExceptionResource.NotSupported_StringComparison, exceptionArgument);
@@ -761,43 +760,47 @@ namespace J2N.Text
                 if (x is not null && y is null) return 1;
 
                 if (y is SynchronizedTextBuilder stb)
-                    return J2N.Globalization.Ordinal.CompareString(x, stb);
+                {
+                    if (x is null) return -1;
+
+                    return J2N.Globalization.Ordinal.CompareString(x?.builder, stb.AsSpan());
+                }
                 if (y is ICharSequence cs)
                 {
 #if FEATURE_BROKEN_NULL_CHARSEQUENCE_COMPARISON
                     if (x is null) return cs.HasValue ? 0 : -1;
                     if (!cs.HasValue) return 1;
+#else
+                    if (x is null) return !cs.HasValue ? 0 : -1;
+                    if (!cs.HasValue) return 1;
 #endif
-                    return J2N.Globalization.Ordinal.CompareString(x, cs);
+
+                    return J2N.Globalization.Ordinal.CompareString(x?.builder, cs);
                 }
                 if (y is ISpannable<char> spannable)
                 {
                     if (x is null) return !spannable.HasValue ? 0 : -1;
                     if (!spannable.HasValue) return -1;
 
-                    lock (x.SyncRoot)
-                        return J2N.Globalization.Ordinal.CompareString(x.builder, spannable.AsSpan());
+                    return J2N.Globalization.Ordinal.CompareString(x.builder, spannable.AsSpan());
                 }
                 if (y is string s)
                 {
                     if (x is null) return -1;
 
-                    lock (x.SyncRoot)
-                        return J2N.Globalization.Ordinal.CompareString(x.builder, s);
+                    return J2N.Globalization.Ordinal.CompareString(x.builder, s);
                 }
                 if (y is char[] charArray)
                 {
                     if (x is null) return -1;
 
-                    lock (x.SyncRoot)
-                        return J2N.Globalization.Ordinal.CompareString(x.builder, charArray);
+                    return J2N.Globalization.Ordinal.CompareString(x.builder, charArray);
                 }
                 if (y is StringBuilder sb)
                 {
                     if (x is null) return -1;
 
-                    lock (x.SyncRoot)
-                        return J2N.Globalization.Ordinal.CompareString(x.builder, sb);
+                    return J2N.Globalization.Ordinal.CompareString(x.builder, sb);
                 }
 
                 ThrowHelper.ThrowArgumentException(ExceptionResource.NotSupported_StringComparison, exceptionArgument);
@@ -833,17 +836,11 @@ namespace J2N.Text
                 }
                 if (x is SynchronizedTextBuilderCharSequence stb)
                 {
-                    lock (stb.SyncRoot)
-                    {
-                        return stb.Value.AsSpan().SequenceCompareTo(y);
-                    }
+                    return stb.Value.AsSpan().SequenceCompareTo(y);
                 }
                 if (x is StringBuffer stringBuffer)
                 {
-                    lock (stringBuffer.SyncRoot)
-                    {
-                        return J2N.Globalization.Ordinal.CompareString(stringBuffer.builder, y);
-                    }
+                    return J2N.Globalization.Ordinal.CompareString(stringBuffer.builder, y);
                 }
 
                 int result;
@@ -876,13 +873,13 @@ namespace J2N.Text
                 if (y is null || !y.HasValue) return 1;
 #endif
                 if (x is SynchronizedTextBuilderCharSequence stbcs1)
-                    return J2N.Globalization.Ordinal.CompareString(stbcs1.Value, y);
+                    return Compare(stbcs1.Value.AsSpan(), y);
                 if (x is StringBuffer sbuf1)
-                    return J2N.Globalization.Ordinal.CompareString(sbuf1, y);
+                    return J2N.Globalization.Ordinal.CompareString(sbuf1.builder, y);
                 if (y is SynchronizedTextBuilderCharSequence stbcs2)
-                    return J2N.Globalization.Ordinal.CompareString(x, stbcs2.Value);
+                    return Compare(x, stbcs2.Value.AsSpan());
                 if (y is StringBuffer sbuf2)
-                    return J2N.Globalization.Ordinal.CompareString(x, sbuf2);
+                    return J2N.Globalization.Ordinal.CompareString(x, sbuf2.builder);
 
                 if (x is StringBuilderCharSequence sbcs1)
                 {
@@ -1119,40 +1116,41 @@ namespace J2N.Text
 
                 if (y is SynchronizedTextBuilder stb)
                 {
-                    return J2N.Globalization.Ordinal.Equal(x, stb);
+                    if (x is null) return false;
+
+                    return x.AsSpan().SequenceEqual(stb.AsSpan());
                 }
                 if (y is ICharSequence cs)
                 {
-                    return J2N.Globalization.Ordinal.Equal(x, cs);
+                    if (x is null) return !cs.HasValue;
+                    if (!cs.HasValue) return false;
+
+                    return Equals(x.AsSpan(), cs);
                 }
                 if (y is ISpannable<char> spannable)
                 {
                     if (x is null) return !spannable.HasValue;
                     if (!spannable.HasValue) return false;
 
-                    lock (x.SyncRoot)
-                        return x.AsSpan().SequenceEqual(spannable.AsSpan());
+                    return x.AsSpan().SequenceEqual(spannable.AsSpan());
                 }
                 if (y is string s)
                 {
                     if (x is null) return false;
 
-                    lock (x.SyncRoot)
-                        return x.AsSpan().SequenceEqual(s);
+                    return x.AsSpan().SequenceEqual(s);
                 }
                 if (y is char[] charArray)
                 {
                     if (x is null) return false;
 
-                    lock (x.SyncRoot)
-                        return x.AsSpan().SequenceEqual(charArray);
+                    return x.AsSpan().SequenceEqual(charArray);
                 }
                 if (y is StringBuilder sb)
                 {
                     if (x is null) return false;
 
-                    lock (x.SyncRoot)
-                        return J2N.Globalization.Ordinal.Equal(x.AsSpan(), sb);
+                    return J2N.Globalization.Ordinal.Equal(x.AsSpan(), sb);
                 }
 
                 return false;
@@ -1168,40 +1166,41 @@ namespace J2N.Text
 
                 if (y is SynchronizedTextBuilder stb)
                 {
-                    return J2N.Globalization.Ordinal.Equal(x, stb);
+                    if (x is null) return false;
+
+                    return J2N.Globalization.Ordinal.Equal(x?.builder, stb.AsSpan());
                 }
                 if (y is ICharSequence cs)
                 {
-                    return J2N.Globalization.Ordinal.Equal(x, cs);
+                    if (x is null) return !cs.HasValue;
+                    if (!cs.HasValue) return false;
+
+                    return J2N.Globalization.Ordinal.Equal(x?.builder, cs);
                 }
                 if (y is ISpannable<char> spannable)
                 {
                     if (x is null) return !spannable.HasValue;
                     if (!spannable.HasValue) return false;
 
-                    lock (x.SyncRoot)
-                        return J2N.Globalization.Ordinal.Equal(x.builder, spannable.AsSpan());
+                    return J2N.Globalization.Ordinal.Equal(x.builder, spannable.AsSpan());
                 }
                 if (y is string s)
                 {
                     if (x is null) return false;
 
-                    lock (x.SyncRoot)
-                        return J2N.Globalization.Ordinal.Equal(x.builder, s);
+                    return J2N.Globalization.Ordinal.Equal(x.builder, s);
                 }
                 if (y is char[] charArray)
                 {
                     if (x is null) return false;
 
-                    lock (x.SyncRoot)
-                        return J2N.Globalization.Ordinal.Equal(x.builder, charArray);
+                    return J2N.Globalization.Ordinal.Equal(x.builder, charArray);
                 }
                 if (y is StringBuilder sb)
                 {
                     if (x is null) return false;
 
-                    lock (x.SyncRoot)
-                        return J2N.Globalization.Ordinal.Equal(x.builder, sb);
+                    return J2N.Globalization.Ordinal.Equal(x.builder, sb);
                 }
 
                 return false;
@@ -1214,6 +1213,10 @@ namespace J2N.Text
             {
                 if (x is null || !x.HasValue) return false;
 
+                int len = x.Length;
+                if (len != y.Length) return false;
+                if (len == 0) return true;
+
                 if (x is ISpannable<char> spannable)
                 {
                     return spannable.AsSpan().SequenceEqual(y);
@@ -1224,21 +1227,13 @@ namespace J2N.Text
                 }
                 if (x is SynchronizedTextBuilderCharSequence stb)
                 {
-                    lock (stb.SyncRoot)
-                    {
-                        return stb.Value.AsSpan().SequenceEqual(y);
-                    }
+                    return stb.Value.AsSpan().SequenceEqual(y);
                 }
                 if (x is StringBuffer stringBuffer)
                 {
-                    lock (stringBuffer.SyncRoot)
-                    {
-                        return J2N.Globalization.Ordinal.Equal(stringBuffer.builder, y);
-                    }
+                    return J2N.Globalization.Ordinal.Equal(stringBuffer.builder, y);
                 }
 
-                int len = x.Length;
-                if (len != y.Length) return false;
                 for (int i = 0; i < len; i++)
                 {
                     if (x[i] != y[i]) return false;
@@ -1258,14 +1253,18 @@ namespace J2N.Text
                 if (y is null || !y.HasValue)
                     return false;
 
+                int len = x.Length;
+                if (len != y.Length) return false;
+                if (len == 0) return true;
+
                 if (x is SynchronizedTextBuilderCharSequence stbcs1)
-                    return J2N.Globalization.Ordinal.Equal(stbcs1.Value, y);
+                    return Equals(stbcs1.Value.AsSpan(), y);
                 if (x is StringBuffer sbuf1)
-                    return J2N.Globalization.Ordinal.Equal(sbuf1, y);
+                    return J2N.Globalization.Ordinal.Equal(sbuf1.builder, y);
                 if (y is SynchronizedTextBuilderCharSequence stbcs2)
-                    return J2N.Globalization.Ordinal.Equal(x, stbcs2.Value);
+                    return Equals(x, stbcs2.Value.AsSpan());
                 if (y is StringBuffer sbuf2)
-                    return J2N.Globalization.Ordinal.Equal(x, sbuf2);
+                    return J2N.Globalization.Ordinal.Equal(x, sbuf2.builder);
 
                 if (x is StringBuilderCharSequence sbcs1)
                 {
@@ -1278,8 +1277,6 @@ namespace J2N.Text
                 if (y is ISpannable<char> spannable2)
                     return Equals(x, spannable2.AsSpan());
 
-                int len = x.Length;
-                if (len != y.Length) return false;
                 for (int i = 0; i < len; i++)
                 {
                     if (x[i] != y[i]) return false;
@@ -1351,11 +1348,12 @@ namespace J2N.Text
                 }
                 else if (obj is ICharSequence otherCharSequence)
                     return GetHashCode(otherCharSequence);
+                // J2N: We are not locking the SynchronizedTextBuilder because that is what the original code
+                // did. So, we are also not going to lock SynchronizedTextBuilder for the time being.
+                // We can change this behavior if needed before it is released, but it isn't clear we even
+                // truely need CharSequenceComparer other than a place to calculate hash codes similarly to Java.
                 else if (obj is SynchronizedTextBuilder otherSynchronizedTextBuilder)
-                {
-                    lock (otherSynchronizedTextBuilder.SyncRoot)
-                        return GetHashCode(otherSynchronizedTextBuilder.AsSpan());
-                }
+                    return GetHashCode(otherSynchronizedTextBuilder.AsSpan());
 
                 // J2N: Just like the BCL, we are calling GetHashCode() on the passed in object
                 // as a fallback when the type is not in our comparison domain.
@@ -1374,13 +1372,19 @@ namespace J2N.Text
                     return GetHashCode(yStringBuilder.Value);
                 if (obj is SynchronizedTextBuilderCharSequence synchronizedTextBuilderCharSequence)
                 {
-                    lock (synchronizedTextBuilderCharSequence.SyncRoot)
-                        return GetHashCode(synchronizedTextBuilderCharSequence.Value.AsSpan());
+                    // J2N: We are not locking the SynchronizedTextBuilderCharSequence because that is what the original code
+                    // did. So, we are also not going to lock SynchronizedTextBuilder for the time being.
+                    // We can change this behavior if needed before it is released, but it isn't clear we even
+                    // truely need CharSequenceComparer other than a place to calculate hash codes similarly to Java.
+                    return GetHashCode(synchronizedTextBuilderCharSequence.Value.AsSpan());
                 }
                 if (obj is StringBuffer yStringBuffer)
                 {
-                    lock (yStringBuffer.SyncRoot)
-                        return GetHashCode(yStringBuffer.builder);
+                    // J2N: We are not locking the StringBuffer because that is what the original code
+                    // did. So, we are also not going to lock SynchronizedTextBuilder for the time being.
+                    // We can change this behavior if needed before it is released, but it isn't clear we even
+                    // truely need CharSequenceComparer other than a place to calculate hash codes similarly to Java.
+                    return GetHashCode(yStringBuffer.builder);
                 }
 
                 // From Apache Harmony

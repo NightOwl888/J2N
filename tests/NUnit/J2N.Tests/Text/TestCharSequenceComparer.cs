@@ -167,66 +167,6 @@ namespace J2N.Text
         }
 
 
-        [Test]
-        public void Test_Equals_ICharSequence_SynchronizedTextBuilderCharSequence_SynchronizesWhileReading()
-        {
-            const string Value = "abcdefghijklmnopqrstuvwxyz";
-
-            foreach (var leftFactory in CharSequenceUtil.ICharSequenceFactories)
-            {
-                var sequence = CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence(Value);
-                CharSequenceUtil.AssertSynchronizesWhileReading(sequence.Value!, () => Assert.IsTrue(CharSequenceComparer.Ordinal.Equals(leftFactory(Value), sequence)));
-            }
-        }
-
-        [Test]
-        public void Test_Equals_ICharSequence_StringBuffer_SynchronizesWhileReading()
-        {
-            const string Value = "abcdefghijklmnopqrstuvwxyz";
-
-            foreach (var leftFactory in CharSequenceUtil.ICharSequenceFactories)
-            {
-                var sequence = CharSequenceUtil.CreateStringBuffer(Value);
-                CharSequenceUtil.AssertSynchronizesWhileReading(sequence!, () => Assert.IsTrue(CharSequenceComparer.Ordinal.Equals(leftFactory(Value), sequence)));
-            }
-        }
-
-        [Test]
-        public void Test_Equals_Object_SynchronizedTextBuilderCharSequence_SynchronizesWhileReading()
-        {
-            const string Value = "abcdefghijklmnopqrstuvwxyz";
-
-            foreach (var leftFactory in CharSequenceUtil.ComparableObjectFactories)
-            {
-                var sequence = CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence(Value);
-                CharSequenceUtil.AssertSynchronizesWhileReading(sequence.Value!, () => Assert.IsTrue(CharSequenceComparer.Ordinal.Equals((object?)leftFactory(Value), (object?)sequence)));
-            }
-        }
-
-        [Test]
-        public void Test_Equals_Object_SynchronizedTextBuilder_SynchronizesWhileReading()
-        {
-            const string Value = "abcdefghijklmnopqrstuvwxyz";
-
-            foreach (var leftFactory in CharSequenceUtil.ComparableObjectFactories)
-            {
-                var sequence = CharSequenceUtil.CreateSynchronizedTextBuilder(Value);
-                CharSequenceUtil.AssertSynchronizesWhileReading(sequence!, () => Assert.IsTrue(CharSequenceComparer.Ordinal.Equals((object?)leftFactory(Value), (object?)sequence)));
-            }
-        }
-
-        [Test]
-        public void Test_Equals_Object_StringBuffer_SynchronizesWhileReading()
-        {
-            const string Value = "abcdefghijklmnopqrstuvwxyz";
-
-            foreach (var leftFactory in CharSequenceUtil.ComparableObjectFactories)
-            {
-                var sequence = CharSequenceUtil.CreateStringBuffer(Value);
-                CharSequenceUtil.AssertSynchronizesWhileReading(sequence!, () => Assert.IsTrue(CharSequenceComparer.Ordinal.Equals((object?)leftFactory(Value), (object?)sequence)));
-            }
-        }
-
         public static IEnumerable<TestCaseData> Equals_Object_Object_TestData()
         {
             foreach (var leftFactory in CharSequenceUtil.ComparableObjectFactories)
@@ -565,68 +505,6 @@ namespace J2N.Text
         }
 
 
-        [Test]
-        public void Test_Compare_ICharSequence_SynchronizedTextBuilderCharSequence_SynchronizesWhileReading()
-        {
-            const string Value = "abcdefghijklmnopqrstuvwxyz";
-
-            foreach (var leftFactory in CharSequenceUtil.ICharSequenceFactories)
-            {
-                var sequence = CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence(Value);
-                CharSequenceUtil.AssertSynchronizesWhileReading(sequence.Value!, () => Assert.AreEqual(0, CharSequenceComparer.Ordinal.Compare(leftFactory(Value), sequence)));
-            }
-        }
-
-        [Test]
-        public void Test_Compare_ICharSequence_StringBuffer_SynchronizesWhileReading()
-        {
-            const string Value = "abcdefghijklmnopqrstuvwxyz";
-
-            foreach (var leftFactory in CharSequenceUtil.ICharSequenceFactories)
-            {
-                var sequence = CharSequenceUtil.CreateStringBuffer(Value);
-                CharSequenceUtil.AssertSynchronizesWhileReading(sequence!, () => Assert.AreEqual(0, CharSequenceComparer.Ordinal.Compare(leftFactory(Value), sequence)));
-            }
-        }
-
-        [Test]
-        public void Test_Compare_Object_SynchronizedTextBuilderCharSequence_SynchronizesWhileReading()
-        {
-            const string Value = "abcdefghijklmnopqrstuvwxyz";
-
-            foreach (var leftFactory in CharSequenceUtil.ComparableObjectFactories)
-            {
-                var sequence = CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence(Value);
-                CharSequenceUtil.AssertSynchronizesWhileReading(sequence.Value!, () => Assert.AreEqual(0, CharSequenceComparer.Ordinal.Compare((object?)leftFactory(Value), (object?)sequence)));
-            }
-        }
-
-        [Test]
-        public void Test_Compare_Object_SynchronizedTextBuilder_SynchronizesWhileReading()
-        {
-            const string Value = "abcdefghijklmnopqrstuvwxyz";
-
-            foreach (var leftFactory in CharSequenceUtil.ComparableObjectFactories)
-            {
-                var sequence = CharSequenceUtil.CreateSynchronizedTextBuilder(Value);
-                CharSequenceUtil.AssertSynchronizesWhileReading(sequence!, () => Assert.AreEqual(0, CharSequenceComparer.Ordinal.Compare((object?)leftFactory(Value), (object?)sequence)));
-            }
-        }
-
-        [Test]
-        public void Test_Compare_Object_StringBuffer_SynchronizesWhileReading()
-        {
-            const string Value = "abcdefghijklmnopqrstuvwxyz";
-
-            foreach (var leftFactory in CharSequenceUtil.ComparableObjectFactories)
-            {
-                var sequence = CharSequenceUtil.CreateStringBuffer(Value);
-                CharSequenceUtil.AssertSynchronizesWhileReading(sequence!, () => Assert.AreEqual(0, CharSequenceComparer.Ordinal.Compare((object?)leftFactory(Value), (object?)sequence)));
-            }
-        }
-
-
-
         public static IEnumerable<TestCaseData> Compare_Object_Object_TestData()
         {
             foreach (var leftFactory in CharSequenceUtil.ComparableObjectFactories)
@@ -933,46 +811,6 @@ namespace J2N.Text
 
 
         #region GetHashCode
-
-        [Test]
-        public void Test_GetHashCode_ICharSequence_SynchronizedTextBuilderCharSequence_SynchronizesWhileReading()
-        {
-            const string Value = "abcdefghijklmnopqrstuvwxyz";
-            var sequence = CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence(Value);
-            CharSequenceUtil.AssertSynchronizesWhileReading(sequence.Value!, () => Assert.AreEqual(958031277, CharSequenceComparer.Ordinal.GetHashCode(sequence)));
-        }
-
-        [Test]
-        public void Test_GetHashCode_ICharSequence_StringBuffer_SynchronizesWhileReading()
-        {
-            const string Value = "abcdefghijklmnopqrstuvwxyz";
-            var sequence = CharSequenceUtil.CreateStringBuffer(Value);
-            CharSequenceUtil.AssertSynchronizesWhileReading(sequence!, () => Assert.AreEqual(958031277, CharSequenceComparer.Ordinal.GetHashCode(sequence)));
-        }
-
-        [Test]
-        public void Test_GetHashCode_Object_SynchronizedTextBuilderCharSequence_SynchronizesWhileReading()
-        {
-            const string Value = "abcdefghijklmnopqrstuvwxyz";
-            var sequence = CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence(Value);
-            CharSequenceUtil.AssertSynchronizesWhileReading(sequence.Value!, () => Assert.AreEqual(958031277, CharSequenceComparer.Ordinal.GetHashCode((object?)sequence)));
-        }
-
-        [Test]
-        public void Test_GetHashCode_Object_SynchronizedTextBuilder_SynchronizesWhileReading()
-        {
-            const string Value = "abcdefghijklmnopqrstuvwxyz";
-            var sequence = CharSequenceUtil.CreateSynchronizedTextBuilder(Value);
-            CharSequenceUtil.AssertSynchronizesWhileReading(sequence!, () => Assert.AreEqual(958031277, CharSequenceComparer.Ordinal.GetHashCode((object?)sequence)));
-        }
-
-        [Test]
-        public void Test_GetHashCode_Object_StringBuffer_SynchronizesWhileReading()
-        {
-            const string Value = "abcdefghijklmnopqrstuvwxyz";
-            var sequence = CharSequenceUtil.CreateStringBuffer(Value);
-            CharSequenceUtil.AssertSynchronizesWhileReading(sequence!, () => Assert.AreEqual(958031277, CharSequenceComparer.Ordinal.GetHashCode((object?)sequence)));
-        }
 
         public static IEnumerable<TestCaseData> GetHashCode_Object_TestData()
         {

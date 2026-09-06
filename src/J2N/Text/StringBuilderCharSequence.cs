@@ -381,8 +381,7 @@ namespace J2N.Text
             if (other is null)
                 return false;
 
-            lock (other.SyncRoot)
-                return Ordinal.Equal(Value, other.AsSpan());
+            return Ordinal.Equal(Value, other.AsSpan());
         }
 
         /// <summary>
@@ -449,9 +448,9 @@ namespace J2N.Text
         /// </returns>
         public int CompareTo(ICharSequence? other)
         {
-            if (this.Value is null) return (other is null || !other.HasValue) ? 0 : -1;
+            if (!HasValue) return (other is null || !other.HasValue) ? 0 : -1;
             if (other is null) return 1;
-            if (ReferenceEquals(Value, other)) return 0;
+            if (ReferenceEquals(this, other)) return 0;
 
             return Ordinal.CompareString(Value, other);
         }
@@ -469,7 +468,7 @@ namespace J2N.Text
         /// </returns>
         public int CompareTo(string? other)
         {
-            if (this.Value is null) return (other is null) ? 0 : -1;
+            if (!HasValue) return (other is null) ? 0 : -1;
             if (other is null) return 1;
 
             return Ordinal.CompareString(Value, other);
@@ -488,7 +487,7 @@ namespace J2N.Text
         /// </returns>
         public int CompareTo(StringBuilder? other)
         {
-            if (this.Value is null) return (other is null) ? 0 : -1;
+            if (!HasValue) return (other is null) ? 0 : -1;
             if (other is null) return 1;
             if (ReferenceEquals(Value, other)) return 0;
 
@@ -508,7 +507,7 @@ namespace J2N.Text
         /// </returns>
         public int CompareTo(char[]? other)
         {
-            if (this.Value is null) return (other is null) ? 0 : -1;
+            if (!HasValue) return (other is null) ? 0 : -1;
             if (other is null) return 1;
 
             return Ordinal.CompareString(Value, other);
@@ -516,11 +515,10 @@ namespace J2N.Text
 
         internal int CompareTo(SynchronizedTextBuilder? other)
         {
-            if (this.Value is null) return (other is null) ? 0 : -1;
+            if (!HasValue) return (other is null) ? 0 : -1;
             if (other is null) return 1;
 
-            lock (other.SyncRoot)
-                return Ordinal.CompareString(Value, other.buffer);
+            return Ordinal.CompareString(Value, other.buffer);
         }
 
         /// <summary>
