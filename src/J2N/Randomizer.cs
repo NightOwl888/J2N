@@ -16,8 +16,6 @@
  */
 #endregion
 
-#if FEATURE_RANDOMIZER
-
 using System;
 
 namespace J2N
@@ -552,4 +550,3 @@ namespace J2N
 #endif
     }
 }
-#endif
