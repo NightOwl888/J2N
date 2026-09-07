@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net10.0;net9.0;net8.0;net6.0;netstandard2.1</TargetFrameworks>
+    <TargetFrameworks>net9.0;net8.0;net6.0;netstandard2.1</TargetFrameworks>
     <RootNamespace>J2N</RootNamespace>
 
     <WarningsAsErrors Label="Force all public members to have XML doc comments.">NU1605;1591</WarningsAsErrors>
