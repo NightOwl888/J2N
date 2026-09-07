@@ -356,7 +356,7 @@ namespace J2N.Text
 
             if ((uint)finalLength > (uint)m_MaxCapacity)
             {
-                throw new ArgumentOutOfRangeException("requiredLength", SR.ArgumentOutOfRange_SmallCapacity);
+                ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.requiredLength, ExceptionResource.ArgumentOutOfRange_SmallCapacity);
             }
 
             char[] oldArray = m_Chars;
