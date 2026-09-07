@@ -629,8 +629,7 @@ namespace J2N.Text
             }
             // Check if the valueCount will put us over m_MaxCapacity.
             // Doing the check here prevents corruption of the MutableTextBuffer.
-            int newLength = m_Position + valueCount;
-            if (newLength > m_MaxCapacity || newLength < valueCount)
+            if ((uint)m_Position + (uint)valueCount > (uint)m_MaxCapacity)
             {
                 ThrowHelper.ThrowArgumentOutOfRangeException(valueCount, ExceptionArgument.valueCount, ExceptionResource.ArgumentOutOfRange_LengthGreaterThanCapacity);
             }
