@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <CodeGenProject>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)../../eng/J2N.Text.CodeGen/J2N.Text.CodeGen.csproj'))</CodeGenProject>
-    <CodeGenAssembly>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)../../eng/J2N.Text.CodeGen/bin/$(Configuration)/net10.0/J2N.Text.CodeGen.dll'))</CodeGenAssembly>
+    <CodeGenAssembly>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)../../eng/J2N.Text.CodeGen/bin/$(Configuration)/$(BuildToolTargetFramework)/J2N.Text.CodeGen.dll'))</CodeGenAssembly>
     <CodeGenOutputStamp>$(MSBuildProjectExtensionsPath)J2N.Text.CodeGen.stamp</CodeGenOutputStamp>
   </PropertyGroup>
 
