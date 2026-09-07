@@ -17,6 +17,7 @@
 #endregion
 
 using J2N.Buffers;
+using J2N.Globalization;
 using System;
 using System.Buffers;
 using System.Globalization;
@@ -66,16 +67,28 @@ namespace J2N.Text
         /// Zero indicates the strings are equal.
         /// Greater than zero indicates the comparison value is less than the current string.
         /// </returns>
-        public static int CompareToOrdinal(this string? str, ICharSequence? value) // KEEP OVERLOADS FOR ReadOnlySpan<char>, ICharSequence, char[], StringBuilder, and string IN SYNC
+        public static int CompareToOrdinal(this string? str, ICharSequence? value)
         {
             if (str is null) return (value is null || !value.HasValue) ? 0 : -1;
             if (value is null || !value.HasValue) return 1;
-            if (value is StringCharSequence s && object.ReferenceEquals(str, s.Value)) return 0;
+            if (value is StringCharSequence s && ReferenceEquals(str, s.Value)) return 0;
 
+            if (value is ISpannable<char> spannable)
+            {
+                return str.AsSpan().SequenceCompareTo(spannable.AsSpan());
+            }
             if (value is StringBuilderCharSequence sb)
-                return CompareToOrdinal(str, sb.Value);
+            {
+                return Ordinal.CompareString(str, sb.Value);
+            }
             if (value is StringBuffer stringBuffer)
-                return CompareToOrdinal(str, stringBuffer.builder);
+            {
+                return Ordinal.CompareString(str, stringBuffer.builder);
+            }
+            if (value is SynchronizedTextBuilderCharSequence stb)
+            {
+                return str.AsSpan().SequenceCompareTo(stb.Value.AsSpan());
+            }
 
             int length = Math.Min(str.Length, value.Length);
             int result;
@@ -108,18 +121,13 @@ namespace J2N.Text
         /// Zero indicates the strings are equal.
         /// Greater than zero indicates the comparison value is less than the current string.
         /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int CompareToOrdinal(this string? str, char[]? value) // KEEP OVERLOADS FOR ReadOnlySpan<char>, ICharSequence, char[], StringBuilder, and string IN SYNC
         {
             if (str is null) return (value is null) ? 0 : -1;
             if (value is null) return 1;
 
-            unsafe
-            {
-                fixed (char* valuePtr = value)
-                {
-                    return CompareToOrdinalCore(str, valuePtr, value.Length);
-                }
-            }
+            return str.AsSpan().SequenceCompareTo(value);
         }
 
         /// <summary>
@@ -140,39 +148,13 @@ namespace J2N.Text
         /// Zero indicates the strings are equal.
         /// Greater than zero indicates the comparison value is less than the current string.
         /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int CompareToOrdinal(this string? str, StringBuilder? value) // KEEP OVERLOADS FOR ReadOnlySpan<char>, ICharSequence, char[], StringBuilder, and string IN SYNC
         {
             if (str is null) return (value is null) ? 0 : -1;
             if (value is null) return 1;
 
-            int length = Math.Min(str.Length, value.Length);
-            char[]? arrayToReturnToPool = null;
-            try
-            {
-#if FEATURE_STRINGBUILDER_COPYTO_SPAN // If this method isn't supported, we are buffering to an array pool to get to the stack, anyway.
-                Span<char> valueChars = length > CharStackBufferSize
-                    ? (arrayToReturnToPool = ArrayPool<char>.Shared.Rent(length))
-                    : stackalloc char[length];
-                value.CopyTo(0, valueChars, length);
-#else
-                Span<char> valueChars = arrayToReturnToPool = ArrayPool<char>.Shared.Rent(length);
-                value.CopyTo(0, arrayToReturnToPool, 0, length);
-#endif
-                int result;
-                for (int i = 0; i < length; i++)
-                {
-                    if ((result = str[i] - valueChars[i]) != 0)
-                        return result;
-                }
-
-                // At this point, we have compared all the characters in at least one string.
-                // The longer string will be larger.
-                return str.Length - value.Length;
-            }
-            finally
-            {
-                ArrayPool<char>.Shared.ReturnIfNotNull(arrayToReturnToPool);
-            }
+            return Ordinal.CompareString(str, value);
         }
 
         /// <summary>
@@ -193,9 +175,13 @@ namespace J2N.Text
         /// Zero indicates the strings are equal.
         /// Greater than zero indicates the comparison value is less than the current string.
         /// </returns>
-        public static int CompareToOrdinal(this string? str, string? value) // KEEP OVERLOADS FOR ReadOnlySpan<char>, ICharSequence, char[], StringBuilder, and string IN SYNC
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static int CompareToOrdinal(this string? str, string? value)
         {
-            return string.CompareOrdinal(str, value);
+            if (str is null) return (value is null) ? 0 : -1;
+            if (value is null) return 1;
+
+            return str.AsSpan().SequenceCompareTo(value);
         }
 
         /// <summary>
@@ -216,34 +202,16 @@ namespace J2N.Text
         /// Zero indicates the strings are equal.
         /// Greater than zero indicates the comparison value is less than the current string.
         /// </returns>
-        public static int CompareToOrdinal(this string? str, ReadOnlySpan<char> value) // KEEP OVERLOADS FOR ReadOnlySpan<char>, ICharSequence, char[], StringBuilder, and string IN SYNC
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static int CompareToOrdinal(this string? str, ReadOnlySpan<char> value)
         {
             // J2N: Only consider whether the right side is empty if the left side is null. This is the equivalent of calling str.AsSpan() and then doing the comparison. See: https://github.com/NightOwl888/J2N/pull/122#discussion_r1850836158
+#if FEATURE_BROKEN_NULL_CHARSEQUENCE_COMPARISON
             if (str is null) return value.IsEmpty ? 0 : -1;
-
-            unsafe
-            {
-                fixed (char* valuePtr = &MemoryMarshal.GetReference(value))
-                {
-                    return CompareToOrdinalCore(str, valuePtr, value.Length);
-                }
-            }
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private unsafe static int CompareToOrdinalCore(string str, char* value, int valueLength)
-        {
-            int length = Math.Min(str.Length, valueLength);
-            int result;
-            for (int i = 0; i < length; i++)
-            {
-                if ((result = str[i] - value[i]) != 0)
-                    return result;
-            }
-
-            // At this point, we have compared all the characters in at least one string.
-            // The longer string will be larger.
-            return str.Length - valueLength;
+#else
+            if (str is null) return -1;
+#endif
+            return str.AsSpan().SequenceCompareTo(value);
         }
 
         ///// <summary>
@@ -1312,7 +1280,7 @@ namespace J2N.Text
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(startIndex, ExceptionArgument.startIndex);
             if (length < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(length, ExceptionArgument.length);
-            if (startIndex > text.Length - length) // Checks for int overflow
+            if ((uint)startIndex + (uint)length > text.Length)
                 ThrowHelper.ThrowArgumentOutOfRange_IndexLengthString(startIndex, length);
 
             return text.Substring(startIndex, length).AsCharSequence();

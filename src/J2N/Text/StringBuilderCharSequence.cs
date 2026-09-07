@@ -16,9 +16,9 @@
  */
 #endregion
 
-using J2N.Buffers;
+using J2N.Globalization;
 using System;
-using System.Buffers;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace J2N.Text
@@ -27,14 +27,16 @@ namespace J2N.Text
     /// A wrapper class that represents a <see cref="System.Text.StringBuilder"/> and implements <see cref="ICharSequence"/>.
     /// </summary>
     public class StringBuilderCharSequence : ICharSequence, IAppendable, 
-        IComparable<ICharSequence>, IComparable,
-        IComparable<string>, IComparable<StringBuilder>, IComparable<char[]>,
-        IEquatable<ICharSequence>,
-        IEquatable<CharArrayCharSequence>, IEquatable<StringBuilderCharSequence>, IEquatable<StringCharSequence>,
-        IEquatable<string>, IEquatable<StringBuilder>, IEquatable<char[]>, ISpanAppendable
+        IComparable<ICharSequence?>, IComparable,
+        IComparable<string?>, IComparable<StringBuilder?>, IComparable<char[]?>,
+        IEquatable<ICharSequence?>,
+        IEquatable<CharArrayCharSequence?>, IEquatable<StringBuilderCharSequence?>, IEquatable<StringCharSequence?>,
+        IEquatable<string?>, IEquatable<StringBuilder?>, IEquatable<char[]?>, ISpanAppendable,
+        ICopyable<char>
+#if FEATURE_STRINGBUILDER_COPYTO_SPAN
+        , ISpanCopyable<char>
+#endif
     {
-        private const int CharStackBufferSize = 64;
-
         /// <summary>
         /// Initializes a new instance of <see cref="StringBuilderCharSequence"/> with a new backing <see cref="StringBuilder"/>.
         /// </summary>
@@ -251,28 +253,17 @@ namespace J2N.Text
 
         #endregion
 
-        #region Equality
+        #region Equality Comparison
 
         /// <summary>
         /// Determines whether this <see cref="StringBuilderCharSequence"/> is equal to <paramref name="other"/>.
         /// </summary>
         /// <param name="other">An <see cref="ICharSequence"/> to compare to the current <see cref="StringBuilderCharSequence"/>.</param>
         /// <returns><c>true</c> if <paramref name="other"/> is equal to the current <see cref="StringBuilderCharSequence"/>; otherwise, <c>false</c>.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Equals(ICharSequence? other)
         {
-            if (!HasValue)
-                return other is null || !other.HasValue;
-            if (other is null || !other.HasValue)
-                return false;
-
-            if (other.Length != Length) return false;
-
-            if (other is StringBuilderCharSequence stringBuilderCharSequence)
-                return Equals(stringBuilderCharSequence.Value);
-            if (other is StringBuffer stringBuffer)
-                return Equals(stringBuffer.builder);
-
-            return CharSequenceComparer.Ordinal.Equals(this, other);
+            return Ordinal.Equal(Value, other);
         }
 
         /// <summary>
@@ -287,7 +278,7 @@ namespace J2N.Text
             if (other is null || !other.HasValue)
                 return false;
 
-            return Equals(other.Value);
+            return Ordinal.Equal(Value, other.Value);
         }
 
         /// <summary>
@@ -302,7 +293,7 @@ namespace J2N.Text
             if (other is null || !other.HasValue)
                 return false;
 
-            return Equals(other.Value);
+            return Ordinal.Equal(Value, other.Value);
         }
 
         /// <summary>
@@ -317,7 +308,7 @@ namespace J2N.Text
             if (other is null || !other.HasValue)
                 return false;
 
-            return Equals(other.Value);
+            return Ordinal.Equal(Value, other.Value);
         }
 
         /// <summary>
@@ -333,32 +324,7 @@ namespace J2N.Text
             if (other is null)
                 return false;
 
-            int len = Length;
-            int otherLength = other.Length;
-            if (len != otherLength) return false;
-
-            char[]? thisArrayToReturnToPool = null;
-            try
-            {
-#if FEATURE_STRINGBUILDER_COPYTO_SPAN // If this method isn't supported, we are buffering to an array pool to get to the stack, anyway.
-                Span<char> chars = len > CharStackBufferSize
-                    ? (thisArrayToReturnToPool = ArrayPool<char>.Shared.Rent(len))
-                    : stackalloc char[len];
-                value.CopyTo(0, chars, len);
-#else
-                Span<char> chars = thisArrayToReturnToPool = ArrayPool<char>.Shared.Rent(len);
-                value.CopyTo(0, thisArrayToReturnToPool, 0, len);
-#endif
-                for (int i = 0; i < len; i++)
-                {
-                    if (!chars[i].Equals(other[i])) return false;
-                }
-                return true;
-            }
-            finally
-            {
-                ArrayPool<char>.Shared.ReturnIfNotNull(thisArrayToReturnToPool);
-            }
+            return Ordinal.Equal(value, other);
         }
 
         /// <summary>
@@ -368,46 +334,11 @@ namespace J2N.Text
         /// <returns><c>true</c> if <paramref name="other"/> is equal to the current <see cref="StringBuilderCharSequence"/>; otherwise, <c>false</c>.</returns>
         public bool Equals(StringBuilder? other)
         {
-            var value = Value;
-            if (value is null)
-                return other is null;
-            if (other is null)
-                return false;
+            if (!HasValue) return other is null;
+            if (other is null) return false;
+            if (ReferenceEquals(Value, other)) return true;
 
-            int len = Length;
-            int otherLength = other.Length;
-            if (len != otherLength) return false;
-
-            char[]? thisArrayToReturnToPool = null;
-            char[]? otherArrayToReturnToPool = null;
-            try
-            {
-#if FEATURE_STRINGBUILDER_COPYTO_SPAN // If this method isn't supported, we are buffering to an array pool to get to the stack, anyway.
-                Span<char> chars = len > CharStackBufferSize
-                    ? (thisArrayToReturnToPool = ArrayPool<char>.Shared.Rent(len))
-                    : stackalloc char[len];
-                Span<char> otherChars = otherLength > CharStackBufferSize
-                    ? (otherArrayToReturnToPool = ArrayPool<char>.Shared.Rent(otherLength))
-                    : stackalloc char[otherLength];
-                value.CopyTo(0, chars, len);
-                other.CopyTo(0, otherChars, otherLength);
-#else
-                Span<char> chars = thisArrayToReturnToPool = ArrayPool<char>.Shared.Rent(len);
-                Span<char> otherChars = otherArrayToReturnToPool = ArrayPool<char>.Shared.Rent(len);
-                value.CopyTo(0, thisArrayToReturnToPool, 0, len);
-                other.CopyTo(0, otherArrayToReturnToPool, 0, otherLength);
-#endif
-                for (int i = 0; i < len; i++)
-                {
-                    if (!chars[i].Equals(otherChars[i])) return false;
-                }
-                return true;
-            }
-            finally
-            {
-                ArrayPool<char>.Shared.ReturnIfNotNull(thisArrayToReturnToPool);
-                ArrayPool<char>.Shared.ReturnIfNotNull(otherArrayToReturnToPool);
-            }
+            return Ordinal.Equal(Value, other);
         }
 
         /// <summary>
@@ -415,6 +346,7 @@ namespace J2N.Text
         /// </summary>
         /// <param name="other">A <see cref="T:char[]"/> to compare to the current <see cref="StringBuilderCharSequence"/>.</param>
         /// <returns><c>true</c> if <paramref name="other"/> is equal to the current <see cref="StringBuilderCharSequence"/>; otherwise, <c>false</c>.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Equals(char[]? other)
         {
             var value = Value;
@@ -423,32 +355,33 @@ namespace J2N.Text
             if (other is null)
                 return false;
 
-            int len = Length;
-            int otherLength = other.Length;
-            if (len != otherLength) return false;
+            return Ordinal.Equal(value, other);
+        }
 
-            char[]? thisArrayToReturnToPool = null;
-            try
-            {
-#if FEATURE_STRINGBUILDER_COPYTO_SPAN // If this method isn't supported, we are buffering to an array pool to get to the stack, anyway.
-                Span<char> chars = len > CharStackBufferSize
-                    ? (thisArrayToReturnToPool = ArrayPool<char>.Shared.Rent(len))
-                    : stackalloc char[len];
-                value.CopyTo(0, chars, len);
-#else
-                Span<char> chars = thisArrayToReturnToPool = ArrayPool<char>.Shared.Rent(len);
-                value.CopyTo(0, thisArrayToReturnToPool, 0, len);
-#endif
-                for (int i = 0; i < len; i++)
-                {
-                    if (!chars[i].Equals(other[i])) return false;
-                }
-                return true;
-            }
-            finally
-            {
-                ArrayPool<char>.Shared.ReturnIfNotNull(thisArrayToReturnToPool);
-            }
+        /// <summary>
+        /// Determines whether this <see cref="StringBuilderCharSequence"/> is equal to <paramref name="other"/>.
+        /// </summary>
+        /// <param name="other">A <see cref="T:char[]"/> to compare to the current <see cref="StringBuilderCharSequence"/>.</param>
+        /// <returns><c>true</c> if <paramref name="other"/> is equal to the current <see cref="StringBuilderCharSequence"/>; otherwise, <c>false</c>.</returns>
+        // J2N TODO: API - Before we mark this public, we need to evaluate whether existing classes that are implicitly convertible to
+        // ReadOnlySpan<char> (whether or not they implement ICharSequence) will cause "ambiguous overload" issues with the compiler.
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal bool Equals(ReadOnlySpan<char> other)
+        {
+            if (!HasValue)
+                return false;
+
+            return Ordinal.Equal(Value, other);
+        }
+
+        internal bool Equals(SynchronizedTextBuilder? other)
+        {
+            if (!HasValue)
+                return other is null;
+            if (other is null)
+                return false;
+
+            return Ordinal.Equal(Value, other.AsSpan());
         }
 
         /// <summary>
@@ -461,22 +394,26 @@ namespace J2N.Text
             if (other is null)
                 return !HasValue;
 
+            if (other is ISpannable<char> spannable)
+            {
+                if (!spannable.HasValue)
+                    return !HasValue;
+                else if (!HasValue)
+                    return false;
+
+                return Ordinal.Equal(Value, spannable.AsSpan());
+            }
+
             if (other is string otherString)
-                return Equals(otherString);
+                return Ordinal.Equal(Value, otherString);
             else if (other is StringBuilder otherStringBuilder)
-                return Equals(otherStringBuilder);
+                return Ordinal.Equal(Value, otherStringBuilder);
             else if (other is char[] otherCharArray)
-                return Equals(otherCharArray);
-            else if (other is StringCharSequence otherStringCharSequence)
-                return Equals(otherStringCharSequence.Value);
-            else if (other is CharArrayCharSequence otherCharArrayCharSequence)
-                return Equals(otherCharArrayCharSequence.Value);
-            else if (other is StringBuilderCharSequence otherStringBuilderCharSequence)
-                return Equals(otherStringBuilderCharSequence.Value);
-            else if (other is StringBuffer stringBuffer)
-                return Equals(stringBuffer.builder);
+                return Ordinal.Equal(Value, otherCharArray);
             else if (other is ICharSequence otherCharSequence)
-                return Equals(otherCharSequence);
+                return Ordinal.Equal(Value, otherCharSequence);
+            else if (other is SynchronizedTextBuilder otherSynchronizedTextBuilder)
+                return Equals(otherSynchronizedTextBuilder);
 
             return false;
         }
@@ -494,9 +431,9 @@ namespace J2N.Text
             return CharSequenceComparer.Ordinal.GetHashCode(this.Value);
         }
 
-        #endregion
+        #endregion Equality Comparison
 
-        #region IComparable<T>
+        #region IComparable Members
 
         /// <summary>
         /// Compares this instance with a specified <see cref="ICharSequence"/> object and indicates whether
@@ -511,10 +448,11 @@ namespace J2N.Text
         /// </returns>
         public int CompareTo(ICharSequence? other)
         {
-            if (this.Value is null) return (other is null || !other.HasValue) ? 0 : -1;
+            if (!HasValue) return (other is null || !other.HasValue) ? 0 : -1;
             if (other is null) return 1;
+            if (ReferenceEquals(this, other)) return 0;
 
-            return this.Value.CompareToOrdinal(other);
+            return Ordinal.CompareString(Value, other);
         }
 
         /// <summary>
@@ -530,10 +468,10 @@ namespace J2N.Text
         /// </returns>
         public int CompareTo(string? other)
         {
-            if (this.Value is null) return (other is null) ? 0 : -1;
+            if (!HasValue) return (other is null) ? 0 : -1;
             if (other is null) return 1;
 
-            return this.Value.CompareToOrdinal(other);
+            return Ordinal.CompareString(Value, other);
         }
 
         /// <summary>
@@ -549,10 +487,11 @@ namespace J2N.Text
         /// </returns>
         public int CompareTo(StringBuilder? other)
         {
-            if (this.Value is null) return (other is null) ? 0 : -1;
+            if (!HasValue) return (other is null) ? 0 : -1;
             if (other is null) return 1;
+            if (ReferenceEquals(Value, other)) return 0;
 
-            return this.Value.CompareToOrdinal(other);
+            return Ordinal.CompareString(Value, other);
         }
 
         /// <summary>
@@ -568,10 +507,18 @@ namespace J2N.Text
         /// </returns>
         public int CompareTo(char[]? other)
         {
-            if (this.Value is null) return (other is null) ? 0 : -1;
+            if (!HasValue) return (other is null) ? 0 : -1;
             if (other is null) return 1;
 
-            return this.Value.CompareToOrdinal(other);
+            return Ordinal.CompareString(Value, other);
+        }
+
+        internal int CompareTo(SynchronizedTextBuilder? other)
+        {
+            if (!HasValue) return (other is null) ? 0 : -1;
+            if (other is null) return 1;
+
+            return Ordinal.CompareString(Value, other.buffer);
         }
 
         /// <summary>
@@ -587,30 +534,44 @@ namespace J2N.Text
         /// </returns>
         public int CompareTo(object? other)
         {
+#if FEATURE_BROKEN_NULL_CHARSEQUENCE_COMPARISON
             if (!HasValue) return (other is null) ? 0 : -1;
             if (other is null) return 1;
+#else
+            if (other is null)
+                return !HasValue ? 0 : 1;
+#endif
+
+            if (other is ISpannable<char> spannable)
+            {
+                if (!spannable.HasValue)
+                    return !HasValue ? 0 : 1;
+                else if (!HasValue)
+                    return -1;
+
+                return Ordinal.CompareString(Value, spannable.AsSpan());
+            }
 
             if (other is string otherString)
-                return CompareTo(otherString);
+                return Ordinal.CompareString(Value, otherString);
             else if (other is StringBuilder otherStringBuilder)
-                return CompareTo(otherStringBuilder);
+                return Ordinal.CompareString(Value, otherStringBuilder);
             else if (other is char[] otherCharArray)
-                return CompareTo(otherCharArray);
-            else if (other is StringCharSequence otherStringCharSequence)
-                return CompareTo(otherStringCharSequence.Value);
-            else if (other is CharArrayCharSequence otherCharArrayCharSequence)
-                return CompareTo(otherCharArrayCharSequence.Value);
-            else if (other is StringBuilderCharSequence otherStringBuilderCharSequence)
-                return CompareTo(otherStringBuilderCharSequence.Value);
-            else if (other is StringBuffer stringBuffer)
-                return CompareTo(stringBuffer.builder);
+                return Ordinal.CompareString(Value, otherCharArray);
             else if (other is ICharSequence otherCharSequence)
-                return CompareTo(otherCharSequence);
+                return Ordinal.CompareString(Value, otherCharSequence);
+            else if (other is SynchronizedTextBuilder otherSynchronizedTextBuilder)
+                return CompareTo(otherSynchronizedTextBuilder);
 
+#if FEATURE_BROKEN_CHARSEQENCE_EXCEPTION_HANDLING
             return Value.CompareToOrdinal(other.ToString());
+#else
+            ThrowHelper.ThrowArgumentException(ExceptionResource.NotSupported_StringComparison);
+            return 0; // unreachable
+#endif
         }
 
-        #endregion
+        #endregion IComparable Members
 
         #region IAppendable
 
@@ -908,6 +869,26 @@ namespace J2N.Text
         ISpanAppendable ISpanAppendable.Append(ReadOnlySpan<char> value) => this.Append(value);
 
         #endregion
-    }
 
+        #region ICopyable<char> Members
+
+        void ICopyable<char>.CopyTo(int sourceIndex, char[] destination, int destinationIndex, int count)
+        {
+            Value?.CopyTo(sourceIndex, destination, destinationIndex, count);
+        }
+
+        #endregion ICopyable<char> Members
+
+        #region ISpanCopyable<char> Members
+
+#if FEATURE_STRINGBUILDER_COPYTO_SPAN
+        void ISpanCopyable<char>.CopyTo(int sourceIndex, Span<char> destination, int count)
+        {
+            Value?.CopyTo(sourceIndex, destination, count);
+        }
+
+#endif
+
+        #endregion ISpanCopyable<char> Members
+    }
 }

@@ -3,6 +3,10 @@
 
 # Custom for Visual Studio
 *.cs     eol=crlf diff=csharp
+
+# Generated C# files use LF so they can be generated consistently across platforms.
+*.generated.cs eol=lf diff=csharp
+
 *.sln    merge=union
 *.csproj merge=union
 *.vbproj merge=union

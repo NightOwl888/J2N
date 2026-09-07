@@ -1,0 +1,670 @@
+﻿#region Copyright 2019-2026 by Shad Storhaug, Licensed under the Apache License, Version 2.0
+/*  Licensed to the Apache Software Foundation (ASF) under one or more
+ *  contributor license agreements.  See the NOTICE file distributed with
+ *  this work for additional information regarding copyright ownership.
+ *  The ASF licenses this file to You under the Apache License, Version 2.0
+ *  (the "License"); you may not use this file except in compliance with
+ *  the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+#endregion
+
+using J2N.Text.CodeGen.Metadata;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+
+namespace J2N.Text.CodeGen.Roslyn
+{
+    public sealed class RoslynTypeExtractor
+    {
+        public TypeModel Extract(
+            IEnumerable<string> sourceTexts,
+            IEnumerable<string> infrastructureSourceTexts,
+            string fullTypeName)
+        {
+            var parseOptions =
+                new CSharpParseOptions(
+                    preprocessorSymbols:
+                    [
+                        "FEATURE_INDEX_RANGE",
+                        "FEATURE_MEMORYMARSHAL_CREATEREADONLYSPAN",
+                        "FEATURE_MEMORYMARSHAL_GETARRAYDATAREFERENCE"
+                    ]);
+
+
+            IEnumerable<string> allSources =
+                sourceTexts.Concat(infrastructureSourceTexts);
+
+            List<SyntaxTree> trees =
+                allSources
+                    .Select(text =>
+                        CSharpSyntaxTree.ParseText(
+                            text,
+                            parseOptions))
+                    .Cast<SyntaxTree>()
+                    .ToList();
+
+            var references = new[]
+            {
+                MetadataReference.CreateFromFile(typeof(object).Assembly.Location),
+                MetadataReference.CreateFromFile(typeof(Enumerable).Assembly.Location),
+                MetadataReference.CreateFromFile(typeof(System.Runtime.GCSettings).Assembly.Location),
+            };
+
+            var compilation =
+                CSharpCompilation.Create(
+                    assemblyName: "CodeGen",
+                    syntaxTrees: trees,
+                    references: references);
+
+            Dictionary<SyntaxTree, SemanticModel> semanticModels =
+                trees.ToDictionary(
+                    t => t,
+                    t => compilation.GetSemanticModel(t));
+
+            INamedTypeSymbol? typeSymbol =
+                compilation.GlobalNamespace
+                    .GetNamespaceMembers()
+                    .SelectMany(GetAllNamespaces)
+                    .SelectMany(n => n.GetTypeMembers())
+                    .FirstOrDefault(t =>
+                        t.ToDisplayString() == fullTypeName);
+
+            if (typeSymbol is null)
+            {
+                throw new InvalidOperationException(
+                    $"Type '{fullTypeName}' not found.");
+            }
+
+            var model = new TypeModel
+            {
+                Namespace = typeSymbol.ContainingNamespace.ToDisplayString(),
+                Name = typeSymbol.Name,
+                SourceType = typeSymbol.Name,
+                IsSealed = typeSymbol.IsSealed,
+            };
+
+            foreach (SyntaxTree tree in trees)
+            {
+                CompilationUnitSyntax root =
+                    tree.GetCompilationUnitRoot();
+
+                foreach (UsingDirectiveSyntax usingDirective in root.Usings)
+                {
+                    string ns = usingDirective.Name?.ToString() ?? "";
+
+                    if (!string.IsNullOrWhiteSpace(ns))
+                    {
+                        model.Usings.Add(ns);
+                    }
+                }
+            }
+
+            IEnumerable<MemberDeclarationSyntax> members =
+                typeSymbol.DeclaringSyntaxReferences
+                    .Select(r => r.GetSyntax())
+                    .OfType<ClassDeclarationSyntax>()
+                    .SelectMany(c => c.Members);
+
+            foreach (MethodDeclarationSyntax method in members.OfType<MethodDeclarationSyntax>())
+            {
+                bool include =
+                    method.Modifiers.Any(SyntaxKind.PublicKeyword)
+                    || method.Modifiers.Any(SyntaxKind.InternalKeyword);
+
+                if (!include)
+                    continue;
+
+                SemanticModel semanticModel =
+                    semanticModels[method.SyntaxTree];
+
+                model.Methods.Add(
+                    ExtractMethod(
+                        method,
+                        semanticModel));
+            }
+
+            foreach (PropertyDeclarationSyntax property in members.OfType<PropertyDeclarationSyntax>())
+            {
+                if (!property.Modifiers.Any(SyntaxKind.PublicKeyword))
+                    continue;
+
+                SemanticModel semanticModel =
+                    semanticModels[property.SyntaxTree];
+
+                model.Properties.Add(
+                    ExtractProperty(
+                        property,
+                        semanticModel));
+            }
+
+            foreach (IndexerDeclarationSyntax indexer in members.OfType<IndexerDeclarationSyntax>())
+            {
+                if (!indexer.Modifiers.Any(SyntaxKind.PublicKeyword))
+                    continue;
+
+                SemanticModel semanticModel =
+                    semanticModels[indexer.SyntaxTree];
+
+                model.Properties.Add(
+                    ExtractIndexer(
+                        indexer,
+                        semanticModel));
+            }
+
+            return model;
+        }
+
+        private static IEnumerable<INamespaceSymbol> GetAllNamespaces(INamespaceSymbol root)
+        {
+            yield return root;
+
+            foreach (INamespaceSymbol child in root.GetNamespaceMembers())
+            {
+                foreach (INamespaceSymbol descendant in GetAllNamespaces(child))
+                {
+                    yield return descendant;
+                }
+            }
+        }
+
+        private static MethodModel ExtractMethod(MethodDeclarationSyntax method, SemanticModel model)
+        {
+            IMethodSymbol? methodSymbol = model.GetDeclaredSymbol(method);
+
+            if (methodSymbol is null)
+            {
+                throw new InvalidOperationException(
+                    $"Unable to resolve symbol for method '{method.Identifier.Text}'.");
+            }
+
+            DocumentationModel? docs = ExtractDocumentation(method);
+
+            string? returnType = method.ReturnType.ToString();
+            var parameters = method.ParameterList.Parameters
+                .Select(p =>
+                {
+                    string parameterType =
+                        p.Type?.ToString() ?? "object";
+
+                    return new ParameterModel
+                    {
+                        Name = p.Identifier.Text,
+
+                        TypeName = parameterType,
+                        SourceTypeName = parameterType,
+
+                        Modifier =
+                            string.Join(
+                                " ",
+                                p.Modifiers.Select(m => m.Text)),
+
+                        IsThis =
+                            p.Modifiers.Any(SyntaxKind.ThisKeyword),
+
+                        DefaultValueExpression =
+                            p.Default?.Value.ToString(),
+
+                        Attributes = ExtractAttributes(p.AttributeLists),
+                    };
+                }).ToList();
+
+            return new MethodModel
+            {
+                Name = method.Identifier.Text,
+                ReturnType = returnType,
+                ReturnsSelf =
+                    methodSymbol.HasAttribute(CodeGenerationAttributeNames.ReturnsSelf),
+                Ignore =
+                    methodSymbol.HasAttribute(
+                        CodeGenerationAttributeNames.Ignore),
+                IsBuilderMethod = false,
+                IsExtensionMethod =
+                    method.ParameterList.Parameters.FirstOrDefault()?
+                        .Modifiers.Any(SyntaxKind.ThisKeyword)
+                    ?? false,
+                IsConstructorProjection =
+                    methodSymbol.HasAttribute(
+                        CodeGenerationAttributeNames.Constructor),
+                IsStatic =
+                    method.Modifiers.Any(SyntaxKind.StaticKeyword),
+                DeclaredAccessibility = methodSymbol.DeclaredAccessibility,
+                IsUnsafe =
+                    IsUnsafeType(returnType)
+                    || parameters.Any(p => IsUnsafeType(p.TypeName)),
+                BodyText = method.Body?.ToFullString()
+                    ?? method.ExpressionBody?.ToFullString(),
+                Documentation = docs,
+                Parameters = parameters,
+                GenericParameters = ExtractGenericParameters(method),
+                Attributes = ExtractAttributes(method.AttributeLists),
+                SkipSynchronization =
+                    methodSymbol.HasAttribute(
+                        CodeGenerationAttributeNames.SkipSynchronization),
+                IsExtensionImplementation =
+                    methodSymbol.HasAttribute(
+                        CodeGenerationAttributeNames.ExtensionImplementation),
+                GenerateForwarder =
+                    methodSymbol.HasAttribute(
+                        CodeGenerationAttributeNames.GenerateForwarder),
+            };
+        }
+
+        private static PropertyModel ExtractProperty(PropertyDeclarationSyntax property, SemanticModel model)
+        {
+            IPropertySymbol? propertySymbol = model.GetDeclaredSymbol(property);
+
+            if (propertySymbol is null)
+            {
+                throw new InvalidOperationException(
+                    $"Unable to resolve symbol for property '{property.Identifier.Text}'.");
+            }
+
+            string typeName = property.Type.ToString();
+
+            bool hasGetter = false;
+            bool hasSetter = false;
+            List<AttributeModel> getterAttributes = [];
+            List<AttributeModel> setterAttributes = [];
+
+            if (property.ExpressionBody is not null)
+            {
+                hasGetter = true;
+            }
+            else if (property.AccessorList is not null)
+            {
+                foreach (AccessorDeclarationSyntax accessor in property.AccessorList.Accessors)
+                {
+                    switch (accessor.Kind())
+                    {
+                        case SyntaxKind.GetAccessorDeclaration:
+                            hasGetter = true;
+                            getterAttributes.AddRange(
+                                ExtractAttributes(accessor.AttributeLists));
+                            break;
+
+                        case SyntaxKind.SetAccessorDeclaration:
+                            hasSetter = true;
+                            setterAttributes.AddRange(
+                                ExtractAttributes(accessor.AttributeLists));
+                            break;
+                    }
+                }
+            }
+
+            bool skipGetterSynchronization =
+                propertySymbol.GetMethod?
+                    .HasAttribute(
+                        CodeGenerationAttributeNames.SkipSynchronization)
+                ?? false;
+
+            bool skipSetterSynchronization =
+                propertySymbol.SetMethod?
+                    .HasAttribute(
+                        CodeGenerationAttributeNames.SkipSynchronization)
+                ?? false;
+
+            return new PropertyModel
+            {
+                Name = property.Identifier.Text,
+                TypeName = typeName,
+                HasGetter = hasGetter,
+                HasSetter = hasSetter,
+                IsIndexer = false,
+                IsStatic =
+                    property.Modifiers.Any(SyntaxKind.StaticKeyword),
+                IsUnsafe = IsUnsafeType(typeName),
+
+                Documentation = ExtractDocumentation(property),
+
+                Attributes = ExtractAttributes(property.AttributeLists),
+                GetterAttributes = getterAttributes,
+                SetterAttributes = setterAttributes,
+
+                Ignore =
+                    propertySymbol.HasAttribute(
+                        CodeGenerationAttributeNames.Ignore),
+
+                SkipGetterSynchronization =
+                    skipGetterSynchronization,
+
+                SkipSetterSynchronization =
+                    skipSetterSynchronization,
+            };
+        }
+
+        private static PropertyModel ExtractIndexer(IndexerDeclarationSyntax indexer, SemanticModel model)
+        {
+            string? typeName = indexer.Type.ToString();
+
+            IPropertySymbol? indexerSymbol = model.GetDeclaredSymbol(indexer);
+
+            if (indexerSymbol is null)
+            {
+                throw new InvalidOperationException(
+                    $"Unable to resolve symbol for indexer '{typeName}'.");
+            }
+
+            bool hasGetter = false;
+            bool hasSetter = false;
+
+            List<AttributeModel> getterAttributes = [];
+            List<AttributeModel> setterAttributes = [];
+
+            if (indexer.AccessorList is not null)
+            {
+                foreach (var accessor in indexer.AccessorList.Accessors)
+                {
+                    switch (accessor.Kind())
+                    {
+                        case SyntaxKind.GetAccessorDeclaration:
+
+                            hasGetter = true;
+                            getterAttributes.AddRange(
+                                ExtractAttributes(accessor.AttributeLists));
+                            break;
+
+                        case SyntaxKind.SetAccessorDeclaration:
+
+                            hasSetter = true;
+                            setterAttributes.AddRange(
+                                ExtractAttributes(accessor.AttributeLists));
+                            break;
+                    }
+                }
+            }
+
+            var parameters = indexer.ParameterList.Parameters
+                .Select(p =>
+                {
+                    string parameterType =
+                        p.Type?.ToString() ?? "object";
+
+                    return new ParameterModel
+                    {
+                        Name = p.Identifier.Text,
+
+                        TypeName = parameterType,
+                        SourceTypeName = parameterType,
+
+                        Modifier =
+                            string.Join(
+                                " ",
+                                p.Modifiers.Select(m => m.Text)),
+
+                        IsThis =
+                            p.Modifiers.Any(SyntaxKind.ThisKeyword),
+
+                        DefaultValueExpression =
+                            p.Default?.Value.ToString(),
+
+                        Attributes = ExtractAttributes(p.AttributeLists),
+                    };
+                }).ToList();
+
+            return new PropertyModel
+            {
+                Name = "this",
+                TypeName = typeName,
+                HasGetter = hasGetter,
+                HasSetter = hasSetter,
+                IsIndexer = true,
+                IsUnsafe =
+                    IsUnsafeType(typeName)
+                    || parameters.Any(p => IsUnsafeType(p.TypeName)),
+                Documentation = ExtractDocumentation(indexer),
+                IndexParameters = parameters,
+
+                Attributes = ExtractAttributes(indexer.AttributeLists),
+                GetterAttributes = getterAttributes,
+                SetterAttributes = setterAttributes,
+
+                Ignore =
+                    indexerSymbol.HasAttribute(
+                        CodeGenerationAttributeNames.Ignore),
+            };
+        }
+
+        private static List<AttributeModel> ExtractAttributes(SyntaxList<AttributeListSyntax> attributeLists)
+        {
+            var result = new List<AttributeModel>();
+
+            foreach (AttributeListSyntax list in attributeLists)
+            {
+                foreach (AttributeSyntax attribute in list.Attributes)
+                {
+                    var model = new AttributeModel
+                    {
+                        Name = attribute.Name.ToString()
+                    };
+
+                    if (attribute.ArgumentList is not null)
+                    {
+                        foreach (AttributeArgumentSyntax arg in attribute.ArgumentList.Arguments)
+                        {
+                            model.Arguments.Add(arg.ToString());
+                        }
+                    }
+
+                    result.Add(model);
+                }
+            }
+
+            return result;
+        }
+
+        private static List<GenericParameterModel> ExtractGenericParameters(MethodDeclarationSyntax method)
+        {
+            var result = new List<GenericParameterModel>();
+
+            if (method.TypeParameterList is null)
+            {
+                return result;
+            }
+
+            foreach (TypeParameterSyntax parameter in method.TypeParameterList.Parameters)
+            {
+                var model = new GenericParameterModel
+                {
+                    Name = parameter.Identifier.Text
+                };
+
+                foreach (TypeParameterConstraintClauseSyntax clause in method.ConstraintClauses)
+                {
+                    if (clause.Name.ToString() != model.Name)
+                    {
+                        continue;
+                    }
+
+                    foreach (TypeParameterConstraintSyntax constraint in clause.Constraints)
+                    {
+                        model.Constraints.Add(constraint.ToString());
+                    }
+                }
+
+                result.Add(model);
+            }
+
+            return result;
+        }
+
+        private static DocumentationCommentTriviaSyntax? GetDocumentationTrivia(
+            MemberDeclarationSyntax member)
+        {
+            return member.GetLeadingTrivia()
+                .Select(t => t.GetStructure())
+                .OfType<DocumentationCommentTriviaSyntax>()
+                .FirstOrDefault();
+        }
+
+        private static DocumentationModel? ExtractDocumentation(
+            MemberDeclarationSyntax member)
+        {
+            DocumentationCommentTriviaSyntax? docs =
+                GetDocumentationTrivia(member);
+
+            if (docs is null)
+                return null;
+
+            DocumentationModel model = new();
+
+            // Preserve every XML element in document order.
+            model.Elements.AddRange(GetAllXmlElements(docs));
+
+            return model;
+        }
+
+
+        private static List<XmlDocumentationElementModel> GetAllXmlElements(
+            DocumentationCommentTriviaSyntax docs)
+        {
+            List<XmlDocumentationElementModel> result = [];
+
+            foreach (XmlNodeSyntax node in docs.Content)
+            {
+                switch (node)
+                {
+                    case XmlElementSyntax element:
+                        {
+                            XmlDocumentationElementModel model = new()
+                            {
+                                ElementName = element.StartTag.Name.LocalName.Text,
+                                InnerXml = NormalizeDocumentationContent(element.Content)
+                            };
+
+                            AddAttributes(model, element.StartTag.Attributes);
+
+                            result.Add(model);
+                            break;
+                        }
+
+                    case XmlEmptyElementSyntax element:
+                        {
+                            XmlDocumentationElementModel model = new()
+                            {
+                                ElementName = element.Name.LocalName.Text,
+                                InnerXml = null
+                            };
+
+                            AddAttributes(model, element.Attributes);
+
+                            result.Add(model);
+                            break;
+                        }
+
+                    case XmlTextSyntax:
+                        // Formatting (newlines/whitespace) between documentation elements (ignore)
+                        break;
+
+                    default:
+                        throw new NotSupportedException(
+                            $"Unsupported XML documentation element syntax '{node.GetType().Name}'.");
+                }
+            }
+
+            return result;
+        }
+
+        private static void AddAttributes(
+            XmlDocumentationElementModel model,
+            SyntaxList<XmlAttributeSyntax> attributes)
+        {
+            foreach (XmlAttributeSyntax attribute in attributes)
+            {
+                switch (attribute)
+                {
+                    case XmlNameAttributeSyntax nameAttribute:
+
+                        model.Attributes.Add(
+                            nameAttribute.Name!.LocalName.Text,
+                            nameAttribute.Identifier!.Identifier.ValueText);
+
+                        break;
+
+                    case XmlTextAttributeSyntax textAttribute:
+
+                        model.Attributes.Add(
+                            textAttribute.Name!.LocalName.Text,
+                            string.Concat(
+                                textAttribute.TextTokens.Select(
+                                    t => t.ValueText)));
+
+                        break;
+
+                    case XmlCrefAttributeSyntax crefAttribute:
+                        model.Attributes.Add(
+                            crefAttribute.Name!.LocalName.Text,
+                            crefAttribute.Cref?.ToString() ?? "");
+
+                        break;
+
+                    default:
+                        throw new NotSupportedException(
+                            $"Unsupported XML documentation attribute syntax '{attribute.GetType().Name}'.");
+                }
+            }
+        }
+
+        private static string NormalizeDocumentationContent(
+            SyntaxList<XmlNodeSyntax> content)
+        {
+            string raw =
+                string.Concat(content.Select(c => c.ToString()));
+
+            string normalized =
+                raw.Replace("\r\n", "\n")
+                   .Replace('\r', '\n');
+
+            List<string> lines =
+                normalized
+                    .Split('\n')
+                    .Select(line =>
+                    {
+                        line = line.TrimEnd();
+
+                        int commentIndex =
+                            line.IndexOf("///", StringComparison.Ordinal);
+
+                        if (commentIndex >= 0)
+                        {
+                            line = line[(commentIndex + 3)..];
+
+                            if (line.StartsWith(" ", StringComparison.Ordinal))
+                            {
+                                line = line[1..];
+                            }
+                        }
+
+                        return line;
+                    })
+                    .ToList();
+
+            while (lines.Count > 0 &&
+                   string.IsNullOrWhiteSpace(lines[0]))
+            {
+                lines.RemoveAt(0);
+            }
+
+            while (lines.Count > 0 &&
+                   string.IsNullOrWhiteSpace(lines[^1]))
+            {
+                lines.RemoveAt(lines.Count - 1);
+            }
+
+            return string.Join(Environment.NewLine, lines);
+        }
+
+        private static bool IsUnsafeType(string typeName)
+        {
+            return typeName.Contains('*');
+        }
+    }
+}

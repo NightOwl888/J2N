@@ -1,6 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <RootNamespace>J2N</RootNamespace>
     <Description>Abstractions for testing in Xunit (common base classes and mocks).</Description>
     <IsTestProject>false</IsTestProject>
@@ -9,6 +10,9 @@
   <PropertyGroup Label="Assembly Publishing">
     <IsPublishable>false</IsPublishable>
   </PropertyGroup>
+
+  <Import Project="..\..\MicrosoftBclMemoryReferenceOverride.targets" />
+  <Import Project="..\..\SystemMemoryReferenceOverride.targets" />
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\src\J2N\J2N.csproj">

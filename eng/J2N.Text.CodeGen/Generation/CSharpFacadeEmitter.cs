@@ -1,0 +1,517 @@
+﻿#region Copyright 2019-2026 by Shad Storhaug, Licensed under the Apache License, Version 2.0
+/*  Licensed to the Apache Software Foundation (ASF) under one or more
+ *  contributor license agreements.  See the NOTICE file distributed with
+ *  this work for additional information regarding copyright ownership.
+ *  The ASF licenses this file to You under the Apache License, Version 2.0
+ *  (the "License"); you may not use this file except in compliance with
+ *  the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+#endregion
+
+using J2N.Text.CodeGen.Metadata;
+using J2N.Text.CodeGen.Projection;
+using Microsoft.CodeAnalysis;
+using System.Text;
+
+namespace J2N.Text.CodeGen.Generation
+{
+    public sealed class CSharpFacadeEmitter
+    {
+        public string EmitFacade(
+            ProjectedTypeModel model,
+            string backingFieldName,
+            FacadeEmitterOptions? options = null)
+        {
+            options ??= new FacadeEmitterOptions();
+
+            bool wrapMembersInLock = options.WrapMembersInLock;
+
+            var sb = new StringBuilder();
+
+            EmitHeader(sb);
+
+            if (options.ClassAccessibility != Accessibility.Public)
+            {
+                sb.AppendLine("#pragma warning disable CS3019 // CLS compliance checking will not be performed because it is not visible from outside this assembly");
+            }
+
+            foreach (string @using in model.Source.Usings.Distinct())
+            {
+                sb.AppendLine($"using {@using};");
+            }
+
+            sb.AppendLine();
+
+            sb.AppendLine($"namespace {model.Namespace}");
+            sb.AppendLine("{");
+            sb.AppendLine();
+
+            string accessibility =
+                FormatAccessibility(options.ClassAccessibility);
+
+            string sealedModifier =
+                options.IsSealed ? "sealed " : "";
+
+            sb.AppendLine($"    {accessibility} {sealedModifier}partial class {model.Name}");
+            sb.AppendLine("    {");
+
+            foreach (PropertyModel property in model.Properties)
+            {
+                bool suppressDocs =
+                    options.SuppressMissingDocumentationWarnings
+                    && !HasDocumentation(property.Documentation);
+
+                if (suppressDocs)
+                {
+                    sb.AppendLine("#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member");
+                }
+
+                EmitProperty(sb, property, backingFieldName, wrapMembersInLock);
+
+                if (suppressDocs)
+                {
+                    sb.AppendLine("#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member");
+                    sb.AppendLine();
+                }
+            }
+
+            string? activeConditional = null;
+
+            foreach (MethodModel method in model.Methods)
+            {
+                if (method.ConditionalCompilationSymbol
+                    != activeConditional)
+                {
+                    if (activeConditional is not null)
+                    {
+                        sb.AppendLine("#endif");
+                        sb.AppendLine();
+                    }
+
+                    activeConditional =
+                        method.ConditionalCompilationSymbol;
+
+                    if (activeConditional is not null)
+                    {
+                        sb.AppendLine(
+                            $"#if {activeConditional}");
+                    }
+                }
+
+                bool suppressDocs =
+                    options.SuppressMissingDocumentationWarnings
+                    && !HasDocumentation(method.Documentation);
+
+                if (suppressDocs)
+                {
+                    sb.AppendLine(
+                        "#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member");
+                }
+
+                EmitMethod(
+                    sb,
+                    method,
+                    model.Name,
+                    model.Source.SourceType,
+                    backingFieldName,
+                    wrapMembersInLock);
+
+                if (suppressDocs)
+                {
+                    sb.AppendLine(
+                        "#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member");
+
+                    sb.AppendLine();
+                }
+            }
+
+            if (activeConditional is not null)
+            {
+                sb.AppendLine("#endif");
+                sb.AppendLine();
+            }
+
+            sb.AppendLine("    }");
+            sb.AppendLine("}");
+
+            return sb.ToString();
+        }
+
+        private static void EmitHeader(
+            StringBuilder sb)
+        {
+            sb.AppendLine("//------------------------------------------------------------------------------");
+            sb.AppendLine("// <auto-generated>");
+            sb.AppendLine("//     This code was generated by a tool.");
+            sb.AppendLine("//");
+            sb.AppendLine("//     Changes to this file may cause incorrect behavior and will be lost if");
+            sb.AppendLine("//     the code is regenerated.");
+            sb.AppendLine("//");
+            sb.AppendLine("//     Instead of editing this file, the MutableTextBuffer*.cs files should be edited");
+            sb.AppendLine("//     which will propagate the edits to this file.");
+            sb.AppendLine("// </auto-generated>");
+            sb.AppendLine("//------------------------------------------------------------------------------");
+
+            sb.AppendLine("#nullable enable");
+            sb.AppendLine();
+        }
+
+        private static void EmitMethod(
+            StringBuilder sb,
+            MethodModel method,
+            string facadeName,
+            string sourceType,
+            string backingFieldName,
+            bool wrapMembersInLock)
+        {
+            CSharpDocumentationEmitter.EmitDocumentation(
+                sb,
+                method.Documentation);
+
+            EmitAttributes(
+                sb,
+                method.Attributes,
+                "        ");
+
+            string parameterList =
+                string.Join(
+                    ", ",
+                    method.Parameters.Select(FormatParameter));
+
+            string genericParameterList =
+                method.GenericParameters.Count == 0
+                    ? ""
+                    : "<" + string.Join(", ", method.GenericParameters.Select(p => p.Name)) + ">";
+
+            string argumentList =
+                string.Join(
+                    ", ",
+                    method.Parameters.Select(
+                        p => GetArgumentExpression(
+                            p,
+                            sourceType,
+                            backingFieldName)));
+
+            string returnType =
+                method.ReturnsSelf
+                    ? facadeName
+                    : method.ReturnType;
+
+            string accessibility =
+                FormatAccessibility(method.DeclaredAccessibility);
+            string unsafeModifier = method.IsUnsafe ? " unsafe" : "";
+            string modifier = IsObjectMethod(method) ? " override" : "";
+
+            bool shouldWrapInLock =
+                wrapMembersInLock
+                && !method.SkipSynchronization;
+
+            sb.AppendLine($"        {accessibility}{modifier}{unsafeModifier} {returnType} {method.Name}{genericParameterList}({parameterList})");
+            foreach (GenericParameterModel parameter in method.GenericParameters)
+            {
+                if (parameter.Constraints.Count == 0)
+                {
+                    continue;
+                }
+
+                sb.Append("            where ");
+                sb.Append(parameter.Name);
+                sb.Append(" : ");
+                sb.AppendLine(string.Join(", ", parameter.Constraints));
+            }
+            sb.AppendLine("        {");
+
+            if (shouldWrapInLock)
+            {
+                sb.AppendLine("            lock (syncRoot)");
+                sb.AppendLine("            {");
+
+                if (method.IsBuilderMethod && method.ReturnsSelf)
+                {
+                    sb.AppendLine($"                {backingFieldName}.{method.Name}({argumentList});");
+                    sb.AppendLine("                return this;");
+                }
+                else if (method.ReturnType == "void")
+                {
+                    sb.AppendLine($"                {backingFieldName}.{method.Name}({argumentList});");
+                }
+                else
+                {
+                    sb.AppendLine($"                return {backingFieldName}.{method.Name}({argumentList});");
+                }
+
+                sb.AppendLine("            }");
+            }
+            else
+            {
+                if (method.IsBuilderMethod && method.ReturnsSelf)
+                {
+                    sb.AppendLine($"            {backingFieldName}.{method.Name}({argumentList});");
+                    sb.AppendLine("            return this;");
+                }
+                else if (method.ReturnType == "void")
+                {
+                    sb.AppendLine($"            {backingFieldName}.{method.Name}({argumentList});");
+                }
+                else
+                {
+                    sb.AppendLine($"            return {backingFieldName}.{method.Name}({argumentList});");
+                }
+            }
+
+            sb.AppendLine("        }");
+            sb.AppendLine();
+        }
+
+        private static void EmitProperty(
+            StringBuilder sb,
+            PropertyModel property,
+            string backingFieldName,
+            bool wrapMembersInLock)
+        {
+            CSharpDocumentationEmitter.EmitDocumentation(
+                sb,
+                property.Documentation);
+
+            EmitAttributes(
+                sb,
+                property.Attributes,
+                "        ");
+
+            string unsafeModifier = property.IsUnsafe ? " unsafe" : "";
+            bool wrapGetter =
+                wrapMembersInLock
+                && !property.SkipGetterSynchronization;
+            bool wrapSetter =
+                wrapMembersInLock
+                && !property.SkipSetterSynchronization;
+
+            if (!property.IsIndexer)
+            {
+                sb.AppendLine($"        public{unsafeModifier} {property.TypeName} {property.Name}");
+                sb.AppendLine("        {");
+
+                if (property.HasGetter)
+                {
+                    EmitAttributes(sb, property.GetterAttributes, "            ");
+                    if (wrapGetter)
+                    {
+                        sb.AppendLine("            get");
+                        sb.AppendLine("            {");
+
+                        sb.AppendLine("                lock (syncRoot)");
+                        sb.AppendLine("                {");
+                        sb.AppendLine($"                    return {backingFieldName}.{property.Name};");
+                        sb.AppendLine("                }");
+
+                        sb.AppendLine("            }");
+                    }
+                    else
+                    {
+                        sb.AppendLine($"            get => {backingFieldName}.{property.Name};");
+                    }
+                }
+
+                if (property.HasSetter)
+                {
+                    EmitAttributes(sb, property.SetterAttributes, "            ");
+                    if (wrapSetter)
+                    {
+                        sb.AppendLine("            set");
+                        sb.AppendLine("            {");
+
+                        sb.AppendLine("                lock (syncRoot)");
+                        sb.AppendLine("                {");
+                        sb.AppendLine($"                    {backingFieldName}.{property.Name} = value;");
+                        sb.AppendLine("                }");
+
+                        sb.AppendLine("            }");
+                    }
+                    else
+                    {
+                        sb.AppendLine($"            set => {backingFieldName}.{property.Name} = value;");
+                    }
+                }
+
+                sb.AppendLine("        }");
+                sb.AppendLine();
+                return;
+            }
+
+            // Indexer
+            string indexParams =
+                string.Join(", ",
+                    property.IndexParameters.Select(p => $"{p.TypeName} {p.Name}"));
+
+            string args =
+                string.Join(", ",
+                    property.IndexParameters.Select(p => p.Name));
+
+            sb.AppendLine($"        public{unsafeModifier} {property.TypeName} this[{indexParams}]");
+            sb.AppendLine("        {");
+
+            if (property.HasGetter)
+            {
+                EmitAttributes(sb, property.GetterAttributes, "            ");
+                if (wrapGetter)
+                {
+                    sb.AppendLine("            get");
+                    sb.AppendLine("            {");
+
+                    sb.AppendLine("                lock (syncRoot)");
+                    sb.AppendLine("                {");
+                    sb.AppendLine($"                    return {backingFieldName}[{args}];");
+                    sb.AppendLine("                }");
+
+                    sb.AppendLine("            }");
+                }
+                else
+                {
+                    sb.AppendLine($"            get => {backingFieldName}[{args}];");
+                }
+            }
+
+            if (property.HasSetter)
+            {
+                EmitAttributes(sb, property.GetterAttributes, "            ");
+                if (wrapSetter)
+                {
+                    sb.AppendLine("            set");
+                    sb.AppendLine("            {");
+
+                    sb.AppendLine("                lock (syncRoot)");
+                    sb.AppendLine("                {");
+                    sb.AppendLine($"                    {backingFieldName}[{args}] = value;");
+                    sb.AppendLine("                }");
+
+                    sb.AppendLine("            }");
+                }
+                else
+                {
+                    sb.AppendLine($"            set => {backingFieldName}[{args}] = value;");
+                }
+            }
+
+            sb.AppendLine("        }");
+            sb.AppendLine();
+        }
+
+        private static void EmitAttributes(
+            StringBuilder sb,
+            IEnumerable<AttributeModel> attributes,
+            string indent = "        ")
+        {
+            foreach (AttributeModel attribute in attributes
+                .Where(a =>
+                    !a.Name.StartsWith("CodeGeneration", StringComparison.Ordinal)))
+            {
+                sb.Append(indent);
+                sb.AppendLine(FormatAttribute(attribute));
+            }
+        }
+
+        private static bool IsObjectMethod(MethodModel method)
+        {
+            if (method.Name == "ToString"
+                && method.Parameters.Count == 0)
+            {
+                return true;
+            }
+
+            if (method.Name == "GetHashCode"
+                && method.Parameters.Count == 0)
+            {
+                return true;
+            }
+
+            if (method.Name == "Equals"
+                && method.Parameters.Count == 1 && (method.Parameters[0].TypeName == "object?" || method.Parameters[0].TypeName == "object"))
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        private static bool HasDocumentation(
+            DocumentationModel? docs)
+        {
+            return docs is not null
+                && docs.Elements.Count != 0;
+        }
+
+        private static string GetArgumentExpression(
+            ParameterModel parameter,
+            string sourceType,
+            string backingFieldName)
+        {
+            if (parameter.SourceTypeName == sourceType + "?")
+            {
+                return $"{parameter.Name}?.{backingFieldName}";
+            }
+
+            if (parameter.SourceTypeName == sourceType)
+            {
+                return $"{parameter.Name}.{backingFieldName}";
+            }
+
+            return parameter.Name;
+        }
+
+        private static string FormatParameter(ParameterModel parameter)
+        {
+            string attributes =
+                parameter.Attributes.Count == 0
+                    ? ""
+                    : string.Join(
+                        " ",
+                        parameter.Attributes.Select(FormatAttribute)) + " ";
+
+            string modifier =
+                string.IsNullOrWhiteSpace(parameter.Modifier)
+                    ? ""
+                    : parameter.Modifier + " ";
+
+            string defaultValue =
+                parameter.DefaultValueExpression is null
+                    ? ""
+                    : $" = {parameter.DefaultValueExpression}";
+
+            return
+                $"{attributes}{modifier}{parameter.TypeName} {parameter.Name}{defaultValue}";
+        }
+
+        private static string FormatAttribute(AttributeModel attribute)
+        {
+            if (attribute.Arguments.Count == 0)
+            {
+                return $"[{attribute.Name}]";
+            }
+
+            return
+                $"[{attribute.Name}({string.Join(", ", attribute.Arguments)})]";
+        }
+
+        private static string FormatAccessibility(Accessibility accessibility)
+        {
+            return accessibility switch
+            {
+                Accessibility.Public => "public",
+                Accessibility.Internal => "internal",
+                Accessibility.Private => "private",
+                Accessibility.Protected => "protected",
+                Accessibility.ProtectedOrInternal => "protected internal",
+                Accessibility.ProtectedAndInternal => "private protected",
+                _ => "private"
+            };
+        }
+    }
+}

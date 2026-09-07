@@ -6,6 +6,9 @@
     <!-- .NET Framework doesn't support range or index operators -->
     <NoWarn Label="Use index operator">$(NoWarn);IDE0056</NoWarn>
     <NoWarn Label="Use range operator">$(NoWarn);IDE0057</NoWarn>
+    <NoWarn Label="Use ArgumentNullException throw helper">$(NoWarn);CA1510</NoWarn>
+    <NoWarn Label="Use ArgumentException throw helper">$(NoWarn);CA1511</NoWarn>
+    <NoWarn Label="Use ArgumentOutOfRangeException throw helper">$(NoWarn);CA1512</NoWarn>
   </PropertyGroup>
 
   <PropertyGroup Label="Solution-level Publish to Project-specific Directory">
@@ -21,6 +24,7 @@
     <DefineConstants>$(DefineConstants);FEATURE_ENCODINGPROVIDERS</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_ENCODING_GETSTRING_BYTEPTR</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_EXCEPTIONDISPATCHINFO</DefineConstants>
+    <DefineConstants>$(DefineConstants);FEATURE_INDEX_RANGE</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_RANDOMNUMBERGENERATOR_GETBYTES_OFFSET_COUNT</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_RUNTIMEINFORMATION</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_STRINGBUILDER_APPEND_CHARPTR</DefineConstants>
@@ -46,7 +50,12 @@
   <PropertyGroup Condition=" $(TargetFramework.StartsWith('net8.')) Or $(TargetFramework.StartsWith('net9.')) ">
 
     <DefineConstants>$(DefineConstants);FEATURE_BITOPERATIONS_UINTPTR</DefineConstants>
+    <!-- J2N TODO: Finish CompositeFormat support for MutableTextBuffer -->
+    <!--<DefineConstants>$(DefineConstants);FEATURE_COMPOSITEFORMAT</DefineConstants>-->
     <DefineConstants>$(DefineConstants);FEATURE_EXCEPTION_STATIC_GUARDCLAUSES</DefineConstants>
+    <DefineConstants>$(DefineConstants);FEATURE_INLINEARRAYATTRIBUTE</DefineConstants>
+    <DefineConstants>$(DefineConstants);FEATURE_MEMORYEXTENSIONS_REPLACE_T_T</DefineConstants>
+    <DefineConstants>$(DefineConstants);FEATURE_SPANFORMATTABLE</DefineConstants>
     <!-- J2N NOTE: This is technically supported in .NET 6.0, but we don't have a target for it so we are testing .NET Standard 2.1, which doesn't support it -->
     <DefineConstants>$(DefineConstants);FEATURE_STRINGBUILDER_GETCHUNKS</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_UNICODE_DEFINED_0x9FFF</DefineConstants>
@@ -56,12 +65,16 @@
   <!-- Features in .NET 7.x, .NET 8.x and .NET 9.x only -->
   <PropertyGroup Condition=" $(TargetFramework.StartsWith('net7.')) Or $(TargetFramework.StartsWith('net8.')) Or $(TargetFramework.StartsWith('net9.')) ">
 
+    <!-- J2N NOTE: This is technically supported in .NET 5.0, but tesing .NET Standard 2.1 is done on .NET 6.0, so we need to report this as .NET 7.0 or higher -->
+    <DefineConstants>$(DefineConstants);FEATURE_GC_ALLOCATEUNINITIALIZEDARRAY</DefineConstants>
     <!-- J2N NOTE: This API exists on .NET Framework/.NET Standard, but only Ordinal is optimized. All other StringComparison values
          allocate 2 strings to make the comparison. As such, it should be avoided on .NET Framework. -->
     <DefineConstants>$(DefineConstants);FEATURE_MEMORYEXTENSIONS_INDEXOF_STRINGCOMPARISON</DefineConstants>
     <!-- J2N NOTE: This is technically supported in .NET 6.0, but we don't have a target for it so we are testing .NET Standard 2.1, which doesn't support it -->
     <DefineConstants>$(DefineConstants);FEATURE_MEMORYEXTENSIONS_LASTINDEXOF_STRINGCOMPARISON</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_REQUIRESDYNAMICCODEATTRIBUTE</DefineConstants>
+    <DefineConstants>$(DefineConstants);FEATURE_STRINGSYNTAXATTRIBUTE</DefineConstants>
+    <DefineConstants>$(DefineConstants);FEATURE_UNICODE_DEFINED_0x9FFF</DefineConstants>
     
   </PropertyGroup>
 
@@ -81,6 +94,9 @@
   <PropertyGroup Condition=" $(TargetFramework.StartsWith('net5.')) Or $(TargetFramework.StartsWith('net6.')) Or $(TargetFramework.StartsWith('net8.')) Or $(TargetFramework.StartsWith('net9.')) ">
 
     <DefineConstants>$(DefineConstants);FEATURE_CULTUREINFO_PREDEFINEDONLY</DefineConstants>
+    
+    <DefineConstants>$(DefineConstants);FEATURE_HALF</DefineConstants>
+    <DefineConstants>$(DefineConstants);FEATURE_ISEXTERNALINIT</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_MEMORYMARSHAL_GETARRAYDATAREFERENCE</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_UNCONDITIONALSUPPRESSMESSAGEATTRIBUTE</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_UNICODE_DEFINED_0x30000</DefineConstants>
@@ -94,6 +110,7 @@
     <DefineConstants>$(DefineConstants);FEATURE_COLLECTIONSMARSHAL_ASSPAN_LIST</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_NUMERICBITOPERATIONS</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_MATH_LOG2</DefineConstants>
+    <DefineConstants>$(DefineConstants);FEATURE_RUNE</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_STRING_GETHASHCODE_READONLYSPAN_STRINGCOMPARISON</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_STRING_GETHASHCODE_STRINGCOMPARISON</DefineConstants>
 
@@ -105,10 +122,8 @@
     <DefineConstants>$(DefineConstants);FEATURE_BIGINTEGER_CTOR_READONLYSPAN</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_BUFFER_MEMORYCOPY</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_CHARUNICODEINFO_GETUNICODECATEGORY_CODEPOINT</DefineConstants>
-
-    <!--<DefineConstants>$(DefineConstants);FEATURE_CONDITIONALWEAKTABLE_ENUMERATOR</DefineConstants>
-    <DefineConstants>$(DefineConstants);FEATURE_CONDITIONALWEAKTABLE_ADDORUPDATE</DefineConstants>-->
-
+    <DefineConstants>$(DefineConstants);FEATURE_MEMORYMARSHAL_CREATEREADONLYSPAN</DefineConstants>
+    <DefineConstants>$(DefineConstants);FEATURE_MEMORYMARSHAL_CREATESPAN</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_NUMBER_TRYFORMAT</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_RANDOM_NEXTBYTES_SPAN</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_RANDOMNUMBERGENERATOR_FILL_SPAN</DefineConstants>
@@ -130,9 +145,13 @@
   <!-- Features in .NET Framework 4+, .NET Standard 2.x, .NET Core 2.x, .NET Core 3.x, .NET 5.x, .NET 6.x, .NET 8.x, and .NET 9.x -->
   <PropertyGroup Condition=" $(TargetFramework.StartsWith('net4')) Or $(TargetFramework.StartsWith('netstandard2.')) Or $(TargetFramework.StartsWith('netcoreapp2.')) Or $(TargetFramework.StartsWith('netcoreapp3.')) Or $(TargetFramework.StartsWith('net5.')) Or $(TargetFramework.StartsWith('net6.')) Or $(TargetFramework.StartsWith('net8.')) Or $(TargetFramework.StartsWith('net9.')) ">
 
+    <DefineConstants>$(DefineConstants);FEATURE_BROKEN_CHARSEQENCE_EXCEPTION_HANDLING</DefineConstants>
+    <DefineConstants>$(DefineConstants);FEATURE_BROKEN_NULL_CHARSEQUENCE_COMPARISON</DefineConstants>
+    
     <!-- NOTE: Microsoft's recommendation is not to use the ICloneable interface.
         To add it to the build, just add /p:IncludeICloneable to the command line. -->
     <DefineConstants Condition=" '$(IncludeICloneable)' == 'true' ">$(DefineConstants);FEATURE_CLONEABLE</DefineConstants>
+    
     <DefineConstants>$(DefineConstants);FEATURE_SERIALIZABLE</DefineConstants>
     <!-- serializable exeptions were added back in .NET Core 2.0.4: https://docs.microsoft.com/en-us/dotnet/standard/serialization/binary-serialization#net-core -->
     <DefineConstants>$(DefineConstants);FEATURE_SERIALIZABLE_EXCEPTIONS</DefineConstants>
@@ -169,7 +188,12 @@
 
   </PropertyGroup>
 
-  <!-- Features in .NET Framework 4.5+ only (excluding .NET Framework 4.7.1, the target framework we use for testing .NET Standard 2.0)  -->
+  <!-- Features in .NET Framework 4.5+ only -->
+  <PropertyGroup Condition="$(TargetFramework.StartsWith('net45')) Or $(TargetFramework.StartsWith('net46')) Or $(TargetFramework.StartsWith('net47')) Or $(TargetFramework.StartsWith('net48'))">
+    <DefineConstants Condition="'$(TargetFramework)' != 'net47'">$(DefineConstants);FEATURE_INDEX_RANGE</DefineConstants>
+  </PropertyGroup>
+
+  <!-- Features in .NET Framework 4.0+ only (excluding .NET Framework 4.7.1, the target framework we use for testing .NET Standard 2.0)  -->
   <PropertyGroup Condition="$(TargetFramework.StartsWith('net4')) And '$(TargetFramework)' != 'net471'">
 
     <DefineConstants>$(DefineConstants);FEATURE_SERIALIZABLE_RANDOM</DefineConstants>
@@ -177,7 +201,7 @@
 
   </PropertyGroup>
 
-  <!-- Features in .NET Framework 4.5+ only -->
+  <!-- Features in .NET Framework 4.0+ only -->
   <PropertyGroup Condition="$(TargetFramework.StartsWith('net4'))">
 
     <DefineConstants>$(DefineConstants);FEATURE_MEMORYMAPPEDFILESECURITY</DefineConstants>

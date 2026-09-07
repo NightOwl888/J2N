@@ -1,8 +1,10 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+using J2N.Globalization;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.Text;
 
@@ -63,7 +65,10 @@ namespace J2N.Text
 #if FEATURE_SERIALIZABLE_STRINGS
     [Serializable]
 #endif
-    public sealed class StringBuffer : IAppendable, ICharSequence, ISpanAppendable
+    public sealed class StringBuffer : IAppendable, ICharSequence, ISpanAppendable, ICopyable<char>
+#if FEATURE_STRINGBUILDER_COPYTO_SPAN
+        , ISpanCopyable<char>
+#endif
     {
         private const int DefaultCapacity = 16;
 
@@ -1721,7 +1726,17 @@ namespace J2N.Text
 
         #region Equals
 
-#if FEATURE_STRINGBUILDER_EQUALS_READONLYSPAN
+        internal bool Equals(ICharSequence? other)
+        {
+            if (other is null || !other.HasValue)
+                return false;
+            if (this == other) return true;
+
+            lock (syncRoot)
+            {
+                return EqualsCore(other);
+            }
+        }
 
         /// <summary>
         /// Returns a value indicating whether this instance is equal to a specified object.
@@ -1731,9 +1746,8 @@ namespace J2N.Text
         public bool Equals(ReadOnlySpan<char> span)
         {
             lock (syncRoot)
-                return builder.Equals(span);
+                return EqualsCore(span);
         }
-#endif
 
         /// <summary>
         /// Returns a value indicating whether this instance is equal to a specified object.
@@ -1757,8 +1771,10 @@ namespace J2N.Text
         /// and <see cref="MaxCapacity"/> values; otherwise, <c>false</c>.</returns>
         public bool Equals(StringBuilder? other)
         {
+            if (other is null) return false;
+
             lock (syncRoot)
-                return builder.Equals(other);
+                return Ordinal.Equal(builder, other);
         }
 
         /// <summary>
@@ -1769,7 +1785,12 @@ namespace J2N.Text
         /// and <see cref="MaxCapacity"/> values; otherwise, <c>false</c>.</returns>
         public bool Equals(StringBuffer? other)
         {
-            return Equals(other?.builder);
+            if (other is null) return false;
+
+            // J2N NOTE: The JDK does not lock obj, so we do not either. It is up to the
+            // caller to decide whether or not to lock the passed in object.
+            lock (syncRoot)
+                return Ordinal.Equal(builder, other.builder);
         }
 
         /// <summary>
@@ -1781,16 +1802,59 @@ namespace J2N.Text
         public override bool Equals(object? obj)
         {
             if (obj is null) return false;
-
-            if (obj is StringBuffer stringBuffer)
-                return Equals(stringBuffer);
-            if (obj is StringBuilder stringBuilder)
-                return Equals(stringBuilder);
-            if (obj is StringBuilderCharSequence stringBuilder1)
-                return Equals(stringBuilder1);
-
+            if (this == obj) return true;
             lock (syncRoot)
-                return builder.Equals(obj);
+            {
+                return EqualsCore(obj);
+            }
+        }
+
+        private bool EqualsCore(ICharSequence other)
+        {
+            Debug.Assert(other is not null);
+            Debug.Assert(other != this);
+
+            // J2N NOTE: The JDK does not lock obj, so we do not either. It is up to the
+            // caller to decide whether or not to lock the passed in object. So, we have to override
+            // Ordinal.Equal() behavior here until that change can be addressed in Ordinal.Equal().
+            return Ordinal.Equal(builder, other);
+        }
+
+        private bool EqualsCore(ReadOnlySpan<char> other)
+        {
+            return Ordinal.Equal(builder, other);
+        }
+
+        private bool EqualsCore(object other)
+        {
+            Debug.Assert(other != null);
+
+            if (other is ISpannable<char> spannable)
+            {
+                if (!spannable.HasValue)
+                    return false;
+
+                return Ordinal.Equal(builder, spannable.AsSpan());
+            }
+
+            if (other is ICharSequence otherCharSequence)
+            {
+                return EqualsCore(otherCharSequence);
+            }
+            else if (other is SynchronizedTextBuilder otherSynchronizedTextBuilder)
+            {
+                // J2N NOTE: The JDK does not lock obj, so we do not either. It is up to the
+                // caller to decide whether or not to lock the passed in object.
+                return Ordinal.Equal(builder, otherSynchronizedTextBuilder.AsSpan());
+            }
+            else if (other is string otherString)
+                return EqualsCore(otherString);
+            else if (other is char[] otherCharArray)
+                return EqualsCore(otherCharArray);
+            else if (other is StringBuilder otherStringBuilder)
+                return Ordinal.Equal(builder, otherStringBuilder);
+
+            return false; // Cannot be converted to a char sequence, reject
         }
 
         #endregion Equals
@@ -2717,5 +2781,31 @@ namespace J2N.Text
         string ICharSequence.ToString() => ToString();
 
         #endregion
+
+        #region ICopyable<char> Members
+
+        void ICopyable<char>.CopyTo(int sourceIndex, char[] destination, int destinationIndex, int count)
+        {
+            lock (syncRoot)
+            {
+                builder?.CopyTo(sourceIndex, destination, destinationIndex, count);
+            }
+        }
+
+        #endregion ICopyable<char> Members
+
+        #region ISpanCopyable<char> Members
+
+#if FEATURE_STRINGBUILDER_COPYTO_SPAN
+        void ISpanCopyable<char>.CopyTo(int sourceIndex, Span<char> destination, int count)
+        {
+            lock (syncRoot)
+            {
+                builder?.CopyTo(sourceIndex, destination, count);
+            }
+        }
+#endif
+
+        #endregion ISpanCopyable<char> Members
     }
 }

@@ -31,6 +31,7 @@ namespace J2N.Text
     ///     of fractional digits and .</description></item>
     ///     <item><description><see cref="float"/> and <see cref="double"/> negative zeros are displayed as -0.0 and other data types are patched to display
     ///     negative zero on all .NET target platforms lower than .NET Core 3.0.</description></item>
+    ///     <item><description><see cref="decimal"/> values are formatted with a compact format that switches to exponent format when over 6 significant digits.</description></item>
     ///     <item><description><see cref="bool"/> values are lowercased to <c>"true"</c> and <c>"false"</c>, rather than the default .NET <c>"True"</c> and <c>"False"</c>.</description></item>
     ///     <item><description><see cref="ICollection{T}"/> and <see cref="IDictionary{TKey, TValue}"/> types are formatted to include all of their element
     ///     values (and nested collection values).</description></item>
@@ -186,6 +187,7 @@ namespace J2N.Text
         ///     of fractional digits and .</description></item>
         ///     <item><description><see cref="float"/> and <see cref="double"/> negative zeros are displayed as -0.0 and other data types are patched to display
         ///     negative zero on all .NET target platforms lower than .NET Core 3.0.</description></item>
+        ///     <item><description><see cref="decimal"/> values are formatted with a compact format that switches to exponent format when over 6 significant digits.</description></item>
         ///     <item><description><see cref="bool"/> values are lowercased to <c>"true"</c> and <c>"false"</c>, rather than the default .NET <c>"True"</c> and <c>"False"</c>.</description></item>
         ///     <item><description><see cref="ICollection{T}"/> and <see cref="IDictionary{TKey, TValue}"/> types are formatted to include all of their element
         ///     values (and nested collection values).</description></item>
@@ -204,6 +206,8 @@ namespace J2N.Text
                 return DotNetNumber.FormatDouble(d, format, formatProvider);
             else if (arg is float f)
                 return DotNetNumber.FormatSingle(f, format, formatProvider);
+            else if (arg is decimal dec)
+                return DotNetNumber.FormatDecimal(dec, format, formatProvider);
             else if (arg is bool b)
                 return FormatBoolean(b);
             else if (arg is IStructuralFormattable sf)
@@ -227,8 +231,6 @@ namespace J2N.Text
 
 //            // After this point, we don't have any implementations so we make the call
 //            // to ConvertFormat() explicitly.
-//            else if (arg is decimal dec)
-//                return dec.ToString(Number.ConvertFormat(format), formatProvider);
 //            else if (arg is ushort us)
 //                return us.ToString(Number.ConvertFormat(format), formatProvider);
 //            else if (arg is uint ui)
@@ -259,7 +261,7 @@ namespace J2N.Text
             return null!; // Not handled by this formatter
         }
 
-        private static string FormatBoolean(bool b)
+        internal static string FormatBoolean(bool b)
         {
             return b ? "true" : "false";
         }

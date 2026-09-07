@@ -1,38 +1,34 @@
 ﻿using NUnit.Framework;
 using System;
-using System.Collections.Generic;
-using System.Globalization;
 using System.Text;
-using System.Threading;
+#nullable enable
 
 namespace J2N.Text
 {
-    public class TestStringCharSequence : CharSequenceTestBase<StringCharSequence>
+    internal class TestStringCharSequence : CharSequenceTestBase<StringCharSequence>
     {
-        public override void SetUp()
-        {
-            base.SetUp();
-
-            target = new StringCharSequence(String1);
-            nullTarget = new StringCharSequence(null);
-            equalTarget = new StringCharSequence(String1);
-            unequalTarget = new StringCharSequence(String2);
-            emptyTarget = new StringCharSequence(string.Empty);
-        }
-
+        public override StringCharSequence CreateClassUnderTest(string? value)
+            => CharSequenceUtil.CreateStringCharSequence(value);
 
         [Test]
-        public void TestValue()
+        public void Test_Value()
         {
+            var target = CreateClassUnderTest(String1);
+
             Assert.IsNotNull(target.Value);
             Assert.AreEqual(String1, target.Value);
 
-            Assert.IsNull(nullTarget.Value);
+            Assert.IsNull(CreateClassUnderTest(null).Value);
         }
 
         [Test]
-        public virtual void TestEqualityOperators()
+        public virtual void Test_EqualityOperators()
         {
+            var target = CreateClassUnderTest(String1);
+            var equalTarget = CreateClassUnderTest(String1);
+            var unequalTarget = CreateClassUnderTest(String2);
+            var nullTarget = CreateClassUnderTest(null);
+
             Assert.IsTrue(target == equalTarget);
             Assert.IsTrue(equalTarget == target);
 
@@ -45,8 +41,8 @@ namespace J2N.Text
             Assert.IsFalse(target == String2);
             Assert.IsFalse(String2 == target);
 
-            Assert.IsTrue(nullTarget == (string)null);
-            Assert.IsTrue((string)null == nullTarget);
+            Assert.IsTrue(nullTarget == (string?)null);
+            Assert.IsTrue((string?)null == nullTarget);
 
 
             Assert.IsFalse(target != equalTarget);
@@ -61,8 +57,259 @@ namespace J2N.Text
             Assert.IsFalse(target != String1);
             Assert.IsFalse(String1 != target);
 
-            Assert.IsFalse(nullTarget != (string)null);
-            Assert.IsFalse((string)null != nullTarget);
+            Assert.IsFalse(nullTarget != (string?)null);
+            Assert.IsFalse((string?)null != nullTarget);
+        }
+
+
+
+        [Test]
+        public void Test_Equals_Object_WithMatchingFormattedInteger_ReturnsFalse()
+        {
+            int value = 123;
+            var target = CreateClassUnderTest(value.ToString());
+#if FEATURE_BROKEN_CHARSEQENCE_EXCEPTION_HANDLING
+            Assert.IsTrue(target.Equals(value));
+#else
+            Assert.IsFalse(target.Equals(value));
+#endif
+        }
+
+        [TestCaseSource(typeof(CharSequenceUtil), nameof(CharSequenceUtil.Equals_Object_TestData))]
+        public void Test_Equals_Object(string? leftValue, object? rightValue, bool expected)
+        {
+            try
+            {
+                Assert.AreEqual(expected, CreateClassUnderTest(leftValue).Equals(rightValue));
+            }
+            finally
+            {
+                CharSequenceUtil.Dispose(rightValue);
+            }
+        }
+
+        [TestCaseSource(typeof(CharSequenceUtil), nameof(CharSequenceUtil.Equals_ICharSequence_TestData))]
+        public void Test_Equals_ICharSequence(string? leftValue, ICharSequence? rightValue, bool expected)
+        {
+            try
+            {
+                Assert.AreEqual(expected, CreateClassUnderTest(leftValue).Equals(rightValue));
+            }
+            finally
+            {
+                CharSequenceUtil.Dispose(rightValue);
+            }
+        }
+
+        [TestCaseSource(typeof(CharSequenceUtil), nameof(CharSequenceUtil.Equals_StringCharSequence_TestData))]
+        public void Test_Equals_StringCharSequence(string? leftValue, StringCharSequence? rightValue, bool expected)
+        {
+            try
+            {
+                Assert.AreEqual(expected, CreateClassUnderTest(leftValue).Equals(rightValue));
+            }
+            finally
+            {
+                CharSequenceUtil.Dispose(rightValue);
+            }
+        }
+
+        [TestCaseSource(typeof(CharSequenceUtil), nameof(CharSequenceUtil.Equals_CharArrayCharSequence_TestData))]
+        public void Test_Equals_CharArrayCharSequence(string? leftValue, CharArrayCharSequence? rightValue, bool expected)
+        {
+            try
+            {
+                Assert.AreEqual(expected, CreateClassUnderTest(leftValue).Equals(rightValue));
+            }
+            finally
+            {
+                CharSequenceUtil.Dispose(rightValue);
+            }
+        }
+
+        [TestCaseSource(typeof(CharSequenceUtil), nameof(CharSequenceUtil.Equals_StringBuilderCharSequence_TestData))]
+        public void Test_Equals_StringBuilderCharSequence(string? leftValue, StringBuilderCharSequence? rightValue, bool expected)
+        {
+            try
+            {
+                Assert.AreEqual(expected, CreateClassUnderTest(leftValue).Equals(rightValue));
+            }
+            finally
+            {
+                CharSequenceUtil.Dispose(rightValue);
+            }
+        }
+
+
+        [TestCaseSource(typeof(CharSequenceUtil), nameof(CharSequenceUtil.Equals_String_TestData))]
+        public void Test_Equals_String(string? leftValue, string? rightValue, bool expected)
+        {
+            try
+            {
+                Assert.AreEqual(expected, CreateClassUnderTest(leftValue).Equals(rightValue));
+            }
+            finally
+            {
+                CharSequenceUtil.Dispose(rightValue);
+            }
+        }
+
+        [TestCaseSource(typeof(CharSequenceUtil), nameof(CharSequenceUtil.Equals_CharArray_TestData))]
+        public void Test_Equals_CharArray(string? leftValue, char[]? rightValue, bool expected)
+        {
+            try
+            {
+                Assert.AreEqual(expected, CreateClassUnderTest(leftValue).Equals(rightValue));
+            }
+            finally
+            {
+                CharSequenceUtil.Dispose(rightValue);
+            }
+        }
+
+        [TestCaseSource(typeof(CharSequenceUtil), nameof(CharSequenceUtil.Equals_StringBuilder_TestData))]
+        public void Test_Equals_StringBuilder(string? leftValue, StringBuilder? rightValue, bool expected)
+        {
+            try
+            {
+                Assert.AreEqual(expected, CreateClassUnderTest(leftValue).Equals(rightValue));
+            }
+            finally
+            {
+                CharSequenceUtil.Dispose(rightValue);
+            }
+        }
+
+
+        [Test]
+        public void Test_CompareTo_Object_WithMatchingFormattedInteger_ThrowsArgumentException()
+        {
+            int value = 123;
+            var target = CreateClassUnderTest(value.ToString());
+#if FEATURE_BROKEN_CHARSEQENCE_EXCEPTION_HANDLING
+            Assert.AreEqual(0, target.CompareTo(value));
+#else
+            Assert.Throws<ArgumentException>(() => target.CompareTo(value));
+#endif
+        }
+
+        [TestCaseSource(typeof(CharSequenceUtil), nameof(CharSequenceUtil.CompareTo_Object_TestData))]
+        public void Test_CompareTo_Object(string? leftValue, object? rightValue, int expected)
+        {
+            try
+            {
+#if FEATURE_BROKEN_NULL_CHARSEQUENCE_COMPARISON
+                if (leftValue is null)
+                {
+                    if (rightValue is ICharSequence cs2 && !cs2.HasValue)
+                        expected = -1; // J2N TODO: Fix broken null comparison (should be 0)
+                }
+#endif
+
+                Assert.AreEqual(expected, CreateClassUnderTest(leftValue).CompareTo(rightValue));
+            }
+            finally
+            {
+                CharSequenceUtil.Dispose(rightValue);
+            }
+        }
+
+        [TestCaseSource(typeof(CharSequenceUtil), nameof(CharSequenceUtil.CompareTo_ICharSequence_TestData))]
+        public void Test_CompareTo_ICharSequence(string? leftValue, ICharSequence? rightValue, int expected)
+        {
+            try
+            {
+                Assert.AreEqual(expected, CreateClassUnderTest(leftValue).CompareTo(rightValue));
+            }
+            finally
+            {
+                CharSequenceUtil.Dispose(rightValue);
+            }
+        }
+
+        [TestCaseSource(typeof(CharSequenceUtil), nameof(CharSequenceUtil.CompareTo_StringCharSequence_TestData))]
+        public void Test_CompareTo_StringCharSequence(string? leftValue, StringCharSequence? rightValue, int expected)
+        {
+            try
+            {
+                Assert.AreEqual(expected, CreateClassUnderTest(leftValue).CompareTo(rightValue));
+            }
+            finally
+            {
+                CharSequenceUtil.Dispose(rightValue);
+            }
+        }
+
+        [TestCaseSource(typeof(CharSequenceUtil), nameof(CharSequenceUtil.CompareTo_CharArrayCharSequence_TestData))]
+        public void Test_CompareTo_CharArrayCharSequence(string? leftValue, CharArrayCharSequence? rightValue, int expected)
+        {
+            try
+            {
+                Assert.AreEqual(expected, CreateClassUnderTest(leftValue).CompareTo(rightValue));
+            }
+            finally
+            {
+                CharSequenceUtil.Dispose(rightValue);
+            }
+        }
+
+        [TestCaseSource(typeof(CharSequenceUtil), nameof(CharSequenceUtil.CompareTo_StringBuilderCharSequence_TestData))]
+        public void Test_CompareTo_StringBuilderCharSequence(string? leftValue, StringBuilderCharSequence? rightValue, int expected)
+        {
+            try
+            {
+                Assert.AreEqual(expected, CreateClassUnderTest(leftValue).CompareTo(rightValue));
+            }
+            finally
+            {
+                CharSequenceUtil.Dispose(rightValue);
+            }
+        }
+
+        [TestCaseSource(typeof(CharSequenceUtil), nameof(CharSequenceUtil.CompareTo_String_TestData))]
+        public void Test_CompareTo_String(string? leftValue, string? rightValue, int expected)
+        {
+            try
+            {
+                Assert.AreEqual(expected, CreateClassUnderTest(leftValue).CompareTo(rightValue));
+            }
+            finally
+            {
+                CharSequenceUtil.Dispose(rightValue);
+            }
+        }
+
+        [TestCaseSource(typeof(CharSequenceUtil), nameof(CharSequenceUtil.CompareTo_CharArray_TestData))]
+        public void Test_CompareTo_CharArray(string? leftValue, char[]? rightValue, int expected)
+        {
+            try
+            {
+                Assert.AreEqual(expected, CreateClassUnderTest(leftValue).CompareTo(rightValue));
+            }
+            finally
+            {
+                CharSequenceUtil.Dispose(rightValue);
+            }
+        }
+
+        [TestCaseSource(typeof(CharSequenceUtil), nameof(CharSequenceUtil.CompareTo_StringBuilder_TestData))]
+        public void Test_CompareTo_StringBuilder(string? leftValue, StringBuilder? rightValue, int expected)
+        {
+            try
+            {
+                Assert.AreEqual(expected, CreateClassUnderTest(leftValue).CompareTo(rightValue));
+            }
+            finally
+            {
+                CharSequenceUtil.Dispose(rightValue);
+            }
+        }
+
+
+        [TestCaseSource(typeof(CharSequenceUtil), nameof(CharSequenceUtil.GetHashCode_String_TestData))]
+        public void Test_GetHashCode(string? value, int expected)
+        {
+            Assert.AreEqual(expected, CreateClassUnderTest(value).GetHashCode());
         }
     }
 }

@@ -1,37 +1,19 @@
 ﻿using NUnit.Framework;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.Text;
 using System.Threading;
+#nullable enable
 
 namespace J2N.Text
 {
     [TestFixture]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0052:Remove unread private members", Justification = "Use static for consistency")]
-    public class TestCharSequenceComparer
+    internal class TestCharSequenceComparer
     {
-        private static readonly string String1 = "This is a portriat of a Turkish czar";
-        private static readonly string String2 = "This is not an equal string";
-        private static readonly string String3 = String1 + String2;
-        private static readonly string String4 = String1.Substring(0, String1.Length - 10);
+        private CultureInfo originalCulture = null!;
 
-        private static readonly char[] CharArray1 = String1.ToCharArray();
-        private static readonly char[] CharArray2 = String2.ToCharArray();
-        private static readonly char[] CharArray3 = String3.ToCharArray();
-        private static readonly char[] CharArray4 = String4.ToCharArray();
-
-        private static readonly StringBuilder StringBuilder1 = new StringBuilder(String1);
-        private static readonly StringBuilder StringBuilder2 = new StringBuilder(String2);
-        private static readonly StringBuilder StringBuilder3 = new StringBuilder(String3);
-        private static readonly StringBuilder StringBuilder4 = new StringBuilder(String4);
-
-        private CultureInfo originalCulture;
-        private ICharSequence target;
-        private ICharSequence nullTarget;
-        private ICharSequence equalTarget;
-        private ICharSequence unequalTarget;
-        private ICharSequence emptyTarget;
 
         [SetUp]
         public virtual void SetUp()
@@ -43,12 +25,6 @@ namespace J2N.Text
             CultureInfo.CurrentCulture
 #endif
                  = new CultureInfo("tr-TR");
-
-            target = new CharArrayCharSequence(CharArray1);
-            nullTarget = new CharArrayCharSequence(null);
-            equalTarget = new CharArrayCharSequence(CharArray1);
-            unequalTarget = new CharArrayCharSequence(CharArray2);
-            emptyTarget = new CharArrayCharSequence(string.Empty.ToCharArray());
         }
 
         [TearDown]
@@ -62,120 +38,884 @@ namespace J2N.Text
                 = originalCulture;
         }
 
+        #region Equals
+
         [Test]
-        public void TestCompare()
+        public void Test_Equals_Object_SynchronizedTextBuilderCharSequence_SynchronizedTextBuilderCharSequence_ShouldNotDeadlock_WhenComparingOppositeDirections()
         {
-            Assert.AreEqual(0, CharSequenceComparer.Ordinal.Compare(target, String1));
-            Assert.AreEqual(0, CharSequenceComparer.Ordinal.Compare(target, new StringBuilder(String1)));
-            Assert.AreEqual(0, CharSequenceComparer.Ordinal.Compare(target, String1.ToCharArray()));
-            Assert.AreEqual(0, CharSequenceComparer.Ordinal.Compare(target, String1.AsCharSequence()));
-            Assert.AreEqual(0, CharSequenceComparer.Ordinal.Compare(target, new StringBuilderCharSequence(new StringBuilder(String1))));
-            Assert.AreEqual(0, CharSequenceComparer.Ordinal.Compare(target, new CharArrayCharSequence(String1.ToCharArray())));
+            const string Value = "abcdefghijklmnopqrstuvwxyz";
 
-            Assert.Greater(0, CharSequenceComparer.Ordinal.Compare(target, String2));
-            Assert.Greater(0, CharSequenceComparer.Ordinal.Compare(target, new StringBuilder(String2)));
-            Assert.Greater(0, CharSequenceComparer.Ordinal.Compare(target, String2.ToCharArray()));
-            Assert.Greater(0, CharSequenceComparer.Ordinal.Compare(target, String2.AsCharSequence()));
-            Assert.Greater(0, CharSequenceComparer.Ordinal.Compare(target, new StringBuilderCharSequence(new StringBuilder(String2))));
-            Assert.Greater(0, CharSequenceComparer.Ordinal.Compare(target, new CharArrayCharSequence(String2.ToCharArray())));
-
-            Assert.Greater(0, CharSequenceComparer.Ordinal.Compare(target, String3));
-            Assert.Greater(0, CharSequenceComparer.Ordinal.Compare(target, new StringBuilder(String3)));
-            Assert.Greater(0, CharSequenceComparer.Ordinal.Compare(target, String3.ToCharArray()));
-            Assert.Greater(0, CharSequenceComparer.Ordinal.Compare(target, String3.AsCharSequence()));
-            Assert.Greater(0, CharSequenceComparer.Ordinal.Compare(target, new StringBuilderCharSequence(new StringBuilder(String3))));
-            Assert.Greater(0, CharSequenceComparer.Ordinal.Compare(target, new CharArrayCharSequence(String3.ToCharArray())));
-
-            Assert.Less(0, CharSequenceComparer.Ordinal.Compare(target, String4));
-            Assert.Less(0, CharSequenceComparer.Ordinal.Compare(target, new StringBuilder(String4)));
-            Assert.Less(0, CharSequenceComparer.Ordinal.Compare(target, String4.ToCharArray()));
-            Assert.Less(0, CharSequenceComparer.Ordinal.Compare(target, String4.AsCharSequence()));
-            Assert.Less(0, CharSequenceComparer.Ordinal.Compare(target, new StringBuilderCharSequence(new StringBuilder(String4))));
-            Assert.Less(0, CharSequenceComparer.Ordinal.Compare(target, new CharArrayCharSequence(String4.ToCharArray())));
-
-            Assert.Greater(0, CharSequenceComparer.Ordinal.Compare(nullTarget, String1));
-            Assert.Less(0, CharSequenceComparer.Ordinal.Compare(target, (string)null));
-            Assert.Less(0, CharSequenceComparer.Ordinal.Compare(target, (StringBuilder)null));
-            Assert.Less(0, CharSequenceComparer.Ordinal.Compare(target, (char[])null));
+            AssertExtensions.AssertNoABDeadlock(
+                () => CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence(Value),
+                () => CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence(Value),
+                (seq1, seq2) =>
+                {
+                    Assert.IsTrue(CharSequenceComparer.Ordinal.Equals((object?)seq1, (object?)seq2));
+                });
         }
 
         [Test]
-        public void TestEquals()
+        public void Test_Equals_Object_SynchronizedTextBuilderCharSequence_SynchronizedTextBuilder_ShouldNotDeadlock_WhenComparingOppositeDirections()
         {
-            Assert.IsTrue(CharSequenceComparer.Ordinal.Equals(target, String1));
-            Assert.IsTrue(CharSequenceComparer.Ordinal.Equals(target, String1.ToCharArray()));
-            Assert.IsTrue(CharSequenceComparer.Ordinal.Equals(target, new StringBuilder(String1)));
-            Assert.IsTrue(CharSequenceComparer.Ordinal.Equals(target, new StringCharSequence(String1)));
-            Assert.IsTrue(CharSequenceComparer.Ordinal.Equals(target, new StringBuilderCharSequence(new StringBuilder(String1))));
-            Assert.IsTrue(CharSequenceComparer.Ordinal.Equals(target, new CharArrayCharSequence(String1.ToCharArray())));
+            const string Value = "abcdefghijklmnopqrstuvwxyz";
 
-            Assert.IsFalse(CharSequenceComparer.Ordinal.Equals(target, String2));
-            Assert.IsFalse(CharSequenceComparer.Ordinal.Equals(target, String2.ToCharArray()));
-            Assert.IsFalse(CharSequenceComparer.Ordinal.Equals(target, new StringBuilder(String2)));
-            Assert.IsFalse(CharSequenceComparer.Ordinal.Equals(target, new StringCharSequence(String2)));
-            Assert.IsFalse(CharSequenceComparer.Ordinal.Equals(target, new StringBuilderCharSequence(new StringBuilder(String2))));
-            Assert.IsFalse(CharSequenceComparer.Ordinal.Equals(target, new CharArrayCharSequence(String2.ToCharArray())));
-
-
-            Assert.IsTrue(CharSequenceComparer.Ordinal.Equals(target, (object)String1));
-            Assert.IsTrue(CharSequenceComparer.Ordinal.Equals(target, (object)String1.ToCharArray()));
-            Assert.IsTrue(CharSequenceComparer.Ordinal.Equals(target, (object)new StringBuilder(String1)));
-            Assert.IsTrue(CharSequenceComparer.Ordinal.Equals(target, (object)new StringCharSequence(String1)));
-            Assert.IsTrue(CharSequenceComparer.Ordinal.Equals(target, (object)new StringBuilderCharSequence(new StringBuilder(String1))));
-            Assert.IsTrue(CharSequenceComparer.Ordinal.Equals(target, (object)new CharArrayCharSequence(String1.ToCharArray())));
-
-            Assert.IsFalse(CharSequenceComparer.Ordinal.Equals(target, (object)String2));
-            Assert.IsFalse(CharSequenceComparer.Ordinal.Equals(target, (object)String2.ToCharArray()));
-            Assert.IsFalse(CharSequenceComparer.Ordinal.Equals(target, (object)new StringBuilder(String2)));
-            Assert.IsFalse(CharSequenceComparer.Ordinal.Equals(target, (object)new StringCharSequence(String2)));
-            Assert.IsFalse(CharSequenceComparer.Ordinal.Equals(target, (object)new StringBuilderCharSequence(new StringBuilder(String2))));
-            Assert.IsFalse(CharSequenceComparer.Ordinal.Equals(target, (object)new CharArrayCharSequence(String2.ToCharArray())));
+            AssertExtensions.AssertNoABDeadlock(
+                () => CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence(Value),
+                () => CharSequenceUtil.CreateSynchronizedTextBuilder(Value),
+                (seq1, seq2) =>
+                {
+                    Assert.IsTrue(CharSequenceComparer.Ordinal.Equals((object?)seq1, (object?)seq2));
+                });
         }
 
         [Test]
-        public virtual void TestGetHashCode()
+        public void Test_Equals_Object_SynchronizedTextBuilderCharSequence_StringBuffer_ShouldNotDeadlock_WhenComparingOppositeDirections()
         {
-            Assert.AreEqual(CharSequenceComparer.Ordinal.GetHashCode(String1), CharSequenceComparer.Ordinal.GetHashCode(target));
-            Assert.AreEqual(new StringBuilderCharSequence(new StringBuilder(String1)).GetHashCode(), CharSequenceComparer.Ordinal.GetHashCode(target));
-            Assert.AreEqual(new CharArrayCharSequence(String1.ToCharArray()).GetHashCode(), CharSequenceComparer.Ordinal.GetHashCode(target));
+            const string Value = "abcdefghijklmnopqrstuvwxyz";
 
-            Assert.AreEqual(CharSequenceComparer.Ordinal.GetHashCode(String1), CharSequenceComparer.Ordinal.GetHashCode(CharArray1));
-            Assert.AreEqual(new StringBuilderCharSequence(new StringBuilder(String1)).GetHashCode(), CharSequenceComparer.Ordinal.GetHashCode(CharArray1));
-            Assert.AreEqual(new CharArrayCharSequence(String1.ToCharArray()).GetHashCode(), CharSequenceComparer.Ordinal.GetHashCode(CharArray1));
-
-            Assert.AreEqual(CharSequenceComparer.Ordinal.GetHashCode(String1), CharSequenceComparer.Ordinal.GetHashCode(StringBuilder1));
-            Assert.AreEqual(new StringBuilderCharSequence(new StringBuilder(String1)).GetHashCode(), CharSequenceComparer.Ordinal.GetHashCode(StringBuilder1));
-            Assert.AreEqual(new CharArrayCharSequence(String1.ToCharArray()).GetHashCode(), CharSequenceComparer.Ordinal.GetHashCode(StringBuilder1));
-
-            Assert.AreEqual(CharSequenceComparer.Ordinal.GetHashCode(String1), CharSequenceComparer.Ordinal.GetHashCode(String1));
-            Assert.AreEqual(new StringBuilderCharSequence(new StringBuilder(String1)).GetHashCode(), CharSequenceComparer.Ordinal.GetHashCode(String1));
-            Assert.AreEqual(new CharArrayCharSequence(String1.ToCharArray()).GetHashCode(), CharSequenceComparer.Ordinal.GetHashCode(String1));
-
-            Assert.AreNotEqual(CharSequenceComparer.Ordinal.GetHashCode(String2), CharSequenceComparer.Ordinal.GetHashCode(target));
-            Assert.AreNotEqual(new StringBuilderCharSequence(new StringBuilder(String2)).GetHashCode(), CharSequenceComparer.Ordinal.GetHashCode(target));
-            Assert.AreNotEqual(new CharArrayCharSequence(String2.ToCharArray()).GetHashCode(), CharSequenceComparer.Ordinal.GetHashCode(target));
-
-            Assert.AreNotEqual(CharSequenceComparer.Ordinal.GetHashCode(String2), CharSequenceComparer.Ordinal.GetHashCode(CharArray1));
-            Assert.AreNotEqual(new StringBuilderCharSequence(new StringBuilder(String2)).GetHashCode(), CharSequenceComparer.Ordinal.GetHashCode(CharArray1));
-            Assert.AreNotEqual(new CharArrayCharSequence(String2.ToCharArray()).GetHashCode(), CharSequenceComparer.Ordinal.GetHashCode(CharArray1));
-
-            Assert.AreNotEqual(CharSequenceComparer.Ordinal.GetHashCode(String2), CharSequenceComparer.Ordinal.GetHashCode(StringBuilder1));
-            Assert.AreNotEqual(new StringBuilderCharSequence(new StringBuilder(String2)).GetHashCode(), CharSequenceComparer.Ordinal.GetHashCode(StringBuilder1));
-            Assert.AreNotEqual(new CharArrayCharSequence(String2.ToCharArray()).GetHashCode(), CharSequenceComparer.Ordinal.GetHashCode(StringBuilder1));
-
-            Assert.AreNotEqual(CharSequenceComparer.Ordinal.GetHashCode(String2), CharSequenceComparer.Ordinal.GetHashCode(String1));
-            Assert.AreNotEqual(new StringBuilderCharSequence(new StringBuilder(String2)).GetHashCode(), CharSequenceComparer.Ordinal.GetHashCode(String1));
-            Assert.AreNotEqual(new CharArrayCharSequence(String2.ToCharArray()).GetHashCode(), CharSequenceComparer.Ordinal.GetHashCode(String1));
-
-            Assert.AreEqual(0, CharSequenceComparer.Ordinal.GetHashCode(emptyTarget));
-            Assert.AreEqual(0, CharSequenceComparer.Ordinal.GetHashCode(new char[0]));
-            Assert.AreEqual(0, CharSequenceComparer.Ordinal.GetHashCode(new StringBuilder()));
-            Assert.AreEqual(0, CharSequenceComparer.Ordinal.GetHashCode(string.Empty));
-
-            Assert.AreEqual(int.MaxValue, CharSequenceComparer.Ordinal.GetHashCode(nullTarget));
-            Assert.AreEqual(int.MaxValue, CharSequenceComparer.Ordinal.GetHashCode((char[])null));
-            Assert.AreEqual(int.MaxValue, CharSequenceComparer.Ordinal.GetHashCode((StringBuilder)null));
-            Assert.AreEqual(int.MaxValue, CharSequenceComparer.Ordinal.GetHashCode((string)null));
+            AssertExtensions.AssertNoABDeadlock(
+                () => CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence(Value),
+                () => CharSequenceUtil.CreateStringBuffer(Value),
+                (seq1, seq2) =>
+                {
+                    Assert.IsTrue(CharSequenceComparer.Ordinal.Equals((object?)seq1, (object?)seq2));
+                });
         }
+
+        [Test]
+        public void Test_Equals_Object_StringBuffer_SynchronizedTextBuilderCharSequence_ShouldNotDeadlock_WhenComparingOppositeDirections()
+        {
+            const string Value = "abcdefghijklmnopqrstuvwxyz";
+
+            AssertExtensions.AssertNoABDeadlock(
+                () => CharSequenceUtil.CreateStringBuffer(Value),
+                () => CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence(Value),
+                (seq1, seq2) =>
+                {
+                    Assert.IsTrue(CharSequenceComparer.Ordinal.Equals((object?)seq1, (object?)seq2));
+                });
+        }
+
+        [Test]
+        public void Test_Equals_Object_StringBuffer_SynchronizedTextBuilder_ShouldNotDeadlock_WhenComparingOppositeDirections()
+        {
+            const string Value = "abcdefghijklmnopqrstuvwxyz";
+
+            AssertExtensions.AssertNoABDeadlock(
+                () => CharSequenceUtil.CreateStringBuffer(Value),
+                () => CharSequenceUtil.CreateSynchronizedTextBuilder(Value),
+                (seq1, seq2) =>
+                {
+                    Assert.IsTrue(CharSequenceComparer.Ordinal.Equals((object?)seq1, (object?)seq2));
+                });
+        }
+
+        [Test]
+        public void Test_Equals_Object_StringBuffer_StringBuffer_ShouldNotDeadlock_WhenComparingOppositeDirections()
+        {
+            const string Value = "abcdefghijklmnopqrstuvwxyz";
+
+            AssertExtensions.AssertNoABDeadlock(
+                () => CharSequenceUtil.CreateStringBuffer(Value),
+                () => CharSequenceUtil.CreateStringBuffer(Value),
+                (seq1, seq2) =>
+                {
+                    Assert.IsTrue(CharSequenceComparer.Ordinal.Equals((object?)seq1, (object?)seq2));
+                });
+        }
+
+        [Test]
+        public void Test_Equals_ICharSequence_SynchronizedTextBuilderCharSequence_SynchronizedTextBuilderCharSequence_ShouldNotDeadlock_WhenComparingOppositeDirections()
+        {
+            const string Value = "abcdefghijklmnopqrstuvwxyz";
+
+            AssertExtensions.AssertNoABDeadlock(
+                () => CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence(Value),
+                () => CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence(Value),
+                (seq1, seq2) =>
+                {
+                    Assert.IsTrue(CharSequenceComparer.Ordinal.Equals(seq1, seq2));
+                });
+        }
+
+        [Test]
+        public void Test_Equals_ICharSequence_SynchronizedTextBuilderCharSequence_StringBuffer_ShouldNotDeadlock_WhenComparingOppositeDirections()
+        {
+            const string Value = "abcdefghijklmnopqrstuvwxyz";
+
+            AssertExtensions.AssertNoABDeadlock(
+                () => CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence(Value),
+                () => CharSequenceUtil.CreateStringBuffer(Value),
+                (seq1, seq2) =>
+                {
+                    Assert.IsTrue(CharSequenceComparer.Ordinal.Equals(seq1, seq2));
+                });
+        }
+
+        [Test]
+        public void Test_Equals_ICharSequence_StringBuffer_SynchronizedTextBuilderCharSequence_ShouldNotDeadlock_WhenComparingOppositeDirections()
+        {
+            const string Value = "abcdefghijklmnopqrstuvwxyz";
+
+            AssertExtensions.AssertNoABDeadlock(
+                () => CharSequenceUtil.CreateStringBuffer(Value),
+                () => CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence(Value),
+                (seq1, seq2) =>
+                {
+                    Assert.IsTrue(CharSequenceComparer.Ordinal.Equals(seq1, seq2));
+                });
+        }
+
+
+        public static IEnumerable<TestCaseData> Equals_Object_Object_TestData()
+        {
+            foreach (var leftFactory in CharSequenceUtil.ComparableObjectFactories)
+            {
+                foreach (var rightFactory in CharSequenceUtil.ComparableObjectFactories)
+                {
+                    foreach (var item in CharSequenceUtil.Equals_String_TestData())
+                    {
+                        var leftArg = leftFactory((string?)item[0]);
+                        var rightArg = rightFactory((string?)item[1]);
+                        var expectedArg = item[2];
+
+                        yield return new TestCaseData(leftArg, rightArg, expectedArg)
+                            .FormatArguments(leftArg, rightArg);
+                    }
+                }
+            }
+        }
+
+        [TestCaseSource(nameof(Equals_Object_Object_TestData))]
+        public void Test_Equals_Object_Object(object? leftValue, object? rightValue, bool expected)
+        {
+            try
+            {
+#if FEATURE_BROKEN_NULL_CHARSEQUENCE_COMPARISON
+                if (leftValue is null)
+                {
+                    if (rightValue is ICharSequence cs2 && !cs2.HasValue)
+                        expected = false; // J2N TODO: Fix broken null comparison
+                }
+                if (leftValue is ICharSequence cs1 && !cs1.HasValue)
+                {
+                    if (rightValue is null)
+                        expected = false; // J2N TODO: Fix broken null comparison
+                }
+#endif
+
+                Assert.AreEqual(expected, CharSequenceComparer.Ordinal.Equals(leftValue, rightValue));
+            }
+            finally
+            {
+                CharSequenceUtil.Dispose(leftValue);
+                CharSequenceUtil.Dispose(rightValue);
+            }
+        }
+
+#if !FEATURE_BROKEN_CHARSEQENCE_EXCEPTION_HANDLING
+        [TestCaseSource(nameof(Object_Object_Invalid_TestData))]
+        public void Test_Equals_Object_Object_InvalidObjectType_ReturnsFalse(object? leftValue, object? rightValue)
+        {
+            Assert.IsFalse(CharSequenceComparer.Ordinal.Equals(leftValue, rightValue));
+        }
+
+        [Test]
+        public void Test_Equals_Object_WithMatchingFormattedInteger_ReturnsFalse()
+        {
+            int value = 123;
+            Assert.IsFalse(CharSequenceComparer.Ordinal.Equals(value.ToString(), value));
+            Assert.IsFalse(CharSequenceComparer.Ordinal.Equals(value, value.ToString()));
+        }
+#endif
+
+        public static IEnumerable<TestCaseData> Equals_ICharSequence_ICharSequence_TestData()
+        {
+            foreach (var leftFactory in CharSequenceUtil.ICharSequenceFactories)
+            {
+                foreach (var rightFactory in CharSequenceUtil.ICharSequenceFactories)
+                {
+                    foreach (var item in CharSequenceUtil.Equals_String_TestData())
+                    {
+                        var leftArg = leftFactory((string?)item[0]);
+                        var rightArg = rightFactory((string?)item[1]);
+                        var expectedArg = item[2];
+
+                        yield return new TestCaseData(leftArg, rightArg, expectedArg)
+                            .FormatArguments(leftArg, rightArg);
+                    }
+                }
+            }
+        }
+
+        [TestCaseSource(nameof(Equals_ICharSequence_ICharSequence_TestData))]
+        public void Test_Equals_ICharSequence_ICharSequence(ICharSequence? leftValue, ICharSequence? rightValue, bool expected)
+        {
+            try
+            {
+                Assert.AreEqual(expected, CharSequenceComparer.Ordinal.Equals(leftValue, rightValue));
+            }
+            finally
+            {
+                CharSequenceUtil.Dispose(leftValue);
+                CharSequenceUtil.Dispose(rightValue);
+            }
+        }
+
+        public static IEnumerable<TestCaseData> Equals_ICharSequence_String_TestData()
+        {
+            var rightFactories = new Func<string?, object?>[]
+            {
+                CharSequenceUtil.CreateString,
+            };
+
+            foreach (var leftFactory in CharSequenceUtil.ICharSequenceFactories)
+            {
+                foreach (var rightFactory in rightFactories)
+                {
+                    foreach (var item in CharSequenceUtil.Equals_String_TestData())
+                    {
+                        var leftArg = leftFactory((string?)item[0]);
+                        var rightArg = rightFactory((string?)item[1]);
+                        var expectedArg = item[2];
+
+                        yield return new TestCaseData(leftArg, rightArg, expectedArg)
+                            .FormatArguments(leftArg, rightArg);
+                    }
+                }
+            }
+        }
+
+        [TestCaseSource(nameof(Equals_ICharSequence_String_TestData))]
+        public void Test_Equals_ICharSequence_String(ICharSequence? leftValue, string? rightValue, bool expected)
+        {
+            try
+            {
+                Assert.AreEqual(expected, CharSequenceComparer.Ordinal.Equals(leftValue, rightValue));
+            }
+            finally
+            {
+                CharSequenceUtil.Dispose(leftValue);
+            }
+        }
+
+        public static IEnumerable<TestCaseData> Equals_ICharSequence_CharArray_TestData()
+        {
+            var rightFactories = new Func<string?, object?>[]
+            {
+                CharSequenceUtil.CreateCharArray,
+            };
+
+            foreach (var leftFactory in CharSequenceUtil.ICharSequenceFactories)
+            {
+                foreach (var rightFactory in rightFactories)
+                {
+                    foreach (var item in CharSequenceUtil.Equals_String_TestData())
+                    {
+                        var leftArg = leftFactory((string?)item[0]);
+                        var rightArg = rightFactory((string?)item[1]);
+                        var expectedArg = item[2];
+
+                        yield return new TestCaseData(leftArg, rightArg, expectedArg)
+                            .FormatArguments(leftArg, rightArg);
+                    }
+                }
+            }
+        }
+
+        [TestCaseSource(nameof(Equals_ICharSequence_CharArray_TestData))]
+        public void Test_Equals_ICharSequence_CharArray(ICharSequence? leftValue, char[]? rightValue, bool expected)
+        {
+            try
+            {
+                Assert.AreEqual(expected, CharSequenceComparer.Ordinal.Equals(leftValue, rightValue));
+            }
+            finally
+            {
+                CharSequenceUtil.Dispose(leftValue);
+            }
+        }
+
+        public static IEnumerable<TestCaseData> Equals_ICharSequence_StringBuilder_TestData()
+        {
+            var rightFactories = new Func<string?, object?>[]
+            {
+                CharSequenceUtil.CreateStringBuilder,
+            };
+
+            foreach (var leftFactory in CharSequenceUtil.ICharSequenceFactories)
+            {
+                foreach (var rightFactory in rightFactories)
+                {
+                    foreach (var item in CharSequenceUtil.Equals_String_TestData())
+                    {
+                        var leftArg = leftFactory((string?)item[0]);
+                        var rightArg = rightFactory((string?)item[1]);
+                        var expectedArg = item[2];
+
+                        yield return new TestCaseData(leftArg, rightArg, expectedArg)
+                            .FormatArguments(leftArg, rightArg);
+                    }
+                }
+            }
+        }
+
+        [TestCaseSource(nameof(Equals_ICharSequence_StringBuilder_TestData))]
+        public void Test_Equals_ICharSequence_StringBuilder(ICharSequence? leftValue, StringBuilder? rightValue, bool expected)
+        {
+            try
+            {
+                Assert.AreEqual(expected, CharSequenceComparer.Ordinal.Equals(leftValue, rightValue));
+            }
+            finally
+            {
+                CharSequenceUtil.Dispose(leftValue);
+            }
+        }
+
+        #endregion Equals
+
+
+        #region Compare
+
+        [Test]
+        public void Test_Compare_Object_SynchronizedTextBuilderCharSequence_SynchronizedTextBuilderCharSequence_ShouldNotDeadlock_WhenComparingOppositeDirections()
+        {
+            const string Value = "abcdefghijklmnopqrstuvwxyz";
+
+            AssertExtensions.AssertNoABDeadlock(
+                () => CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence(Value),
+                () => CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence(Value),
+                (seq1, seq2) =>
+                {
+                    Assert.AreEqual(0, CharSequenceComparer.Ordinal.Compare((object?)seq1, (object?)seq2));
+                });
+        }
+
+        [Test]
+        public void Test_Compare_Object_SynchronizedTextBuilderCharSequence_SynchronizedTextBuilder_ShouldNotDeadlock_WhenComparingOppositeDirections()
+        {
+            const string Value = "abcdefghijklmnopqrstuvwxyz";
+
+            AssertExtensions.AssertNoABDeadlock(
+                () => CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence(Value),
+                () => CharSequenceUtil.CreateSynchronizedTextBuilder(Value),
+                (seq1, seq2) =>
+                {
+                    Assert.AreEqual(0, CharSequenceComparer.Ordinal.Compare((object?)seq1, (object?)seq2));
+                });
+        }
+
+        [Test]
+        public void Test_Compare_Object_SynchronizedTextBuilderCharSequence_StringBuffer_ShouldNotDeadlock_WhenComparingOppositeDirections()
+        {
+            const string Value = "abcdefghijklmnopqrstuvwxyz";
+
+            AssertExtensions.AssertNoABDeadlock(
+                () => CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence(Value),
+                () => CharSequenceUtil.CreateStringBuffer(Value),
+                (seq1, seq2) =>
+                {
+                    Assert.AreEqual(0, CharSequenceComparer.Ordinal.Compare((object?)seq1, (object?)seq2));
+                });
+        }
+
+        [Test]
+        public void Test_Compare_Object_StringBuffer_SynchronizedTextBuilderCharSequence_ShouldNotDeadlock_WhenComparingOppositeDirections()
+        {
+            const string Value = "abcdefghijklmnopqrstuvwxyz";
+
+            AssertExtensions.AssertNoABDeadlock(
+                () => CharSequenceUtil.CreateStringBuffer(Value),
+                () => CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence(Value),
+                (seq1, seq2) =>
+                {
+                    Assert.AreEqual(0, CharSequenceComparer.Ordinal.Compare((object?)seq1, (object?)seq2));
+                });
+        }
+
+        [Test]
+        public void Test_Compare_Object_StringBuffer_SynchronizedTextBuilder_ShouldNotDeadlock_WhenComparingOppositeDirections()
+        {
+            const string Value = "abcdefghijklmnopqrstuvwxyz";
+
+            AssertExtensions.AssertNoABDeadlock(
+                () => CharSequenceUtil.CreateStringBuffer(Value),
+                () => CharSequenceUtil.CreateSynchronizedTextBuilder(Value),
+                (seq1, seq2) =>
+                {
+                    Assert.AreEqual(0, CharSequenceComparer.Ordinal.Compare((object?)seq1, (object?)seq2));
+                });
+        }
+
+        [Test]
+        public void Test_Compare_Object_StringBuffer_StringBuffer_ShouldNotDeadlock_WhenComparingOppositeDirections()
+        {
+            const string Value = "abcdefghijklmnopqrstuvwxyz";
+
+            AssertExtensions.AssertNoABDeadlock(
+                () => CharSequenceUtil.CreateStringBuffer(Value),
+                () => CharSequenceUtil.CreateStringBuffer(Value),
+                (seq1, seq2) =>
+                {
+                    Assert.AreEqual(0, CharSequenceComparer.Ordinal.Compare((object?)seq1, (object?)seq2));
+                });
+        }
+
+        [Test]
+        public void Test_Compare_ICharSequence_SynchronizedTextBuilderCharSequence_SynchronizedTextBuilderCharSequence_ShouldNotDeadlock_WhenComparingOppositeDirections()
+        {
+            const string Value = "abcdefghijklmnopqrstuvwxyz";
+
+            AssertExtensions.AssertNoABDeadlock(
+                () => CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence(Value),
+                () => CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence(Value),
+                (seq1, seq2) =>
+                {
+                    Assert.AreEqual(0, CharSequenceComparer.Ordinal.Compare(seq1, seq2));
+                });
+        }
+
+        [Test]
+        public void Test_Compare_ICharSequence_SynchronizedTextBuilderCharSequence_StringBuffer_ShouldNotDeadlock_WhenComparingOppositeDirections()
+        {
+            const string Value = "abcdefghijklmnopqrstuvwxyz";
+
+            AssertExtensions.AssertNoABDeadlock(
+                () => CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence(Value),
+                () => CharSequenceUtil.CreateStringBuffer(Value),
+                (seq1, seq2) =>
+                {
+                    Assert.AreEqual(0, CharSequenceComparer.Ordinal.Compare(seq1, seq2));
+                });
+        }
+
+        [Test]
+        public void Test_Compare_ICharSequence_StringBuffer_SynchronizedTextBuilderCharSequence_ShouldNotDeadlock_WhenComparingOppositeDirections()
+        {
+            const string Value = "abcdefghijklmnopqrstuvwxyz";
+
+            AssertExtensions.AssertNoABDeadlock(
+                () => CharSequenceUtil.CreateStringBuffer(Value),
+                () => CharSequenceUtil.CreateSynchronizedTextBuilderCharSequence(Value),
+                (seq1, seq2) =>
+                {
+                    Assert.AreEqual(0, CharSequenceComparer.Ordinal.Compare(seq1, seq2));
+                });
+        }
+
+
+        public static IEnumerable<TestCaseData> Compare_Object_Object_TestData()
+        {
+            foreach (var leftFactory in CharSequenceUtil.ComparableObjectFactories)
+            {
+                foreach (var rightFactory in CharSequenceUtil.ComparableObjectFactories)
+                {
+                    foreach (var item in CharSequenceUtil.CompareTo_String_TestData())
+                    {
+                        var leftArg = leftFactory((string?)item[0]);
+                        var rightArg = rightFactory((string?)item[1]);
+                        var expectedArg = item[2];
+
+                        yield return new TestCaseData(leftArg, rightArg, expectedArg)
+                            .FormatArguments(leftArg, rightArg);
+                    }
+                }
+            }
+        }
+
+        // J2N TODO: When any factories that can return naked null value are added, this test causes
+        // all tests to run when this class node is run in VS2026 and other quirks like changing
+        // grouping depending on which nodes are selected. It is unclear whether this is an NUnit bug,
+        // somethign in the test SDK, something in the adapter, or a bug in VS2026. For now, we will leave
+        // this in place, but if you need selecting the J2N.Text tests to work right, this test needs to be commented.
+        [TestCaseSource(nameof(Compare_Object_Object_TestData))]
+        public void Test_Compare_Object_Object(object? leftValue, object? rightValue, int expected)
+        {
+            try
+            {
+#if FEATURE_BROKEN_NULL_CHARSEQUENCE_COMPARISON
+                if (leftValue is null)
+                {
+                    if (rightValue is ICharSequence cs2 && !cs2.HasValue)
+                        expected = -1; // J2N TODO: Fix broken null comparison
+                }
+                if (leftValue is ICharSequence cs1 && !cs1.HasValue)
+                {
+                    if (rightValue is null)
+                        expected = 1; // J2N TODO: Fix broken null comparison
+                    if (rightValue is ICharSequence cs2)
+                    {
+                        if (!cs2.HasValue)
+                            expected = -1; // J2N TODO: Fix broken null comparison
+                        else if (cs2.HasValue && cs2.Length == 0)
+                            expected = 0; // J2N TODO: Fix broken null comparison
+                    }
+                    if (rightValue is ISpannable<char> spannable2)
+                    {
+                        if (!spannable2.HasValue)
+                            expected = -1; // J2N TODO: Fix broken null comparison
+                        else if (spannable2.HasValue && spannable2.AsSpan().IsEmpty)
+                            expected = 0; // J2N TODO: Fix broken null comparison
+                    }
+                    if (rightValue is SynchronizedTextBuilder stb)
+                    {
+                        if (stb.Length == 0)
+                            expected = 0; // J2N TODO: Fix broken null comparison
+                    }
+                }
+#endif
+
+                Assert.AreEqual(expected, CharSequenceComparer.Ordinal.Compare(leftValue, rightValue));
+            }
+            finally
+            {
+                CharSequenceUtil.Dispose(leftValue);
+                CharSequenceUtil.Dispose(rightValue);
+            }
+        }
+
+#if !FEATURE_BROKEN_CHARSEQENCE_EXCEPTION_HANDLING
+
+        public static IEnumerable<TestCaseData> Object_Object_Invalid_TestData()
+        {
+            const string Value = "abcdefghijklmnopqrstuvwxyz";
+
+            foreach (var factory in CharSequenceUtil.ComparableObjectFactories)
+            {
+                var leftArg = factory(Value);
+                var rightArg = CharSequenceUtil.CreateInvalidCharSequenceObject(Value);
+
+                yield return new TestCaseData(leftArg, rightArg)
+                    .FormatArguments(leftArg, rightArg);
+            }
+
+            foreach (var factory in CharSequenceUtil.ComparableObjectFactories)
+            {
+                var leftArg = CharSequenceUtil.CreateInvalidCharSequenceObject(Value);
+                var rightArg = factory(Value);
+
+                yield return new TestCaseData(leftArg, rightArg)
+                    .FormatArguments(leftArg, rightArg);
+            }
+
+            {
+                var leftArg = CharSequenceUtil.CreateInvalidCharSequenceObject(Value);
+                var rightArg = CharSequenceUtil.CreateInvalidCharSequenceObject(Value);
+
+                yield return new TestCaseData(leftArg, rightArg)
+                    .FormatArguments(leftArg, rightArg);
+            }
+        }
+
+        [TestCaseSource(nameof(Object_Object_Invalid_TestData))]
+        public void Test_Compare_Object_Object_Invalid(object? leftValue, object? rightValue)
+        {
+            Assert.Throws<ArgumentException>(() => CharSequenceComparer.Ordinal.Compare(leftValue, rightValue));
+        }
+#endif
+
+
+        public static IEnumerable<TestCaseData> Compare_ICharSequence_ICharSequence_TestData()
+        {
+            foreach (var leftFactory in CharSequenceUtil.ICharSequenceFactories)
+            {
+                foreach (var rightFactory in CharSequenceUtil.ICharSequenceFactories)
+                {
+                    foreach (var item in CharSequenceUtil.CompareTo_String_TestData())
+                    {
+                        var leftArg = leftFactory((string?)item[0]);
+                        var rightArg = rightFactory((string?)item[1]);
+                        var expectedArg = item[2];
+
+                        Debug.Assert(leftArg is null || leftArg is ICharSequence);
+                        Debug.Assert(rightArg is null || rightArg is ICharSequence);
+
+
+                        yield return new TestCaseData(leftArg, rightArg, expectedArg)
+                            .FormatArguments(leftArg, rightArg);
+                    }
+                }
+            }
+        }
+
+        // J2N TODO: When any factories that can return naked null value are added, this test causes
+        // all tests to run when this class node is run in VS2026 and other quirks like changing
+        // grouping depending on which nodes are selected. It is unclear whether this is an NUnit bug,
+        // somethign in the test SDK, something in the adapter, or a bug in VS2026. For now, we will leave
+        // this in place, but if you need selecting the J2N.Text tests to work right, this test needs to be commented.
+        [TestCaseSource(nameof(Compare_ICharSequence_ICharSequence_TestData))]
+        public void Test_Compare_ICharSequence_ICharSeqeunce(ICharSequence? leftValue, ICharSequence? rightValue, int expected)
+        {
+            try
+            {
+#if FEATURE_BROKEN_NULL_CHARSEQUENCE_COMPARISON
+                if (leftValue is null)
+                {
+                    if (rightValue is ICharSequence cs2)
+                    {
+                        if (!cs2.HasValue)
+                            expected = -1; // J2N TODO: Fix broken null comparison
+                        else if (cs2.HasValue && cs2.Length == 0)
+                            expected = 0; // J2N TODO: Fix broken null comparison
+                    }
+                }
+                if (leftValue is ICharSequence cs1 && !cs1.HasValue)
+                {
+                    if (rightValue is ICharSequence cs2)
+                    {
+                        if (!cs2.HasValue)
+                            expected = -1; // J2N TODO: Fix broken null comparison
+                        else if (cs2.HasValue && cs2.Length == 0)
+                            expected = 0; // J2N TODO: Fix broken null comparison
+                    }
+                }
+#endif
+
+                Assert.AreEqual(expected, CharSequenceComparer.Ordinal.Compare(leftValue, rightValue));
+            }
+            finally
+            {
+                CharSequenceUtil.Dispose(leftValue);
+                CharSequenceUtil.Dispose(rightValue);
+            }
+        }
+
+
+        public static IEnumerable<TestCaseData> Compare_ICharSequence_String_TestData()
+        {
+            var rightFactories = new Func<string?, object?>[]
+            {
+                CharSequenceUtil.CreateString,
+            };
+
+            foreach (var leftFactory in CharSequenceUtil.ICharSequenceFactories)
+            {
+                foreach (var rightFactory in rightFactories)
+                {
+                    foreach (var item in CharSequenceUtil.CompareTo_String_TestData())
+                    {
+                        var leftArg = leftFactory((string?)item[0]);
+                        var rightArg = rightFactory((string?)item[1]);
+                        var expectedArg = item[2];
+
+                        yield return new TestCaseData(leftArg, rightArg, expectedArg)
+                            .FormatArguments(leftArg, rightArg);
+                    }
+                }
+            }
+        }
+
+        [TestCaseSource(nameof(Compare_ICharSequence_String_TestData))]
+        public void Test_Compare_ICharSequence_String(ICharSequence? leftValue, string? rightValue, int expected)
+        {
+            try
+            {
+                Assert.AreEqual(expected, CharSequenceComparer.Ordinal.Compare(leftValue, rightValue));
+            }
+            finally
+            {
+                CharSequenceUtil.Dispose(leftValue);
+            }
+        }
+
+        public static IEnumerable<TestCaseData> Compare_ICharSequence_CharArray_TestData()
+        {
+            var rightFactories = new Func<string?, object?>[]
+            {
+                CharSequenceUtil.CreateCharArray,
+            };
+
+            foreach (var leftFactory in CharSequenceUtil.ICharSequenceFactories)
+            {
+                foreach (var rightFactory in rightFactories)
+                {
+                    foreach (var item in CharSequenceUtil.CompareTo_String_TestData())
+                    {
+                        var leftArg = leftFactory((string?)item[0]);
+                        var rightArg = rightFactory((string?)item[1]);
+                        var expectedArg = item[2];
+
+                        yield return new TestCaseData(leftArg, rightArg, expectedArg)
+                            .FormatArguments(leftArg, rightArg);
+                    }
+                }
+            }
+        }
+
+        [TestCaseSource(nameof(Compare_ICharSequence_CharArray_TestData))]
+        public void Test_Compare_ICharSequence_CharArray(ICharSequence? leftValue, char[]? rightValue, int expected)
+        {
+            try
+            {
+                Assert.AreEqual(expected, CharSequenceComparer.Ordinal.Compare(leftValue, rightValue));
+            }
+            finally
+            {
+                CharSequenceUtil.Dispose(leftValue);
+            }
+        }
+
+        public static IEnumerable<TestCaseData> Compare_ICharSequence_StringBuilder_TestData()
+        {
+            var rightFactories = new Func<string?, object?>[]
+            {
+                CharSequenceUtil.CreateStringBuilder,
+            };
+
+            foreach (var leftFactory in CharSequenceUtil.ICharSequenceFactories)
+            {
+                foreach (var rightFactory in rightFactories)
+                {
+                    foreach (var item in CharSequenceUtil.CompareTo_String_TestData())
+                    {
+                        var leftArg = leftFactory((string?)item[0]);
+                        var rightArg = rightFactory((string?)item[1]);
+                        var expectedArg = item[2];
+
+                        yield return new TestCaseData(leftArg, rightArg, expectedArg)
+                            .FormatArguments(leftArg, rightArg);
+                    }
+                }
+            }
+        }
+
+        [TestCaseSource(nameof(Compare_ICharSequence_StringBuilder_TestData))]
+        public void Test_Compare_ICharSequence_StringBuilder(ICharSequence? leftValue, StringBuilder? rightValue, int expected)
+        {
+            try
+            {
+#if FEATURE_BROKEN_NULL_CHARSEQUENCE_COMPARISON
+                if (leftValue is null)
+                {
+                    if (rightValue is null)
+                        expected = -1; // J2N TODO: Fix broken null comparison
+                }
+                if (leftValue is ICharSequence cs1 && !cs1.HasValue)
+                {
+                    if (rightValue is null)
+                        expected = -1; // J2N TODO: Fix broken null comparison
+                }
+
+#endif
+                Assert.AreEqual(expected, CharSequenceComparer.Ordinal.Compare(leftValue, rightValue));
+            }
+            finally
+            {
+                CharSequenceUtil.Dispose(leftValue);
+            }
+        }
+
+
+        #endregion Compare
+
+
+        #region GetHashCode
+
+        public static IEnumerable<TestCaseData> GetHashCode_Object_TestData()
+        {
+            foreach (var leftFactory in CharSequenceUtil.ComparableObjectFactories)
+            {
+                foreach (var item in CharSequenceUtil.GetHashCode_String_TestData())
+                {
+                    var leftArg = leftFactory((string?)item[0]);
+                    var expectedArg = item[1];
+                    yield return new TestCaseData(leftArg, expectedArg)
+                        .FormatArguments(leftArg);
+                }
+            }
+        }
+
+        [TestCaseSource(nameof(GetHashCode_Object_TestData))]
+        public void Test_GetHashCode_Object(object? value, int expected)
+        {
+            Assert.AreEqual(expected, CharSequenceComparer.Ordinal.GetHashCode(value));
+        }
+
+        [Test]
+        public void Test_GetHashCode_Object_Invalid()
+        {
+            // Just like the BCL, we allow arbitrary types to return their own hash code even if they are not in our comparison domain.
+            Assert.DoesNotThrow(() => CharSequenceComparer.Ordinal.GetHashCode(CharSequenceUtil.CreateInvalidCharSequenceObject(null)));
+        }
+
+        public static IEnumerable<TestCaseData> GetHashCode_ICharSequence_TestData()
+        {
+            foreach (var leftFactory in CharSequenceUtil.ICharSequenceFactories)
+            {
+                foreach (var item in CharSequenceUtil.GetHashCode_String_TestData())
+                {
+                    var leftArg = leftFactory((string?)item[0]);
+                    var expectedArg = item[1];
+                    yield return new TestCaseData(leftArg, expectedArg)
+                        .FormatArguments(leftArg);
+                }
+            }
+        }
+
+        [TestCaseSource(nameof(GetHashCode_ICharSequence_TestData))]
+        public void Test_GetHashCode_ICharSequence(ICharSequence? value, int expected)
+        {
+            Assert.AreEqual(expected, CharSequenceComparer.Ordinal.GetHashCode(value));
+        }
+
+
+        [TestCaseSource(typeof(CharSequenceUtil), nameof(CharSequenceUtil.GetHashCode_String_TestData))]
+        public void Test_GetHashCode_String(string? value, int expected)
+        {
+            Assert.AreEqual(expected, CharSequenceComparer.Ordinal.GetHashCode(value));
+        }
+
+        public static IEnumerable<TestCaseData> GetHashCode_CharArray_TestData()
+        {
+            var factories = new Func<string?, object?>[]
+            {
+                CharSequenceUtil.CreateCharArray,
+            };
+
+            foreach (var leftFactory in factories)
+            {
+                foreach (var item in CharSequenceUtil.GetHashCode_String_TestData())
+                {
+                    var leftArg = leftFactory((string?)item[0]);
+                    var expectedArg = item[1];
+                    yield return new TestCaseData(leftArg, expectedArg)
+                        .FormatArguments(leftArg);
+                }
+            }
+        }
+
+        [TestCaseSource(nameof(GetHashCode_CharArray_TestData))]
+        public void Test_GetHashCode_CharArray(char[]? value, int expected)
+        {
+            Assert.AreEqual(expected, CharSequenceComparer.Ordinal.GetHashCode(value));
+        }
+
+        public static IEnumerable<TestCaseData> GetHashCode_StringBuilder_TestData()
+        {
+            var factories = new Func<string?, object?>[]
+            {
+                CharSequenceUtil.CreateStringBuilder,
+            };
+
+            foreach (var leftFactory in factories)
+            {
+                foreach (var item in CharSequenceUtil.GetHashCode_String_TestData())
+                {
+                    var leftArg = leftFactory((string?)item[0]);
+                    var expectedArg = item[1];
+                    yield return new TestCaseData(leftArg, expectedArg)
+                        .FormatArguments(leftArg);
+                }
+            }
+        }
+
+        [TestCaseSource(nameof(GetHashCode_StringBuilder_TestData))]
+        public void Test_GetHashCode_StringBuilder(StringBuilder? value, int expected)
+        {
+            Assert.AreEqual(expected, CharSequenceComparer.Ordinal.GetHashCode(value));
+        }
+
+        #endregion GetHashCode
     }
 }

@@ -1,4 +1,6 @@
-﻿using System;
+﻿using J2N.Runtime.InteropServices;
+using J2N.Text;
+using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -310,6 +312,31 @@ namespace J2N
         }
 
         #endregion LastIndexOf
+
+        #region Replace
+
+        /// <summary>
+        /// Replaces all occurrences of <paramref name="oldChar"/> with <paramref name="newChar"/> in
+        /// <paramref name="text"/>. The operation is done in place.
+        /// </summary>
+        /// <param name="text">This <see cref="Span{T}"/>.</param>
+        /// <param name="oldChar">The Unicode character to be replaced.</param>
+        /// <param name="newChar">The Unicode character to replace all occurrences of <paramref name="oldChar"/>.</param>
+        internal static void Replace(this Span<char> text, char oldChar, char newChar)
+        {
+#if FEATURE_MEMORYEXTENSIONS_REPLACE_T_T
+            System.MemoryExtensions.Replace(text, oldChar, newChar);
+#else
+            int length = text.Length;
+            for (int i = 0; i < length; i++)
+            {
+                if (text[i] == oldChar)
+                    text[i] = newChar;
+            }
+#endif
+        }
+
+        #endregion Replace
 
         #region ReverseText
 
