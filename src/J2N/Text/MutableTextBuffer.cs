@@ -1328,7 +1328,7 @@ namespace J2N.Text
             // Check to ensure we don't exceed MaxCapacity
             if (((uint)additionalCapacityBeyondPos + (uint)Length) > (uint)m_MaxCapacity)
             {
-                throw new ArgumentOutOfRangeException("requiredLength", SR.ArgumentOutOfRange_SmallCapacity);
+                ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.requiredLength, ExceptionResource.ArgumentOutOfRange_SmallCapacity);
             }
 
             ReplaceBuffer(CalculateNewArrayLength(additionalCapacityBeyondPos));
