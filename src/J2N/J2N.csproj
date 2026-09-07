@@ -24,10 +24,6 @@
     <None Include="$(RepositoryRoot)README.md" Pack="true" PackagePath="\readme.md" />
   </ItemGroup>
 
-  <PropertyGroup Label="Compilation Features">
-    <DefineConstants>$(DefineConstants);FEATURE_TIME_PUBLIC</DefineConstants>
-  </PropertyGroup>
-
   <ItemGroup>
     <PackageReference Include="Aigamo.ResXGenerator" Version="$(AigamoResXGeneratorPackageReferenceVersion)">
       <PrivateAssets>all</PrivateAssets>
