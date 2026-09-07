@@ -188,8 +188,7 @@ namespace J2N.Text
             {
                 // Check if the valueCount will put us over m_MaxCapacity.
                 // Doing the check here prevents corruption of the MutableTextBuffer.
-                uint newLength = (uint)m_Position + (uint)ensureAdditionalCapacityBeyondPos;
-                if (newLength > (uint)m_MaxCapacity)
+                if ((uint)m_Position + (uint)ensureAdditionalCapacityBeyondPos > (uint)m_MaxCapacity)
                 {
                     ThrowHelper.ThrowArgumentOutOfRangeException(value, ExceptionArgument.valueCount, ExceptionResource.ArgumentOutOfRange_LengthGreaterThanCapacity);
                 }
@@ -200,7 +199,14 @@ namespace J2N.Text
             int charsWritten;
             while (!default(TFormatter).TryFormat(value, format, provider, m_Chars.AsSpan(m_Position), out charsWritten))
             {
-                GrowForRetry(throwOnOverflow: true);
+                GrowForRetry();
+            }
+
+            // Don't update m_Position until after the logical limit has been checked.
+            uint newLength = (uint)m_Position + (uint)charsWritten;
+            if (newLength > (uint)m_MaxCapacity)
+            {
+                ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.valueCount, ExceptionResource.ArgumentOutOfRange_LengthGreaterThanCapacity);
             }
 
             m_Position += charsWritten;
@@ -219,7 +225,14 @@ namespace J2N.Text
             int charsWritten;
             while (!value.TryFormat(m_Chars.AsSpan(m_Position), out charsWritten, format, provider))
             {
-                GrowForRetry(throwOnOverflow: true);
+                GrowForRetry();
+            }
+
+            // Don't update m_Position until after the logical limit has been checked.
+            uint newLength = (uint)m_Position + (uint)charsWritten;
+            if (newLength > (uint)m_MaxCapacity)
+            {
+                ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.valueCount, ExceptionResource.ArgumentOutOfRange_LengthGreaterThanCapacity);
             }
 
             m_Position += charsWritten;

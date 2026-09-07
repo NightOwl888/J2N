@@ -1312,13 +1312,17 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// Resize the internal buffer either by doubling current buffer size or
-        /// by adding <paramref name="additionalCapacityBeyondPos"/> to
-        /// <see cref="m_Position"/> whichever is greater.
+        /// Resizes the internal buffer to accommodate the specified number of additional
+        /// characters beyond the current position.
         /// </summary>
         /// <param name="additionalCapacityBeyondPos">
-        /// Number of chars requested beyond current position.
+        /// The number of characters required beyond the current position.
         /// </param>
+        /// <remarks>
+        /// The new buffer capacity is the greater of the required length and the preferred
+        /// growth capacity. The preferred capacity is approximately twice the current
+        /// buffer length, plus two, subject to the maximum supported array length.
+        /// </remarks>
         [MethodImpl(MethodImplOptions.NoInlining)]
         private void Grow(int additionalCapacityBeyondPos)
         {
@@ -1334,22 +1338,23 @@ namespace J2N.Text
             ReplaceBuffer(CalculateNewArrayLength(additionalCapacityBeyondPos));
         }
 
+        /// <summary>
+        /// Grows the internal buffer when an operation requires additional capacity after
+        /// the initial capacity check has failed.
+        /// </summary>
         [MethodImpl(MethodImplOptions.NoInlining)]
-        private void GrowForRetry(bool throwOnOverflow)
+        private void GrowForRetry()
         {
             int additionalCapacity = (m_Chars.Length - m_Position) + 1;
+            int newCapacity = CalculateNewArrayLength(additionalCapacity);
 
-            if (throwOnOverflow)
+            if (newCapacity == m_Chars.Length)
             {
-                int requiredLength = m_Position + additionalCapacity;
-
-                if (requiredLength > m_MaxCapacity)
-                {
-                    ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.valueCount, ExceptionResource.ArgumentOutOfRange_LengthGreaterThanCapacity);
-                }
+                // If the capacity overflows
+                ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.valueCount, ExceptionResource.ArgumentOutOfRange_LengthGreaterThanCapacity);
             }
 
-            Grow(additionalCapacity);
+            ReplaceBuffer(newCapacity);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1362,7 +1367,10 @@ namespace J2N.Text
                 ((uint)m_Chars.Length * 2) + 2,
                 (uint)Arrays.MaxArrayLength);
 
-            return (int)Math.Max(minimum, preferred);
+            uint newCapacity = Math.Max(minimum, preferred);
+
+            // Ensure we always return a positive value.
+            return (int)Math.Min(newCapacity, (uint)Arrays.MaxArrayLength);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

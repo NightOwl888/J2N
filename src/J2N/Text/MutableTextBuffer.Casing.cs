@@ -62,8 +62,7 @@ namespace J2N.Text
             {
                 // Check if the valueCount will put us over m_MaxCapacity.
                 // Doing the check here prevents corruption of the MutableTextBuffer.
-                uint newLength = (uint)m_Position + (uint)valueLength;
-                if (newLength > m_MaxCapacity)
+                if ((uint)m_Position + (uint)valueLength > m_MaxCapacity)
                 {
                     ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.valueCount, ExceptionResource.ArgumentOutOfRange_LengthGreaterThanCapacity);
                 }
@@ -74,9 +73,17 @@ namespace J2N.Text
             int length = value.ToUpper(m_Chars.AsSpan(m_Position), culture);
             while (length < 0) // rare
             {
-                GrowForRetry(throwOnOverflow: true);
+                GrowForRetry();
                 length = value.ToUpper(m_Chars.AsSpan(m_Position), culture);
             }
+
+            // Don't update m_Position until after the logical limit has been checked.
+            uint newLength = (uint)m_Position + (uint)length;
+            if (newLength > (uint)m_MaxCapacity)
+            {
+                ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.valueCount, ExceptionResource.ArgumentOutOfRange_LengthGreaterThanCapacity);
+            }
+
             m_Position += length;
         }
 
@@ -116,8 +123,7 @@ namespace J2N.Text
             {
                 // Check if the valueCount will put us over m_MaxCapacity.
                 // Doing the check here prevents corruption of the MutableTextBuffer.
-                uint newLength = (uint)m_Position + (uint)valueLength;
-                if (newLength > m_MaxCapacity)
+                if ((uint)m_Position + (uint)valueLength > m_MaxCapacity)
                 {
                     ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.valueCount, ExceptionResource.ArgumentOutOfRange_LengthGreaterThanCapacity);
                 }
@@ -128,9 +134,17 @@ namespace J2N.Text
             int length = value.ToLower(m_Chars.AsSpan(m_Position), culture);
             while (length < 0) // rare
             {
-                GrowForRetry(throwOnOverflow: true);
+                GrowForRetry();
                 length = value.ToLower(m_Chars.AsSpan(m_Position), culture);
             }
+
+            // Don't update m_Position until after the logical limit has been checked.
+            uint newLength = (uint)m_Position + (uint)length;
+            if (newLength > (uint)m_MaxCapacity)
+            {
+                ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.valueCount, ExceptionResource.ArgumentOutOfRange_LengthGreaterThanCapacity);
+            }
+
             m_Position += length;
         }
 
@@ -166,6 +180,13 @@ namespace J2N.Text
             int pos = m_Position;
             if (pos > m_Chars.Length - valueLength)
             {
+                // Check if the valueCount will put us over m_MaxCapacity.
+                // Doing the check here prevents corruption of the MutableTextBuffer.
+                if ((uint)m_Position + (uint)valueLength > m_MaxCapacity)
+                {
+                    ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.valueCount, ExceptionResource.ArgumentOutOfRange_LengthGreaterThanCapacity);
+                }
+
                 Grow(valueLength);
             }
 
@@ -206,6 +227,13 @@ namespace J2N.Text
             int pos = m_Position;
             if (pos > m_Chars.Length - valueLength)
             {
+                // Check if the valueCount will put us over m_MaxCapacity.
+                // Doing the check here prevents corruption of the MutableTextBuffer.
+                if ((uint)m_Position + (uint)valueLength > m_MaxCapacity)
+                {
+                    ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.valueCount, ExceptionResource.ArgumentOutOfRange_LengthGreaterThanCapacity);
+                }
+
                 Grow(valueLength);
             }
 

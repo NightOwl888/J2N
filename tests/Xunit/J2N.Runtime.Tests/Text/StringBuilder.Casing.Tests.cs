@@ -285,6 +285,24 @@ namespace J2N.Text.Tests
             Assert.Equal(expected, sb.ToString());
         }
 
+        [Fact]
+        public void AppendLowerInvariant_CharSpan_NoSpareCapacity_ThrowsArgumentOutOfRangeException()
+        {
+            var builder = MutableTextBufferFactory(0, 5);
+            builder.Append("Hello");
+
+            AssertExtensions.Throws<ArgumentOutOfRangeException>(s_noCapacityParamName, () => builder.AppendLowerInvariant("abc".AsSpan()));
+        }
+
+        [Fact]
+        public void AppendLowerInvariant_String_NoSpareCapacity_ThrowsArgumentOutOfRangeException()
+        {
+            var builder = MutableTextBufferFactory(0, 5);
+            builder.Append("Hello");
+
+            AssertExtensions.Throws<ArgumentOutOfRangeException>(s_noCapacityParamName, () => builder.AppendLowerInvariant("abc"));
+        }
+
         // ------------------------------
         // AppendUpperInvariant()
         // ------------------------------
@@ -312,6 +330,24 @@ namespace J2N.Text.Tests
             var sb = MutableTextBufferFactory(original, 15);
             sb.AppendUpperInvariant(input);
             Assert.Equal(expected, sb.ToString());
+        }
+
+        [Fact]
+        public void AppendUpperInvariant_CharSpan_NoSpareCapacity_ThrowsArgumentOutOfRangeException()
+        {
+            var builder = MutableTextBufferFactory(0, 5);
+            builder.Append("Hello");
+
+            AssertExtensions.Throws<ArgumentOutOfRangeException>(s_noCapacityParamName, () => builder.AppendUpperInvariant("abc".AsSpan()));
+        }
+
+        [Fact]
+        public void AppendUpperInvariant_String_NoSpareCapacity_ThrowsArgumentOutOfRangeException()
+        {
+            var builder = MutableTextBufferFactory(0, 5);
+            builder.Append("Hello");
+
+            AssertExtensions.Throws<ArgumentOutOfRangeException>(s_noCapacityParamName, () => builder.AppendUpperInvariant("abc"));
         }
     }
 }
