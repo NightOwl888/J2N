@@ -1287,7 +1287,7 @@ namespace J2N.Text
             if (m_Position > 0)
             {
                 // Copy the head of the current buffer to the new buffer.
-                int copyCount1 = index; //Math.Min(count, index);
+                int copyCount1 = index;
                 if (copyCount1 > 0)
                 {
                     new ReadOnlySpan<char>(m_Chars, 0, copyCount1).CopyTo(newArray);
