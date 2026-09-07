@@ -452,13 +452,13 @@ namespace J2N.Text
                 return this;
             }
 
-            if (value is ISpanCopyable<char> copyable)
+            if (value is ISpanCopyable<char> spanCopyable)
             {
-                copyable.CopyTo(0, m_Chars, length);
+                spanCopyable.CopyTo(0, m_Chars, length);
             }
-            else if (value is ICopyable<char> spanCopyable)
+            else if (value is ICopyable<char> copyable)
             {
-                spanCopyable.CopyTo(0, m_Chars, 0, length);
+                copyable.CopyTo(0, m_Chars, 0, length);
             }
             else
             {
@@ -472,6 +472,6 @@ namespace J2N.Text
             return this;
         }
 
-#endregion J2N Constructors
+        #endregion J2N Constructors
     }
 }
