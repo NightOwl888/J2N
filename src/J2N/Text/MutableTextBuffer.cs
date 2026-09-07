@@ -849,7 +849,10 @@ namespace J2N.Text
         /// whether the characters in the current instance and <paramref name="other"/> are equal.
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool Equals([NotNullWhen(true)] MutableTextBuffer? other)
+        // J2N TODO: Decide whether this should be Equals(), ContentEquals(), or SequenceEqual().
+        // In the JDK, contentEquals() will lock other if it is a synchronized type, but equals()
+        // is not even overridden by StringBuilder and so uses instance equality only.
+        internal bool Equals([NotNullWhen(true)] MutableTextBuffer? other)
         {
             if (other == null)
             {
@@ -876,7 +879,11 @@ namespace J2N.Text
         /// The <see cref="Equals(StringBuilder?)"/> method performs an ordinal comparison to determine
         /// whether the characters in the current instance and <paramref name="other"/> are equal.
         /// </remarks>
-        public bool Equals([NotNullWhen(true)] StringBuilder? other)
+        // J2N TODO: Decide whether this should be Equals(), ContentEquals(), or SequenceEqual().
+        // In the JDK, contentEquals() will lock other if it is a synchronized type, but equals()
+        // is not even overridden by StringBuilder and so uses instance equality only. Perhaps
+        // this StringBuilder overload should also be made into an extension method?
+        internal bool Equals([NotNullWhen(true)] StringBuilder? other)
         {
             if (other == null)
             {
@@ -902,7 +909,10 @@ namespace J2N.Text
         /// whether the characters in the current instance and <paramref name="other"/> are equal.
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool Equals(ReadOnlySpan<char> other)
+        // J2N TODO: Decide whether this should be Equals(), ContentEquals(), or SequenceEqual().
+        // In the JDK, contentEquals() will lock other if it is a synchronized type, but equals()
+        // is not even overridden by StringBuilder and so uses instance equality only.
+        internal bool Equals(ReadOnlySpan<char> other)
         {
             if (other.Length != Length)
             {

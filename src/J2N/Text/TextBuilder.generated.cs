@@ -299,57 +299,6 @@ namespace J2N.Text
             buffer.CopyTo(sourceIndex, destination, count);
         }
 
-        /// <summary>Returns a value indicating whether this instance is equal to a specified object.</summary>
-        /// <param name="other">An object to compare with this instance, or <see langword="null"/>.</param>
-        /// <returns>
-        /// <see langword="true"/> if the characters in this instance and <paramref name="other"/> are the same;
-        /// otherwise, <see langword="false"/>.
-        /// </returns>
-        /// <remarks>
-        /// The <see cref="Equals(TextBuilder?)"/> method performs an ordinal comparison to determine
-        /// whether the characters in the current instance and <paramref name="other"/> are equal.
-        /// </remarks>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool Equals([NotNullWhen(true)] TextBuilder? other)
-        {
-            return buffer.Equals(other?.buffer);
-        }
-
-        /// <summary>Returns a value indicating whether this instance is equal to a specified object.</summary>
-        /// <param name="other">An object to compare with this instance, or <see langword="null"/>.</param>
-        /// <returns>
-        /// <see langword="true"/> if the characters in this instance and <paramref name="other"/> are the same;
-        /// otherwise, <see langword="false"/>.
-        /// </returns>
-        /// <remarks>
-        /// The <see cref="Equals(StringBuilder?)"/> method performs an ordinal comparison to determine
-        /// whether the characters in the current instance and <paramref name="other"/> are equal.
-        /// </remarks>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool Equals([NotNullWhen(true)] StringBuilder? other)
-        {
-            return buffer.Equals(other);
-        }
-
-        /// <summary>
-        /// Returns a value indicating whether the characters in this instance are equal to the
-        /// characters in a specified read-only character span.
-        /// </summary>
-        /// <param name="other">The character span to compare with the current instance.</param>
-        /// <returns>
-        /// <see langword="true"/> if the characters in this instance and <paramref name="other"/> are the same;
-        /// otherwise, <see langword="false"/>.
-        /// </returns>
-        /// <remarks>
-        /// The <see cref="Equals(ReadOnlySpan{char})"/> method performs an ordinal comparison to determine
-        /// whether the characters in the current instance and <paramref name="other"/> are equal.
-        /// </remarks>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool Equals(ReadOnlySpan<char> other)
-        {
-            return buffer.Equals(other);
-        }
-
         /// <summary>Converts the value of this instance to a <see cref="string"/>.</summary>
         /// <returns>A string whose value is the same as this instance.</returns>
         /// <remarks>
