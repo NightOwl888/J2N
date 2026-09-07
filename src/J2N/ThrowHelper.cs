@@ -1220,6 +1220,8 @@ namespace J2N
                     return "reader";
                 case ExceptionArgument.repeatCount:
                     return "repeatCount";
+                case ExceptionArgument.requiredLength:
+                    return "requiredLength";
                 case ExceptionArgument.s:
                     return "s";
                 case ExceptionArgument.seq:
@@ -1755,6 +1757,7 @@ namespace J2N
         random,
         reader,
         repeatCount,
+        requiredLength,
         s,
         seq,
         set,

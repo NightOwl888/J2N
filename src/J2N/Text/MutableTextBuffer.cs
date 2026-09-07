@@ -1265,9 +1265,9 @@ namespace J2N.Text
             Debug.Assert(index >= 0);
             Debug.Assert(index <= m_Position);
 
-            if (count + Length > m_MaxCapacity || count + Length < count)
+            if ((uint)count + (uint)m_Position > (uint)m_MaxCapacity)
             {
-                throw new ArgumentOutOfRangeException("requiredLength", SR.ArgumentOutOfRange_SmallCapacity);
+                ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.requiredLength, ExceptionResource.ArgumentOutOfRange_SmallCapacity);
             }
 
             // Cool, we have some space in this block, and we don't have to copy much to get at it, so go ahead and use it.
