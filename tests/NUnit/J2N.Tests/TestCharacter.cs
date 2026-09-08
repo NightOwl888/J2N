@@ -1741,7 +1741,8 @@ namespace J2N
                     int expected = UnicodeCharacterData.Digit(c, radix);
                     int actual = Character.Digit((char)c, radix);
 
-                    assertEquals($"{c} (Hex 0x{c.ToHexString()}) failed to match for radix {radix}.", expected, actual);
+                    if (expected != actual)
+                        fail($"{c} (Hex 0x{c.ToHexString()}) failed to match for radix {radix}.\n\nExpected: {expected}\nActual: {actual}");
                 }
             }
         }
@@ -1774,7 +1775,8 @@ namespace J2N
                     int expected = UnicodeCharacterData.Digit(c, radix);
                     int actual = Character.Digit(c, radix);
 
-                    assertEquals($"{c} (Hex 0x{c.ToHexString()}) failed to match for radix {radix}.", expected, actual);
+                    if (expected != actual)
+                        fail($"{c} (Hex 0x{c.ToHexString()}) failed to match for radix {radix}.\n\nExpected: {expected}\nActual: {actual}");
                 }
             }
         }
@@ -1861,7 +1863,8 @@ namespace J2N
                 int expected = UnicodeCharacterData.GetNumericValue(c);
                 int actual = Character.GetNumericValue((char)c);
 
-                assertEquals($"{c} (Hex 0x{c.ToHexString()}) failed to match.", expected, actual);
+                if (expected != actual)
+                    fail($"{c} (Hex 0x{c.ToHexString()}) failed to match.\n\nExpected: {expected}\nActual: {actual}");
             }
         }
 
@@ -1921,7 +1924,8 @@ namespace J2N
                 int expected = UnicodeCharacterData.GetNumericValue(c);
                 int actual = Character.GetNumericValue(c);
 
-                assertEquals($"{c} (Hex 0x{c.ToHexString()}) failed to match.", expected, actual);
+                if (expected != actual)
+                    fail($"{c} (Hex 0x{c.ToHexString()}) failed to match.\n\nExpected: {expected}\nActual: {actual}");
             }
         }
 
@@ -2807,17 +2811,23 @@ namespace J2N
 
             foreach (char c in javaGoodWhiteSpaceChars)
             {
-                assertTrue($"0x{c:X4}", Character.IsWhiteSpace(c));
+                if (!Character.IsWhiteSpace(c))
+                    fail($"0x{c:X4}");
             }
 
             foreach (char c in javaBadWhiteSpaceChars)
             {
-                assertFalse($"0x{c:X4}", Character.IsWhiteSpace(c));
+                if (Character.IsWhiteSpace(c))
+                    fail($"0x{c:X4}");
             }
 
             for (int c = Character.MinCodePoint; c <= Character.MaxCodePoint; c++)
             {
-                assertEquals($"0x{c:X4}", UnicodeCharacterData.IsWhiteSpace((char)c), Character.IsWhiteSpace((char)c));
+                bool expected = UnicodeCharacterData.IsWhiteSpace((char)c);
+                bool actual = Character.IsWhiteSpace((char)c);
+
+                if (expected != actual)
+                    fail($"0x{c:X4}\n\nExpected: {expected}\nActual: {actual}");
             }
 
             //assertTrue("space returned false", Character.IsWhiteSpace('\n'));
@@ -2876,19 +2886,25 @@ namespace J2N
                 0x200b,
             };
 
-            foreach (int c in javaGoodWhiteSpaceChars)
+            foreach (char c in javaGoodWhiteSpaceChars)
             {
-                assertTrue($"0x{c:X4}", Character.IsWhiteSpace(c));
+                if (!Character.IsWhiteSpace(c))
+                    fail($"0x{c:X4}");
             }
 
-            foreach (int c in javaBadWhiteSpaceChars)
+            foreach (char c in javaBadWhiteSpaceChars)
             {
-                assertFalse($"0x{c:X4}", Character.IsWhiteSpace(c));
+                if (Character.IsWhiteSpace(c))
+                    fail($"0x{c:X4}");
             }
 
             for (int c = Character.MinCodePoint; c <= Character.MaxCodePoint; c++)
             {
-                assertEquals($"0x{c:X4}", UnicodeCharacterData.IsWhiteSpace(c), Character.IsWhiteSpace(c));
+                bool expected = UnicodeCharacterData.IsWhiteSpace((char)c);
+                bool actual = Character.IsWhiteSpace((char)c);
+
+                if (expected != actual)
+                    fail($"0x{c:X4}\n\nExpected: {expected}\nActual: {actual}");
             }
 
             //assertTrue(Character.IsWhiteSpace((int)'\n'));
