@@ -49,7 +49,11 @@ Both files are downloaded from `https://www.unicode.org/Public/<version>/ucd`:
 
 ## Output format
 
-A run-length encoded, `;`-delimited text file whose rows tile `U+0000..U+10FFFF` with no gaps:
+A run-length encoded, ;-delimited UTF-8 text file with a BOM. The BOM is intentional: the generated
+file contains only ASCII characters, so without a BOM some tools may incorrectly identify the file
+as a legacy encoding such as Windows-1252.
+
+The rows tile U+0000..U+10FFFF with no gaps:
 
 ```
 startCodePoint;endCodePoint;digitValue;numericValue;isWhiteSpace
