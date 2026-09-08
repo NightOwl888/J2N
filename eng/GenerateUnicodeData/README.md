@@ -22,13 +22,13 @@ moving to a newer Unicode version is a matter of re-running the tool with a new 
 ## Usage
 
 ```sh
-dotnet run --project tools/GenerateUnicodeData -- <unicodeVersion> [outputFile]
+dotnet run --project eng/GenerateUnicodeData -- <unicodeVersion> [outputFile]
 ```
 
 For example, to regenerate the current data file:
 
 ```sh
-dotnet run --project tools/GenerateUnicodeData -- 10.0.0
+dotnet run --project eng/GenerateUnicodeData -- 10.0.0
 ```
 
 The version defaults to `10.0.0` (matching the Unicode version implemented by

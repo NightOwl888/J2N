@@ -18,6 +18,7 @@
 
 using System.Globalization;
 using System.IO.Compression;
+using System.Text;
 
 // Generates the compact Unicode character data file that J2N.Tests uses as the
 // expected-value oracle for Character.Digit(), Character.GetNumericValue() and
@@ -29,10 +30,10 @@ using System.IO.Compression;
 // Unicode version a given ICU4N release happens to ship.
 //
 // Usage:
-//     dotnet run --project tools/GenerateUnicodeData -- <unicodeVersion> [outputFile]
+//     dotnet run --project eng/GenerateUnicodeData -- <unicodeVersion> [outputFile]
 //
 // Example:
-//     dotnet run --project tools/GenerateUnicodeData -- 10.0.0
+//     dotnet run --project eng/GenerateUnicodeData -- 10.0.0
 
 string unicodeVersion = args.Length > 0 ? args[0] : "10.0.0";
 string outputFile = args.Length > 1

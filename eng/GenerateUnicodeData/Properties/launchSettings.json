@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "GenerateUnicodeData": {
+      "commandName": "Project",
+      "commandLineArgs": "10.0.0"
+    }
+  }
+}
