@@ -171,7 +171,10 @@ static void WriteRunLengthEncodedData(string outputFile, string unicodeVersion, 
         Directory.CreateDirectory(directory);
     }
 
-    using var writer = new StreamWriter(Path.GetFullPath(outputFile)) { NewLine = "\n" };
+    // NOTE: To be stable xplat, we are hard-wiring the newline to "\n" here and also
+    // specifying UTF-8 encoding with a BOM. This is because the file contains nothing but ASCII text,
+    // so the BOM is not needed for encoding detection to prevent it from reading different on different OSes.
+    using var writer = new StreamWriter(Path.GetFullPath(outputFile), append: false, encoding: Encoding.UTF8) { NewLine = "\n" };
     writer.WriteLine("# Expected Character.Digit(), Character.GetNumericValue() and Character.IsWhiteSpace()");
     writer.WriteLine("# values, derived from the Unicode Character Database (https://www.unicode.org/Public/).");
     writer.WriteLine("#");
