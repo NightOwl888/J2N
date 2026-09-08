@@ -9,7 +9,6 @@
   </PropertyGroup>
   
   <ItemGroup>
-    <PackageReference Include="ICU4N" Version="$(ICU4NPackageReferenceVersion)" />
     <PackageReference Include="RandomizedTesting.Generators" Version="$(RandomizedTestingGeneratorsPackageReferenceVersion)" />
   </ItemGroup>
 
@@ -33,6 +32,7 @@
     <EmbeddedResource Include="hyts_PropertiesTest.properties" />
     <EmbeddedResource Include="IO\ReadFully.txt" />
     <EmbeddedResource Include="test_resource.txt" />
+    <EmbeddedResource Include="Unicode\UnicodeCharacterData.txt" />
   </ItemGroup>
 
   <ItemGroup>
