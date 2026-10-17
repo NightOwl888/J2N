@@ -3605,7 +3605,8 @@ namespace J2N.Numerics
         /// <inheritdoc/>
         public override byte ToByte()
         {
-            return (byte)value;
+            // J2N: Narrow to int first to match Java. Casting directly to a narrow integer type saturates in .NET 11+ (see #197).
+            return (byte)(int)value;
         }
 
         /// <inheritdoc/>
@@ -3617,7 +3618,8 @@ namespace J2N.Numerics
         /// <inheritdoc/>
         public override short ToInt16()
         {
-            return (short)value;
+            // J2N: Narrow to int first to match Java. Casting directly to a narrow integer type saturates in .NET 11+ (see #197).
+            return (short)(int)value;
         }
 
         /// <inheritdoc/>
@@ -3636,7 +3638,8 @@ namespace J2N.Numerics
         [CLSCompliant(false)]
         public override sbyte ToSByte()
         {
-            return (sbyte)value;
+            // J2N: Narrow to int first to match Java. Casting directly to a narrow integer type saturates in .NET 11+ (see #197).
+            return (sbyte)(int)value;
         }
 
         /// <inheritdoc/>

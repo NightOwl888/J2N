@@ -257,6 +257,63 @@ namespace J2N.Numerics
             assertEquals("Returned incorrect byte value", (sbyte)-17, (sbyte)d.ToByte());
         }
 
+        // J2N: Out of range values must be narrowed by first converting to int (truncating toward zero),
+        // then discarding the high-order bits, as Java does. Casting directly to a narrow integer type
+        // saturates in .NET 11+. See: https://github.com/NightOwl888/J2N/issues/197
+        [TestCase(135d, (sbyte)-121)]
+        [TestCase(-135d, (sbyte)121)]
+        [TestCase(255.9d, (sbyte)-1)]
+        [TestCase(-129.5d, (sbyte)127)]
+        [TestCase(32768d, (sbyte)0)]
+        [TestCase(70000d, (sbyte)112)]
+        [TestCase(-70000d, (sbyte)-112)]
+        [TestCase(1923311.47712d, (sbyte)-17)]
+        [TestCase(double.NaN, (sbyte)0)]
+        [TestCase(double.NegativeInfinity, (sbyte)0)]
+        [TestCase(-1e10d, (sbyte)0)]
+        public void Test_ToSByte_OutOfRange(double value, sbyte expected)
+        {
+            assertEquals(expected, Double.GetInstance(value).ToSByte());
+        }
+
+        // J2N: Out of range values must be narrowed by first converting to int (truncating toward zero),
+        // then discarding the high-order bits, as Java does. Casting directly to a narrow integer type
+        // saturates in .NET 11+. See: https://github.com/NightOwl888/J2N/issues/197
+        [TestCase(135d, (byte)135)]
+        [TestCase(-135d, (byte)121)]
+        [TestCase(255.9d, (byte)255)]
+        [TestCase(-129.5d, (byte)127)]
+        [TestCase(32768d, (byte)0)]
+        [TestCase(70000d, (byte)112)]
+        [TestCase(-70000d, (byte)144)]
+        [TestCase(1923311.47712d, (byte)239)]
+        [TestCase(double.NaN, (byte)0)]
+        [TestCase(double.NegativeInfinity, (byte)0)]
+        [TestCase(-1e10d, (byte)0)]
+        public void Test_ToByte_OutOfRange(double value, byte expected)
+        {
+            assertEquals(expected, Double.GetInstance(value).ToByte());
+        }
+
+        // J2N: Out of range values must be narrowed by first converting to int (truncating toward zero),
+        // then discarding the high-order bits, as Java does. Casting directly to a narrow integer type
+        // saturates in .NET 11+. See: https://github.com/NightOwl888/J2N/issues/197
+        [TestCase(135d, (short)135)]
+        [TestCase(-135d, (short)-135)]
+        [TestCase(255.9d, (short)255)]
+        [TestCase(-129.5d, (short)-129)]
+        [TestCase(32768d, (short)-32768)]
+        [TestCase(70000d, (short)4464)]
+        [TestCase(-70000d, (short)-4464)]
+        [TestCase(1923311.47712d, (short)22767)]
+        [TestCase(double.NaN, (short)0)]
+        [TestCase(double.NegativeInfinity, (short)0)]
+        [TestCase(-1e10d, (short)0)]
+        public void Test_ToInt16_OutOfRange(double value, short expected)
+        {
+            assertEquals(expected, Double.GetInstance(value).ToInt16());
+        }
+
         /**
          * @tests java.lang.Double#compareTo(java.lang.Double)
          * @tests java.lang.Double#compare(double, double)
